@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="type_test" targetNamespace="http://www.iona.com/demos/type_test" xmlns:tns="http://www.iona.com/demos/type_test" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:s="http://www.iona.com/demos/type_test/types" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.iona.com/demos/type_test/corba/typemap/">
+    <corba:union xmlns="" xmlns:ns4="http://schemas.xmlsoap.org/wsdl/" discriminator="corba:boolean" repositoryID="IDL:string_nil:1.0" type="varAttrString" name="string_nil">
+      <corba:unionbranch name="value" idltype="corba:string" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:union xmlns="" xmlns:ns4="http://schemas.xmlsoap.org/wsdl/" discriminator="corba:boolean" repositoryID="IDL:long_nil:1.0" type="varAttrIntOptional" name="long_nil">
+      <corba:unionbranch name="value" idltype="corba:long" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:SimpleStruct:1.0" type="s:SimpleStruct" name="SimpleStruct">
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="varAttrString" idltype="ns1:string_nil" />
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="varAttrIntOptional" idltype="ns1:long_nil" />
+      <corba:member name="varFloat" idltype="corba:float" />
+      <corba:member name="varInt" idltype="corba:long" />
+      <corba:member name="varString" idltype="corba:string" />
+    </corba:struct>
+    <corba:array xmlns:s="http://www.iona.com/demos/type_test/types" elemtype="corba:long" bound="3" repositoryID="IDL:FixedArray:1.0" type="s:FixedArray" name="FixedArray" />
+    <corba:union xmlns="" xmlns:ns4="http://schemas.xmlsoap.org/wsdl/" discriminator="corba:boolean" repositoryID="IDL:string_nil:1.0" type="attrString" name="string_nil">
+      <corba:unionbranch name="value" idltype="corba:string" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:union xmlns:s="http://www.iona.com/demos/type_test/types" discriminator="corba:long" repositoryID="IDL:DerivedChoice_BaseStructChoiceType:1.0" type="s:DerivedChoice_BaseStruct" name="DerivedChoice_BaseStructChoiceType">
+      <corba:unionbranch name="varStringExt" idltype="corba:string" default="false">
+        <corba:case label="0" />
+      </corba:unionbranch>
+      <corba:unionbranch name="varFloatExt" idltype="corba:float" default="false">
+        <corba:case label="1" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:DerivedChoice_BaseStruct:1.0" type="s:DerivedChoice_BaseStruct" name="DerivedChoice_BaseStruct">
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="attrString" idltype="ns1:string_nil" />
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="DerivedChoice_BaseStructChoiceType_f" idltype="ns1:DerivedChoice_BaseStructChoiceType" />
+    </corba:struct>
+    <corba:fixed xmlns:xs="http://www.w3.org/2001/XMLSchema" scale="6" digits="31" repositoryID="IDL:fixed_1:1.0" type="xs:decimal" name="fixed_1" />
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:OrderNumber:1.0" type="s:OrderNumber" name="OrderNumber">
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="_simpleTypeValue" idltype="ns1:fixed_1" />
+    </corba:struct>
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:SimpleAll:1.0" type="s:SimpleAll" name="SimpleAll">
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="varAttrString" idltype="ns1:string_nil" />
+      <corba:member name="varFloat" idltype="corba:float" />
+      <corba:member name="varInt" idltype="corba:long" />
+      <corba:member name="varString" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:SimpleChoice:1.0" type="s:SimpleChoice" name="SimpleChoice">
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="varAttrString" idltype="ns1:string_nil" />
+      <corba:member name="varFloat" idltype="corba:float" />
+      <corba:member name="varInt" idltype="corba:long" />
+      <corba:member name="varString" idltype="corba:string" />
+    </corba:struct>
+    <corba:sequence xmlns:s="http://www.iona.com/demos/type_test/types" elemtype="corba:string" bound="0" repositoryID="IDL:UnboundedArray:1.0" type="s:UnboundedArray" name="UnboundedArray" />
+    <corba:sequence xmlns:s="http://www.iona.com/demos/type_test/types" elemtype="corba:float" bound="3" repositoryID="IDL:BoundedArray:1.0" type="s:BoundedArray" name="BoundedArray" />
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:NestedStruct:1.0" type="s:NestedStruct" name="NestedStruct">
+      <corba:member name="varString" idltype="corba:string" />
+      <corba:member name="varInt" idltype="corba:long" />
+      <corba:member name="varFloat" idltype="corba:float" />
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="varStruct" idltype="ns1:SimpleStruct" />
+    </corba:struct>
+    <corba:union xmlns="" xmlns:ns4="http://schemas.xmlsoap.org/wsdl/" discriminator="corba:boolean" repositoryID="IDL:string_nil:1.0" type="currency" name="string_nil">
+      <corba:unionbranch name="value" idltype="corba:string" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:struct xmlns:s="http://www.iona.com/demos/type_test/types" repositoryID="IDL:InternationalPrice:1.0" type="s:InternationalPrice" name="InternationalPrice">
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="_simpleTypeValue" idltype="ns1:fixed_1" />
+      <corba:member xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="currency" idltype="ns1:string_nil" />
+    </corba:struct>
+    <corba:sequence xmlns:s="http://www.iona.com/demos/type_test/types" xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" elemtype="ns1:UnboundedArray" bound="0" repositoryID="IDL:NestedArray:1.0" type="s:NestedArray" name="NestedArray" />
+  </corba:typeMapping>
+  <types>
+    <xsd:schema targetNamespace="http://www.iona.com/demos/type_test/types">
+			<xsd:complexType name="SimpleStruct">
+				<xsd:sequence>
+					<xsd:element name="varFloat" type="xsd:float"/>
+					<xsd:element name="varInt" type="xsd:int"/>
+					<xsd:element name="varString" type="xsd:string"/>
+				</xsd:sequence>
+				<xsd:attribute name="varAttrString" type="xsd:string"/>
+				<xsd:attribute name="varAttrIntOptional" type="xsd:int" use="optional"/>
+			</xsd:complexType>
+			<xsd:complexType name="NestedStruct">
+				<xsd:sequence>
+					<xsd:element name="varString" type="xsd:string"/>
+					<xsd:element name="varInt" type="xsd:int"/>
+					<xsd:element name="varFloat" type="xsd:float"/>
+					<xsd:element name="varStruct" type="s:SimpleStruct"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="FixedArray">
+				<xsd:sequence>
+					<xsd:element maxOccurs="3" minOccurs="3" name="item" type="xsd:int"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="UnboundedArray">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="BoundedArray">
+				<xsd:sequence>
+					<xsd:element maxOccurs="3" minOccurs="1" name="item" type="xsd:float"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="NestedArray">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="subarray" type="s:UnboundedArray"/>
+				</xsd:sequence>
+			</xsd:complexType> 
+                        <xsd:complexType name="OrderNumber">
+                            <xsd:simpleContent>
+                                <xsd:restriction base="xsd:decimal">
+                                    <xsd:maxExclusive value="1000000"/>
+                                </xsd:restriction>
+                            </xsd:simpleContent>
+                        </xsd:complexType>
+                        <xsd:complexType name="InternationalPrice">
+                            <xsd:simpleContent>
+                                <xsd:extension base="xsd:decimal">
+                                    <xsd:attribute name="currency" type="xsd:string"/>
+                                </xsd:extension>
+                            </xsd:simpleContent>
+                        </xsd:complexType>
+			<xsd:complexType name="SimpleChoice">
+				<xsd:choice>
+					<xsd:element name="varFloat" type="xsd:float"/>
+					<xsd:element name="varInt" type="xsd:int"/>
+					<xsd:element name="varString" type="xsd:string"/>
+				</xsd:choice>
+				<xsd:attribute name="varAttrString" type="xsd:string"/>
+			</xsd:complexType>
+			<xsd:complexType name="SimpleAll">
+				<xsd:all>
+					<xsd:element name="varFloat" type="xsd:float"/>
+					<xsd:element name="varInt" type="xsd:int"/>
+					<xsd:element name="varString" type="xsd:string"/>
+				</xsd:all>
+				<xsd:attribute name="varAttrString" type="xsd:string"/>
+			</xsd:complexType>
+			<xsd:complexType name="DerivedChoice_BaseStruct">
+				<xsd:complexContent mixed="false">
+					<xsd:extension base="s:SimpleStruct">
+						<xsd:choice>
+							<xsd:element name="varStringExt" type="xsd:string"/>
+							<xsd:element name="varFloatExt" type="xsd:float"/>
+						</xsd:choice>
+						<xsd:attribute name="attrString" type="xsd:string"/>
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+			<xsd:element name="SimpleStruct_x" type="s:SimpleStruct"/>
+			<xsd:element name="SimpleStruct_y" type="s:SimpleStruct"/>
+			<xsd:element name="SimpleStruct_z" type="s:SimpleStruct"/>
+			<xsd:element name="SimpleStruct_return" type="s:SimpleStruct"/>
+			<xsd:element name="NestedStruct_x" type="s:NestedStruct"/>
+			<xsd:element name="NestedStruct_y" type="s:NestedStruct"/>
+			<xsd:element name="NestedStruct_z" type="s:NestedStruct"/>
+			<xsd:element name="NestedStruct_return" type="s:NestedStruct"/>
+			<xsd:element name="FixedArray_x" type="s:FixedArray"/>
+			<xsd:element name="FixedArray_y" type="s:FixedArray"/>
+			<xsd:element name="FixedArray_z" type="s:FixedArray"/>
+			<xsd:element name="FixedArray_return" type="s:FixedArray"/>
+			<xsd:element name="UnboundedArray_x" type="s:UnboundedArray"/>
+			<xsd:element name="UnboundedArray_y" type="s:UnboundedArray"/>
+			<xsd:element name="UnboundedArray_z" type="s:UnboundedArray"/>
+			<xsd:element name="UnboundedArray_return" type="s:UnboundedArray"/>
+			<xsd:element name="BoundedArray_x" type="s:BoundedArray"/>
+			<xsd:element name="BoundedArray_y" type="s:BoundedArray"/>
+			<xsd:element name="BoundedArray_z" type="s:BoundedArray"/>
+			<xsd:element name="BoundedArray_return" type="s:BoundedArray"/>
+			<xsd:element name="NestedArray_x" type="s:NestedArray"/>
+			<xsd:element name="NestedArray_y" type="s:NestedArray"/>
+			<xsd:element name="NestedArray_z" type="s:NestedArray"/>
+			<xsd:element name="NestedArray_return" type="s:NestedArray"/>
+			<xsd:element name="OrderNumber_x" type="s:OrderNumber"/>
+			<xsd:element name="OrderNumber_y" type="s:OrderNumber"/>
+			<xsd:element name="OrderNumber_z" type="s:OrderNumber"/>
+			<xsd:element name="OrderNumber_return" type="s:OrderNumber"/>
+			<xsd:element name="InternationalPrice_x" type="s:InternationalPrice"/>
+			<xsd:element name="InternationalPrice_y" type="s:InternationalPrice"/>
+			<xsd:element name="InternationalPrice_z" type="s:InternationalPrice"/>
+			<xsd:element name="InternationalPrice_return" type="s:InternationalPrice"/>
+			<xsd:element name="SimpleChoice_x" type="s:SimpleChoice"/>
+			<xsd:element name="SimpleChoice_y" type="s:SimpleChoice"/>
+			<xsd:element name="SimpleChoice_z" type="s:SimpleChoice"/>
+			<xsd:element name="SimpleChoice_return" type="s:SimpleChoice"/>
+			<xsd:element name="SimpleAll_x" type="s:SimpleAll"/>
+			<xsd:element name="SimpleAll_y" type="s:SimpleAll"/>
+			<xsd:element name="SimpleAll_z" type="s:SimpleAll"/>
+			<xsd:element name="SimpleAll_return" type="s:SimpleAll"/>
+			<xsd:element name="DerivedChoice_BaseStruct_x" type="s:DerivedChoice_BaseStruct"/>
+			<xsd:element name="DerivedChoice_BaseStruct_y" type="s:DerivedChoice_BaseStruct"/>
+			<xsd:element name="DerivedChoice_BaseStruct_z" type="s:DerivedChoice_BaseStruct"/>
+			<xsd:element name="DerivedChoice_BaseStruct_return" type="s:DerivedChoice_BaseStruct"/>
+		</xsd:schema>
+  </types>
+  <message name="test_SimpleAll">
+    <part name="x" element="s:SimpleAll_x">
+    </part>
+    <part name="y" element="s:SimpleAll_y">
+    </part>
+  </message>
+  <message name="test_DerivedChoice_BaseStruct">
+    <part name="x" element="s:DerivedChoice_BaseStruct_x">
+    </part>
+    <part name="y" element="s:DerivedChoice_BaseStruct_y">
+    </part>
+  </message>
+  <message name="test_NestedArray_response">
+    <part name="return" element="s:NestedArray_return">
+    </part>
+    <part name="y" element="s:NestedArray_y">
+    </part>
+    <part name="z" element="s:NestedArray_z">
+    </part>
+  </message>
+  <message name="test_NestedStruct_response">
+    <part name="return" element="s:NestedStruct_return">
+    </part>
+    <part name="y" element="s:NestedStruct_y">
+    </part>
+    <part name="z" element="s:NestedStruct_z">
+    </part>
+  </message>
+  <message name="test_BoundedArray_response">
+    <part name="return" element="s:BoundedArray_return">
+    </part>
+    <part name="y" element="s:BoundedArray_y">
+    </part>
+    <part name="z" element="s:BoundedArray_z">
+    </part>
+  </message>
+  <message name="test_DerivedChoice_BaseStruct_response">
+    <part name="return" element="s:DerivedChoice_BaseStruct_return">
+    </part>
+    <part name="y" element="s:DerivedChoice_BaseStruct_y">
+    </part>
+    <part name="z" element="s:DerivedChoice_BaseStruct_z">
+    </part>
+  </message>
+  <message name="test_OrderNumber_response">
+    <part name="return" element="s:OrderNumber_return">
+    </part>
+    <part name="y" element="s:OrderNumber_y">
+    </part>
+    <part name="z" element="s:OrderNumber_z">
+    </part>
+  </message>
+  <message name="test_SimpleAll_response">
+    <part name="return" element="s:SimpleAll_return">
+    </part>
+    <part name="y" element="s:SimpleAll_y">
+    </part>
+    <part name="z" element="s:SimpleAll_z">
+    </part>
+  </message>
+  <message name="test_SimpleStruct">
+    <part name="x" element="s:SimpleStruct_x">
+    </part>
+    <part name="y" element="s:SimpleStruct_y">
+    </part>
+  </message>
+  <message name="test_SimpleChoice">
+    <part name="x" element="s:SimpleChoice_x">
+    </part>
+    <part name="y" element="s:SimpleChoice_y">
+    </part>
+  </message>
+  <message name="test_NestedStruct">
+    <part name="x" element="s:NestedStruct_x">
+    </part>
+    <part name="y" element="s:NestedStruct_y">
+    </part>
+  </message>
+  <message name="test_InternationalPrice">
+    <part name="x" element="s:InternationalPrice_x">
+    </part>
+    <part name="y" element="s:InternationalPrice_y">
+    </part>
+  </message>
+  <message name="test_BoundedArray">
+    <part name="x" element="s:BoundedArray_x">
+    </part>
+    <part name="y" element="s:BoundedArray_y">
+    </part>
+  </message>
+  <message name="test_InternationalPrice_response">
+    <part name="return" element="s:InternationalPrice_return">
+    </part>
+    <part name="y" element="s:InternationalPrice_y">
+    </part>
+    <part name="z" element="s:InternationalPrice_z">
+    </part>
+  </message>
+  <message name="test_SimpleChoice_response">
+    <part name="return" element="s:SimpleChoice_return">
+    </part>
+    <part name="y" element="s:SimpleChoice_y">
+    </part>
+    <part name="z" element="s:SimpleChoice_z">
+    </part>
+  </message>
+  <message name="test_UnboundedArray">
+    <part name="x" element="s:UnboundedArray_x">
+    </part>
+    <part name="y" element="s:UnboundedArray_y">
+    </part>
+  </message>
+  <message name="test_OrderNumber">
+    <part name="x" element="s:OrderNumber_x">
+    </part>
+    <part name="y" element="s:OrderNumber_y">
+    </part>
+  </message>
+  <message name="test_NestedArray">
+    <part name="x" element="s:NestedArray_x">
+    </part>
+    <part name="y" element="s:NestedArray_y">
+    </part>
+  </message>
+  <message name="test_FixedArray_response">
+    <part name="return" element="s:FixedArray_return">
+    </part>
+    <part name="y" element="s:FixedArray_y">
+    </part>
+    <part name="z" element="s:FixedArray_z">
+    </part>
+  </message>
+  <message name="test_SimpleStruct_response">
+    <part name="return" element="s:SimpleStruct_return">
+    </part>
+    <part name="y" element="s:SimpleStruct_y">
+    </part>
+    <part name="z" element="s:SimpleStruct_z">
+    </part>
+  </message>
+  <message name="test_FixedArray">
+    <part name="x" element="s:FixedArray_x">
+    </part>
+    <part name="y" element="s:FixedArray_y">
+    </part>
+  </message>
+  <message name="test_UnboundedArray_response">
+    <part name="return" element="s:UnboundedArray_return">
+    </part>
+    <part name="y" element="s:UnboundedArray_y">
+    </part>
+    <part name="z" element="s:UnboundedArray_z">
+    </part>
+  </message>
+  <portType name="TypeTestPortType">
+    <operation name="test_SimpleStruct">
+      <input name="test_SimpleStruct" message="tns:test_SimpleStruct">
+    </input>
+      <output name="test_SimpleStruct_response" message="tns:test_SimpleStruct_response">
+    </output>
+    </operation>
+    <operation name="test_NestedStruct">
+      <input name="test_NestedStruct" message="tns:test_NestedStruct">
+    </input>
+      <output name="test_NestedStruct_response" message="tns:test_NestedStruct_response">
+    </output>
+    </operation>
+    <operation name="test_FixedArray">
+      <input name="test_FixedArray" message="tns:test_FixedArray">
+    </input>
+      <output name="test_FixedArray_response" message="tns:test_FixedArray_response">
+    </output>
+    </operation>
+    <operation name="test_UnboundedArray">
+      <input name="test_UnboundedArray" message="tns:test_UnboundedArray">
+    </input>
+      <output name="test_UnboundedArray_response" message="tns:test_UnboundedArray_response">
+    </output>
+    </operation>
+    <operation name="test_BoundedArray">
+      <input name="test_BoundedArray" message="tns:test_BoundedArray">
+    </input>
+      <output name="test_BoundedArray_response" message="tns:test_BoundedArray_response">
+    </output>
+    </operation>
+    <operation name="test_NestedArray">
+      <input name="test_NestedArray" message="tns:test_NestedArray">
+    </input>
+      <output name="test_NestedArray_response" message="tns:test_NestedArray_response">
+    </output>
+    </operation>
+    <operation name="test_OrderNumber">
+      <input name="test_OrderNumber" message="tns:test_OrderNumber">
+    </input>
+      <output name="test_OrderNumber_response" message="tns:test_OrderNumber_response">
+    </output>
+    </operation>
+    <operation name="test_InternationalPrice">
+      <input name="test_InternationalPrice" message="tns:test_InternationalPrice">
+    </input>
+      <output name="test_InternationalPrice_response" message="tns:test_InternationalPrice_response">
+    </output>
+    </operation>
+    <operation name="test_SimpleChoice">
+      <input name="test_SimpleChoice" message="tns:test_SimpleChoice">
+    </input>
+      <output name="test_SimpleChoice_response" message="tns:test_SimpleChoice_response">
+    </output>
+    </operation>
+    <operation name="test_SimpleAll">
+      <input name="test_SimpleAll" message="tns:test_SimpleAll">
+    </input>
+      <output name="test_SimpleAll_response" message="tns:test_SimpleAll_response">
+    </output>
+    </operation>
+    <operation name="test_DerivedChoice_BaseStruct">
+      <input name="test_DerivedChoice_BaseStruct" message="tns:test_DerivedChoice_BaseStruct">
+    </input>
+      <output name="test_DerivedChoice_BaseStruct_response" message="tns:test_DerivedChoice_BaseStruct_response">
+    </output>
+    </operation>
+  </portType>
+  <binding name="TypeTestCORBABinding" type="tns:TypeTestPortType">
+    <corba:binding xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" repositoryID="IDL:TypeTestPortType:1.0" />
+    <operation name="test_SimpleStruct">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_SimpleStruct">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:SimpleStruct" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:SimpleStruct" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:SimpleStruct" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:SimpleStruct" />
+      </corba:operation>
+      <input name="test_SimpleStruct">
+      </input>
+      <output name="test_SimpleStruct_response">
+      </output>
+    </operation>
+    <operation name="test_NestedStruct">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_NestedStruct">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:NestedStruct" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:NestedStruct" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:NestedStruct" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:NestedStruct" />
+      </corba:operation>
+      <input name="test_NestedStruct">
+      </input>
+      <output name="test_NestedStruct_response">
+      </output>
+    </operation>
+    <operation name="test_FixedArray">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_FixedArray">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:FixedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:FixedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:FixedArray" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:FixedArray" />
+      </corba:operation>
+      <input name="test_FixedArray">
+      </input>
+      <output name="test_FixedArray_response">
+      </output>
+    </operation>
+    <operation name="test_UnboundedArray">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_UnboundedArray">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:UnboundedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:UnboundedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:UnboundedArray" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:UnboundedArray" />
+      </corba:operation>
+      <input name="test_UnboundedArray">
+      </input>
+      <output name="test_UnboundedArray_response">
+      </output>
+    </operation>
+    <operation name="test_BoundedArray">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_BoundedArray">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:BoundedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:BoundedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:BoundedArray" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:BoundedArray" />
+      </corba:operation>
+      <input name="test_BoundedArray">
+      </input>
+      <output name="test_BoundedArray_response">
+      </output>
+    </operation>
+    <operation name="test_NestedArray">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_NestedArray">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:NestedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:NestedArray" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:NestedArray" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:NestedArray" />
+      </corba:operation>
+      <input name="test_NestedArray">
+      </input>
+      <output name="test_NestedArray_response">
+      </output>
+    </operation>
+    <operation name="test_OrderNumber">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_OrderNumber">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:OrderNumber" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:OrderNumber" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:OrderNumber" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:OrderNumber" />
+      </corba:operation>
+      <input name="test_OrderNumber">
+      </input>
+      <output name="test_OrderNumber_response">
+      </output>
+    </operation>
+    <operation name="test_InternationalPrice">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_InternationalPrice">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:InternationalPrice" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:InternationalPrice" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:InternationalPrice" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:InternationalPrice" />
+      </corba:operation>
+      <input name="test_InternationalPrice">
+      </input>
+      <output name="test_InternationalPrice_response">
+      </output>
+    </operation>
+    <operation name="test_SimpleChoice">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_SimpleChoice">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:SimpleChoice" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:SimpleChoice" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:SimpleChoice" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:SimpleChoice" />
+      </corba:operation>
+      <input name="test_SimpleChoice">
+      </input>
+      <output name="test_SimpleChoice_response">
+      </output>
+    </operation>
+    <operation name="test_SimpleAll">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_SimpleAll">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:SimpleAll" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:SimpleAll" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:SimpleAll" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:SimpleAll" />
+      </corba:operation>
+      <input name="test_SimpleAll">
+      </input>
+      <output name="test_SimpleAll_response">
+      </output>
+    </operation>
+    <operation name="test_DerivedChoice_BaseStruct">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="test_DerivedChoice_BaseStruct">
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="in" name="x" idltype="ns1:DerivedChoice_BaseStruct" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="inout" name="y" idltype="ns1:DerivedChoice_BaseStruct" />
+        <corba:param xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" mode="out" name="z" idltype="ns1:DerivedChoice_BaseStruct" />
+        <corba:return xmlns:ns1="http://www.iona.com/demos/type_test/corba/typemap/" name="return" idltype="ns1:DerivedChoice_BaseStruct" />
+      </corba:operation>
+      <input name="test_DerivedChoice_BaseStruct">
+      </input>
+      <output name="test_DerivedChoice_BaseStruct_response">
+      </output>
+    </operation>
+  </binding>
+  <service name="TypeTestCORBAService">
+    <port name="TypeTestCORBAPort" binding="tns:TypeTestCORBABinding">
+      <corba:address xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" location="file:./TypeTest.ref" />
+    </port>
+  </service>
+</definitions>

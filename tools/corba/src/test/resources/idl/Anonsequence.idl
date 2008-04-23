@@ -1,0 +1,87 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+
+
+typedef sequence<long> SeqLong;
+typedef sequence< sequence<long> > SeqSeqLong;
+typedef sequence< sequence< sequence<long> > > SeqSeqSeqLong;
+
+
+struct anonStruct {
+
+    sequence<long> structSeqLong;
+    sequence< sequence< long > > structSeqSeqLong;
+    sequence< sequence< sequence<long> > > structSeqSeqSeqLong;
+
+};
+
+typedef struct anonTypedefStruct {
+
+    sequence< short > typedefStructSeqShort;
+    sequence< sequence< short > > typedefStructSeqSeqShort;
+    sequence< sequence< sequence< short > > > typedefStructSeqSeqSeqShort;
+
+} myAnonTypedefStruct;
+
+
+
+union anonUnion switch(long) {
+    case 1:
+        sequence< long > unionSeqLong;
+    case 2:
+        sequence< sequence< long > > unionSeqSeqLong;
+    default:
+        sequence< sequence< sequence< long > > > unionSeqSeqSeqLong;
+};
+
+typedef union anonTypedefUnion switch(long) {
+    case 1:
+        sequence< long > typedefUnionSeqLong;
+    case 2:
+        sequence< sequence< long > > typedefUnionSeqSeqLong;
+    default:
+        sequence< sequence< sequence< long > > > typedefUnionSeqSeqSeqLong;
+} myAnonUnion;
+
+
+
+exception anonException {
+    sequence< long > exceptionSeqLong;
+    sequence< sequence< long > > exceptionSeqSeqLong;
+    sequence< sequence< sequence< long > > > exceptionSeqSeqSeqLong;
+};
+
+
+module anonSequences {
+    typedef sequence< sequence< float > > myFloatSeqSeq;
+    typedef sequence< sequence< double > > myDoubleSeqSeq;
+    typedef sequence< sequence< long double > > myLongDoubleSeqSeq;
+    typedef sequence< sequence< short > > myShortSeqSeq;
+    typedef sequence< sequence< long > > myLongSeqSeq;
+    typedef sequence< sequence< long long > > myLonglongSeqSeq;
+    typedef sequence< sequence< unsigned short > > myUnsignedShortSeqSeq;
+    typedef sequence< sequence< unsigned long > > myUnsignedLongSeqSeq;
+    typedef sequence< sequence< unsigned long long > > myUnsignedLongLongSeqSeq;
+    typedef sequence< sequence< char > > myCharSeqSeq;
+    typedef sequence< sequence< wchar > > myWcharSeqSeq;
+    typedef sequence< sequence< boolean > > myBooleanSeqSeq;
+    typedef sequence< sequence< octet > > myOctetSeqSeq;
+    //typedef sequence< sequence< any > > myAnySeqSeq;
+};
+

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap">
+    <corba:alias xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" basetype="TypedefIf.IpCall" repositoryID="IDL:TypedefIf/typedefCall/myIpCall:1.0" type="ns4:EndpointReferenceType" name="TypedefIf.typedefCall.myIpCall" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" xmlns="" elemtype="ns4:TypedefIf.IpCall" elemname="item" bound="2" repositoryID="IDL:TypedefIf/typedefCall/myIpCallArray:1.0" type="ns5:TypedefIf.typedefCall.myIpCallArray" name="TypedefIf.typedefCall.myIpCallArray" />
+    <corba:sequence xmlns:ns5="http://www.w3.org/2005/08/addressing" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" xmlns="" elemtype="ns4:TypedefIf.IpCall" elemname="item" bound="0" repositoryID="IDL:TypedefIf/typedefCall/mySeqIpCall:1.0" type="ns5:EndpointReferenceType" name="TypedefIf.typedefCall.mySeqIpCall" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" repositoryID="IDL:TypedefIf/typedefCall/aStruct:1.0" type="TypedefIf.typedefCall.aStruct" name="TypedefIf.typedefCall.aStruct">
+      <corba:member name="aStructMyLong" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" basetype="TypedefIf.typedefCall.aStruct" repositoryID="IDL:TypedefIf/typedefCall/myStruct:1.0" name="TypedefIf.typedefCall.myStruct" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" discriminator="corba:long" repositoryID="IDL:TypedefIf/typedefCall/aUnion:1.0" type="TypedefIf.typedefCall.aUnion" name="TypedefIf.typedefCall.aUnion">
+      <corba:unionbranch name="aUnionMyLong">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="aUnionMyBoolean" idltype="corba:boolean" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" basetype="TypedefIf.typedefCall.aUnion" repositoryID="IDL:TypedefIf/typedefCall/myUnion:1.0" name="TypedefIf.typedefCall.myUnion" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" repositoryID="IDL:TypedefIf/typedefCall/anotherStruct:1.0" type="TypedefIf.typedefCall.anotherStruct" name="TypedefIf.typedefCall.anotherStruct">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" name="myOtherLong" idltype="ns4:TypedefIf.IpCall" />
+      <corba:member name="anotherLong" idltype="corba:long" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" basetype="TypedefIf.typedefCall.anotherStruct" repositoryID="IDL:TypedefIf/typedefCall/myOtherStruct:1.0" name="TypedefIf.typedefCall.myOtherStruct" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" binding="TypedefIf.IpCallCORBABinding" repositoryID="IDL:TypedefIf/IpCall:1.0" type="ns4:EndpointReferenceType" name="TypedefIf.IpCall" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:complexType name="TypedefIf.typedefCall.myIpCallArray">
+        <xs:sequence>
+          <xs:element maxOccurs="2" minOccurs="2" name="item" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="TypedefIf.typedefCall.mySeqIpCall">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="TypedefIf.typedefCall.aStruct">
+        <xs:sequence>
+          <xs:element name="aStructMyLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="TypedefIf.typedefCall.aUnion">
+        <xs:choice>
+          <xs:element name="aUnionMyLong">
+          </xs:element>
+          <xs:element name="aUnionMyBoolean" type="xs:boolean">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="TypedefIf.typedefCall.anotherStruct">
+        <xs:sequence>
+          <xs:element name="myOtherLong" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+          <xs:element name="anotherLong" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="opIn">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inMyIpCall">
+            </xs:element>
+            <xs:element name="inMySeqIpCall" type="TypedefIf.typedefCall.mySeqIpCall">
+            </xs:element>
+            <xs:element name="inMyStruct" type="TypedefIf.typedefCall.aStruct">
+            </xs:element>
+            <xs:element name="inMyUnion" type="TypedefIf.typedefCall.aUnion">
+            </xs:element>
+            <xs:element name="inMyOtherStruct" type="TypedefIf.typedefCall.anotherStruct">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opInResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opOut">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opOutResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outMyIpCall">
+            </xs:element>
+            <xs:element name="outMySeqIpCall" type="TypedefIf.typedefCall.mySeqIpCall">
+            </xs:element>
+            <xs:element name="outMyStruct" type="TypedefIf.typedefCall.aStruct">
+            </xs:element>
+            <xs:element name="outMyUnion" type="TypedefIf.typedefCall.aUnion">
+            </xs:element>
+            <xs:element name="outMyOtherStruct" type="TypedefIf.typedefCall.anotherStruct">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opInOut">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inoutMyIpCall">
+            </xs:element>
+            <xs:element name="inoutMySeqIpCall" type="TypedefIf.typedefCall.mySeqIpCall">
+            </xs:element>
+            <xs:element name="inoutMyStruct" type="TypedefIf.typedefCall.aStruct">
+            </xs:element>
+            <xs:element name="inoutMyUnion" type="TypedefIf.typedefCall.aUnion">
+            </xs:element>
+            <xs:element name="inoutMyOtherStruct" type="TypedefIf.typedefCall.anotherStruct">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opInOutResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inoutMyIpCall">
+            </xs:element>
+            <xs:element name="inoutMySeqIpCall" type="TypedefIf.typedefCall.mySeqIpCall">
+            </xs:element>
+            <xs:element name="inoutMyStruct" type="TypedefIf.typedefCall.aStruct">
+            </xs:element>
+            <xs:element name="inoutMyUnion" type="TypedefIf.typedefCall.aUnion">
+            </xs:element>
+            <xs:element name="inoutMyOtherStruct" type="TypedefIf.typedefCall.anotherStruct">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="method">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="methodResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TypedefIf.IpCallRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="opOutResponse">
+    <wsdl:part name="outparameter" element="tns:opOutResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opInOut">
+    <wsdl:part name="inparameter" element="tns:opInOut">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opInOutResponse">
+    <wsdl:part name="outparameter" element="tns:opInOutResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opIn">
+    <wsdl:part name="inparameter" element="tns:opIn">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opOut">
+    <wsdl:part name="inparameter" element="tns:opOut">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="method">
+    <wsdl:part name="inparameter" element="tns:method">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="methodResponse">
+    <wsdl:part name="outparameter" element="tns:methodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opInResponse">
+    <wsdl:part name="outparameter" element="tns:opInResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TypedefIf.IpCall">
+    <wsdl:operation name="method">
+      <wsdl:input name="methodRequest" message="tns:method">
+    </wsdl:input>
+      <wsdl:output name="methodResponse" message="tns:methodResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="TypedefIf.typedefCall">
+    <wsdl:operation name="opIn">
+      <wsdl:input name="opInRequest" message="tns:opIn">
+    </wsdl:input>
+      <wsdl:output name="opInResponse" message="tns:opInResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opOut">
+      <wsdl:input name="opOutRequest" message="tns:opOut">
+    </wsdl:input>
+      <wsdl:output name="opOutResponse" message="tns:opOutResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opInOut">
+      <wsdl:input name="opInOutRequest" message="tns:opInOut">
+    </wsdl:input>
+      <wsdl:output name="opInOutResponse" message="tns:opInOutResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TypedefIf.typedefCallCORBABinding" type="tns:TypedefIf.typedefCall">
+    <corba:binding repositoryID="IDL:TypedefIf/typedefCall:1.0" />
+    <wsdl:operation name="opIn">
+      <corba:operation name="opIn">
+        <corba:param mode="in" name="inMyIpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="in" name="inMySeqIpCall" idltype="TypedefIf.typedefCall.mySeqIpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="in" name="inMyStruct" idltype="TypedefIf.typedefCall.myStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="in" name="inMyUnion" idltype="TypedefIf.typedefCall.myUnion" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="in" name="inMyOtherStruct" idltype="TypedefIf.typedefCall.myOtherStruct" />
+      </corba:operation>
+      <wsdl:input name="opInRequest">
+      </wsdl:input>
+      <wsdl:output name="opInResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opOut">
+      <corba:operation name="opOut">
+        <corba:param mode="out" name="outMyIpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="out" name="outMySeqIpCall" idltype="TypedefIf.typedefCall.mySeqIpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="out" name="outMyStruct" idltype="TypedefIf.typedefCall.myStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="out" name="outMyUnion" idltype="TypedefIf.typedefCall.myUnion" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="out" name="outMyOtherStruct" idltype="TypedefIf.typedefCall.myOtherStruct" />
+      </corba:operation>
+      <wsdl:input name="opOutRequest">
+      </wsdl:input>
+      <wsdl:output name="opOutResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opInOut">
+      <corba:operation name="opInOut">
+        <corba:param mode="inout" name="inoutMyIpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="inout" name="inoutMySeqIpCall" idltype="TypedefIf.typedefCall.mySeqIpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="inout" name="inoutMyStruct" idltype="TypedefIf.typedefCall.myStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="inout" name="inoutMyUnion" idltype="TypedefIf.typedefCall.myUnion" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceTypedef/typemap" mode="inout" name="inoutMyOtherStruct" idltype="TypedefIf.typedefCall.myOtherStruct" />
+      </corba:operation>
+      <wsdl:input name="opInOutRequest">
+      </wsdl:input>
+      <wsdl:output name="opInOutResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="TypedefIf.IpCallCORBABinding" type="tns:TypedefIf.IpCall">
+    <corba:binding repositoryID="IDL:TypedefIf/IpCall:1.0" />
+    <wsdl:operation name="method">
+      <corba:operation name="method" />
+      <wsdl:input name="methodRequest">
+      </wsdl:input>
+      <wsdl:output name="methodResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TypedefIf.typedefCallCORBAService">
+    <wsdl:port name="TypedefIf.typedefCallCORBAPort" binding="tns:TypedefIf.typedefCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="TypedefIf.IpCallCORBAService">
+    <wsdl:port name="TypedefIf.IpCallCORBAPort" binding="tns:TypedefIf.IpCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

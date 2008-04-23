@@ -1,0 +1,73 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+module C {
+    interface C1 {
+        struct CC1 {
+            string<14>  aString_f;
+            ::B::B1::BB1 b_f;
+        };
+        struct op_CC1 {
+            CC1 p1;
+            ::B::B1::BB1 p2;
+        };
+        struct op_CC1Result {
+            CC1 return;
+            ::B::B1::BB1 p2;
+            ::A::A1::AA1 p3;
+        };
+        CC1
+        op_CC1(
+            in CC1 p1,
+            out ::A::A1::AA1 p3,
+            inout ::B::B1::BB1 p2
+        );
+    };
+};
+module A {
+    module A1 {
+        struct AA1 {
+            string s;
+            float f;
+        };
+        struct op_AA1 {
+            AA1 p1;
+            AA1 p2;
+        };
+        struct op_AA1Result {
+            AA1 return;
+            AA1 p2;
+            AA1 p3;
+        };
+    };
+};
+module B {
+    module B1 {
+        struct BB1 {
+            short t;
+            ::A::A1::AA1 r;
+        };
+        struct op_BB1Result {
+            BB1 return;
+            BB1 p2;
+        };
+        struct op_BB1 {
+            ::A::A1::AA1 p1;
+        };
+    };
+};

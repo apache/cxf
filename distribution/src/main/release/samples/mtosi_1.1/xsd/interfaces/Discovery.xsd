@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1" xmlns="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <!-- ============ Element Declarations ========= -->
+  <xsd:element name="getAllCapabilities" type="getAllCapabilities_T"/>
+  <xsd:element name="getAllCapabilitiesResponse" type="getAllCapabilitiesResponse_T"/>
+  <!-- ============ getAllCapabilities Request/Response Messages ========= -->
+  <xsd:complexType name="getAllCapabilities_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation returns the operations list per each service/interface and notifications supported by an OS and their version number.
+        
+        Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllCapabilitiesResponse_T">
+    <xsd:sequence>
+      <xsd:element name="capabilities" type="CapabilitiesList_T">
+        <xsd:annotation>
+          <xsd:documentation>The OS capabilities</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ========== Global Type Declarations =========== -->
+  <xsd:complexType name="BaseDiscoveredCapability_T">
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="CapabilitiesList_T">
+    <xsd:annotation>
+      <xsd:documentation>The element designates the capabilities of the specific MTOSI implementation.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <!-- Describe the MTOSI Configuration Service capabilities -->
+      <xsd:element name="ConfigurationService" minOccurs="0">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="EquipmentInventoryMgr" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getAllEquipment" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllEquipmentNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSupportedPTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSupportedPTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSupportingEquipmentNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSupportingEquipment" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedEquipment" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getEquipment" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSupportedEquipment" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSupportedEquipmentNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSupportingEquipment" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSupportingEquipmentNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="InventoryRetrieval" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getInventory" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ManagedElementMgr" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getAllActiveAlarms" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllCrossConnections" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllFixedCrossConnections" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllFTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllFTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllManagedElementNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllManagedElements" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllPTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllPTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllPTPNamesWithoutFTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllPTPsWithoutFTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllUnacknowledgedActiveAlarms" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedCurrentCTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedCurrentCTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedInUseCTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedInUseCTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedPotentialCTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainedPotentialCTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainingSubnetworkNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainingTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainingTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getManagedElement" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getPotentialFixedCCs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getTP" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="MultiLayerSubnetworkMgr" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getAllEdgePointNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllEdgePoints" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllFixedSubnetworkConnectionNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllFixedSubnetworkConnections" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllManagedElementNamesWrtMLSN" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllManagedElementsWrtMLSN" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSubnetworkConnectionNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSubnetworkConnectionNamesWithTP" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSubnetworkConnections" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSubnetworkConnectionsWithTP" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTopologicalLinkNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTopologicalLinks" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTPPoolNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTPPools" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAssociatedTP" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getMultiLayerSubnetwork" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getRoute" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getRouteAndTopologicalLinks" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSNC" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSNCsByUserLabel" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getTopologicalLink" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getTPGroupingRelationships" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getTPPool" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="OperationsSystemMgr" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getAllMDNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllMDs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllMENamesPassingFilter" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllMEsPassingFilter" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllMENamesWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllMEsWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllOSNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllOSs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSNNamesWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllSNsWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTLNamesBetweenMDs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTLsBetweenMDs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTLNamesWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTLsWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTMDNamesWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTMDsWrtOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTopLevelSubnetworkNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTopLevelSubnetworks" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTopLevelTopologicalLinkNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTopLevelTopologicalLinks" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getMD" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getSubordinateOS" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getTopLevelTopologicalLink" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ProtectionMgr" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getAllEProtectionGroups" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllNUTTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllPreemptibleTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllProtectedTPNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllProtectionGroups" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getContainingPGNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getEProtectionGroup" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getProtectionGroup" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="retrieveESwitchData" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="retrieveSwitchData" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="TransmissionDescriptorMgr" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getAllTransmissionDescriptorNames" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAllTransmissionDescriptors" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getAssociatedTPs" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getTransmissionDescriptor" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+          <xsd:attribute name="name" type="xsd:string" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <!-- Describe the MTOSI Fault Service capabilities -->
+      <xsd:element name="FaultService" minOccurs="0">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="AlarmRetrieval" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="getActiveAlarms"  type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="getActiveAlarmsCount"  type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+          <xsd:attribute name="name" type="xsd:string" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <!-- Describe the MTOSI Notification Service capabilities -->
+      <xsd:element name="NotificationService" minOccurs="0">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="FaultTopicEvents" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="Alarm" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="FileTransferStatus" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="Heartbeat" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossOccurred" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossCleared" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="VendorNotification" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="InventoryTopicEvents" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="ObjectCreation" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="ObjectDiscovery" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="ObjectDeletion" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="AttributeValueChange" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="StateChange" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="FileTransferStatus" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="Heartbeat" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossOccurred" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossCleared" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="VendorNotification" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ProtectionTopicEvents" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="ProtectionSwitch" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EProtectionSwitch" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="Heartbeat" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossOccurred" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossCleared" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="VendorTopicEvents" minOccurs="0">
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="VendorNotification" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="Heartbeat" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossOccurred" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                  <xsd:element name="EventLossCleared" type="BaseDiscoveredCapability_T" minOccurs="0"/>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+          <xsd:attribute name="name" type="xsd:string" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+</xsd:schema>

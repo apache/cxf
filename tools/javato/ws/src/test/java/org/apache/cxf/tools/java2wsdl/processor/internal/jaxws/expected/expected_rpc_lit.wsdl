@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="GreeterRPCLitService" targetNamespace="http://apache.org/hello_world_rpclit/javato" xmlns:tns="http://apache.org/hello_world_rpclit/javato" xmlns:ns1="http://apache.org/hello_world_rpclit/javato/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://apache.org/hello_world_rpclit/javato/types" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/hello_world_rpclit/javato/types">
+<xs:complexType name="myComplexStruct">
+<xs:sequence>
+<xs:element form="qualified" name="elem1" type="xs:string"/>
+<xs:element form="qualified" name="elem2" type="xs:string"/>
+<xs:element form="qualified" name="elem3" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sendReceiveData">
+    <wsdl:part name="in" type="ns1:myComplexStruct">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse">
+    <wsdl:part name="out" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHi">
+  </wsdl:message>
+  <wsdl:message name="greetMeResponse">
+    <wsdl:part name="out" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendReceiveDataResponse">
+    <wsdl:part name="out" type="ns1:myComplexStruct">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMe">
+    <wsdl:part name="in" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="GreeterRPCLit">
+    <wsdl:operation name="sayHi">
+      <wsdl:input name="sayHi" message="tns:sayHi">
+    </wsdl:input>
+      <wsdl:output name="sayHiResponse" message="tns:sayHiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendReceiveData">
+      <wsdl:input name="sendReceiveData" message="tns:sendReceiveData">
+    </wsdl:input>
+      <wsdl:output name="sendReceiveDataResponse" message="tns:sendReceiveDataResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <wsdl:input name="greetMe" message="tns:greetMe">
+    </wsdl:input>
+      <wsdl:output name="greetMeResponse" message="tns:greetMeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GreeterRPCLitServiceSoapBinding" type="tns:GreeterRPCLit">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHi">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="sayHi">
+        <soap:body use="literal" namespace="http://apache.org/hello_world_rpclit/javato"/>
+      </wsdl:input>
+      <wsdl:output name="sayHiResponse">
+        <soap:body use="literal" namespace="http://apache.org/hello_world_rpclit/javato"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendReceiveData">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="sendReceiveData">
+        <soap:body use="literal" namespace="http://apache.org/hello_world_rpclit/javato"/>
+      </wsdl:input>
+      <wsdl:output name="sendReceiveDataResponse">
+        <soap:body use="literal" namespace="http://apache.org/hello_world_rpclit/javato"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="greetMe">
+        <soap:body use="literal" namespace="http://apache.org/hello_world_rpclit/javato"/>
+      </wsdl:input>
+      <wsdl:output name="greetMeResponse">
+        <soap:body use="literal" namespace="http://apache.org/hello_world_rpclit/javato"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GreeterRPCLitService">
+    <wsdl:port name="GreeterRPCLitPort" binding="tns:GreeterRPCLitServiceSoapBinding">
+      <soap:address location="http://localhost"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

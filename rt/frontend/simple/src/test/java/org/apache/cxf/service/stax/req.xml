@@ -1,0 +1,10 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <invokeWithCallback
+      xmlns="http://stax.service.cxf.apache.org/">
+      <reader>
+        <bleh>foo</bleh>
+      </reader>
+    </invokeWithCallback>
+  </soap:Body>
+</soap:Envelope>

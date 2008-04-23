@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateOpNames" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/duplicateOpNames" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateOpNames/typemap" />
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateOpNames" xmlns="http://cxf.apache.org/bindings/corba/idl/duplicateOpNames" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="testOperation">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testOperationResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ModuleB_InterfaceB_testOperation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="param" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ModuleB_InterfaceB_testOperationResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="testOperationResponse">
+    <wsdl:part name="outparameter" element="tns:testOperationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ModuleB_InterfaceB_testOperationResponse">
+    <wsdl:part name="outparameter" element="tns:ModuleB_InterfaceB_testOperationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ModuleB_InterfaceB_testOperation">
+    <wsdl:part name="inparameter" element="tns:ModuleB_InterfaceB_testOperation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOperation">
+    <wsdl:part name="inparameter" element="tns:testOperation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ModuleA.InterfaceA">
+    <wsdl:operation name="testOperation">
+      <wsdl:input name="testOperationRequest" message="tns:testOperation">
+    </wsdl:input>
+      <wsdl:output name="testOperationResponse" message="tns:testOperationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ModuleB.InterfaceB">
+    <wsdl:operation name="ModuleB_InterfaceB_testOperation">
+      <wsdl:input name="ModuleB_InterfaceB_testOperationRequest" message="tns:ModuleB_InterfaceB_testOperation">
+    </wsdl:input>
+      <wsdl:output name="ModuleB_InterfaceB_testOperationResponse" message="tns:ModuleB_InterfaceB_testOperationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ModuleA.InterfaceACORBABinding" type="tns:ModuleA.InterfaceA">
+    <corba:binding repositoryID="IDL:ModuleA/InterfaceA:1.0" />
+    <wsdl:operation name="testOperation">
+      <corba:operation name="testOperation" />
+      <wsdl:input name="testOperationRequest">
+      </wsdl:input>
+      <wsdl:output name="testOperationResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ModuleB.InterfaceBCORBABinding" type="tns:ModuleB.InterfaceB">
+    <corba:binding repositoryID="IDL:ModuleB/InterfaceB:1.0" />
+    <wsdl:operation name="ModuleB_InterfaceB_testOperation">
+      <corba:operation name="testOperation">
+        <corba:param mode="in" name="param" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="ModuleB_InterfaceB_testOperationRequest">
+      </wsdl:input>
+      <wsdl:output name="ModuleB_InterfaceB_testOperationResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ModuleB.InterfaceBCORBAService">
+    <wsdl:port name="ModuleB.InterfaceBCORBAPort" binding="tns:ModuleB.InterfaceBCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="ModuleA.InterfaceACORBAService">
+    <wsdl:port name="ModuleA.InterfaceACORBAPort" binding="tns:ModuleA.InterfaceACORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

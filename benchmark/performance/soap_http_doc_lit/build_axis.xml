@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project name="test.complex_type" default="build" basedir=".">
+    <property name="thirdparty.classpath" location ="${basedir}/../base/build/classes"/>
+
+  <property environment="env"/>
+
+  <property name="wsdl.location" location="${basedir}/wsdl/perf.wsdl"/>
+
+
+  <path id="jaxws.classpath">
+    <fileset dir="${env.AXIS2_HOME}/lib" includes="*.jar"/>
+  </path>
+
+    <macrodef name="cxf.run">
+        <attribute name="logging-properties-file" default="${cxf.etc.dir}/logging.properties"/>
+        <attribute name="classname"/>
+        <attribute name="params" default=""/>
+        <attribute name="jvmargs" default="-D' '"/>
+        <sequential>
+            <java classname="@{classname}" fork="yes">
+                <classpath>
+                    <path refid="jaxws.classpath"/>
+                    <pathelement path="build/classes"/>
+                    <pathelement path="${thirdparty.classpath}"/>
+                </classpath>
+                <arg line="@{params}"/>
+                <jvmarg line="@{jvmargs}"/>
+                <!--assertions>
+                    <enable package="org.apache.cxf"/>
+                </assertions-->
+                <sysproperty key="java.util.logging.config.file" value="@{logging-properties-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+
+  <target name="client" description="run complex_type client">
+    <property name="param" value=""/>
+    <property name="pipe" value=""/>
+
+
+    <!-- for sun labs -->
+    <!--
+    <cxf.run classname="org.apache.cxf.performance.complex_type.client.Client" 
+        params="-WSDL ${wsdl.location} -Amount ${cxf.running.time} -BasedOn ${cxf.basedon} -Operation ${cxf.operation} -PacketSize ${cxf.packet.size} -Threads ${cxf.threads}"
+        jvmargs="-server -Xmx2500M -Xms2500M -Xmn1800M -XX:+AggressiveOpts -XX:+UseBiasedLocking -XX:+UseParallelGC -XX:+UseParallelOldGC -XX:CompileThreshold=1000 "
+        />
+      -->
+
+
+    <!-- for my linux boxes -->
+    <cxf.run classname="org.apache.cxf.performance.complex_type.client.Client" 
+        params="-WSDL ${wsdl.location} -Amount ${cxf.running.time} -BasedOn ${cxf.basedon} -Operation ${cxf.operation} -PacketSize ${cxf.packet.size} -Threads ${cxf.threads}" 
+        jvmargs="-server -Xmx1500M -Xms1500M  -XX:+UseParallelGC -XX:+UseParallelOldGC -XX:CompileThreshold=200 -Xss128K"/>
+  </target>
+
+  <target name="server" description="run complex_type server">
+    <cxf.run classname="org.apache.cxf.performance.complex_type.server.Server" 
+        params="-WSDL ${wsdl.location}"
+        jvmargs="-server -XX:CompileThreshold=1000 -Xmx1500M -Xms1500M -Xmn1000M -XX:+UseParallelGC -XX:+UseParallelOldGC"/>
+  </target>
+
+
+
+</project>

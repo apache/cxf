@@ -1,0 +1,139 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+interface X {
+    typedef sequence<sequence<sequence<long> > >  A[1][2][3];
+    typedef long MyLong;
+    typedef string B[4][5][6];
+    typedef string C;
+    typedef sequence<sequence<string<20> > >  D[2];
+    typedef string<10>  String10;
+    typedef sequence<sequence<String10> > E;
+    module op_f {
+    };
+    typedef sequence<fixed<4, 2> > H;
+    struct myStruct {
+        long l;
+        short o;
+    };
+    typedef myStruct Z;
+    union myUnion switch(long) {
+        case 0:
+            long l;
+        case 1:
+            string str;
+        case 2:
+            float f;
+        default:
+            octet o;
+    };
+    typedef myUnion U;
+    const short P = 5;
+    typedef sequence<string, 5> strSeq;
+    enum myEnum {
+        myEnum_AA,
+        myEnum_BB,
+        myEnum_CC
+    };
+    typedef myEnum tEnum;
+    typedef any tAny;
+    exception eNotFound {
+        string reason;
+        string type;
+    };
+    typedef char tChar;
+    A
+    op_a(
+        in A p1,
+        inout A p2,
+        out A p3
+    );
+    B
+    op_b(
+        in B p1,
+        inout B p2,
+        out B p3
+    );
+    C
+    op_c(
+        in C p1,
+        inout C p2,
+        out C p3
+    );
+    D
+    op_d(
+        in D p1,
+        inout D p2,
+        out D p3
+    );
+    E
+    op_e(
+        in E p1,
+        inout E p2,
+        out E p3
+    );
+    string<4> 
+    op_f(
+        in string<1>  p1,
+        inout string<2>  p2,
+        out string<3>  p3
+    );
+    attribute string<20>  op_g;
+    H
+    op_h(
+        in H p1,
+        inout H p2,
+        out H p3
+    );
+    Z
+    op_z(
+        in Z p1,
+        inout Z p2,
+        out Z p3
+    );
+    U
+    op_U(
+        in U p1,
+        inout U p2,
+        out U p3
+    );
+    strSeq
+    op_p(
+        in strSeq p1,
+        inout strSeq p2,
+        out strSeq p3
+    );
+    tEnum
+    op_tEnum(
+        in tEnum p1,
+        inout tEnum p2,
+        out tEnum p3
+    );
+    tAny
+    op_tAny(
+        in tAny p1,
+        inout tAny p2,
+        out tAny p3
+    );
+    tChar
+    op_tChar(
+        in tChar p1,
+        inout tChar p2,
+        out tChar p3
+    );
+};

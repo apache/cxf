@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://cxf.apache.org/bugs/oobh" xmlns:intf="http://cxf.apache.org/bugs/oobh" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <wsdl:types>
+
+        <schema targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://www.w3.org/2001/XMLSchema">
+            <!--  type defined for soap header  -->
+            <complexType name="SessionHeader">
+                <sequence>
+                    <element name="SessionId" type="xsd:string"/>
+                </sequence>
+            </complexType>
+            <element name="SessionHeader" type="impl:SessionHeader"/>
+
+            <!--  elements for Login operation messages  -->
+            <complexType name="LoginRequest">
+                <sequence>
+                    <element name="UserName" type="xsd:string"/>
+                    <element name="Password" type="xsd:string"/>
+                </sequence>
+            </complexType>
+            <element name="Login" type="impl:LoginRequest"/>
+            <element name="LoginReturn" type="xsd:string"/>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="SessionHeader">
+        <wsdl:part name="SessionHeader" element="impl:SessionHeader"/>
+    </wsdl:message>
+    <wsdl:message name="LoginRequest">
+        <wsdl:part name="param" element="impl:Login"/>
+    </wsdl:message>
+    <wsdl:message name="LoginResponse">
+        <wsdl:part name="param" element="impl:LoginReturn"/>
+    </wsdl:message>
+
+    <wsdl:portType name="LoginInterface">
+        <wsdl:operation name="Login">
+            <wsdl:input name="LoginRequest" message="impl:LoginRequest"/>
+            <wsdl:output name="LoginResponse" message="impl:LoginResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="LoginServiceSoapBinding" type="impl:LoginInterface">
+        <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="Login">
+            <wsdlsoap:operation soapAction=""/>
+            <wsdl:input>
+                <wsdlsoap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <wsdlsoap:header message="impl:SessionHeader" part="SessionHeader" use="literal"/>
+                <wsdlsoap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="LoginService">
+        <wsdl:port name="Login" binding="impl:LoginServiceSoapBinding">
+            <wsdlsoap:address location="http://localhost:9999/Login"/>
+        </wsdl:port>
+    </wsdl:service  >
+</wsdl:definitions>
+

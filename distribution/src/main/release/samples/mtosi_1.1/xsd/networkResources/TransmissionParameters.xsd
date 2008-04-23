@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="LayerRates.xsd"/>
+  <!-- ======== Global Type Declarations ========= -->
+  <xsd:complexType name="LayeredParametersList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      LayeredParametersList_T is used in the TP definition and as a consequence is available for use in a connection specification where a TP is specified.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="layeredParameters" type="LayeredParameters_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ======= LayeredParameters_T Declaration ======= -->
+  <xsd:complexType name="LayeredParameters_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      LayeredParameters_T is a structure that includes the layer rate with the applicable list of transmissions parameters
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="layer" type="LayerRate_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          Represents the layer to which the parameters apply.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transmissionParams" type="NVSList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of transmission parameters as specified in definitionOfLayeredParameters.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="TransmissionParametersExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The specific containment for vendor extensions of the list of tranmission parameters in the LayeredParameters_T structure.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<!-- The xhtml namespace is for usage documentation -->
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
+    xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
+    xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
+    xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
+
+    <annotation> Examples :
+        idltowsdl HelloWorld.idl
+        idltowsdl -o HelloWorld HelloWorld.idl
+        idltowsdl -w http://www.mycompany.com/schemas HelloWorld.idl
+        idltowsdl -f HelloWorld.ior -interface HelloWorld HellowWorld.idl
+    </annotation>
+
+    <usage>
+
+        <optionGroup id="options">
+
+            <option id="includedir" maxOccurs="unbounded">
+                <annotation>Specify a directory to be included in the search path for the IDL preprocessor.</annotation>
+                <switch>I</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>idl-include-directory</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="outputdir" maxOccurs="1">
+                <annotation>The wsdl output directory.</annotation>
+                <switch>o</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>output-directory</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="address" maxOccurs="1">
+                <annotation>Specify the value to be used for the corba:address location attribute.</annotation>
+                <switch>a</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>corba-address</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="boundedstrings" maxOccurs="1">
+                <annotation>Treat bounded strings as unbounded.</annotation>
+                <switch>b</switch>
+            </option>
+
+            <option id="addressfile" maxOccurs="1">
+                <annotation>Use the contents of file as the value for the corba:address locationattribute.</annotation>
+                <switch>f</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>corba-address-file</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="importschema" maxOccurs="1">
+                <annotation>Do not generate schema types, but instead import them from file.</annotation>
+                <switch>n</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>schema-import-file</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="sequencetype" maxOccurs="1">
+                <annotation>Specify the XML Schema type used for the IDL sequence octet type.
+                    Valid option values for type are base64Binary and hexBinary. The default is base64Binary.</annotation>
+                <switch>s</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>idl-sequence-type</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="tns" maxOccurs="1">
+                <annotation>Specify the target namespace to use in the wsdl.</annotation>
+                <switch>w</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>target-namespace</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="schemans" maxOccurs="1">
+                <annotation>Specify the schema namespace to use in the wsdl.</annotation>
+                <switch>x</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>schema-namespace</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="corbatypemapns" maxOccurs="1">
+                <annotation>Specify the corba type map target namespace to use in the wsdl.</annotation>
+                <switch>t</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>corba-type-map target-namespace</annotation>
+                </associatedArgument>
+            </option>
+
+
+            <option id="referenceimport" maxOccurs="1">
+                <annotation>Specify the pathname of the schema file imported to define the Reference type.</annotation>
+                <switch>r</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>reference-schema-file</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="logical" maxOccurs="1">
+                <annotation>Split the generated WSDL into two files.
+                    The logical portion of the WSDL is generated into the specified file.
+                    The physical portion is generated into the default output file, unless -P is also used.</annotation>
+                <switch>L</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>logical-wsdl-filename</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="physical" maxOccurs="1">
+                <annotation>Split the generated WSDL into two files.
+                    The physical portion of the WSDL is generated into specified file.
+                    The logical portion is generated into the default output file, unless -L is also used.</annotation>
+                <switch>P</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>physical-wsdl-filename</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="schema" maxOccurs="1">
+                <annotation>Generate schema types into the specified file.
+                    The file is then imported back into the logical portion of the generated WSDL.
+                    This option cannot be used with -n.</annotation>
+                <switch>T</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>schema-file-name</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="interface" maxOccurs="1">
+                <annotation>Specify the interface name within idl to use during fast track process.</annotation>
+                <switch>interface</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>interface-name</annotation>
+                </associatedArgument>
+            </option>
+
+
+            <option id="qualified" maxOccurs="1">
+                <annotation>Generate qualified wsdl contract</annotation>
+                <switch>qualified</switch>
+            </option>
+
+            <option id="inline" maxOccurs="1">
+                <annotation>In-line imported schema</annotation>
+                <switch>inline</switch>
+            </option>
+            
+            <option id="encoding" maxOccurs="1">
+                <annotation>Use specified encoding as the value of the generated WSDL xml encoding attribute.
+                    Defaults to UTF-8.</annotation>
+                <switch>e</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>xml-encoding-type</annotation>
+                </associatedArgument>
+            </option>
+
+        </optionGroup>
+
+	<optionGroup id="common_options">
+	    <option id="help" maxOccurs="1">
+		<annotation>Display detailed information for options.</annotation>
+		<switch>h</switch>
+		<switch>?</switch>
+		<switch>help</switch>
+	    </option>
+	    
+	    <option id="version">
+		<annotation>Display the version of the tool.</annotation>
+		<switch>v</switch>
+	    </option>
+
+	    <option id="verbose">
+		<annotation>Verbose mode</annotation>
+		<switch>verbose</switch>
+		<switch>V</switch>
+	    </option>
+
+	    <option id="quiet">
+		<annotation>Quiet mode</annotation>
+		<switch>quiet</switch>
+		<switch>q</switch>
+	    </option>
+
+
+	</optionGroup>
+
+        <argument id="idl" minOccurs="1" maxOccurs="1">
+            <annotation>idl-file-name</annotation>
+        </argument>
+    </usage>
+
+
+
+</toolspec>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements. See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership. The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License. You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied. See the License for the
+	specific language governing permissions and limitations
+	under the License.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:simple="http://cxf.apache.org/simple"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/simple
+http://cxf.apache.org/schemas/simple.xsd
+http://cxf.apache.org/jaxws
+http://cxf.apache.org/schemas/jaxws.xsd
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
+	
+    <cxf:bus>
+      <cxf:features>
+          <cxf:logging/>
+      </cxf:features>
+    </cxf:bus> 
+
+	<bean id="mtomImpl"
+		class="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl" />
+
+	<simple:server id="mtom-server" address="http://localhost:9002/mtom"
+		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
+		<simple:dataBinding>
+			<bean
+				class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+				<property name="mtomEnabled" value="true" />
+			</bean>
+		</simple:dataBinding>
+		<simple:serviceBean>
+			<ref bean="mtomImpl" />
+		</simple:serviceBean>
+		<simple:serviceFactory>
+			<bean
+				class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+				<property name="properties">
+					<map>
+						<entry key="mtom-enabled">
+							<value>true</value>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</simple:serviceFactory>
+	</simple:server>
+	
+	<simple:server id="mtom-xmime-server" address="http://localhost:9002/mtomXmime"
+		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
+		<simple:dataBinding>
+			<bean
+				class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+				<property name="mtomEnabled" value="true" />
+				<property name="mtomUseXmime" value="true"/>
+			</bean>
+		</simple:dataBinding>
+		<simple:serviceBean>
+			<ref bean="mtomImpl" />
+		</simple:serviceBean>
+		<simple:serviceFactory>
+			<bean
+				class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+				<property name="properties">
+					<map>
+						<entry key="mtom-enabled">
+							<value>true</value>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</simple:serviceFactory>
+	</simple:server>
+
+</beans>

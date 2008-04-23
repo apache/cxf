@@ -1,0 +1,26 @@
+# 1 C.idl 1
+
+
+
+
+
+
+
+
+module c
+{
+  interface C {
+
+    const boolean b = TRUE;
+
+
+/* #endif _b */
+
+
+    const boolean c = FALSE;
+
+
+// endif _c
+  };
+};
+

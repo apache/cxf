@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:xfire:xmlbeans:nstest"
+  xmlns:xf="urn:xfire:xmlbeans:nstest"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:import namespace="urn:xfire:xmlbeans:nstest" schemaLocation="Base.xsd" />
+  <xs:element name="RequestText">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="xf:Request">
+          <xs:attribute name="query" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attribute name="foo" type="xs:string" />
+</xs:schema>

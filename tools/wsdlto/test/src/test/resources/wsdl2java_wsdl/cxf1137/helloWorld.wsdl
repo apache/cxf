@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+		  xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
+		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		  xmlns:tns="http://company.hw.demo/"
+		  xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld"
+		  targetNamespace="http://company.hw.demo/">
+    <wsdl:types>
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   xmlns="http://company.hw.demo/"
+		   attributeFormDefault="unqualified"
+		   elementFormDefault="unqualified"
+		   targetNamespace="http://company.hw.demo/">
+	    <xs:complexType name="response">
+		<xs:sequence>
+		    <xs:element minOccurs="0" name="a" type="xs:string" />
+		    <xs:element minOccurs="0" name="b" type="xs:string" />
+		</xs:sequence>
+	    </xs:complexType>
+	    <xs:complexType name="request">
+		<xs:sequence>
+		    <xs:element minOccurs="0" name="a" type="xs:string" />
+		    <xs:element minOccurs="0" name="b" type="xs:string" />
+		</xs:sequence>
+	    </xs:complexType>
+	    <xs:element name="CustomException" type="CustomException" />
+	    <xs:complexType name="CustomException">
+		<xs:sequence>
+		    <xs:element name="a" nillable="true" type="xs:string" />
+		    <xs:element name="b" nillable="true" type="xs:string" />
+		    <xs:element name="message" nillable="true"
+				type="xs:string" />
+		</xs:sequence>
+	    </xs:complexType>
+	    <xs:element name="sayHi" type="sayHi" />
+	    <xs:complexType name="sayHi">
+		<xs:sequence>
+		    <xs:element minOccurs="0" name="arg0" type="request" />
+		</xs:sequence>
+	    </xs:complexType>
+	    <xs:element name="sayHiResponse" type="sayHiResponse" />
+	    <xs:complexType name="sayHiResponse">
+		<xs:sequence>
+		    <xs:element minOccurs="0" name="return" type="response" />
+		</xs:sequence>
+	    </xs:complexType>
+	</xs:schema>
+    </wsdl:types>
+    <wsdl:message name="sayHi">
+	<wsdl:part element="tns:sayHi" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="CustomException">
+	<wsdl:part element="tns:CustomException" name="CustomException">
+	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sayHiResponse">
+	<wsdl:part element="tns:sayHiResponse" name="result"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="HelloWorldPortType">
+	<wsdl:operation name="sayHi">
+	    <wsdl:input message="tns:sayHi" name="sayHi"></wsdl:input>
+	    <wsdl:output message="tns:sayHiResponse"
+			 name="sayHiResponse">
+	    </wsdl:output>
+	    <wsdl:fault message="tns:CustomException"
+			name="CustomException">
+	    </wsdl:fault>
+	</wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="HelloWorldSoapBinding" type="tns:HelloWorld">
+	<soap:binding style="document"
+		      transport="http://schemas.xmlsoap.org/soap/http" />
+	<wsdl:operation name="sayHi">
+	    <soap:operation soapAction="" style="document" />
+	    <wsdl:input name="sayHi">
+		<soap:body use="literal" />
+	    </wsdl:input>
+	    <wsdl:output name="sayHiResponse">
+		<soap:body use="literal" />
+	    </wsdl:output>
+	    <wsdl:fault name="CustomException">
+		<soap:fault name="CustomException" use="literal" />
+	    </wsdl:fault>
+	</wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="HelloWorldService">
+	<wsdl:port binding="tns:HelloWorldSoapBinding" name="HelloWorldPort">
+	    <soap:address location="http://localhost:8080/helloWorld" />
+	</wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

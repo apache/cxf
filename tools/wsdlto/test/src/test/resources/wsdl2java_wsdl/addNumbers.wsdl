@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions
+    name="AddNumbers"
+    targetNamespace="http://www.apache.org/handlers"
+    xmlns:tns="http://www.apache.org/handlers"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:x1="http://www.apache.org/handlers/types">
+    <types>
+        <xsd:schema
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.apache.org/handlers/types"
+            elementFormDefault="qualified">
+
+            <complexType name="addNumbersResponse">
+                <sequence>
+                    <element name="return" type="xsd:int" />
+                </sequence>
+            </complexType>
+            <element name="addNumbersResponse" type="x1:addNumbersResponse"/>
+
+            <complexType name="addNumbers">
+                <sequence>
+                    <element name="arg0" type="xsd:int" />
+                    <element name="arg1" type="xsd:int" />
+                </sequence>
+            </complexType>
+            <element name="addNumbers" type="x1:addNumbers"/>
+
+            <element name="FaultDetail" type="x1:FaultDetail" />
+            <complexType name="FaultDetail">
+                <sequence>
+                    <element name="faultInfo" type="xsd:string" />
+                    <element name="message" type="xsd:string" />
+                </sequence>
+            </complexType>
+        </xsd:schema>
+    </types>
+    <message name="addNumbers">
+        <part name="parameters" element="x1:addNumbers" />
+    </message>
+    <message name="addNumbersResponse">
+        <part name="result" element="x1:addNumbersResponse" />
+    </message>
+    <message name="addNumbersFault">
+        <part name="AddNumbersFault" element="x1:FaultDetail" />
+    </message>
+    <portType name="AddNumbers">
+        <operation name="addNumbers">
+            <input message="tns:addNumbers" />
+            <output message="tns:addNumbersResponse" />
+            <fault name="addNumbersFault" message="tns:addNumbersFault"/>
+        </operation>
+    </portType>
+    <binding name="AddNumbersBinding" type="tns:AddNumbers">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <operation name="addNumbers">
+            <soap:operation soapAction="" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="addNumbersFault">
+                <soap:fault name="addNumbersFault" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <service name="AddNumbersService">
+        <port name="AddNumbersPort" binding="tns:AddNumbersBinding">
+            <soap:address location="http://localhost:9000/handlers/AddNumbersService/AddNumbersPort" />
+        </port>
+    </service>
+</definitions>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:xfire:xmlbeans:nstest" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:xf="urn:xfire:xmlbeans:nstest" 
+  elementFormDefault="qualified" 
+  attributeFormDefault="unqualified">
+	<xs:complexType name="Request">
+		<xs:attribute name="id" type="xs:long" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="Response">
+		<xs:attribute name="id" type="xs:long" use="required"/>
+	</xs:complexType>
+</xs:schema>

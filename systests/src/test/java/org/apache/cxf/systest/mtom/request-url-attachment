@@ -1,0 +1,19 @@
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/xml
+Content-Transfer-Encoding: binary
+Content-ID: <echo.xml>
+
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Body>
+  <m:echo xmlns:m="http://mtom.systest.cxf.apache.org">
+    <m:Data>
+      <m:someData><xop:Include 
+        xmlns:xop='http://www.w3.org/2004/08/xop/include' 
+        href='http://localhost:9036/policy.xsd'/>
+      </m:someData>
+    </m:Data>
+  </m:echo>
+ </env:Body>
+</env:Envelope>
+------=_Part_4_701508.1145579811786--

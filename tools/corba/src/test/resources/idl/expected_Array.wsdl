@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Array/typemap">
+    <corba:array xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:long" elemname="item" bound="10" repositoryID="IDL:LongArray:1.0" type="ns4:LongArray" name="LongArray" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:long" elemname="item" bound="100" type="ns4:_Anon1_LongArrayArray" name="_Anon1_LongArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_LongArrayArray" elemname="item" bound="10" repositoryID="IDL:LongArrayArray:1.0" type="ns5:LongArrayArray" name="LongArrayArray" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:long" elemname="item" bound="1000" type="ns4:_Anon1_LongArrayArrayArray" name="_Anon1_LongArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_LongArrayArrayArray" elemname="item" bound="100" type="ns5:_Anon2_LongArrayArrayArray" name="_Anon2_LongArrayArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon2_LongArrayArrayArray" elemname="item" bound="10" repositoryID="IDL:LongArrayArrayArray:1.0" type="ns5:LongArrayArrayArray" name="LongArrayArrayArray" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:long" elemname="item" bound="10000" type="ns4:_Anon1_LongArrayArrayArrayArray" name="_Anon1_LongArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_LongArrayArrayArrayArray" elemname="item" bound="1000" type="ns5:_Anon2_LongArrayArrayArrayArray" name="_Anon2_LongArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon2_LongArrayArrayArrayArray" elemname="item" bound="100" type="ns5:_Anon3_LongArrayArrayArrayArray" name="_Anon3_LongArrayArrayArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon3_LongArrayArrayArrayArray" elemname="item" bound="10" repositoryID="IDL:LongArrayArrayArrayArray:1.0" type="ns5:LongArrayArrayArrayArray" name="LongArrayArrayArrayArray" />
+    <corba:array xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:short" elemname="item" bound="2" repositoryID="IDL:ShortArray:1.0" type="ns4:ShortArray" name="ShortArray" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:short" elemname="item" bound="4" type="ns4:_Anon1_ShortArrayArray" name="_Anon1_ShortArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_ShortArrayArray" elemname="item" bound="2" repositoryID="IDL:ShortArrayArray:1.0" type="ns5:ShortArrayArray" name="ShortArrayArray" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:short" elemname="item" bound="8" type="ns4:_Anon1_ShortArrayArrayArrayArray" name="_Anon1_ShortArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_ShortArrayArrayArrayArray" elemname="item" bound="4" type="ns5:_Anon2_ShortArrayArrayArrayArray" name="_Anon2_ShortArrayArrayArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon2_ShortArrayArrayArrayArray" elemname="item" bound="2" repositoryID="IDL:ShortArrayArrayArrayArray:1.0" type="ns5:ShortArrayArrayArrayArray" name="ShortArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="" elemtype="corba:short" elemname="item" bound="16" type="ns4:_Anon1_ShortArrayArrayArrayArrayArray" name="_Anon1_ShortArrayArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_ShortArrayArrayArrayArrayArray" elemname="item" bound="8" type="ns5:_Anon2_ShortArrayArrayArrayArrayArray" name="_Anon2_ShortArrayArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon2_ShortArrayArrayArrayArrayArray" elemname="item" bound="4" type="ns5:_Anon3_ShortArrayArrayArrayArrayArray" name="_Anon3_ShortArrayArrayArrayArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon3_ShortArrayArrayArrayArrayArray" elemname="item" bound="2" repositoryID="IDL:ShortArrayArrayArrayArrayArray:1.0" type="ns5:ShortArrayArrayArrayArrayArray" name="ShortArrayArrayArrayArrayArray" />
+    <corba:alias basetype="corba:long" repositoryID="IDL:myLong:1.0" name="myLong" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:myLong" elemname="item" bound="10" repositoryID="IDL:MyLongArray:1.0" type="ns5:MyLongArray" name="MyLongArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:myLong" elemname="item" bound="100" type="ns5:_Anon1_MyLongArrayArray" name="_Anon1_MyLongArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_MyLongArrayArray" elemname="item" bound="10" repositoryID="IDL:MyLongArrayArray:1.0" type="ns5:MyLongArrayArray" name="MyLongArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:myLong" elemname="item" bound="1000" type="ns5:_Anon1_MyLongArrayArrayArray" name="_Anon1_MyLongArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_MyLongArrayArrayArray" elemname="item" bound="100" type="ns5:_Anon2_MyLongArrayArrayArray" name="_Anon2_MyLongArrayArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon2_MyLongArrayArrayArray" elemname="item" bound="10" repositoryID="IDL:MyLongArrayArrayArray:1.0" type="ns5:MyLongArrayArrayArray" name="MyLongArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:myLong" elemname="item" bound="10000" type="ns5:_Anon1_MyLongArrayArrayArrayArray" name="_Anon1_MyLongArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon1_MyLongArrayArrayArrayArray" elemname="item" bound="1000" type="ns5:_Anon2_MyLongArrayArrayArrayArray" name="_Anon2_MyLongArrayArrayArrayArray" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon2_MyLongArrayArrayArrayArray" elemname="item" bound="100" type="ns5:_Anon3_MyLongArrayArrayArrayArray" name="_Anon3_MyLongArrayArrayArrayArray" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:_Anon3_MyLongArrayArrayArrayArray" elemname="item" bound="10" repositoryID="IDL:MyLongArrayArrayArrayArray:1.0" type="ns5:MyLongArrayArrayArrayArray" name="MyLongArrayArrayArrayArray" />
+    <corba:anonstring xmlns="http://cxf.apache.org/bindings/corba/idl/Array" bound="35" type="BuildingAddress_T" name="_Anon1_BuildingAddress_T" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="http://cxf.apache.org/bindings/corba/idl/Array/typemap" basetype="_Anon1_BuildingAddress_T" repositoryID="IDL:BuildingAddress_T:1.0" type="ns4:BuildingAddress_T" name="BuildingAddress_T" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Array/typemap" xmlns="" elemtype="ns4:BuildingAddress_T" elemname="item" bound="6" repositoryID="IDL:BuildingAddress_6_T:1.0" type="ns5:BuildingAddress_6_T" name="BuildingAddress_6_T" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Array" xmlns="http://cxf.apache.org/bindings/corba/idl/Array" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="LongArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_LongArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="100" minOccurs="100" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="LongArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon1_LongArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_LongArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="1000" minOccurs="1000" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_LongArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="100" minOccurs="100" name="item" type="_Anon1_LongArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="LongArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon2_LongArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_LongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10000" minOccurs="10000" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_LongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="1000" minOccurs="1000" name="item" type="_Anon1_LongArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_LongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="100" minOccurs="100" name="item" type="_Anon2_LongArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="LongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon3_LongArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ShortArray">
+        <xs:sequence>
+          <xs:element maxOccurs="2" minOccurs="2" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_ShortArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="4" minOccurs="4" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ShortArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="2" minOccurs="2" name="item" type="_Anon1_ShortArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_ShortArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="8" minOccurs="8" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_ShortArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="4" minOccurs="4" name="item" type="_Anon1_ShortArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ShortArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="2" minOccurs="2" name="item" type="_Anon2_ShortArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_ShortArrayArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="16" minOccurs="16" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_ShortArrayArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="8" minOccurs="8" name="item" type="_Anon1_ShortArrayArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_ShortArrayArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="4" minOccurs="4" name="item" type="_Anon2_ShortArrayArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ShortArrayArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="2" minOccurs="2" name="item" type="_Anon3_ShortArrayArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MyLongArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_MyLongArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="100" minOccurs="100" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MyLongArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon1_MyLongArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_MyLongArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="1000" minOccurs="1000" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_MyLongArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="100" minOccurs="100" name="item" type="_Anon1_MyLongArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MyLongArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon2_MyLongArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_MyLongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10000" minOccurs="10000" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_MyLongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="1000" minOccurs="1000" name="item" type="_Anon1_MyLongArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_MyLongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="100" minOccurs="100" name="item" type="_Anon2_MyLongArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MyLongArrayArrayArrayArray">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon3_MyLongArrayArrayArrayArray">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="BuildingAddress_T">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="BuildingAddress_6_T">
+        <xs:sequence>
+          <xs:element maxOccurs="6" minOccurs="6" name="item" type="BuildingAddress_T">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+</wsdl:definitions>

@@ -1,0 +1,25 @@
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/xml
+Content-Transfer-Encoding: binary
+Content-ID: <addPerson.xml>
+
+<addPerson xmlns="http://cxf.apache.org/person/"
+  xmlns:xmlmime="http://www.w3.org/2004/11/xmlmime">
+  <Person>
+    <Name>Dan Diephouse</Name>
+    <Photo xmlmime:contentType="application/octet-stream">
+      <xop:Include 
+        xmlns:xop="http://www.w3.org/2004/08/xop/include" 
+        href="cid:xfire_logo.jpg"/>
+    </Photo>
+  </Person>
+</addPerson>
+
+------=_Part_4_701508.1145579811786
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+Content-ID: <xfire_logo.jpg>
+
+foobar
+------=_Part_4_701508.1145579811786--

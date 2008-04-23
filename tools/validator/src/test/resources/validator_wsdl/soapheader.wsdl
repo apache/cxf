@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" 
+		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+		  xmlns:tns="http://apache.org/header_test" 
+		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+		  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+		  targetNamespace="http://apache.org/header_test" 
+		  name="TestHeaderWSDL"
+		  xmlns:all="http://apache.org/tests/type_test/all"
+		  xmlns:chc="http://apache.org/tests/type_test/choice"
+		  xmlns:seq="http://apache.org/tests/type_test/sequence">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
+            targetNamespace="http://apache.org/tests/type_test/all">
+            <element name="test_all" type="all:SimpleAll"/>
+            <complexType name="SimpleAll">
+                <all>
+                    <element name="varFloat" type="float"/>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </all>
+                <attribute name="varAttrString" type="string"/>
+            </complexType>
+        </schema>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
+            targetNamespace="http://apache.org/tests/type_test/sequence">
+            <element name="test_seq" type="seq:SimpleStruct"/>
+            <complexType name="SimpleStruct">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+                <attribute name="varAttrString" type="string"/>
+            </complexType>
+        </schema>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
+            targetNamespace="http://apache.org/tests/type_test/choice">
+            <element name="test_chc" type="chc:SimpleChoice"/>
+            <complexType name="SimpleChoice">
+                <choice>
+                    <element name="varFloat" type="float"/>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </choice>
+            </complexType>
+        </schema>
+    </wsdl:types>
+    <message name="AnyTypeRequest">
+        <part name="x" element="all:test_all"/>
+        <part name="y" element="chc:test_chc"/>
+    </message>
+    <message name="AnyTypeResponse">
+        <part name="x" element="all:test_all"/>
+        <part name="return" element="seq:test_seq"/>
+    </message>
+    <wsdl:portType name="TestHeader">
+        <operation name="send_receive_any_type">
+            <input name="send_receive_any_type_request" message="tns:AnyTypeRequest"/>
+            <output name="send_receive_any_type_response" message="tns:AnyTypeResponse"/>
+        </operation>
+    </wsdl:portType>
+    <wsdl:binding name="TestHeader_SOAPBinding" type="tns:TestHeader">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="send_receive_any_type">
+            <soap:operation soapAction="" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </wsdl:binding>
+    <wsdl:service name="SOAPHeaderService">
+        <wsdl:port name="SoapHeaderPort" binding="tns:TestHeader_SOAPBinding">
+            <soap:address location="http://localhost:9104/SoapHeaderContext/SoapHeaderPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

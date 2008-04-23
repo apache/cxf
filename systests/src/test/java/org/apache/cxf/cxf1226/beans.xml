@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:jaxws="http://cxf.apache.org/jaxws" 
+xmlns:cxf="http://cxf.apache.org/core" 
+xsi:schemaLocation=" 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"> 
+<import resource="classpath:META-INF/cxf/cxf.xml" /> 
+<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
+<import resource="classpath:META-INF/cxf/cxf-servlet.xml" /> 
+    <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/> 
+    <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/> 
+    <cxf:bus> 
+        <cxf:inInterceptors> <ref bean="logInbound"/> </cxf:inInterceptors> 
+        <cxf:outInterceptors> <ref bean="logOutbound"/> </cxf:outInterceptors> 
+        <cxf:inFaultInterceptors> <ref bean="logOutbound"/> </cxf:inFaultInterceptors> 
+    </cxf:bus> 
+    <jaxws:endpoint id="helloWorld" implementor="org.apache.cxf.cxf1226.HelloWorldImpl" address="/HelloWorld" /> 
+</beans> 

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes/typemap">
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes" binding="IpCallCORBABinding" repositoryID="IDL:IpCall:1.0" type="ns4:EndpointReferenceType" name="IpCall" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="_get_ReadOnlyIpCall">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ReadOnlyIpCallResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ReadWriteIpCall">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ReadWriteIpCallResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_ReadWriteIpCall">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="_arg" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_ReadWriteIpCallResult">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeReq">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeReqResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IpCallRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="_get_ReadOnlyIpCall">
+    <wsdl:part name="parameters" element="tns:_get_ReadOnlyIpCall">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ReadWriteIpCallResponse">
+    <wsdl:part name="parameters" element="tns:_get_ReadWriteIpCallResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_ReadWriteIpCallResponse">
+    <wsdl:part name="parameters" element="tns:_set_ReadWriteIpCallResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_ReadWriteIpCall">
+    <wsdl:part name="parameters" element="tns:_set_ReadWriteIpCall">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ReadWriteIpCall">
+    <wsdl:part name="parameters" element="tns:_get_ReadWriteIpCall">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeReqResponse">
+    <wsdl:part name="outparameter" element="tns:routeReqResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeReq">
+    <wsdl:part name="inparameter" element="tns:routeReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ReadOnlyIpCallResponse">
+    <wsdl:part name="parameters" element="tns:_get_ReadOnlyIpCallResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="temp">
+    <wsdl:operation name="_get_ReadOnlyIpCall">
+      <wsdl:input name="_get_ReadOnlyIpCall" message="tns:_get_ReadOnlyIpCall">
+    </wsdl:input>
+      <wsdl:output name="_get_ReadOnlyIpCallResponse" message="tns:_get_ReadOnlyIpCallResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_ReadWriteIpCall">
+      <wsdl:input name="_get_ReadWriteIpCall" message="tns:_get_ReadWriteIpCall">
+    </wsdl:input>
+      <wsdl:output name="_get_ReadWriteIpCallResponse" message="tns:_get_ReadWriteIpCallResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_ReadWriteIpCall">
+      <wsdl:input name="_set_ReadWriteIpCall" message="tns:_set_ReadWriteIpCall">
+    </wsdl:input>
+      <wsdl:output name="_set_ReadWriteIpCallResponse" message="tns:_set_ReadWriteIpCallResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="IpCall">
+    <wsdl:operation name="routeReq">
+      <wsdl:input name="routeReqRequest" message="tns:routeReq">
+    </wsdl:input>
+      <wsdl:output name="routeReqResponse" message="tns:routeReqResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="IpCallCORBABinding" type="tns:IpCall">
+    <corba:binding repositoryID="IDL:IpCall:1.0" />
+    <wsdl:operation name="routeReq">
+      <corba:operation name="routeReq">
+        <corba:param mode="in" name="inDouble" idltype="corba:double" />
+        <corba:param mode="out" name="outShort" idltype="corba:short" />
+        <corba:param mode="inout" name="inoutLong" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="routeReqRequest">
+      </wsdl:input>
+      <wsdl:output name="routeReqResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="tempCORBABinding" type="tns:temp">
+    <corba:binding repositoryID="IDL:temp:1.0" />
+    <wsdl:operation name="_get_ReadOnlyIpCall">
+      <corba:operation name="_get_ReadOnlyIpCall">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes/typemap" name="return" idltype="IpCall" />
+      </corba:operation>
+      <wsdl:input name="_get_ReadOnlyIpCall">
+      </wsdl:input>
+      <wsdl:output name="_get_ReadOnlyIpCallResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_ReadWriteIpCall">
+      <corba:operation name="_get_ReadWriteIpCall">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes/typemap" name="return" idltype="IpCall" />
+      </corba:operation>
+      <wsdl:input name="_get_ReadWriteIpCall">
+      </wsdl:input>
+      <wsdl:output name="_get_ReadWriteIpCallResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_ReadWriteIpCall">
+      <corba:operation name="_set_ReadWriteIpCall">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceAttributes/typemap" mode="in" name="_arg" idltype="IpCall" />
+      </corba:operation>
+      <wsdl:input name="_set_ReadWriteIpCall">
+      </wsdl:input>
+      <wsdl:output name="_set_ReadWriteIpCallResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="IpCallCORBAService">
+    <wsdl:port name="IpCallCORBAPort" binding="tns:IpCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="tempCORBAService">
+    <wsdl:port name="tempCORBAPort" binding="tns:tempCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

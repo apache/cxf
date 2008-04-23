@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/String" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/String" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/String/typemap">
+    <corba:anonstring xmlns="http://cxf.apache.org/bindings/corba/idl/String" bound="10" type="string10" name="_Anon1_string10" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/String" xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" basetype="_Anon1_string10" repositoryID="IDL:string10:1.0" type="ns4:string10" name="string10" />
+    <corba:anonwstring xmlns="http://cxf.apache.org/bindings/corba/idl/String" bound="20" type="wstring20" name="_Anon1_wstring20" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/String" xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" basetype="_Anon1_wstring20" repositoryID="IDL:wstring20:1.0" type="ns4:wstring20" name="wstring20" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" basetype="string10" repositoryID="IDL:myString10:1.0" name="myString10" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" basetype="wstring20" repositoryID="IDL:myWString20:1.0" name="myWString20" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:myString:1.0" type="xs:string" name="myString" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:myWString:1.0" type="xs:string" name="myWString" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/String" repositoryID="IDL:strStruct:1.0" type="strStruct" name="strStruct">
+      <corba:member name="unboundedStr" idltype="corba:string" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/String/typemap" name="boundedStr10" idltype="ns4:string10" />
+      <corba:member name="unboundedWStr" idltype="corba:wstring" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/String/typemap" name="boundedWStr20" idltype="ns4:wstring20" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/String/typemap" name="myStringStruct" idltype="ns4:myString" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/String/typemap" name="myWStringStruct" idltype="ns4:myWString" />
+    </corba:struct>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/String" xmlns="http://cxf.apache.org/bindings/corba/idl/String" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:simpleType name="string10">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="wstring20">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="strStruct">
+        <xs:sequence>
+          <xs:element name="unboundedStr" type="xs:string">
+          </xs:element>
+          <xs:element name="boundedStr10" type="string10">
+          </xs:element>
+          <xs:element name="unboundedWStr" type="xs:string">
+          </xs:element>
+          <xs:element name="boundedWStr20" type="wstring20">
+          </xs:element>
+          <xs:element name="myStringStruct" type="xs:string">
+          </xs:element>
+          <xs:element name="myWStringStruct" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="combineStrings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="string10Parm" type="string10">
+            </xs:element>
+            <xs:element name="myString10Parm" type="string10">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="combineStringsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="combineWstrings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="wstring20Parm" type="wstring20">
+            </xs:element>
+            <xs:element name="myWString20Parm" type="wstring20">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="combineWstringsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="combineWstrings">
+    <wsdl:part name="inparameter" element="tns:combineWstrings">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="combineStrings">
+    <wsdl:part name="inparameter" element="tns:combineStrings">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="combineWstringsResponse">
+    <wsdl:part name="outparameter" element="tns:combineWstringsResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="combineStringsResponse">
+    <wsdl:part name="outparameter" element="tns:combineStringsResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="if">
+    <wsdl:operation name="combineStrings">
+      <wsdl:input name="combineStringsRequest" message="tns:combineStrings">
+    </wsdl:input>
+      <wsdl:output name="combineStringsResponse" message="tns:combineStringsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="combineWstrings">
+      <wsdl:input name="combineWstringsRequest" message="tns:combineWstrings">
+    </wsdl:input>
+      <wsdl:output name="combineWstringsResponse" message="tns:combineWstringsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ifCORBABinding" type="tns:if">
+    <corba:binding repositoryID="IDL:if:1.0" />
+    <wsdl:operation name="combineStrings">
+      <corba:operation name="combineStrings">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" mode="in" name="string10Parm" idltype="string10" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" mode="in" name="myString10Parm" idltype="myString10" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" name="return" idltype="myString" />
+      </corba:operation>
+      <wsdl:input name="combineStringsRequest">
+      </wsdl:input>
+      <wsdl:output name="combineStringsResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="combineWstrings">
+      <corba:operation name="combineWstrings">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" mode="in" name="wstring20Parm" idltype="wstring20" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" mode="in" name="myWString20Parm" idltype="myWString20" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" name="return" idltype="myWString" />
+      </corba:operation>
+      <wsdl:input name="combineWstringsRequest">
+      </wsdl:input>
+      <wsdl:output name="combineWstringsResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ifCORBAService">
+    <wsdl:port name="ifCORBAPort" binding="tns:ifCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

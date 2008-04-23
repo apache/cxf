@@ -1,0 +1,9 @@
+<mappings xmlns:btrnm="urn:org:apache:cxf:aegis:type:missing">
+	<mapping name="btrnm:Outer">
+	<!-- without this, the XML must contain an array, even if the array is zero-length. -->
+	<property name='transliterations' mappedName='btrnm:transliterations' minOccurs='0' nillable='true' />
+	<property name='data' mappedName='btrnm:data' minOccurs='1' nillable='true'/>
+	<property name='entityUID' mappedName='btrnm:entityUID' minOccurs='1' nillable='true' />
+	<property name='extra' mappedName='btrnm:extra' minOccurs='1' nillable='true' />
+	</mapping>
+</mappings>

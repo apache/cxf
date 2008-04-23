@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<definitions name="soap_header" targetNamespace="http://apache.org/headers/rpc_lit" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xformat="http://cxf.apache.org/bindings/xformat" xmlns:tns="http://apache.org/headers/rpc_lit" xmlns:x1="http://apache.org/headers/coloc/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <types>
+	<schema targetNamespace="http://apache.org/headers/rpc_lit" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	    <xsd:import namespace="http://apache.org/headers/coloc/types" schemaLocation="./header.xsd"/>
+	</schema>
+    </types>
+    <message name="outHeaderRequest">
+	<part type="x1:outHeaderT" name="in"/>
+    </message>
+    <message name="outHeaderResponse">
+	<part type="x1:outHeaderResponseT" name="out"/>
+	<part element="x1:header" name="header"/>
+    </message>
+
+    <portType name="headerTester">
+	<operation name="outHeader">
+	    <input message="tns:outHeaderRequest" name="outHeaderRequest"/>
+	    <output message="tns:outHeaderResponse" name="outHeaderResponse"/>
+	</operation>
+    </portType>
+    <binding name="headerTesterSOAPBinding" type="tns:headerTester">
+	<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+	<operation name="outHeader">
+	    <soap:operation soapAction="" style="rpc"/>
+	    <input name="outHeaderRequest">
+		<soap:body namespace="http://apache.org/headers/coloc/types" use="literal"/>
+	    </input>
+	    <output name="outHeaderResponse">
+		<!--
+		    If the part:header is not a soap:header, then it violate the R2203, means RPC part:element must ref the type
+		    <soap:body parts="out" use="literal"/>
+		    <soap:header message="tns:outHeaderResponse" part="header" use="literal"/>
+		-->
+	    </output>
+	</operation>
+    </binding>
+    <service name="SOAPHeaderService">
+	<port binding="tns:headerTesterSOAPBinding" name="SoapPort">
+	    <soap:address location="http://localhost:9222/headers"/>
+	</port>
+    </service>
+</definitions>

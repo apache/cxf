@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <bean id="org.apache.cxf.ws.policy.AssertionBuilderRegistry" class="org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl">
+        <constructor-arg>
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanQNameMap">
+              <property name="type" value="org.apache.cxf.ws.policy.AssertionBuilder"/>
+              <property name="idsProperty" value="knownElements"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+    
+    <bean class="org.apache.cxf.ws.policy.PolicyConstants"
+	  id="org.apache.cxf.ws.policy.PolicyConstants"/>
+    
+    <bean id="org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry" class="org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistryImpl">
+        <constructor-arg>
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanQNameMap">
+              <property name="type" value="org.apache.cxf.ws.policy.PolicyInterceptorProvider"/>
+              <property name="idsProperty" value="assertionTypes"/>
+            </bean>
+        </constructor-arg>
+    </bean>   
+    
+    <bean id="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry" 
+          class="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry">
+        <constructor-arg>
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanQNameMap">
+              <property name="type" value="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilder"/>
+              <property name="idsProperty" value="domainExpressionTypes"/>
+            </bean>
+        </constructor-arg>
+    </bean>   
+    
+    <bean class="org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder"
+	  id="org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder"/> 
+    
+    <bean id="org.apache.cxf.ws.policy.PolicyBuilder" class="org.apache.cxf.ws.policy.PolicyBuilderImpl">
+        <property name="bus" ref="cxf"/>
+        <property name="assertionBuilderRegistry" ref="org.apache.cxf.ws.policy.AssertionBuilderRegistry"/>
+    </bean>
+  
+    <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.spring.InitializingPolicyEngine">
+       <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean class="org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider"
+	  id="org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider">
+        <constructor-arg ref="cxf"/>
+    </bean>
+        
+    <bean class="org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider"
+	  id="org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider">
+        <constructor-arg ref="cxf"/>
+    </bean>
+    
+    <!-- MTOM Policy Support -->
+    <bean class="org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder"
+	  id="org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    <bean class="org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider"
+	  id="org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider"/>
+</beans>

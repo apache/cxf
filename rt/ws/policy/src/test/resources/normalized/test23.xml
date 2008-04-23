@@ -1,0 +1,1 @@
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"><wsp:ExactlyOne><wsp:All><ans1:SecurityHeader xmlns:ans1="http://schemas.xmlsoap.org/ws/2002/12/secext" MustManifestEncryption="true" MustPrepend="true" /></wsp:All><wsp:All /></wsp:ExactlyOne></wsp:Policy>

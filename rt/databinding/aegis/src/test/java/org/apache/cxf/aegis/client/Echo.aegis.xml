@@ -1,0 +1,7 @@
+<mappings>
+  <mapping>
+    <method name="echo" xmlns:e="urn:echo:header">
+      <parameter index="1" componentType="java.lang.String"/>
+    </method>
+  </mapping>
+</mappings>

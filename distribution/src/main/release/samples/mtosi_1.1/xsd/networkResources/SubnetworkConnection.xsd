@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ============ Includes ========= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="LayerRates.xsd"/>
+  <xsd:include schemaLocation="TerminationPoint.xsd"/>
+  <xsd:include schemaLocation="TransmissionParameters.xsd"/>
+  <!-- ============ Global Type Declarations ========= -->
+  <xsd:simpleType name="SNCType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The SNC Type describes the connection based on the signal flows. 
+For a detailed description of the use of this attribute see SNC Types.
+In case of an ATM SNC (VP or VC), ST_SIMPLE is used to specify a 'plain' (hard or regular) PVC.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ST_SIMPLE"/>
+      <xsd:enumeration value="ST_ADD_DROP_A"/>
+      <xsd:enumeration value="ST_ADD_DROP_Z"/>
+      <xsd:enumeration value="ST_INTERCONNECT"/>
+      <xsd:enumeration value="ST_DOUBLE_INTERCONNECT"/>
+      <xsd:enumeration value="ST_DOUBLE_ADD_DROP"/>
+      <xsd:enumeration value="ST_OPEN_ADD_DROP"/>
+      <xsd:enumeration value="ST_EXPLICIT"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="SNCState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The SNCState enum is used to represent the various states that an SNC may take.
+
+The following states may be supported by the EMS, depending on the SNC management mode of operation used by the EMS. See SNC Management Modes Of Operation for details.
+
+SNCS_PENDING: the SNC has been created by an NMS and has not been activated by any NMS; or the SNC has been successfully deactivated by an NMS. That state has no relationship with the network state of the cross- connects of the SNC. It is allowable for an EMS to not support the SNCS_PENDING state and to reject any operation that attempts to put an SNC into SNCS_PENDING state. 
+SNCS_ACTIVE: the SNC is not in pending state, a route has been assigned to the SNC and all cross-connects for the SNC are active in the network. 
+SNCS_PARTIAL: the SNC is not in pending state, and either a route has not been assigned to the SNC, or not all of the cross-connects of the SNC are active in the network. This may or may not include activated SNCs for which there are currently no active cross- connects in the network, depending on the SNC management mode of operation.It is possible that, in some EMSes, this state be unreachable. 
+SNCS_NONEXISTENT: this is not an SNC state per se, as it applies to "non-existent SNCs". It is used in the interface to report SNCs that have been deleted. 
+See SNCState state diagram for details on valid transitions.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="SNCS_NONEXISTENT"/>
+      <xsd:enumeration value="SNCS_PENDING"/>
+      <xsd:enumeration value="SNCS_ACTIVE"/>
+      <xsd:enumeration value="SNCS_PARTIAL"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="Reroute_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The Reroute_T type indicates if the EMS/MEs are allowed and/or required to reroute this SNC if there is a failure on this SNC, periodically to optimize the routes, of for any other reason.It is an EMS/ME implementation whether this is done using network routing protocols or if the EMS/MEs detect the failure and take appropriate action to attempt to fix the SNC.
+
+The RR_NO value means that the EMS/MEs are not allowed to reroute the SNC. The RR_YES value means that the EMS/MEs are allowed to reroute the SNC and required to attempt to reroute it upon failure. The RR_NA value is used when the NMS does not want to specify the exact EMS behaviour. In this case it is left up to the EMS to decide whether rerouting will be provided. It is also used if the EMS/MEs are allowed to reroute the SNC but not required to attempt to reroute it upon failure.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="RR_NA"/>
+      <xsd:enumeration value="RR_NO"/>
+      <xsd:enumeration value="RR_YES"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="NetworkRouted_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Network routed, indicates if the route must be or is computed and implemented at the network level. NR_YES indicates that the route must be / is computed at the network. NR_NO indicates that the route must not be / is not computed at the network. NR_NA indicates that the route can be computed anywhere.
+
+If rerouting is allowed, this attribute will indicate who last rerouted the SNC, the network (NR_YES) or the EMS (NR_NO).
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="NR_NA"/>
+      <xsd:enumeration value="NR_NO"/>
+      <xsd:enumeration value="NR_YES"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="StaticProtectionLevel_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The static protection level is a statement of the internal resiliency of the SNC (internal to the subnetwork). The more resilient an SNC is, the more bandwidth it will consume.
+The protection level does not have any bearing on the externally visible shape and traffic flows of the SNC (in non-failure cases).
+For a detailed description of the use of this attribute, see SNC Types.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="PREEMPTIBLE"/>
+          <xsd:enumeration value="UNPROTECTED"/>
+          <xsd:enumeration value="PARTIALLY_PROTECTED"/>
+          <xsd:enumeration value="FULLY_PROTECTED"/>
+          <xsd:enumeration value="HIGHLY_PROTECTED"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="CrossConnect_T">
+    <xsd:annotation>
+      <xsd:documentation>
+A crossConnect represents a connection within a single managed element. This structure is primarily used in the specification of routes
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="active" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates if the cross-connect is active in the ME.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="direction" type="ConnectionDirection_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Directionality of the cross connection.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ccType" type="SNCType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Relative names of PTPs/CTPs/FTPs at the aEnd of the cross connection.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="fixed" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The attribute defines if the CrossConnect is fixed (i.e. cannot be deleted by the NMS) or is flexible.
+(promoted from MTNM V 3 .0 additional Info)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aEndNameList">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="aEndName" type="NamingAttributes_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+Names of PTPs/CTPs/FTPs at the aEnd of the cross connection.
+                 </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="zEndNameList">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="zEndName" type="NamingAttributes_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+Names of PTPs/CTPs/FTPs at the zEnd of the cross connection.
+                 </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="CCVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Vendor extensions
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="Route_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        A route for an SNC is defined as a partially ordered list of cross-connects.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="routeCClist" type="CrossConnectList_T" minOccurs="0"/>
+      <xsd:element name="vendorExtensions" type="RouteVendorExtensions_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TPData_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This aggregate defines a set of attributes associated with a TP.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Specifies aEnd termination point.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpMappingMode" type="TerminationMode_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The mapping mode to put the TP in.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transmissionParams" type="LayeredParametersList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+When used as output to the NMS, this is the transmission parameters of the TP. When used as input to the EMS, this is a "delta" list that needs to be applied to the specified TP. Only a subset of the parameters may be specified in the list, and only those should be applied in the NE. If the list is empty then this means do nothing. To remove a parameter from the list, "-" should be specified in the value part of the structure. When a BLSR connection is created, the SPRING_NodeId parameter should be provided for the aEnd and zEnd CTPs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection termination point may have an optional reference to an ingress (incoming)Transmission Descriptor. The Descriptor name will be empty if there is no associated Descriptor.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection termination point may have an optional reference to an egress (outgoing)Transmission Descriptor. The Transmission Descriptor name will be empty if there is no associated Descriptor.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TPDataList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+List of TPData_T elements.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpData" type="TPData_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="SubnetworkConnection_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This aggregate defines the Subnetwork Connection object.
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="sncState" type="SNCState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The sncState is an attribute managed by the EMS.
+The EMS manages the state transition of this attribute.
+The EMS will assess the cross-connections in the network that support the SNC and will appropriately adjust the value of SNCState to reflect the actual state of the SNC in the network.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="direction" type="ConnectionDirection_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Specifies the direction of the subnetwork connection.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="rate" type="LayerRate_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The rate of the SubnetworkConnection is obtained by reading this attribute.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="staticProtectionLevel" type="StaticProtectionLevel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The static protection level of the SNC. For a detailed description of the use of this attribute, see SNC Types.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="sncType" type="SNCType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The type of the SNC. For a detailed description of the use of this attribute, see SNC Types.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aEnd" type="TPDataList_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The list of Aend termination points TP where this SNC terminates. For a detailed description of the use of this attribute, see MTNM SNC Types supporting document.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="zEnd" type="TPDataList_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The list of Zend termination points TP where this SNC terminates. For a detailed description of the use of this attribute, see MTNM SNC Types supporting document.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="rerouteAllowed" type="Reroute_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This attribute indicates if the EMS/MEs are allowed and/or required to reroute this SNC if there is a failure on this SNC, periodically to optimize the routes, of for any other reason.It is an EMS/ME implementation whether this is done using network routing protocols or if the EMS/MEs detect the failure and take appropriate action to attempt to fix the SNC
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="networkRouted" type="NetworkRouted_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This attribute specifies if the route for this SNC is computed by the network.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="networkAccessDomain" type="NetworkAccessDomain_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A free-format string used to associate the resource to a Network Access Domain.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="alarmReportingIndicator" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Provides an indication whether alarm reporting for this instance is active or not.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="fixed" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Takes value True  when all cross-connects of the SNC are fixed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="SNCVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="CrossConnectList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of CrossConnects
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="cc" type="CrossConnect_T" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="SubnetworkConnectionList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of SubnetworkConnections
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="snc" type="SubnetworkConnection_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="RouteList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of Routes
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="route" type="Route_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

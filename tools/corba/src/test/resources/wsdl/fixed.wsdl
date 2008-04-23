@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="fixed.idl"
+ targetNamespace="http://schemas.apache.org/idl/fixed.idl"
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:tns="http://schemas.apache.org/idl/fixed.idl"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd1="http://schemas.apache.org/idltypes/fixed.idl"
+ xmlns:corba="http://cxf.apache.org/bindings/corba"
+ xmlns:corbatm="http://cxf.apache.org/bindings/corba/typemap">
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/fixed.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified">
+      <xsd:complexType name="Y.H">
+        <xsd:sequence>
+          <xsd:element name="item" type="xsd:decimal" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="X.H">
+        <xsd:restriction base="xsd:decimal">
+          <xsd:totalDigits value="10"/>
+          <xsd:fractionDigits value="2"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="X.PARAM.H">
+        <xsd:restriction base="xsd:decimal">
+          <xsd:fractionDigits value="2"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Z.H">
+        <xsd:restriction base="xsd:decimal">
+          <xsd:totalDigits value="8"/>
+          <xsd:fractionDigits value="7"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Z.PARAM.H">
+        <xsd:restriction base="xsd:decimal"/>
+      </xsd:simpleType>
+      <xsd:simpleType name="EXTENDED.X.PARAM.H">
+        <xsd:restriction base="xsd1:X.PARAM.H">
+          <xsd:totalDigits value="8"/>
+        </xsd:restriction>
+      </xsd:simpleType>      
+      <xsd:element name="Y.op_k.p1" type="xsd:decimal"/>
+      <xsd:element name="Y.op_k.p2" type="xsd:decimal"/>
+      <xsd:element name="Y.op_k.p3" type="xsd:decimal"/>
+      <xsd:element name="Y.op_k.return" type="xsd:decimal"/>
+      <xsd:element name="Y.op_h.p1" type="xsd1:Y.H"/>
+      <xsd:element name="Y.op_h.p2" type="xsd1:Y.H"/>
+      <xsd:element name="Y.op_h.p3" type="xsd1:Y.H"/>
+      <xsd:element name="Y.op_h.return" type="xsd1:Y.H"/>
+      <xsd:element name="X.op_m.p1" type="xsd1:X.PARAM.H"/>
+      <xsd:element name="X.op_m.p2" type="xsd1:X.PARAM.H"/>
+      <xsd:element name="X.op_m.p3" type="xsd1:X.PARAM.H"/>
+      <xsd:element name="X.op_m.return" type="xsd1:X.H"/>
+      <xsd:element name="Z.op_n.p1" type="xsd1:Z.PARAM.H"/>
+      <xsd:element name="Z.op_n.p2" type="xsd1:Z.PARAM.H"/>
+      <xsd:element name="Z.op_n.p3" type="xsd1:Z.PARAM.H"/>
+      <xsd:element name="Z.op_n.return" type="xsd1:Z.H"/>
+      <xsd:element name="EXTENDED.X.op_m.p1" type="xsd1:EXTENDED.X.PARAM.H"/>
+      <xsd:element name="EXTENDED.X.op_m.p2" type="xsd1:EXTENDED.X.PARAM.H"/>
+      <xsd:element name="EXTENDED.X.op_m.p3" type="xsd1:EXTENDED.X.PARAM.H"/>
+      <xsd:element name="EXTENDED.X.op_m.return" type="xsd1:EXTENDED.X.PARAM.H"/>
+    </schema>
+  </types>
+  <message name="Y.op_k">
+    <part name="p1" element="xsd1:Y.op_k.p1"/>
+    <part name="p2" element="xsd1:Y.op_k.p2"/>
+  </message>
+  <message name="Y.op_kResponse">
+    <part name="return" element="xsd1:Y.op_k.return"/>
+    <part name="p2" element="xsd1:Y.op_k.p2"/>
+    <part name="p3" element="xsd1:Y.op_k.p3"/>
+  </message>
+  <message name="Y.op_h">
+    <part name="p1" element="xsd1:Y.op_h.p1"/>
+    <part name="p2" element="xsd1:Y.op_h.p2"/>
+  </message>
+  <message name="Y.op_hResponse">
+    <part name="return" element="xsd1:Y.op_h.return"/>
+    <part name="p2" element="xsd1:Y.op_h.p2"/>
+    <part name="p3" element="xsd1:Y.op_h.p3"/>
+  </message>
+  <message name="X.op_m">
+    <part name="p1" element="xsd1:X.op_m.p1"/>
+    <part name="p2" element="xsd1:X.op_m.p2"/>
+  </message>
+  <message name="X.op_mResponse">
+    <part name="return" element="xsd1:X.op_m.return"/>
+    <part name="p2" element="xsd1:X.op_m.p2"/>
+    <part name="p3" element="xsd1:X.op_m.p3"/>
+  </message>
+  <message name="Z.op_n">
+    <part name="p1" element="xsd1:Z.op_n.p1"/>
+    <part name="p2" element="xsd1:Z.op_n.p2"/>
+  </message>
+  <message name="Z.op_nResponse">
+    <part name="return" element="xsd1:Z.op_n.return"/>
+    <part name="p2" element="xsd1:Z.op_n.p2"/>
+    <part name="p3" element="xsd1:Z.op_n.p3"/>
+  </message>
+  <message name="EXTENDED.X.op_m">
+    <part name="p1" element="xsd1:EXTENDED.X.op_m.p1"/>
+    <part name="p2" element="xsd1:EXTENDED.X.op_m.p2"/>
+  </message>
+  <message name="EXTENDED.X.op_mResponse">
+    <part name="return" element="xsd1:EXTENDED.X.op_m.return"/>
+    <part name="p2" element="xsd1:EXTENDED.X.op_m.p2"/>
+    <part name="p3" element="xsd1:EXTENDED.X.op_m.p3"/>
+  </message>
+  <portType name="Y">
+    <operation name="op_k">
+      <input message="tns:Y.op_k" name="op_k"/>
+      <output message="tns:Y.op_kResponse" name="op_kResponse"/>
+    </operation>
+    <operation name="op_h">
+      <input message="tns:Y.op_h" name="op_h"/>
+      <output message="tns:Y.op_hResponse" name="op_hResponse"/>
+    </operation>
+    <operation name="op_m">
+      <input message="tns:X.op_m" name="op_m"/>
+      <output message="tns:X.op_mResponse" name="op_mResponse"/>
+    </operation>
+    <operation name="op_n">
+      <input message="tns:Z.op_n" name="op_n"/>
+      <output message="tns:Z.op_nResponse" name="op_nResponse"/>
+    </operation>
+    <operation name="extended_op_m">
+      <input message="tns:EXTENDED.X.op_m" name="extended_op_m"/>
+      <output message="tns:EXTENDED.X.op_mResponse" name="extended_op_mResponse"/>
+    </operation>
+  </portType>
+</definitions>

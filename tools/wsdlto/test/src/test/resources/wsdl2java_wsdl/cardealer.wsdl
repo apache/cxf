@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	     xmlns:tns="http://server.type_substitution/" 
+	     xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	     xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	     targetNamespace="http://server.type_substitution/" name="CarDealerService">
+    <types>
+	<xsd:schema targetNamespace="http://server.type_substitution/">
+	    <xsd:element name="getSedans" type="tns:getSedans"></xsd:element>
+
+	    <xsd:element name="getSedansResponse" type="tns:getSedansResponse"></xsd:element>
+
+	    <xsd:element name="tradeIn" type="tns:car"></xsd:element>
+
+	    <xsd:element name="tradeInResponse" type="tns:car"></xsd:element>
+
+	    <xsd:complexType name="car" abstract="true">
+		<xsd:sequence>
+		    <xsd:element name="make" type="xsd:string" minOccurs="0"></xsd:element>
+		    <xsd:element name="model" type="xsd:string" minOccurs="0"></xsd:element>
+		    <xsd:element name="year" type="xsd:string" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	    </xsd:complexType>
+
+	    <xsd:complexType name="porsche">
+		<xsd:complexContent>
+		    <xsd:extension base="tns:car">
+			<xsd:sequence>
+			    <xsd:element name="color" type="xsd:string" minOccurs="0"></xsd:element>
+			</xsd:sequence>
+		    </xsd:extension>
+		</xsd:complexContent>
+	    </xsd:complexType>
+
+	    <xsd:complexType name="getSedans">
+		<xsd:sequence>
+		    <xsd:element name="arg0" type="xsd:string" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	    </xsd:complexType>
+
+	    <xsd:complexType name="getSedansResponse">
+		<xsd:sequence>
+		    <xsd:element name="return" type="tns:car" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	    </xsd:complexType>
+	</xsd:schema>
+    </types>
+    <message name="getSedans">
+	<part name="parameters" element="tns:getSedans"></part>
+    </message>
+    <message name="getSedansResponse">
+	<part name="parameters" element="tns:getSedansResponse"></part>
+    </message>
+    <message name="tradeIn">
+	<part name="tradeIn" element="tns:tradeIn"></part>
+    </message>
+    <message name="tradeInResponse">
+	<part name="tradeInResponse" element="tns:tradeInResponse"></part>
+    </message>
+    <portType name="CarDealer">
+	<operation name="getSedans">
+	    <input message="tns:getSedans"></input>
+	    <output message="tns:getSedansResponse"></output>
+	</operation>
+	<operation name="tradeIn">
+	    <input message="tns:tradeIn"></input>
+	    <output message="tns:tradeInResponse"></output>
+	</operation>
+    </portType>
+    <binding name="CarDealerPortBinding" type="tns:CarDealer">
+	<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+	<operation name="getSedans">
+	    <soap:operation soapAction=""></soap:operation>
+	    <input>
+		<soap:body use="literal"></soap:body>
+	    </input>
+	    <output>
+		<soap:body use="literal"></soap:body>
+	    </output>
+	</operation>
+	<operation name="tradeIn">
+	    <soap:operation soapAction=""></soap:operation>
+	    <input>
+		<soap:body use="literal"></soap:body>
+	    </input>
+	    <output>
+		<soap:body use="literal"></soap:body>
+	    </output>
+	</operation>
+    </binding>
+    <service name="CarDealerService">
+	<port name="CarDealerPort" binding="tns:CarDealerPortBinding">
+	    <soap:address location="http://localhost:8080/jaxws-type_substitution/cardealer"></soap:address>
+	</port>
+    </service>
+</definitions>

@@ -1,0 +1,1 @@
+NOTE: This directory contains files copied from Apache HTTP Client project.

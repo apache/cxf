@@ -1,0 +1,30 @@
+struct BasicTest {
+    string member1;
+    sequence<BasicTest> member2;
+};
+
+struct ForwardTest;
+struct ForwardTest {
+    string member1;
+    sequence<ForwardTest> member2;
+};
+
+struct ForwardSeqTest;
+typedef sequence<ForwardSeqTest> ForwardSeqTestSeq;
+struct ForwardSeqTest {
+    string member1;
+    ForwardSeqTestSeq member2;
+};
+
+struct NestedTestOuter;
+typedef sequence<NestedTestOuter> NestedTestOuterSeq;
+struct NestedTestOuter {
+    string member1;
+    struct NestedTestInner {
+        double mem;
+        NestedTestOuterSeq memberSeq;
+    } member2;
+};
+
+interface TestInterface {
+};

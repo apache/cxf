@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<schema
+  targetNamespace="http://cxf.apache.org/Xutil/ToolSpecification"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tool="http://cxf.apache.org/Xutil/ToolSpecification">
+
+  <simpleType name="classname">
+    <annotation>
+      <documentation>
+A regular expression matching class names, see the Java Language Specification 2.0 section 3.8 (Identifiers). 
+One caveat: I have decided to outlaw use of the unnamed (top-level) package for controllers. 
+This ensures that the user cannot mistakenly put in something like an IDREF, thinking it possible to reference controllers.
+This policy can be changed by modifying the ending '+' to a '*' in the regular expression.
+      </documentation>
+    </annotation>
+    <restriction base="string">
+      <pattern value="([\p{L}_$][\p{L}\p{Nd}_$]*)(\.[\p{L}_$][\p{L}\p{Nd}_$]*)+"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="mimetype">
+    <restriction base="token">
+      <pattern value="[\p{L}]+/[\p{L}\+]+"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="mimetypes">
+    <restriction base="token">
+      <pattern value="[\p{L}]+/[\p{L}\+]+(,[\p{Zs}]*[\p{L}]+/[\p{L}\+]+)*"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="word">
+    <restriction base="token">
+      <pattern value="[\p{L}\??]+"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="allNNI">
+    <union memberTypes="nonNegativeInteger">
+      <simpleType>
+        <restriction base="NMTOKEN">
+          <enumeration value="unbounded"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+ 
+  <simpleType name="placementType">
+    <restriction base="NMTOKEN">
+      <enumeration value="afterSpace"/>
+      <enumeration value="immediate"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="optionType">
+    <restriction base="NMTOKEN">
+      <enumeration value="hidden"/>
+      <enumeration value="visible"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="yesno">
+    <restriction base="NMTOKEN">
+      <enumeration value="yes"/>
+      <enumeration value="no"/>
+    </restriction>
+  </simpleType>
+
+  <element name="toolspec">
+    <complexType>
+      <sequence>
+        <element ref="tool:annotation" minOccurs="0"/>
+        <element ref="tool:streams" minOccurs="0"/>
+        <element ref="tool:usage" minOccurs="0"/>
+        <element ref="tool:pipeline" minOccurs="0"/>
+      </sequence>
+      <attribute name="handler" type="tool:classname" use="optional"/>
+    </complexType>
+  </element>
+
+  <element name="streams">
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="tool:instream"/>
+        <element ref="tool:outstream"/>
+      </choice>
+    </complexType>
+  </element>
+
+  <simpleType name="pluralities">
+    <restriction base="string">
+      <enumeration value="singular"/>
+      <enumeration value="multiplex"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="stream">
+    <attribute name="id" type="ID" use="required"/>
+<!--    <attribute name="mimetype" type="tool:mimetypes" use="optional" default="application/xml"/>  -->
+  </complexType>
+
+  <element name="instream" type="tool:stream"/>
+  <element name="outstream" type="tool:stream"/>
+
+  <element name="usage">
+    <complexType>
+      <choice>
+        <group ref="tool:formModel"/>
+
+        <sequence>
+<!--          <element ref="tool:annotation" minOccurs="0" maxOccurs="1"/>
+          <element ref="tool:optionGroup" minOccurs="0" maxOccurs="1"/>
+-->
+          <element ref="tool:form" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+      </choice>
+    </complexType>
+  </element>
+
+  <group name="formModel">
+    <sequence>
+      <element ref="tool:annotation" minOccurs="0" maxOccurs="1"/>
+<!-- Potentially put in sections corresponding to nroff -man macros, eg. title, synopsis, description, author, bugs, see-also, etc.. -->
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="tool:option"/>
+        <element ref="tool:optionGroup"/>
+      </choice>
+
+      <!-- Unfortunately, Xerces does not yet cope with local element declarations, so we cannot have two types of argument element treated differently -->
+      <!--      <element name="argument" type="tool:trailingArgument" minOccurs="0" maxOccurs="unbounded"/> -->
+      <element ref="tool:argument" minOccurs="0" maxOccurs="unbounded"/>
+
+    </sequence>
+  </group>
+
+  <element name="form">
+    <complexType>
+      <group ref="tool:formModel"/>
+      <attribute name="value" type="NMTOKEN" use="required"/>
+    </complexType>
+  </element>
+
+  <element name="appinfo">
+    <complexType mixed="true">
+      <sequence minOccurs="0" maxOccurs="unbounded">
+        <any processContents="lax"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="documentation">
+    <complexType mixed="true">
+      <sequence minOccurs="0" maxOccurs="unbounded">
+        <any processContents="lax"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="annotation">
+    <complexType mixed="true">
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="tool:appinfo"/>
+        <element ref="tool:documentation"/>
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="optionGroup">
+    <complexType>
+      <sequence>
+        <element ref="tool:option" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+      <attribute name="id" type="ID" use="optional"/>
+      <attribute name="ref" type="IDREF" use="optional"/>
+    </complexType>
+  </element>
+
+  <element name="option">
+    <complexType>
+      <sequence>
+        <element ref="tool:annotation" minOccurs="0" maxOccurs="1"/>
+        <choice minOccurs="1" maxOccurs="unbounded">
+          <element ref="tool:switch"/>
+        </choice>
+      <!-- Unfortunately, Xerces does not yet cope with local element declarations, so we cannot have two types of argument element treated differently -->
+      <!-- In the future, I will allow the tag 'associatedArgument' to be replaced with the tag 'argument'. However, I will keep associatedArgument for backward compatibility -->
+<!--        <element name="argument" type="tool:associatedArgument" minOccurs="0" maxOccurs="1"/> -->
+        <element ref="tool:associatedArgument" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="id" type="ID" use="required"/><!-- so that tools can access options by id -->
+      <attribute name="minOccurs" type="nonNegativeInteger" use="optional" default="0"/>
+      <attribute name="maxOccurs" type="tool:allNNI" use="optional" default="1"/>
+      <attribute name="type" type="tool:optionType" use="optional" default="visible"/>
+    </complexType>
+  </element>
+
+  <element name="switch" type="tool:word"/>
+
+  <simpleType name="valuetype_type">
+    <restriction base="string">
+      <enumeration value="IdentifyString"/>
+      <enumeration value="Digital"/>
+      <enumeration value="NamingSpacePackageString"/>
+    </restriction>
+  </simpleType>
+
+  <element name="valuetype" type="tool:valuetype_type"/>
+
+  <simpleType name="valueenum_type">
+    <restriction base="string">
+    </restriction>
+  </simpleType>
+
+  <element name="valueenum" type="tool:valueenum_type"/>
+
+  <element name="associatedArgument" type="tool:associatedArgument"/>
+  <element name="argument" type="tool:trailingArgument"/>
+
+  <complexType name="associatedArgument">
+    <sequence>
+      <element ref="tool:valuetype" minOccurs="0"/>
+      <element ref="tool:annotation" minOccurs="0"/>
+      <element ref="tool:valueenum" minOccurs="0"/>
+    </sequence>
+    <attribute name="default" type="token" use="optional"/>
+    <attribute name="placement" type="tool:placementType" use="optional" default="afterSpace"/>
+    <attribute name="streamref" type="IDREF" use="optional"/>
+  </complexType>
+
+  <complexType name="trailingArgument">
+    <sequence>
+      <element ref="tool:annotation" minOccurs="0"/>
+    </sequence>
+    <attribute name="id" type="ID" use="required"/>
+    <attribute name="minOccurs" type="nonNegativeInteger" use="optional" default="1"/>
+    <attribute name="maxOccurs" type="tool:allNNI" use="optional" default="1"/>
+    <attribute name="default" type="token" use="optional"/>
+    <attribute name="streamref" type="IDREF" use="optional"/>
+    <attribute name="type" type="tool:optionType" use="optional" default="visible"/>
+  </complexType>
+
+  <!-- pipelines -->
+
+  <element name="pipeline">
+    <complexType>
+      <choice minOccurs="1" maxOccurs="unbounded">
+        <element ref="tool:tool"/>
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="tool">
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="tool:bindstream"/>
+        <element ref="tool:param"/>
+      </choice>
+      <attribute name="id" type="ID" use="optional"/>
+      <attribute name="specref" type="anyURI" use="required"/>
+    </complexType>
+  </element>
+
+  <simpleType name="nameref">
+    <restriction base="string">
+      <pattern value="\c*#\c*"/>
+    </restriction>
+  </simpleType>
+
+  <element name="bindstream">
+    <complexType>
+      <attribute name="instream" type="NCName" use="required"/>
+      <attribute name="source" type="tool:nameref" use="required"/>
+    </complexType>
+  </element>
+
+  <element name="param">
+    <complexType>
+      <attribute name="name" type="NCName" use="required"/>
+      <attribute name="paramref" type="NCName" use="optional"/>
+      <attribute name="value" type="string" use="optional"/>
+    </complexType>
+  </element>
+
+</schema>

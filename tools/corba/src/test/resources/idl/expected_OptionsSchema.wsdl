@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/OptionsSchema" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/OptionsSchema" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd1="http://cxf.apache.org/bindings/corba/idl/OptionsSchema-types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/OptionsSchema/typemap">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsSchema-types" repositoryID="IDL:foo/bar/Employee:1.0" type="foo.bar.Employee" name="foo.bar.Employee">
+      <corba:member name="name" idltype="corba:string" />
+      <corba:member name="number" idltype="corba:long" />
+    </corba:struct>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xsd:schema>
+      <xsd:import namespace="http://cxf.apache.org/bindings/corba/idl/OptionsSchema-types" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="getEmployee">
+    <wsdl:part name="inparameter" element="xsd1:getEmployee">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEmployeeResponse">
+    <wsdl:part name="outparameter" element="xsd1:getEmployeeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="foo.bar">
+    <wsdl:operation name="getEmployee">
+      <wsdl:input name="getEmployeeRequest" message="tns:getEmployee">
+    </wsdl:input>
+      <wsdl:output name="getEmployeeResponse" message="tns:getEmployeeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="foo.barCORBABinding" type="tns:foo.bar">
+    <corba:binding repositoryID="IDL:foo/bar:1.0" />
+    <wsdl:operation name="getEmployee">
+      <corba:operation name="getEmployee">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsSchema/typemap" mode="in" name="inEmp" idltype="foo.bar.Employee" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsSchema/typemap" mode="out" name="outEmp" idltype="foo.bar.Employee" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsSchema/typemap" mode="inout" name="inoutEmp" idltype="foo.bar.Employee" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsSchema/typemap" name="return" idltype="foo.bar.Employee" />
+      </corba:operation>
+      <wsdl:input name="getEmployeeRequest">
+      </wsdl:input>
+      <wsdl:output name="getEmployeeResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="foo.barCORBAService">
+    <wsdl:port name="foo.barCORBAPort" binding="tns:foo.barCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

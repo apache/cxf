@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements. See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership. The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License. You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied. See the License for the
+	specific language governing permissions and limitations
+	under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://cxf.apache.org/w2j/hello_world_mime"
+	xmlns:x1="http://cxf.apache.org/w2j/hello_world_mime/types"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+	targetNamespace="http://cxf.apache.org/w2j/hello_world_mime"
+	name="HelloMime">
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://cxf.apache.org/w2j/hello_world_mime/types">
+
+			<element name="address">
+				<complexType>
+					<sequence>
+						<element name="postcode" type="string" />
+						<element name="address" type="string" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="addressRes">
+				<complexType>
+					<sequence>
+						<element name="postcode" type="string" />
+						<element name="address" type="string" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="body" type="string" />
+		</schema>
+
+	</wsdl:types>
+
+	<wsdl:message name="helloIn">
+		<wsdl:part name="body" element="x1:body" />
+		<wsdl:part name="mime" type="xsd:base64Binary" />
+	</wsdl:message>
+
+	<wsdl:message name="helloOut">
+		<wsdl:part name="mime" type="xsd:base64Binary" />
+	</wsdl:message>
+
+	<wsdl:message name="helloMimeIn">
+		<wsdl:part name="body" element="x1:body" />
+		<wsdl:part name="mime" type="xsd:base64Binary" />
+	</wsdl:message>
+
+	<wsdl:message name="helloMimeOut">
+		<wsdl:part name="mime" type="xsd:base64Binary" />
+	</wsdl:message>
+
+	<wsdl:message name="addressIn">
+		<wsdl:part name="mime" element="x1:address" />
+	</wsdl:message>
+
+	<wsdl:message name="addressOut">
+		<wsdl:part name="mime" element="x1:addressRes" />
+	</wsdl:message>
+
+	<wsdl:portType name="Hello">
+		<wsdl:operation name="hello">
+			<wsdl:input message="tns:helloIn" />
+			<wsdl:output message="tns:helloOut" />
+		</wsdl:operation>
+
+
+		<wsdl:operation name="helloMime">
+			<wsdl:input message="tns:helloMimeIn" />
+			<wsdl:output message="tns:helloMimeOut" />
+		</wsdl:operation>
+
+		<wsdl:operation name="address">
+			<wsdl:input message="tns:addressIn" />
+			<wsdl:output message="tns:addressOut" />
+		</wsdl:operation>
+
+
+	</wsdl:portType>
+
+	<wsdl:binding name="HelloBinding" type="tns:Hello">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="hello">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="body" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="mime" type="image/jpeg" />
+					</mime:part>
+				</mime:multipartRelated>
+			</wsdl:input>
+			<wsdl:output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="mime" type="image/jpeg" />
+					</mime:part>
+				</mime:multipartRelated>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="helloMime">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="body" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="mime" type="image/jpeg" />
+					</mime:part>
+				</mime:multipartRelated>
+			</wsdl:input>
+			<wsdl:output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="mime" type="image/jpeg" />
+					</mime:part>
+				</mime:multipartRelated>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="address">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="mime" type="text/xml" />
+					</mime:part>
+				</mime:multipartRelated>
+			</wsdl:output>
+		</wsdl:operation>
+
+
+	</wsdl:binding>
+
+	<wsdl:service name="HelloService">
+		<wsdl:port name="soapPort" binding="tns:HelloBinding">
+			<soap:address location="http://localhost:8080/mime" />
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>

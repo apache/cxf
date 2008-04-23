@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://cxf.apache.org/DiffPortTypeNs-Import/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DiffPortTypeNs-Import"
+    targetNamespace="http://cxf.apache.org/DiffPortTypeNs-Import/">
+
+    <wsdl:message name="NewOperationResponse">
+        <wsdl:part name="NewOperationResponse" type="xsd:string" />
+    </wsdl:message>
+    <wsdl:message name="NewOperationRequest">
+        <wsdl:part name="NewOperationRequest" type="xsd:string" />
+    </wsdl:message>
+    <wsdl:portType name="DiffPortTypeNs">
+        <wsdl:operation name="NewOperation">
+            <wsdl:input message="tns:NewOperationRequest" />
+            <wsdl:output message="tns:NewOperationResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:message name="NewOperationResponseRpc">
+        <wsdl:part name="NewOperationResponseRpc" type="xsd:string" />
+    </wsdl:message>
+    <wsdl:message name="NewOperationRequestRpc">
+        <wsdl:part name="NewOperationRequestRpc" type="xsd:string" />
+    </wsdl:message>
+    <wsdl:portType name="DiffPortTypeNsRpc">
+        <wsdl:operation name="NewOperationRpc">
+            <wsdl:input message="tns:NewOperationRequestRpc" />
+            <wsdl:output message="tns:NewOperationResponseRpc" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+</wsdl:definitions>

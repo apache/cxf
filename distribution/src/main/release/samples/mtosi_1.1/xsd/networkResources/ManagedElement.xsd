@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="LayerRates.xsd"/>
+  <!-- ======== Global Type Declarations ========= -->
+  <xsd:simpleType name="CommunicationState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This state reflects a communication state between the EMS and its ManagedElement.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="CS_AVAILABLE"/>
+      <xsd:enumeration value="CS_UNAVAILABLE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="Version_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Identifies the version of the message associated with this header.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+	</xsd:restriction>
+  </xsd:simpleType>
+  <!-- ========= ManagedElement_T Declaration ======== -->
+  <xsd:complexType name="ManagedElement_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This aggregate defines the Managed Element object.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="location" type="Location_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The location is the geographical location of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="manufacturer" type="Manufacturer_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The manufacturer attribute identifies the managed element manufacturer name.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="productName" type="ProductName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The productName identifies the managed element product/type name.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="version" type="Version_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The active software version of the ManagedElement.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="InSyncState" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates if the EMS/OS is able to keep the current EMS/OS data synchronized with the current NE data and generate all appropriate notifications. The EMS sets this attribute to false to indicate that it requires resynchronization with NE data and that it is not able to generate the appropriate notifications (such as OCs/ODs/AVCs) while doing so. 
+The EMS/OS sets this attribute back to true when the resynchronization is completed and when notifications can start being generated as appropriate.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportedRates" type="LayerRateList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute is a list (possibly empty) of potential Cross Connection Rates at which it is possible to have cross-connections within the managed element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="communicationState" type="CommunicationState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This state reflects a communication state between the EMS and its ManagedElement.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="networkAccessDomain" type="NetworkAccessDomain_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          A free-format string used to associate the resource to a Network Access Domain.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="manufacturerDate" type="xsd:string" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The manufacturerDate attribute identifies the production date of the Equipment in the format of YYYYMMDD where YYYY = the 4-digit year of manufacture, MM is the 2-digit month, and DD is the 2-digit date.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>      
+      <xsd:element name="vendorExtensions" type="MEVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ========= ManagedElementList_T Declaration ======== -->
+  <xsd:complexType name="ManagedElementList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      List of ManagedElements
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="me" type="ManagedElement_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

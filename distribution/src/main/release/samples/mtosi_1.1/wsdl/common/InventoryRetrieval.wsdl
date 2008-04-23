@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-InventoryRetrievalInterfaces" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ===================== import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/InventoryRetrieval.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ===================== Import Exception Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ===================== Definition of getInventory Request/Response Messages ========= -->
+  <wsdl:message name="getInventory">
+    <wsdl:documentation>
+    The getInventory request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getInventory"/>
+  </wsdl:message>
+  <wsdl:message name="getInventoryResponse">
+    <wsdl:documentation>
+    The getInventory response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getInventoryResponse"/>
+  </wsdl:message>
+  <!-- ===================== Port Type Definitions ====================== -->
+  <!-- ===================== InventoryRetrieval Port Type  ===================== -->
+  <wsdl:portType name="InventoryRetrieval">
+    <wsdl:documentation>
+    The MTOSI InventoryRetrieval porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getInventory">
+      <wsdl:documentation>
+        This is the getInventory request/response operation.
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getInventory"/>
+      <wsdl:output message="tmf854WS:getInventoryResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

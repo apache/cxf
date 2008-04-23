@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap">
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" repositoryID="IDL:SeqLong:1.0" type="ns4:SeqLong" name="SeqLong" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:_Anon1_SeqSeqLong" name="_Anon1_SeqSeqLong" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:_Anon1_SeqSeqLong" elemname="item" bound="0" repositoryID="IDL:SeqSeqLong:1.0" type="ns5:SeqSeqLong" name="SeqSeqLong" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:SeqSeqSeqLong._Anon1_SeqSeqSeqLong" name="SeqSeqSeqLong._Anon1_SeqSeqSeqLong" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:SeqSeqSeqLong._Anon1_SeqSeqSeqLong" elemname="item" bound="0" type="ns5:_Anon1_SeqSeqSeqLong" name="_Anon1_SeqSeqSeqLong" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:_Anon1_SeqSeqSeqLong" elemname="item" bound="0" repositoryID="IDL:SeqSeqSeqLong:1.0" type="ns5:SeqSeqSeqLong" name="SeqSeqSeqLong" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:_Anon1_anonStruct" name="_Anon1_anonStruct" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonStruct._Anon1_anonStruct" name="anonStruct._Anon1_anonStruct" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonStruct._Anon1_anonStruct" elemname="item" bound="0" type="ns5:_Anon2_anonStruct" name="_Anon2_anonStruct" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonStruct._Anon2_anonStruct" name="anonStruct._Anon2_anonStruct" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonStruct._Anon2_anonStruct" elemname="item" bound="0" type="ns5:anonStruct._Anon3_anonStruct" name="anonStruct._Anon3_anonStruct" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonStruct._Anon3_anonStruct" elemname="item" bound="0" type="ns5:_Anon3_anonStruct" name="_Anon3_anonStruct" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" repositoryID="IDL:anonStruct:1.0" type="anonStruct" name="anonStruct">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="structSeqLong" idltype="ns4:_Anon1_anonStruct" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="structSeqSeqLong" idltype="ns4:_Anon2_anonStruct" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="structSeqSeqSeqLong" idltype="ns4:_Anon3_anonStruct" />
+    </corba:struct>
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:short" elemname="item" bound="0" type="ns4:_Anon1_anonTypedefStruct" name="_Anon1_anonTypedefStruct" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:short" elemname="item" bound="0" type="ns4:anonTypedefStruct._Anon1_anonTypedefStruct" name="anonTypedefStruct._Anon1_anonTypedefStruct" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonTypedefStruct._Anon1_anonTypedefStruct" elemname="item" bound="0" type="ns5:_Anon2_anonTypedefStruct" name="_Anon2_anonTypedefStruct" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:short" elemname="item" bound="0" type="ns4:anonTypedefStruct._Anon2_anonTypedefStruct" name="anonTypedefStruct._Anon2_anonTypedefStruct" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonTypedefStruct._Anon2_anonTypedefStruct" elemname="item" bound="0" type="ns5:anonTypedefStruct._Anon3_anonTypedefStruct" name="anonTypedefStruct._Anon3_anonTypedefStruct" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonTypedefStruct._Anon3_anonTypedefStruct" elemname="item" bound="0" type="ns5:_Anon3_anonTypedefStruct" name="_Anon3_anonTypedefStruct" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" repositoryID="IDL:anonTypedefStruct:1.0" type="anonTypedefStruct" name="anonTypedefStruct">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="typedefStructSeqShort" idltype="ns4:_Anon1_anonTypedefStruct" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="typedefStructSeqSeqShort" idltype="ns4:_Anon2_anonTypedefStruct" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="typedefStructSeqSeqSeqShort" idltype="ns4:_Anon3_anonTypedefStruct" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" basetype="anonTypedefStruct" repositoryID="IDL:myAnonTypedefStruct:1.0" name="myAnonTypedefStruct" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:_Anon1_anonUnion" name="_Anon1_anonUnion" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonUnion._Anon1_anonUnion" name="anonUnion._Anon1_anonUnion" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonUnion._Anon1_anonUnion" elemname="item" bound="0" type="ns5:_Anon2_anonUnion" name="_Anon2_anonUnion" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonUnion._Anon2_anonUnion" name="anonUnion._Anon2_anonUnion" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonUnion._Anon2_anonUnion" elemname="item" bound="0" type="ns5:anonUnion._Anon3_anonUnion" name="anonUnion._Anon3_anonUnion" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonUnion._Anon3_anonUnion" elemname="item" bound="0" type="ns5:_Anon3_anonUnion" name="_Anon3_anonUnion" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" discriminator="corba:long" repositoryID="IDL:anonUnion:1.0" type="anonUnion" name="anonUnion">
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="unionSeqLong" idltype="ns4:_Anon1_anonUnion">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="unionSeqSeqLong" idltype="ns4:_Anon2_anonUnion">
+        <corba:case label="2" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="unionSeqSeqSeqLong" idltype="ns4:_Anon3_anonUnion" default="true" />
+    </corba:union>
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:_Anon1_anonTypedefUnion" name="_Anon1_anonTypedefUnion" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonTypedefUnion._Anon1_anonTypedefUnion" name="anonTypedefUnion._Anon1_anonTypedefUnion" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonTypedefUnion._Anon1_anonTypedefUnion" elemname="item" bound="0" type="ns5:_Anon2_anonTypedefUnion" name="_Anon2_anonTypedefUnion" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonTypedefUnion._Anon2_anonTypedefUnion" name="anonTypedefUnion._Anon2_anonTypedefUnion" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonTypedefUnion._Anon2_anonTypedefUnion" elemname="item" bound="0" type="ns5:anonTypedefUnion._Anon3_anonTypedefUnion" name="anonTypedefUnion._Anon3_anonTypedefUnion" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonTypedefUnion._Anon3_anonTypedefUnion" elemname="item" bound="0" type="ns5:_Anon3_anonTypedefUnion" name="_Anon3_anonTypedefUnion" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" discriminator="corba:long" repositoryID="IDL:anonTypedefUnion:1.0" type="anonTypedefUnion" name="anonTypedefUnion">
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="typedefUnionSeqLong" idltype="ns4:_Anon1_anonTypedefUnion">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="typedefUnionSeqSeqLong" idltype="ns4:_Anon2_anonTypedefUnion">
+        <corba:case label="2" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="typedefUnionSeqSeqSeqLong" idltype="ns4:_Anon3_anonTypedefUnion" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" basetype="anonTypedefUnion" repositoryID="IDL:myAnonUnion:1.0" name="myAnonUnion" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:_Anon1_anonException" name="_Anon1_anonException" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonException._Anon1_anonException" name="anonException._Anon1_anonException" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonException._Anon1_anonException" elemname="item" bound="0" type="ns5:_Anon2_anonException" name="_Anon2_anonException" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonException._Anon2_anonException" name="anonException._Anon2_anonException" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonException._Anon2_anonException" elemname="item" bound="0" type="ns5:anonException._Anon3_anonException" name="anonException._Anon3_anonException" />
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonException._Anon3_anonException" elemname="item" bound="0" type="ns5:_Anon3_anonException" name="_Anon3_anonException" />
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" repositoryID="IDL:anonException:1.0" type="anonExceptionType" name="anonException">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="exceptionSeqLong" idltype="ns4:_Anon1_anonException" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="exceptionSeqSeqLong" idltype="ns4:_Anon2_anonException" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" name="exceptionSeqSeqSeqLong" idltype="ns4:_Anon3_anonException" />
+    </corba:exception>
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:float" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myFloatSeqSeq" name="anonSequences._Anon1_myFloatSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myFloatSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myFloatSeqSeq:1.0" type="ns5:anonSequences.myFloatSeqSeq" name="anonSequences.myFloatSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:double" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myDoubleSeqSeq" name="anonSequences._Anon1_myDoubleSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myDoubleSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myDoubleSeqSeq:1.0" type="ns5:anonSequences.myDoubleSeqSeq" name="anonSequences.myDoubleSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:longdouble" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myLongDoubleSeqSeq" name="anonSequences._Anon1_myLongDoubleSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myLongDoubleSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myLongDoubleSeqSeq:1.0" type="ns5:anonSequences.myLongDoubleSeqSeq" name="anonSequences.myLongDoubleSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:short" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myShortSeqSeq" name="anonSequences._Anon1_myShortSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myShortSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myShortSeqSeq:1.0" type="ns5:anonSequences.myShortSeqSeq" name="anonSequences.myShortSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myLongSeqSeq" name="anonSequences._Anon1_myLongSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myLongSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myLongSeqSeq:1.0" type="ns5:anonSequences.myLongSeqSeq" name="anonSequences.myLongSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:longlong" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myLonglongSeqSeq" name="anonSequences._Anon1_myLonglongSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myLonglongSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myLonglongSeqSeq:1.0" type="ns5:anonSequences.myLonglongSeqSeq" name="anonSequences.myLonglongSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:ushort" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myUnsignedShortSeqSeq" name="anonSequences._Anon1_myUnsignedShortSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myUnsignedShortSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myUnsignedShortSeqSeq:1.0" type="ns5:anonSequences.myUnsignedShortSeqSeq" name="anonSequences.myUnsignedShortSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:ulong" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myUnsignedLongSeqSeq" name="anonSequences._Anon1_myUnsignedLongSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myUnsignedLongSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myUnsignedLongSeqSeq:1.0" type="ns5:anonSequences.myUnsignedLongSeqSeq" name="anonSequences.myUnsignedLongSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myUnsignedLongLongSeqSeq" name="anonSequences._Anon1_myUnsignedLongLongSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myUnsignedLongLongSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myUnsignedLongLongSeqSeq:1.0" type="ns5:anonSequences.myUnsignedLongLongSeqSeq" name="anonSequences.myUnsignedLongLongSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:char" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myCharSeqSeq" name="anonSequences._Anon1_myCharSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myCharSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myCharSeqSeq:1.0" type="ns5:anonSequences.myCharSeqSeq" name="anonSequences.myCharSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:wchar" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myWcharSeqSeq" name="anonSequences._Anon1_myWcharSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myWcharSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myWcharSeqSeq:1.0" type="ns5:anonSequences.myWcharSeqSeq" name="anonSequences.myWcharSeqSeq" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="" elemtype="corba:boolean" elemname="item" bound="0" type="ns4:anonSequences._Anon1_myBooleanSeqSeq" name="anonSequences._Anon1_myBooleanSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myBooleanSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myBooleanSeqSeq:1.0" type="ns5:anonSequences.myBooleanSeqSeq" name="anonSequences.myBooleanSeqSeq" />
+    <corba:anonsequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="" elemtype="corba:octet" elemname="item" bound="0" type="xs:base64Binary" name="anonSequences._Anon1_myOctetSeqSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonsequence/typemap" xmlns="" elemtype="ns4:anonSequences._Anon1_myOctetSeqSeq" elemname="item" bound="0" repositoryID="IDL:anonSequences/myOctetSeqSeq:1.0" type="ns5:anonSequences.myOctetSeqSeq" name="anonSequences.myOctetSeqSeq" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns="http://cxf.apache.org/bindings/corba/idl/Anonsequence" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="SeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_SeqSeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SeqSeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="_Anon1_SeqSeqLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SeqSeqSeqLong._Anon1_SeqSeqSeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_SeqSeqSeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="SeqSeqSeqLong._Anon1_SeqSeqSeqLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SeqSeqSeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="_Anon1_SeqSeqSeqLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_anonStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonStruct._Anon1_anonStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_anonStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonStruct._Anon1_anonStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonStruct._Anon2_anonStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonStruct._Anon3_anonStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonStruct._Anon2_anonStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_anonStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonStruct._Anon3_anonStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonStruct">
+        <xs:sequence>
+          <xs:element name="structSeqLong" type="_Anon1_anonStruct">
+          </xs:element>
+          <xs:element name="structSeqSeqLong" type="_Anon2_anonStruct">
+          </xs:element>
+          <xs:element name="structSeqSeqSeqLong" type="_Anon3_anonStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_anonTypedefStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefStruct._Anon1_anonTypedefStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_anonTypedefStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonTypedefStruct._Anon1_anonTypedefStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefStruct._Anon2_anonTypedefStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefStruct._Anon3_anonTypedefStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonTypedefStruct._Anon2_anonTypedefStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_anonTypedefStruct">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonTypedefStruct._Anon3_anonTypedefStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefStruct">
+        <xs:sequence>
+          <xs:element name="typedefStructSeqShort" type="_Anon1_anonTypedefStruct">
+          </xs:element>
+          <xs:element name="typedefStructSeqSeqShort" type="_Anon2_anonTypedefStruct">
+          </xs:element>
+          <xs:element name="typedefStructSeqSeqSeqShort" type="_Anon3_anonTypedefStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_anonUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonUnion._Anon1_anonUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_anonUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonUnion._Anon1_anonUnion">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonUnion._Anon2_anonUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonUnion._Anon3_anonUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonUnion._Anon2_anonUnion">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_anonUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonUnion._Anon3_anonUnion">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonUnion">
+        <xs:choice>
+          <xs:element name="unionSeqLong" type="_Anon1_anonUnion">
+          </xs:element>
+          <xs:element name="unionSeqSeqLong" type="_Anon2_anonUnion">
+          </xs:element>
+          <xs:element name="unionSeqSeqSeqLong" type="_Anon3_anonUnion">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_anonTypedefUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefUnion._Anon1_anonTypedefUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_anonTypedefUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonTypedefUnion._Anon1_anonTypedefUnion">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefUnion._Anon2_anonTypedefUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefUnion._Anon3_anonTypedefUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonTypedefUnion._Anon2_anonTypedefUnion">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_anonTypedefUnion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonTypedefUnion._Anon3_anonTypedefUnion">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonTypedefUnion">
+        <xs:choice>
+          <xs:element name="typedefUnionSeqLong" type="_Anon1_anonTypedefUnion">
+          </xs:element>
+          <xs:element name="typedefUnionSeqSeqLong" type="_Anon2_anonTypedefUnion">
+          </xs:element>
+          <xs:element name="typedefUnionSeqSeqSeqLong" type="_Anon3_anonTypedefUnion">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_anonException">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonException._Anon1_anonException">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_anonException">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonException._Anon1_anonException">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonException._Anon2_anonException">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonException._Anon3_anonException">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonException._Anon2_anonException">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon3_anonException">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonException._Anon3_anonException">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="anonException" type="anonExceptionType">
+      </xs:element>
+      <xs:complexType name="anonExceptionType">
+        <xs:sequence>
+          <xs:element name="exceptionSeqLong" type="_Anon1_anonException">
+          </xs:element>
+          <xs:element name="exceptionSeqSeqLong" type="_Anon2_anonException">
+          </xs:element>
+          <xs:element name="exceptionSeqSeqSeqLong" type="_Anon3_anonException">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myFloatSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:float">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myFloatSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myFloatSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myDoubleSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:double">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myDoubleSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myDoubleSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myLongDoubleSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:double">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myLongDoubleSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myLongDoubleSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myShortSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myShortSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myShortSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myLongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myLongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myLongSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myLonglongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:long">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myLonglongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myLonglongSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myUnsignedShortSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedShort">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myUnsignedShortSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myUnsignedShortSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myUnsignedLongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedInt">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myUnsignedLongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myUnsignedLongSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myUnsignedLongLongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myUnsignedLongLongSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myUnsignedLongLongSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myCharSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:byte">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myCharSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myCharSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myWcharSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myWcharSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myWcharSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences._Anon1_myBooleanSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:boolean">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myBooleanSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonSequences._Anon1_myBooleanSeqSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="anonSequences.myOctetSeqSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:base64Binary">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="anonException">
+    <wsdl:part name="exception" element="tns:anonException">
+    </wsdl:part>
+  </wsdl:message>
+</wsdl:definitions>

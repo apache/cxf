@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.apache.org/configuration/foo" targetNamespace="http://cxf.apache.org/configuration/foo" elementFormDefault="qualified">
+
+    <xs:element name="foo" type="tns:foo"/>
+    
+    <xs:simpleType name="celsius">
+        <xs:restriction base="xs:int">
+            <xs:minExclusive value="-273"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="cel">
+        <xs:restriction base="tns:celsius">
+            <xs:minExclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="drivingDecision">
+    	<xs:restriction base="xs:string">
+    		<xs:enumeration value="RightTurn"/>
+    		<xs:enumeration value="LeftTurn"/>
+    		<xs:enumeration value="U-Turn"/>
+    	</xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="pageColor">
+	<xs:sequence>
+	    <xs:element name="background" type="xs:string" default="red"/>
+	    <xs:element name="foreground" type="xs:string" default="blue"/>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="foo">        
+        <xs:sequence>
+	    <xs:element name="pageColor" type="tns:pageColor" minOccurs="0"></xs:element>
+            <xs:element name="driving" type="tns:drivingDecision" default="LeftTurn" minOccurs="0"></xs:element>
+            <xs:element name="stringElem" type="xs:string" default="hello" minOccurs="0"></xs:element>
+            <xs:element name="booleanElem" type="xs:boolean" default="true" minOccurs="0"></xs:element>
+            <xs:element name="integerElem" type="xs:integer" default="11" minOccurs="0"></xs:element>
+            <xs:element name="intElem" type="xs:int" default="12" minOccurs="0"></xs:element>
+            <xs:element name="longElem" type="xs:long" default="13" minOccurs="0"></xs:element>
+            <xs:element name="shortElem" type="xs:short" default="14" minOccurs="0"></xs:element>
+            <xs:element name="decimalElem" type="xs:decimal" default="15" minOccurs="0"></xs:element>
+            <xs:element name="floatElem" type="xs:float" default="16" minOccurs="0"></xs:element>
+            <xs:element name="doubleElem" type="xs:double" default="17" minOccurs="0"></xs:element>
+            <xs:element name="byteElem" type="xs:byte" default="18" minOccurs="0"></xs:element>
+            <xs:element name="qnameElem" type="xs:QName" default="xs:string" minOccurs="0"></xs:element>
+            <xs:element name="base64BinaryElem" type="xs:base64Binary" default="abcdefgh" minOccurs="0"></xs:element>
+            <xs:element name="hexBinaryElem" type="xs:hexBinary" default="ffff" minOccurs="0"></xs:element>
+            <xs:element name="unsignedIntElem" type="xs:unsignedInt" default="19" minOccurs="0"></xs:element>
+            <xs:element name="unsignedShortElem" type="xs:unsignedShort" default="20" minOccurs="0"></xs:element>
+            <xs:element name="unsignedByteElem" type="xs:unsignedByte" default="21" minOccurs="0"></xs:element>
+            <xs:element name="durationElem" type="xs:duration" default="PT3H" minOccurs="0"></xs:element>
+            <xs:element name="temperature" type="tns:celsius" default="37" minOccurs="0"></xs:element>
+            <xs:element name="roomTemperature" type="tns:cel" default="38" minOccurs="0"></xs:element>
+            
+            <xs:element name="point" type="tns:point" minOccurs="0"></xs:element>
+
+            <xs:element name="address" minOccurs="0">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="city" type="xs:string"></xs:element>
+                    <xs:element name="zip" type="xs:int"></xs:element>
+                    <xs:element name="street" type="xs:string"></xs:element>
+                    <xs:element name="nr" type="xs:int"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+
+        <xs:attribute name="stringAttr" type="xs:string" default="hello"/>
+        <xs:attribute name="booleanAttr" type="xs:boolean" default="true"/>
+        <xs:attribute name="integerAttr" type="xs:integer" default="111"/>
+        <xs:attribute name="intAttr" type="xs:int" default="112"/>
+        <xs:attribute name="longAttr" type="xs:long" default="113"/>
+        <xs:attribute name="shortAttr" type="xs:short" default="114"/>
+        <xs:attribute name="decimalAttr" type="xs:decimal" default="115"/>
+        <xs:attribute name="floatAttr" type="xs:float" default="116"/>
+        <xs:attribute name="doubleAttr" type="xs:double" default="117"/>
+        <xs:attribute name="byteAttr" type="xs:byte" default="118"/>
+        <xs:attribute name="qnameAttr" type="xs:QName" default="xs:schema"/>
+        <xs:attribute name="base64BinaryAttr" type="xs:base64Binary" default="wxyz"/>
+        <xs:attribute name="hexBinaryAttr" type="xs:hexBinary" default="aaaa"/>
+        <xs:attribute name="unsignedIntAttr" type="xs:unsignedInt" default="119"/>
+        <xs:attribute name="unsignedShortAttr" type="xs:unsignedShort" default="120"/>
+        <xs:attribute name="unsignedByteAttr" type="xs:unsignedByte" default="121"/>
+        <xs:attribute name="durationAttr" type="xs:duration" default="PT3S"/>
+        
+        <xs:attribute name="stringAttrNoDefault" type="xs:string"/>
+        <xs:attribute name="booleanAttrNoDefault" type="xs:boolean"/>
+        <xs:attribute name="integerAttrNoDefault" type="xs:integer"/>
+        <xs:attribute name="intAttrNoDefault" type="xs:int"/>
+        <xs:attribute name="longAttrNoDefault" type="xs:long"/>
+        <xs:attribute name="shortAttrNoDefault" type="xs:short"/>
+        <xs:attribute name="decimalAttrNoDefault" type="xs:decimal"/>
+        <xs:attribute name="floatAttrNoDefault" type="xs:float"/>
+        <xs:attribute name="doubleAttrNoDefault" type="xs:double"/>
+        <xs:attribute name="byteAttrNoDefault" type="xs:byte"/>
+        <xs:attribute name="qnameAttrNoDefault" type="xs:QName"/>
+        <xs:attribute name="base64BinaryAttrNoDefault" type="xs:base64Binary"/>
+        <xs:attribute name="hexBinaryAttrNoDefault" type="xs:hexBinary"/>
+        <xs:attribute name="unsignedIntAttrNoDefault" type="xs:unsignedInt"/>
+        <xs:attribute name="unsignedShortAttrNoDefault" type="xs:unsignedShort"/>
+        <xs:attribute name="unsignedByteAttrNoDefault" type="xs:unsignedByte"/>
+        <xs:attribute name="durationAttrNoDefault" type="xs:duration"/>
+    </xs:complexType>
+    
+    <xs:complexType name="point">
+        <xs:sequence>
+            <xs:element name="x" type="xs:int"></xs:element>
+            <xs:element name="y" type="xs:int"></xs:element>
+        </xs:sequence>
+    </xs:complexType>    
+        
+</xs:schema>

@@ -1,0 +1,136 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */ 
+
+typedef sequence<string> stringArray;
+
+interface Primitives {
+
+    void getShort   (out   short outShort);
+    void setShort   (in    short inShort);
+    void getSetShort(inout short inOutShort);
+    short testShort(in short inShort,
+                    inout short inoutShort,
+                    out short outShort);
+
+    void getUnsignedShort   (out   unsigned short outUnsignedShort);
+    void setUnsignedShort   (in    unsigned short inUnsignedShort);
+    void getSetUnsignedShort(inout unsigned short inOutUnsignedShort);
+    unsigned short testUnsignedShort(in unsigned short inUnsignedShort,
+                                     out unsigned short outUnsignedShort,
+                                     inout unsigned short inoutUnsignedShort);
+
+    void getLong   (out   long outLong);
+    void setLong   (in    long inLong);
+    void getSetLong(inout long inOutLong);
+    long testLong(in long inLong,
+                  out long outLong,
+                  inout long inoutLong);
+
+    void getUnsignedLong   (out   unsigned long outUnsignedLong);
+    void setUnsignedLong   (in    unsigned long inUnsignedLong);
+    void getSetUnsignedLong(inout unsigned long inOutUnsignedLong);
+    unsigned long testUnsignedLong(in unsigned long inUnsignedLong,
+                                   out unsigned long outUnsignedLong,
+                                   inout unsigned long inoutUnsignedLong);
+
+    void getLongLong   (out   long long outLong);
+    void setLongLong   (in    long long inLong);
+    void getSetLongLong(inout long long inoutLong);
+    long long testLongLong(in long long inLongLong,
+                           out long long outLongLong,
+                           inout long long inoutLongLong);
+
+    void getUnsignedLongLong   (out   unsigned long long outUnsignedLongLong);
+    void setUnsignedLongLong   (in    unsigned long long inUnsignedLongLong);
+    void getSetUnsignedLongLong(inout unsigned long long inOutUnsignedLongLong);
+    unsigned long long testUnsignedLongLong(in unsigned long long inUnsignedLongLong,
+                                            out unsigned long long outUnsignedLongLong,
+                                            inout unsigned long long inoutUnsignedLongLong);
+
+    void getFloat   (out   float outFloat);
+    void setFloat   (in    float inFloat);
+    void getSetFloat(inout float inOutFloat);
+    float testFloat(in float inFloat,
+                    out float outFloat,
+                    inout float inoutFloat);
+
+    void getDouble   (out   double outDouble);
+    void setDouble   (in    double inDouble);
+    void getSetDouble(inout double inOutDouble);
+    double testDouble(in double inDouble,
+                      out double outDouble,
+                      inout double inoutDouble);
+
+    void getChar   (out   char outChar);
+    void setChar   (in    char inChar);
+    void getSetChar(inout char inOutChar);
+    char testChar(in char inChar,
+                  out char outChar,
+                  inout char inoutChar);
+	
+    void getWChar   (out   wchar outWChar);
+    void setWChar   (in    wchar inWChar);
+    void getSetWChar(inout wchar inOutWChar);
+    wchar testWchar(in wchar inWchar,
+                    out wchar outWchar,
+                    inout wchar inoutWchar);
+
+    void getBoolean   (out   boolean outBoolean);
+    void setBoolean   (in    boolean inBoolean);
+    void getSetBoolean(inout boolean inOutBoolean);
+    boolean testBoolean(in boolean inBoolean,
+                        inout boolean inoutBoolean,
+                        out boolean outBoolean);
+	
+    void getOctet   (out   octet outOctet);
+    void setOctet   (in    octet inOctet);
+    void getSetOctet(inout octet inOutOctet);
+    octet testOctet(in octet inOctet,
+                    out octet outOctet,
+                    inout octet inoutOctet);
+
+    void getAny   (out   any outAny);
+    void setAny   (in    any inAny);
+    void getSetAny(inout any inOutAny);
+    any testAny(in any inAny,
+                out any outAny,
+                inout any inoutAny);
+
+
+
+    void getString   (out   string outString);
+    void setString   (in    string inString);
+    void getSetString(inout string inOutString);
+    string testString(in string inString,
+                      inout string inoutString,
+                      out string outString);
+
+    void getWstring   (out   wstring outWstring);
+    void setWstring   (in    wstring inWstring);
+    void getSetWstring(inout wstring inOutWstring);
+    wstring testWstring(in wstring inWstring,
+                      inout wstring inoutWstring,
+                      out wstring outWstring);
+
+
+    void getStringArray(out stringArray outStringArray);
+    void setStringArray(in stringArray inStringArray);
+    void getSetStringArray(inout stringArray inOutStringArray);	
+
+};

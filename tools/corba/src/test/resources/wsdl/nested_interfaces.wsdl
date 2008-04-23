@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="nested_interfaces" 
+    targetNamespace="http://schemas.apache.org/idl/nested_interfaces.idl" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://schemas.apache.org/bindings/corba" 
+    xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_interfaces.idl" 
+    xmlns:tns="http://schemas.apache.org/idl/nested_interfaces.idl" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl">
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/idltypes/nested_interfaces.idl" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="A.A1.AA1">
+                <sequence>
+                    <element name="s" type="string"/>
+                    <element name="f" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="B.B1.BB1">
+                <sequence>
+                    <element name="t" type="short"/>
+                    <element name="r" type="xsd1:A.A1.AA1"/>
+                </sequence>
+            </complexType>
+            <simpleType name="C.C1.aString">
+                <restriction base="string">
+                    <maxLength value="14"/>
+                </restriction>
+            </simpleType>
+            <complexType name="C.C1.CC1">
+                <sequence>
+                    <element name="aString_f" type="xsd1:C.C1.aString"/>
+                    <element name="b_f" type="xsd1:B.B1.BB1"/>
+                </sequence>
+            </complexType>
+            <element name="A.A1.op_AA1">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:A.A1.AA1"/>
+                        <element name="p2" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="A.A1.op_AA1Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:A.A1.AA1"/>
+                        <element name="p2" type="xsd1:A.A1.AA1"/>
+                        <element name="p3" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="B.B1.op_BB1">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="B.B1.op_BB1Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:B.B1.BB1"/>
+                        <element name="p2" type="xsd1:B.B1.BB1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="C.C1.op_CC1">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:C.C1.CC1"/>
+                        <element name="p2" type="xsd1:B.B1.BB1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="C.C1.op_CC1Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:C.C1.CC1"/>
+                        <element name="p2" type="xsd1:B.B1.BB1"/>
+                        <element name="p3" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
+    <message name="A.A1.op_AA1">
+        <part element="xsd1:A.A1.op_AA1" name="parameters"/>
+    </message>
+    <message name="A.A1.op_AA1Response">
+        <part element="xsd1:A.A1.op_AA1Result" name="parameters"/>
+    </message>
+    <message name="B.B1.op_BB1">
+        <part element="xsd1:B.B1.op_BB1" name="parameters"/>
+    </message>
+    <message name="B.B1.op_BB1Response">
+        <part element="xsd1:B.B1.op_BB1Result" name="parameters"/>
+    </message>
+    <message name="C.C1.op_CC1">
+        <part element="xsd1:C.C1.op_CC1" name="parameters"/>
+    </message>
+    <message name="C.C1.op_CC1Response">
+        <part element="xsd1:C.C1.op_CC1Result" name="parameters"/>
+    </message>
+    <portType name="A.A1">
+        <operation name="op_AA1">
+            <input message="tns:A.A1.op_AA1" name="op_AA1"/>
+            <output message="tns:A.A1.op_AA1Response" name="op_AA1Response"/>
+        </operation>
+    </portType>
+    <portType name="B.B1">
+        <operation name="op_BB1">
+            <input message="tns:B.B1.op_BB1" name="op_BB1"/>
+            <output message="tns:B.B1.op_BB1Response" name="op_BB1Response"/>
+        </operation>
+    </portType>
+    <portType name="C.C1">
+        <operation name="op_CC1">
+            <input message="tns:C.C1.op_CC1" name="op_CC1"/>
+            <output message="tns:C.C1.op_CC1Response" name="op_CC1Response"/>
+        </operation>
+    </portType>
+</definitions>

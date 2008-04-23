@@ -1,0 +1,20 @@
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/xml
+Content-ID: <rootPart>
+
+<attachmentRequest count="2"/>
+
+------=_Part_4_701508.1145579811786
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+Content-ID: <foo>
+
+foobar
+------=_Part_4_701508.1145579811786--
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+Content-ID: <bar>
+
+barbaz
+------=_Part_4_701508.1145579811786--

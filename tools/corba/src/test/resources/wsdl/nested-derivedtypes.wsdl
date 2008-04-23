@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="mf" targetNamespace="http://schemas.apache.org/idl/mf.idl" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://schemas.apache.org/bindings/corba" 
+    xmlns:corbatm="http://schemas.apache.org/typemap/corba/mf.idl" 
+    xmlns:tns="http://schemas.apache.org/idl/mf.idl" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl">
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/idltypes/mf.idl" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified">
+            <complexType name="base">
+                <sequence>
+                    <element name="e1" type="int"/>
+                    <element name="e2" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1SequenceStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub1SequenceStruct_f" type="xsd1:sub1SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub2ChoiceType">
+                <choice>
+                    <element name="e4" type="double"/>
+                    <element name="e5" type="double"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_sub2ChoiceType">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="e4" type="double"/>
+                        <element name="e5" type="double"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="sub2">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub2ChoiceType_f" type="xsd1:sub2ChoiceType"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3SequenceStruct">
+                <sequence>
+                    <element name="e6" type="boolean"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3">
+                <sequence>
+                    <element name="sub2_f" type="xsd1:sub2"/>
+                    <element name="sub3SequenceStruct_f" type="xsd1:sub3SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromEmptySequenceSequenceStruct">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromEmptySequence">
+                <sequence>
+                    <element name="ExtendFromEmptySequenceSequenceStruct_f" 
+                        type="xsd1:ExtendFromEmptySequenceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ContainingAnonSequenceSequenceStruct">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ContainingAnonSequence">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="ContainingAnonSequenceSequenceStruct_f" 
+                        type="xsd1:ContainingAnonSequenceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromContainingAnonSequenceSequenceStruct">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromContainingAnonSequence">
+                <sequence>
+                    <element name="ContainingAnonSequence_f" 
+                        type="xsd1:ContainingAnonSequence"/>
+                    <element name="ExtendFromContainingAnonSequenceSequenceStruct_f" 
+                        type="xsd1:ExtendFromContainingAnonSequenceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromSchemaTypeSequenceStruct">
+                <sequence>
+                    <element name="varString" type="string"/>
+                    <element name="varFloat" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromSchemaType">
+                <sequence>
+                    <element name="attrString" type="string"/>
+                    <element name="string_f" type="string"/>
+                    <element name="ExtendFromSchemaTypeSequenceStruct_f" 
+                        type="xsd1:ExtendFromSchemaTypeSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="baseAll">
+                <sequence>
+                    <element name="e1" type="int"/>
+                    <element name="e2" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="AllExtendingAllAllStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="AllExtendingAll">
+                <sequence>
+                    <element name="baseAll_f" type="xsd1:baseAll"/>
+                    <element name="AllExtendingAllAllStruct_f" 
+                        type="xsd1:AllExtendingAllAllStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="SequenceExtendedFromAllSequenceStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="SequenceExtendedFromAll">
+                <sequence>
+                    <element name="baseAll_f" type="xsd1:baseAll"/>
+                    <element name="SequenceExtendedFromAllSequenceStruct_f" 
+                        type="xsd1:SequenceExtendedFromAllSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceElem">
+                <choice>
+                    <element name="a" type="string"/>
+                    <element name="b" type="string"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_ChoiceElem">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="a" type="string"/>
+                        <element name="b" type="string"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromChoiceSequenceStruct">
+                <sequence>
+                    <element name="c" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromChoice">
+                <sequence>
+                    <element name="ChoiceElem_f" type="xsd1:ChoiceElem"/>
+                    <element name="ExtendFromChoiceSequenceStruct_f" 
+                        type="xsd1:ExtendFromChoiceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceDerivedFromSequenceChoiceType">
+                <choice>
+                    <element name="a" type="string"/>
+                    <element name="b" type="string"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_ChoiceDerivedFromSequenceChoiceType">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="a" type="string"/>
+                        <element name="b" type="string"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceDerivedFromSequence">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="ChoiceDerivedFromSequenceChoiceType_f" 
+                        type="xsd1:ChoiceDerivedFromSequenceChoiceType"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceInTheMiddleSequenceStruct">
+                <sequence>
+                    <element name="c" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceInTheMiddle">
+                <sequence>
+                    <element name="ChoiceDerivedFromSequence_f" 
+                        type="xsd1:ChoiceDerivedFromSequence"/>
+                    <element name="ChoiceInTheMiddleSequenceStruct_f" 
+                        type="xsd1:ChoiceInTheMiddleSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedElement">
+                <sequence>
+                    <element maxOccurs="3" minOccurs="0" name="item" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromRepeatedElementSequenceStruct">
+                <sequence>
+                    <element name="c" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromRepeatedElement">
+                <sequence>
+                    <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
+                    <element name="ExtendFromRepeatedElementSequenceStruct_f" 
+                        type="xsd1:ExtendFromRepeatedElementSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="sArray">
+                <sequence>
+                    <element maxOccurs="4" minOccurs="0" name="item" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedFromRepeatedElementSequenceStruct">
+                <sequence>
+                    <element name="s" type="xsd1:sArray"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedFromRepeatedElement">
+                <sequence>
+                    <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
+                    <element name="RepeatedFromRepeatedElementSequenceStruct_f" 
+                        type="xsd1:RepeatedFromRepeatedElementSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedSequenceFromRepeatedElementSequenceStruct">
+                <sequence>
+                    <element name="s" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedSequenceFromRepeatedElementSequenceStructArray">
+                <sequence>
+                    <element maxOccurs="4" minOccurs="0" name="item" 
+                        type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedSequenceFromRepeatedElement">
+                <sequence>
+                    <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
+                    <element 
+                        name="RepeatedSequenceFromRepeatedElementSequenceStructArray_f" 
+                        type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStructArray"/>
+                </sequence>
+            </complexType>
+            <element name="DerivedTypesPortType.echoBaseObj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoBaseObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub1Obj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:sub1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub1ObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub2Obj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub2ObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub3Obj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:sub3"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub3ObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub3"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromEmptySequence">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromEmptySequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromEmptySequenceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromEmptySequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromContainingAnonSequence">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromContainingAnonSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element 
+                name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" 
+                            type="xsd1:ExtendFromContainingAnonSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromSchemaType">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromSchemaType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromSchemaTypeResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromSchemaType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoAllExtendingAll">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:AllExtendingAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoAllExtendingAllResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:AllExtendingAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSequenceExtendedFromAll">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:SequenceExtendedFromAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSequenceExtendedFromAllResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:SequenceExtendedFromAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromChoice">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromChoice"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromChoiceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromChoice"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceDerivedFromSequence">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ChoiceDerivedFromSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceDerivedFromSequenceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ChoiceDerivedFromSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceInTheMiddle">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ChoiceInTheMiddle"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceInTheMiddleResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ChoiceInTheMiddle"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromRepeatedElement">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromRepeatedElementResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoRepeatedFromRepeatedElement">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:RepeatedFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoRepeatedFromRepeatedElementResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:RepeatedFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
+    <message name="DerivedTypesPortType.echoBaseObj">
+        <part element="xsd1:DerivedTypesPortType.echoBaseObj" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoBaseObjResponse">
+        <part element="xsd1:DerivedTypesPortType.echoBaseObjResult" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSub1Obj">
+        <part element="xsd1:DerivedTypesPortType.echoSub1Obj" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSub1ObjResponse">
+        <part element="xsd1:DerivedTypesPortType.echoSub1ObjResult" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSub2Obj">
+        <part element="xsd1:DerivedTypesPortType.echoSub2Obj" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSub2ObjResponse">
+        <part element="xsd1:DerivedTypesPortType.echoSub2ObjResult" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSub3Obj">
+        <part element="xsd1:DerivedTypesPortType.echoSub3Obj" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSub3ObjResponse">
+        <part element="xsd1:DerivedTypesPortType.echoSub3ObjResult" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromEmptySequence">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequence" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromEmptySequenceResponse">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequenceResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromContainingAnonSequence">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequence" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse">
+        <part 
+            element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromSchemaType">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromSchemaType" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromSchemaTypeResponse">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromSchemaTypeResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoAllExtendingAll">
+        <part element="xsd1:DerivedTypesPortType.echoAllExtendingAll" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoAllExtendingAllResponse">
+        <part element="xsd1:DerivedTypesPortType.echoAllExtendingAllResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSequenceExtendedFromAll">
+        <part element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAll" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoSequenceExtendedFromAllResponse">
+        <part element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAllResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromChoice">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromChoice" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromChoiceResponse">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromChoiceResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoChoiceDerivedFromSequence">
+        <part element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequence" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse">
+        <part element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequenceResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoChoiceInTheMiddle">
+        <part element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddle" name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoChoiceInTheMiddleResponse">
+        <part element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddleResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromRepeatedElement">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElement" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoExtendFromRepeatedElementResponse">
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElementResult" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoRepeatedFromRepeatedElement">
+        <part element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElement" 
+            name="parameters"/>
+    </message>
+    <message name="DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse">
+        <part element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElementResult" 
+            name="parameters"/>
+    </message>
+    <portType name="DerivedTypesPortType">
+        <operation name="echoBaseObj">
+            <input message="tns:DerivedTypesPortType.echoBaseObj" name="echoBaseObj"/>
+            <output message="tns:DerivedTypesPortType.echoBaseObjResponse" 
+                name="echoBaseObjResponse"/>
+        </operation>
+        <operation name="echoSub1Obj">
+            <input message="tns:DerivedTypesPortType.echoSub1Obj" name="echoSub1Obj"/>
+            <output message="tns:DerivedTypesPortType.echoSub1ObjResponse" 
+                name="echoSub1ObjResponse"/>
+        </operation>
+        <operation name="echoSub2Obj">
+            <input message="tns:DerivedTypesPortType.echoSub2Obj" name="echoSub2Obj"/>
+            <output message="tns:DerivedTypesPortType.echoSub2ObjResponse" 
+                name="echoSub2ObjResponse"/>
+        </operation>
+        <operation name="echoSub3Obj">
+            <input message="tns:DerivedTypesPortType.echoSub3Obj" name="echoSub3Obj"/>
+            <output message="tns:DerivedTypesPortType.echoSub3ObjResponse" 
+                name="echoSub3ObjResponse"/>
+        </operation>
+        <operation name="echoExtendFromEmptySequence">
+            <input message="tns:DerivedTypesPortType.echoExtendFromEmptySequence" 
+                name="echoExtendFromEmptySequence"/>
+            <output 
+                message="tns:DerivedTypesPortType.echoExtendFromEmptySequenceResponse" 
+                name="echoExtendFromEmptySequenceResponse"/>
+        </operation>
+        <operation name="echoExtendFromContainingAnonSequence">
+            <input 
+                message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequence" 
+                name="echoExtendFromContainingAnonSequence"/>
+            <output 
+                message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse" 
+                name="echoExtendFromContainingAnonSequenceResponse"/>
+        </operation>
+        <operation name="echoExtendFromSchemaType">
+            <input message="tns:DerivedTypesPortType.echoExtendFromSchemaType" 
+                name="echoExtendFromSchemaType"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromSchemaTypeResponse" 
+                name="echoExtendFromSchemaTypeResponse"/>
+        </operation>
+        <operation name="echoAllExtendingAll">
+            <input message="tns:DerivedTypesPortType.echoAllExtendingAll" 
+                name="echoAllExtendingAll"/>
+            <output message="tns:DerivedTypesPortType.echoAllExtendingAllResponse" 
+                name="echoAllExtendingAllResponse"/>
+        </operation>
+        <operation name="echoSequenceExtendedFromAll">
+            <input message="tns:DerivedTypesPortType.echoSequenceExtendedFromAll" 
+                name="echoSequenceExtendedFromAll"/>
+            <output 
+                message="tns:DerivedTypesPortType.echoSequenceExtendedFromAllResponse" 
+                name="echoSequenceExtendedFromAllResponse"/>
+        </operation>
+        <operation name="echoExtendFromChoice">
+            <input message="tns:DerivedTypesPortType.echoExtendFromChoice" 
+                name="echoExtendFromChoice"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromChoiceResponse" 
+                name="echoExtendFromChoiceResponse"/>
+        </operation>
+        <operation name="echoChoiceDerivedFromSequence">
+            <input message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequence" 
+                name="echoChoiceDerivedFromSequence"/>
+            <output 
+                message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse" 
+                name="echoChoiceDerivedFromSequenceResponse"/>
+        </operation>
+        <operation name="echoChoiceInTheMiddle">
+            <input message="tns:DerivedTypesPortType.echoChoiceInTheMiddle" 
+                name="echoChoiceInTheMiddle"/>
+            <output message="tns:DerivedTypesPortType.echoChoiceInTheMiddleResponse" 
+                name="echoChoiceInTheMiddleResponse"/>
+        </operation>
+        <operation name="echoExtendFromRepeatedElement">
+            <input message="tns:DerivedTypesPortType.echoExtendFromRepeatedElement" 
+                name="echoExtendFromRepeatedElement"/>
+            <output 
+                message="tns:DerivedTypesPortType.echoExtendFromRepeatedElementResponse" 
+                name="echoExtendFromRepeatedElementResponse"/>
+        </operation>
+        <operation name="echoRepeatedFromRepeatedElement">
+            <input message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElement" 
+                name="echoRepeatedFromRepeatedElement"/>
+            <output 
+                message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse" 
+                name="echoRepeatedFromRepeatedElementResponse"/>
+        </operation>
+    </portType>
+</definitions>

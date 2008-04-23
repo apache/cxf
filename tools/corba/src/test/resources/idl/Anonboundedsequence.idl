@@ -1,0 +1,89 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+
+
+
+typedef sequence<unsigned long, 10> SeqLong;
+typedef sequence< sequence<long, 10>, 100> SeqSeqLong;
+typedef sequence< sequence< sequence<long, 10>, 100 >, 1000 > SeqSeqSeqLong;
+
+
+struct anonStruct {
+
+    sequence<long, 10> structSeqLong;
+    sequence< sequence< long, 10 >, 100 > structSeqSeqLong;
+    sequence< sequence< sequence<long, 10>, 100 >, 1000 > structSeqSeqSeqLong;
+
+};
+
+typedef struct anonTypedefStruct {
+
+    sequence< short, 10 > typedefStructSeqShort;
+    sequence< sequence< short, 10 >, 100 > typedefStructSeqSeqShort;
+    sequence< sequence< sequence< short, 10 >, 100 >, 1000 > typedefStructSeqSeqSeqShort;
+
+} myAnonTypedefStruct;
+
+
+
+union anonUnion switch(long) {
+    case 1:
+        sequence< long, 10 > unionSeqLong;
+    case 2:
+        sequence< sequence< long, 10 >, 100 > unionSeqLong;
+    default:
+        sequence< sequence< sequence< long, 10 >, 100 >, 1000 > unionSeqLong;
+};
+
+typedef union anonTypedefUnion switch(long) {
+    case 1:
+        sequence< long, 10 > typedefUnionSeqLong;
+    case 2:
+        sequence< sequence< long, 10 >, 100 > typedefUnionSeqLong;
+    default:
+        sequence< sequence< sequence< long, 10 >, 100 >, 1000 > typedefUnionSeqLong;
+} myAnonUnion;
+
+
+
+exception anonException {
+    sequence< long, 10 > exceptionSeqLong;
+    sequence< sequence< long, 10 >, 100 > exceptionSeqSeqLong;
+    sequence< sequence< sequence< long, 10 >, 100 >, 1000 > exceptionSeqSeqSeqLong;
+};
+
+
+
+module anonBoundedSequences {
+    typedef sequence< sequence< float, 5 > > myFloatBoundedSeqSeq;
+    typedef sequence< sequence< double, 5 > > myDoubleBoundedSeqSeq;
+    typedef sequence< sequence< long double, 5 > > myLongDoubleBoundedSeqSeq;
+    typedef sequence< sequence< short, 5 > > myShortBoundedSeqSeq;
+    typedef sequence< sequence< long, 5 > > myLongBoundedSeqSeq;
+    typedef sequence< sequence< long long, 5 > > myLonglongBoundedSeqSeq;
+    typedef sequence< sequence< unsigned short, 5 > > myUnsignedShortBoundedSeqSeq;
+    typedef sequence< sequence< unsigned long, 5 > > myUnsignedLongBoundedSeqSeq;
+    typedef sequence< sequence< unsigned long long, 5 > > myUnsignedLongLongBoundedSeqSeq;
+    typedef sequence< sequence< char, 5 > > myCharBoundedSeqSeq;
+    typedef sequence< sequence< wchar, 5 > > myWcharBoundedSeqSeq;
+    typedef sequence< sequence< boolean, 5 > > myBooleanBoundedSeqSeq;
+    typedef sequence< sequence< octet, 5 > > myOctetBoundedSeqSeq;
+    //typedef sequence< sequence< any, 5 > > myAnyBoundedSeqSeq;
+};
+

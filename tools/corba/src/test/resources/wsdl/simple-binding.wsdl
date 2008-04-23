@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<definitions name="BaseService" targetNamespace="http://schemas.apache.org/tests" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://schemas.apache.org/tests" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/tests">
+    
+    <corba:typeMapping targetNamespace="http://schemas.apache.org/tests/corba/typemap/">
+        <corba:sequence bound="0" elemtype="corba:string" name="AnonList" 
+            repositoryID="IDL:AnonList:1.0" type="tns:AnonList"/>
+        <corba:sequence bound="0" elemtype="corba:string" name="StringList" 
+            repositoryID="IDL:StringList:1.0" type="tns:StringList"/>
+        <corba:enum name="StringEnum1" repositoryID="IDL:StringEnum1:1.0" 
+            type="tns:StringEnum1">
+            <corba:enumerator value="RED"/>
+            <corba:enumerator value="BLUE"/>
+        </corba:enum>
+    </corba:typeMapping>    
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/tests" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <simpleType name="StringEnum1">
+                <restriction base="string">
+                    <enumeration value="RED"/>
+                    <enumeration value="BLUE"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="StringList">
+                <list itemType="string"/>
+            </simpleType>
+            <simpleType name="AnonList">
+                <list>
+                    <simpleType>
+                        <restriction base="string"/>
+                    </simpleType>
+                </list>
+            </simpleType>
+        </schema>
+    </types>
+    <message name="echoString">
+        <part name="x" type="tns:StringEnum1"/>
+        <part name="y" type="tns:StringList"/>
+        <part name="z" type="tns:AnonList"/>
+    </message>
+    <message name="echoStringResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <portType name="BasePortType">
+        <operation name="echoString">
+            <input message="tns:echoString" name="echoString"/>
+            <output message="tns:echoStringResponse" name="echoStringResponse"/>
+        </operation>
+    </portType>
+    <binding name="BaseCORBABinding" type="tns:BasePortType">
+        <corba:binding repositoryID="IDL:BasePortType:1.0"/>
+        <operation name="echoString">
+            <corba:operation name="echoString">
+                <corba:param idltype="ns1:StringEnum1" mode="in" name="x"/>
+                <corba:param idltype="ns1:StringList" mode="in" name="y"/>
+                <corba:param idltype="ns1:AnonList" mode="in" name="z"/>
+                <corba:return idltype="corba:string" name="return"/>
+            </corba:operation>
+            <input name="echoString"/>
+            <output name="echoStringResponse"/>
+        </operation>
+    </binding>    
+</definitions>

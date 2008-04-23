@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Sequence/typemap">
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" repositoryID="IDL:longSequence:1.0" type="ns4:longSequence" name="longSequence" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:string" elemname="item" bound="0" repositoryID="IDL:stringSequence:1.0" type="ns4:stringSequence" name="stringSequence" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:long" elemname="item" bound="10" repositoryID="IDL:boundedLongSequence:1.0" type="ns4:boundedLongSequence" name="boundedLongSequence" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:string" elemname="item" bound="2" repositoryID="IDL:boundedStringSequence:1.0" type="ns4:boundedStringSequence" name="boundedStringSequence" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence/typemap" xmlns="" elemtype="ns4:longSequence" elemname="item" bound="0" repositoryID="IDL:longSequenceSequence:1.0" type="ns5:longSequenceSequence" name="longSequenceSequence" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence/typemap" xmlns="" elemtype="ns4:boundedLongSequence" elemname="item" bound="0" repositoryID="IDL:boundedLongSequenceSequence:1.0" type="ns5:boundedLongSequenceSequence" name="boundedLongSequenceSequence" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence/typemap" xmlns="" elemtype="ns4:longSequence" elemname="item" bound="30" repositoryID="IDL:longSequenceBoundedSequence:1.0" type="ns5:longSequenceBoundedSequence" name="longSequenceBoundedSequence" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence/typemap" xmlns="" elemtype="ns4:boundedLongSequence" elemname="item" bound="10" repositoryID="IDL:boundedLongSequenceBoundedSequence:1.0" type="ns5:boundedLongSequenceBoundedSequence" name="boundedLongSequenceBoundedSequence" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:float" elemname="item" bound="0" repositoryID="IDL:sequences/myFloat:1.0" type="ns4:sequences.myFloat" name="sequences.myFloat" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:double" elemname="item" bound="0" repositoryID="IDL:sequences/myDouble:1.0" type="ns4:sequences.myDouble" name="sequences.myDouble" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:longdouble" elemname="item" bound="0" repositoryID="IDL:sequences/myLongDouble:1.0" type="ns4:sequences.myLongDouble" name="sequences.myLongDouble" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:short" elemname="item" bound="0" repositoryID="IDL:sequences/myShort:1.0" type="ns4:sequences.myShort" name="sequences.myShort" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:long" elemname="item" bound="0" repositoryID="IDL:sequences/myLong:1.0" type="ns4:sequences.myLong" name="sequences.myLong" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:longlong" elemname="item" bound="0" repositoryID="IDL:sequences/myLonglong:1.0" type="ns4:sequences.myLonglong" name="sequences.myLonglong" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:ushort" elemname="item" bound="0" repositoryID="IDL:sequences/myUnsignedShort:1.0" type="ns4:sequences.myUnsignedShort" name="sequences.myUnsignedShort" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:ulong" elemname="item" bound="0" repositoryID="IDL:sequences/myUnsignedLong:1.0" type="ns4:sequences.myUnsignedLong" name="sequences.myUnsignedLong" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:sequences/myUnsignedLongLong:1.0" type="ns4:sequences.myUnsignedLongLong" name="sequences.myUnsignedLongLong" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:char" elemname="item" bound="0" repositoryID="IDL:sequences/myChar:1.0" type="ns4:sequences.myChar" name="sequences.myChar" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:wchar" elemname="item" bound="0" repositoryID="IDL:sequences/myWchar:1.0" type="ns4:sequences.myWchar" name="sequences.myWchar" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="" elemtype="corba:boolean" elemname="item" bound="0" repositoryID="IDL:sequences/myBoolean:1.0" type="ns4:sequences.myBoolean" name="sequences.myBoolean" />
+    <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="" elemtype="corba:octet" elemname="item" bound="0" repositoryID="IDL:sequences/myOctet:1.0" type="xs:base64Binary" name="sequences.myOctet" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns="http://cxf.apache.org/bindings/corba/idl/Sequence" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="longSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="stringSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="boundedLongSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="boundedStringSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="2" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="longSequenceSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="longSequence">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="boundedLongSequenceSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="boundedLongSequence">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="longSequenceBoundedSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="30" minOccurs="0" name="item" type="longSequence">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="boundedLongSequenceBoundedSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="boundedLongSequence">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myFloat">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:float">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myDouble">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:double">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myLongDouble">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:double">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myShort">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myLonglong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:long">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myUnsignedShort">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedShort">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myUnsignedLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedInt">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myUnsignedLongLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myChar">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:byte">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myWchar">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequences.myBoolean">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:boolean">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+</wsdl:definitions>

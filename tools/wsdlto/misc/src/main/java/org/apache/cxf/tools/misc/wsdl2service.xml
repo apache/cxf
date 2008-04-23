@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
+	  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
+	  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
+	  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
+
+    <annotation>
+Examples :
+
+wsdl2service -transport http -e servicename -p portname -n bindingname HelloWorld.wsdl
+    </annotation>
+
+	<usage>
+		<optionGroup id="options">
+	
+	   	    <option id="transport" maxOccurs="1">
+		       <annotation>
+		            If the payload being sent over the wire is jms, use 
+		            -transport jms. For all other payloads use -transport http.
+		       </annotation>
+				<switch>transport</switch>
+				<associatedArgument placement="afterSpace">
+				    <annotation>soap/xml/jms</annotation>
+				  	<valueenum>soap|xml|jms</valueenum>
+				</associatedArgument>
+		    </option>
+	
+	   	    <option id="service" minOccurs="1" maxOccurs="1">
+			<annotation>
+			    Specifies the name of the generated service.
+			</annotation>
+				<switch>e</switch>
+				<associatedArgument placement="afterSpace">
+				    <annotation>service-name</annotation>
+				</associatedArgument>
+		    </option>
+	
+	   	    <option id="port" minOccurs="1" maxOccurs="1">
+			 <annotation>
+			    Specifies the value of the name attribute of the generated 
+			    port element
+			  </annotation>
+				<switch>p</switch>
+				<associatedArgument placement="afterSpace">
+				    <annotation>port-name</annotation>
+				</associatedArgument>
+		    </option>
+			
+	   	    <option id="attrbinding" minOccurs="1" maxOccurs="1">
+			  <annotation>
+			    Specifies the name of the binding for which the service 
+			    is generated
+			   </annotation>
+				<switch>n</switch>
+				<associatedArgument placement="afterSpace">
+				    <annotation>attribute-binding-name</annotation>
+				</associatedArgument>
+		    </option>
+	
+	   	<option id="address" maxOccurs="1">
+			<annotation>
+			    Specifies the value used in the address element of the port
+			</annotation>
+				<switch>a</switch>
+				<associatedArgument placement="afterSpace">
+				    <annotation>address</annotation>
+				</associatedArgument>
+		</option>
+
+
+		<option id="soap12" maxOccurs="1">
+		    <annotation>
+			Specifies the SOAP version to SOAP 1.2
+		    </annotation>
+		    <switch>soap12</switch>
+		</option>
+
+	
+		<option id="destinationStyle" maxOccurs="1">
+		     	 <annotation>
+		     	    JMS destination style (queue/topic) 
+		     	  </annotation>
+	     	  	 <switch>jds</switch>
+	     	  	 <associatedArgument placement="afterSpace">
+	         	<annotation>jms-destionation-Style(queue/topic)</annotation>
+	     	    	<valueenum>queue|topic</valueenum>
+	     	  	 </associatedArgument>
+    		</option>
+
+		<option id="jndiProviderURL" maxOccurs="1">
+			<annotation>
+			    JMS JNDI provider URL
+			 </annotation>
+				<switch>jpu</switch>
+				<associatedArgument placement="afterSpace">
+				  <annotation>jms-jndi-provider-URL</annotation>
+				</associatedArgument>
+		</option>
+	
+		<option id="initialContextFactory" maxOccurs="1">
+			<annotation>
+			    JMS initial context factory
+			</annotation>
+				<switch>jcf</switch>
+				<associatedArgument placement="afterSpace">
+					 <annotation>jms-initial-context-factory</annotation>
+				</associatedArgument>
+		</option>
+	
+		<option id="jndiConnectionFactoryName" maxOccurs="1">
+			<annotation>
+			    JMS JNDI connection factory name
+			</annotation>
+				<switch>jfn</switch>
+				<associatedArgument placement="afterSpace">
+					 <annotation>jms-jndi-connection-factory-name</annotation>
+				</associatedArgument>
+		</option>
+	
+		<option id="jndiDestinationName" maxOccurs="1">
+		    	<annotation>
+		    	    JMS JNDI destination name
+		    	</annotation>
+				<switch>jdn</switch>
+				<associatedArgument placement="afterSpace">
+					  <annotation>jms-jndi-destination-name</annotation>
+				</associatedArgument>
+		</option>
+	
+		<option id="messageType" maxOccurs="1">
+			<annotation>
+			    JMS message type(text/binary)
+			</annotation>
+				<switch>jmt</switch>
+				<associatedArgument placement="afterSpace">
+					  <annotation>jms-message-type(text/binary)</annotation>
+					  <valueenum>text|binary</valueenum>
+				</associatedArgument>
+		</option>
+	
+		<option id="useMessageIDAsCorrelationID" maxOccurs="1">
+		      <annotation>
+		      	    Use MessageID As CorrelationID(true/false)
+		      </annotation>
+				<switch>jmc</switch>
+				<associatedArgument placement="afterSpace">
+					  <annotation>use-messageid-as-correlationid(true/false)</annotation>          	
+					  <valueenum>true|false</valueenum>
+			</associatedArgument>
+		</option>
+			
+	        <option id="durableSubscriberName" maxOccurs="1">
+	             <annotation>
+	                    Durable Subscriber Name
+	             </annotation>
+				<switch>jsn</switch>
+				<associatedArgument placement="afterSpace">
+					  <annotation>durable-subscriber-name</annotation>
+				</associatedArgument>
+	        </option>    	
+
+	      	<option id="outputfile" maxOccurs="1">
+		    <annotation>
+		            Specify output wsdl file name
+		    </annotation>
+				<switch>o</switch>
+		        <associatedArgument placement="afterSpace">
+		        	<annotation>output-file</annotation>
+		        </associatedArgument>
+	      	</option>
+	
+	    	<option id="outputdir" maxOccurs="1">
+		     <annotation>
+		            The directory in which the generated wsdl is placed
+		     </annotation>
+		        <switch>d</switch>
+		        <associatedArgument placement="afterSpace">
+		          	<annotation>output-directory</annotation>
+		        </associatedArgument>
+		    </option>
+		</optionGroup>
+	
+		<optionGroup id="common_options">
+		
+		    <option id="help" maxOccurs="1">
+		     <annotation>
+		            Display detailed information for options.
+		     </annotation>
+				<switch>h</switch>
+				<switch>?</switch>
+				<switch>help</switch>
+		    </option>
+		    
+		    <option id="version">
+		    <annotation>
+		            Display the version of the tool
+		    </annotation>
+				<switch>v</switch>
+		    </option>
+	
+		    <option id="verbose">
+                    <annotation>
+                            Verbose mode
+                    </annotation>
+				<switch>verbose</switch>
+				<switch>V</switch>
+		    </option>
+	
+		    <option id="quiet">
+		     <annotation>
+		            Quiet mode
+		     </annotation>
+				<switch>quiet</switch>
+				<switch>q</switch>
+		    </option>
+		</optionGroup>
+		
+		<argument id="wsdlurl" minOccurs="1" maxOccurs="1">
+		    <annotation>
+		            WSDL URL
+		    </annotation>
+		</argument>
+		
+	</usage>
+	
+</toolspec>

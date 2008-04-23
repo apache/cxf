@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions
+ targetNamespace="http://schemas.apache.org/idl/iacc.idl"
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:tns="http://schemas.apache.org/idl/iacc.idl"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl"
+ xmlns:corba="http://schemas.apache.org/bindings/corba"
+ xmlns:corbatm="http://schemas.apache.org/typemap/corba/iacc.idl"
+ xmlns:references="http://schemas.apache.org/references">
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/iacc.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified">
+      <xsd:complexType name="IACC.IACCException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.ConnectionExhaustedException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.ConnectionNotAvailableException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.RemoteException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.TimeoutException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.ConnectionNotClosedException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.IACClassNotLoadedException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.OneAttribute">
+        <xsd:sequence>
+          <xsd:element name="level" type="xsd:int"/>
+          <xsd:element name="name" type="xsd:string"/>
+          <xsd:element name="value" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.IACCList">
+        <xsd:sequence>
+          <xsd:element name="item" type="xsd1:IACC.OneAttribute" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.Subscriber">
+        <xsd:sequence>
+          <xsd:element name="info" type="xsd1:IACC.IACCList"/>
+          <xsd:element name="request_id" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="IACC.IACCLists">
+        <xsd:sequence>
+          <xsd:element name="item" type="xsd1:IACC.Subscriber" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="IACC.Server.updateConfigParameters">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.updateConfigParametersResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.RemoteException" type="xsd1:IACC.RemoteException"/>
+      <xsd:element name="IACC.Server.hasCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+            <xsd:element name="operation" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.hasCreditResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.IACCException" type="xsd1:IACC.IACCException"/>
+      <xsd:element name="IACC.ConnectionExhaustedException" type="xsd1:IACC.ConnectionExhaustedException"/>
+      <xsd:element name="IACC.ConnectionNotAvailableException" type="xsd1:IACC.ConnectionNotAvailableException"/>
+      <xsd:element name="IACC.TimeoutException" type="xsd1:IACC.TimeoutException"/>
+      <xsd:element name="IACC.Server.hasCredit2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCLists"/>
+            <xsd:element name="operation" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.hasCredit2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.commitReservation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.commitReservationResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.commitReservation2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.commitReservation2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.cancelReservation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.cancelReservationResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.cancelReservation2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.cancelReservation2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.makeAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.makeAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.refreshAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.refreshAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.commitAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.commitAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.cancelAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.cancelAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.makeTopUp">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.makeTopUpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setConnectionInstances">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="number" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setConnectionInstancesResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getConnectionInstances">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getConnectionInstancesResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setDatabaseHostName">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="hostname" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setDatabaseHostNameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getDatabaseHostName">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getDatabaseHostNameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setDatabaseHostPort">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="port" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setDatabaseHostPortResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getDatabaseHostPort">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getDatabaseHostPortResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setUsername">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="username" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setUsernameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getUsername">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getUsernameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setPassword">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="password" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setPasswordResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getPassword">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getPasswordResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setLoginType">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="logintype" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setLoginTypeResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getLoginType">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getLoginTypeResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setSNParserClass">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="parserName" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setSNParserClassResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getSNParserClass">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getSNParserClassResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setServiceNameSelector">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="option" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.setServiceNameSelectorResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getServiceNameSelector">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getServiceNameSelectorResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.shutdown">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.shutdownResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.isServerUp">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.isServerUpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.isProxyUp">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.isProxyUpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getVersion">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.getVersionResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.isServerUp2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="IACC.Server.isServerUp2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </schema>
+  </types>
+  <message name="IACC.Server.updateConfigParameters">
+    <part name="parameters" element="xsd1:IACC.Server.updateConfigParameters"/>
+  </message>
+  <message name="IACC.Server.updateConfigParametersResponse">
+    <part name="parameters" element="xsd1:IACC.Server.updateConfigParametersResult"/>
+  </message>
+  <message name="IACC.RemoteException">
+    <part name="exception" element="xsd1:IACC.RemoteException"/>
+  </message>
+  <message name="IACC.Server.hasCredit">
+    <part name="parameters" element="xsd1:IACC.Server.hasCredit"/>
+  </message>
+  <message name="IACC.Server.hasCreditResponse">
+    <part name="parameters" element="xsd1:IACC.Server.hasCreditResult"/>
+  </message>
+  <message name="IACC.IACCException">
+    <part name="exception" element="xsd1:IACC.IACCException"/>
+  </message>
+  <message name="IACC.ConnectionExhaustedException">
+    <part name="exception" element="xsd1:IACC.ConnectionExhaustedException"/>
+  </message>
+  <message name="IACC.ConnectionNotAvailableException">
+    <part name="exception" element="xsd1:IACC.ConnectionNotAvailableException"/>
+  </message>
+  <message name="IACC.TimeoutException">
+    <part name="exception" element="xsd1:IACC.TimeoutException"/>
+  </message>
+  <message name="IACC.Server.hasCredit2">
+    <part name="parameters" element="xsd1:IACC.Server.hasCredit2"/>
+  </message>
+  <message name="IACC.Server.hasCredit2Response">
+    <part name="parameters" element="xsd1:IACC.Server.hasCredit2Result"/>
+  </message>
+  <message name="IACC.Server.commitReservation">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservation"/>
+  </message>
+  <message name="IACC.Server.commitReservationResponse">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservationResult"/>
+  </message>
+  <message name="IACC.Server.commitReservation2">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservation2"/>
+  </message>
+  <message name="IACC.Server.commitReservation2Response">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservation2Result"/>
+  </message>
+  <message name="IACC.Server.cancelReservation">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservation"/>
+  </message>
+  <message name="IACC.Server.cancelReservationResponse">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservationResult"/>
+  </message>
+  <message name="IACC.Server.cancelReservation2">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservation2"/>
+  </message>
+  <message name="IACC.Server.cancelReservation2Response">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservation2Result"/>
+  </message>
+  <message name="IACC.Server.makeAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.makeAllowance"/>
+  </message>
+  <message name="IACC.Server.makeAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.makeAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.refreshAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.refreshAllowance"/>
+  </message>
+  <message name="IACC.Server.refreshAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.refreshAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.commitAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.commitAllowance"/>
+  </message>
+  <message name="IACC.Server.commitAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.commitAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.cancelAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.cancelAllowance"/>
+  </message>
+  <message name="IACC.Server.cancelAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.cancelAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.makeTopUp">
+    <part name="parameters" element="xsd1:IACC.Server.makeTopUp"/>
+  </message>
+  <message name="IACC.Server.makeTopUpResponse">
+    <part name="parameters" element="xsd1:IACC.Server.makeTopUpResult"/>
+  </message>
+  <message name="IACC.Server.setConnectionInstances">
+    <part name="parameters" element="xsd1:IACC.Server.setConnectionInstances"/>
+  </message>
+  <message name="IACC.Server.setConnectionInstancesResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setConnectionInstancesResult"/>
+  </message>
+  <message name="IACC.Server.getConnectionInstances">
+    <part name="parameters" element="xsd1:IACC.Server.getConnectionInstances"/>
+  </message>
+  <message name="IACC.Server.getConnectionInstancesResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getConnectionInstancesResult"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostName">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostName"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostNameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostNameResult"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostName">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostName"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostNameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostNameResult"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostPort">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostPort"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostPortResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostPortResult"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostPort">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostPort"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostPortResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostPortResult"/>
+  </message>
+  <message name="IACC.Server.setUsername">
+    <part name="parameters" element="xsd1:IACC.Server.setUsername"/>
+  </message>
+  <message name="IACC.Server.setUsernameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setUsernameResult"/>
+  </message>
+  <message name="IACC.Server.getUsername">
+    <part name="parameters" element="xsd1:IACC.Server.getUsername"/>
+  </message>
+  <message name="IACC.Server.getUsernameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getUsernameResult"/>
+  </message>
+  <message name="IACC.Server.setPassword">
+    <part name="parameters" element="xsd1:IACC.Server.setPassword"/>
+  </message>
+  <message name="IACC.Server.setPasswordResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setPasswordResult"/>
+  </message>
+  <message name="IACC.Server.getPassword">
+    <part name="parameters" element="xsd1:IACC.Server.getPassword"/>
+  </message>
+  <message name="IACC.Server.getPasswordResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getPasswordResult"/>
+  </message>
+  <message name="IACC.Server.setLoginType">
+    <part name="parameters" element="xsd1:IACC.Server.setLoginType"/>
+  </message>
+  <message name="IACC.Server.setLoginTypeResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setLoginTypeResult"/>
+  </message>
+  <message name="IACC.Server.getLoginType">
+    <part name="parameters" element="xsd1:IACC.Server.getLoginType"/>
+  </message>
+  <message name="IACC.Server.getLoginTypeResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getLoginTypeResult"/>
+  </message>
+  <message name="IACC.Server.setSNParserClass">
+    <part name="parameters" element="xsd1:IACC.Server.setSNParserClass"/>
+  </message>
+  <message name="IACC.Server.setSNParserClassResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setSNParserClassResult"/>
+  </message>
+  <message name="IACC.Server.getSNParserClass">
+    <part name="parameters" element="xsd1:IACC.Server.getSNParserClass"/>
+  </message>
+  <message name="IACC.Server.getSNParserClassResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getSNParserClassResult"/>
+  </message>
+  <message name="IACC.Server.setServiceNameSelector">
+    <part name="parameters" element="xsd1:IACC.Server.setServiceNameSelector"/>
+  </message>
+  <message name="IACC.Server.setServiceNameSelectorResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setServiceNameSelectorResult"/>
+  </message>
+  <message name="IACC.Server.getServiceNameSelector">
+    <part name="parameters" element="xsd1:IACC.Server.getServiceNameSelector"/>
+  </message>
+  <message name="IACC.Server.getServiceNameSelectorResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getServiceNameSelectorResult"/>
+  </message>
+  <message name="IACC.Server.shutdown">
+    <part name="parameters" element="xsd1:IACC.Server.shutdown"/>
+  </message>
+  <message name="IACC.Server.shutdownResponse">
+    <part name="parameters" element="xsd1:IACC.Server.shutdownResult"/>
+  </message>
+  <message name="IACC.Server.isServerUp">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUp"/>
+  </message>
+  <message name="IACC.Server.isServerUpResponse">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUpResult"/>
+  </message>
+  <message name="IACC.Server.isProxyUp">
+    <part name="parameters" element="xsd1:IACC.Server.isProxyUp"/>
+  </message>
+  <message name="IACC.Server.isProxyUpResponse">
+    <part name="parameters" element="xsd1:IACC.Server.isProxyUpResult"/>
+  </message>
+  <message name="IACC.Server.getVersion">
+    <part name="parameters" element="xsd1:IACC.Server.getVersion"/>
+  </message>
+  <message name="IACC.Server.getVersionResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getVersionResult"/>
+  </message>
+  <message name="IACC.Server.isServerUp2">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUp2"/>
+  </message>
+  <message name="IACC.Server.isServerUp2Response">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUp2Result"/>
+  </message>
+  <portType name="IACC.Server">
+    <operation name="updateConfigParameters">
+      <input message="tns:IACC.Server.updateConfigParameters" name="updateConfigParameters"/>
+      <output message="tns:IACC.Server.updateConfigParametersResponse" name="updateConfigParametersResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="hasCredit">
+      <input message="tns:IACC.Server.hasCredit" name="hasCredit"/>
+      <output message="tns:IACC.Server.hasCreditResponse" name="hasCreditResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="hasCredit2">
+      <input message="tns:IACC.Server.hasCredit2" name="hasCredit2"/>
+      <output message="tns:IACC.Server.hasCredit2Response" name="hasCredit2Response"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="commitReservation">
+      <input message="tns:IACC.Server.commitReservation" name="commitReservation"/>
+      <output message="tns:IACC.Server.commitReservationResponse" name="commitReservationResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="commitReservation2">
+      <input message="tns:IACC.Server.commitReservation2" name="commitReservation2"/>
+      <output message="tns:IACC.Server.commitReservation2Response" name="commitReservation2Response"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="cancelReservation">
+      <input message="tns:IACC.Server.cancelReservation" name="cancelReservation"/>
+      <output message="tns:IACC.Server.cancelReservationResponse" name="cancelReservationResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="cancelReservation2">
+      <input message="tns:IACC.Server.cancelReservation2" name="cancelReservation2"/>
+      <output message="tns:IACC.Server.cancelReservation2Response" name="cancelReservation2Response"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="makeAllowance">
+      <input message="tns:IACC.Server.makeAllowance" name="makeAllowance"/>
+      <output message="tns:IACC.Server.makeAllowanceResponse" name="makeAllowanceResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="refreshAllowance">
+      <input message="tns:IACC.Server.refreshAllowance" name="refreshAllowance"/>
+      <output message="tns:IACC.Server.refreshAllowanceResponse" name="refreshAllowanceResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="commitAllowance">
+      <input message="tns:IACC.Server.commitAllowance" name="commitAllowance"/>
+      <output message="tns:IACC.Server.commitAllowanceResponse" name="commitAllowanceResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="cancelAllowance">
+      <input message="tns:IACC.Server.cancelAllowance" name="cancelAllowance"/>
+      <output message="tns:IACC.Server.cancelAllowanceResponse" name="cancelAllowanceResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="makeTopUp">
+      <input message="tns:IACC.Server.makeTopUp" name="makeTopUp"/>
+      <output message="tns:IACC.Server.makeTopUpResponse" name="makeTopUpResponse"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+      <fault message="tns:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException"/>
+      <fault message="tns:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+      <fault message="tns:IACC.TimeoutException" name="IACC.TimeoutException"/>
+    </operation>
+    <operation name="setConnectionInstances">
+      <input message="tns:IACC.Server.setConnectionInstances" name="setConnectionInstances"/>
+      <output message="tns:IACC.Server.setConnectionInstancesResponse" name="setConnectionInstancesResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getConnectionInstances">
+      <input message="tns:IACC.Server.getConnectionInstances" name="getConnectionInstances"/>
+      <output message="tns:IACC.Server.getConnectionInstancesResponse" name="getConnectionInstancesResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setDatabaseHostName">
+      <input message="tns:IACC.Server.setDatabaseHostName" name="setDatabaseHostName"/>
+      <output message="tns:IACC.Server.setDatabaseHostNameResponse" name="setDatabaseHostNameResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getDatabaseHostName">
+      <input message="tns:IACC.Server.getDatabaseHostName" name="getDatabaseHostName"/>
+      <output message="tns:IACC.Server.getDatabaseHostNameResponse" name="getDatabaseHostNameResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setDatabaseHostPort">
+      <input message="tns:IACC.Server.setDatabaseHostPort" name="setDatabaseHostPort"/>
+      <output message="tns:IACC.Server.setDatabaseHostPortResponse" name="setDatabaseHostPortResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getDatabaseHostPort">
+      <input message="tns:IACC.Server.getDatabaseHostPort" name="getDatabaseHostPort"/>
+      <output message="tns:IACC.Server.getDatabaseHostPortResponse" name="getDatabaseHostPortResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setUsername">
+      <input message="tns:IACC.Server.setUsername" name="setUsername"/>
+      <output message="tns:IACC.Server.setUsernameResponse" name="setUsernameResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getUsername">
+      <input message="tns:IACC.Server.getUsername" name="getUsername"/>
+      <output message="tns:IACC.Server.getUsernameResponse" name="getUsernameResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setPassword">
+      <input message="tns:IACC.Server.setPassword" name="setPassword"/>
+      <output message="tns:IACC.Server.setPasswordResponse" name="setPasswordResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getPassword">
+      <input message="tns:IACC.Server.getPassword" name="getPassword"/>
+      <output message="tns:IACC.Server.getPasswordResponse" name="getPasswordResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setLoginType">
+      <input message="tns:IACC.Server.setLoginType" name="setLoginType"/>
+      <output message="tns:IACC.Server.setLoginTypeResponse" name="setLoginTypeResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getLoginType">
+      <input message="tns:IACC.Server.getLoginType" name="getLoginType"/>
+      <output message="tns:IACC.Server.getLoginTypeResponse" name="getLoginTypeResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setSNParserClass">
+      <input message="tns:IACC.Server.setSNParserClass" name="setSNParserClass"/>
+      <output message="tns:IACC.Server.setSNParserClassResponse" name="setSNParserClassResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getSNParserClass">
+      <input message="tns:IACC.Server.getSNParserClass" name="getSNParserClass"/>
+      <output message="tns:IACC.Server.getSNParserClassResponse" name="getSNParserClassResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="setServiceNameSelector">
+      <input message="tns:IACC.Server.setServiceNameSelector" name="setServiceNameSelector"/>
+      <output message="tns:IACC.Server.setServiceNameSelectorResponse" name="setServiceNameSelectorResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getServiceNameSelector">
+      <input message="tns:IACC.Server.getServiceNameSelector" name="getServiceNameSelector"/>
+      <output message="tns:IACC.Server.getServiceNameSelectorResponse" name="getServiceNameSelectorResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="shutdown">
+      <input message="tns:IACC.Server.shutdown" name="shutdown"/>
+      <output message="tns:IACC.Server.shutdownResponse" name="shutdownResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="isServerUp">
+      <input message="tns:IACC.Server.isServerUp" name="isServerUp"/>
+      <output message="tns:IACC.Server.isServerUpResponse" name="isServerUpResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="isProxyUp">
+      <input message="tns:IACC.Server.isProxyUp" name="isProxyUp"/>
+      <output message="tns:IACC.Server.isProxyUpResponse" name="isProxyUpResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="getVersion">
+      <input message="tns:IACC.Server.getVersion" name="getVersion"/>
+      <output message="tns:IACC.Server.getVersionResponse" name="getVersionResponse"/>
+      <fault message="tns:IACC.RemoteException" name="IACC.RemoteException"/>
+    </operation>
+    <operation name="isServerUp2">
+      <input message="tns:IACC.Server.isServerUp2" name="isServerUp2"/>
+      <output message="tns:IACC.Server.isServerUp2Response" name="isServerUp2Response"/>
+      <fault message="tns:IACC.IACCException" name="IACC.IACCException"/>
+    </operation>
+  </portType>
+</definitions>

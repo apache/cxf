@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<wsdl:definitions xmlns:tmf854WS="tmf854.v1.ws" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="tmf854.v1.ws" name="TMF854-EquipmentInventoryMgrInterfaces-SOAP-HTTP">
+	<wsdl:import namespace="tmf854.v1.ws" location="../../common/EquipmentInventoryMgr.wsdl" />
+	<wsdl:binding name="EquipmentInventoryMgrSoapHTTPBinding" type="tmf854WS:EquipmentInventoryMgr">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="getAllEquipmentNames">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getAllEquipmentNames" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getAllEquipmentNamesResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getAllEquipment">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getAllEquipment" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getAllEquipmentResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getAllSupportedPTPNames">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getAllSupportedPTPNames" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getAllSupportedPTPNamesResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getAllSupportedPTPs">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getAllSupportedPTPs" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getAllSupportedPTPsResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getAllSupportingEquipmentNames">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getAllSupportingEquipmentNames" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getAllSupportingEquipmentNamesResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getAllSupportingEquipment">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getAllSupportingEquipment" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getAllSupportingEquipmentResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getContainedEquipment">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getContainedEquipment" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getContainedEquipmentResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getEquipment">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getEquipment" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getEquipmentResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSupportedEquipmentNames">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getSupportedEquipmentNames" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getSupportedEquipmentNamesResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSupportedEquipment">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getSupportedEquipment" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getSupportedEquipmentResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSupportingEquipmentNames">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getSupportingEquipmentNames" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getSupportingEquipmentNamesResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSupportingEquipment">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getSupportingEquipment" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getSupportingEquipmentResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+</wsdl:definitions>

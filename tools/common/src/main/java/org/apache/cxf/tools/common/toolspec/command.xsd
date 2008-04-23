@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<!-- Xutil toolspec Command Schema -->
+
+<schema
+  targetNamespace="http://cxf.apache.org/Xpipe/Command"
+  xmlns:command="http://cxf.apache.org/Xpipe/Command"
+  xmlns="http://www.w3.org/2001/XMLSchema">
+
+  <element name="command">
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="command:option"/>
+        <element ref="command:argument"/>
+      </choice>
+      <attribute name="form" type="token" use="optional"/>
+    </complexType>
+  </element>
+
+  <complexType name="valueType">
+    <simpleContent>
+      <extension base="token">
+        <attribute name="name" type="NMTOKEN" use="required"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <element name="option" type="command:valueType"/>
+
+  <element name="argument" type="command:valueType"/>
+
+</schema>

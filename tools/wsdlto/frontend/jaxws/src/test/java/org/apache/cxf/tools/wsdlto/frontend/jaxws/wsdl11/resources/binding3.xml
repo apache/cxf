@@ -1,0 +1,47 @@
+<!--
+        Licensed to the Apache Software Foundation (ASF) under one
+        or more contributor license agreements. See the NOTICE file
+        distributed with this work for additional information
+        regarding copyright ownership. The ASF licenses this file
+        to you under the Apache License, Version 2.0 (the
+        "License"); you may not use this file except in compliance
+        with the License. You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing,
+        software distributed under the License is distributed on an
+        "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+        KIND, either express or implied. See the License for the
+        specific language governing permissions and limitations
+        under the License.
+-->
+<jaxws:bindings
+        wsdlLocation="hello_world.wsdl"
+        xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+        xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+        xmlns:wsdlFoo="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://apache.org/hello_world_soap_http"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <jaxws:package name="com.foo" />
+        <jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping>
+
+        <jaxws:bindings node="wsdlFoo:portType[@name='Greeter']">
+                <jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping>
+                <jaxws:bindings
+                        node="wsdlFoo:operation[@name='greetMeOneWay']">
+                        <jaxws:method name="echoMeOneWay" />
+                        <jaxws:parameter part="wsdlFoo:message[@name='greetMeOneWayRequest']/wsdlFoo:part[@name='in']" childElementName="tns:number1" name="num1"/>
+                </jaxws:bindings>
+        </jaxws:bindings>
+
+        <jaxws:bindings node="wsdlFoo:definitions/wsdlFoo:types/xsd:schema">
+                <jaxb:bindings version="2.0" node="xsd:element[@name='CreateProcess']/xsd:complexType/xsd:sequence/xsd:element[@name='MyProcess']/xsd:simpleType">
+                                <jaxb:typesafeEnumClass name="MyProcess">
+                                        <jaxb:typesafeEnumMember name="BLUE" value="BLUE" />
+                                        <jaxb:typesafeEnumMember name="RED" value="RED" />
+                                        <jaxb:typesafeEnumMember name="GREEN" value="GREEN" />
+                                </jaxb:typesafeEnumClass>
+                </jaxb:bindings>
+        </jaxws:bindings>
+</jaxws:bindings>

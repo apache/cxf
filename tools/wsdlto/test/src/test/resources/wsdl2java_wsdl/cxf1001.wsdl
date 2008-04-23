@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="com.esendex.ems.soapinterface" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="com.esendex.ems.soapinterface" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <wsdl:types>
+	<s:schema elementFormDefault="qualified" targetNamespace="com.esendex.ems.soapinterface">
+	    <s:element name="GetMessageLimit">
+		<s:complexType />
+
+	    </s:element>
+	    <s:element name="GetMessageLimitResponse">
+		<s:complexType>
+		    <s:sequence>
+			<s:element minOccurs="1" maxOccurs="1" name="GetMessageLimitResult" type="s:int" />
+		    </s:sequence>
+		</s:complexType>
+	    </s:element>
+	    <s:element name="MessengerHeader" type="tns:MessengerHeader" />
+
+	    <s:complexType name="MessengerHeader">
+		<s:sequence>
+		    <s:element minOccurs="0" maxOccurs="1" name="Username" type="s:string" />
+		    <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+		    <s:element minOccurs="0" maxOccurs="1" name="Account" type="s:string" />
+		</s:sequence>
+		<s:anyAttribute />
+	    </s:complexType>
+	</s:schema>
+
+    </wsdl:types>
+    <wsdl:message name="GetMessageLimitSoapIn">
+	<wsdl:part name="parameters" element="tns:GetMessageLimit" />
+    </wsdl:message>
+    <wsdl:message name="GetMessageLimitSoapOut">
+	<wsdl:part name="parameters" element="tns:GetMessageLimitResponse" />
+    </wsdl:message>
+    <wsdl:message name="GetMessageLimitMessengerHeader">
+	<wsdl:part name="MessengerHeader" element="tns:MessengerHeader" />
+
+    </wsdl:message>
+    <wsdl:portType name="AccountServiceSoap">
+	<wsdl:operation name="GetMessageLimit">
+	    <wsdl:input message="tns:GetMessageLimitSoapIn" />
+	    <wsdl:output message="tns:GetMessageLimitSoapOut" />
+	</wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AccountServiceSoap" type="tns:AccountServiceSoap">
+	<soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+	<wsdl:operation name="GetMessageLimit">
+	    <soap:operation soapAction="com.esendex.ems.soapinterface/GetMessageLimit" style="document" />
+	    <wsdl:input>
+		<soap:body use="literal" />
+		<soap:header message="tns:GetMessageLimitMessengerHeader" part="MessengerHeader" use="literal" />
+	    </wsdl:input>
+
+	    <wsdl:output>
+		<soap:body use="literal" />
+	    </wsdl:output>
+	</wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="AccountService">
+	<wsdl:port name="AccountServiceSoap" binding="tns:AccountServiceSoap">
+	    <soap:address location="https://www.esendex.com/secure/messenger/soap/AccountService.asmx" />
+	</wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

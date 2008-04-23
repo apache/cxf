@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="exceptions.idl" 
+    targetNamespace="http://schemas.apache.org/idl/exceptions.idl" 
+    xmlns:tns="http://schemas.apache.org/idl/exceptions.idl" 
+    xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:ns1="http://schemas.apache.org/idl/exceptions.idl/corba/typemap/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd2="urn:mytypes" 
+    xmlns:xsd1="http://schemas.apache.org/idltypes/exceptions.idl" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/">
+    
+<corba:typeMapping>
+    <corba:struct repositoryID="IDL:TestException/BadRecord:1.0" 
+	      type="xsd1:TestException.BadRecord" name="TestException.BadRecord">
+		    <corba:member name="reason" idltype="corba:string" />
+		    <corba:member name="code" idltype="corba:short" />
+    </corba:struct>
+    <corba:struct repositoryID="IDL:MyExceptionType:1.0" type="xsd2:MyExceptionType" 
+	      name="MyExceptionType">
+		    <corba:member name="message" idltype="corba:string" />
+		    <corba:member name="code" idltype="corba:short" />
+		    <corba:member name="company" idltype="corba:string" />
+    </corba:struct>
+    <corba:exception repositoryID="IDL:TestException/BadRecordException:1.0" 
+	      type="xsd1:TestException.BadRecord" name="TestException.BadRecordException">
+		    <corba:member name="reason" idltype="corba:string" />
+		    <corba:member name="code" idltype="corba:short" />
+    </corba:exception>
+    <corba:exception repositoryID="IDL:MyExceptionMessage:1.0" type="xsd2:MyExceptionType" 
+	      name="MyExceptionMessage">
+		    <corba:member name="message" idltype="corba:string" />
+		    <corba:member name="code" idltype="corba:short" />
+		    <corba:member name="company" idltype="corba:string" />
+   </corba:exception>
+</corba:typeMapping> 
+<types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/exceptions.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestException.BadRecord">
+        <xsd:sequence>
+          <xsd:element name="reason" type="xsd:string"/>
+          <xsd:element name="code" type="xsd:short"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestException.ExceptionTest.review_data.data" type="xsd:string"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestException.BadRecord" type="xsd1:TestException.BadRecord"/>
+        <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ExceptionEl" type="xsd2:MyExceptionType"/>
+    </schema>
+    <schema targetNamespace="urn:mytypes" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+          <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="MyExceptionType">
+              <xsd:sequence>
+                  <xsd:element name="message" type="xsd:string"/>
+                  <xsd:element name="code" type="xsd:short"/>
+                  <xsd:element name="company" type="xsd:string"/>
+              </xsd:sequence>
+          </xsd:complexType>
+      </schema>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/exceptions.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestException.BadRecord">
+        <xsd:sequence>
+          <xsd:element name="reason" type="xsd:string"/>
+          <xsd:element name="code" type="xsd:short"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestException.ExceptionTest.review_data.data" type="xsd:string"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestException.BadRecord" type="xsd1:TestException.BadRecord"/>
+        <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ExceptionEl" type="xsd2:MyExceptionType"/>
+    </schema>
+    <schema targetNamespace="urn:mytypes" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+          <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="MyExceptionType">
+              <xsd:sequence>
+                  <xsd:element name="message" type="xsd:string"/>
+                  <xsd:element name="code" type="xsd:short"/>
+                  <xsd:element name="company" type="xsd:string"/>
+              </xsd:sequence>
+          </xsd:complexType>
+      </schema>
+  </types>
+  <message name="TestException.ExceptionTest.review_data">
+    <part name="data" element="xsd1:TestException.ExceptionTest.review_data.data"/>
+  </message>
+  <message name="MyExceptionMessage">
+    <part name="exception" element="xsd1:ExceptionEl"/>
+  </message>
+  <message name="TestException.ExceptionTest.review_dataResponse">
+  </message>
+  <message name="_exception.TestException.BadRecord">
+    <part name="exception" element="xsd1:TestException.BadRecord"/>
+  </message>
+  <portType name="TestException.ExceptionTest">
+    <operation name="review_data">
+      <input name="review_data" message="tns:TestException.ExceptionTest.review_data"/>
+      <output name="review_dataResponse" message="tns:TestException.ExceptionTest.review_dataResponse"/>
+      <fault name="TestException.BadRecord" message="tns:_exception.TestException.BadRecord"/>
+      <fault name="MyException" message="tns:MyExceptionMessage"/>
+    </operation>
+  </portType>
+  <binding name="TestException.ExceptionTestCORBABinding" type="tns:TestException.ExceptionTest">
+      <corba:binding repositoryID="IDL:TestException/ExceptionTest:1.0" />
+      <operation name="review_data">
+          <corba:operation name="review_data">
+              <corba:param mode="in" name="data" idltype="corba:string" />
+              <corba:raises exception="ns1:TestException.BadRecordException" />
+              <corba:raises exception="ns1:MyExceptionMessage" />
+          </corba:operation> 
+      <input name="review_data">
+      </input>
+      <output name="review_dataResponse">
+      </output>
+      <fault name="TestException.BadRecord">
+      </fault>
+      <fault name="MyException">
+      </fault>
+    </operation>
+  </binding>
+</definitions>

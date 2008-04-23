@@ -1,0 +1,9 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Body xmlns:x="http://www.webservicex.net">
+   <x:setWeatherData>
+     <data>
+       <x:MinTemperatureF>1</x:MinTemperatureF>
+     </data>
+   </x:setWeatherData>
+ </env:Body>
+</env:Envelope>

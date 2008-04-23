@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-EquipmentInventoryMgrInterfaces" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- =======Import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/EquipmentInventoryMgr.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ======= Import Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ======= Definition of getAllEquipmentNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllEquipmentNames">
+    <wsdl:documentation>
+    The getAllEquipmentNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEquipmentNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllEquipmentNamesResponse">
+    <wsdl:documentation>
+    The Names response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllEquipment Request/Response Messages ========= -->
+  <wsdl:message name="getAllEquipment">
+    <wsdl:documentation>
+    The getAllEquipment request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEquipment"/>
+  </wsdl:message>
+  <wsdl:message name="getAllEquipmentResponse">
+    <wsdl:documentation>
+    The getAllEquipment response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEquipmentResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllSupportedPTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllSupportedPTPNames">
+    <wsdl:documentation>
+    The getAllSupportedPTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSupportedPTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSupportedPTPNamesResponse">
+    <wsdl:documentation>
+    The getAllSupportedPTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllSupportedPTPs Request/Response Messages ========= -->
+  <wsdl:message name="getAllSupportedPTPs">
+    <wsdl:documentation>
+    The getAllSupportedPTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSupportedPTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSupportedPTPsResponse">
+    <wsdl:documentation>
+    The getAllSupportedPTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSupportedPTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllSupportingEquipmentNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllSupportingEquipmentNames">
+    <wsdl:documentation>
+    The getAllSupportingEquipmentNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSupportingEquipmentNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSupportingEquipmentNamesResponse">
+    <wsdl:documentation>
+    The getAllSupportingEquipmentNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllSupportingEquipment Request/Response Messages ========= -->
+  <wsdl:message name="getAllSupportingEquipment">
+    <wsdl:documentation>
+    The getAllSupportingEquipment request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSupportingEquipment"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSupportingEquipmentResponse">
+    <wsdl:documentation>
+    The getAllSupportingEquipment response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSupportingEquipmentResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedEquipment Request/Response Messages ========= -->
+  <wsdl:message name="getContainedEquipment">
+    <wsdl:documentation>
+    The getContainedEquipment request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedEquipment"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedEquipmentResponse">
+    <wsdl:documentation>
+    The getContainedEquipment response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedEquipmentResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getEquipment Request/Response Messages ========= -->
+  <wsdl:message name="getEquipment">
+    <wsdl:documentation>
+    The getEquipment request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getEquipment"/>
+  </wsdl:message>
+  <wsdl:message name="getEquipmentResponse">
+    <wsdl:documentation>
+    The getEquipment response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getEquipmentResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getSupportedEquipmentNames Request/Response Messages ========= -->
+  <wsdl:message name="getSupportedEquipmentNames">
+    <wsdl:documentation>
+    The getSupportedEquipmentNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSupportedEquipmentNames"/>
+  </wsdl:message>
+  <wsdl:message name="getSupportedEquipmentNamesResponse">
+    <wsdl:documentation>
+    The getSupportedEquipmentNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getSupportedEquipment Request/Response Messages ========= -->
+  <wsdl:message name="getSupportedEquipment">
+    <wsdl:documentation>
+    The getSupportedEquipment request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSupportedEquipment"/>
+  </wsdl:message>
+  <wsdl:message name="getSupportedEquipmentResponse">
+    <wsdl:documentation>
+    The getSupportedEquipment response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSupportedEquipmentResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getSupportingEquipmentNames Request/Response Messages ========= -->
+  <wsdl:message name="getSupportingEquipmentNames">
+    <wsdl:documentation>
+    The getSupportingEquipmentNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSupportingEquipmentNames"/>
+  </wsdl:message>
+  <wsdl:message name="getSupportingEquipmentNamesResponse">
+    <wsdl:documentation>
+    The getSupportingEquipmentNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getSupportingEquipment Request/Response Messages ========= -->
+  <wsdl:message name="getSupportingEquipment">
+    <wsdl:documentation>
+    The getSupportingEquipment request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSupportingEquipment"/>
+  </wsdl:message>
+  <wsdl:message name="getSupportingEquipmentResponse">
+    <wsdl:documentation>
+    The getSupportingEquipment response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSupportingEquipmentResponse"/>
+  </wsdl:message>
+  <!-- ======= Port Type Definitions ========= -->
+  <!-- ======= EquipmentInventoryMgr Port Type  ======== -->
+  <wsdl:portType name="EquipmentInventoryMgr">
+    <wsdl:documentation>
+    The MTOSI EquipmentInventoryMgr porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getAllEquipmentNames">
+      <wsdl:documentation>
+        This is the getAllEquipmentNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllEquipmentNames"/>
+      <wsdl:output message="tmf854WS:getAllEquipmentNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllEquipment">
+      <wsdl:documentation>
+        This is the getAllEquipment request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllEquipment"/>
+      <wsdl:output message="tmf854WS:getAllEquipmentResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSupportedPTPNames">
+      <wsdl:documentation>
+        This is the getAllSupportedPTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSupportedPTPNames"/>
+      <wsdl:output message="tmf854WS:getAllSupportedPTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSupportedPTPs">
+      <wsdl:documentation>
+        This is the getAllSupportedPTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSupportedPTPs"/>
+      <wsdl:output message="tmf854WS:getAllSupportedPTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSupportingEquipmentNames">
+      <wsdl:documentation>
+        This is the getAllSupportingEquipmentNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSupportingEquipmentNames"/>
+      <wsdl:output message="tmf854WS:getAllSupportingEquipmentNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSupportingEquipment">
+      <wsdl:documentation>
+        This is the getAllSupportingEquipment request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSupportingEquipment"/>
+      <wsdl:output message="tmf854WS:getAllSupportingEquipmentResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedEquipment">
+      <wsdl:documentation>
+        This is the getContainedEquipment request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedEquipment"/>
+      <wsdl:output message="tmf854WS:getContainedEquipmentResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getEquipment">
+      <wsdl:documentation>
+        This is the getEquipment request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getEquipment"/>
+      <wsdl:output message="tmf854WS:getEquipmentResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSupportedEquipmentNames">
+      <wsdl:documentation>
+        This is the getSupportedEquipmentNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getSupportedEquipmentNames"/>
+      <wsdl:output message="tmf854WS:getSupportedEquipmentNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSupportedEquipment">
+      <wsdl:documentation>
+        This is the getSupportedEquipment request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getSupportedEquipment"/>
+      <wsdl:output message="tmf854WS:getSupportedEquipmentResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSupportingEquipmentNames">
+      <wsdl:documentation>
+        This is the getSupportingEquipmentNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getSupportingEquipmentNames"/>
+      <wsdl:output message="tmf854WS:getSupportingEquipmentNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSupportingEquipment">
+      <wsdl:documentation>
+        This is the getSupportingEquipment request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getSupportingEquipment"/>
+      <wsdl:output message="tmf854WS:getSupportingEquipmentResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

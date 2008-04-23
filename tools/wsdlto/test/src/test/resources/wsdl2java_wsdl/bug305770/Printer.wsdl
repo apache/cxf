@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	Copyright (C) OASIS Open (2004). All Rights Reserved.
+	
+	This document and translations of it may be copied and furnished to others, and derivative works that comment on or otherwise explain it or assist in its implementation may be prepared, copied, published and distributed, in whole or in part, without restriction of any kind, provided that the above copyright notice and this paragraph are included on all such copies and derivative works. However, this document itself may not be modified in any way, such as by removing the copyright notice or references to OASIS, except as needed for the purpose of developing OASIS specifications, in which case the procedures for copyrights defined in the OASIS Intellectual Property Rights document must be followed, or as required to translate it into languages other than English. 
+	
+	The limited permissions granted above are perpetual and will not be revoked by OASIS or its successors or assigns. 
+	
+	This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+	
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:pr="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.xsd"
+	xmlns:prw="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsaw="http://www.w3.org/2005/02/addressing/wsdl"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2"
+	xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2"
+	xmlns:wsrf-rpw="http://docs.oasis-open.org/wsrf/rpw-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" name="WSRFIPP"
+	targetNamespace="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl">
+
+	<wsdl:import location="./rw-2.wsdl"
+		namespace="http://docs.oasis-open.org/wsrf/rw-2" />
+	<wsdl:import location="./rpw-2.wsdl"
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2" />
+	<wsdl:import location="./rlw-2.wsdl"
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2" />
+
+
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified" elementFormDefault="qualified">
+			<xsd:import
+				namespace="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.xsd"
+				schemaLocation="./Printer.xsd" />
+			<xsd:import
+				namespace="http://www.w3.org/2005/02/addressing/wsdl"
+				schemaLocation="/schemas/wsdl/ws-addr-wsdl.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+
+	<!-- WSRF printer -->
+
+	<wsdl:message name="Print_JobRequest">
+		<wsdl:part element="pr:Print_JobRequest"
+			name="Print_JobRequest" />
+	</wsdl:message>
+	<wsdl:message name="Print_JobResponse">
+		<wsdl:part element="pr:JobCreationResponse"
+			name="Print_JobResponse" />
+	</wsdl:message>
+	<wsdl:message name="client_error_not_possibleFault">
+		<wsdl:part element="pr:client_error_not_possibleFault"
+			name="client_error_not_possibleFault" />
+	</wsdl:message>
+	<wsdl:message name="Create_JobRequest">
+		<wsdl:part element="pr:Create_JobRequest"
+			name="Create_JobRequest" />
+	</wsdl:message>
+	<wsdl:message name="Create_JobResponse">
+		<wsdl:part element="pr:JobCreationResponse"
+			name="Create_JobResponse" />
+	</wsdl:message>
+
+	<!-- WSRF print job -->
+
+	<wsdl:message name="Send_DocumentRequest">
+		<wsdl:part element="pr:Send_DocumentRequest"
+			name="Send_DocumentRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="Send_DocumentResponse">
+		<wsdl:part element="pr:JobCreationResponse"
+			name="Send_DocumentResponse" />
+	</wsdl:message>
+
+	<!--	<wsdl:portType name="Printer" wsrf-rp:ResourceProperties="pr:PrinterRP">  -->
+	<wsdl:portType name="Printer">
+
+		<!--		<wsdl:operation name="Print_Job">       -->
+		<wsdl:operation name="PrintJob">
+			<wsdl:input message="prw:Print_JobRequest"
+				name="Print_JobRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Print_Job/Print_JobRequest" />
+			<wsdl:output message="prw:Print_JobResponse"
+				name="Print_JobResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Print_Job/Print_JobResponse" />
+			<wsdl:fault message="prw:client_error_not_possibleFault"
+				name="client_error_not_possibleFault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<!--		<wsdl:operation name="Create_Job">      -->
+		<wsdl:operation name="CreateJob">
+			<wsdl:input message="prw:Create_JobRequest"
+				name="Create_JobRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Create_Job/Create_JobRequest" />
+			<wsdl:output message="prw:Create_JobResponse"
+				name="Create_JobResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Create_Job/Create_JobResponse" />
+			<wsdl:fault message="prw:client_error_not_possibleFault"
+				name="client_error_not_possibleFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="GetResourcePropertyDocument">
+			<wsdl:input
+				message="wsrf-rpw:GetResourcePropertyDocumentRequest"
+				name="GetResourcePropertyDocumentRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourcePropertyDocument/GetResourcePropertyDocumentRequest" />
+			<wsdl:output
+				message="wsrf-rpw:GetResourcePropertyDocumentResponse"
+				name="GetResourcePropertyDocumentResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourcePropertyDocument/GetResourcePropertyDocumentResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="GetResourceProperty">
+			<wsdl:input message="wsrf-rpw:GetResourcePropertyRequest"
+				name="GetResourcePropertyRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyRequest" />
+			<wsdl:output message="wsrf-rpw:GetResourcePropertyResponse"
+				name="GetResourcePropertyResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyResponse" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="GetMultipleResourceProperties">
+			<wsdl:input
+				message="wsrf-rpw:GetMultipleResourcePropertiesRequest"
+				name="GetMultipleResourcePropertiesRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetMultipleResourceProperties/GetMultipleResourcePropertiesRequest" />
+			<wsdl:output
+				message="wsrf-rpw:GetMultipleResourcePropertiesResponse"
+				name="GetMultipleResourcePropertiesResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetMultipleResourceProperties/GetMultipleResourcePropertiesResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="SetResourceProperties">
+			<wsdl:input message="wsrf-rpw:SetResourcePropertiesRequest"
+				name="SetResourcePropertiesRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/SetResourceProperties/SetResourcePropertiesRequest" />
+			<wsdl:output
+				message="wsrf-rpw:SetResourcePropertiesResponse"
+				name="SetResourcePropertiesResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/SetResourceProperties/SetResourcePropertiesResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rpw:InvalidModificationFault"
+				name="InvalidModificationFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:UnableToModifyResourcePropertyFault"
+				name="UnableToModifyResourcePropertyFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:SetResourcePropertyRequestFailedFault"
+				name="SetResourcePropertyRequestFailedFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="InsertResourceProperties">
+			<wsdl:input
+				message="wsrf-rpw:InsertResourcePropertiesRequest"
+				name="InsertResourcePropertiesRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/InsertResourceProperties/InsertResourcePropertiesRequest" />
+			<wsdl:output
+				message="wsrf-rpw:InsertResourcePropertiesResponse"
+				name="InsertResourcePropertiesResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/InsertResourceProperties/InsertResourcePropertiesResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rpw:InvalidModificationFault"
+				name="InvalidModificationFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:UnableToModifyResourcePropertyFault"
+				name="UnableToModifyResourcePropertyFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InsertResourcePropertiesRequestFailedFault"
+				name="InsertResourcePropertiesRequestFailedFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="UpdateResourceProperties">
+			<wsdl:input
+				message="wsrf-rpw:UpdateResourcePropertiesRequest"
+				name="UpdateResourcePropertiesRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/UpdateResourceProperties/UpdateResourcePropertiesRequest" />
+			<wsdl:output
+				message="wsrf-rpw:UpdateResourcePropertiesResponse"
+				name="UpdateResourcePropertiesResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/UpdateResourceProperties/UpdateResourcePropertiesResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rpw:InvalidModificationFault"
+				name="InvalidModificationFault" />
+			<wsdl:fault
+				message="wsrf-rpw:UnableToModifyResourcePropertyFault"
+				name="UnableToModifyResourcePropertyFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:UpdateResourcePropertiesRequestFailedFault"
+				name="UpdateResourcePropertiesRequestFailedFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="DeleteResourceProperties">
+			<wsdl:input
+				message="wsrf-rpw:DeleteResourcePropertiesRequest"
+				name="DeleteResourcePropertiesRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/DeleteResourceProperties/DeleteResourcePropertiesRequest" />
+			<wsdl:output
+				message="wsrf-rpw:DeleteResourcePropertiesResponse"
+				name="DeleteResourcePropertiesResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/DeleteResourceProperties/DeleteResourcePropertiesResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rpw:InvalidModificationFault"
+				name="InvalidModificationFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:UnableToModifyResourcePropertyFault"
+				name="UnableToModifyResourcePropertyFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:DeleteResourcePropertiesRequestFailedFault"
+				name="DeleteResourcePropertiesRequestFailedFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+
+		<wsdl:operation name="QueryResourceProperties">
+			<wsdl:input
+				message="wsrf-rpw:QueryResourcePropertiesRequest"
+				name="QueryResourcePropertiesRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesRequest" />
+			<wsdl:output
+				message="wsrf-rpw:QueryResourcePropertiesResponse"
+				name="QueryResourcePropertiesResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rpw:UnknownQueryExpressionDialectFault"
+				name="UnknownQueryExpressionDialectFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rpw:InvalidQueryExpressionFault"
+				name="InvalidQueryExpressionFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rpw:QueryEvaluationErrorFault"
+				name="QueryEvaluationErrorFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<!--	<wsdl:portType name="Job" wsrf-rp:ResourceProperties="pr:job_properties">       -->
+	<wsdl:portType name="Job">
+		<wsdl:operation name="Destroy">
+			<wsdl:input message="wsrf-rlw:DestroyRequest"
+				name="DestroyRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rlw-2/ImmediateResourceTermination/DestroyRequest" />
+			<wsdl:output message="wsrf-rlw:DestroyResponse"
+				name="DestroyResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rlw-2/ImmediateResourceTermination/DestroyResponse" />
+			<wsdl:fault message="wsrf-rlw:ResourceNotDestroyedFault"
+				name="ResourceNotDestroyedFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+		<wsdl:operation name="SetTerminationTime">
+			<wsdl:input message="wsrf-rlw:SetTerminationTimeRequest"
+				name="SetTerminationTimeRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rlw-2/ScheduledResourceTermination/SetTerminationTimeRequest" />
+			<wsdl:output message="wsrf-rlw:SetTerminationTimeResponse"
+				name="SetTerminationTimeResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rlw-2/ScheduledResourceTermination/SetTerminationTimeResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rlw:TerminationTimeChangeRejectedFault"
+				name="TerminationTimeChangeRejectedFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault
+				message="wsrf-rlw:UnableToSetTerminationTimeFault"
+				name="UnableToSetTerminationTimeFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+		<wsdl:operation name="GetResourceProperty">
+			<wsdl:input message="wsrf-rpw:GetResourcePropertyRequest"
+				name="GetResourcePropertyRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyRequest" />
+			<wsdl:output message="wsrf-rpw:GetResourcePropertyResponse"
+				name="GetResourcePropertyResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyResponse" />
+			<wsdl:fault
+				message="wsrf-rpw:InvalidResourcePropertyQNameFault"
+				name="InvalidResourcePropertyQNameFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+		</wsdl:operation>
+		<!--		<wsdl:operation name="Send_Document">   -->
+		<wsdl:operation name="SendDocument">
+			<wsdl:input message="prw:Send_DocumentRequest"
+				name="Send_DocumentRequest"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Job/Send_DocumentRequest" />
+			<wsdl:output message="prw:Send_DocumentResponse"
+				name="Send_DocumentResponse"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.wsdl/Job/Send_DocumentResponse" />
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				name="ResourceUnknownFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				name="ResourceUnavailableFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/fault" />
+			<wsdl:fault message="prw:client_error_not_possibleFault"
+				name="client_error_not_possibleFault"
+				wsaw:Action="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer.wsdl/Fault" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="Printer_SOAPBinding" type="prw:Printer">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<!--            <wsdl:operation name="Print_Job">       -->
+		<wsdl:operation name="PrintJob">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="Print_JobRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="Print_JobResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="client_error_not_possibleFault">
+				<soap:fault name="client_error_not_possibleFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<!--            <wsdl:operation name="Create_Job">      -->
+		<wsdl:operation name="CreateJob">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="Create_JobRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="Create_JobResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="client_error_not_possibleFault">
+				<soap:fault name="client_error_not_possibleFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetResourcePropertyDocument">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="GetResourcePropertyDocumentRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="GetResourcePropertyDocumentResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetResourceProperty">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="GetResourcePropertyRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="GetResourcePropertyResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetMultipleResourceProperties">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="GetMultipleResourcePropertiesRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="GetMultipleResourcePropertiesResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="SetResourceProperties">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="SetResourcePropertiesRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="SetResourcePropertiesResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidModificationFault">
+				<soap:fault name="InvalidModificationFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="UnableToModifyResourcePropertyFault">
+				<soap:fault name="UnableToModifyResourcePropertyFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="SetResourcePropertyRequestFailedFault">
+				<soap:fault name="SetResourcePropertyRequestFailedFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="InsertResourceProperties">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="InsertResourcePropertiesRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="InsertResourcePropertiesResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidModificationFault">
+				<soap:fault name="InvalidModificationFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="UnableToModifyResourcePropertyFault">
+				<soap:fault name="UnableToModifyResourcePropertyFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault
+				name="InsertResourcePropertiesRequestFailedFault">
+				<soap:fault
+					name="InsertResourcePropertiesRequestFailedFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="UpdateResourceProperties">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="UpdateResourcePropertiesRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="UpdateResourcePropertiesResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidModificationFault">
+				<soap:fault name="InvalidModificationFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="UnableToModifyResourcePropertyFault">
+				<soap:fault name="UnableToModifyResourcePropertyFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault
+				name="UpdateResourcePropertiesRequestFailedFault">
+				<soap:fault
+					name="UpdateResourcePropertiesRequestFailedFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteResourceProperties">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="DeleteResourcePropertiesRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="DeleteResourcePropertiesResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidModificationFault">
+				<soap:fault name="InvalidModificationFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="UnableToModifyResourcePropertyFault">
+				<soap:fault name="UnableToModifyResourcePropertyFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault
+				name="DeleteResourcePropertiesRequestFailedFault">
+				<soap:fault
+					name="DeleteResourcePropertiesRequestFailedFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="QueryResourceProperties">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="QueryResourcePropertiesRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="QueryResourcePropertiesResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="UnknownQueryExpressionDialectFault">
+				<soap:fault name="UnknownQueryExpressionDialectFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="InvalidQueryExpressionFault">
+				<soap:fault name="InvalidQueryExpressionFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="QueryEvaluationErrorFault">
+				<soap:fault name="QueryEvaluationErrorFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:binding name="Job_SOAPBinding" type="prw:Job">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="Destroy">
+			<wsdl:input name="DestroyRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="DestroyResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceNotDestroyedFault">
+				<soap:fault name="ResourceNotDestroyedFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="SetTerminationTime">
+			<wsdl:input name="SetTerminationTimeRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="SetTerminationTimeResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="TerminationTimeChangeRejectedFault">
+				<soap:fault name="TerminationTimeChangeRejectedFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="UnableToSetTerminationTimeFault">
+				<soap:fault name="UnableToSetTerminationTimeFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="GetResourceProperty">
+			<wsdl:input name="GetResourcePropertyRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="GetResourcePropertyResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="InvalidResourcePropertyQNameFault">
+				<soap:fault name="InvalidResourcePropertyQNameFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<!--            <wsdl:operation name="Send_Document">   -->
+		<wsdl:operation name="SendDocument">
+			<wsdl:input name="Send_DocumentRequest">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="Send_DocumentResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ResourceUnknownFault">
+				<soap:fault name="ResourceUnknownFault" use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="ResourceUnavailableFault">
+				<soap:fault name="ResourceUnavailableFault"
+					use="literal" />
+			</wsdl:fault>
+			<wsdl:fault name="client_error_not_possibleFault">
+				<soap:fault name="client_error_not_possibleFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+
+	<wsdl:service name="SOAPService">
+		<wsdl:port binding="prw:Printer_SOAPBinding"
+			name="PrinterSOAPPort">
+			<soap:address
+				location="http://localhost:9000/PrinterService/PrinterSOAPPort" />
+			<wswa:UsingAddressing
+				xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl" />
+		</wsdl:port>
+		<wsdl:port binding="prw:Job_SOAPBinding" name="JobSOAPPort">
+			<soap:address
+				location="http://localhost:9000/PrinterService/JobSOAPPort" />
+			<wswa:UsingAddressing
+				xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl" />
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>

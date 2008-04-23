@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements. See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership. The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License. You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied. See the License for the
+   specific language governing permissions and limitations
+   under the License.
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://cxf.apache.org/aegis/1.1"
+  xmlns:tns="http://cxf.apache.org/aegis/1.1"
+  elementFormDefault="unqualified" 
+  attributeFormDefault="unqualified" >
+
+  <element name="mappings">
+    <complexType>
+      <sequence>
+        <element name="mapping" minOccurs="0" maxOccurs="unbounded" type="tns:mappingType" />
+      </sequence>
+    </complexType>
+  </element>
+
+  <complexType name="mappingType">
+    <sequence>
+      <element minOccurs="0" maxOccurs="unbounded" ref="tns:property" />
+    </sequence>
+    <attribute name="uri" type="string"/>
+    <attribute name="name" type="string"/>
+  </complexType>
+
+  <element name="property">
+    <complexType>
+      <attributeGroup ref="tns:mappedType"/>
+      <anyAttribute namespace='##other' processContents='lax'/>
+    </complexType>
+  </element>
+  
+  <element name="return-type">
+    <complexType>
+      <attributeGroup ref="tns:mappedType"/>
+      <anyAttribute namespace='##other' processContents='lax'/>
+    </complexType>
+  </element>
+  
+  <element name="parameter">
+    <complexType>
+      <attribute name="index" type="int"/>
+      <attribute name="class" type="string"/>
+      <attributeGroup ref="tns:mappedType"/>
+      <anyAttribute namespace='##other' processContents='lax'/>
+    </complexType>
+  </element>
+
+  <element name="component">
+    <complexType>
+      <attribute name="class" type="string"/>
+      <attributeGroup ref="tns:mappedType"/>
+      <anyAttribute namespace='##other' processContents='lax'/>
+    </complexType>
+  </element>
+  
+  <attributeGroup name="mappedType">
+    <attribute name="name" type="string" />
+    <attribute name="type" type="string" />
+    <attribute name="typeName" type="string" />
+    <attribute name="mappedName" type="string" />
+    <attribute name="nillable" type="boolean" />
+    <attribute name="flag" type="boolean" />
+    <attribute name="ignore" type="boolean" />
+    <attribute name="componentType" type="string" />
+    <attribute name="keyType" type="string" />
+    <attribute name="valueType" type="string" />
+    <attribute name="minOccurs" type="int"/>
+    <attribute name="maxOccurs" type="string"/> <!--  takes * -->
+    <attribute name="style">
+      <simpleType>
+        <restriction base="string">
+          <enumeration value="attribute"/>
+          <enumeration value="element"/>
+        </restriction>
+      </simpleType>
+    </attribute>
+    <anyAttribute namespace='##other' processContents='lax'/>
+  </attributeGroup> 
+
+</schema>

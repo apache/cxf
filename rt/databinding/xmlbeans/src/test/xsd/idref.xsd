@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 sp1 U (http://www.altova.com) by Brian Blitzer (NA) -->
+<xs:schema xmlns="http://www.alservices.com/xsd/sample" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.alservices.com/xsd/sample" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="SampleElement">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SampleUserInformation">
+
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="SampleFirstName" type="xs:string"/>
+							<xs:element name="SampleLastName" type="xs:string"/>
+							<xs:element name="SampleAnID" type="xs:IDREFS"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

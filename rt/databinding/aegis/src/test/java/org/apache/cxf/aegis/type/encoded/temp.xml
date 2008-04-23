@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:root xmlns:b="urn:Bean">
+  <b:po href="0"/>
+  <b:po xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" id="0" ns1:type="b:po">
+    <billing href="1"/>
+    <shipping href="2"/>
+  </b:po>
+  <b:address xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" id="1" ns1:type="b:address">
+    <city>Las Vegas</city>
+    <state>NV</state>
+    <street>1234 Fake Street</street>
+    <zip>89102</zip>
+  </b:address>
+  <b:address xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" id="2" ns1:type="b:address">
+    <city>Gainesville</city>
+    <state>FL</state>
+    <street>1234 Riverside Drive</street>
+    <zip>30506</zip>
+  </b:address>
+</b:root>

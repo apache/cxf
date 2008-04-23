@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project name="test.Benchmark" default="build" basedir=".">
+    <import file="../performance/etc/common_build.xml"/>
+    <property name="wsdl.dir" location="${basedir}/wsdl"/>
+    <property name="wsdl.file" value="Benchmark.wsdl"/>
+
+    <target name="client" description="run Benchmark client">
+         <java maxmemory="512m" fork="true" classname="org.apache.cxf.performance.client.BenchClient">
+            <jvmarg line="-server -Xmx512m -Dtest.setup=LINUX_PENTIUM_M -Dserver.name=CXF"/>
+           <!--file:${basedir}/wsdl/${wsdl.file} wsldlocation 
+                200    totalelementtosend
+                aa     to invoke all method
+                1,10   the arraysize for eacho call  -->
+            <arg line="http://localhost:8080/cxf/services/Benchmark?wsdl 200 aa 1,10"/>
+            <classpath refid="cxf.classpath"/>
+            <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
+            <sysproperty key="log4j.configuration" value="file:///${cxf.etc.dir}/log4j.properties"/>
+        </java>
+
+    </target>
+
+    <target name="server" description="run Benchmark server">
+        <cxf.server.run classname="org.apache.cxf.performance.server.BenchmarkServer" argline="${basedir}/wsdl/${wsdl.file}"/>
+    </target>
+
+     <target name="generate.code">
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java file="Benchmark.wsdl"/>
+    </target>
+  
+
+</project>

@@ -1,0 +1,92 @@
+Apache CXF 2.1 Beta 1 Release Notes
+
+1. Overview
+
+Apache CXF 2.1 (Beta 1) delivers the second major version of 
+the Celtix project (http://celtix.objectweb.org) and the XFire project
+(http://xfire.codehaus.org) merge.  This release is a major update from 
+the 2.0.x series.   The major new addition is JAX-WS 2.1 support.  However, there
+are a lot of other improvements like CORBA support, javascript generation,
+preliminary JAX-RS 0.6 support, xmlbeans databinding runtime, etc...
+
+2. Installation Prerequisites 
+
+Before installing Apache CXF, make sure the following products,
+with the specified versions, are installed on your system:
+
+    * Java 5 Development Kit
+    * Apache ant 1.6
+
+2.1 Java 5 Development Kit
+
+You must install the J2SE Development Kit (JDK) 5.0, which can be downloaded
+from:
+
+    http://java.sun.com/j2se/1.5.0/download.jsp
+
+After installing the JDK, set or modify the following environment variables:
+
+    * JAVA_HOME -- set this environment variable
+      to point at the root directory of the JDK 5.0 installation.
+
+    * PATH -- make sure that your PATH includes: 
+      %JAVA_HOME%\bin  (Windows) 
+      $JAVA_HOME/bin   (UNIX)
+
+2.2 Apache Ant 1.6.5 (or newer, 1.7.0 should work as well)
+
+To run samples included in the binary distribution of Apache CXF,
+you must install the Apache Ant 1.6.5 build utility, which can be downloaded
+from:
+
+    http://ant.apache.org/bindownload.cgi
+
+After installing Apache Ant, add the <AntInstallDir>/bin directory to your PATH.
+
+For more details, see the Installation Guide.
+
+
+2.3 Bouncy Castle/JCE and Xalan requirement for WS-Security
+
+To use the WS-Security features of CXF, you need to obtain a JCE crypto provider
+that implements the algorithms that you plan to use. One option is to download 
+the Bouncy Castle jar from:
+http://bouncycastle.org/download/bcprov-jdk14-136.jar 
+and add that to the lib directory or classpath. 
+
+You also need to have xalan available as the xmlsec code has direct 
+dependencies on xalan.  However, all recent versions of xalan (2.5.0 - 2.7.1) 
+have bugs in them that prevent the JAX-WS TCK from passing if it's on the
+classpath.  Specifically, reading an EndpointReference via 
+EndpointReference.readFrom(Source) may not result in an EndpointReference that
+is completely usable as namespace declarations may be lost.
+
+
+3. Building the Samples
+
+Building the samples included in the binary distribution is easy. Change to
+the samples directory and follow the build instructions in the README.txt file 
+included with each sample.
+
+4. Errata
+
+4.1 WS-Security
+The WS-Security configuration mechanisms may change between this release and 
+the next one as we add in support for WS-SecurityPolicy and WS-Trust.
+
+5. Reporting Problems
+
+If you have any problems or want to send feedback of any kind, please e-mail the
+cxf dev list, cxf-dev@incubator.apache.org.  You can also file issues in JIRA at:
+
+http://issues.apache.org/jira/browse/CXF
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Fixed" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Fixed" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Fixed/typemap">
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="31" repositoryID="IDL:f1_1:1.0" type="f1_1" name="f1_1" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="8" repositoryID="IDL:f1_2:1.0" type="f1_2" name="f1_2" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="31" repositoryID="IDL:if/f2_1:1.0" type="if.f2_1" name="if.f2_1" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="8" repositoryID="IDL:if/f2_2:1.0" type="if.f2_2" name="if.f2_2" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="31" repositoryID="IDL:m/f3_1:1.0" type="m.f3_1" name="m.f3_1" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="8" repositoryID="IDL:m/f3_2:1.0" type="m.f3_2" name="m.f3_2" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="31" repositoryID="IDL:m/m_if/f4_1:1.0" type="m.m_if.f4_1" name="m.m_if.f4_1" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" scale="2" digits="8" repositoryID="IDL:m/m_if/f4_2:1.0" type="m.m_if.f4_2" name="m.m_if.f4_2" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Fixed" xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:simpleType name="f1_1">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="f1_2">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="8">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="if.f2_1">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="if.f2_2">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="8">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="op2_1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_op2_1_f1_1" type="f1_1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2_1Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2_2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2_2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="out_op2_2_f2_2" type="if.f2_2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="m.f3_1">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="m.f3_2">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="8">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="m.m_if.f4_1">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="m.m_if.f4_2">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="8">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="op4_1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_m_if_op4_1_f1_1" type="f1_1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4_1Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4_3">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inout_m_if_op4_3_f3_1" type="m.f3_1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4_3Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inout_m_if_op4_3_f3_1" type="m.f3_1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4_4">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_m_if_op4_4_f4_1" type="m.m_if.f4_1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4_4Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="op2_1">
+    <wsdl:part name="inparameter" element="tns:op2_1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4_1Response">
+    <wsdl:part name="outparameter" element="tns:op4_1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2_2Response">
+    <wsdl:part name="outparameter" element="tns:op2_2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4_4Response">
+    <wsdl:part name="outparameter" element="tns:op4_4Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4_1">
+    <wsdl:part name="inparameter" element="tns:op4_1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4_3Response">
+    <wsdl:part name="outparameter" element="tns:op4_3Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4_3">
+    <wsdl:part name="inparameter" element="tns:op4_3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2_2">
+    <wsdl:part name="inparameter" element="tns:op2_2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4_4">
+    <wsdl:part name="inparameter" element="tns:op4_4">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2_1Response">
+    <wsdl:part name="outparameter" element="tns:op2_1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="if">
+    <wsdl:operation name="op2_1">
+      <wsdl:input name="op2_1Request" message="tns:op2_1">
+    </wsdl:input>
+      <wsdl:output name="op2_1Response" message="tns:op2_1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op2_2">
+      <wsdl:input name="op2_2Request" message="tns:op2_2">
+    </wsdl:input>
+      <wsdl:output name="op2_2Response" message="tns:op2_2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="m.m_if">
+    <wsdl:operation name="op4_1">
+      <wsdl:input name="op4_1Request" message="tns:op4_1">
+    </wsdl:input>
+      <wsdl:output name="op4_1Response" message="tns:op4_1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4_3">
+      <wsdl:input name="op4_3Request" message="tns:op4_3">
+    </wsdl:input>
+      <wsdl:output name="op4_3Response" message="tns:op4_3Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4_4">
+      <wsdl:input name="op4_4Request" message="tns:op4_4">
+    </wsdl:input>
+      <wsdl:output name="op4_4Response" message="tns:op4_4Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="m.m_ifCORBABinding" type="tns:m.m_if">
+    <corba:binding repositoryID="IDL:m/m_if:1.0" />
+    <wsdl:operation name="op4_1">
+      <corba:operation name="op4_1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed/typemap" mode="in" idltype="f1_1" name="in_m_if_op4_1_f1_1" />
+      </corba:operation>
+      <wsdl:input name="op4_1Request">
+      </wsdl:input>
+      <wsdl:output name="op4_1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4_3">
+      <corba:operation name="op4_3">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed/typemap" mode="inout" idltype="m.f3_1" name="inout_m_if_op4_3_f3_1" />
+      </corba:operation>
+      <wsdl:input name="op4_3Request">
+      </wsdl:input>
+      <wsdl:output name="op4_3Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4_4">
+      <corba:operation name="op4_4">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed/typemap" mode="in" idltype="m.m_if.f4_1" name="in_m_if_op4_4_f4_1" />
+      </corba:operation>
+      <wsdl:input name="op4_4Request">
+      </wsdl:input>
+      <wsdl:output name="op4_4Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ifCORBABinding" type="tns:if">
+    <corba:binding repositoryID="IDL:if:1.0" />
+    <wsdl:operation name="op2_1">
+      <corba:operation name="op2_1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed/typemap" mode="in" idltype="f1_1" name="in_op2_1_f1_1" />
+      </corba:operation>
+      <wsdl:input name="op2_1Request">
+      </wsdl:input>
+      <wsdl:output name="op2_1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op2_2">
+      <corba:operation name="op2_2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Fixed/typemap" mode="out" idltype="if.f2_2" name="out_op2_2_f2_2" />
+      </corba:operation>
+      <wsdl:input name="op2_2Request">
+      </wsdl:input>
+      <wsdl:output name="op2_2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ifCORBAService">
+    <wsdl:port name="ifCORBAPort" binding="tns:ifCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="m.m_ifCORBAService">
+    <wsdl:port name="m.m_ifCORBAPort" binding="tns:m.m_ifCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap">
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" xmlns="" elemtype="ns4:StructTest.Foo" elemname="item" bound="0" repositoryID="IDL:StructTest/FooSeq:1.0" type="ns5:StructTest.Foo" name="StructTest.FooSeq" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" xmlns="" elemtype="ns4:StructTest.FooSeq" elemname="item" bound="0" repositoryID="IDL:StructTest/FooTree:1.0" type="ns5:StructTest.FooTree" name="StructTest.FooTree" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" repositoryID="IDL:StructTest/Foo:1.0" type="StructTest.Foo" name="StructTest.Foo">
+      <corba:member name="number" idltype="corba:long" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" name="letter" idltype="ns4:StructTest.FooSeq" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" name="word" idltype="ns4:StructTest.FooTree" />
+    </corba:struct>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="StructTest.FooSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="StructTest.Foo">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="StructTest.FooTree">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="StructTest.FooSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="StructTest.Foo">
+        <xs:sequence>
+          <xs:element name="number" type="xs:int">
+          </xs:element>
+          <xs:element name="letter" type="StructTest.FooSeq">
+          </xs:element>
+          <xs:element name="word" type="StructTest.FooTree">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="getEmployee">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inEmp" type="StructTest.FooTree">
+            </xs:element>
+            <xs:element name="inoutEmp" type="StructTest.FooTree">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getEmployeeResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="StructTest.FooTree">
+            </xs:element>
+            <xs:element name="outEmp" type="StructTest.FooTree">
+            </xs:element>
+            <xs:element name="inoutEmp" type="StructTest.FooTree">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getEmployeeResponse">
+    <wsdl:part name="outparameter" element="tns:getEmployeeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEmployee">
+    <wsdl:part name="inparameter" element="tns:getEmployee">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="StructTest">
+    <wsdl:operation name="getEmployee">
+      <wsdl:input name="getEmployeeRequest" message="tns:getEmployee">
+    </wsdl:input>
+      <wsdl:output name="getEmployeeResponse" message="tns:getEmployeeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="StructTestCORBABinding" type="tns:StructTest">
+    <corba:binding repositoryID="IDL:StructTest:1.0" />
+    <wsdl:operation name="getEmployee">
+      <corba:operation name="getEmployee">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" mode="in" name="inEmp" idltype="StructTest.FooTree" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" mode="out" name="outEmp" idltype="StructTest.FooTree" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" mode="inout" name="inoutEmp" idltype="StructTest.FooTree" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardStruct/typemap" name="return" idltype="StructTest.FooTree" />
+      </corba:operation>
+      <wsdl:input name="getEmployeeRequest">
+      </wsdl:input>
+      <wsdl:output name="getEmployeeResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="StructTestCORBAService">
+    <wsdl:port name="StructTestCORBAPort" binding="tns:StructTestCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

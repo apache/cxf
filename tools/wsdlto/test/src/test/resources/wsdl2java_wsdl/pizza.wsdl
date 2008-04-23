@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions
+        name="PizzaService"
+        targetNamespace="http://mypizzaco.com/pizza"
+        xmlns:tns="http://mypizzaco.com/pizza"
+        xmlns:types="http://mypizzaco.com/pizza/types"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+  <wsdl:import namespace="http://mypizzaco.com/pizza"  location="pizza_messages.wsdl"/>
+
+  <wsdl:binding name="PizzaPortBinding" type="tns:PizzaPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <wsdl:operation name="OrderPizzaBroken">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:header message="tns:CallerIDHeader" part="callerID" use="literal" />
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OrderPizza">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:header message="tns:OrderPizzaRequest" part="callerID" use="literal" />
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="PizzaService">
+    <wsdl:port name="PizzaPort" binding="tns:PizzaPortBinding">
+      <soap:address location="http://localhost:8080/pizza_service/services/PizzaService"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

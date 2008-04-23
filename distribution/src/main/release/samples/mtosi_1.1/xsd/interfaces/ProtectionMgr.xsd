@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ===================== Includes ========= -->
+  <xsd:include schemaLocation="Common.xsd"/>
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Protection.xsd"/>
+  <!-- ===================== Element Declarations ========= -->
+  <xsd:element name="getAllEProtectionGroups" type="getAllEProtectionGroups_T"/>
+  <xsd:element name="getAllEProtectionGroupsResponse" type="getAllEProtectionGroupsResponse_T"/>
+  <xsd:element name="getAllNUTTPNames" type="getAllNUTTPNames_T"/>
+  <xsd:element name="getAllPreemptibleTPNames" type="getAllPreemptibleTPNames_T"/>
+  <xsd:element name="getAllProtectedTPNames" type="getAllProtectedTPNames_T"/>
+  <xsd:element name="getAllProtectionGroups" type="getAllProtectionGroups_T"/>
+  <xsd:element name="getAllProtectionGroupsResponse" type="getAllProtectionGroupsResponse_T"/>
+  <xsd:element name="getContainingPGNames" type="getContainingPGNames_T"/>
+  <xsd:element name="getEProtectionGroup" type="getEProtectionGroup_T"/>
+  <xsd:element name="getEProtectionGroupResponse" type="getEProtectionGroupResponse_T"/>
+  <xsd:element name="getProtectionGroup" type="getProtectionGroup_T"/>
+  <xsd:element name="getProtectionGroupResponse" type="getProtectionGroupResponse_T"/>
+  <xsd:element name="retrieveESwitchData" type="retrieveESwitchData_T"/>
+  <xsd:element name="retrieveESwitchDataResponse" type="retrieveESwitchDataResponse_T"/>
+  <xsd:element name="retrieveSwitchData" type="retrieveSwitchData_T"/>
+  <xsd:element name="retrieveSwitchDataResponse" type="retrieveSwitchDataResponse_T"/>
+  <!-- ===================== getAllEProtectionGroups Request/Response Messages ========= -->
+  <xsd:complexType name="getAllEProtectionGroups_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation is used by the client to discover all the equipment protection groups currently in operation for the managed element.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+        
+        Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managedElement object
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the managed element for which the request is made
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllEProtectionGroupsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllEProtectionGroups operation. See also getAllEProtectionGroups_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="epgpList" type="EProtectionGroupList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            equipment protection groups
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllNUTTPNames Request Messages ========= -->
+  <xsd:complexType name="getAllNUTTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation gets the list of names of CTPs that are configured to carry Non-preemptible Unprotected extra Traffic. The result is independent of the current switch status.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+        
+        Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when pgName does not reference a protectionGroup object
+EXCPT_ENTITY_NOT_FOUND - Raised when pgName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="groupName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the protection group
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllPreemptibleTPNames Request Messages ========= -->
+  <xsd:complexType name="getAllPreemptibleTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation gets the list of names of CTPs that can carry preemptible extra traffic. The result is independent of the current switch status
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+        
+        Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when pgName does not reference a protectionGroup object
+EXCPT_ENTITY_NOT_FOUND - Raised when pgName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="groupName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the protection group
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllProtectedTPNames Request Messages ========= -->
+  <xsd:complexType name="getAllProtectedTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation gets the list of CTPs that can carry protected traffic. The result is independent of the current switch status.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+        Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when pgName does not reference a protectionGroup object
+EXCPT_ENTITY_NOT_FOUND - Raised when pgName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="pgName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the protection group
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllProtectionGroups Request/Response Messages ========= -->
+  <xsd:complexType name="getAllProtectionGroups_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation is used by the client to discover all the  protection groups currently in operation for the managed element.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+        
+        Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managedElement object
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the managed element for which the request is made
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllProtectionGroupsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllProtectionGroups operation. See also getAllProtectionGroups_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="pgpList" type="ProtectionGroupList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            protection groups
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainingPGNames Request Messages ========= -->
+  <xsd:complexType name="getContainingPGNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This service returns the names of the Protection Groups containing the given PhysicalTerminationPoint.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+        Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when pTPName does not reference a PTP object
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="pTPName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the PhysicalTerminationPoint
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getEProtectionGroup Request Messages ========= -->
+  <xsd:complexType name="getEProtectionGroup_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation is used to get the current status of a Equipment Protection Group. This service is needed so that even if a filter is established, the NMS can query the status of a protection group.
+        
+        Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INVALID_INPUT - Raised when ePGPName does not reference an equipment protection group
+EXCPT_ENTITY_NOT_FOUND - Raised when ePGPName references an object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ePGPname" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            name of the equipment protection group that the client is interested in.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getEProtectionGroupResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getEProtectionGroup operation. See also getEProtectionGroup_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eProtectionGroup" type="EProtectionGroup_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the returned equipment protection group.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getProtectionGroup Request Messages ========= -->
+  <xsd:complexType name="getProtectionGroup_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation is used to get the current status of a  Protection Group. This service is needed so that even if a filter is established, the NMS can query the status of a protection group.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when pgName does not reference a protection group
+EXCPT_ENTITY_NOT_FOUND - Raised when pgName references a PG object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="protectionGroupName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            name of the  protection group that the client is interested in.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getProtectionGroupResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getProtectionGroup operation. See also getProtectionGroup_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="protectionGroup" type="ProtectionGroup_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the returned protection group.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== retrieveESwitchData Request Messages ========= -->
+  <xsd:complexType name="retrieveESwitchData_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This service is used by the NMS to get the latest switch status on an equipment protection group.
+        
+        For a retrieval of a revertive M:N group, N ESwitchData_T are returned as a result of retrieveESwitchData (one for each worker equipment instance).
+        For a retrieval of a non-revertive M:N group, N ESwitchData_T are returned as a result of retrieveESwitchData (one for each active equipment instance).
+
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when ePGPName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when ePGPName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ePGPName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            This is the equipment protection group name for which the switch data is being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="retrieveESwitchDataResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the retrieveESwitchData operation. See also retrieveESwitchData_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eSwitchDataList" type="ESwitchDataList_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The current protection switch status of the equipment protection group provided.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== retrieveSwitchData Request Messages ========= -->
+  <xsd:complexType name="retrieveSwitchData_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service is used by the NMS to get the latest switch status on a SNC or a MSP group. 
+      It should be noted that although the term MSP was chosen as the original specific protection scheme to which the related behaviour applied was Multiplex Section Protection, the label is now more generally applied to any 1+1 or 1:N Trail protection scheme.
+      When used on the reliable CTP/FTP of an SNC, a single struct is returned and the group name is NULL. The switchToTP indicates the presently active source of the traffic to the protectedTP.
+      When used on a 1+1 MSP, a single struct is provided with the relevant data.
+      When used on a 1:N MSP, a struct per worker TP is presented with protectedTP being the worker TP Name and the switchToTP identifying the present source of the traffic.
+      When used on a 2F BLSR, two structs are returned, one per TP. In a stable state, the protectedTP and the switchToTP are the same TP. In a switched state, the switchToTP is the same for both protectedTPs.
+      When used on a 4F BLSR, two structs are returned, each one identifying a span with the protectedTP being the worker TP and the switchToTP identifying the present source of the ring traffic for that span.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when an OS is unable to support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when reliableSinkCtpOrGroupName does not reference a reliable CTP nor FTP nor PG object
+EXCPT_ENTITY_NOT_FOUND - Raised when reliableSinkCtpOrGroupName references a CTP or FTP or PG or object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="reliableSinkCtpOrGroupName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+               		This is the CTP/FTP that is the output of a service selector in case of the SNC or the group name for which the switch data is being requested. The termination point name must be explicit (a generic endpoint specification may not be used in this case).
+               	</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="retrieveSwitchDataResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the retrieveSwitchData operation. See also retrieveSwitchData_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="switchDataList" type="SwitchDataList_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The current protection switch status of the CTP, FTP or PG provided.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

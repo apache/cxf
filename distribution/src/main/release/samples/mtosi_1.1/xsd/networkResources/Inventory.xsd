@@ -1,0 +1,1021 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="ManagedElement.xsd"/>
+  <xsd:include schemaLocation="ManagementDomain.xsd"/>
+  <xsd:include schemaLocation="TerminationPoint.xsd"/>
+  <xsd:include schemaLocation="OperationsSystem.xsd"/>
+  <xsd:include schemaLocation="TopologicalLink.xsd"/>
+  <xsd:include schemaLocation="Equipment.xsd"/>
+  <xsd:include schemaLocation="Protection.xsd"/>
+  <xsd:include schemaLocation="SubnetworkConnection.xsd"/>
+  <xsd:include schemaLocation="TransmissionDescriptor.xsd"/>
+  <xsd:include schemaLocation="MultiLayerSubnetwork.xsd"/>
+  <!-- ======== Global Type Declarations ========= -->
+  <xsd:complexType name="DataQualityIndicator_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the in-line exception log found in the inventory report on object retrieval exception.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="suspect" type="xsd:boolean">
+        <xsd:annotation>
+          <xsd:documentation>
+          Flag to indicate suspect data is applicable to the associated network resource object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="descendant" type="xsd:boolean">
+        <xsd:annotation>
+          <xsd:documentation>
+          Flag to indicate suspect data is applicable to all the children of the associated network resource object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="reason" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Free string to provide reason description on suspect data issue.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="OS_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Operations System as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="osNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="osAttrs" type="OperationsSystem_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="subordinateOSNameList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of the subordinate OS names.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="osNm" type="NameValue_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The name of a subordinate OS
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="supportedMDNameList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of the supported Management Domain names.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="mdNm" type="NameValue_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The name of a supported MD.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on OS data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="MD_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Management Domain as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="mdNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the MD.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mdAttrs" type="ManagementDomain_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the MD.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportingOSNameList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of OS names supporting this MD.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="osNm" type="NameValue_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The name of a supporting OS.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="meList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of ME inventories contained in this MD.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="meInv" type="ME_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A Managed Element inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="mlsnList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of MLSN inventories contained in this MD
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="mlsnInv" type="MLSN_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  An MLSN inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tlList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of TL inventories contained in this MD
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tlInv" type="TL_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A Topological Link inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on MD data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ME_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Managed Element as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="meNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the ME in the MD.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="meAttrs" type="ManagedElement_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the ME.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="containingMLSNNameList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of MLSN names that the Managed Element belongs to.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ehList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The equipment inventory contained in ME.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ehInv" type="EH_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  An Equipment Holder inventory (note recursivity of EH)
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ptpList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of PTP inventories contained in ME.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ptpInv" type="PTP_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A PTP inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ftpList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of FTP inventories contained in ME.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ftpInv" type="FTP_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A FTP inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ccList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of Cross Connects contained in ME.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ccAttr" type="CrossConnect_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Cross Connect attributes.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="pgpList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of PGP inventories contained in ME.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="pgpInv" type="PGP_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A PGP inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="epgpList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of EPGP inventories contained in ME.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="epgpInv" type="EPGP_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A EPGP inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on ME data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EH_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Equipment Holder as returned in inventory report.
+        Refer to the InventoryLayout and the EquipmentModel supporting documents.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="ehNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the Equipment Holder in the ME.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ehAttrs" type="EquipmentHolder_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the Equipment Holder.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ehList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of contained equipments (EQ or EH).
+            It is optional to terminate recursive definition.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ehInv" type="EH_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Inventory of a contained Equipment Holder.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="eqInv" type="EQ_Inventory_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The inventory of the Equipment contained directly in this Equipment Holder
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on EH data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EQ_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Equipment as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="eqNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the EQ in the EH.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="eqAttrs" type="Equipment_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the Equipment.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportedPTPNameList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The PTPs that are returned are those that share their physical layer with the primary equipment (i.e. that represent a port on the equipment or are connected by a fibre, wire, etc.). The FTPs that are returned are those which are implemented by the physical circuitry supported by the equipment and will include FTPs that are named from the specified equipment (the FTPs will depend upon the presence of that equipment for their most basic operation). When there is equipment protection, this list reports PTPs/FTPs for the primary equipment only. That is, when called on a protecting equipment (as opposed to the primary equipment), this list returns an empty list, irrespective of the current switch status.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportedEQNameList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of equipment names supported by a given piece of equipment, e.g., a power pack might support many circuit packs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportingEQNameList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of equipment that supports a given piece of equipment, e.g., the power pack and synchronization card that support a given piece of equipment.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on EQ data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="PTP_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Physical Termination Point as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="ptpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the PTP in the ME.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ptpAttrs" type="PhysicalTerminationPoint_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the PTP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportingEquipList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of absolute names of supporting equipment associated with the PTP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ctpList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of CTP inventories contained in PTP.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ctpInv" type="CTP_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A contained CTP inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on PTP data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="FTP_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Floating Termination Point as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="ftpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the FTP in the ME.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ftpAttrs" type="FloatingTerminationPoint_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the FTP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="supportingEquipList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of absolute names of supporting equipment associated with the FTP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ctpList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of CTP inventories contained in FTP.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ctpInv" type="CTP_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A contained CTP inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on FTP data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="CTP_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Connection Termination Point as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="ctpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the CTP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ctpAttrs" type="ConnectionTerminationPoint_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the CTP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on CTP data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TPPool_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the TPPool as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="tppoolNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the TPPool.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tppoolAttrs" type="TPPool_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the TPPool.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on TPPool data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="PGP_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Protection Group as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="pgpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the PGP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="pgpAttrs" type="ProtectionGroup_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the PGP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on PGP data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EPGP_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Equipment Protection Group as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="epgpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the EPGP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="epgpAttrs" type="EProtectionGroup_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the EPGP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on EPGP data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="MLSN_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Multi Layer Subnetwork as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="mlsnNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the MLSN in the MD.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mlsnAttrs" type="MultiLayerSubnetwork_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the MLSN.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="sncList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of SubnetworkConnection inventories contained in the MLSN.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sncInv" type="SNC_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A SNC inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tpPoolList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of TPPool inventories contained in the MLSN.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tpPoolInv" type="TPPool_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A TPPool inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tlList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of TL inventories contained in the MLSN.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tlInv" type="TL_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  A TL inventory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="associatedMEList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of ME names associated with the MLSN.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="associatedME" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  An associated ME structure including the ME absolute name and edge PTPs/FTPs.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                <xsd:all>
+                  <xsd:element name="name" type="NamingAttributes_T">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                        An absolute ME name.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:element>
+                  <xsd:element name="edgePTPList" minOccurs="0">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                        The list of edge PTP inventories associated with the MLSN. When this list is populated, the associated ME and the Topological Links are typically not provided.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="edgePTPInv" type="PTP_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+                          <xsd:annotation>
+                            <xsd:documentation>
+                              An edge PTP inventory.
+                            </xsd:documentation>
+                          </xsd:annotation>
+                        </xsd:element>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                  <xsd:element name="edgeFTPList" minOccurs="0">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                        The list of edge FTP inventories associated with the MLSN. When this list is populated, the associated ME and the Topological Links are typically not provided.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="edgeFTPInv" type="FTP_Inventory_T" minOccurs="0" maxOccurs="unbounded">
+                          <xsd:annotation>
+                            <xsd:documentation>
+                              An edge FTP inventory.
+                            </xsd:documentation>
+                          </xsd:annotation>
+                        </xsd:element>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:all>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on MLSN data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="SNC_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Subnetwork Connection as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="sncNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The relative name of the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="sncAttrs" type="SubnetworkConnection_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="route" type="Route_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            Route for the SNC (List of cross-connects)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on SNC data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TL_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Topological Link as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="tlNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TL.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tlAttrs" type="TopologicalLink_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the TL.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on TL data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TMD_Inventory_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        The data structure of the Transmission Descriptor as returned in inventory report.
+        Refer to the InventoryLayout supporting document.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="tmdNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TMD.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tmdAttrs" type="TransmissionDescriptor_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The specific attributes of the TMD.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="qualityIndicator" type="DataQualityIndicator_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The quality indicator used to report exception information on TMD data retrieval .
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

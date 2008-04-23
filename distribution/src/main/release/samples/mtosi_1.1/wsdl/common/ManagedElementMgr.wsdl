@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-ManagedElementMgrInterfaces" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ======= import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/ManagedElementMgr.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ======= Import Exception Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ======= Definition of getAllActiveAlarms Request/Response Messages ========= -->
+  <wsdl:message name="getAllActiveAlarms">
+    <wsdl:documentation>
+    The getAllActiveAlarms request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllActiveAlarms"/>
+  </wsdl:message>
+  <wsdl:message name="getAllActiveAlarmsResponse">
+    <wsdl:documentation>
+    The getAllActiveAlarms response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllActiveAlarmsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllCrossConnections Request/Response Messages ========= -->
+  <wsdl:message name="getAllCrossConnections">
+    <wsdl:documentation>
+    The getAllCrossConnections request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllCrossConnections"/>
+  </wsdl:message>
+  <wsdl:message name="getAllCrossConnectionsResponse">
+    <wsdl:documentation>
+    The getAllCrossConnections response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllCrossConnectionsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllFixedCrossConnections Request/Response Messages ========= -->
+  <wsdl:message name="getAllFixedCrossConnections">
+    <wsdl:documentation>
+    The getAllFixedCrossConnections request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFixedCrossConnections"/>
+  </wsdl:message>
+  <wsdl:message name="getAllFixedCrossConnectionsResponse">
+    <wsdl:documentation>
+    The getAllFixedCrossConnections response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFixedCrossConnectionsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllFTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllFTPNames">
+    <wsdl:documentation>
+    The getAllFTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllFTPNamesResponse">
+    <wsdl:documentation>
+    The getAllFTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllFTPs Request/Response Messages ========= -->
+  <wsdl:message name="getAllFTPs">
+    <wsdl:documentation>
+    The getAllFTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getAllFTPsResponse">
+    <wsdl:documentation>
+    The getAllFTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllManagedElementNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllManagedElementNames">
+    <wsdl:documentation>
+    The getAllManagedElementNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllManagedElementNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllManagedElementNamesResponse">
+    <wsdl:documentation>
+    The getAllManagedElementNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllManagedElements Request/Response Messages ========= -->
+  <wsdl:message name="getAllManagedElements">
+    <wsdl:documentation>
+    The getAllManagedElements request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllManagedElements"/>
+  </wsdl:message>
+  <wsdl:message name="getAllManagedElementsResponse">
+    <wsdl:documentation>
+    The getAllManagedElements response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllManagedElementsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllPTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllPTPNames">
+    <wsdl:documentation>
+    The getAllPTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllPTPNamesResponse">
+    <wsdl:documentation>
+    The getAllPTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllPTPs Request/Response Messages ========= -->
+  <wsdl:message name="getAllPTPs">
+    <wsdl:documentation>
+    The getAllPTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getAllPTPsResponse">
+    <wsdl:documentation>
+    The getAllPTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllPTPNamesWithoutFTPs Request/Response Messages ========= -->
+  <wsdl:message name="getAllPTPNamesWithoutFTPs">
+    <wsdl:documentation>
+    The getAllPTPNamesWithoutFTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPTPNamesWithoutFTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getAllPTPNamesWithoutFTPsResponse">
+    <wsdl:documentation>
+    The getAllPTPNamesWithoutFTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllPTPsWithoutFTPs Request/Response Messages ========= -->
+  <wsdl:message name="getAllPTPsWithoutFTPs">
+    <wsdl:documentation>
+    The getAllPTPsWithoutFTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPTPsWithoutFTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getAllPTPsWithoutFTPsResponse">
+    <wsdl:documentation>
+    The getAllPTPsWithoutFTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPTPsWithoutFTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllUnacknowledgedActiveAlarms Request/Response Messages ========= -->
+  <wsdl:message name="getAllUnacknowledgedActiveAlarms">
+    <wsdl:documentation>
+    The getAllUnacknowledgedActiveAlarms request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllUnacknowledgedActiveAlarms"/>
+  </wsdl:message>
+  <wsdl:message name="getAllUnacknowledgedActiveAlarmsResponse">
+    <wsdl:documentation>
+    The getAllUnacknowledgedActiveAlarms response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllUnacknowledgedActiveAlarmsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedCurrentCTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getContainedCurrentCTPNames">
+    <wsdl:documentation>
+    The getContainedCurrentCTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedCurrentCTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedCurrentCTPNamesResponse">
+    <wsdl:documentation>
+    The getContainedCurrentCTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedCurrentCTPs Request/Response Messages ========= -->
+  <wsdl:message name="getContainedCurrentCTPs">
+    <wsdl:documentation>
+    The getContainedCurrentCTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedCurrentCTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedCurrentCTPsResponse">
+    <wsdl:documentation>
+    The getContainedCurrentCTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedCurrentCTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedInUseCTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getContainedInUseCTPNames">
+    <wsdl:documentation>
+    The getContainedInUseCTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedInUseCTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedInUseCTPNamesResponse">
+    <wsdl:documentation>
+    The getContainedInUseCTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedInUseCTPs Request/Response Messages ========= -->
+  <wsdl:message name="getContainedInUseCTPs">
+    <wsdl:documentation>
+    The getContainedInUseCTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedInUseCTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedInUseCTPsResponse">
+    <wsdl:documentation>
+    The getContainedInUseCTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedInUseCTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedPotentialCTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getContainedPotentialCTPNames">
+    <wsdl:documentation>
+    The getContainedPotentialCTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedPotentialCTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedPotentialCTPNamesResponse">
+    <wsdl:documentation>
+    The getContainedPotentialCTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainedPotentialCTPs Request/Response Messages ========= -->
+  <wsdl:message name="getContainedPotentialCTPs">
+    <wsdl:documentation>
+    The getContainedPotentialCTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedPotentialCTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getContainedPotentialCTPsResponse">
+    <wsdl:documentation>
+    The getContainedPotentialCTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainedPotentialCTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainingSubnetworkNames Request/Response Messages ========= -->
+  <wsdl:message name="getContainingSubnetworkNames">
+    <wsdl:documentation>
+    The getContainingSubnetworkNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainingSubnetworkNames"/>
+  </wsdl:message>
+  <wsdl:message name="getContainingSubnetworkNamesResponse">
+    <wsdl:documentation>
+    The getContainingSubnetworkNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainingTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getContainingTPNames">
+    <wsdl:documentation>
+    The getContainingTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainingTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getContainingTPNamesResponse">
+    <wsdl:documentation>
+    The getContainingTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainingTPs Request/Response Messages ========= -->
+  <wsdl:message name="getContainingTPs">
+    <wsdl:documentation>
+    The getContainingTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainingTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getContainingTPsResponse">
+    <wsdl:documentation>
+    The getContainingTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainingTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getManagedElement Request/Response Messages ========= -->
+  <wsdl:message name="getManagedElement">
+    <wsdl:documentation>
+    The getManagedElement request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getManagedElement"/>
+  </wsdl:message>
+  <wsdl:message name="getManagedElementResponse">
+    <wsdl:documentation>
+    The getManagedElement response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getManagedElementResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getPotentialFixedCCs Request/Response Messages ========= -->
+  <wsdl:message name="getPotentialFixedCCs">
+    <wsdl:documentation>
+    The getPotentialFixedCCs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getPotentialFixedCCs"/>
+  </wsdl:message>
+  <wsdl:message name="getPotentialFixedCCsResponse">
+    <wsdl:documentation>
+    The getPotentialFixedCCs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getPotentialFixedCCsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getTP Request/Response Messages ========= -->
+  <wsdl:message name="getTP">
+    <wsdl:documentation>
+    The getTP request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTP"/>
+  </wsdl:message>
+  <wsdl:message name="getTPResponse">
+    <wsdl:documentation>
+    The getTP response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTPResponse"/>
+  </wsdl:message>
+  <!-- ======= Port Type Definitions ====================== -->
+  <!-- ======= ManagedElementMgr Port Type  ===================== -->
+  <wsdl:portType name="ManagedElementMgr">
+    <wsdl:documentation>
+The MTOSI ManagedElementMgr porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getAllActiveAlarms">
+      <wsdl:documentation>
+        This is the getAllActiveAlarms request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllActiveAlarms"/>
+      <wsdl:output message="tmf854WS:getAllActiveAlarmsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllCrossConnections">
+      <wsdl:documentation>
+        This is the getAllCrossConnections request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllCrossConnections"/>
+      <wsdl:output message="tmf854WS:getAllCrossConnectionsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllFixedCrossConnections">
+      <wsdl:documentation>
+        This is the getAllFixedCrossConnections request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllFixedCrossConnections"/>
+      <wsdl:output message="tmf854WS:getAllFixedCrossConnectionsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllFTPNames">
+      <wsdl:documentation>
+        This is the getAllFTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllFTPNames"/>
+      <wsdl:output message="tmf854WS:getAllFTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllFTPs">
+      <wsdl:documentation>
+        This is the getAllFTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllFTPs"/>
+      <wsdl:output message="tmf854WS:getAllFTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllManagedElementNames">
+      <wsdl:documentation>
+        This is the getAllManagedElementNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllManagedElementNames"/>
+      <wsdl:output message="tmf854WS:getAllManagedElementNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllManagedElements">
+      <wsdl:documentation>
+        This is the getAllManagedElements request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllManagedElements"/>
+      <wsdl:output message="tmf854WS:getAllManagedElementsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllPTPNames">
+      <wsdl:documentation>
+        This is the getAllPTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllPTPNames"/>
+      <wsdl:output message="tmf854WS:getAllPTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllPTPs">
+      <wsdl:documentation>
+        This is the getAllPTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllPTPs"/>
+      <wsdl:output message="tmf854WS:getAllPTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllPTPNamesWithoutFTPs">
+      <wsdl:documentation>
+        This is the getAllPTPNamesWithoutFTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllPTPNamesWithoutFTPs"/>
+      <wsdl:output message="tmf854WS:getAllPTPNamesWithoutFTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllPTPsWithoutFTPs">
+      <wsdl:documentation>
+        This is the getAllPTPsWithoutFTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllPTPsWithoutFTPs"/>
+      <wsdl:output message="tmf854WS:getAllPTPsWithoutFTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllUnacknowledgedActiveAlarms">
+      <wsdl:documentation>
+        This is the getAllUnacknowledgedActiveAlarms request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllUnacknowledgedActiveAlarms"/>
+      <wsdl:output message="tmf854WS:getAllUnacknowledgedActiveAlarmsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedCurrentCTPNames">
+      <wsdl:documentation>
+        This is the getContainedCurrentCTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedCurrentCTPNames"/>
+      <wsdl:output message="tmf854WS:getContainedCurrentCTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedCurrentCTPs">
+      <wsdl:documentation>
+        This is the getContainedCurrentCTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedCurrentCTPs"/>
+      <wsdl:output message="tmf854WS:getContainedCurrentCTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedInUseCTPNames">
+      <wsdl:documentation>
+        This is the getContainedInUseCTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedInUseCTPNames"/>
+      <wsdl:output message="tmf854WS:getContainedInUseCTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedInUseCTPs">
+      <wsdl:documentation>
+        This is the getContainedInUseCTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedInUseCTPs"/>
+      <wsdl:output message="tmf854WS:getContainedInUseCTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedPotentialCTPNames">
+      <wsdl:documentation>
+        This is the getContainedPotentialCTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedPotentialCTPNames"/>
+      <wsdl:output message="tmf854WS:getContainedPotentialCTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainedPotentialCTPs">
+      <wsdl:documentation>
+        This is the getContainedPotentialCTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainedPotentialCTPs"/>
+      <wsdl:output message="tmf854WS:getContainedPotentialCTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainingSubnetworkNames">
+      <wsdl:documentation>
+        This is the getContainingSubnetworkNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainingSubnetworkNames"/>
+      <wsdl:output message="tmf854WS:getContainingSubnetworkNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainingTPNames">
+      <wsdl:documentation>
+        This is the getContainingTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainingTPNames"/>
+      <wsdl:output message="tmf854WS:getContainingTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainingTPs">
+      <wsdl:documentation>
+        This is the getContainingTPs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainingTPs"/>
+      <wsdl:output message="tmf854WS:getContainingTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getManagedElement">
+      <wsdl:documentation>
+        This is the getManagedElement request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getManagedElement"/>
+      <wsdl:output message="tmf854WS:getManagedElementResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getPotentialFixedCCs">
+      <wsdl:documentation>
+        This is the getPotentialFixedCCs request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getPotentialFixedCCs"/>
+      <wsdl:output message="tmf854WS:getPotentialFixedCCsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getTP">
+      <wsdl:documentation>
+        This is the getTP request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getTP"/>
+      <wsdl:output message="tmf854WS:getTPResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

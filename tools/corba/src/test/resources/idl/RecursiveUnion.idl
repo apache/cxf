@@ -1,0 +1,46 @@
+union BasicTest switch(short) {
+    case 1:
+        long case1;
+    case 2:
+        sequence<BasicTest> case2;
+    default:
+        string caseDef;
+};
+
+union ForwardTest;
+union ForwardTest switch(short) {
+    case 1:
+        long case1;
+    case 2:
+        sequence<ForwardTest> case2;
+    default:
+        string caseDef;
+};
+
+union ForwardSeqTest;
+typedef sequence<ForwardSeqTest> ForwardSeqTestSeq;
+union ForwardSeqTest switch(short) {
+    case 1:
+        long case1;
+    case 2:
+        ForwardSeqTestSeq case2;
+    default:
+        string caseDef;
+};
+
+union NestedTestOuter;
+typedef sequence<NestedTestOuter> NestedTestOuterSeq;
+union NestedTestOuter switch(short) {
+    case 1:
+        long case1;
+    case 2:
+        struct NestedTestInner {
+            string member1;
+            NestedTestOuterSeq member2;
+        } case2;
+    default:
+        string caseDef;
+};
+
+interface TestInterface {
+};

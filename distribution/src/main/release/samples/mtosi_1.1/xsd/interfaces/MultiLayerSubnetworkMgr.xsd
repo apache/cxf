@@ -1,0 +1,1104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ===================== Includes ========= -->
+  <xsd:include schemaLocation="Common.xsd"/>
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Inventory.xsd"/>
+  <!-- ===================== Element Declarations ========= -->
+  <xsd:element name="getAllEdgePointNames" type="getAllEdgePointNames_T"/>
+  <xsd:element name="getAllEdgePoints" type="getAllEdgePoints_T"/>
+  <xsd:element name="getAllEdgePointsResponse" type="getAllEdgePointsResponse_T"/>
+  <xsd:element name="getAllFixedSubnetworkConnectionNames" type="getAllFixedSubnetworkConnectionNames_T"/>
+  <xsd:element name="getAllFixedSubnetworkConnections" type="getAllFixedSubnetworkConnections_T"/>
+  <xsd:element name="getAllFixedSubnetworkConnectionsResponse" type="getAllFixedSubnetworkConnectionsResponse_T"/>
+  <xsd:element name="getAllManagedElementNamesWrtMLSN" type="getAllManagedElementNamesWrtMLSN_T"/>
+  <xsd:element name="getAllManagedElementsWrtMLSN" type="getAllManagedElementsWrtMLSN_T"/>
+  <xsd:element name="getAllManagedElementsWrtMLSNResponse" type="getAllManagedElementsWrtMLSNResponse_T"/>
+  <xsd:element name="getAllSubnetworkConnectionNames" type="getAllSubnetworkConnectionNames_T"/>
+  <xsd:element name="getAllSubnetworkConnectionNamesWithTP" type="getAllSubnetworkConnectionNamesWithTP_T"/>
+  <xsd:element name="getAllSubnetworkConnections" type="getAllSubnetworkConnections_T"/>
+  <xsd:element name="getAllSubnetworkConnectionsResponse" type="getAllSubnetworkConnectionsResponse_T"/>
+  <xsd:element name="getAllSubnetworkConnectionsWithTP" type="getAllSubnetworkConnectionsWithTP_T"/>
+  <xsd:element name="getAllSubnetworkConnectionsWithTPResponse" type="getAllSubnetworkConnectionsWithTPResponse_T"/>
+  <xsd:element name="getAllTopologicalLinkNames" type="getAllTopologicalLinkNames_T"/>
+  <xsd:element name="getAllTopologicalLinks" type="getAllTopologicalLinks_T"/>
+  <xsd:element name="getAllTopologicalLinksResponse" type="getAllTopologicalLinksResponse_T"/>
+  <xsd:element name="getAllTPPoolNames" type="getAllTPPoolNames_T"/>
+  <xsd:element name="getAllTPPools" type="getAllTPPools_T"/>
+  <xsd:element name="getAllTPPoolsResponse" type="getAllTPPoolsResponse_T"/>
+  <xsd:element name="getAssociatedTP" type="getAssociatedTP_T"/>
+  <xsd:element name="getAssociatedTPResponse" type="getAssociatedTPResponse_T"/>
+  <xsd:element name="getMultiLayerSubnetwork" type="getMultiLayerSubnetwork_T"/>
+  <xsd:element name="getMultiLayerSubnetworkResponse" type="getMultiLayerSubnetworkResponse_T"/>
+  <xsd:element name="getRoute" type="getRoute_T"/>
+  <xsd:element name="getRouteResponse" type="getRouteResponse_T"/>
+  <xsd:element name="getRouteAndTopologicalLinks" type="getRouteAndTopologicalLinks_T"/>
+  <xsd:element name="getRouteAndTopologicalLinksResponse" type="getRouteAndTopologicalLinksResponse_T"/>
+  <xsd:element name="getSNC" type="getSNC_T"/>
+  <xsd:element name="getSNCResponse" type="getSNCResponse_T"/>
+  <xsd:element name="getSNCsByUserLabel" type="getSNCsByUserLabel_T"/>
+  <xsd:element name="getSNCsByUserLabelResponse" type="getSNCsByUserLabelResponse_T"/>
+  <xsd:element name="getTopologicalLink" type="getTopologicalLink_T"/>
+  <xsd:element name="getTopologicalLinkResponse" type="getTopologicalLinkResponse_T"/>
+  <xsd:element name="getTPGroupingRelationships" type="getTPGroupingRelationships_T"/>
+  <xsd:element name="getTPPool" type="getTPPool_T"/>
+  <xsd:element name="getTPPoolResponse" type="getTPPoolResponse_T"/>
+  <!-- ===================== getAllEdgePointNames Request Message ========= -->
+  <xsd:complexType name="getAllEdgePointNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation has exactly the same behaviour as getAllEdgePoints(), but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object,or tpLayerRateList or connectionLayerRateList contain undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of TP layer rates for which the edge points are to be fetched. An edge point must contain at least one of the layer rates specified to be reported. If the list is empty then edge points of all rates are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the edge points are to be fetched. An edge point must support connections for at least one of the layer rates specified to be reported. If the list is empty then edge points for all connection rates are returned. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllEdgePoints Request/Response Messages ========= -->
+  <xsd:complexType name="getAllEdgePoints_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request a list of the edge termination points (PTPs/FTPs) for the specified subnetwork, at one or more of the NMS- specified layers, and that are capable of containing CTPs that can be connected at one or more of the NMS-specified connection layer rates. This operation considers the capability/flexibility of the TPs, not their current states.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object,or tpLayerRateList or connectionLayerRateList contain undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of TP layer rates for which the edge points are to be fetched. An edge point must contain at least one of the layer rates specified to be reported. If the list is empty then edge points of all rates are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the edge points are to be fetched. An edge point must support connections for at least one of the layer rates specified to be reported. If the list is empty then edge points for all connection rates are returned. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllEdgePointsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllEdgePoints operation. See also getAllEdgePoints_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpList" type="TerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of all PTPs and FTPs that are edge points
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllFixedSubnetworkConnectionNames Request Message ========= -->
+  <xsd:complexType name="getAllFixedSubnetworkConnectionNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation has exactly the same behaviour as getAllFixedSubnetworkConnections(), but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates of the SNC names to be reported. If an empty list is specified, then all SNC names of all rates are to be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllFixedSubnetworkConnections Request/Response Messages ========= -->
+  <xsd:complexType name="getAllFixedSubnetworkConnections_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation has exactly the same behaviour as getAllSubnetworkConnections(), but instead returns only fixed SNCs object structures. See Subnetwork Connection Types for an explanation of fixed SNCs.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises globaldefs::ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference an multiLayerSubnetwork object or connectionRateList contains undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the edge points are to be fetched. An edge point must support connections for at least one of the layer rates specified to be reported. If the list is empty then edge points for all connection rates are returned. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllFixedSubnetworkConnectionsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllFixedSubnetworkConnections operation. See also getAllFixedSubnetworkConnections_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncList" type="SubnetworkConnectionList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of SNCs
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllManagedElementNamesWrtMLSN Request Message ========= -->
+  <xsd:complexType name="getAllManagedElementNamesWrtMLSN_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllManagedElements(), but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllManagedElementsWrtMLSN Request/Response Messages ========= -->
+  <xsd:complexType name="getAllManagedElementsWrtMLSN_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This allows an NMS to request a list of the ManagedElements that are associated with the specified Subnetwork.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllManagedElementsWrtMLSNResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllManagedElementsWrtMLSN operation. See also getAllManagedElementsWrtMLSN_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meList" type="ManagedElementList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of MEs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSubnetworkConnectionNames Request Message ========= -->
+  <xsd:complexType name="getAllSubnetworkConnectionNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllSubnetworkConnections but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference an multiLayerSubnetwork object or connectionRateList contains undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates of the SNCs to be reported. If an empty list is specified, then all SNCs of all rates are to be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSubnetworkConnectionNamesWithTP Request Message ========= -->
+  <xsd:complexType name="getAllSubnetworkConnectionNamesWithTP_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllSubnetworkConnectionsWithTP(), but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+      		Raises globaldefs::ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised if tpName does not reference a terminationPoint object or connectionRateList contains undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+        </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Termination point for which to report SNCs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates of the SNCs to be reported. If an empty list is specified, then all SNCs of all rates are to be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSubnetworkConnections Request/Response Messages ========= -->
+  <xsd:complexType name="getAllSubnetworkConnections_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request a list of the SNCs for the specified Subnetwork at the specified connectionRates. This operation also returns bundled SNCs, if any (see Bundled SNC overview for further details).
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference an multiLayerSubnetwork object or connectionRateList contains undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates of the SNCs to be reported. If an empty list is specified, then all SNCs of all rates are to be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllSubnetworkConnectionsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllSubnetworkConnections operation. See also getAllSubnetworkConnections_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncList" type="SubnetworkConnectionList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of SNCs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSubnetworkConnectionsWithTP Request/Response Messages ========= -->
+  <xsd:complexType name="getAllSubnetworkConnectionsWithTP_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This allows an NMS to request a list of the SNCs using the specified termination point at the specified connection rates. A SNC is using the specified TP if any of its routes, intended and/or backup, in any state, use this TP. A TP may be a PTP in which case a full list of SNCs using any of its contained CTPs is required. A TP may be:
+
+a CTP, in which case SNCs using that CTP or any of its contained CTPs are required. This includes SNCs in which any of the referenced CTPs participate that match the specified connection rate filter. 
+an FTP, in which case a full list of SNCs using the FTP or any of its contained CTPs is required. This includes SNCs in which the FTP or any of the referenced CTPs participate that match the specified connection rate filter. 
+
+All legs of a broadcast system can be retrieved using this operation where the source TP of the broadcast system is used as input to the operation.The output will be the list of individual SNCs that make up the broadcast system.
+
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+Raises globaldefs::ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised if tpName does not reference a terminationPoint object or connectionRateList contains undefined values
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Termination point for which to report SNCs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates of the SNCs to be reported. If an empty list is specified, then all SNCs of all rates are to be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllSubnetworkConnectionsWithTPResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllSubnetworkConnectionsWithTP operation. See also getAllSubnetworkConnectionsWithTP_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncList" type="SubnetworkConnectionList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of SNCs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTopologicalLinkNames Request Message ========= -->
+  <xsd:complexType name="getAllTopologicalLinkNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllTopologicalLinks but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTopologicalLinks Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTopologicalLinks_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns a list of TopologicalLinks which exist inside the Subnetwork whose name is passed as a parameter. For singletons, no topologicalLinks will be returned. The OS should report topological links at the "lowest" layer (i.e. closest to physical) about which it has accurate knowledge
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTopologicalLinksResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllTopologicalLinks operation. See also getAllTopologicalLinks_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tlList" type="TopologicalLinkList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of TLs</xsd:documentation>
+        </xsd:annotation>
+        </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTPPoolNames Request Message ========= -->
+  <xsd:complexType name="getAllTPPoolNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllTPPools but instead of returning the entire object structures, this operation returns their names.
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetworkName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetworkName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetworkName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTPPools Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTPPools_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns all TP Pools within a Subnetwork contained in an OS. The TP Pool is a TP used to logically group TPs. The TP Pool does not affect TP containment. TP containment remains from the Network Element view. Given a TP Pool, the NMS could then determine all the TPs that are associated with the TP Pool, for the purpose of logical partitioning or grouping. See getTPGroupingRelationships().
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetworkName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetworkName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetworkName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            subnetworkName
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTPPoolsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllTPPools operation. See also getAllTPPools_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpPoolList" type="TPPoolList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of TPPools</xsd:documentation>
+        </xsd:annotation>
+        </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAssociatedTP Request/Response Messages ========= -->
+  <xsd:complexType name="getAssociatedTP_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns a list of PSR (UPSR or SNCP) associated termination points for the TP whose name is passed as a parameter.
+      		Note: The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+
+When this service is invoked with a TP that is not an edge point, the returned TPs will be on the same Managed Element
+
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a CTP, FTP or PTP.
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a CTP, FTP or PTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TP for which to retrieve associated TPs
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAssociatedTPResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAssociatedTP operation. See also getAssociatedTP_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpList" type="TerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of all associated TPs (PTPs, FTPs, and CTPs)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getMultiLayerSubnetwork Request/Response Messages ========= -->
+  <xsd:complexType name="getMultiLayerSubnetwork_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This service returns a Subnetwork given a subnetwork name.
+      
+      Raises globaldefs::ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when subnetName does not reference a multiLayerSubnetwork object
+EXCPT_ENTITY_NOT_FOUND - Raised when subnetName references a multiLayerSubnetwork object that does not exist
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork to retrieve.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getMultiLayerSubnetworkResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getMultiLayerSubnetwork operation. See also getMultiLayerSubnetwork_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="subnetwork" type="MultiLayerSubnetwork_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            Subnetwork structure returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getRouteAndTopologicalLinks Request/Response Messages ========= -->
+  <xsd:complexType name="getRouteAndTopologicalLinks_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Like getRoute(), this service returns the route, in terms of crossconnects, for the SNC whose name is specified as a parameter. This service also returns the list of topological links for that SNC that are used in the route.
+
+All topological links that the traffic of the SNC travel across are returned including the links that connect to the terminating PTP and/or TP containing the termination TP.
+
+The route information, in the form of crossconnects, should identify the resources allocated to the SNC at the time of the request and the way in which these resources are used. For example, for a resilient SNC that is implemented in the subnetwork using subnetwork connection protection, all details of the route including normal and alternative paths should be provided. If the SNC is using some form of dynamic rerouting then it is clearly acceptable that the route include only the single thread of crossconnections that is supporting the traffic (as there may be many alternative potential paths that could be selected). 
+
+The list of Topological links can be used in conjunction with the crossconnects to lay out the entire route through the subnetwork.
+
+Unlike getRoute(), this service always retrieves resources in all layers that support the route. This includes all crossconnects of the SNC (i.e. the crossconnects SNC) and all higher order crossconnects (i.e. the crossconnects of server SNCs that are used to carry the traffic of the queried SNC). It also includes all topological links (at any layer) that any traffic of the SNC passes across. 
+
+All crossconnects allocated to the SNC must be returned, even if they are not active in the managed elements. This allows the NMS to query the route that will be used before activating the SNC. 
+
+If the SNC has more alternative routes, then it retrieves the intended route if the SNC is pending or partial, otherwise it retrieves the active route. This because there can be more partial routes and no active route, in such case the intended route is replied, as it is not known which of the partial routes is the candidate for becoming the active route.
+
+In the vendorExtension field of first CrossConnect_T (first XC is the one involving A1 end point of the SNC) record of the replied sequence the following parameters may be present:
+
+name="RouteId"; value="id" 
+name="RouteIntended "; value="y" | "n" 
+name="RouteActualState"; value="inactive" | "partial" | "active" 
+name="RouteAdminState"; value="locked" | "unlocked" 
+name="RouteInUse"; value="y" | "n" 
+name="RouteExclusive"; value="y" | "n"
+
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when sncName does not reference a subnetworkConnection object
+EXCPT_ENTITY_NOT_FOUND - Raised when sncName references a subnetworkConnection object that does not exist
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getRouteAndTopologicalLinksResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getRouteAndTopologicalLinks operation. See also getRouteAndTopologicalLinks_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="route" type="Route_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+              The route of the SNC.
+            </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="topologicalLinkList" type="TopologicalLinkList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of the topological links.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getRoute Request/Response Messages ========= -->
+  <xsd:complexType name="getRoute_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This service returns the route for the SNC whose name is specified as a parameter. This operation also works for bundled SNCs.
+
+The route information, in the form of crossconnects, should identify the resources allocated to the SNC at the time of the request and the way in which these resources are used. For example, for a resilient SNC that is implemented in the subnetwork using subnetwork connection protection, all details of the route including normal and alternative paths should be provided. If the SNC is using some form of dynamic rerouting then it is clearly acceptable that the route include only the single thread of crossconnections that is supporting the traffic (as there may be many alternative potential paths that could be selected).
+
+The NMS specifies if it wants to retrieve only resources in the layer of the SNC (the CCs that belong to the SNC), or higher order CCs also (the CCs of other SNCs that are used to carry the traffic of the queried SNC). The ability to retrieve higher order CCs is optional.
+
+All cross-connections allocated to the SNC must be returned, even if they are not active in the managed elements. This allows the NMS to query the route that will be used before activating an SNC.
+
+If the SNC has more alternative routes, then it retrieves the intended route if the SNC is pending or partial, otherwise it retrieves the active route. This because there can be more partial routes and no active route, in such case the intended route is replied, as it is not known which of the partial routes is the candidate for becoming the active route.
+
+In the vendorExtension field of first CrossConnect_T (first XC is the one involving A1 end point of the SNC) record of the replied sequence the following parameters may be present:
+
+name="RouteId"; value="id" 
+name="RouteIntended "; value="y" | "n" 
+name="RouteActualState"; value="inactive" | "partial" | "active" 
+name="RouteAdminState"; value="locked" | "unlocked" 
+name="RouteInUse"; value="y" | "n" 
+name="RouteExclusive"; value="y" | "n"
+
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when sncName does not reference a subnetworkConnection object
+EXCPT_ENTITY_NOT_FOUND - Raised when sncName references an SNC object that does not exist
+EXCPT_UNABLE_TO_COMPLY - Raised when the provided value for includeHigherOrderCCs is "True" and OS is not able to provide higher order CCs in the reply
+       	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="includeHigherOrderCCs" type="xsd:boolean">
+        <xsd:annotation>
+          <xsd:documentation>
+            Specifies whether the higher order CCs of other SNCs used to carry the queried SNC have to be included in addition to the CCs of the queried SNC
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getRouteResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getRoute operation. See also getRoute_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="route" type="Route_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The route of the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSNC Request/Response Messages ========= -->
+  <xsd:complexType name="getSNC_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation will return the SubnetworkConnection structure for the SNC whose name is supplied as a parameter. This operations will provide a bundled SNC structure if the name provided is that of a bundled SNC (see Bundled SNC overview for further details).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when sncName does not reference a subnetworkConnection object
+EXCPT_ENTITY_NOT_FOUND - Raised when sncName references an SNC object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getSNCResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getSNC operation. See also getSNC_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="snc" type="SubnetworkConnection_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSNCsByUserLabel Request/Response Messages ========= -->
+  <xsd:complexType name="getSNCsByUserLabel_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This operation will return the SubnetworkConnection structures for the SNCs whose userLabel is supplied as a parameter. This operations will provide a bundled SNC structure if the name provided is that of a bundled SNC (see Bundled SNC overview for further details).
+
+This operation does not use multiple responses, since the number of SNCs returned is expected to be usually 1.
+
+Raises globaldefs::ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="userLabel" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+            The userLabel of the SNCs to retrieve.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getSNCsByUserLabelResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getSNCsByUserLabel operation. See also getSNCsByUserLabel_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sncList" type="SubnetworkConnectionList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the SNC.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getTopologicalLink Request/Response Messages ========= -->
+  <xsd:complexType name="getTopologicalLink_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns a subnetwork topological link given its name
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when topoLinkName does not reference a subnetwork topologicallink object
+EXCPT_ENTITY_NOT_FOUND - Raised when topoLinkName references a subnetwork topological link object that does not exist
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="topoLinkName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the subnetwork topological link to retrieve
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getTopologicalLinkResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getTopologicalLink operation. See also getTopologicalLink_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tl" type="TopologicalLink_T" minOccurs="0">
+        </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getTPGroupingRelationships Request Message ========= -->
+  <xsd:complexType name="getTPGroupingRelationships_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This method allows the NMS to query the associations between TPPool and TP .
+
+If a TPPool name is supplied, the method will return the names of all the TPs that have been grouped to the supplied TPPool.
+
+If a TP name is supplied, the method will return the names of any associated TPPools. An empty list is returned if no associated TP pools exist for the input TP, or if no TPs have been grouped to the input TP pool.
+
+Note 1. Any termination point name must be explicit (a generic endpoint specification must not be used in this case). See Object Naming for further detail on FTP naming and for details on general TP and TP pool naming.
+
+Note 2. A TP can be a member of at most one TPPool. A TP is associated to a TPPool (TP -- TPPool) by admission as a member (TP is a member of TPPool).
+
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a TP or TPPool object
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a TP to TP pool object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TP pool or TP for which to retrieve the association.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getTPPool Request Message ========= -->
+  <xsd:complexType name="getTPPool_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      	This service returns the TPPool structure for the given TPPool name, and the additional attributes numberOfMembers, numberOfIdleMembers, and descriptionOfUse. The attribute containedMembers, i.e. the list of names of contained TPs, can be retrieved by means of the operation getTPGroupingRelationships() with input tpPoolName.
+      	
+      	Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when OS does not support TP pools at all or does not support retrieval of TP pools by the NMS.
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tPPoolName does not reference a TPPool
+EXCPT_ENTITY_NOT_FOUND - Raised when tPPoolName references a TPPool object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tPPoolName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TP pool or TP for which to retrieve the association.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getTPPoolResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getTPPool operation. See also getTPPool_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpPool" type="TPPool_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The retrieved TPPool. The attributes ingressTransmissionDescriptorName, egressTransmissionDescriptorName, connectionState, tpMappingMode, direction, tpProtectionAssociation, and edgePoint will contain NULL values.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="numberOfMembers" type="xsd:unsignedLong">
+        <xsd:annotation>
+          <xsd:documentation>
+            The total number of TPs currently contained in the TPPool.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="numberOfIdleMembers" type="xsd:unsignedLong">
+        <xsd:annotation>
+          <xsd:documentation>
+            The number of contained TPs that are currently idle, i.e. can be used for the intended purpose.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="descriptionOfUse" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+            A description of the specific use of the TP pool, in particular how its members are collected and administered.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

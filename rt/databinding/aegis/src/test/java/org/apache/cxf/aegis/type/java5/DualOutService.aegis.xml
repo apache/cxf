@@ -1,0 +1,7 @@
+<mappings>
+  <mapping>
+    <method name="getValues">
+     <parameter index="0" componentType="java.lang.String"/>
+    </method>
+  </mapping>
+</mappings>

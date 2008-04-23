@@ -1,0 +1,1717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions targetNamespace="http://efms.att.com/ms/BVOIP/v1" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:ch="http://cio.att.com/CommonHeader/v2" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+    xmlns:msbvoip="http://efms.att.com/ms/BVOIP/v1" 
+    xmlns:ns1="http://efms.att.com/ms/BVOIP/v1/corba/typemap/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <corba:typeMapping targetNamespace="http://efms.att.com/ms/BVOIP/v1/corba/typemap/">
+        <corba:struct name="CancelObjectResponseType" 
+            repositoryID="IDL:CancelObjectResponseType:1.0" 
+            type="msbvoip:CancelObjectResponse"/>
+        <corba:enum name="BillingElementEnum" repositoryID="IDL:BillingElementEnum:1.0" 
+            type="msbvoip:BillingElementEnum">
+            <corba:enumerator value="BVOIP"/>
+            <corba:enumerator value="TOLLFREE"/>
+        </corba:enum>
+        <corba:enum name="OrderReleaseStatusEnum" 
+            repositoryID="IDL:OrderReleaseStatusEnum:1.0" 
+            type="msbvoip:OrderReleaseStatusEnum">
+            <corba:enumerator value="Release"/>
+        </corba:enum>
+        <corba:enum name="BillingResultEnum" repositoryID="IDL:BillingResultEnum:1.0" 
+            type="msbvoip:BillingResultEnum">
+            <corba:enumerator value="COMPLETE"/>
+            <corba:enumerator value="ERROR"/>
+        </corba:enum>
+        <corba:enum name="OrderTypeEnum" repositoryID="IDL:OrderTypeEnum:1.0" 
+            type="msbvoip:OrderTypeEnum">
+            <corba:enumerator value="BVOIP"/>
+            <corba:enumerator value="TFAF"/>
+        </corba:enum>
+        <corba:sequence bound="0" elemtype="ns1:OrderSrPair" name="ArrayOfOrderSrPairs" 
+            repositoryID="IDL:ArrayOfOrderSrPairs:1.0" type="msbvoip:ArrayOfOrderSrPairs"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="USRPOrderNumberArray" 
+            repositoryID="IDL:USRPOrderNumberArray:1.0" type="msbvoip:USRPOrderNumber"/>
+        <corba:enum name="OrderStatusEnum" repositoryID="IDL:OrderStatusEnum:1.0" 
+            type="msbvoip:OrderStatusEnum">
+            <corba:enumerator value="0"/>
+            <corba:enumerator value="1"/>
+            <corba:enumerator value="2"/>
+            <corba:enumerator value="3"/>
+            <corba:enumerator value="4"/>
+        </corba:enum>
+        <corba:struct name="SendTargetSystemResultRequestType" 
+            repositoryID="IDL:SendTargetSystemResultRequestType:1.0" 
+            type="msbvoip:SendTargetSystemResultRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
+            <corba:member idltype="corba:string" name="PackageName"/>
+            <corba:member idltype="ns1:TargetSystemEnum" name="TargetSystem"/>
+            <corba:member idltype="ns1:TargetSystemActionEnum" name="TargetSystemAction"/>
+            <corba:member idltype="ns1:TargetSystemResultEnum" name="TargetSystemResult"/>
+            <corba:member idltype="ns1:TargetSystemErrorCodeArray" 
+                name="TargetSystemErrorCode"/>
+            <corba:member idltype="ns1:TargetSystemErrorMessageArray" 
+                name="TargetSystemErrorMessage"/>
+            <corba:member idltype="ns1:TNStartArray" name="TNStart"/>
+            <corba:member idltype="ns1:TNEndArray" name="TNEnd"/>
+        </corba:struct>
+        <corba:sequence bound="1" elemtype="corba:long" name="TargetSystemErrorCodeArray" 
+            repositoryID="IDL:TargetSystemErrorCodeArray:1.0" 
+            type="msbvoip:TargetSystemErrorCode"/>
+        <corba:struct name="SendBillingResultRequestType" 
+            repositoryID="IDL:SendBillingResultRequestType:1.0" 
+            type="msbvoip:SendBillingResultRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
+            <corba:member idltype="corba:string" name="PackageName"/>
+            <corba:member idltype="ns1:BillingSystemEnum" name="BillingSystem"/>
+            <corba:member idltype="ns1:BillingActionEnum" name="BillingAction"/>
+            <corba:member idltype="ns1:BillingElementEnum" name="BillingElement"/>
+            <corba:member idltype="ns1:BillingResultEnum" name="BillingResult"/>
+            <corba:member idltype="ns1:BillingErrorCodeArray" name="BillingErrorCode"/>
+            <corba:member idltype="ns1:BillingErrorMessageArray" 
+                name="BillingErrorMessage"/>
+        </corba:struct>
+        <corba:sequence bound="0" elemtype="ns1:ActivityItem" name="ArrayOfActivityItems" 
+            repositoryID="IDL:ArrayOfActivityItems:1.0" 
+            type="msbvoip:ArrayOfActivityItems"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="GRCArray" 
+            repositoryID="IDL:GRCArray:1.0" type="msbvoip:GRC"/>
+        <corba:struct name="ActivityItem" repositoryID="IDL:ActivityItem:1.0" 
+            type="msbvoip:ActivityItem">
+            <corba:member idltype="ns1:RequestOptionEnum" name="RequestOption"/>
+        </corba:struct>
+        <corba:enum name="CountryCodeEnum" repositoryID="IDL:CountryCodeEnum:1.0" 
+            type="msbvoip:CountryCodeEnum">
+            <corba:enumerator value="AF"/>
+            <corba:enumerator value="AL"/>
+            <corba:enumerator value="DZ"/>
+            <corba:enumerator value="AS"/>
+            <corba:enumerator value="AD"/>
+            <corba:enumerator value="AO"/>
+            <corba:enumerator value="AI"/>
+            <corba:enumerator value="AQ"/>
+            <corba:enumerator value="AG"/>
+            <corba:enumerator value="AR"/>
+            <corba:enumerator value="AM"/>
+            <corba:enumerator value="AW"/>
+            <corba:enumerator value="AU"/>
+            <corba:enumerator value="AT"/>
+            <corba:enumerator value="AZ"/>
+            <corba:enumerator value="BS"/>
+            <corba:enumerator value="BH"/>
+            <corba:enumerator value="BD"/>
+            <corba:enumerator value="BB"/>
+            <corba:enumerator value="BY"/>
+            <corba:enumerator value="BE"/>
+            <corba:enumerator value="BZ"/>
+            <corba:enumerator value="BJ"/>
+            <corba:enumerator value="BM"/>
+            <corba:enumerator value="BT"/>
+            <corba:enumerator value="BO"/>
+            <corba:enumerator value="BA"/>
+            <corba:enumerator value="BW"/>
+            <corba:enumerator value="BV"/>
+            <corba:enumerator value="BR"/>
+            <corba:enumerator value="IO"/>
+            <corba:enumerator value="VG"/>
+            <corba:enumerator value="BN"/>
+            <corba:enumerator value="BG"/>
+            <corba:enumerator value="BF"/>
+            <corba:enumerator value="BI"/>
+            <corba:enumerator value="KH"/>
+            <corba:enumerator value="CM"/>
+            <corba:enumerator value="CA"/>
+            <corba:enumerator value="CV"/>
+            <corba:enumerator value="KY"/>
+            <corba:enumerator value="CF"/>
+            <corba:enumerator value="TD"/>
+            <corba:enumerator value="CL"/>
+            <corba:enumerator value="CN"/>
+            <corba:enumerator value="CX"/>
+            <corba:enumerator value="CC"/>
+            <corba:enumerator value="CO"/>
+            <corba:enumerator value="KM"/>
+            <corba:enumerator value="CD"/>
+            <corba:enumerator value="CG"/>
+            <corba:enumerator value="CK"/>
+            <corba:enumerator value="CR"/>
+            <corba:enumerator value="CI"/>
+            <corba:enumerator value="CU"/>
+            <corba:enumerator value="CY"/>
+            <corba:enumerator value="CZ"/>
+            <corba:enumerator value="DK"/>
+            <corba:enumerator value="DJ"/>
+            <corba:enumerator value="DM"/>
+            <corba:enumerator value="DO"/>
+            <corba:enumerator value="EC"/>
+            <corba:enumerator value="EG"/>
+            <corba:enumerator value="SV"/>
+            <corba:enumerator value="GQ"/>
+            <corba:enumerator value="ER"/>
+            <corba:enumerator value="EE"/>
+            <corba:enumerator value="ET"/>
+            <corba:enumerator value="FO"/>
+            <corba:enumerator value="FK"/>
+            <corba:enumerator value="FJ"/>
+            <corba:enumerator value="FI"/>
+            <corba:enumerator value="FR"/>
+            <corba:enumerator value="GF"/>
+            <corba:enumerator value="PF"/>
+            <corba:enumerator value="TF"/>
+            <corba:enumerator value="GA"/>
+            <corba:enumerator value="GM"/>
+            <corba:enumerator value="GE"/>
+            <corba:enumerator value="DE"/>
+            <corba:enumerator value="GH"/>
+            <corba:enumerator value="GI"/>
+            <corba:enumerator value="GR"/>
+            <corba:enumerator value="GL"/>
+            <corba:enumerator value="GD"/>
+            <corba:enumerator value="GP"/>
+            <corba:enumerator value="GU"/>
+            <corba:enumerator value="GT"/>
+            <corba:enumerator value="GN"/>
+            <corba:enumerator value="GW"/>
+            <corba:enumerator value="GY"/>
+            <corba:enumerator value="HT"/>
+            <corba:enumerator value="HM"/>
+            <corba:enumerator value="VA"/>
+            <corba:enumerator value="HN"/>
+            <corba:enumerator value="HK"/>
+            <corba:enumerator value="HR"/>
+            <corba:enumerator value="HU"/>
+            <corba:enumerator value="IS"/>
+            <corba:enumerator value="IN"/>
+            <corba:enumerator value="ID"/>
+            <corba:enumerator value="IR"/>
+            <corba:enumerator value="IQ"/>
+            <corba:enumerator value="IE"/>
+            <corba:enumerator value="IL"/>
+            <corba:enumerator value="IT"/>
+            <corba:enumerator value="JM"/>
+            <corba:enumerator value="JP"/>
+            <corba:enumerator value="JO"/>
+            <corba:enumerator value="KZ"/>
+            <corba:enumerator value="KE"/>
+            <corba:enumerator value="KI"/>
+            <corba:enumerator value="KP"/>
+            <corba:enumerator value="KR"/>
+            <corba:enumerator value="KW"/>
+            <corba:enumerator value="KG"/>
+            <corba:enumerator value="LA"/>
+            <corba:enumerator value="LV"/>
+            <corba:enumerator value="LB"/>
+            <corba:enumerator value="LS"/>
+            <corba:enumerator value="LR"/>
+            <corba:enumerator value="LY"/>
+            <corba:enumerator value="LI"/>
+            <corba:enumerator value="LT"/>
+            <corba:enumerator value="LU"/>
+            <corba:enumerator value="MO"/>
+            <corba:enumerator value="MK"/>
+            <corba:enumerator value="MG"/>
+            <corba:enumerator value="MW"/>
+            <corba:enumerator value="MY"/>
+            <corba:enumerator value="MV"/>
+            <corba:enumerator value="ML"/>
+            <corba:enumerator value="MT"/>
+            <corba:enumerator value="MH"/>
+            <corba:enumerator value="MQ"/>
+            <corba:enumerator value="MR"/>
+            <corba:enumerator value="MU"/>
+            <corba:enumerator value="YT"/>
+            <corba:enumerator value="MX"/>
+            <corba:enumerator value="FM"/>
+            <corba:enumerator value="MD"/>
+            <corba:enumerator value="MC"/>
+            <corba:enumerator value="MN"/>
+            <corba:enumerator value="MS"/>
+            <corba:enumerator value="MA"/>
+            <corba:enumerator value="MZ"/>
+            <corba:enumerator value="MM"/>
+            <corba:enumerator value="NA"/>
+            <corba:enumerator value="NR"/>
+            <corba:enumerator value="NP"/>
+            <corba:enumerator value="AN"/>
+            <corba:enumerator value="NL"/>
+            <corba:enumerator value="NC"/>
+            <corba:enumerator value="NZ"/>
+            <corba:enumerator value="NI"/>
+            <corba:enumerator value="NE"/>
+            <corba:enumerator value="NG"/>
+            <corba:enumerator value="NU"/>
+            <corba:enumerator value="NF"/>
+            <corba:enumerator value="MP"/>
+            <corba:enumerator value="NO"/>
+            <corba:enumerator value="OM"/>
+            <corba:enumerator value="PK"/>
+            <corba:enumerator value="PW"/>
+            <corba:enumerator value="PS"/>
+            <corba:enumerator value="PA"/>
+            <corba:enumerator value="PG"/>
+            <corba:enumerator value="PY"/>
+            <corba:enumerator value="PE"/>
+            <corba:enumerator value="PH"/>
+            <corba:enumerator value="PN"/>
+            <corba:enumerator value="PL"/>
+            <corba:enumerator value="PT"/>
+            <corba:enumerator value="PR"/>
+            <corba:enumerator value="QA"/>
+            <corba:enumerator value="RE"/>
+            <corba:enumerator value="RO"/>
+            <corba:enumerator value="RU"/>
+            <corba:enumerator value="RW"/>
+            <corba:enumerator value="SH"/>
+            <corba:enumerator value="KN"/>
+            <corba:enumerator value="LC"/>
+            <corba:enumerator value="PM"/>
+            <corba:enumerator value="VC"/>
+            <corba:enumerator value="WS"/>
+            <corba:enumerator value="SM"/>
+            <corba:enumerator value="ST"/>
+            <corba:enumerator value="SA"/>
+            <corba:enumerator value="SN"/>
+            <corba:enumerator value="CS"/>
+            <corba:enumerator value="SC"/>
+            <corba:enumerator value="SL"/>
+            <corba:enumerator value="SG"/>
+            <corba:enumerator value="SK"/>
+            <corba:enumerator value="SI"/>
+            <corba:enumerator value="SB"/>
+            <corba:enumerator value="SO"/>
+            <corba:enumerator value="ZA"/>
+            <corba:enumerator value="GS"/>
+            <corba:enumerator value="ES"/>
+            <corba:enumerator value="LK"/>
+            <corba:enumerator value="SD"/>
+            <corba:enumerator value="SR"/>
+            <corba:enumerator value="SJ"/>
+            <corba:enumerator value="SZ"/>
+            <corba:enumerator value="SE"/>
+            <corba:enumerator value="CH"/>
+            <corba:enumerator value="SY"/>
+            <corba:enumerator value="TW"/>
+            <corba:enumerator value="TJ"/>
+            <corba:enumerator value="TZ"/>
+            <corba:enumerator value="TH"/>
+            <corba:enumerator value="TL"/>
+            <corba:enumerator value="TG"/>
+            <corba:enumerator value="TK"/>
+            <corba:enumerator value="TO"/>
+            <corba:enumerator value="TT"/>
+            <corba:enumerator value="TN"/>
+            <corba:enumerator value="TR"/>
+            <corba:enumerator value="TM"/>
+            <corba:enumerator value="TC"/>
+            <corba:enumerator value="TV"/>
+            <corba:enumerator value="VI"/>
+            <corba:enumerator value="UG"/>
+            <corba:enumerator value="UA"/>
+            <corba:enumerator value="AE"/>
+            <corba:enumerator value="GB"/>
+            <corba:enumerator value="UM"/>
+            <corba:enumerator value="US"/>
+            <corba:enumerator value="UY"/>
+            <corba:enumerator value="UZ"/>
+            <corba:enumerator value="VU"/>
+            <corba:enumerator value="VE"/>
+            <corba:enumerator value="VN"/>
+            <corba:enumerator value="WF"/>
+            <corba:enumerator value="EH"/>
+            <corba:enumerator value="YE"/>
+            <corba:enumerator value="ZM"/>
+            <corba:enumerator value="ZW"/>
+            <corba:enumerator value="X_CA_N"/>
+            <corba:enumerator value="X_CA_S"/>
+            <corba:enumerator value="X_GB_E"/>
+            <corba:enumerator value="X_AN_C"/>
+            <corba:enumerator value="X_UK_E"/>
+        </corba:enum>
+        <corba:struct name="SendOrderReadyRequestType" 
+            repositoryID="IDL:SendOrderReadyRequestType:1.0" 
+            type="msbvoip:SendOrderReadyRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
+            <corba:member idltype="corba:long" name="GIOMOrderVersion"/>
+            <corba:member idltype="corba:string" name="PackageName"/>
+            <corba:member idltype="ns1:DDMMYYYYhhmm" name="CreatedDateandTime"/>
+            <corba:member idltype="ns1:USRPOrderNumberArray" name="USRPOrderNumber"/>
+            <corba:member idltype="ns1:GCSMSolutionNumberArray" name="GCSMSolutionNumber"/>
+            <corba:member idltype="ns1:OrderTypeEnum" name="OrderType"/>
+        </corba:struct>
+        <corba:enum name="TargetSystemEnum" repositoryID="IDL:TargetSystemEnum:1.0" 
+            type="msbvoip:TargetSystemEnum">
+            <corba:enumerator value="LNP"/>
+            <corba:enumerator value="SPP"/>
+        </corba:enum>
+        <corba:struct name="SendBillingResultResponseType" 
+            repositoryID="IDL:SendBillingResultResponseType:1.0" 
+            type="msbvoip:SendBillingResultResponse"/>
+        <corba:struct name="FullOrder" repositoryID="IDL:FullOrder:1.0" 
+            type="msbvoip:FullOrder">
+            <corba:member idltype="corba:string" name="OrderNumber"/>
+            <corba:member idltype="corba:longlong" name="ToSiteOriginalKey"/>
+            <corba:member idltype="ns1:YesNoEnum" name="IsCheckedOut"/>
+            <corba:member idltype="ns1:OrderStateEnum" name="OrderState"/>
+            <corba:member idltype="ns1:ArrayOfActivityItems" name="ActivityList"/>
+        </corba:struct>
+        <corba:struct name="GetOrderStatusRequestType" 
+            repositoryID="IDL:GetOrderStatusRequestType:1.0" 
+            type="msbvoip:GetOrderStatusRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
+            <corba:member idltype="corba:string" name="PackageName"/>
+        </corba:struct>
+        <corba:enum name="TargetSystemResultEnum" 
+            repositoryID="IDL:TargetSystemResultEnum:1.0" 
+            type="msbvoip:TargetSystemResultEnum">
+            <corba:enumerator value="ACK"/>
+            <corba:enumerator value="COMPLETE"/>
+            <corba:enumerator value="CONFLICT"/>
+            <corba:enumerator value="ERROR"/>
+            <corba:enumerator value="FOC"/>
+        </corba:enum>
+        <corba:struct name="CreateCrRequestType" 
+            repositoryID="IDL:CreateCrRequestType:1.0" type="msbvoip:CreateCrRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="ns1:SolutionCrNumberArray" name="SolutionCrNumber"/>
+            <corba:member idltype="corba:string" name="CrNumber"/>
+            <corba:member idltype="corba:string" name="MCN"/>
+            <corba:member idltype="ns1:GRCArray" name="GRC"/>
+            <corba:member idltype="corba:string" name="ContractNumber"/>
+            <corba:member idltype="corba:string" name="CustomerName"/>
+            <corba:member idltype="corba:string" name="AuthentId"/>
+            <corba:member idltype="ns1:YesNoEnum" name="AttTnInd"/>
+            <corba:member idltype="ns1:UserTypeEnum" name="UserType"/>
+        </corba:struct>
+        <corba:struct name="ReviewSuppResponseType" 
+            repositoryID="IDL:ReviewSuppResponseType:1.0" 
+            type="msbvoip:ReviewSuppResponse"/>
+        <corba:enum name="SuppActionEnum" repositoryID="IDL:SuppActionEnum:1.0" 
+            type="msbvoip:SuppActionEnum">
+            <corba:enumerator value="Add"/>
+            <corba:enumerator value="Change"/>
+            <corba:enumerator value="Delete"/>
+        </corba:enum>
+        <corba:struct name="SiteAddress" repositoryID="IDL:SiteAddress:1.0" 
+            type="msbvoip:SiteAddress">
+            <corba:member idltype="corba:string" name="StreetAddress"/>
+            <corba:member idltype="corba:string" name="Room"/>
+            <corba:member idltype="corba:string" name="Floor"/>
+            <corba:member idltype="ns1:SuiteArray" name="Suite"/>
+            <corba:member idltype="ns1:BuildingArray" name="Building"/>
+            <corba:member idltype="corba:string" name="City"/>
+            <corba:member idltype="ns1:CountyArray" name="County"/>
+            <corba:member idltype="ns1:StateArray" name="State"/>
+            <corba:member idltype="ns1:PostalCodeArray" name="PostalCode"/>
+            <corba:member idltype="ns1:CountryCodeEnum" name="Country"/>
+        </corba:struct>
+        <corba:struct name="SendOrderReadyResponseType" 
+            repositoryID="IDL:SendOrderReadyResponseType:1.0" 
+            type="msbvoip:SendOrderReadyResponse"/>
+        <corba:sequence bound="1" elemtype="corba:string" 
+            name="TargetSystemErrorMessageArray" 
+            repositoryID="IDL:TargetSystemErrorMessageArray:1.0" 
+            type="msbvoip:TargetSystemErrorMessage"/>
+        <corba:enum name="UserTypeEnum" repositoryID="IDL:UserTypeEnum:1.0" 
+            type="msbvoip:UserTypeEnum">
+            <corba:enumerator value="1"/>
+            <corba:enumerator value="2"/>
+        </corba:enum>
+        <corba:struct name="CancelObjectRequestType" 
+            repositoryID="IDL:CancelObjectRequestType:1.0" 
+            type="msbvoip:CancelObjectRequest">
+            <corba:member idltype="ns1:ObjectTypeEnum" name="ObjectType"/>
+            <corba:member idltype="corba:string" name="ObjectId"/>
+            <corba:member idltype="corba:string" name="Reason"/>
+        </corba:struct>
+        <corba:sequence bound="1" elemtype="corba:string" name="TNEndArray" 
+            repositoryID="IDL:TNEndArray:1.0" type="msbvoip:TNEnd"/>
+        <corba:enum name="EventEnum" repositoryID="IDL:EventEnum:1.0" 
+            type="msbvoip:EventEnum">
+            <corba:enumerator value="Cancel"/>
+            <corba:enumerator value="LNS_Prov_Status"/>
+            <corba:enumerator value="Ten_D_Trigger_Remove_Status"/>
+            <corba:enumerator value="VoIP_NE_Prov_Status"/>
+        </corba:enum>
+        <corba:enum name="ObjectTypeEnum" repositoryID="IDL:ObjectTypeEnum:1.0" 
+            type="msbvoip:ObjectTypeEnum">
+            <corba:enumerator value="Activity"/>
+            <corba:enumerator value="CR"/>
+            <corba:enumerator value="Order"/>
+            <corba:enumerator value="SolutionCR"/>
+            <corba:enumerator value="SR"/>
+        </corba:enum>
+        <corba:sequence bound="1" elemtype="corba:string" name="BillingErrorMessageArray" 
+            repositoryID="IDL:BillingErrorMessageArray:1.0" 
+            type="msbvoip:BillingErrorMessage"/>
+        <corba:struct name="NotifySvcOrderActStatusResponseType" 
+            repositoryID="IDL:NotifySvcOrderActStatusResponseType:1.0" 
+            type="msbvoip:NotifySvcOrderActStatusResponse"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="SrNumberArray" 
+            repositoryID="IDL:SrNumberArray:1.0" type="msbvoip:SrNumber"/>
+        <corba:enum name="OrderStateEnum" repositoryID="IDL:OrderStateEnum:1.0" 
+            type="msbvoip:OrderStateEnum">
+            <corba:enumerator value="Deleted"/>
+            <corba:enumerator value="Not_Processed"/>
+            <corba:enumerator value="Processed"/>
+        </corba:enum>
+        <corba:enum name="ProductEnum" repositoryID="IDL:ProductEnum:1.0" 
+            type="msbvoip:ProductEnum">
+            <corba:enumerator value="BVOIP"/>
+        </corba:enum>
+        <corba:sequence bound="1" elemtype="corba:string" name="SolutionCrNumberArray" 
+            repositoryID="IDL:SolutionCrNumberArray:1.0" type="msbvoip:SolutionCrNumber"/>
+        <corba:struct name="OrderSrPair" repositoryID="IDL:OrderSrPair:1.0" 
+            type="msbvoip:OrderSrPair">
+            <corba:member idltype="corba:string" name="OrderNumber"/>
+            <corba:member idltype="ns1:SrNumberArray" name="SrNumber"/>
+            <corba:member idltype="ns1:OrderReleaseStatusEnum" name="ReleaseStatus"/>
+        </corba:struct>
+        <corba:struct name="CreateSrResponseType" 
+            repositoryID="IDL:CreateSrResponseType:1.0" type="msbvoip:CreateSrResponse">
+            <corba:member idltype="ns1:ArrayOfOrderSrPairs" name="SrNumberList"/>
+        </corba:struct>
+        <corba:sequence bound="1" elemtype="corba:string" name="BuildingArray" 
+            repositoryID="IDL:BuildingArray:1.0" type="msbvoip:Building"/>
+        <corba:enum name="RequestOptionEnum" repositoryID="IDL:RequestOptionEnum:1.0" 
+            type="msbvoip:RequestOptionEnum">
+            <corba:enumerator value="0"/>
+            <corba:enumerator value="1"/>
+            <corba:enumerator value="2"/>
+            <corba:enumerator value="3"/>
+            <corba:enumerator value="4"/>
+            <corba:enumerator value="5"/>
+            <corba:enumerator value="7"/>
+            <corba:enumerator value="8"/>
+            <corba:enumerator value="9"/>
+        </corba:enum>
+        <corba:enum name="BillingActionEnum" repositoryID="IDL:BillingActionEnum:1.0" 
+            type="msbvoip:BillingActionEnum">
+            <corba:enumerator value="START"/>
+        </corba:enum>
+        <corba:struct name="NotifySvcOrderActStatusRequestType" 
+            repositoryID="IDL:NotifySvcOrderActStatusRequestType:1.0" 
+            type="msbvoip:NotifySvcOrderActStatusRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="OrderNumber"/>
+            <corba:member idltype="corba:long" name="VersionNumber"/>
+            <corba:member idltype="ns1:EventEnum" name="Event"/>
+            <corba:member idltype="ns1:EventStatusEnum" name="EventStatus"/>
+            <corba:member idltype="corba:string" name="SPP_Link"/>
+        </corba:struct>
+        <corba:enum name="EventStatusEnum" repositoryID="IDL:EventStatusEnum:1.0" 
+            type="msbvoip:EventStatusEnum">
+            <corba:enumerator value="failure"/>
+            <corba:enumerator value="success"/>
+        </corba:enum>
+        <corba:sequence bound="1" elemtype="corba:string" name="PostalCodeArray" 
+            repositoryID="IDL:PostalCodeArray:1.0" type="msbvoip:PostalCode"/>
+        <corba:enum name="BillingSystemEnum" repositoryID="IDL:BillingSystemEnum:1.0" 
+            type="msbvoip:BillingSystemEnum">
+            <corba:enumerator value="CADM"/>
+            <corba:enumerator value="WAT/SOP"/>
+        </corba:enum>
+        <corba:sequence bound="1" elemtype="corba:string" name="GCSMSolutionNumberArray" 
+            repositoryID="IDL:GCSMSolutionNumberArray:1.0" 
+            type="msbvoip:GCSMSolutionNumber"/>
+        <corba:struct name="Site" repositoryID="IDL:Site:1.0" type="msbvoip:Site">
+            <corba:member idltype="corba:longlong" name="SiteOriginalKey"/>
+            <corba:member idltype="corba:string" name="SiteName"/>
+            <corba:member idltype="ns1:SiteAddress" name="Address"/>
+        </corba:struct>
+        <corba:sequence bound="1" elemtype="corba:string" name="SuiteArray" 
+            repositoryID="IDL:SuiteArray:1.0" type="msbvoip:Suite"/>
+        <corba:struct name="CreateCrResponseType" 
+            repositoryID="IDL:CreateCrResponseType:1.0" type="msbvoip:CreateCrResponse"/>
+        <corba:struct name="ReviewSuppRequestType" 
+            repositoryID="IDL:ReviewSuppRequestType:1.0" type="msbvoip:ReviewSuppRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
+            <corba:member idltype="corba:long" name="GIOMOrderVersion"/>
+            <corba:member idltype="corba:string" name="PackageName"/>
+            <corba:member idltype="ns1:DDMMYYYYhhmm" name="CreatedDateandTime"/>
+            <corba:member idltype="ns1:OrderTypeEnum" name="OrderType"/>
+        </corba:struct>
+        <corba:enum name="YesNoEnum" repositoryID="IDL:YesNoEnum:1.0" 
+            type="msbvoip:YesNoEnum">
+            <corba:enumerator value="N"/>
+            <corba:enumerator value="Y"/>
+        </corba:enum>
+        <corba:enum name="TargetSystemActionEnum" 
+            repositoryID="IDL:TargetSystemActionEnum:1.0" 
+            type="msbvoip:TargetSystemActionEnum">
+            <corba:enumerator value="APRQ"/>
+            <corba:enumerator value="CancelVPR"/>
+            <corba:enumerator value="PPRQ"/>
+            <corba:enumerator value="VPR"/>
+        </corba:enum>
+        <corba:sequence bound="1" elemtype="corba:string" name="BillingErrorCodeArray" 
+            repositoryID="IDL:BillingErrorCodeArray:1.0" type="msbvoip:BillingErrorCode"/>
+        <corba:exception name="WSException" repositoryID="IDL:WSException:1.0" 
+            type="msbvoip:SendTargetSystemResultResponse"/>
+        <corba:struct name="GetOrderStatusResponseType" 
+            repositoryID="IDL:GetOrderStatusResponseType:1.0" 
+            type="msbvoip:GetOrderStatusResponse">
+            <corba:member idltype="ns1:OrderStatusEnum" name="OrderStatus"/>
+            <corba:member idltype="ns1:YesNoEnum" name="SuppInd"/>
+            <corba:member idltype="ns1:YesNoEnum" name="CancelInd"/>
+        </corba:struct>
+        <corba:sequence bound="1" elemtype="corba:string" name="TNStartArray" 
+            repositoryID="IDL:TNStartArray:1.0" type="msbvoip:TNStart"/>
+        <corba:struct name="CreateSrRequestType" 
+            repositoryID="IDL:CreateSrRequestType:1.0" type="msbvoip:CreateSrRequest">
+            <corba:member idltype="ns1:ProductEnum" name="Product"/>
+            <corba:member idltype="corba:string" name="CrNumber"/>
+            <corba:member idltype="ns1:ArrayOfSites" name="SiteList"/>
+            <corba:member idltype="ns1:ArrayOfFullOrders" name="OrderList"/>
+        </corba:struct>
+        <corba:sequence bound="1" elemtype="corba:string" name="StateArray" 
+            repositoryID="IDL:StateArray:1.0" type="msbvoip:State"/>
+        <corba:anonstring bound="12" name="DDMMYYYYhhmm" type="xsd:string"/>
+        <corba:sequence bound="0" elemtype="ns1:FullOrder" name="ArrayOfFullOrders" 
+            repositoryID="IDL:ArrayOfFullOrders:1.0" type="msbvoip:ArrayOfFullOrders"/>
+        <corba:sequence bound="0" elemtype="ns1:Site" name="ArrayOfSites" 
+            repositoryID="IDL:ArrayOfSites:1.0" type="msbvoip:ArrayOfSites"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="CountyArray" 
+            repositoryID="IDL:CountyArray:1.0" type="msbvoip:County"/>
+    </corba:typeMapping>    
+    <types>
+        <schema elementFormDefault="qualified" 
+            targetNamespace="http://efms.att.com/ms/BVOIP/v1" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <!-- Simple Types -->
+            <!-- Key -->
+            <simpleType name="KeyType">
+                <restriction base="xsd:long">
+                    <maxLength value="11"/>
+                </restriction>
+            </simpleType>
+            <!-- Date format DDMMYYYYhhmm -->
+            <simpleType name="DDMMYYYYhhmm">
+                <restriction base="xsd:string">
+                    <maxLength value="12"/>
+                </restriction>
+            </simpleType>
+            <!-- Enumerations -->
+            <!-- Billing Action Enum -->
+            <simpleType name="BillingActionEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="START"/>
+                </restriction>
+            </simpleType>
+            <!-- Billing Element Enum -->
+            <simpleType name="BillingElementEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="BVOIP"/>
+                    <enumeration value="TOLLFREE"/>
+                </restriction>
+            </simpleType>
+            <!-- Billing Result Enum -->
+            <simpleType name="BillingResultEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="COMPLETE"/>
+                    <enumeration value="ERROR"/>
+                </restriction>
+            </simpleType>
+            <!-- Billing System Enum -->
+            <simpleType name="BillingSystemEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="CADM"/>
+                    <enumeration value="WAT/SOP"/>
+                </restriction>
+            </simpleType>
+            <!-- Country Code Enum ISO 3166 -->
+            <simpleType name="CountryCodeEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="AF"/>
+                    <enumeration value="AL"/>
+                    <enumeration value="DZ"/>
+                    <enumeration value="AS"/>
+                    <enumeration value="AD"/>
+                    <enumeration value="AO"/>
+                    <enumeration value="AI"/>
+                    <enumeration value="AQ"/>
+                    <enumeration value="AG"/>
+                    <enumeration value="AR"/>
+                    <enumeration value="AM"/>
+                    <enumeration value="AW"/>
+                    <enumeration value="AU"/>
+                    <enumeration value="AT"/>
+                    <enumeration value="AZ"/>
+                    <enumeration value="BS"/>
+                    <enumeration value="BH"/>
+                    <enumeration value="BD"/>
+                    <enumeration value="BB"/>
+                    <enumeration value="BY"/>
+                    <enumeration value="BE"/>
+                    <enumeration value="BZ"/>
+                    <enumeration value="BJ"/>
+                    <enumeration value="BM"/>
+                    <enumeration value="BT"/>
+                    <enumeration value="BO"/>
+                    <enumeration value="BA"/>
+                    <enumeration value="BW"/>
+                    <enumeration value="BV"/>
+                    <enumeration value="BR"/>
+                    <enumeration value="IO"/>
+                    <enumeration value="VG"/>
+                    <enumeration value="BN"/>
+                    <enumeration value="BG"/>
+                    <enumeration value="BF"/>
+                    <enumeration value="BI"/>
+                    <enumeration value="KH"/>
+                    <enumeration value="CM"/>
+                    <enumeration value="CA"/>
+                    <enumeration value="CV"/>
+                    <enumeration value="KY"/>
+                    <enumeration value="CF"/>
+                    <enumeration value="TD"/>
+                    <enumeration value="CL"/>
+                    <enumeration value="CN"/>
+                    <enumeration value="CX"/>
+                    <enumeration value="CC"/>
+                    <enumeration value="CO"/>
+                    <enumeration value="KM"/>
+                    <enumeration value="CD"/>
+                    <enumeration value="CG"/>
+                    <enumeration value="CK"/>
+                    <enumeration value="CR"/>
+                    <enumeration value="CI"/>
+                    <enumeration value="CU"/>
+                    <enumeration value="CY"/>
+                    <enumeration value="CZ"/>
+                    <enumeration value="DK"/>
+                    <enumeration value="DJ"/>
+                    <enumeration value="DM"/>
+                    <enumeration value="DO"/>
+                    <enumeration value="EC"/>
+                    <enumeration value="EG"/>
+                    <enumeration value="SV"/>
+                    <enumeration value="GQ"/>
+                    <enumeration value="ER"/>
+                    <enumeration value="EE"/>
+                    <enumeration value="ET"/>
+                    <enumeration value="FO"/>
+                    <enumeration value="FK"/>
+                    <enumeration value="FJ"/>
+                    <enumeration value="FI"/>
+                    <enumeration value="FR"/>
+                    <enumeration value="GF"/>
+                    <enumeration value="PF"/>
+                    <enumeration value="TF"/>
+                    <enumeration value="GA"/>
+                    <enumeration value="GM"/>
+                    <enumeration value="GE"/>
+                    <enumeration value="DE"/>
+                    <enumeration value="GH"/>
+                    <enumeration value="GI"/>
+                    <enumeration value="GR"/>
+                    <enumeration value="GL"/>
+                    <enumeration value="GD"/>
+                    <enumeration value="GP"/>
+                    <enumeration value="GU"/>
+                    <enumeration value="GT"/>
+                    <enumeration value="GN"/>
+                    <enumeration value="GW"/>
+                    <enumeration value="GY"/>
+                    <enumeration value="HT"/>
+                    <enumeration value="HM"/>
+                    <enumeration value="VA"/>
+                    <enumeration value="HN"/>
+                    <enumeration value="HK"/>
+                    <enumeration value="HR"/>
+                    <enumeration value="HU"/>
+                    <enumeration value="IS"/>
+                    <enumeration value="IN"/>
+                    <enumeration value="ID"/>
+                    <enumeration value="IR"/>
+                    <enumeration value="IQ"/>
+                    <enumeration value="IE"/>
+                    <enumeration value="IL"/>
+                    <enumeration value="IT"/>
+                    <enumeration value="JM"/>
+                    <enumeration value="JP"/>
+                    <enumeration value="JO"/>
+                    <enumeration value="KZ"/>
+                    <enumeration value="KE"/>
+                    <enumeration value="KI"/>
+                    <enumeration value="KP"/>
+                    <enumeration value="KR"/>
+                    <enumeration value="KW"/>
+                    <enumeration value="KG"/>
+                    <enumeration value="LA"/>
+                    <enumeration value="LV"/>
+                    <enumeration value="LB"/>
+                    <enumeration value="LS"/>
+                    <enumeration value="LR"/>
+                    <enumeration value="LY"/>
+                    <enumeration value="LI"/>
+                    <enumeration value="LT"/>
+                    <enumeration value="LU"/>
+                    <enumeration value="MO"/>
+                    <enumeration value="MK"/>
+                    <enumeration value="MG"/>
+                    <enumeration value="MW"/>
+                    <enumeration value="MY"/>
+                    <enumeration value="MV"/>
+                    <enumeration value="ML"/>
+                    <enumeration value="MT"/>
+                    <enumeration value="MH"/>
+                    <enumeration value="MQ"/>
+                    <enumeration value="MR"/>
+                    <enumeration value="MU"/>
+                    <enumeration value="YT"/>
+                    <enumeration value="MX"/>
+                    <enumeration value="FM"/>
+                    <enumeration value="MD"/>
+                    <enumeration value="MC"/>
+                    <enumeration value="MN"/>
+                    <enumeration value="MS"/>
+                    <enumeration value="MA"/>
+                    <enumeration value="MZ"/>
+                    <enumeration value="MM"/>
+                    <enumeration value="NA"/>
+                    <enumeration value="NR"/>
+                    <enumeration value="NP"/>
+                    <enumeration value="AN"/>
+                    <enumeration value="NL"/>
+                    <enumeration value="NC"/>
+                    <enumeration value="NZ"/>
+                    <enumeration value="NI"/>
+                    <enumeration value="NE"/>
+                    <enumeration value="NG"/>
+                    <enumeration value="NU"/>
+                    <enumeration value="NF"/>
+                    <enumeration value="MP"/>
+                    <enumeration value="NO"/>
+                    <enumeration value="OM"/>
+                    <enumeration value="PK"/>
+                    <enumeration value="PW"/>
+                    <enumeration value="PS"/>
+                    <enumeration value="PA"/>
+                    <enumeration value="PG"/>
+                    <enumeration value="PY"/>
+                    <enumeration value="PE"/>
+                    <enumeration value="PH"/>
+                    <enumeration value="PN"/>
+                    <enumeration value="PL"/>
+                    <enumeration value="PT"/>
+                    <enumeration value="PR"/>
+                    <enumeration value="QA"/>
+                    <enumeration value="RE"/>
+                    <enumeration value="RO"/>
+                    <enumeration value="RU"/>
+                    <enumeration value="RW"/>
+                    <enumeration value="SH"/>
+                    <enumeration value="KN"/>
+                    <enumeration value="LC"/>
+                    <enumeration value="PM"/>
+                    <enumeration value="VC"/>
+                    <enumeration value="WS"/>
+                    <enumeration value="SM"/>
+                    <enumeration value="ST"/>
+                    <enumeration value="SA"/>
+                    <enumeration value="SN"/>
+                    <enumeration value="CS"/>
+                    <enumeration value="SC"/>
+                    <enumeration value="SL"/>
+                    <enumeration value="SG"/>
+                    <enumeration value="SK"/>
+                    <enumeration value="SI"/>
+                    <enumeration value="SB"/>
+                    <enumeration value="SO"/>
+                    <enumeration value="ZA"/>
+                    <enumeration value="GS"/>
+                    <enumeration value="ES"/>
+                    <enumeration value="LK"/>
+                    <enumeration value="SD"/>
+                    <enumeration value="SR"/>
+                    <enumeration value="SJ"/>
+                    <enumeration value="SZ"/>
+                    <enumeration value="SE"/>
+                    <enumeration value="CH"/>
+                    <enumeration value="SY"/>
+                    <enumeration value="TW"/>
+                    <enumeration value="TJ"/>
+                    <enumeration value="TZ"/>
+                    <enumeration value="TH"/>
+                    <enumeration value="TL"/>
+                    <enumeration value="TG"/>
+                    <enumeration value="TK"/>
+                    <enumeration value="TO"/>
+                    <enumeration value="TT"/>
+                    <enumeration value="TN"/>
+                    <enumeration value="TR"/>
+                    <enumeration value="TM"/>
+                    <enumeration value="TC"/>
+                    <enumeration value="TV"/>
+                    <enumeration value="VI"/>
+                    <enumeration value="UG"/>
+                    <enumeration value="UA"/>
+                    <enumeration value="AE"/>
+                    <enumeration value="GB"/>
+                    <enumeration value="UM"/>
+                    <enumeration value="US"/>
+                    <enumeration value="UY"/>
+                    <enumeration value="UZ"/>
+                    <enumeration value="VU"/>
+                    <enumeration value="VE"/>
+                    <enumeration value="VN"/>
+                    <enumeration value="WF"/>
+                    <enumeration value="EH"/>
+                    <enumeration value="YE"/>
+                    <enumeration value="ZM"/>
+                    <enumeration value="ZW"/>
+                    <enumeration value="X_CA_N"/>
+                    <enumeration value="X_CA_S"/>
+                    <enumeration value="X_GB_E"/>
+                    <enumeration value="X_AN_C"/>
+                    <enumeration value="X_UK_E"/>
+                </restriction>
+            </simpleType>
+            <!-- Event Enum -->
+            <simpleType name="EventEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="Cancel"/>
+                    <enumeration value="LNS_Prov_Status"/>
+                    <enumeration value="Ten_D_Trigger_Remove_Status"/>
+                    <enumeration value="VoIP_NE_Prov_Status"/>
+                </restriction>
+            </simpleType>
+            <!-- Event Status Enum -->
+            <simpleType name="EventStatusEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="failure"/>
+                    <enumeration value="success"/>
+                </restriction>
+            </simpleType>
+            <!-- Object Type Enum -->
+            <simpleType name="ObjectTypeEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="Activity"/>
+                    <enumeration value="CR"/>
+                    <enumeration value="Order"/>
+                    <enumeration value="SolutionCR"/>
+                    <enumeration value="SR"/>
+                </restriction>
+            </simpleType>
+            <!-- Order Release Status Enum -->
+            <simpleType name="OrderReleaseStatusEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="Release"/>
+                </restriction>
+            </simpleType>
+            <!-- Order State Enum -->
+            <simpleType name="OrderStateEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="Deleted"/>
+                    <enumeration value="Not_Processed"/>
+                    <enumeration value="Processed"/>
+                </restriction>
+            </simpleType>
+            <!-- Order Status Enum -->
+            <simpleType name="OrderStatusEnum">
+                <restriction base="xsd:int">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                    <enumeration value="3"/>
+                    <enumeration value="4"/>
+                </restriction>
+            </simpleType>
+            <!-- Order Type Enum -->
+            <simpleType name="OrderTypeEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="BVOIP"/>
+                    <enumeration value="TFAF"/>
+                </restriction>
+            </simpleType>
+            <!-- Product Enum -->
+            <simpleType name="ProductEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="BVOIP"/>
+                </restriction>
+            </simpleType>
+            <!-- Request Option Enum -->
+            <simpleType name="RequestOptionEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                    <enumeration value="3"/>
+                    <enumeration value="4"/>
+                    <enumeration value="5"/>
+                    <enumeration value="7"/>
+                    <enumeration value="8"/>
+                    <enumeration value="9"/>
+                </restriction>
+            </simpleType>
+            <!-- Supp Action Enum -->
+            <simpleType name="SuppActionEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="Add"/>
+                    <enumeration value="Change"/>
+                    <enumeration value="Delete"/>
+                </restriction>
+            </simpleType>
+            <!-- Target System Action Enum -->
+            <simpleType name="TargetSystemActionEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="APRQ"/>
+                    <enumeration value="CancelVPR"/>
+                    <enumeration value="PPRQ"/>
+                    <enumeration value="VPR"/>
+                </restriction>
+            </simpleType>
+            <!-- Target System Enum -->
+            <simpleType name="TargetSystemEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="LNP"/>
+                    <enumeration value="SPP"/>
+                </restriction>
+            </simpleType>
+            <!-- Target System Result Enum -->
+            <simpleType name="TargetSystemResultEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="ACK"/>
+                    <enumeration value="COMPLETE"/>
+                    <enumeration value="CONFLICT"/>
+                    <enumeration value="ERROR"/>
+                    <enumeration value="FOC"/>
+                </restriction>
+            </simpleType>
+            <!-- User Type Enum -->
+            <simpleType name="UserTypeEnum">
+                <restriction base="xsd:int">
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                </restriction>
+            </simpleType>
+            <!-- Yes No Enum -->
+            <simpleType name="YesNoEnum">
+                <restriction base="xsd:string">
+                    <enumeration value="N"/>
+                    <enumeration value="Y"/>
+                </restriction>
+            </simpleType>
+            <!-- End of Enumerations -->
+            <!-- End of Simple Types -->
+            <!-- Complex Types -->
+            <!-- Site Address (Site) -->
+            <complexType name="SiteAddress">
+                <sequence>
+                    <element name="StreetAddress" type="xsd:string"/>
+                    <element name="Room" type="xsd:string"/>
+                    <element name="Floor" type="xsd:string"/>
+                    <element minOccurs="0" name="Suite" type="xsd:string"/>
+                    <element minOccurs="0" name="Building" type="xsd:string"/>
+                    <element name="City" type="xsd:string"/>
+                    <element minOccurs="0" name="County" type="xsd:string"/>
+                    <element minOccurs="0" name="State" type="xsd:string"/>
+                    <element minOccurs="0" name="PostalCode" type="xsd:string"/>
+                    <element name="Country" type="msbvoip:CountryCodeEnum"/>
+                </sequence>
+            </complexType>
+            <!-- End of Site Address (Site) -->
+            <!-- ActivityItem (OrderItem) -->
+            <complexType name="ActivityItem">
+                <sequence>
+                    <element name="RequestOption" type="msbvoip:RequestOptionEnum"/>
+                </sequence>
+            </complexType>
+            <complexType name="ArrayOfActivityItems">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="1" name="ActivityItem" 
+                        type="msbvoip:ActivityItem"/>
+                </sequence>
+            </complexType>
+            <!-- End of Activity (OrderItem) -->
+            <!-- Site (CreateSrRequest) -->
+            <complexType name="Site">
+                <sequence>
+                    <element name="SiteOriginalKey" type="msbvoip:KeyType"/>
+                    <element name="SiteName" type="xsd:string"/>
+                    <element name="Address" type="msbvoip:SiteAddress"/>
+                </sequence>
+            </complexType>
+            <complexType name="ArrayOfSites">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="1" name="Site" 
+                        type="msbvoip:Site"/>
+                </sequence>
+            </complexType>
+            <!-- End of Site (CreateSrRequest) -->
+            <!-- FullOrder (CreateSrRequest) -->
+            <complexType name="FullOrder">
+                <sequence>
+                    <element name="OrderNumber" type="xsd:string"/>
+                    <element name="ToSiteOriginalKey" type="msbvoip:KeyType"/>
+                    <element name="IsCheckedOut" type="msbvoip:YesNoEnum"/>
+                    <element name="OrderState" type="msbvoip:OrderStateEnum"/>
+                    <element name="ActivityList" type="msbvoip:ArrayOfActivityItems"/>
+                </sequence>
+            </complexType>
+            <complexType name="ArrayOfFullOrders">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="1" name="Order" 
+                        type="msbvoip:FullOrder"/>
+                </sequence>
+            </complexType>
+            <!-- End of OrderItem(CreateSrRequest) -->
+            <!-- Order / SR pair (CreateSrResponse) -->
+            <complexType name="OrderSrPair">
+                <sequence>
+                    <element name="OrderNumber" type="xsd:string"/>
+                    <element minOccurs="0" name="SrNumber" type="xsd:string"/>
+                    <element name="ReleaseStatus" type="msbvoip:OrderReleaseStatusEnum"/>
+                </sequence>
+            </complexType>
+            <complexType name="ArrayOfOrderSrPairs">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="1" name="OrderSrPair" 
+                        type="msbvoip:OrderSrPair"/>
+                </sequence>
+            </complexType>
+            <!-- End of Order / SR pair (CreateSrResponse) -->
+            <!-- End of Complex Types -->
+            <!-- Operation request / response elements  -->
+            <!-- Cancel Object Request/Response Messages -->
+            <element name="CancelObjectRequest">
+                <complexType>
+                    <sequence>
+                        <element name="ObjectType" type="msbvoip:ObjectTypeEnum"/>
+                        <element name="ObjectId" type="xsd:string"/>
+                        <element name="Reason" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="CancelObjectResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <!-- CreateCr Operation Request/Response Messages -->
+            <element name="CreateCrRequest">
+                <complexType>
+                    <sequence>
+                        <element name="Product" type="msbvoip:ProductEnum"/>
+                        <element minOccurs="0" name="SolutionCrNumber" type="xsd:string"/>
+                        <element name="CrNumber" type="xsd:string"/>
+                        <element name="MCN" type="xsd:string"/>
+                        <element minOccurs="0" name="GRC" type="xsd:string"/>
+                        <element name="ContractNumber" type="xsd:string"/>
+                        <element name="CustomerName" type="xsd:string"/>
+                        <element name="AuthentId" type="xsd:string"/>
+                        <element name="AttTnInd" type="msbvoip:YesNoEnum"/>
+                        <element name="UserType" type="msbvoip:UserTypeEnum"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="CreateCrResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <!-- CreateSr Operation Request/Response Messages -->
+            <element name="CreateSrRequest">
+                <complexType>
+                    <sequence>
+                        <element name="Product" type="msbvoip:ProductEnum"/>
+                        <element name="CrNumber" type="xsd:string"/>
+                        <element name="SiteList" type="msbvoip:ArrayOfSites"/>
+                        <element name="OrderList" type="msbvoip:ArrayOfFullOrders"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="CreateSrResponse">
+                <complexType>
+                    <sequence>
+                        <element name="SrNumberList" type="msbvoip:ArrayOfOrderSrPairs"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- GetOrderStatus Operation Request/Response Messages -->
+            <element name="GetOrderStatusRequest">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="1" name="Product" 
+                            type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
+                            type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="GetOrderStatusResponse">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="1" name="OrderStatus" 
+                            type="msbvoip:OrderStatusEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="SuppInd" 
+                            type="msbvoip:YesNoEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="CancelInd" 
+                            type="msbvoip:YesNoEnum"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- NotifySvcOrderActStatus Operation Request/Response Messages -->
+            <element name="NotifySvcOrderActStatusRequest">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="1" name="Product" 
+                            type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="OrderNumber" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="VersionNumber" 
+                            type="xsd:int"/>
+                        <element maxOccurs="1" minOccurs="1" name="Event" 
+                            type="msbvoip:EventEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="EventStatus" 
+                            type="msbvoip:EventStatusEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="SPP_Link" 
+                            type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="NotifySvcOrderActStatusResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <!-- ReviewSupp Operation Request/Response Messages -->
+            <element name="ReviewSuppRequest">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="1" name="Product" 
+                            type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderVersion" 
+                            type="xsd:int"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="CreatedDateandTime" 
+                            type="msbvoip:DDMMYYYYhhmm"/>
+                        <element maxOccurs="1" minOccurs="1" name="OrderType" 
+                            type="msbvoip:OrderTypeEnum"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="ReviewSuppResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <!-- SendBillingResult Operation Request/Response Messages -->
+            <element name="SendBillingResultRequest">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="1" name="Product" 
+                            type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingSystem" 
+                            type="msbvoip:BillingSystemEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingAction" 
+                            type="msbvoip:BillingActionEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingElement" 
+                            type="msbvoip:BillingElementEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingResult" 
+                            type="msbvoip:BillingResultEnum"/>
+                        <element maxOccurs="1" minOccurs="0" name="BillingErrorCode" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="BillingErrorMessage" 
+                            type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="SendBillingResultResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <!-- SendOrderReady Operation Request/Response Messages -->
+            <element name="SendOrderReadyRequest">
+                <complexType>
+                    <sequence>
+                        <element name="Product" type="msbvoip:ProductEnum"/>
+                        <element name="GIOMOrderNumber" type="xsd:string"/>
+                        <element name="GIOMOrderVersion" type="xsd:int"/>
+                        <element name="PackageName" type="xsd:string"/>
+                        <element name="CreatedDateandTime" type="msbvoip:DDMMYYYYhhmm"/>
+                        <element maxOccurs="1" minOccurs="0" name="USRPOrderNumber" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="GCSMSolutionNumber" 
+                            type="xsd:string"/>
+                        <element name="OrderType" type="msbvoip:OrderTypeEnum"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="SendOrderReadyResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <!-- SendTargetSystemResult Operation Request/Response Messages -->
+            <element name="SendTargetSystemResultRequest">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="1" name="Product" 
+                            type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="TargetSystem" 
+                            type="msbvoip:TargetSystemEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="TargetSystemAction" 
+                            type="msbvoip:TargetSystemActionEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="TargetSystemResult" 
+                            type="msbvoip:TargetSystemResultEnum"/>
+                        <element maxOccurs="1" minOccurs="0" name="TargetSystemErrorCode" 
+                            type="xsd:int"/>
+                        <element maxOccurs="1" minOccurs="0" 
+                            name="TargetSystemErrorMessage" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="TNStart" 
+                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="TNEnd" 
+                            type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="SendTargetSystemResultResponse">
+                <complexType>
+                    <sequence>
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- End of Operation request / response elements  -->
+        </schema>
+    </types>
+    <!-- Message Definition -->
+    <message name="CancelObjectRequest">
+        <part element="msbvoip:CancelObjectRequest" name="parameters"/>
+    </message>
+    <message name="CancelObjectResponse">
+        <part element="msbvoip:CancelObjectResponse" name="parameters"/>
+    </message>
+    <message name="CreateCrRequest">
+        <part element="msbvoip:CreateCrRequest" name="parameters"/>
+    </message>
+    <message name="CreateCrResponse">
+        <part element="msbvoip:CreateCrResponse" name="parameters"/>
+    </message>
+    <message name="CreateSrRequest">
+        <part element="msbvoip:CreateSrRequest" name="parameters"/>
+    </message>
+    <message name="CreateSrResponse">
+        <part element="msbvoip:CreateSrResponse" name="parameters"/>
+    </message>
+    <message name="GetOrderStatusRequest">
+        <part element="msbvoip:GetOrderStatusRequest" name="parameters"/>
+    </message>
+    <message name="GetOrderStatusResponse">
+        <part element="msbvoip:GetOrderStatusResponse" name="parameters"/>
+    </message>
+    <message name="NotifySvcOrderActStatusRequest">
+        <part element="msbvoip:NotifySvcOrderActStatusRequest" name="parameters"/>
+    </message>
+    <message name="NotifySvcOrderActStatusResponse">
+        <part element="msbvoip:NotifySvcOrderActStatusResponse" name="parameters"/>
+    </message>
+    <message name="ReviewSuppRequest">
+        <part element="msbvoip:ReviewSuppRequest" name="parameters"/>
+    </message>
+    <message name="ReviewSuppResponse">
+        <part element="msbvoip:ReviewSuppResponse" name="parameters"/>
+    </message>
+    <message name="SendBillingResultRequest">
+        <part element="msbvoip:SendBillingResultRequest" name="parameters"/>
+    </message>
+    <message name="SendBillingResultResponse">
+        <part element="msbvoip:SendBillingResultResponse" name="parameters"/>
+    </message>
+    <message name="SendOrderReadyRequest">
+        <part element="msbvoip:SendOrderReadyRequest" name="parameters"/>
+    </message>
+    <message name="SendOrderReadyResponse">
+        <part element="msbvoip:SendOrderReadyResponse" name="parameters"/>
+    </message>
+    <message name="SendTargetSystemResultRequest">
+        <part element="msbvoip:SendTargetSystemResultRequest" name="parameters"/>
+    </message>
+    <message name="SendTargetSystemResultResponse">
+        <part element="msbvoip:SendTargetSystemResultResponse" name="parameters"/>
+    </message>
+    <message name="WSException">
+        <part element="msbvoip:SendTargetSystemResultResponse" name="WSException"/>
+    </message>
+    <!-- End of Message Definition -->
+    <!-- Port Type Details -->
+    <portType name="BVOIPPortType">
+        <operation name="CancelObject">
+            <input message="msbvoip:CancelObjectRequest" name="CancelObject"/>
+            <output message="msbvoip:CancelObjectResponse" name="CancelObjectResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="CreateCr">
+            <input message="msbvoip:CreateCrRequest" name="CreateCr"/>
+            <output message="msbvoip:CreateCrResponse" name="CreateCrResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="CreateSr">
+            <input message="msbvoip:CreateSrRequest" name="CreateSr"/>
+            <output message="msbvoip:CreateSrResponse" name="CreateSrResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="GetOrderStatus">
+            <input message="msbvoip:GetOrderStatusRequest" name="GetOrderStatus"/>
+            <output message="msbvoip:GetOrderStatusResponse" 
+                name="GetOrderStatusResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="NotifySvcOrderActStatus">
+            <input message="msbvoip:NotifySvcOrderActStatusRequest" 
+                name="NotifySvcOrderActStatus"/>
+            <output message="msbvoip:NotifySvcOrderActStatusResponse" 
+                name="NotifySvcOrderActStatusResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="ReviewSupp">
+            <input message="msbvoip:ReviewSuppRequest" name="ReviewSupp"/>
+            <output message="msbvoip:ReviewSuppResponse" name="ReviewSuppResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="SendBillingResult">
+            <input message="msbvoip:SendBillingResultRequest" name="SendBillingResult"/>
+            <output message="msbvoip:SendBillingResultResponse" 
+                name="SendBillingResultResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="SendOrderReady">
+            <input message="msbvoip:SendOrderReadyRequest" name="SendOrderReady"/>
+            <output message="msbvoip:SendOrderReadyResponse" 
+                name="SendOrderReadyResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+        <operation name="SendTargetSystemResult">
+            <input message="msbvoip:SendTargetSystemResultRequest" 
+                name="SendTargetSystemResult"/>
+            <output message="msbvoip:SendTargetSystemResultResponse" 
+                name="SendTargetSystemResultResponse"/>
+            <fault message="msbvoip:WSException" name="WSException"/>
+        </operation>
+    </portType>
+    <!-- Binding Details -->
+    <binding name="BVOIPSoap" type="msbvoip:BVOIPPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="CancelObject">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CancelObject" 
+                style="document"/>
+            <input name="CancelObject">
+                <soap:body use="literal"/>
+            </input>
+            <output name="CancelObjectResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="CreateCr">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CreateCr" 
+                style="document"/>
+            <input name="CreateCr">
+                <soap:body use="literal"/>
+            </input>
+            <output name="CreateCrResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="CreateSr">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CreateSr" 
+                style="document"/>
+            <input name="CreateSr">
+                <soap:body use="literal"/>
+            </input>
+            <output name="CreateSrResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="GetOrderStatus">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/GetOrderStatus" 
+                style="document"/>
+            <input name="GetOrderStatus">
+                <soap:body use="literal"/>
+            </input>
+            <output name="GetOrderStatusResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="NotifySvcOrderActStatus">
+            <soap:operation 
+                soapAction="http://efms.att.com/ms/BVOIP/NotifySvcOrderActStatus" 
+                style="document"/>
+            <input name="NotifySvcOrderActStatus">
+                <soap:body use="literal"/>
+            </input>
+            <output name="NotifySvcOrderActStatusResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="ReviewSupp">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/ReviewSupp" 
+                style="document"/>
+            <input name="ReviewSupp">
+                <soap:body use="literal"/>
+            </input>
+            <output name="ReviewSuppResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="SendBillingResult">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendBillingResult" 
+                style="document"/>
+            <input name="SendBillingResult">
+                <soap:body use="literal"/>
+            </input>
+            <output name="SendBillingResultResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="SendOrderReady">
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendOrderReady" 
+                style="document"/>
+            <input name="SendOrderReady">
+                <soap:body use="literal"/>
+            </input>
+            <output name="SendOrderReadyResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="SendTargetSystemResult">
+            <soap:operation 
+                soapAction="http://efms.att.com/ms/BVOIP/SendTargetSystemResult" 
+                style="document"/>
+            <input name="SendTargetSystemResult">
+                <soap:body use="literal"/>
+            </input>
+            <output name="SendTargetSystemResultResponse">
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WSException">
+                <soap:fault name="WSException" use="literal"/>
+            </fault>
+        </operation>
+    </binding>
+    <binding name="BVOIPCORBABinding" type="msbvoip:BVOIPPortType">
+        <corba:binding repositoryID="IDL:BVOIPPortType:1.0"/>
+        <operation name="CancelObject">
+            <corba:operation name="CancelObject">
+                <corba:param idltype="ns1:ObjectTypeEnum" mode="in" name="ObjectType"/>
+                <corba:param idltype="corba:string" mode="in" name="ObjectId"/>
+                <corba:param idltype="corba:string" mode="in" name="Reason"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="CancelObject"/>
+            <output name="CancelObjectResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="CreateCr">
+            <corba:operation name="CreateCr">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="ns1:SolutionCrNumberArray" mode="in" 
+                    name="SolutionCrNumber"/>
+                <corba:param idltype="corba:string" mode="in" name="CrNumber"/>
+                <corba:param idltype="corba:string" mode="in" name="MCN"/>
+                <corba:param idltype="ns1:GRCArray" mode="in" name="GRC"/>
+                <corba:param idltype="corba:string" mode="in" name="ContractNumber"/>
+                <corba:param idltype="corba:string" mode="in" name="CustomerName"/>
+                <corba:param idltype="corba:string" mode="in" name="AuthentId"/>
+                <corba:param idltype="ns1:YesNoEnum" mode="in" name="AttTnInd"/>
+                <corba:param idltype="ns1:UserTypeEnum" mode="in" name="UserType"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="CreateCr"/>
+            <output name="CreateCrResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="CreateSr">
+            <corba:operation name="CreateSr">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="CrNumber"/>
+                <corba:param idltype="ns1:ArrayOfSites" mode="in" name="SiteList"/>
+                <corba:param idltype="ns1:ArrayOfFullOrders" mode="in" name="OrderList"/>
+                <corba:return idltype="ns1:ArrayOfOrderSrPairs" name="SrNumberList"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="CreateSr"/>
+            <output name="CreateSrResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="GetOrderStatus">
+            <corba:operation name="GetOrderStatus">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
+                <corba:param idltype="corba:string" mode="in" name="PackageName"/>
+                <corba:param idltype="ns1:YesNoEnum" mode="out" name="SuppInd"/>
+                <corba:param idltype="ns1:YesNoEnum" mode="out" name="CancelInd"/>
+                <corba:return idltype="ns1:OrderStatusEnum" name="OrderStatus"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="GetOrderStatus"/>
+            <output name="GetOrderStatusResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="NotifySvcOrderActStatus">
+            <corba:operation name="NotifySvcOrderActStatus">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="OrderNumber"/>
+                <corba:param idltype="corba:long" mode="in" name="VersionNumber"/>
+                <corba:param idltype="ns1:EventEnum" mode="in" name="Event"/>
+                <corba:param idltype="ns1:EventStatusEnum" mode="in" name="EventStatus"/>
+                <corba:param idltype="corba:string" mode="in" name="SPP_Link"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="NotifySvcOrderActStatus"/>
+            <output name="NotifySvcOrderActStatusResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="ReviewSupp">
+            <corba:operation name="ReviewSupp">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
+                <corba:param idltype="corba:long" mode="in" name="GIOMOrderVersion"/>
+                <corba:param idltype="corba:string" mode="in" name="PackageName"/>
+                <corba:param idltype="ns1:DDMMYYYYhhmm" mode="in" 
+                    name="CreatedDateandTime"/>
+                <corba:param idltype="ns1:OrderTypeEnum" mode="in" name="OrderType"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="ReviewSupp"/>
+            <output name="ReviewSuppResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="SendBillingResult">
+            <corba:operation name="SendBillingResult">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
+                <corba:param idltype="corba:string" mode="in" name="PackageName"/>
+                <corba:param idltype="ns1:BillingSystemEnum" mode="in" 
+                    name="BillingSystem"/>
+                <corba:param idltype="ns1:BillingActionEnum" mode="in" 
+                    name="BillingAction"/>
+                <corba:param idltype="ns1:BillingElementEnum" mode="in" 
+                    name="BillingElement"/>
+                <corba:param idltype="ns1:BillingResultEnum" mode="in" 
+                    name="BillingResult"/>
+                <corba:param idltype="ns1:BillingErrorCodeArray" mode="in" 
+                    name="BillingErrorCode"/>
+                <corba:param idltype="ns1:BillingErrorMessageArray" mode="in" 
+                    name="BillingErrorMessage"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="SendBillingResult"/>
+            <output name="SendBillingResultResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="SendOrderReady">
+            <corba:operation name="SendOrderReady">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
+                <corba:param idltype="corba:long" mode="in" name="GIOMOrderVersion"/>
+                <corba:param idltype="corba:string" mode="in" name="PackageName"/>
+                <corba:param idltype="ns1:DDMMYYYYhhmm" mode="in" 
+                    name="CreatedDateandTime"/>
+                <corba:param idltype="ns1:USRPOrderNumberArray" mode="in" 
+                    name="USRPOrderNumber"/>
+                <corba:param idltype="ns1:GCSMSolutionNumberArray" mode="in" 
+                    name="GCSMSolutionNumber"/>
+                <corba:param idltype="ns1:OrderTypeEnum" mode="in" name="OrderType"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="SendOrderReady"/>
+            <output name="SendOrderReadyResponse"/>
+            <fault name="WSException"/>
+        </operation>
+        <operation name="SendTargetSystemResult">
+            <corba:operation name="SendTargetSystemResult">
+                <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
+                <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
+                <corba:param idltype="corba:string" mode="in" name="PackageName"/>
+                <corba:param idltype="ns1:TargetSystemEnum" mode="in" name="TargetSystem"/>
+                <corba:param idltype="ns1:TargetSystemActionEnum" mode="in" 
+                    name="TargetSystemAction"/>
+                <corba:param idltype="ns1:TargetSystemResultEnum" mode="in" 
+                    name="TargetSystemResult"/>
+                <corba:param idltype="ns1:TargetSystemErrorCodeArray" mode="in" 
+                    name="TargetSystemErrorCode"/>
+                <corba:param idltype="ns1:TargetSystemErrorMessageArray" mode="in" 
+                    name="TargetSystemErrorMessage"/>
+                <corba:param idltype="ns1:TNStartArray" mode="in" name="TNStart"/>
+                <corba:param idltype="ns1:TNEndArray" mode="in" name="TNEnd"/>
+                <corba:raises exception="ns1:WSException"/>
+            </corba:operation>
+            <input name="SendTargetSystemResult"/>
+            <output name="SendTargetSystemResultResponse"/>
+            <fault name="WSException"/>
+        </operation>
+    </binding>
+    <!-- Formal Service Definition -->
+    <service name="BVOIP">
+        <documentation>EFMS Managed Services BVoIP Service.</documentation>
+        <port binding="msbvoip:BVOIPSoap" name="BVOIP">
+            <soap:address location="http://efms.att.com/ms/BVOIPService"/>
+        </port>
+    </service>
+</definitions>

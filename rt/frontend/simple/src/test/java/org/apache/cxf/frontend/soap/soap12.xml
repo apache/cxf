@@ -1,0 +1,12 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+	<soap:Body>
+		<sayHello
+			xmlns="http://factory.service.cxf.apache.org/">
+			<ns2:arg0
+				xmlns:ns2="http://factory.service.cxf.apache.org/"
+				xmlns="http://www.w3.org/2005/02/addressing/wsdl">
+				hello
+			</ns2:arg0>
+		</sayHello>
+	</soap:Body>
+</soap:Envelope>

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="SoapInteropCompound" targetNamespace="http://soapinterop.org/" xmlns:typens="http://soapinterop.org/xsd" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://soapinterop.org/corba/typemap/" xmlns:wsdlns="http://soapinterop.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://soapinterop.org/corba/typemap/">
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type5SequenceStruct:1.0" type="typens:Type5" name="Type5SequenceStruct">
+      <corba:member name="varInt" idltype="corba:long" />
+      <corba:member name="varString" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type5:1.0" type="typens:Type5" name="Type5">
+      <corba:member name="varFloat" idltype="corba:float" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Type5SequenceStruct_f" idltype="ns1:Type5SequenceStruct" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type4AllStruct:1.0" type="typens:Type4" name="Type4AllStruct">
+      <corba:member name="varStringExt" idltype="corba:string" />
+      <corba:member name="varFloatExt" idltype="corba:float" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type4:1.0" type="typens:Type4" name="Type4">
+      <corba:member name="anyType_f" idltype="corba:any" />
+      <corba:member name="AttrString" idltype="corba:string" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Type4AllStruct_f" idltype="ns1:Type4AllStruct" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:base:1.0" type="typens:base" name="base">
+      <corba:member name="attr1" idltype="corba:string" />
+      <corba:member name="attr2" idltype="corba:long" />
+      <corba:member name="e1" idltype="corba:long" />
+      <corba:member name="e2" idltype="corba:string" />
+    </corba:struct>
+    <corba:union xmlns="" xmlns:ns4="http://schemas.xmlsoap.org/wsdl/" discriminator="corba:boolean" repositoryID="IDL:long_nil:1.0" type="attrib1" name="long_nil">
+      <corba:unionbranch name="value" idltype="corba:long" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:anonstring bound="2" type="corba:string" name="attrib2Type" />
+    <corba:union xmlns="" xmlns:ns4="http://schemas.xmlsoap.org/wsdl/" discriminator="corba:boolean" repositoryID="IDL:attrib2Type_nil:1.0" type="attrib2" name="attrib2Type_nil">
+      <corba:unionbranch xmlns:ns1="http://soapinterop.org/corba/typemap/" name="value" idltype="ns1:attrib2Type" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type6:1.0" type="typens:Type6" name="Type6">
+      <corba:member name="_simpleTypeValue" idltype="corba:short" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="attrib1" idltype="ns1:long_nil" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="attrib2" idltype="ns1:attrib2Type_nil" />
+    </corba:struct>
+    <corba:union xmlns:typens="http://soapinterop.org/xsd" discriminator="corba:long" repositoryID="IDL:sub2ChoiceType:1.0" type="typens:sub2" name="sub2ChoiceType">
+      <corba:unionbranch name="e4" idltype="corba:double" default="false">
+        <corba:case label="0" />
+      </corba:unionbranch>
+      <corba:unionbranch name="e6" idltype="corba:double" default="false">
+        <corba:case label="1" />
+      </corba:unionbranch>
+    </corba:union>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:sub2:1.0" type="typens:sub2" name="sub2">
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="base_f" idltype="ns1:base" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="sub2ChoiceType_f" idltype="ns1:sub2ChoiceType" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type2SequenceStruct:1.0" type="typens:Type2" name="Type2SequenceStruct">
+      <corba:member name="varFloat" idltype="corba:float" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type2:1.0" type="typens:Type2" name="Type2">
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+      <corba:member name="attrString1" idltype="corba:string" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Type2SequenceStruct_f" idltype="ns1:Type2SequenceStruct" />
+      <corba:member name="attrString2" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:sub3SequenceStruct:1.0" type="typens:sub3" name="sub3SequenceStruct">
+      <corba:member name="e5" idltype="corba:boolean" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:sub3:1.0" type="typens:sub3" name="sub3">
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="sub2_f" idltype="ns1:sub2" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="sub3SequenceStruct_f" idltype="ns1:sub3SequenceStruct" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type3:1.0" type="typens:Type3" name="Type3">
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+      <corba:member name="attrString" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type1SequenceStruct:1.0" type="typens:Type1" name="Type1SequenceStruct">
+      <corba:member name="varString" idltype="corba:long" />
+      <corba:member name="varFloat" idltype="corba:float" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:Type1:1.0" type="typens:Type1" name="Type1">
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+      <corba:member name="attrString" idltype="corba:string" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Type1SequenceStruct_f" idltype="ns1:Type1SequenceStruct" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:SimpleStruct:1.0" type="typens:SimpleStruct" name="SimpleStruct">
+      <corba:member name="varFloat" idltype="corba:float" />
+      <corba:member name="varInt" idltype="corba:long" />
+      <corba:member name="varString" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:sub1SequenceStruct:1.0" type="typens:sub1" name="sub1SequenceStruct">
+      <corba:member name="e3" idltype="corba:float" />
+    </corba:struct>
+    <corba:struct xmlns:typens="http://soapinterop.org/xsd" repositoryID="IDL:sub1:1.0" type="typens:sub1" name="sub1">
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="base_f" idltype="ns1:base" />
+      <corba:member xmlns:ns1="http://soapinterop.org/corba/typemap/" name="sub1SequenceStruct_f" idltype="ns1:sub1SequenceStruct" />
+    </corba:struct>
+  </corba:typeMapping>
+  <types>
+    <schema elementFormDefault="qualified" targetNamespace="http://soapinterop.org/xsd" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <element name="in_obj" type="typens:base"/>
+            <element name="result_obj" type="typens:base"/>
+            <element name="in_obj2" type="typens:sub1"/>
+            <element name="result_obj2" type="typens:sub2"/>
+            <element name="in_obj3" type="typens:sub3"/>
+            <element name="result_obj3" type="typens:sub2"/>
+
+            <complexType name="base">
+                <sequence>
+                    <element name="e1" type="xsd:int"/>
+                    <element name="e2" type="xsd:string"/>
+                </sequence>
+                <attribute name="attr1" type="xsd:string" use="required"/>
+                <attribute name="attr2" type="xsd:int" use="required"/>
+            </complexType>
+            <complexType name="sub1">
+                <complexContent>
+                    <extension base="typens:base">
+                        <sequence>
+                            <element name="e3" type="xsd:float"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType name="sub2">
+
+                <complexContent>
+                    <extension base="typens:base">
+                        <choice>
+                            <element name="e4" type="xsd:double"/>
+                            <element name="e6" type="xsd:double"/>
+                        </choice>
+                    </extension>
+                </complexContent>
+
+            </complexType>
+            <complexType name="sub3">
+                <complexContent>
+                    <extension base="typens:sub2">
+                        <sequence>
+                            <element name="e5" type="xsd:boolean"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            
+            <complexType name="SimpleStruct">
+                <sequence>
+                    <element name="varFloat" type="xsd:float"/>
+                    <element name="varInt" type="xsd:int"/>
+                    <element name="varString" type="xsd:string"/>
+                </sequence>
+            </complexType>
+
+            <complexType name="Type1">
+                <complexContent>
+                    <extension base="typens:SimpleStruct">
+                        <attribute name="attrString" type="xsd:string" use="required"/>
+                        <sequence>
+                            <element name="varString" type="xsd:int"/>
+                            <element name="varFloat" type="xsd:float"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+
+            <complexType name="Type2">
+                <complexContent>
+                    <extension base="typens:SimpleStruct">
+                        <attribute name="attrString1" type="xsd:string" use="required"/>
+                        <sequence>
+                            <element name="varFloat" type="xsd:float"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+                <attribute name="attrString2" type="xsd:string" use="required"/>
+            </complexType>
+
+            <complexType name="Type3">
+                <complexContent>
+                    <extension base="typens:SimpleStruct">
+                        <attribute name="attrString" type="xsd:string" use="required"/>
+                    </extension>
+                </complexContent>
+            </complexType>
+
+            <complexType name="Type4">
+                <complexContent mixed="false">
+                    <extension base="xsd:anyType">
+                        <attribute name="AttrString" type="xsd:string" use="required"/>
+                        <all>
+                            <element name="varStringExt" type="xsd:string"/>
+                            <element name="varFloatExt" type="xsd:float"/>
+                        </all>
+                    </extension>
+                </complexContent>
+            </complexType> 
+
+            <complexType name="Type5">
+                <sequence>
+                    <element name="varFloat" type="xsd:float"/>
+                    <sequence>
+                        <element name="varInt" type="xsd:int"/>
+                        <element name="varString" type="xsd:string"/>
+                    </sequence>
+                </sequence>
+            </complexType>
+
+            <complexType name="Type6">
+                <simpleContent>
+                    <extension base="xsd:short">
+                        <attribute name="attrib1" type="xsd:int" use="optional"/>
+                    </extension>
+                </simpleContent>
+                <attribute name="attrib2">
+                    <simpleType>
+                        <restriction base="xsd:string">
+                            <maxLength value="2"/>
+                    </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+
+
+
+
+        </schema>
+  </types>
+  <message name="echoObjectResponse">
+    <part name="Result" element="typens:result_obj">
+    </part>
+  </message>
+  <message name="echoObject">
+    <part name="x" element="typens:in_obj">
+    </part>
+  </message>
+  <message name="echoObject3Response">
+    <part name="Result" element="typens:result_obj3">
+    </part>
+  </message>
+  <message name="echoObject2Response">
+    <part name="Result" element="typens:result_obj2">
+    </part>
+  </message>
+  <message name="echoObject2">
+    <part name="x" element="typens:in_obj2">
+    </part>
+  </message>
+  <message name="echoObject3">
+    <part name="x" element="typens:in_obj3">
+    </part>
+  </message>
+  <portType name="TypeInheritancePortType">
+    <operation name="echoObject" parameterOrder="x">
+      <input name="echoObject" message="wsdlns:echoObject">
+    </input>
+      <output name="echoObjectResponse" message="wsdlns:echoObjectResponse">
+    </output>
+    </operation>
+    <operation name="echoObject2" parameterOrder="x">
+      <input name="echoObject2" message="wsdlns:echoObject2">
+    </input>
+      <output name="echoObject2Response" message="wsdlns:echoObject2Response">
+    </output>
+    </operation>
+    <operation name="echoObject3" parameterOrder="x">
+      <input name="echoObject3" message="wsdlns:echoObject3">
+    </input>
+      <output name="echoObject3Response" message="wsdlns:echoObject3Response">
+    </output>
+    </operation>
+  </portType>
+  <binding name="TypeInheritanceCORBABinding" type="wsdlns:TypeInheritancePortType">
+    <corba:binding xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" repositoryID="IDL:TypeInheritancePortType:1.0" />
+    <operation name="echoObject">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="echoObject">
+        <corba:param xmlns:ns1="http://soapinterop.org/corba/typemap/" mode="in" name="x" idltype="ns1:base" />
+        <corba:return xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Result" idltype="ns1:base" />
+      </corba:operation>
+      <input name="echoObject">
+      </input>
+      <output name="echoObjectResponse">
+      </output>
+    </operation>
+    <operation name="echoObject2">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="echoObject2">
+        <corba:param xmlns:ns1="http://soapinterop.org/corba/typemap/" mode="in" name="x" idltype="ns1:sub1" />
+        <corba:return xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Result" idltype="ns1:sub2" />
+      </corba:operation>
+      <input name="echoObject2">
+      </input>
+      <output name="echoObject2Response">
+      </output>
+    </operation>
+    <operation name="echoObject3">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="echoObject3">
+        <corba:param xmlns:ns1="http://soapinterop.org/corba/typemap/" mode="in" name="x" idltype="ns1:sub3" />
+        <corba:return xmlns:ns1="http://soapinterop.org/corba/typemap/" name="Result" idltype="ns1:sub2" />
+      </corba:operation>
+      <input name="echoObject3">
+      </input>
+      <output name="echoObject3Response">
+      </output>
+    </operation>
+  </binding>
+  <service name="TypeInheritanceCORBAService">
+    <port name="TypeInheritanceCORBAPort" binding="wsdlns:TypeInheritanceCORBABinding">
+      <corba:address xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" location="file:./TypeInheritance.ref" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements. See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership. The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License. You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied. See the License for the
+	specific language governing permissions and limitations
+	under the License.
+-->
+<wsdl:definitions xmlns:tns="http://docwrapped.iona.com/"
+	xmlns:ns1="http://docwrapped.iona.com/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="http://docwrapped.iona.com/"
+	xmlns:x1="http://docwrapped.iona.com/jaxws">
+	<wsdl:types>
+		<schema targetNamespace="http://docwrapped.iona.com/jaxws"
+			xmlns="http://www.w3.org/2001/XMLSchema"
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+			<element name="getPrice">
+				<complexType>
+					<sequence>
+						<element name="requestType" type="xs:string" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getPriceResponse">
+				<complexType>
+					<sequence>
+						<element name="responseType" type="xs:float" />
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="getPrice">
+		<wsdl:part name="getPrice" element="x1:getPrice" />
+	</wsdl:message>
+	<wsdl:message name="getPriceResponse">
+		<wsdl:part name="getPriceResponse"
+			element="x1:getPriceResponse" />
+	</wsdl:message>
+	<wsdl:portType name="StockPortType">
+		<wsdl:operation name="getPrice">
+			<wsdl:input name="getPrice" message="tns:getPrice" />
+			<wsdl:output name="getPriceResponse"
+				message="tns:getPriceResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="StockPortTypeBinding"
+		type="tns:StockPortType">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="getPrice">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="StockService">
+		<wsdl:port name="StockPort"
+			binding="tns:StockPortTypeBinding">
+			<soap:address location="http://localhost/changme" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

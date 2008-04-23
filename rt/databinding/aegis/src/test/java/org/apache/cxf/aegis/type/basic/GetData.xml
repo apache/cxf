@@ -1,0 +1,5 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Body>
+  <getData xmlns="http://services.aegis.cxf.apache.org"/>
+ </env:Body>
+</env:Envelope>

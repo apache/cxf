@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="any.idl" targetNamespace="http://schemas.apache.org/idl/any.idl" xmlns:tns="http://schemas.apache.org/idl/any.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/any.idl" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/any.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/any.idl" xmlns:references="http://schemas.apache.org/references" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/any.idl/corba/typemap/">
+    <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/any.idl" discriminator="corba:long" repositoryID="IDL:anyInterface/_omg_SimpleUnion:1.0" type="xsd1:anyInterface._omg_SimpleUnion" name="anyInterface._omg_SimpleUnion">
+      <corba:unionbranch name="varString" idltype="corba:string" default="false">
+        <corba:case label="0" />
+      </corba:unionbranch>
+        <corba:unionbranch name="varAny" idltype="corba:any" default="false">
+          <corba:case label="1" />
+        </corba:unionbranch>
+          <corba:unionbranch name="varFloat" idltype="corba:float" default="false">
+            <corba:case label="2" />
+          </corba:unionbranch>
+          </corba:union>
+            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/any.idl" repositoryID="IDL:anyInterface/ErrorInfoEnh:1.0" type="xsd1:anyInterface.ErrorInfoEnh" name="anyInterface.ErrorInfoEnh">
+              <corba:member name="errorCode" idltype="corba:long" />
+              <corba:member name="errorMessage" idltype="corba:string" />
+              <corba:member name="errorData" idltype="corba:any" />
+            </corba:struct>
+              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/any.idl" repositoryID="IDL:anyInterface/PrimitiveStruct:1.0" type="xsd1:anyInterface.PrimitiveStruct" name="anyInterface.PrimitiveStruct">
+                <corba:member name="varLong" idltype="corba:long" />
+                <corba:member name="varShort" idltype="corba:short" />
+                <corba:member name="varFloat" idltype="corba:float" />
+                <corba:member name="varDouble" idltype="corba:double" />
+                <corba:member name="varChar" idltype="corba:char" />
+                <corba:member name="varBoolean" idltype="corba:boolean" />
+                <corba:member name="varOctet" idltype="corba:octet" />
+                <corba:member name="varString" idltype="corba:string" />
+                <corba:member name="varUlong" idltype="corba:ulong" />
+                <corba:member name="varUshort" idltype="corba:ushort" />
+                <corba:member name="varAny" idltype="corba:any" />
+              </corba:struct>
+                <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/any.idl" discriminator="corba:long" repositoryID="IDL:anyInterface/SimpleUnion:1.0" type="ns3:anyInterface.SimpleUnion" name="anyInterface.SimpleUnion">
+                  <corba:unionbranch name="varString" idltype="corba:string" default="false">
+                    <corba:case label="0" />
+                  </corba:unionbranch>
+                    <corba:unionbranch name="varAny" idltype="corba:any" default="false">
+                      <corba:case label="1" />
+                    </corba:unionbranch>
+                      <corba:unionbranch name="varFloat" idltype="corba:float" default="false">
+                        <corba:case label="2" />
+                      </corba:unionbranch>
+                      </corba:union>
+                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/any.idl" repositoryID="IDL:anyInterface/SimpleStruct:1.0" type="xsd1:anyInterface.SimpleStruct" name="anyInterface.SimpleStruct">
+                          <corba:member name="varFloat" idltype="corba:float" />
+                          <corba:member name="varAny" idltype="corba:any" />
+                          <corba:member name="varString" idltype="corba:string" />
+                        </corba:struct>
+                        </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/any.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.SimpleStruct">
+        <xsd:sequence>
+          <xsd:element name="varFloat" type="xsd:float"/>
+          <xsd:element name="varAny" type="xsd:anyType"/>
+          <xsd:element name="varString" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.PrimitiveStruct">
+        <xsd:sequence>
+          <xsd:element name="varLong" type="xsd:int"/>
+          <xsd:element name="varShort" type="xsd:short"/>
+          <xsd:element name="varFloat" type="xsd:float"/>
+          <xsd:element name="varDouble" type="xsd:double"/>
+          <xsd:element name="varChar" type="xsd:byte"/>
+          <xsd:element name="varBoolean" type="xsd:boolean"/>
+          <xsd:element name="varOctet" type="xsd:unsignedByte"/>
+          <xsd:element name="varString" type="xsd:string"/>
+          <xsd:element name="varUlong" type="xsd:unsignedInt"/>
+          <xsd:element name="varUshort" type="xsd:unsignedShort"/>
+          <xsd:element name="varAny" type="xsd:anyType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.SimpleUnion">
+        <xsd:choice>
+          <xsd:element name="varString" type="xsd:string"/>
+          <xsd:element name="varAny" type="xsd:anyType"/>
+          <xsd:element name="varFloat" type="xsd:float"/>
+        </xsd:choice>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface._omg_SimpleUnion">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="1" name="discriminator" type="xsd:int"/>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="varString" type="xsd:string"/>
+            <xsd:element name="varAny" type="xsd:anyType"/>
+            <xsd:element name="varFloat" type="xsd:float"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.ErrorInfoEnh">
+        <xsd:sequence>
+          <xsd:element name="errorCode" type="xsd:int"/>
+          <xsd:element name="errorMessage" type="xsd:string"/>
+          <xsd:element name="errorData" type="xsd:anyType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.test_any.p" type="xsd:string"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.test_any.x" type="xsd:anyType"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.test_any.y" type="xsd:anyType"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.test_any.z" type="xsd:anyType"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anyInterface.test_any.return" type="xsd:anyType"/>
+    </schema>
+  </types>
+  <message name="anyInterface.test_anyResponse">
+    <part name="return" element="xsd1:anyInterface.test_any.return"/>
+    <part name="y" element="xsd1:anyInterface.test_any.y"/>
+    <part name="z" element="xsd1:anyInterface.test_any.z"/>
+  </message>
+  <message name="anyInterface.test_any">
+    <part name="p" element="xsd1:anyInterface.test_any.p"/>
+    <part name="x" element="xsd1:anyInterface.test_any.x"/>
+    <part name="y" element="xsd1:anyInterface.test_any.y"/>
+  </message>
+  <portType name="anyInterface">
+    <operation name="test_any">
+      <input name="test_any" message="tns:anyInterface.test_any"/>
+      <output name="test_anyResponse" message="tns:anyInterface.test_anyResponse"/>
+    </operation>
+  </portType>
+  <binding name="anyInterfaceCORBABinding" type="tns:anyInterface">
+    <corba:binding repositoryID="IDL:anyInterface:1.0" />
+    <operation name="test_any">
+      <corba:operation name="test_any">
+        <corba:param mode="in" name="p" idltype="corba:string" />
+        <corba:param mode="in" name="x" idltype="corba:any" />
+        <corba:param mode="out" name="z" idltype="corba:any" />
+        <corba:param mode="inout" name="y" idltype="corba:any" />
+        <corba:return name="return" idltype="corba:any" />
+      </corba:operation>
+      <input name="test_any">
+      </input>
+      <output name="test_anyResponse">
+      </output>
+    </operation>
+  </binding>
+</definitions>

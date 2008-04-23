@@ -1,0 +1,2572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/primitives" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/primitives" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/primitives/typemap">
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="" elemtype="corba:string" elemname="item" bound="0" repositoryID="IDL:stringArray:1.0" type="ns4:stringArray" name="stringArray" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/primitives" xmlns="http://cxf.apache.org/bindings/corba/idl/primitives" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="stringArray">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="getShort">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outShort" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setShort">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inShort" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetShort">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutShort" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutShort" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testShort">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutShort" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutShort" type="xs:short">
+            </xs:element>
+            <xs:element name="outShort" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getUnsignedShort">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getUnsignedShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setUnsignedShort">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setUnsignedShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetUnsignedShort">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetUnsignedShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testUnsignedShort">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="inoutUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testUnsignedShortResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="outUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="inoutUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getLong">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inLong" type="xs:int">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:int">
+            </xs:element>
+            <xs:element name="outLong" type="xs:int">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getUnsignedLong">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getUnsignedLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setUnsignedLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setUnsignedLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetUnsignedLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetUnsignedLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testUnsignedLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="inoutUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testUnsignedLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="outUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="inoutUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getLongLong">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outLong" type="xs:long">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setLongLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inLong" type="xs:long">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetLongLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inoutLong" type="xs:long">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inoutLong" type="xs:long">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testLongLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inLongLong" type="xs:long">
+            </xs:element>
+            <xs:element name="inoutLongLong" type="xs:long">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:long">
+            </xs:element>
+            <xs:element name="outLongLong" type="xs:long">
+            </xs:element>
+            <xs:element name="inoutLongLong" type="xs:long">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getUnsignedLongLong">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getUnsignedLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setUnsignedLongLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setUnsignedLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetUnsignedLongLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetUnsignedLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testUnsignedLongLong">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="inoutUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testUnsignedLongLongResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="outUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="inoutUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getFloat">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getFloatResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outFloat" type="xs:float">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setFloat">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inFloat" type="xs:float">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setFloatResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetFloat">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutFloat" type="xs:float">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetFloatResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutFloat" type="xs:float">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testFloat">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inFloat" type="xs:float">
+            </xs:element>
+            <xs:element name="inoutFloat" type="xs:float">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testFloatResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:float">
+            </xs:element>
+            <xs:element name="outFloat" type="xs:float">
+            </xs:element>
+            <xs:element name="inoutFloat" type="xs:float">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getDouble">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getDoubleResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outDouble" type="xs:double">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setDouble">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inDouble" type="xs:double">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setDoubleResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetDouble">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutDouble" type="xs:double">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetDoubleResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutDouble" type="xs:double">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDouble">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutDouble" type="xs:double">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDoubleResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:double">
+            </xs:element>
+            <xs:element name="outDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutDouble" type="xs:double">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getChar">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outChar" type="xs:byte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setChar">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inChar" type="xs:byte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetChar">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutChar" type="xs:byte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutChar" type="xs:byte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testChar">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inChar" type="xs:byte">
+            </xs:element>
+            <xs:element name="inoutChar" type="xs:byte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:byte">
+            </xs:element>
+            <xs:element name="outChar" type="xs:byte">
+            </xs:element>
+            <xs:element name="inoutChar" type="xs:byte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getWChar">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getWCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outWChar" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setWChar">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inWChar" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setWCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetWChar">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutWChar" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetWCharResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutWChar" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testWchar">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inWchar" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutWchar" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testWcharResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="outWchar" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutWchar" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getBoolean">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getBooleanResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outBoolean" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setBoolean">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inBoolean" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setBooleanResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetBoolean">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutBoolean" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetBooleanResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutBoolean" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testBoolean">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inBoolean" type="xs:boolean">
+            </xs:element>
+            <xs:element name="inoutBoolean" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testBooleanResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:boolean">
+            </xs:element>
+            <xs:element name="inoutBoolean" type="xs:boolean">
+            </xs:element>
+            <xs:element name="outBoolean" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getOctet">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getOctetResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outOctet" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setOctet">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOctet" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setOctetResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetOctet">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutOctet" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetOctetResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutOctet" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testOctet">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOctet" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="inoutOctet" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testOctetResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="outOctet" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="inoutOctet" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getAny">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getAnyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outAny" type="xs:anyType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setAny">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inAny" type="xs:anyType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setAnyResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetAny">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutAny" type="xs:anyType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetAnyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutAny" type="xs:anyType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testAny">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inAny" type="xs:anyType">
+            </xs:element>
+            <xs:element name="inoutAny" type="xs:anyType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testAnyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:anyType">
+            </xs:element>
+            <xs:element name="outAny" type="xs:anyType">
+            </xs:element>
+            <xs:element name="inoutAny" type="xs:anyType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getString">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getStringResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setString">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setStringResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetString">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetStringResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testString">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inString" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testStringResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutString" type="xs:string">
+            </xs:element>
+            <xs:element name="outString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getWstring">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getWstringResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outWstring" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setWstring">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inWstring" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setWstringResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetWstring">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutWstring" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetWstringResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutWstring" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testWstring">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inWstring" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutWstring" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testWstringResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutWstring" type="xs:string">
+            </xs:element>
+            <xs:element name="outWstring" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getStringArray">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getStringArrayResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outStringArray" type="stringArray">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setStringArray">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inStringArray" type="stringArray">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setStringArrayResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetStringArray">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutStringArray" type="stringArray">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSetStringArrayResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inOutStringArray" type="stringArray">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getLong">
+    <wsdl:part name="inparameter" element="tns:getLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetUnsignedLong">
+    <wsdl:part name="inparameter" element="tns:getSetUnsignedLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDoubleResponse">
+    <wsdl:part name="outparameter" element="tns:testDoubleResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testLong">
+    <wsdl:part name="inparameter" element="tns:testLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testStringResponse">
+    <wsdl:part name="outparameter" element="tns:testStringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:getLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testLongResponse">
+    <wsdl:part name="outparameter" element="tns:testLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetShort">
+    <wsdl:part name="inparameter" element="tns:getSetShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetBooleanResponse">
+    <wsdl:part name="outparameter" element="tns:getSetBooleanResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setStringArray">
+    <wsdl:part name="inparameter" element="tns:setStringArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:testLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getShort">
+    <wsdl:part name="inparameter" element="tns:getShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testFloatResponse">
+    <wsdl:part name="outparameter" element="tns:testFloatResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getBoolean">
+    <wsdl:part name="inparameter" element="tns:getBoolean">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnsignedShort">
+    <wsdl:part name="inparameter" element="tns:getUnsignedShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testWchar">
+    <wsdl:part name="inparameter" element="tns:testWchar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setShort">
+    <wsdl:part name="inparameter" element="tns:setShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getWstringResponse">
+    <wsdl:part name="outparameter" element="tns:getWstringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetWstringResponse">
+    <wsdl:part name="outparameter" element="tns:getSetWstringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCharResponse">
+    <wsdl:part name="outparameter" element="tns:getCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setUnsignedLongLong">
+    <wsdl:part name="inparameter" element="tns:setUnsignedLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetFloat">
+    <wsdl:part name="inparameter" element="tns:getSetFloat">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFloatResponse">
+    <wsdl:part name="outparameter" element="tns:getFloatResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnsignedLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:getUnsignedLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getWChar">
+    <wsdl:part name="inparameter" element="tns:getWChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetOctet">
+    <wsdl:part name="inparameter" element="tns:getSetOctet">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:getSetLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testWstringResponse">
+    <wsdl:part name="outparameter" element="tns:testWstringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFloat">
+    <wsdl:part name="inparameter" element="tns:getFloat">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setAny">
+    <wsdl:part name="inparameter" element="tns:setAny">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setWChar">
+    <wsdl:part name="inparameter" element="tns:setWChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setUnsignedLong">
+    <wsdl:part name="inparameter" element="tns:setUnsignedLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnsignedLongResponse">
+    <wsdl:part name="outparameter" element="tns:getUnsignedLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetAnyResponse">
+    <wsdl:part name="outparameter" element="tns:getSetAnyResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setWstring">
+    <wsdl:part name="inparameter" element="tns:setWstring">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getOctet">
+    <wsdl:part name="inparameter" element="tns:getOctet">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testChar">
+    <wsdl:part name="inparameter" element="tns:testChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testLongLong">
+    <wsdl:part name="inparameter" element="tns:testLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetShortResponse">
+    <wsdl:part name="outparameter" element="tns:getSetShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setLong">
+    <wsdl:part name="inparameter" element="tns:setLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnyResponse">
+    <wsdl:part name="outparameter" element="tns:getAnyResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOctetResponse">
+    <wsdl:part name="outparameter" element="tns:testOctetResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setUnsignedLongResponse">
+    <wsdl:part name="outparameter" element="tns:setUnsignedLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testUnsignedLongLong">
+    <wsdl:part name="inparameter" element="tns:testUnsignedLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetLong">
+    <wsdl:part name="inparameter" element="tns:getSetLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetOctetResponse">
+    <wsdl:part name="outparameter" element="tns:getSetOctetResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testAnyResponse">
+    <wsdl:part name="outparameter" element="tns:testAnyResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetUnsignedShortResponse">
+    <wsdl:part name="outparameter" element="tns:getSetUnsignedShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testAny">
+    <wsdl:part name="inparameter" element="tns:testAny">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getOctetResponse">
+    <wsdl:part name="outparameter" element="tns:getOctetResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetDoubleResponse">
+    <wsdl:part name="outparameter" element="tns:getSetDoubleResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetUnsignedLongLong">
+    <wsdl:part name="inparameter" element="tns:getSetUnsignedLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetString">
+    <wsdl:part name="inparameter" element="tns:getSetString">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStringResponse">
+    <wsdl:part name="outparameter" element="tns:getStringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setFloatResponse">
+    <wsdl:part name="outparameter" element="tns:setFloatResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetStringArray">
+    <wsdl:part name="inparameter" element="tns:getSetStringArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setString">
+    <wsdl:part name="inparameter" element="tns:setString">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetUnsignedLongResponse">
+    <wsdl:part name="outparameter" element="tns:getSetUnsignedLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testUnsignedShort">
+    <wsdl:part name="inparameter" element="tns:testUnsignedShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setLongResponse">
+    <wsdl:part name="outparameter" element="tns:setLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStringArrayResponse">
+    <wsdl:part name="outparameter" element="tns:getStringArrayResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setCharResponse">
+    <wsdl:part name="outparameter" element="tns:setCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setAnyResponse">
+    <wsdl:part name="outparameter" element="tns:setAnyResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetAny">
+    <wsdl:part name="inparameter" element="tns:getSetAny">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testFloat">
+    <wsdl:part name="inparameter" element="tns:testFloat">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setOctetResponse">
+    <wsdl:part name="outparameter" element="tns:setOctetResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:setLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetWChar">
+    <wsdl:part name="inparameter" element="tns:getSetWChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getChar">
+    <wsdl:part name="inparameter" element="tns:getChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getWCharResponse">
+    <wsdl:part name="outparameter" element="tns:getWCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testString">
+    <wsdl:part name="inparameter" element="tns:testString">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testUnsignedShortResponse">
+    <wsdl:part name="outparameter" element="tns:testUnsignedShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetStringResponse">
+    <wsdl:part name="outparameter" element="tns:getSetStringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getString">
+    <wsdl:part name="inparameter" element="tns:getString">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetCharResponse">
+    <wsdl:part name="outparameter" element="tns:getSetCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testUnsignedLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:testUnsignedLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStringArray">
+    <wsdl:part name="inparameter" element="tns:getStringArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setWCharResponse">
+    <wsdl:part name="outparameter" element="tns:setWCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetBoolean">
+    <wsdl:part name="inparameter" element="tns:getSetBoolean">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetLongResponse">
+    <wsdl:part name="outparameter" element="tns:getSetLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getBooleanResponse">
+    <wsdl:part name="outparameter" element="tns:getBooleanResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getWstring">
+    <wsdl:part name="inparameter" element="tns:getWstring">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setUnsignedLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:setUnsignedLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setShortResponse">
+    <wsdl:part name="outparameter" element="tns:setShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setStringArrayResponse">
+    <wsdl:part name="outparameter" element="tns:setStringArrayResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetWCharResponse">
+    <wsdl:part name="outparameter" element="tns:getSetWCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetLongLong">
+    <wsdl:part name="inparameter" element="tns:getSetLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testShort">
+    <wsdl:part name="inparameter" element="tns:testShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testBoolean">
+    <wsdl:part name="inparameter" element="tns:testBoolean">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOctet">
+    <wsdl:part name="inparameter" element="tns:testOctet">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnsignedLongLong">
+    <wsdl:part name="inparameter" element="tns:getUnsignedLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testWcharResponse">
+    <wsdl:part name="outparameter" element="tns:testWcharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetUnsignedShort">
+    <wsdl:part name="inparameter" element="tns:getSetUnsignedShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setBooleanResponse">
+    <wsdl:part name="outparameter" element="tns:setBooleanResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setUnsignedShort">
+    <wsdl:part name="inparameter" element="tns:setUnsignedShort">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setChar">
+    <wsdl:part name="inparameter" element="tns:setChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setUnsignedShortResponse">
+    <wsdl:part name="outparameter" element="tns:setUnsignedShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCharResponse">
+    <wsdl:part name="outparameter" element="tns:testCharResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testUnsignedLong">
+    <wsdl:part name="inparameter" element="tns:testUnsignedLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetUnsignedLongLongResponse">
+    <wsdl:part name="outparameter" element="tns:getSetUnsignedLongLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setDoubleResponse">
+    <wsdl:part name="outparameter" element="tns:setDoubleResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setStringResponse">
+    <wsdl:part name="outparameter" element="tns:setStringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getShortResponse">
+    <wsdl:part name="outparameter" element="tns:getShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testShortResponse">
+    <wsdl:part name="outparameter" element="tns:testShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getDoubleResponse">
+    <wsdl:part name="outparameter" element="tns:getDoubleResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnsignedLong">
+    <wsdl:part name="inparameter" element="tns:getUnsignedLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetChar">
+    <wsdl:part name="inparameter" element="tns:getSetChar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetStringArrayResponse">
+    <wsdl:part name="outparameter" element="tns:getSetStringArrayResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnsignedShortResponse">
+    <wsdl:part name="outparameter" element="tns:getUnsignedShortResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setBoolean">
+    <wsdl:part name="inparameter" element="tns:setBoolean">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetDouble">
+    <wsdl:part name="inparameter" element="tns:getSetDouble">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setOctet">
+    <wsdl:part name="inparameter" element="tns:setOctet">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testBooleanResponse">
+    <wsdl:part name="outparameter" element="tns:testBooleanResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLongResponse">
+    <wsdl:part name="outparameter" element="tns:getLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAny">
+    <wsdl:part name="inparameter" element="tns:getAny">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setFloat">
+    <wsdl:part name="inparameter" element="tns:setFloat">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetFloatResponse">
+    <wsdl:part name="outparameter" element="tns:getSetFloatResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getDouble">
+    <wsdl:part name="inparameter" element="tns:getDouble">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testUnsignedLongResponse">
+    <wsdl:part name="outparameter" element="tns:testUnsignedLongResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testWstring">
+    <wsdl:part name="inparameter" element="tns:testWstring">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSetWstring">
+    <wsdl:part name="inparameter" element="tns:getSetWstring">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLongLong">
+    <wsdl:part name="inparameter" element="tns:getLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setDouble">
+    <wsdl:part name="inparameter" element="tns:setDouble">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDouble">
+    <wsdl:part name="inparameter" element="tns:testDouble">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setWstringResponse">
+    <wsdl:part name="outparameter" element="tns:setWstringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setLongLong">
+    <wsdl:part name="inparameter" element="tns:setLongLong">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Primitives">
+    <wsdl:operation name="getShort">
+      <wsdl:input name="getShortRequest" message="tns:getShort">
+    </wsdl:input>
+      <wsdl:output name="getShortResponse" message="tns:getShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setShort">
+      <wsdl:input name="setShortRequest" message="tns:setShort">
+    </wsdl:input>
+      <wsdl:output name="setShortResponse" message="tns:setShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetShort">
+      <wsdl:input name="getSetShortRequest" message="tns:getSetShort">
+    </wsdl:input>
+      <wsdl:output name="getSetShortResponse" message="tns:getSetShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testShort">
+      <wsdl:input name="testShortRequest" message="tns:testShort">
+    </wsdl:input>
+      <wsdl:output name="testShortResponse" message="tns:testShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUnsignedShort">
+      <wsdl:input name="getUnsignedShortRequest" message="tns:getUnsignedShort">
+    </wsdl:input>
+      <wsdl:output name="getUnsignedShortResponse" message="tns:getUnsignedShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setUnsignedShort">
+      <wsdl:input name="setUnsignedShortRequest" message="tns:setUnsignedShort">
+    </wsdl:input>
+      <wsdl:output name="setUnsignedShortResponse" message="tns:setUnsignedShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetUnsignedShort">
+      <wsdl:input name="getSetUnsignedShortRequest" message="tns:getSetUnsignedShort">
+    </wsdl:input>
+      <wsdl:output name="getSetUnsignedShortResponse" message="tns:getSetUnsignedShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testUnsignedShort">
+      <wsdl:input name="testUnsignedShortRequest" message="tns:testUnsignedShort">
+    </wsdl:input>
+      <wsdl:output name="testUnsignedShortResponse" message="tns:testUnsignedShortResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLong">
+      <wsdl:input name="getLongRequest" message="tns:getLong">
+    </wsdl:input>
+      <wsdl:output name="getLongResponse" message="tns:getLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setLong">
+      <wsdl:input name="setLongRequest" message="tns:setLong">
+    </wsdl:input>
+      <wsdl:output name="setLongResponse" message="tns:setLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetLong">
+      <wsdl:input name="getSetLongRequest" message="tns:getSetLong">
+    </wsdl:input>
+      <wsdl:output name="getSetLongResponse" message="tns:getSetLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testLong">
+      <wsdl:input name="testLongRequest" message="tns:testLong">
+    </wsdl:input>
+      <wsdl:output name="testLongResponse" message="tns:testLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUnsignedLong">
+      <wsdl:input name="getUnsignedLongRequest" message="tns:getUnsignedLong">
+    </wsdl:input>
+      <wsdl:output name="getUnsignedLongResponse" message="tns:getUnsignedLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setUnsignedLong">
+      <wsdl:input name="setUnsignedLongRequest" message="tns:setUnsignedLong">
+    </wsdl:input>
+      <wsdl:output name="setUnsignedLongResponse" message="tns:setUnsignedLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetUnsignedLong">
+      <wsdl:input name="getSetUnsignedLongRequest" message="tns:getSetUnsignedLong">
+    </wsdl:input>
+      <wsdl:output name="getSetUnsignedLongResponse" message="tns:getSetUnsignedLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testUnsignedLong">
+      <wsdl:input name="testUnsignedLongRequest" message="tns:testUnsignedLong">
+    </wsdl:input>
+      <wsdl:output name="testUnsignedLongResponse" message="tns:testUnsignedLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLongLong">
+      <wsdl:input name="getLongLongRequest" message="tns:getLongLong">
+    </wsdl:input>
+      <wsdl:output name="getLongLongResponse" message="tns:getLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setLongLong">
+      <wsdl:input name="setLongLongRequest" message="tns:setLongLong">
+    </wsdl:input>
+      <wsdl:output name="setLongLongResponse" message="tns:setLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetLongLong">
+      <wsdl:input name="getSetLongLongRequest" message="tns:getSetLongLong">
+    </wsdl:input>
+      <wsdl:output name="getSetLongLongResponse" message="tns:getSetLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testLongLong">
+      <wsdl:input name="testLongLongRequest" message="tns:testLongLong">
+    </wsdl:input>
+      <wsdl:output name="testLongLongResponse" message="tns:testLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUnsignedLongLong">
+      <wsdl:input name="getUnsignedLongLongRequest" message="tns:getUnsignedLongLong">
+    </wsdl:input>
+      <wsdl:output name="getUnsignedLongLongResponse" message="tns:getUnsignedLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setUnsignedLongLong">
+      <wsdl:input name="setUnsignedLongLongRequest" message="tns:setUnsignedLongLong">
+    </wsdl:input>
+      <wsdl:output name="setUnsignedLongLongResponse" message="tns:setUnsignedLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetUnsignedLongLong">
+      <wsdl:input name="getSetUnsignedLongLongRequest" message="tns:getSetUnsignedLongLong">
+    </wsdl:input>
+      <wsdl:output name="getSetUnsignedLongLongResponse" message="tns:getSetUnsignedLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testUnsignedLongLong">
+      <wsdl:input name="testUnsignedLongLongRequest" message="tns:testUnsignedLongLong">
+    </wsdl:input>
+      <wsdl:output name="testUnsignedLongLongResponse" message="tns:testUnsignedLongLongResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFloat">
+      <wsdl:input name="getFloatRequest" message="tns:getFloat">
+    </wsdl:input>
+      <wsdl:output name="getFloatResponse" message="tns:getFloatResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setFloat">
+      <wsdl:input name="setFloatRequest" message="tns:setFloat">
+    </wsdl:input>
+      <wsdl:output name="setFloatResponse" message="tns:setFloatResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetFloat">
+      <wsdl:input name="getSetFloatRequest" message="tns:getSetFloat">
+    </wsdl:input>
+      <wsdl:output name="getSetFloatResponse" message="tns:getSetFloatResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testFloat">
+      <wsdl:input name="testFloatRequest" message="tns:testFloat">
+    </wsdl:input>
+      <wsdl:output name="testFloatResponse" message="tns:testFloatResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDouble">
+      <wsdl:input name="getDoubleRequest" message="tns:getDouble">
+    </wsdl:input>
+      <wsdl:output name="getDoubleResponse" message="tns:getDoubleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setDouble">
+      <wsdl:input name="setDoubleRequest" message="tns:setDouble">
+    </wsdl:input>
+      <wsdl:output name="setDoubleResponse" message="tns:setDoubleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetDouble">
+      <wsdl:input name="getSetDoubleRequest" message="tns:getSetDouble">
+    </wsdl:input>
+      <wsdl:output name="getSetDoubleResponse" message="tns:getSetDoubleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testDouble">
+      <wsdl:input name="testDoubleRequest" message="tns:testDouble">
+    </wsdl:input>
+      <wsdl:output name="testDoubleResponse" message="tns:testDoubleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getChar">
+      <wsdl:input name="getCharRequest" message="tns:getChar">
+    </wsdl:input>
+      <wsdl:output name="getCharResponse" message="tns:getCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setChar">
+      <wsdl:input name="setCharRequest" message="tns:setChar">
+    </wsdl:input>
+      <wsdl:output name="setCharResponse" message="tns:setCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetChar">
+      <wsdl:input name="getSetCharRequest" message="tns:getSetChar">
+    </wsdl:input>
+      <wsdl:output name="getSetCharResponse" message="tns:getSetCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testChar">
+      <wsdl:input name="testCharRequest" message="tns:testChar">
+    </wsdl:input>
+      <wsdl:output name="testCharResponse" message="tns:testCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWChar">
+      <wsdl:input name="getWCharRequest" message="tns:getWChar">
+    </wsdl:input>
+      <wsdl:output name="getWCharResponse" message="tns:getWCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setWChar">
+      <wsdl:input name="setWCharRequest" message="tns:setWChar">
+    </wsdl:input>
+      <wsdl:output name="setWCharResponse" message="tns:setWCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetWChar">
+      <wsdl:input name="getSetWCharRequest" message="tns:getSetWChar">
+    </wsdl:input>
+      <wsdl:output name="getSetWCharResponse" message="tns:getSetWCharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testWchar">
+      <wsdl:input name="testWcharRequest" message="tns:testWchar">
+    </wsdl:input>
+      <wsdl:output name="testWcharResponse" message="tns:testWcharResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getBoolean">
+      <wsdl:input name="getBooleanRequest" message="tns:getBoolean">
+    </wsdl:input>
+      <wsdl:output name="getBooleanResponse" message="tns:getBooleanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setBoolean">
+      <wsdl:input name="setBooleanRequest" message="tns:setBoolean">
+    </wsdl:input>
+      <wsdl:output name="setBooleanResponse" message="tns:setBooleanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetBoolean">
+      <wsdl:input name="getSetBooleanRequest" message="tns:getSetBoolean">
+    </wsdl:input>
+      <wsdl:output name="getSetBooleanResponse" message="tns:getSetBooleanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testBoolean">
+      <wsdl:input name="testBooleanRequest" message="tns:testBoolean">
+    </wsdl:input>
+      <wsdl:output name="testBooleanResponse" message="tns:testBooleanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOctet">
+      <wsdl:input name="getOctetRequest" message="tns:getOctet">
+    </wsdl:input>
+      <wsdl:output name="getOctetResponse" message="tns:getOctetResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setOctet">
+      <wsdl:input name="setOctetRequest" message="tns:setOctet">
+    </wsdl:input>
+      <wsdl:output name="setOctetResponse" message="tns:setOctetResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetOctet">
+      <wsdl:input name="getSetOctetRequest" message="tns:getSetOctet">
+    </wsdl:input>
+      <wsdl:output name="getSetOctetResponse" message="tns:getSetOctetResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testOctet">
+      <wsdl:input name="testOctetRequest" message="tns:testOctet">
+    </wsdl:input>
+      <wsdl:output name="testOctetResponse" message="tns:testOctetResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAny">
+      <wsdl:input name="getAnyRequest" message="tns:getAny">
+    </wsdl:input>
+      <wsdl:output name="getAnyResponse" message="tns:getAnyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setAny">
+      <wsdl:input name="setAnyRequest" message="tns:setAny">
+    </wsdl:input>
+      <wsdl:output name="setAnyResponse" message="tns:setAnyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetAny">
+      <wsdl:input name="getSetAnyRequest" message="tns:getSetAny">
+    </wsdl:input>
+      <wsdl:output name="getSetAnyResponse" message="tns:getSetAnyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testAny">
+      <wsdl:input name="testAnyRequest" message="tns:testAny">
+    </wsdl:input>
+      <wsdl:output name="testAnyResponse" message="tns:testAnyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getString">
+      <wsdl:input name="getStringRequest" message="tns:getString">
+    </wsdl:input>
+      <wsdl:output name="getStringResponse" message="tns:getStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setString">
+      <wsdl:input name="setStringRequest" message="tns:setString">
+    </wsdl:input>
+      <wsdl:output name="setStringResponse" message="tns:setStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetString">
+      <wsdl:input name="getSetStringRequest" message="tns:getSetString">
+    </wsdl:input>
+      <wsdl:output name="getSetStringResponse" message="tns:getSetStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testString">
+      <wsdl:input name="testStringRequest" message="tns:testString">
+    </wsdl:input>
+      <wsdl:output name="testStringResponse" message="tns:testStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWstring">
+      <wsdl:input name="getWstringRequest" message="tns:getWstring">
+    </wsdl:input>
+      <wsdl:output name="getWstringResponse" message="tns:getWstringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setWstring">
+      <wsdl:input name="setWstringRequest" message="tns:setWstring">
+    </wsdl:input>
+      <wsdl:output name="setWstringResponse" message="tns:setWstringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetWstring">
+      <wsdl:input name="getSetWstringRequest" message="tns:getSetWstring">
+    </wsdl:input>
+      <wsdl:output name="getSetWstringResponse" message="tns:getSetWstringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testWstring">
+      <wsdl:input name="testWstringRequest" message="tns:testWstring">
+    </wsdl:input>
+      <wsdl:output name="testWstringResponse" message="tns:testWstringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStringArray">
+      <wsdl:input name="getStringArrayRequest" message="tns:getStringArray">
+    </wsdl:input>
+      <wsdl:output name="getStringArrayResponse" message="tns:getStringArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setStringArray">
+      <wsdl:input name="setStringArrayRequest" message="tns:setStringArray">
+    </wsdl:input>
+      <wsdl:output name="setStringArrayResponse" message="tns:setStringArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetStringArray">
+      <wsdl:input name="getSetStringArrayRequest" message="tns:getSetStringArray">
+    </wsdl:input>
+      <wsdl:output name="getSetStringArrayResponse" message="tns:getSetStringArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PrimitivesCORBABinding" type="tns:Primitives">
+    <corba:binding repositoryID="IDL:Primitives:1.0" />
+    <wsdl:operation name="getShort">
+      <corba:operation name="getShort">
+        <corba:param mode="out" name="outShort" idltype="corba:short" />
+      </corba:operation>
+      <wsdl:input name="getShortRequest">
+      </wsdl:input>
+      <wsdl:output name="getShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setShort">
+      <corba:operation name="setShort">
+        <corba:param mode="in" name="inShort" idltype="corba:short" />
+      </corba:operation>
+      <wsdl:input name="setShortRequest">
+      </wsdl:input>
+      <wsdl:output name="setShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetShort">
+      <corba:operation name="getSetShort">
+        <corba:param mode="inout" name="inOutShort" idltype="corba:short" />
+      </corba:operation>
+      <wsdl:input name="getSetShortRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testShort">
+      <corba:operation name="testShort">
+        <corba:param mode="in" name="inShort" idltype="corba:short" />
+        <corba:param mode="inout" name="inoutShort" idltype="corba:short" />
+        <corba:param mode="out" name="outShort" idltype="corba:short" />
+        <corba:return name="return" idltype="corba:short" />
+      </corba:operation>
+      <wsdl:input name="testShortRequest">
+      </wsdl:input>
+      <wsdl:output name="testShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUnsignedShort">
+      <corba:operation name="getUnsignedShort">
+        <corba:param mode="out" name="outUnsignedShort" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="getUnsignedShortRequest">
+      </wsdl:input>
+      <wsdl:output name="getUnsignedShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setUnsignedShort">
+      <corba:operation name="setUnsignedShort">
+        <corba:param mode="in" name="inUnsignedShort" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="setUnsignedShortRequest">
+      </wsdl:input>
+      <wsdl:output name="setUnsignedShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetUnsignedShort">
+      <corba:operation name="getSetUnsignedShort">
+        <corba:param mode="inout" name="inOutUnsignedShort" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="getSetUnsignedShortRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetUnsignedShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testUnsignedShort">
+      <corba:operation name="testUnsignedShort">
+        <corba:param mode="in" name="inUnsignedShort" idltype="corba:ushort" />
+        <corba:param mode="out" name="outUnsignedShort" idltype="corba:ushort" />
+        <corba:param mode="inout" name="inoutUnsignedShort" idltype="corba:ushort" />
+        <corba:return name="return" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="testUnsignedShortRequest">
+      </wsdl:input>
+      <wsdl:output name="testUnsignedShortResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLong">
+      <corba:operation name="getLong">
+        <corba:param mode="out" name="outLong" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="getLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setLong">
+      <corba:operation name="setLong">
+        <corba:param mode="in" name="inLong" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="setLongRequest">
+      </wsdl:input>
+      <wsdl:output name="setLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetLong">
+      <corba:operation name="getSetLong">
+        <corba:param mode="inout" name="inOutLong" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="getSetLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testLong">
+      <corba:operation name="testLong">
+        <corba:param mode="in" name="inLong" idltype="corba:long" />
+        <corba:param mode="out" name="outLong" idltype="corba:long" />
+        <corba:param mode="inout" name="inoutLong" idltype="corba:long" />
+        <corba:return name="return" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="testLongRequest">
+      </wsdl:input>
+      <wsdl:output name="testLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUnsignedLong">
+      <corba:operation name="getUnsignedLong">
+        <corba:param mode="out" name="outUnsignedLong" idltype="corba:ulong" />
+      </corba:operation>
+      <wsdl:input name="getUnsignedLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getUnsignedLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setUnsignedLong">
+      <corba:operation name="setUnsignedLong">
+        <corba:param mode="in" name="inUnsignedLong" idltype="corba:ulong" />
+      </corba:operation>
+      <wsdl:input name="setUnsignedLongRequest">
+      </wsdl:input>
+      <wsdl:output name="setUnsignedLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetUnsignedLong">
+      <corba:operation name="getSetUnsignedLong">
+        <corba:param mode="inout" name="inOutUnsignedLong" idltype="corba:ulong" />
+      </corba:operation>
+      <wsdl:input name="getSetUnsignedLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetUnsignedLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testUnsignedLong">
+      <corba:operation name="testUnsignedLong">
+        <corba:param mode="in" name="inUnsignedLong" idltype="corba:ulong" />
+        <corba:param mode="out" name="outUnsignedLong" idltype="corba:ulong" />
+        <corba:param mode="inout" name="inoutUnsignedLong" idltype="corba:ulong" />
+        <corba:return name="return" idltype="corba:ulong" />
+      </corba:operation>
+      <wsdl:input name="testUnsignedLongRequest">
+      </wsdl:input>
+      <wsdl:output name="testUnsignedLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLongLong">
+      <corba:operation name="getLongLong">
+        <corba:param mode="out" name="outLong" idltype="corba:longlong" />
+      </corba:operation>
+      <wsdl:input name="getLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setLongLong">
+      <corba:operation name="setLongLong">
+        <corba:param mode="in" name="inLong" idltype="corba:longlong" />
+      </corba:operation>
+      <wsdl:input name="setLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="setLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetLongLong">
+      <corba:operation name="getSetLongLong">
+        <corba:param mode="inout" name="inoutLong" idltype="corba:longlong" />
+      </corba:operation>
+      <wsdl:input name="getSetLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testLongLong">
+      <corba:operation name="testLongLong">
+        <corba:param mode="in" name="inLongLong" idltype="corba:longlong" />
+        <corba:param mode="out" name="outLongLong" idltype="corba:longlong" />
+        <corba:param mode="inout" name="inoutLongLong" idltype="corba:longlong" />
+        <corba:return name="return" idltype="corba:longlong" />
+      </corba:operation>
+      <wsdl:input name="testLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="testLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUnsignedLongLong">
+      <corba:operation name="getUnsignedLongLong">
+        <corba:param mode="out" name="outUnsignedLongLong" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="getUnsignedLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getUnsignedLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setUnsignedLongLong">
+      <corba:operation name="setUnsignedLongLong">
+        <corba:param mode="in" name="inUnsignedLongLong" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="setUnsignedLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="setUnsignedLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetUnsignedLongLong">
+      <corba:operation name="getSetUnsignedLongLong">
+        <corba:param mode="inout" name="inOutUnsignedLongLong" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="getSetUnsignedLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetUnsignedLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testUnsignedLongLong">
+      <corba:operation name="testUnsignedLongLong">
+        <corba:param mode="in" name="inUnsignedLongLong" idltype="corba:ulonglong" />
+        <corba:param mode="out" name="outUnsignedLongLong" idltype="corba:ulonglong" />
+        <corba:param mode="inout" name="inoutUnsignedLongLong" idltype="corba:ulonglong" />
+        <corba:return name="return" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="testUnsignedLongLongRequest">
+      </wsdl:input>
+      <wsdl:output name="testUnsignedLongLongResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFloat">
+      <corba:operation name="getFloat">
+        <corba:param mode="out" name="outFloat" idltype="corba:float" />
+      </corba:operation>
+      <wsdl:input name="getFloatRequest">
+      </wsdl:input>
+      <wsdl:output name="getFloatResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setFloat">
+      <corba:operation name="setFloat">
+        <corba:param mode="in" name="inFloat" idltype="corba:float" />
+      </corba:operation>
+      <wsdl:input name="setFloatRequest">
+      </wsdl:input>
+      <wsdl:output name="setFloatResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetFloat">
+      <corba:operation name="getSetFloat">
+        <corba:param mode="inout" name="inOutFloat" idltype="corba:float" />
+      </corba:operation>
+      <wsdl:input name="getSetFloatRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetFloatResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testFloat">
+      <corba:operation name="testFloat">
+        <corba:param mode="in" name="inFloat" idltype="corba:float" />
+        <corba:param mode="out" name="outFloat" idltype="corba:float" />
+        <corba:param mode="inout" name="inoutFloat" idltype="corba:float" />
+        <corba:return name="return" idltype="corba:float" />
+      </corba:operation>
+      <wsdl:input name="testFloatRequest">
+      </wsdl:input>
+      <wsdl:output name="testFloatResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDouble">
+      <corba:operation name="getDouble">
+        <corba:param mode="out" name="outDouble" idltype="corba:double" />
+      </corba:operation>
+      <wsdl:input name="getDoubleRequest">
+      </wsdl:input>
+      <wsdl:output name="getDoubleResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setDouble">
+      <corba:operation name="setDouble">
+        <corba:param mode="in" name="inDouble" idltype="corba:double" />
+      </corba:operation>
+      <wsdl:input name="setDoubleRequest">
+      </wsdl:input>
+      <wsdl:output name="setDoubleResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetDouble">
+      <corba:operation name="getSetDouble">
+        <corba:param mode="inout" name="inOutDouble" idltype="corba:double" />
+      </corba:operation>
+      <wsdl:input name="getSetDoubleRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetDoubleResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testDouble">
+      <corba:operation name="testDouble">
+        <corba:param mode="in" name="inDouble" idltype="corba:double" />
+        <corba:param mode="out" name="outDouble" idltype="corba:double" />
+        <corba:param mode="inout" name="inoutDouble" idltype="corba:double" />
+        <corba:return name="return" idltype="corba:double" />
+      </corba:operation>
+      <wsdl:input name="testDoubleRequest">
+      </wsdl:input>
+      <wsdl:output name="testDoubleResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getChar">
+      <corba:operation name="getChar">
+        <corba:param mode="out" name="outChar" idltype="corba:char" />
+      </corba:operation>
+      <wsdl:input name="getCharRequest">
+      </wsdl:input>
+      <wsdl:output name="getCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setChar">
+      <corba:operation name="setChar">
+        <corba:param mode="in" name="inChar" idltype="corba:char" />
+      </corba:operation>
+      <wsdl:input name="setCharRequest">
+      </wsdl:input>
+      <wsdl:output name="setCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetChar">
+      <corba:operation name="getSetChar">
+        <corba:param mode="inout" name="inOutChar" idltype="corba:char" />
+      </corba:operation>
+      <wsdl:input name="getSetCharRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testChar">
+      <corba:operation name="testChar">
+        <corba:param mode="in" name="inChar" idltype="corba:char" />
+        <corba:param mode="out" name="outChar" idltype="corba:char" />
+        <corba:param mode="inout" name="inoutChar" idltype="corba:char" />
+        <corba:return name="return" idltype="corba:char" />
+      </corba:operation>
+      <wsdl:input name="testCharRequest">
+      </wsdl:input>
+      <wsdl:output name="testCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWChar">
+      <corba:operation name="getWChar">
+        <corba:param mode="out" name="outWChar" idltype="corba:wchar" />
+      </corba:operation>
+      <wsdl:input name="getWCharRequest">
+      </wsdl:input>
+      <wsdl:output name="getWCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setWChar">
+      <corba:operation name="setWChar">
+        <corba:param mode="in" name="inWChar" idltype="corba:wchar" />
+      </corba:operation>
+      <wsdl:input name="setWCharRequest">
+      </wsdl:input>
+      <wsdl:output name="setWCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetWChar">
+      <corba:operation name="getSetWChar">
+        <corba:param mode="inout" name="inOutWChar" idltype="corba:wchar" />
+      </corba:operation>
+      <wsdl:input name="getSetWCharRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetWCharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testWchar">
+      <corba:operation name="testWchar">
+        <corba:param mode="in" name="inWchar" idltype="corba:wchar" />
+        <corba:param mode="out" name="outWchar" idltype="corba:wchar" />
+        <corba:param mode="inout" name="inoutWchar" idltype="corba:wchar" />
+        <corba:return name="return" idltype="corba:wchar" />
+      </corba:operation>
+      <wsdl:input name="testWcharRequest">
+      </wsdl:input>
+      <wsdl:output name="testWcharResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getBoolean">
+      <corba:operation name="getBoolean">
+        <corba:param mode="out" name="outBoolean" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="getBooleanRequest">
+      </wsdl:input>
+      <wsdl:output name="getBooleanResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setBoolean">
+      <corba:operation name="setBoolean">
+        <corba:param mode="in" name="inBoolean" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="setBooleanRequest">
+      </wsdl:input>
+      <wsdl:output name="setBooleanResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetBoolean">
+      <corba:operation name="getSetBoolean">
+        <corba:param mode="inout" name="inOutBoolean" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="getSetBooleanRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetBooleanResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testBoolean">
+      <corba:operation name="testBoolean">
+        <corba:param mode="in" name="inBoolean" idltype="corba:boolean" />
+        <corba:param mode="inout" name="inoutBoolean" idltype="corba:boolean" />
+        <corba:param mode="out" name="outBoolean" idltype="corba:boolean" />
+        <corba:return name="return" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="testBooleanRequest">
+      </wsdl:input>
+      <wsdl:output name="testBooleanResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOctet">
+      <corba:operation name="getOctet">
+        <corba:param mode="out" name="outOctet" idltype="corba:octet" />
+      </corba:operation>
+      <wsdl:input name="getOctetRequest">
+      </wsdl:input>
+      <wsdl:output name="getOctetResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setOctet">
+      <corba:operation name="setOctet">
+        <corba:param mode="in" name="inOctet" idltype="corba:octet" />
+      </corba:operation>
+      <wsdl:input name="setOctetRequest">
+      </wsdl:input>
+      <wsdl:output name="setOctetResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetOctet">
+      <corba:operation name="getSetOctet">
+        <corba:param mode="inout" name="inOutOctet" idltype="corba:octet" />
+      </corba:operation>
+      <wsdl:input name="getSetOctetRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetOctetResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testOctet">
+      <corba:operation name="testOctet">
+        <corba:param mode="in" name="inOctet" idltype="corba:octet" />
+        <corba:param mode="out" name="outOctet" idltype="corba:octet" />
+        <corba:param mode="inout" name="inoutOctet" idltype="corba:octet" />
+        <corba:return name="return" idltype="corba:octet" />
+      </corba:operation>
+      <wsdl:input name="testOctetRequest">
+      </wsdl:input>
+      <wsdl:output name="testOctetResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAny">
+      <corba:operation name="getAny">
+        <corba:param mode="out" name="outAny" idltype="corba:any" />
+      </corba:operation>
+      <wsdl:input name="getAnyRequest">
+      </wsdl:input>
+      <wsdl:output name="getAnyResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setAny">
+      <corba:operation name="setAny">
+        <corba:param mode="in" name="inAny" idltype="corba:any" />
+      </corba:operation>
+      <wsdl:input name="setAnyRequest">
+      </wsdl:input>
+      <wsdl:output name="setAnyResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetAny">
+      <corba:operation name="getSetAny">
+        <corba:param mode="inout" name="inOutAny" idltype="corba:any" />
+      </corba:operation>
+      <wsdl:input name="getSetAnyRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetAnyResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testAny">
+      <corba:operation name="testAny">
+        <corba:param mode="in" name="inAny" idltype="corba:any" />
+        <corba:param mode="out" name="outAny" idltype="corba:any" />
+        <corba:param mode="inout" name="inoutAny" idltype="corba:any" />
+        <corba:return name="return" idltype="corba:any" />
+      </corba:operation>
+      <wsdl:input name="testAnyRequest">
+      </wsdl:input>
+      <wsdl:output name="testAnyResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getString">
+      <corba:operation name="getString">
+        <corba:param mode="out" name="outString" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="getStringRequest">
+      </wsdl:input>
+      <wsdl:output name="getStringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setString">
+      <corba:operation name="setString">
+        <corba:param mode="in" name="inString" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="setStringRequest">
+      </wsdl:input>
+      <wsdl:output name="setStringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetString">
+      <corba:operation name="getSetString">
+        <corba:param mode="inout" name="inOutString" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="getSetStringRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetStringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testString">
+      <corba:operation name="testString">
+        <corba:param mode="in" name="inString" idltype="corba:string" />
+        <corba:param mode="inout" name="inoutString" idltype="corba:string" />
+        <corba:param mode="out" name="outString" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="testStringRequest">
+      </wsdl:input>
+      <wsdl:output name="testStringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWstring">
+      <corba:operation name="getWstring">
+        <corba:param mode="out" name="outWstring" idltype="corba:wstring" />
+      </corba:operation>
+      <wsdl:input name="getWstringRequest">
+      </wsdl:input>
+      <wsdl:output name="getWstringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setWstring">
+      <corba:operation name="setWstring">
+        <corba:param mode="in" name="inWstring" idltype="corba:wstring" />
+      </corba:operation>
+      <wsdl:input name="setWstringRequest">
+      </wsdl:input>
+      <wsdl:output name="setWstringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetWstring">
+      <corba:operation name="getSetWstring">
+        <corba:param mode="inout" name="inOutWstring" idltype="corba:wstring" />
+      </corba:operation>
+      <wsdl:input name="getSetWstringRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetWstringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testWstring">
+      <corba:operation name="testWstring">
+        <corba:param mode="in" name="inWstring" idltype="corba:wstring" />
+        <corba:param mode="inout" name="inoutWstring" idltype="corba:wstring" />
+        <corba:param mode="out" name="outWstring" idltype="corba:wstring" />
+        <corba:return name="return" idltype="corba:wstring" />
+      </corba:operation>
+      <wsdl:input name="testWstringRequest">
+      </wsdl:input>
+      <wsdl:output name="testWstringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStringArray">
+      <corba:operation name="getStringArray">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/primitives/typemap" mode="out" name="outStringArray" idltype="stringArray" />
+      </corba:operation>
+      <wsdl:input name="getStringArrayRequest">
+      </wsdl:input>
+      <wsdl:output name="getStringArrayResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setStringArray">
+      <corba:operation name="setStringArray">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/primitives/typemap" mode="in" name="inStringArray" idltype="stringArray" />
+      </corba:operation>
+      <wsdl:input name="setStringArrayRequest">
+      </wsdl:input>
+      <wsdl:output name="setStringArrayResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSetStringArray">
+      <corba:operation name="getSetStringArray">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/primitives/typemap" mode="inout" name="inOutStringArray" idltype="stringArray" />
+      </corba:operation>
+      <wsdl:input name="getSetStringArrayRequest">
+      </wsdl:input>
+      <wsdl:output name="getSetStringArrayResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PrimitivesCORBAService">
+    <wsdl:port name="PrimitivesCORBAPort" binding="tns:PrimitivesCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

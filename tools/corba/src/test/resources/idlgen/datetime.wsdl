@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions targetNamespace="http://schemas.apache.org/idl/datetime.idl" xmlns:tns="http://schemas.apache.org/idl/datetime.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/datetime.idl" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/datetime.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/datetime.idl" xmlns:references="http://schemas.apache.org/references" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/datetime.idl/corba/typemap/">
+    <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/datetime.idl" discriminator="corba:long" repositoryID="IDL:BasePortType/_omg_SimpleUnion:1.0" type="xsd1:BasePortType._omg_SimpleUnion" name="BasePortType._omg_SimpleUnion">
+      <corba:unionbranch name="varUTCTime" idltype="corba:dateTime" default="false">
+        <corba:case label="0" />
+      </corba:unionbranch>
+        <corba:unionbranch name="varInt" idltype="corba:long" default="false">
+          <corba:case label="1" />
+        </corba:unionbranch>
+          <corba:unionbranch name="varFloat" idltype="corba:float" default="false">
+            <corba:case label="2" />
+          </corba:unionbranch>
+          </corba:union>
+            <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/datetime.idl" discriminator="corba:long" repositoryID="IDL:BasePortType/SimpleUnion:1.0" type="ns3:BasePortType.SimpleUnion" name="BasePortType.SimpleUnion">
+              <corba:unionbranch name="varUTCTime" idltype="corba:dateTime" default="false">
+                <corba:case label="0" />
+              </corba:unionbranch>
+                <corba:unionbranch name="varInt" idltype="corba:long" default="false">
+                  <corba:case label="1" />
+                </corba:unionbranch>
+                  <corba:unionbranch name="varFloat" idltype="corba:float" default="false">
+                    <corba:case label="2" />
+                  </corba:unionbranch>
+                  </corba:union>
+                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/datetime.idl" repositoryID="IDL:TimeBase/IntervalT:1.0" type="xsd1:TimeBase.IntervalT" name="TimeBase.IntervalT">
+                      <corba:member name="lower_bound" idltype="corba:ulonglong" />
+                      <corba:member name="upper_bound" idltype="corba:ulonglong" />
+                    </corba:struct>
+                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/datetime.idl" repositoryID="IDL:BasePortType/SimpleStruct:1.0" type="xsd1:BasePortType.SimpleStruct" name="BasePortType.SimpleStruct">
+                        <corba:member name="varUTCTime" idltype="corba:dateTime" />
+                        <corba:member name="varInt" idltype="corba:long" />
+                        <corba:member name="varTime" idltype="corba:ulonglong" />
+                      </corba:struct>
+                      </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/datetime.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TimeBase.IntervalT">
+        <xsd:sequence>
+          <xsd:element name="lower_bound" type="xsd:unsignedLong"/>
+          <xsd:element name="upper_bound" type="xsd:unsignedLong"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.SimpleStruct">
+        <xsd:sequence>
+          <xsd:element name="varUTCTime" type="xsd:dateTime"/>
+          <xsd:element name="varInt" type="xsd:int"/>
+          <xsd:element name="varTime" type="xsd:unsignedLong"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.SimpleUnion">
+        <xsd:choice>
+          <xsd:element name="varUTCTime" type="xsd:dateTime"/>
+          <xsd:element name="varInt" type="xsd:int"/>
+          <xsd:element name="varFloat" type="xsd:float"/>
+        </xsd:choice>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType._omg_SimpleUnion">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="1" name="discriminator" type="xsd:int"/>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="varUTCTime" type="xsd:dateTime"/>
+            <xsd:element name="varInt" type="xsd:int"/>
+            <xsd:element name="varFloat" type="xsd:float"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoDateTime.input" type="xsd:dateTime"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoDateTime.return" type="xsd:dateTime"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoDate.input" type="xsd:date"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoDate.return" type="xsd:date"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoTime.input" type="xsd:time"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoTime.return" type="xsd:time"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGYearMonth.input" type="xsd:gYearMonth"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGYearMonth.return" type="xsd:gYearMonth"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGYear.input" type="xsd:gYear"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGYear.return" type="xsd:gYear"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGMonthDay.input" type="xsd:gMonthDay"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGMonthDay.return" type="xsd:gMonthDay"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGMonth.input" type="xsd:gMonth"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGMonth.return" type="xsd:gMonth"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGDay.input" type="xsd:gDay"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.echoGDay.return" type="xsd:gDay"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BasePortType.set_interval.interval" type="xsd1:TimeBase.IntervalT"/>
+    </schema>
+  </types>
+  <message name="BasePortType.set_intervalResponse">
+  </message>
+  <message name="BasePortType.echoGYear">
+    <part name="inputGYear" element="xsd1:BasePortType.echoGYear.input"/>
+  </message>
+  <message name="BasePortType.echoGMonthResponse">
+    <part name="return" element="xsd1:BasePortType.echoGMonth.return"/>
+  </message>
+  <message name="BasePortType.echoDateTime">
+    <part name="inputDateTime" element="xsd1:BasePortType.echoDateTime.input"/>
+  </message>
+  <message name="BasePortType.echoGYearMonthResponse">
+    <part name="return" element="xsd1:BasePortType.echoGYearMonth.return"/>
+  </message>
+  <message name="BasePortType.echoTimeResponse">
+    <part name="return" element="xsd1:BasePortType.echoTime.return"/>
+  </message>
+  <message name="BasePortType.echoGYearResponse">
+    <part name="return" element="xsd1:BasePortType.echoGYear.return"/>
+  </message>
+  <message name="BasePortType.echoGDay">
+    <part name="inputGDay" element="xsd1:BasePortType.echoGDay.input"/>
+  </message>
+  <message name="BasePortType.echoGMonthDayResponse">
+    <part name="return" element="xsd1:BasePortType.echoGMonthDay.return"/>
+  </message>
+  <message name="BasePortType.echoGYearMonth">
+    <part name="inputGYearMonth" element="xsd1:BasePortType.echoGYearMonth.input"/>
+  </message>
+  <message name="BasePortType.echoGMonthDay">
+    <part name="inputGMonthDay" element="xsd1:BasePortType.echoGMonthDay.input"/>
+  </message>
+  <message name="BasePortType.echoTime">
+    <part name="inputTime" element="xsd1:BasePortType.echoTime.input"/>
+  </message>
+  <message name="BasePortType.echoDate">
+    <part name="inputDate" element="xsd1:BasePortType.echoDate.input"/>
+  </message>
+  <message name="BasePortType.echoDateTimeResponse">
+    <part name="return" element="xsd1:BasePortType.echoDateTime.return"/>
+  </message>
+  <message name="BasePortType.set_interval">
+    <part name="interval" element="xsd1:BasePortType.set_interval.interval"/>
+  </message>
+  <message name="BasePortType.echoGDayResponse">
+    <part name="return" element="xsd1:BasePortType.echoGDay.return"/>
+  </message>
+  <message name="BasePortType.echoDateResponse">
+    <part name="return" element="xsd1:BasePortType.echoDate.return"/>
+  </message>
+  <message name="BasePortType.echoGMonth">
+    <part name="inputGMonth" element="xsd1:BasePortType.echoGMonth.input"/>
+  </message>
+  <portType name="BasePortType">
+    <operation name="echoDateTime">
+      <input name="echoDateTime" message="tns:BasePortType.echoDateTime"/>
+      <output name="echoDateTimeResponse" message="tns:BasePortType.echoDateTimeResponse"/>
+    </operation>
+    <operation name="echoDate">
+      <input name="echoDate" message="tns:BasePortType.echoDate"/>
+      <output name="echoDateResponse" message="tns:BasePortType.echoDateResponse"/>
+    </operation>
+    <operation name="echoTime">
+      <input name="echoTime" message="tns:BasePortType.echoTime"/>
+      <output name="echoTimeResponse" message="tns:BasePortType.echoTimeResponse"/>
+    </operation>
+    <operation name="echoGYearMonth">
+      <input name="echoGYearMonth" message="tns:BasePortType.echoGYearMonth"/>
+      <output name="echoGYearMonthResponse" message="tns:BasePortType.echoGYearMonthResponse"/>
+    </operation>
+    <operation name="echoGYear">
+      <input name="echoGYear" message="tns:BasePortType.echoGYear"/>
+      <output name="echoGYearResponse" message="tns:BasePortType.echoGYearResponse"/>
+    </operation>
+    <operation name="echoGMonthDay">
+      <input name="echoGMonthDay" message="tns:BasePortType.echoGMonthDay"/>
+      <output name="echoGMonthDayResponse" message="tns:BasePortType.echoGMonthDayResponse"/>
+    </operation>
+    <operation name="echoGMonth">
+      <input name="echoGMonth" message="tns:BasePortType.echoGMonth"/>
+      <output name="echoGMonthResponse" message="tns:BasePortType.echoGMonthResponse"/>
+    </operation>
+    <operation name="echoGDay">
+      <input name="echoGDay" message="tns:BasePortType.echoGDay"/>
+      <output name="echoGDayResponse" message="tns:BasePortType.echoGDayResponse"/>
+    </operation>
+    <operation name="set_interval">
+      <input name="set_interval" message="tns:BasePortType.set_interval"/>
+      <output name="set_intervalResponse" message="tns:BasePortType.set_intervalResponse"/>
+    </operation>
+  </portType>
+  <binding name="BaseCORBABinding" type="tns:BasePortType">
+    <corba:binding repositoryID="IDL:BasePortType:1.0" />
+    <operation name="echoDateTime">
+      <corba:operation name="echoDateTime">
+        <corba:param mode="in" name="inputDateTime" idltype="corba:dateTime" />
+        <corba:return name="return" idltype="corba:dateTime" />
+      </corba:operation>
+      <input name="echoDateTime">
+      </input>
+      <output name="echoDateTimeResponse">
+      </output>
+    </operation>
+    <operation name="echoDate">
+      <corba:operation name="echoDate">
+        <corba:param mode="in" name="inputDate" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoDate">
+      </input>
+      <output name="echoDateResponse">
+      </output>
+    </operation>
+    <operation name="echoTime">
+      <corba:operation name="echoTime">
+        <corba:param mode="in" name="inputTime" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoTime">
+      </input>
+      <output name="echoTimeResponse">
+      </output>
+    </operation>
+    <operation name="echoGYearMonth">
+      <corba:operation name="echoGYearMonth">
+        <corba:param mode="in" name="inputGYearMonth" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoGYearMonth">
+      </input>
+      <output name="echoGYearMonthResponse">
+      </output>
+    </operation>
+    <operation name="echoGYear">
+      <corba:operation name="echoGYear">
+        <corba:param mode="in" name="inputGYear" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoGYear">
+      </input>
+      <output name="echoGYearResponse">
+      </output>
+    </operation>
+    <operation name="echoGMonthDay">
+      <corba:operation name="echoGMonthDay">
+        <corba:param mode="in" name="inputGMonthDay" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoGMonthDay">
+      </input>
+      <output name="echoGMonthDayResponse">
+      </output>
+    </operation>
+    <operation name="echoGMonth">
+      <corba:operation name="echoGMonth">
+        <corba:param mode="in" name="inputGMonth" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoGMonth">
+      </input>
+      <output name="echoGMonthResponse">
+      </output>
+    </operation>
+    <operation name="echoGDay">
+      <corba:operation name="echoGDay">
+        <corba:param mode="in" name="inputGDay" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <input name="echoGDay">
+      </input>
+      <output name="echoGDayResponse">
+      </output>
+    </operation>
+    <operation name="set_interval">
+      <corba:operation name="set_interval">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/datetime.idl/corba/typemap/" mode="in" name="interval" idltype="ns1:TimeBase.IntervalT" />
+      </corba:operation>
+      <input name="set_interval">
+      </input>
+      <output name="set_intervalResponse">
+      </output>
+    </operation>
+  </binding>
+</definitions>

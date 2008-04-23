@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="GreeterService" targetNamespace="http://apache.org/fault" xmlns:tns="http://apache.org/fault" xmlns:ns1="http://apache.org/fault/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/fault/types" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/fault/types">
+<xs:element name="BadRecordLit" nillable="true" type="xs:string"/>
+<xs:element name="NoSuchCodeLit">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" name="code" type="tns:ErrorCode"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="greetMe">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" name="requestType" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="greetMeResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" name="responseType" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="testDocLitFault">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" name="faultType" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="testDocLitFaultResponse">
+<xs:complexType/>
+</xs:element>
+<xs:complexType name="ErrorCode">
+<xs:sequence>
+<xs:element form="qualified" name="minor" type="xs:short"/>
+<xs:element form="qualified" name="major" type="xs:short"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="BadRecord">
+<xs:sequence>
+<xs:element form="qualified" name="reason" type="xs:string"/>
+<xs:element form="qualified" name="code" type="xs:short"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="BadRecordLitFault">
+    <wsdl:part name="BadRecordLitFault" element="ns1:BadRecordLit">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NoSuchCodeLitFault">
+    <wsdl:part name="NoSuchCodeLitFault" element="ns1:NoSuchCodeLit">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDocLitFault">
+    <wsdl:part name="parameters" element="ns1:testDocLitFault">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMeResponse">
+    <wsdl:part name="parameters" element="ns1:greetMeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDocLitFaultResponse">
+    <wsdl:part name="parameters" element="ns1:testDocLitFaultResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMe">
+    <wsdl:part name="parameters" element="ns1:greetMe">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Greeter">
+    <wsdl:operation name="greetMe">
+      <wsdl:input name="greetMe" message="tns:greetMe">
+    </wsdl:input>
+      <wsdl:output name="greetMeResponse" message="tns:greetMeResponse">
+    </wsdl:output>
+      <wsdl:fault name="NoSuchCodeLitFault" message="tns:NoSuchCodeLitFault">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="testDocLitFault">
+      <wsdl:input name="testDocLitFault" message="tns:testDocLitFault">
+    </wsdl:input>
+      <wsdl:output name="testDocLitFaultResponse" message="tns:testDocLitFaultResponse">
+    </wsdl:output>
+      <wsdl:fault name="BadRecordLitFault" message="tns:BadRecordLitFault">
+    </wsdl:fault>
+      <wsdl:fault name="NoSuchCodeLitFault" message="tns:NoSuchCodeLitFault">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GreeterServiceSoapBinding" type="tns:Greeter">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="greetMe">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="greetMe">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="greetMeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="NoSuchCodeLitFault">
+        <soap:fault name="NoSuchCodeLitFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="testDocLitFault">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="testDocLitFault">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="testDocLitFaultResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="BadRecordLitFault">
+        <soap:fault name="BadRecordLitFault" use="literal"/>
+      </wsdl:fault>
+      <wsdl:fault name="NoSuchCodeLitFault">
+        <soap:fault name="NoSuchCodeLitFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GreeterService">
+    <wsdl:port name="GreeterPort" binding="tns:GreeterServiceSoapBinding">
+      <soap:address location="http://localhost:9090/GreeterPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

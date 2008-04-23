@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ObjectRef" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ObjectRef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap">
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef" binding="ObjectRefCORBABinding" repositoryID="IDL:ObjectRef:1.0" type="ns4:EndpointReferenceType" name="ObjectRef" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef" repositoryID="IDL:TestStruct:1.0" type="TestStruct" name="TestStruct">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="ref" idltype="ns4:ObjectRef" />
+      <corba:member name="str" idltype="corba:string" />
+    </corba:struct>
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef" repositoryID="IDL:TestException:1.0" type="TestExceptionType" name="TestException">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="ref" idltype="ns4:ObjectRef" />
+    </corba:exception>
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/ObjectRef" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" xmlns="" elemtype="ns4:ObjectRef" elemname="item" bound="5" repositoryID="IDL:TestArray:1.0" type="ns5:TestArray" name="TestArray" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/ObjectRef" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" xmlns="" elemtype="ns4:ObjectRef" elemname="item" bound="0" repositoryID="IDL:TestSequence:1.0" type="ns5:TestSequence" name="TestSequence" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef" discriminator="corba:short" repositoryID="IDL:TestUnion:1.0" type="TestUnion" name="TestUnion">
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="ref" idltype="ns4:ObjectRef">
+        <corba:case label="0" />
+      </corba:unionbranch>
+      <corba:unionbranch name="str" idltype="corba:string">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="def" idltype="corba:long" default="true" />
+    </corba:union>
+    <corba:object xmlns="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="EndpointReferenceType" name="CORBA.Object" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ObjectRef" xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="testOp">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testOpResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ObjectRefRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:complexType name="TestStruct">
+        <xs:sequence>
+          <xs:element name="ref" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+          <xs:element name="str" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="TestException" type="TestExceptionType">
+      </xs:element>
+      <xs:complexType name="TestExceptionType">
+        <xs:sequence>
+          <xs:element name="ref" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="TestArray">
+        <xs:sequence>
+          <xs:element maxOccurs="5" minOccurs="5" name="item" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="TestSequence">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="TestUnion">
+        <xs:choice>
+          <xs:element name="ref" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+          <xs:element name="str" type="xs:string">
+          </xs:element>
+          <xs:element name="def" type="xs:int">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:element name="_get_ref">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_refResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_ref">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="_arg" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_refResult">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_obj">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_objResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_obj">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="_arg" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_objResult">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectRefAsParam">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="o" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectRefAsParamResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectRefAsReturn">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectRefAsReturnResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectAsParam">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="o" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectAsParamResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectAsReturn">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectAsReturnResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="testObjectAsParamResponse">
+    <wsdl:part name="outparameter" element="tns:testObjectAsParamResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_refResponse">
+    <wsdl:part name="parameters" element="tns:_get_refResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="TestException">
+    <wsdl:part name="exception" element="tns:TestException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_objResponse">
+    <wsdl:part name="parameters" element="tns:_set_objResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectRefAsParamResponse">
+    <wsdl:part name="outparameter" element="tns:testObjectRefAsParamResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOp">
+    <wsdl:part name="inparameter" element="tns:testOp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectRefAsParam">
+    <wsdl:part name="inparameter" element="tns:testObjectRefAsParam">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectAsReturnResponse">
+    <wsdl:part name="outparameter" element="tns:testObjectAsReturnResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectAsReturn">
+    <wsdl:part name="inparameter" element="tns:testObjectAsReturn">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_refResponse">
+    <wsdl:part name="parameters" element="tns:_set_refResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_objResponse">
+    <wsdl:part name="parameters" element="tns:_get_objResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectAsParam">
+    <wsdl:part name="inparameter" element="tns:testObjectAsParam">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ref">
+    <wsdl:part name="parameters" element="tns:_get_ref">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOpResponse">
+    <wsdl:part name="outparameter" element="tns:testOpResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectRefAsReturnResponse">
+    <wsdl:part name="outparameter" element="tns:testObjectRefAsReturnResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_obj">
+    <wsdl:part name="parameters" element="tns:_set_obj">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectRefAsReturn">
+    <wsdl:part name="inparameter" element="tns:testObjectRefAsReturn">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_ref">
+    <wsdl:part name="parameters" element="tns:_set_ref">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_obj">
+    <wsdl:part name="parameters" element="tns:_get_obj">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TestInterface">
+    <wsdl:operation name="_get_ref">
+      <wsdl:input name="_get_ref" message="tns:_get_ref">
+    </wsdl:input>
+      <wsdl:output name="_get_refResponse" message="tns:_get_refResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_ref">
+      <wsdl:input name="_set_ref" message="tns:_set_ref">
+    </wsdl:input>
+      <wsdl:output name="_set_refResponse" message="tns:_set_refResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_obj">
+      <wsdl:input name="_get_obj" message="tns:_get_obj">
+    </wsdl:input>
+      <wsdl:output name="_get_objResponse" message="tns:_get_objResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_obj">
+      <wsdl:input name="_set_obj" message="tns:_set_obj">
+    </wsdl:input>
+      <wsdl:output name="_set_objResponse" message="tns:_set_objResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectRefAsParam">
+      <wsdl:input name="testObjectRefAsParamRequest" message="tns:testObjectRefAsParam">
+    </wsdl:input>
+      <wsdl:output name="testObjectRefAsParamResponse" message="tns:testObjectRefAsParamResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectRefAsReturn">
+      <wsdl:input name="testObjectRefAsReturnRequest" message="tns:testObjectRefAsReturn">
+    </wsdl:input>
+      <wsdl:output name="testObjectRefAsReturnResponse" message="tns:testObjectRefAsReturnResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectAsParam">
+      <wsdl:input name="testObjectAsParamRequest" message="tns:testObjectAsParam">
+    </wsdl:input>
+      <wsdl:output name="testObjectAsParamResponse" message="tns:testObjectAsParamResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectAsReturn">
+      <wsdl:input name="testObjectAsReturnRequest" message="tns:testObjectAsReturn">
+    </wsdl:input>
+      <wsdl:output name="testObjectAsReturnResponse" message="tns:testObjectAsReturnResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ObjectRef">
+    <wsdl:operation name="testOp">
+      <wsdl:input name="testOpRequest" message="tns:testOp">
+    </wsdl:input>
+      <wsdl:output name="testOpResponse" message="tns:testOpResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TestInterfaceCORBABinding" type="tns:TestInterface">
+    <corba:binding repositoryID="IDL:TestInterface:1.0" />
+    <wsdl:operation name="_get_ref">
+      <corba:operation name="_get_ref">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="return" idltype="ObjectRef" />
+      </corba:operation>
+      <wsdl:input name="_get_ref">
+      </wsdl:input>
+      <wsdl:output name="_get_refResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_ref">
+      <corba:operation name="_set_ref">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" mode="in" name="_arg" idltype="ObjectRef" />
+      </corba:operation>
+      <wsdl:input name="_set_ref">
+      </wsdl:input>
+      <wsdl:output name="_set_refResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_obj">
+      <corba:operation name="_get_obj">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="return" idltype="CORBA.Object" />
+      </corba:operation>
+      <wsdl:input name="_get_obj">
+      </wsdl:input>
+      <wsdl:output name="_get_objResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_obj">
+      <corba:operation name="_set_obj">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" mode="in" name="_arg" idltype="CORBA.Object" />
+      </corba:operation>
+      <wsdl:input name="_set_obj">
+      </wsdl:input>
+      <wsdl:output name="_set_objResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectRefAsParam">
+      <corba:operation name="testObjectRefAsParam">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" mode="in" name="o" idltype="ObjectRef" />
+      </corba:operation>
+      <wsdl:input name="testObjectRefAsParamRequest">
+      </wsdl:input>
+      <wsdl:output name="testObjectRefAsParamResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectRefAsReturn">
+      <corba:operation name="testObjectRefAsReturn">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="return" idltype="ObjectRef" />
+      </corba:operation>
+      <wsdl:input name="testObjectRefAsReturnRequest">
+      </wsdl:input>
+      <wsdl:output name="testObjectRefAsReturnResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectAsParam">
+      <corba:operation name="testObjectAsParam">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" mode="in" name="o" idltype="CORBA.Object" />
+      </corba:operation>
+      <wsdl:input name="testObjectAsParamRequest">
+      </wsdl:input>
+      <wsdl:output name="testObjectAsParamResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectAsReturn">
+      <corba:operation name="testObjectAsReturn">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ObjectRef/typemap" name="return" idltype="CORBA.Object" />
+      </corba:operation>
+      <wsdl:input name="testObjectAsReturnRequest">
+      </wsdl:input>
+      <wsdl:output name="testObjectAsReturnResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ObjectRefCORBABinding" type="tns:ObjectRef">
+    <corba:binding repositoryID="IDL:ObjectRef:1.0" />
+    <wsdl:operation name="testOp">
+      <corba:operation name="testOp" />
+      <wsdl:input name="testOpRequest">
+      </wsdl:input>
+      <wsdl:output name="testOpResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TestInterfaceCORBAService">
+    <wsdl:port name="TestInterfaceCORBAPort" binding="tns:TestInterfaceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="ObjectRefCORBAService">
+    <wsdl:port name="ObjectRefCORBAPort" binding="tns:ObjectRefCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

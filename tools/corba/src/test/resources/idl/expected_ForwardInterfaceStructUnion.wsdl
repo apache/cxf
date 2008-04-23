@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" repositoryID="IDL:org/cc/TpCallIdentifier:1.0" type="org.cc.TpCallIdentifier" name="org.cc.TpCallIdentifier">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" name="CallReference" idltype="ns4:org.cc.IpCall" />
+      <corba:member name="number" idltype="corba:long" />
+    </corba:struct>
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" discriminator="corba:long" repositoryID="IDL:org/cc/u2:1.0" type="org.cc.u2" name="org.cc.u2">
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" name="u2_1" idltype="ns4:org.cc.IpCall">
+        <corba:case label="e2_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u2_2" idltype="corba:string" default="true" />
+    </corba:union>
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" binding="org.cc.IpCallCORBABinding" repositoryID="IDL:org/cc/IpCall:1.0" type="ns4:EndpointReferenceType" name="org.cc.IpCall" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:complexType name="org.cc.TpCallIdentifier">
+        <xs:sequence>
+          <xs:element name="CallReference" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+          <xs:element name="number" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="org.cc.u2">
+        <xs:choice>
+          <xs:element name="u2_1" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+          <xs:element name="u2_2" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:element name="routeCallStruct">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inTp" type="org.cc.TpCallIdentifier">
+            </xs:element>
+            <xs:element name="inoutTp" type="org.cc.TpCallIdentifier">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeCallStructResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outTp" type="org.cc.TpCallIdentifier">
+            </xs:element>
+            <xs:element name="inoutTp" type="org.cc.TpCallIdentifier">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeCallUnion">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inTp" type="org.cc.u2">
+            </xs:element>
+            <xs:element name="inoutTp" type="org.cc.u2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeCallUnionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outTp" type="org.cc.u2">
+            </xs:element>
+            <xs:element name="inoutTp" type="org.cc.u2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeCallParam">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+            <xs:element name="inoutTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeCallParamResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+            <xs:element name="inoutTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeReq">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeReqResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="org.cc.IpCallRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="routeCallUnionResponse">
+    <wsdl:part name="outparameter" element="tns:routeCallUnionResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeReq">
+    <wsdl:part name="inparameter" element="tns:routeReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCallUnion">
+    <wsdl:part name="inparameter" element="tns:routeCallUnion">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCallParam">
+    <wsdl:part name="inparameter" element="tns:routeCallParam">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCallStruct">
+    <wsdl:part name="inparameter" element="tns:routeCallStruct">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCallParamResponse">
+    <wsdl:part name="outparameter" element="tns:routeCallParamResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeReqResponse">
+    <wsdl:part name="outparameter" element="tns:routeReqResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCallStructResponse">
+    <wsdl:part name="outparameter" element="tns:routeCallStructResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="org.cc.IpAppCall">
+    <wsdl:operation name="routeCallStruct">
+      <wsdl:input name="routeCallStructRequest" message="tns:routeCallStruct">
+    </wsdl:input>
+      <wsdl:output name="routeCallStructResponse" message="tns:routeCallStructResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="routeCallUnion">
+      <wsdl:input name="routeCallUnionRequest" message="tns:routeCallUnion">
+    </wsdl:input>
+      <wsdl:output name="routeCallUnionResponse" message="tns:routeCallUnionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="routeCallParam">
+      <wsdl:input name="routeCallParamRequest" message="tns:routeCallParam">
+    </wsdl:input>
+      <wsdl:output name="routeCallParamResponse" message="tns:routeCallParamResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="org.cc.IpCall">
+    <wsdl:operation name="routeReq">
+      <wsdl:input name="routeReqRequest" message="tns:routeReq">
+    </wsdl:input>
+      <wsdl:output name="routeReqResponse" message="tns:routeReqResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="org.cc.IpAppCallCORBABinding" type="tns:org.cc.IpAppCall">
+    <corba:binding repositoryID="IDL:org/cc/IpAppCall:1.0" />
+    <wsdl:operation name="routeCallStruct">
+      <corba:operation name="routeCallStruct">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="in" name="inTp" idltype="org.cc.TpCallIdentifier" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="out" name="outTp" idltype="org.cc.TpCallIdentifier" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="inout" name="inoutTp" idltype="org.cc.TpCallIdentifier" />
+      </corba:operation>
+      <wsdl:input name="routeCallStructRequest">
+      </wsdl:input>
+      <wsdl:output name="routeCallStructResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="routeCallUnion">
+      <corba:operation name="routeCallUnion">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="in" name="inTp" idltype="org.cc.u2" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="out" name="outTp" idltype="org.cc.u2" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="inout" name="inoutTp" idltype="org.cc.u2" />
+      </corba:operation>
+      <wsdl:input name="routeCallUnionRequest">
+      </wsdl:input>
+      <wsdl:output name="routeCallUnionResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="routeCallParam">
+      <corba:operation name="routeCallParam">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="in" name="inTp" idltype="org.cc.IpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="out" name="outTp" idltype="org.cc.IpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceStructUnion/typemap" mode="inout" name="inoutTp" idltype="org.cc.IpCall" />
+      </corba:operation>
+      <wsdl:input name="routeCallParamRequest">
+      </wsdl:input>
+      <wsdl:output name="routeCallParamResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="org.cc.IpCallCORBABinding" type="tns:org.cc.IpCall">
+    <corba:binding repositoryID="IDL:org/cc/IpCall:1.0" />
+    <wsdl:operation name="routeReq">
+      <corba:operation name="routeReq">
+        <corba:param mode="in" name="inDouble" idltype="corba:double" />
+        <corba:param mode="out" name="outShort" idltype="corba:short" />
+        <corba:param mode="inout" name="inoutLong" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="routeReqRequest">
+      </wsdl:input>
+      <wsdl:output name="routeReqResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="org.cc.IpCallCORBAService">
+    <wsdl:port name="org.cc.IpCallCORBAPort" binding="tns:org.cc.IpCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="org.cc.IpAppCallCORBAService">
+    <wsdl:port name="org.cc.IpAppCallCORBAPort" binding="tns:org.cc.IpAppCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

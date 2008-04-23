@@ -1,0 +1,115 @@
+// $ANTLR 2.7.4: idl.g -> IDLTokenTypes.txt$
+IDL    // output token vocab name
+SEMI(";")=4
+LITERAL_abstract="abstract"=5
+LITERAL_local="local"=6
+LITERAL_interface="interface"=7
+LITERAL_custom="custom"=8
+LITERAL_valuetype="valuetype"=9
+LITERAL_eventtype="eventtype"=10
+LITERAL_module="module"=11
+LCURLY("{")=12
+RCURLY("}")=13
+COLON(":")=14
+COMMA(",")=15
+SCOPEOP("::")=16
+IDENT("an identifer")=17
+LITERAL_truncatable="truncatable"=18
+LITERAL_supports="supports"=19
+LITERAL_public="public"=20
+LITERAL_private="private"=21
+LITERAL_factory="factory"=22
+LPAREN("(")=23
+RPAREN(")")=24
+LITERAL_in="in"=25
+LITERAL_const="const"=26
+ASSIGN("=")=27
+OR("|")=28
+XOR("^")=29
+AND("&")=30
+LSHIFT("<<")=31
+RSHIFT(">>")=32
+PLUS("+")=33
+MINUS("-")=34
+STAR("*")=35
+DIV("/")=36
+MOD("%")=37
+TILDE("~")=38
+LITERAL_TRUE="TRUE"=39
+LITERAL_FALSE="FALSE"=40
+LITERAL_typedef="typedef"=41
+LITERAL_native="native"=42
+LITERAL_float="float"=43
+LITERAL_double="double"=44
+LITERAL_long="long"=45
+LITERAL_short="short"=46
+LITERAL_unsigned="unsigned"=47
+LITERAL_char="char"=48
+LITERAL_wchar="wchar"=49
+LITERAL_boolean="boolean"=50
+LITERAL_octet="octet"=51
+LITERAL_any="any"=52
+LITERAL_Object="Object"=53
+LITERAL_struct="struct"=54
+LITERAL_union="union"=55
+LITERAL_switch="switch"=56
+LITERAL_case="case"=57
+LITERAL_default="default"=58
+LITERAL_enum="enum"=59
+LITERAL_sequence="sequence"=60
+LT("<")=61
+GT(">")=62
+LITERAL_string="string"=63
+LITERAL_wstring="wstring"=64
+LBRACK("[")=65
+RBRACK("]")=66
+LITERAL_exception="exception"=67
+LITERAL_oneway="oneway"=68
+LITERAL_void="void"=69
+LITERAL_out="out"=70
+LITERAL_inout="inout"=71
+LITERAL_raises="raises"=72
+LITERAL_context="context"=73
+LITERAL_fixed="fixed"=74
+LITERAL_ValueBase="ValueBase"=75
+LITERAL_import="import"=76
+LITERAL_typeid="typeid"=77
+LITERAL_typeprefix="typeprefix"=78
+LITERAL_readonly="readonly"=79
+LITERAL_attribute="attribute"=80
+LITERAL_getraises="getraises"=81
+LITERAL_setraises="setraises"=82
+LITERAL_component="component"=83
+LITERAL_provides="provides"=84
+LITERAL_uses="uses"=85
+LITERAL_multiple="multiple"=86
+LITERAL_emits="emits"=87
+LITERAL_publishes="publishes"=88
+LITERAL_consumes="consumes"=89
+LITERAL_home="home"=90
+LITERAL_manages="manages"=91
+LITERAL_primarykey="primarykey"=92
+LITERAL_finder="finder"=93
+INT("an integer value")=94
+OCTAL("an octal value")=95
+HEX("a hexadecimal value value")=96
+STRING_LITERAL("a string literal")=97
+WIDE_STRING_LITERAL("a wide string literal")=98
+CHAR_LITERAL("a character literal")=99
+WIDE_CHAR_LITERAL("a wide character literal")=100
+FIXED=101
+FLOAT("a floating point value")=102
+QUESTION("?")=103
+DOT(".")=104
+NOT("!")=105
+WS("white space")=106
+PREPROC_DIRECTIVE("a preprocessor directive")=107
+SL_COMMENT("a comment")=108
+ML_COMMENT("a comment")=109
+ESC("an escape sequence")=110
+VOCAB("an escaped character value")=111
+DIGIT("a digit")=112
+NONZERODIGIT("a non-zero digit")=113
+OCTDIGIT("an octal digit")=114
+HEXDIGIT("a hexadecimal digit")=115
+ESCAPED_IDENT("an escaped identifer")=116

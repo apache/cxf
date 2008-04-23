@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="../common/Definitions.xsd"/>
+  <!-- ============ Global Type Declarations ========= -->
+  <!-- ============ LayerRateList_T Declaration ========= -->
+  <xsd:complexType name="LayerRateList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      A list of LayerRates
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="layerRate" type="LayerRate_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ============ LayerRate_T Declaration ========= -->
+  <xsd:simpleType name="LayerRate_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The LayerRate_T value is used to identify:
+
+- the Layer of a PTP/CTP,
+- the characteristic information of a PTP/FTP,
+- the Layer/Rate of a connection.
+
+Each LayerRate_T may be used in conjunction with a CTP/PTP/FTP of that layer. In the SDH definitions, the G.805 CP and G.805 Termination Function layer names differ, for example TU12 is used for the G.805 CP and VC12 for the corresponding G.805 Termination Function. In this interface definition the TU and VC definitions have been combined into a single composite layer and this has been named to include the equivalent SONET layer, e.g. LR_VT2_and_TU12_VC12.
+
+For more details refer to the following supporting document:
+- layering documentfor all layering concepts
+- LayerRates document for information about recognized values in MTOSI
+
+Any vendor extensions are permitted. However, they shall comply with MTOSI attribute vendor extension rule: Values must have the "PROP_" prefix. Refer to the TMF 854 XML Solution Set document for more details.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="LR_DS0_64K"/>
+          <xsd:enumeration value="LR_DSL"/>
+          <xsd:enumeration value="LR_Not_Applicable"/>
+          <xsd:enumeration value="LR_Async_FOTS_150M"/>
+          <xsd:enumeration value="LR_Async_FOTS_417M"/>
+          <xsd:enumeration value="LR_Async_FOTS_560M"/>
+          <xsd:enumeration value="LR_Async_FOTS_565M"/>
+          <xsd:enumeration value="LR_Async_FOTS_1130M"/>
+          <xsd:enumeration value="LR_Async_FOTS_1G7"/>
+          <xsd:enumeration value="LR_Async_FOTS_1G8"/>
+          <xsd:enumeration value="LR_ATM_NI"/>
+          <xsd:enumeration value="LR_ATM_VC"/>
+          <xsd:enumeration value="LR_ATM_VP"/>
+          <xsd:enumeration value="LR_D1_Video"/>
+          <xsd:enumeration value="LR_DIGITAL_SIGNAL_RATE"/>
+          <xsd:enumeration value="LR_DIGITAL_SIGNAL_RATE"/>
+          <xsd:enumeration value="LR_PHYSICAL_ELECTRICAL."/>
+          <xsd:enumeration value="LR_DSR_1_5M"/>
+          <xsd:enumeration value="LR_DSR_2M"/>
+          <xsd:enumeration value="LR_DSR_4M"/>
+          <xsd:enumeration value="LR_DSR_6M"/>
+          <xsd:enumeration value="LR_DSR_8M"/>
+          <xsd:enumeration value="LR_DSR_16M"/>
+          <xsd:enumeration value="LR_DSR_34M"/>
+          <xsd:enumeration value="LR_E2_8M"/>
+          <xsd:enumeration value="LR_E5_565M"/>
+          <xsd:enumeration value="LR_Encapsulation"/>
+          <xsd:enumeration value="LR_Fragment"/>
+          <xsd:enumeration value="LR_DSR_45M"/>
+          <xsd:enumeration value="LR_DSR_140M"/>
+          <xsd:enumeration value="LR_DSR_565M"/>
+          <xsd:enumeration value="LR_DSR_Fast_Ethernet"/>
+          <xsd:enumeration value="LR_DSR_Gigabit_Ethernet"/>
+          <xsd:enumeration value="LR_DSR_10Gigabit_Ethernet"/>
+          <xsd:enumeration value="LR_DSR_OC1_STM0"/>
+          <xsd:enumeration value="LR_DSR_OC3_STM1"/>
+          <xsd:enumeration value="LR_DSR_2xSTM1"/>
+          <xsd:enumeration value="LR_DSR_OC12_STM4"/>
+          <xsd:enumeration value="LR_DSR_OC24_STM8"/>
+          <xsd:enumeration value="LR_DSR_OC48_and_STM16"/>
+          <xsd:enumeration value="LR_DSR_OC192_and_STM64"/>
+          <xsd:enumeration value="LR_DSR_OC768_and_STM256"/>
+          <xsd:enumeration value="LR_DSR_OTU1"/>
+          <xsd:enumeration value="LR_DSR_OTU2"/>
+          <xsd:enumeration value="LR_DSR_OTU3"/>
+          <xsd:enumeration value="LR_E1_2M"/>
+          <xsd:enumeration value="LR_E20_2x2M"/>
+          <xsd:enumeration value="LR_E30_8x2M"/>
+          <xsd:enumeration value="LR_E3_34M"/>
+          <xsd:enumeration value="LR_E4_140M"/>
+          <xsd:enumeration value="LR_ESCON"/>
+          <xsd:enumeration value="LR_Ethernet"/>
+          <xsd:enumeration value="LR_ETR"/>
+          <xsd:enumeration value="LR_Fast_Ethernet"/>
+          <xsd:enumeration value="LR_FC_12_133M"/>
+          <xsd:enumeration value="LR_FC_25_266M"/>
+          <xsd:enumeration value="LR_FC_50_531M"/>
+          <xsd:enumeration value="LR_FC_100_1063M"/>
+          <xsd:enumeration value="LR_FDDI"/>
+          <xsd:enumeration value="LR_FICON"/>
+          <xsd:enumeration value="LR_FR_IF"/>
+          <xsd:enumeration value="LR_FR_PVC"/>
+          <xsd:enumeration value="LR_Gigabit_Ethernet"/>
+          <xsd:enumeration value="LR_ISDN_BRI"/>
+          <xsd:enumeration value="LR_Line_OC1_STS1_and_MS_STM0"/>
+          <xsd:enumeration value="LR_Line_OC3_STS3_and_MS_STM1"/>
+          <xsd:enumeration value="LR_Line_OC12_STS12_and_MS_STM4"/>
+          <xsd:enumeration value="LR_Line_OC24_STS24_and_MS_STM8"/>
+          <xsd:enumeration value="LR_Line_OC48_STS48_and_MS_STM16"/>
+          <xsd:enumeration value="LR_Line_OC192_STS192_and_MS_STM64"/>
+          <xsd:enumeration value="LR_Line_OC768_STS768_and_MS_STM256"/>
+          <xsd:enumeration value="LR_Low_Order_TU3_VC3"/>
+          <xsd:enumeration value="LR_OCH_Data_Unit_1"/>
+          <xsd:enumeration value="LR_OCH_Data_Unit_2"/>
+          <xsd:enumeration value="LR_OCH_Data_Unit_3"/>
+          <xsd:enumeration value="LR_OCH_Transport_Unit_1"/>
+          <xsd:enumeration value="LR_OCH_Transport_Unit_2"/>
+          <xsd:enumeration value="LR_OCH_Transport_Unit_3"/>
+          <xsd:enumeration value="LR_STS3c_and_AU4_VC4"/>
+          <xsd:enumeration value="LR_STS4c_and_VC3_4c"/>
+          <xsd:enumeration value="LR_STS5c_and_VC3_5c"/>
+          <xsd:enumeration value="LR_STS6c_and_VC4_2c"/>
+          <xsd:enumeration value="LR_STS7c_and_VC3_7c"/>
+          <xsd:enumeration value="LR_STS8c_and_VC3_8c"/>
+          <xsd:enumeration value="LR_STS9c_and_VC4_3c"/>
+          <xsd:enumeration value="LR_Optical_Channel"/>
+          <xsd:enumeration value="LR_Optical_Multiplex_Section"/>
+          <xsd:enumeration value="LR_OPTICAL_SECTION"/>
+          <xsd:enumeration value="LR_Optical_Transmission_Section"/>
+          <xsd:enumeration value="LR_PHYSICAL_ELECTRICAL"/>
+          <xsd:enumeration value="LR_PHYSICAL_MEDIALESS"/>
+          <xsd:enumeration value="LR_PHYSICAL_OPTICAL"/>
+          <xsd:enumeration value="LR_POTS"/>
+          <xsd:enumeration value="LR_Section_OC1_STS1_and_RS_STM0"/>
+          <xsd:enumeration value="LR_Section_OC3_STS3_and_RS_STM1"/>
+          <xsd:enumeration value="LR_Section_OC12_STS12_and_RS_STM4"/>
+          <xsd:enumeration value="LR_Section_OC24_STS24_and_RS_STM8"/>
+          <xsd:enumeration value="LR_Section_OC48_STS48_and_RS_STM16"/>
+          <xsd:enumeration value="LR_Section_OC192_STS192_and_RS_STM64"/>
+          <xsd:enumeration value="LR_Section_OC768_STS768_and_RS_STM256"/>
+          <xsd:enumeration value="LR_STS1_and_AU3_High_Order_VC3"/>
+          <xsd:enumeration value="LR_STS2c_and_VC3_2c"/>
+          <xsd:enumeration value="LR_STS10c_and_VC3_10c"/>
+          <xsd:enumeration value="LR_STS11c_and_VC3_11c"/>
+          <xsd:enumeration value="LR_STS12c_and_VC4_4c"/>
+          <xsd:enumeration value="LR_STS13c_and_VC3_13c"/>
+          <xsd:enumeration value="LR_STS14c_and_VC3_14c"/>
+          <xsd:enumeration value="LR_STS15c_and_VC4_5c"/>
+          <xsd:enumeration value="LR_STS16c_and_VC3_16c"/>
+          <xsd:enumeration value="LR_STS17c_and_VC3_17c"/>
+          <xsd:enumeration value="LR_STS18c_and_VC4_6c"/>
+          <xsd:enumeration value="LR_STS19c_and_VC3_19c"/>
+          <xsd:enumeration value="LR_STS20c_and_VC3_20c"/>
+          <xsd:enumeration value="LR_STS21c_and_VC4_7c"/>
+          <xsd:enumeration value="LR_STS22c_and_VC3_22c"/>
+          <xsd:enumeration value="LR_STS23c_and_VC3_23c"/>
+          <xsd:enumeration value="LR_STS24c_and_VC4_8c"/>
+          <xsd:enumeration value="LR_STS25c_and_VC3_25c"/>
+          <xsd:enumeration value="LR_STS26c_and_VC3_26c"/>
+          <xsd:enumeration value="LR_STS27c_and_VC4_9c"/>
+          <xsd:enumeration value="LR_STS28c_and_VC3_28c"/>
+          <xsd:enumeration value="LR_STS29c_and_VC3_29c"/>
+          <xsd:enumeration value="LR_STS30c_and_VC4_10c"/>
+          <xsd:enumeration value="LR_STS31c_and_VC3_31c"/>
+          <xsd:enumeration value="LR_STS32c_and_VC3_32c"/>
+          <xsd:enumeration value="LR_STS33c_and_VC4_11c"/>
+          <xsd:enumeration value="LR_STS34c_and_VC3_34c"/>
+          <xsd:enumeration value="LR_STS35c_and_VC3_35c"/>
+          <xsd:enumeration value="LR_STS36c_and_VC4_12c"/>
+          <xsd:enumeration value="LR_STS37c_and_VC3_37c"/>
+          <xsd:enumeration value="LR_STS38c_and_VC3_38c"/>
+          <xsd:enumeration value="LR_STS39c_and_VC4_13c"/>
+          <xsd:enumeration value="LR_STS40c_and_VC3_40c"/>
+          <xsd:enumeration value="LR_STS41c_and_VC3_41c"/>
+          <xsd:enumeration value="LR_STS42c_and_VC4_14c"/>
+          <xsd:enumeration value="LR_STS43c_and_VC3_43c"/>
+          <xsd:enumeration value="LR_STS44c_and_VC3_44c"/>
+          <xsd:enumeration value="LR_STS45c_and_VC4_15c"/>
+          <xsd:enumeration value="LR_STS46c_and_VC3_46c"/>
+          <xsd:enumeration value="LR_STS47c_and_VC3_47c"/>
+          <xsd:enumeration value="LR_STS48c_and_VC4_16c"/>
+          <xsd:enumeration value="LR_STS49c_and_VC3_49c"/>
+          <xsd:enumeration value="LR_STS50c_and_VC3_50c"/>
+          <xsd:enumeration value="LR_STS51c_and_VC4_17c"/>
+          <xsd:enumeration value="LR_STS52c_and_VC3_52c"/>
+          <xsd:enumeration value="LR_STS53c_and_VC3_53c"/>
+          <xsd:enumeration value="LR_STS54c_and_VC4_18c"/>
+          <xsd:enumeration value="LR_STS55c_and_VC3_55c"/>
+          <xsd:enumeration value="LR_STS56c_and_VC3_56c"/>
+          <xsd:enumeration value="LR_STS57c_and_VC4_19c"/>
+          <xsd:enumeration value="LR_STS58c_and_VC3_58c"/>
+          <xsd:enumeration value="LR_STS59c_and_VC3_59c"/>
+          <xsd:enumeration value="LR_STS60c_and_VC4_20c"/>
+          <xsd:enumeration value="LR_STS61c_and_VC3_61c"/>
+          <xsd:enumeration value="LR_STS62c_and_VC3_62c"/>
+          <xsd:enumeration value="LR_STS63c_and_VC4_21c"/>
+          <xsd:enumeration value="LR_STS64c_and_VC3_64c"/>
+          <xsd:enumeration value="LR_STS65c_and_VC3_65c"/>
+          <xsd:enumeration value="LR_STS66c_and_VC4_22c"/>
+          <xsd:enumeration value="LR_STS67c_and_VC3_67c"/>
+          <xsd:enumeration value="LR_STS68c_and_VC3_68c"/>
+          <xsd:enumeration value="LR_STS69c_and_VC4_23c"/>
+          <xsd:enumeration value="LR_STS70c_and_VC3_70c"/>
+          <xsd:enumeration value="LR_STS71c_and_VC3_71c"/>
+          <xsd:enumeration value="LR_STS72c_and_VC4_24c"/>
+          <xsd:enumeration value="LR_STS73c_and_VC3_73c"/>
+          <xsd:enumeration value="LR_STS74c_and_VC3_74c"/>
+          <xsd:enumeration value="LR_STS75c_and_VC4_25c"/>
+          <xsd:enumeration value="LR_STS76c_and_VC3_76c"/>
+          <xsd:enumeration value="LR_STS77c_and_VC3_77c"/>
+          <xsd:enumeration value="LR_STS78c_and_VC4_26c"/>
+          <xsd:enumeration value="LR_STS79c_and_VC3_79c"/>
+          <xsd:enumeration value="LR_STS80c_and_VC3_80c"/>
+          <xsd:enumeration value="LR_STS81c_and_VC4_27c"/>
+          <xsd:enumeration value="LR_STS82c_and_VC3_82c"/>
+          <xsd:enumeration value="LR_STS83c_and_VC3_83c"/>
+          <xsd:enumeration value="LR_STS84c_and_VC4_28c"/>
+          <xsd:enumeration value="LR_STS85c_and_VC3_85c"/>
+          <xsd:enumeration value="LR_STS86c_and_VC3_86c"/>
+          <xsd:enumeration value="LR_STS87c_and_VC4_29c"/>
+          <xsd:enumeration value="LR_STS88c_and_VC3_88c"/>
+          <xsd:enumeration value="LR_STS89c_and_VC3_89c"/>
+          <xsd:enumeration value="LR_STS90c_and_VC4_30c"/>
+          <xsd:enumeration value="LR_STS91c_and_VC3_91c"/>
+          <xsd:enumeration value="LR_STS92c_and_VC3_92c"/>
+          <xsd:enumeration value="LR_STS93c_and_VC4_31c"/>
+          <xsd:enumeration value="LR_STS94c_and_VC3_94c"/>
+          <xsd:enumeration value="LR_STS95c_and_VC3_95c"/>
+          <xsd:enumeration value="LR_STS96c_and_VC4_32c"/>
+          <xsd:enumeration value="LR_STS97c_and_VC3_97c"/>
+          <xsd:enumeration value="LR_STS98c_and_VC3_98c"/>
+          <xsd:enumeration value="LR_STS99c_and_VC4_33c"/>
+          <xsd:enumeration value="LR_STS100c_and_VC3_100c"/>
+          <xsd:enumeration value="LR_STS101c_and_VC3_101c"/>
+          <xsd:enumeration value="LR_STS102c_and_VC4_34c"/>
+          <xsd:enumeration value="LR_STS103c_and_VC3_103c"/>
+          <xsd:enumeration value="LR_STS104c_and_VC3_104c"/>
+          <xsd:enumeration value="LR_STS105c_and_VC4_35c"/>
+          <xsd:enumeration value="LR_STS106c_and_VC3_106c"/>
+          <xsd:enumeration value="LR_STS107c_and_VC3_107c"/>
+          <xsd:enumeration value="LR_STS108c_and_VC4_36c"/>
+          <xsd:enumeration value="LR_STS109c_and_VC3_109c"/>
+          <xsd:enumeration value="LR_STS110c_and_VC3_110c"/>
+          <xsd:enumeration value="LR_STS111c_and_VC4_37c"/>
+          <xsd:enumeration value="LR_STS112c_and_VC3_112c"/>
+          <xsd:enumeration value="LR_STS113c_and_VC3_113c"/>
+          <xsd:enumeration value="LR_STS114c_and_VC4_38c"/>
+          <xsd:enumeration value="LR_STS115c_and_VC3_115c"/>
+          <xsd:enumeration value="LR_STS116c_and_VC3_116c"/>
+          <xsd:enumeration value="LR_STS117c_and_VC4_39c"/>
+          <xsd:enumeration value="LR_STS118c_and_VC3_118c"/>
+          <xsd:enumeration value="LR_STS119c_and_VC3_119c"/>
+          <xsd:enumeration value="LR_STS120c_and_VC4_40c"/>
+          <xsd:enumeration value="LR_STS121c_and_VC3_121c"/>
+          <xsd:enumeration value="LR_STS122c_and_VC3_122c"/>
+          <xsd:enumeration value="LR_STS123c_and_VC4_41c"/>
+          <xsd:enumeration value="LR_STS124c_and_VC3_124c"/>
+          <xsd:enumeration value="LR_STS125c_and_VC3_125c"/>
+          <xsd:enumeration value="LR_STS126c_and_VC4_42c"/>
+          <xsd:enumeration value="LR_STS127c_and_VC3_127c"/>
+          <xsd:enumeration value="LR_STS128c_and_VC3_128c"/>
+          <xsd:enumeration value="LR_STS129c_and_VC4_43c"/>
+          <xsd:enumeration value="LR_STS130c_and_VC3_130c"/>
+          <xsd:enumeration value="LR_STS131c_and_VC3_131c"/>
+          <xsd:enumeration value="LR_STS132c_and_VC4_44c"/>
+          <xsd:enumeration value="LR_STS133c_and_VC3_133c"/>
+          <xsd:enumeration value="LR_STS134c_and_VC3_134c"/>
+          <xsd:enumeration value="LR_STS135c_and_VC4_45c"/>
+          <xsd:enumeration value="LR_STS136c_and_VC3_136c"/>
+          <xsd:enumeration value="LR_STS137c_and_VC3_137c"/>
+          <xsd:enumeration value="LR_STS138c_and_VC4_46c"/>
+          <xsd:enumeration value="LR_STS139c_and_VC3_139c"/>
+          <xsd:enumeration value="LR_STS140c_and_VC3_140c"/>
+          <xsd:enumeration value="LR_STS141c_and_VC4_47c"/>
+          <xsd:enumeration value="LR_STS142c_and_VC3_142c"/>
+          <xsd:enumeration value="LR_STS143c_and_VC3_143c"/>
+          <xsd:enumeration value="LR_STS144c_and_VC4_48c"/>
+          <xsd:enumeration value="LR_STS145c_and_VC3_145c"/>
+          <xsd:enumeration value="LR_STS146c_and_VC3_146c"/>
+          <xsd:enumeration value="LR_STS147c_and_VC4_49c"/>
+          <xsd:enumeration value="LR_STS148c_and_VC3_148c"/>
+          <xsd:enumeration value="LR_STS149c_and_VC3_149c"/>
+          <xsd:enumeration value="LR_STS150c_and_VC4_50c"/>
+          <xsd:enumeration value="LR_STS151c_and_VC3_151c"/>
+          <xsd:enumeration value="LR_STS152c_and_VC3_152c"/>
+          <xsd:enumeration value="LR_STS153c_and_VC4_51c"/>
+          <xsd:enumeration value="LR_STS154c_and_VC3_154c"/>
+          <xsd:enumeration value="LR_STS155c_and_VC3_155c"/>
+          <xsd:enumeration value="LR_STS156c_and_VC4_52c"/>
+          <xsd:enumeration value="LR_STS157c_and_VC3_157c"/>
+          <xsd:enumeration value="LR_STS158c_and_VC3_158c"/>
+          <xsd:enumeration value="LR_STS159c_and_VC4_53c"/>
+          <xsd:enumeration value="LR_STS160c_and_VC3_160c"/>
+          <xsd:enumeration value="LR_STS161c_and_VC3_161c"/>
+          <xsd:enumeration value="LR_STS162c_and_VC4_54c"/>
+          <xsd:enumeration value="LR_STS163c_and_VC3_163c"/>
+          <xsd:enumeration value="LR_STS164c_and_VC3_164c"/>
+          <xsd:enumeration value="LR_STS165c_and_VC4_55c"/>
+          <xsd:enumeration value="LR_STS166c_and_VC3_166c"/>
+          <xsd:enumeration value="LR_STS167c_and_VC3_167c"/>
+          <xsd:enumeration value="LR_STS168c_and_VC4_56c"/>
+          <xsd:enumeration value="LR_STS169c_and_VC3_169c"/>
+          <xsd:enumeration value="LR_STS170c_and_VC3_170c"/>
+          <xsd:enumeration value="LR_STS171c_and_VC4_57c"/>
+          <xsd:enumeration value="LR_STS172c_and_VC3_172c"/>
+          <xsd:enumeration value="LR_STS173c_and_VC3_173c"/>
+          <xsd:enumeration value="LR_STS174c_and_VC4_58c"/>
+          <xsd:enumeration value="LR_STS175c_and_VC3_175c"/>
+          <xsd:enumeration value="LR_STS176c_and_VC3_176c"/>
+          <xsd:enumeration value="LR_STS177c_and_VC4_59c"/>
+          <xsd:enumeration value="LR_STS178c_and_VC3_178c"/>
+          <xsd:enumeration value="LR_STS179c_and_VC3_179c"/>
+          <xsd:enumeration value="LR_STS180c_and_VC4_60c"/>
+          <xsd:enumeration value="LR_STS181c_and_VC3_181c"/>
+          <xsd:enumeration value="LR_STS182c_and_VC3_182c"/>
+          <xsd:enumeration value="LR_STS183c_and_VC4_61c"/>
+          <xsd:enumeration value="LR_STS184c_and_VC3_184c"/>
+          <xsd:enumeration value="LR_STS185c_and_VC3_185c"/>
+          <xsd:enumeration value="LR_STS186c_and_VC4_62c"/>
+          <xsd:enumeration value="LR_STS187c_and_VC3_187c"/>
+          <xsd:enumeration value="LR_STS188c_and_VC3_188c"/>
+          <xsd:enumeration value="LR_STS189c_and_VC4_63c"/>
+          <xsd:enumeration value="LR_STS190c_and_VC3_190c"/>
+          <xsd:enumeration value="LR_STS191c_and_VC3_191c"/>
+          <xsd:enumeration value="LR_STS192c_and_VC4_64c"/>
+          <xsd:enumeration value="LR_STS768c_and_VC4_256c"/>
+          <xsd:enumeration value="LR_T1_and_DS1_1_5M"/>
+          <xsd:enumeration value="LR_T2_and_DS2_6M"/>
+          <xsd:enumeration value="LR_T3_and_DS3_45M"/>
+          <xsd:enumeration value="LR_VT1_5_and_TU11_VC11"/>
+          <xsd:enumeration value="LR_VT2_and_TU12_VC12"/>
+          <xsd:enumeration value="LR_VT6_and_TU2_VC2"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+</xsd:schema>

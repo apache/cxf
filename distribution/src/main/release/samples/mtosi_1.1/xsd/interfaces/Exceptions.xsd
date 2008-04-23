@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <!-- =========== Includes ========= -->
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <!-- =========== Element Declarations ========= -->
+  <xsd:element name="ProcessingFailureException" type="ProcessingFailureException_T"/>
+  <!-- =========== Type Definitions ========= -->
+  <xsd:simpleType name="ExceptionType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The type of exception returned by failed invokation of an MTOSI message request.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="EXCPT_NOT_IMPLEMENTED"/>
+          <xsd:enumeration value="EXCPT_INTERNAL_ERROR"/>
+          <xsd:enumeration value="EXCPT_INVALID_INPUT"/>
+          <xsd:enumeration value="EXCPT_OBJECT_IN_USE"/>
+          <xsd:enumeration value="EXCPT_TP_INVALID_ENDPOINT"/>
+          <xsd:enumeration value="EXCPT_ENTITY_NOT_FOUND"/>
+          <xsd:enumeration value="EXCPT_TIMESLOT_IN_USE"/>
+          <xsd:enumeration value="EXCPT_PROTECTION_EFFORT_NOT_MET"/>
+          <xsd:enumeration value="EXCPT_NOT_IN_VALID_STATE"/>
+          <xsd:enumeration value="EXCPT_UNABLE_TO_COMPLY"/>
+          <xsd:enumeration value="EXCPT_CAPACITY_EXCEEDED"/>
+          <xsd:enumeration value="EXCPT_ACCESS_DENIED"/>
+          <xsd:enumeration value="EXCPT_UNSUPPORTED_ROUTING_CONSTRAINTS"/>
+          <xsd:enumeration value="EXCPT_USERLABEL_IN_USE"/>
+          <xsd:enumeration value="EXCPT_COMM_FAILURE"/>
+          <xsd:enumeration value="EXCPT_UNSUPPORTED_COMPRESSION_FORMAT"/>
+          <xsd:enumeration value="EXCPT_UNSUPPORTED_PACKING_FORMAT"/>
+          <xsd:enumeration value="EXCPT_INVALID_FILTER_DEFINITION"/>
+          <xsd:enumeration value="EXCPT_INVALID_TOPIC"/>
+          <xsd:enumeration value="EXCPT_NOTIFICATION_SERVICE_PROBLEM"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:complexType name="ProcessingFailureException_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      A coarse grain approach is adopted for capturing exceptions as well. This has the advantage of making the catching of exceptions fairly generic. This is similar to the TMF 814 Corba interface. In the future, each interface operation could implement a specific set of the exceptions.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="header" type="Header_T" minOccurs="0" />
+      <xsd:element name="exception" type="ExceptionType_T">
+        <xsd:annotation>
+          <xsd:documentation>The exception type based on the enumeration
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="reason" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>A string indicating further details about the exception. It is a free format string filled by the OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="ExceptionVendorExtensions_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>A string indicating further details about the exception. It is a free format string filled by the OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

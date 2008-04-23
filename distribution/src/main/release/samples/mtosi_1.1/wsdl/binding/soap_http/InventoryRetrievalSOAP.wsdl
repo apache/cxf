@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<wsdl:definitions xmlns:tmf854WS="tmf854.v1.ws" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="tmf854.v1.ws" name="TMF854-InventoryRetrieval-SOAP-HTTP">
+	<wsdl:import namespace="tmf854.v1.ws" location="../../common/InventoryRetrieval.wsdl" />
+	<wsdl:binding name="InventoryRetrievalSoapHTTPBinding" type="tmf854WS:InventoryRetrieval">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="getInventory">
+			<wsdl:input>
+				<soap:header message="tmf854WS:getInventory" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:getInventoryResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+			    <soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+				<soap:fault name="ProcessingFailureException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+</wsdl:definitions>

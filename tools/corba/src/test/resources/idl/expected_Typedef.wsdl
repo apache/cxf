@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap">
+    <corba:alias basetype="corba:float" repositoryID="IDL:TypedefIf/myFloat:1.0" name="TypedefIf.myFloat" />
+    <corba:alias basetype="corba:double" repositoryID="IDL:TypedefIf/myDouble:1.0" name="TypedefIf.myDouble" />
+    <corba:alias basetype="corba:longdouble" repositoryID="IDL:TypedefIf/myLongDouble:1.0" name="TypedefIf.myLongDouble" />
+    <corba:alias basetype="corba:short" repositoryID="IDL:TypedefIf/myShort:1.0" name="TypedefIf.myShort" />
+    <corba:alias basetype="corba:long" repositoryID="IDL:TypedefIf/myLong:1.0" name="TypedefIf.myLong" />
+    <corba:alias basetype="corba:longlong" repositoryID="IDL:TypedefIf/myLongLong:1.0" name="TypedefIf.myLongLong" />
+    <corba:alias basetype="corba:ushort" repositoryID="IDL:TypedefIf/myUnsignedShort:1.0" name="TypedefIf.myUnsignedShort" />
+    <corba:alias basetype="corba:ulong" repositoryID="IDL:TypedefIf/myUnsignedLong:1.0" name="TypedefIf.myUnsignedLong" />
+    <corba:alias basetype="corba:ulonglong" repositoryID="IDL:TypedefIf/myUnsignedLongLong:1.0" name="TypedefIf.myUnsignedLongLong" />
+    <corba:alias basetype="corba:char" repositoryID="IDL:TypedefIf/myChar:1.0" name="TypedefIf.myChar" />
+    <corba:alias basetype="corba:wchar" repositoryID="IDL:TypedefIf/myWChar:1.0" name="TypedefIf.myWChar" />
+    <corba:alias basetype="corba:boolean" repositoryID="IDL:TypedefIf/myBoolean:1.0" name="TypedefIf.myBoolean" />
+    <corba:alias basetype="corba:octet" repositoryID="IDL:TypedefIf/myOctet:1.0" name="TypedefIf.myOctet" />
+    <corba:alias basetype="corba:any" repositoryID="IDL:TypedefIf/myAny:1.0" name="TypedefIf.myAny" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns="" elemtype="corba:long" elemname="item" bound="0" repositoryID="IDL:TypedefIf/SeqLong:1.0" type="ns4:TypedefIf.SeqLong" name="TypedefIf.SeqLong" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:TypedefIf/aString:1.0" type="xs:string" name="TypedefIf.aString" />
+    <corba:anonstring xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" bound="10" type="TypedefIf.aBoundedString" name="TypedefIf._Anon1_aBoundedString" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf._Anon1_aBoundedString" repositoryID="IDL:TypedefIf/aBoundedString:1.0" type="ns4:TypedefIf.aBoundedString" name="TypedefIf.aBoundedString" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" scale="2" digits="5" repositoryID="IDL:TypedefIf/Fixed52:1.0" type="TypedefIf.Fixed52" name="TypedefIf.Fixed52" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.SeqLong" repositoryID="IDL:TypedefIf/mySeqLong:1.0" name="TypedefIf.mySeqLong" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.aString" repositoryID="IDL:TypedefIf/myString:1.0" name="TypedefIf.myString" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.aBoundedString" repositoryID="IDL:TypedefIf/myBoundedString:1.0" name="TypedefIf.myBoundedString" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.Fixed52" repositoryID="IDL:TypedefIf/myFixed52:1.0" name="TypedefIf.myFixed52" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" repositoryID="IDL:TypedefIf/aStruct:1.0" type="TypedefIf.aStruct" name="TypedefIf.aStruct">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" name="aStructMyLong" idltype="ns4:TypedefIf.myLong" />
+      <corba:member name="aLong" idltype="corba:long" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.aStruct" repositoryID="IDL:TypedefIf/myStruct:1.0" name="TypedefIf.myStruct" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" repositoryID="IDL:TypedefIf/aEnum:1.0" type="TypedefIf.aEnum" name="TypedefIf.aEnum">
+      <corba:enumerator value="aEnum1" />
+      <corba:enumerator value="aEnum2" />
+    </corba:enum>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.aEnum" repositoryID="IDL:TypedefIf/myEnum:1.0" name="TypedefIf.myEnum" />
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" discriminator="TypedefIf.myEnum" repositoryID="IDL:TypedefIf/aUnion:1.0" type="ns4:TypedefIf.aUnion" name="TypedefIf.aUnion">
+      <corba:unionbranch name="aUnionMyLong" idltype="TypedefIf.myLong">
+        <corba:case label="aEnum1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="aUnionLong" idltype="corba:long">
+        <corba:case label="aEnum2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="aUnionMyBoolean" idltype="TypedefIf.myBoolean" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.aUnion" repositoryID="IDL:TypedefIf/myUnion:1.0" name="TypedefIf.myUnion" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" repositoryID="IDL:TypedefIf/anotherStruct:1.0" type="TypedefIf.anotherStruct" name="TypedefIf.anotherStruct">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" name="myOtherLong" idltype="ns4:TypedefIf.myLong" />
+      <corba:member name="anotherLong" idltype="corba:long" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.anotherStruct" repositoryID="IDL:TypedefIf/myOtherStruct:1.0" name="TypedefIf.myOtherStruct" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" repositoryID="IDL:TypedefIf/anotherEnum:1.0" type="TypedefIf.anotherEnum" name="TypedefIf.anotherEnum">
+      <corba:enumerator value="anotherEnum1" />
+      <corba:enumerator value="anotherEnum2" />
+    </corba:enum>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.anotherEnum" repositoryID="IDL:TypedefIf/myOtherEnum:1.0" name="TypedefIf.myOtherEnum" />
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" discriminator="TypedefIf.myOtherEnum" repositoryID="IDL:TypedefIf/anotherUnion:1.0" type="ns4:TypedefIf.anotherUnion" name="TypedefIf.anotherUnion">
+      <corba:unionbranch name="anotherUnionMyLong" idltype="TypedefIf.myLong">
+        <corba:case label="anotherEnum1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="anotherUnionLong" idltype="corba:long">
+        <corba:case label="anotherEnum2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="anotherUnionMyBoolean" idltype="TypedefIf.myBoolean" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" basetype="TypedefIf.anotherUnion" repositoryID="IDL:TypedefIf/myOtherUnion:1.0" name="TypedefIf.myOtherUnion" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="TypedefIf.SeqLong">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="TypedefIf.aBoundedString">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="TypedefIf.Fixed52">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="5">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="TypedefIf.aStruct">
+        <xs:sequence>
+          <xs:element name="aStructMyLong" type="xs:int">
+          </xs:element>
+          <xs:element name="aLong" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="TypedefIf.aEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="aEnum1">
+          </xs:enumeration>
+          <xs:enumeration value="aEnum2">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="TypedefIf.aUnion">
+        <xs:choice>
+          <xs:element name="aUnionMyLong" type="xs:int">
+          </xs:element>
+          <xs:element name="aUnionLong" type="xs:int">
+          </xs:element>
+          <xs:element name="aUnionMyBoolean" type="xs:boolean">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="TypedefIf.anotherStruct">
+        <xs:sequence>
+          <xs:element name="myOtherLong" type="xs:int">
+          </xs:element>
+          <xs:element name="anotherLong" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="TypedefIf.anotherEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="anotherEnum1">
+          </xs:enumeration>
+          <xs:enumeration value="anotherEnum2">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="TypedefIf.anotherUnion">
+        <xs:choice>
+          <xs:element name="anotherUnionMyLong" type="xs:int">
+          </xs:element>
+          <xs:element name="anotherUnionLong" type="xs:int">
+          </xs:element>
+          <xs:element name="anotherUnionMyBoolean" type="xs:boolean">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:element name="opIn">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inMyFloat" type="xs:float">
+            </xs:element>
+            <xs:element name="inMyDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inMyLongDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inMyShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inMyLong" type="xs:int">
+            </xs:element>
+            <xs:element name="inMyLongLong" type="xs:long">
+            </xs:element>
+            <xs:element name="inMyUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="inMyUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="inMyUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="inMyChar" type="xs:byte">
+            </xs:element>
+            <xs:element name="inMyWChar" type="xs:string">
+            </xs:element>
+            <xs:element name="inMyBoolean" type="xs:boolean">
+            </xs:element>
+            <xs:element name="inMyOctet" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="inMyAny" type="xs:anyType">
+            </xs:element>
+            <xs:element name="inMySeqLong" type="TypedefIf.SeqLong">
+            </xs:element>
+            <xs:element name="inMyString" type="xs:string">
+            </xs:element>
+            <xs:element name="inMyBoundedString" type="TypedefIf.aBoundedString">
+            </xs:element>
+            <xs:element name="inMyFixed52" type="TypedefIf.Fixed52">
+            </xs:element>
+            <xs:element name="inMyStruct" type="TypedefIf.aStruct">
+            </xs:element>
+            <xs:element name="inMyEnum" type="TypedefIf.aEnum">
+            </xs:element>
+            <xs:element name="inMyUnion" type="TypedefIf.aUnion">
+            </xs:element>
+            <xs:element name="inMyOtherStruct" type="TypedefIf.anotherStruct">
+            </xs:element>
+            <xs:element name="inMyOtherEnum" type="TypedefIf.anotherEnum">
+            </xs:element>
+            <xs:element name="inMyOtherUnion" type="TypedefIf.anotherUnion">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opInResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opOut">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opOutResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outMyFloat" type="xs:float">
+            </xs:element>
+            <xs:element name="outMyDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="outMyLongDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="outMyShort" type="xs:short">
+            </xs:element>
+            <xs:element name="outMyLong" type="xs:int">
+            </xs:element>
+            <xs:element name="outMyLongLong" type="xs:long">
+            </xs:element>
+            <xs:element name="outMyUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="outMyUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="outMyUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="outMyChar" type="xs:byte">
+            </xs:element>
+            <xs:element name="outMyWChar" type="xs:string">
+            </xs:element>
+            <xs:element name="outMyBoolean" type="xs:boolean">
+            </xs:element>
+            <xs:element name="outMyOctet" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="outMyAny" type="xs:anyType">
+            </xs:element>
+            <xs:element name="outMySeqLong" type="TypedefIf.SeqLong">
+            </xs:element>
+            <xs:element name="outMyString" type="xs:string">
+            </xs:element>
+            <xs:element name="outMyBoundedString" type="TypedefIf.aBoundedString">
+            </xs:element>
+            <xs:element name="outMyFixed52" type="TypedefIf.Fixed52">
+            </xs:element>
+            <xs:element name="outMyStruct" type="TypedefIf.aStruct">
+            </xs:element>
+            <xs:element name="outMyEnum" type="TypedefIf.aEnum">
+            </xs:element>
+            <xs:element name="outMyUnion" type="TypedefIf.aUnion">
+            </xs:element>
+            <xs:element name="outMyOtherStruct" type="TypedefIf.anotherStruct">
+            </xs:element>
+            <xs:element name="outMyOtherEnum" type="TypedefIf.anotherEnum">
+            </xs:element>
+            <xs:element name="outMyOtherUnion" type="TypedefIf.anotherUnion">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opInOut">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inoutMyFloat" type="xs:float">
+            </xs:element>
+            <xs:element name="inoutMyDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutMyLongDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutMyShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutMyLong" type="xs:int">
+            </xs:element>
+            <xs:element name="inoutMyLongLong" type="xs:long">
+            </xs:element>
+            <xs:element name="inoutMyUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="inoutMyUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="inoutMyUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="inoutMyChar" type="xs:byte">
+            </xs:element>
+            <xs:element name="inoutMyWChar" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutMyBoolean" type="xs:boolean">
+            </xs:element>
+            <xs:element name="inoutMyOctet" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="inoutMyAny" type="xs:anyType">
+            </xs:element>
+            <xs:element name="inoutMySeqLong" type="TypedefIf.SeqLong">
+            </xs:element>
+            <xs:element name="inoutMyString" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutMyBoundedString" type="TypedefIf.aBoundedString">
+            </xs:element>
+            <xs:element name="inoutMyFixed52" type="TypedefIf.Fixed52">
+            </xs:element>
+            <xs:element name="inoutMyStruct" type="TypedefIf.aStruct">
+            </xs:element>
+            <xs:element name="inoutMyEnum" type="TypedefIf.aEnum">
+            </xs:element>
+            <xs:element name="inoutMyUnion" type="TypedefIf.aUnion">
+            </xs:element>
+            <xs:element name="inoutMyOtherStruct" type="TypedefIf.anotherStruct">
+            </xs:element>
+            <xs:element name="inoutMyOtherEnum" type="TypedefIf.anotherEnum">
+            </xs:element>
+            <xs:element name="inoutMyOtherUnion" type="TypedefIf.anotherUnion">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opInOutResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inoutMyFloat" type="xs:float">
+            </xs:element>
+            <xs:element name="inoutMyDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutMyLongDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutMyShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutMyLong" type="xs:int">
+            </xs:element>
+            <xs:element name="inoutMyLongLong" type="xs:long">
+            </xs:element>
+            <xs:element name="inoutMyUnsignedShort" type="xs:unsignedShort">
+            </xs:element>
+            <xs:element name="inoutMyUnsignedLong" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="inoutMyUnsignedLongLong" type="xs:unsignedLong">
+            </xs:element>
+            <xs:element name="inoutMyChar" type="xs:byte">
+            </xs:element>
+            <xs:element name="inoutMyWChar" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutMyBoolean" type="xs:boolean">
+            </xs:element>
+            <xs:element name="inoutMyOctet" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="inoutMyAny" type="xs:anyType">
+            </xs:element>
+            <xs:element name="inoutMySeqLong" type="TypedefIf.SeqLong">
+            </xs:element>
+            <xs:element name="inoutMyString" type="xs:string">
+            </xs:element>
+            <xs:element name="inoutMyBoundedString" type="TypedefIf.aBoundedString">
+            </xs:element>
+            <xs:element name="inoutMyFixed52" type="TypedefIf.Fixed52">
+            </xs:element>
+            <xs:element name="inoutMyStruct" type="TypedefIf.aStruct">
+            </xs:element>
+            <xs:element name="inoutMyEnum" type="TypedefIf.aEnum">
+            </xs:element>
+            <xs:element name="inoutMyUnion" type="TypedefIf.aUnion">
+            </xs:element>
+            <xs:element name="inoutMyOtherStruct" type="TypedefIf.anotherStruct">
+            </xs:element>
+            <xs:element name="inoutMyOtherEnum" type="TypedefIf.anotherEnum">
+            </xs:element>
+            <xs:element name="inoutMyOtherUnion" type="TypedefIf.anotherUnion">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="opInOut">
+    <wsdl:part name="inparameter" element="tns:opInOut">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opOutResponse">
+    <wsdl:part name="outparameter" element="tns:opOutResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opInOutResponse">
+    <wsdl:part name="outparameter" element="tns:opInOutResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opOut">
+    <wsdl:part name="inparameter" element="tns:opOut">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opInResponse">
+    <wsdl:part name="outparameter" element="tns:opInResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opIn">
+    <wsdl:part name="inparameter" element="tns:opIn">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TypedefIf">
+    <wsdl:operation name="opIn">
+      <wsdl:input name="opInRequest" message="tns:opIn">
+    </wsdl:input>
+      <wsdl:output name="opInResponse" message="tns:opInResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opOut">
+      <wsdl:input name="opOutRequest" message="tns:opOut">
+    </wsdl:input>
+      <wsdl:output name="opOutResponse" message="tns:opOutResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opInOut">
+      <wsdl:input name="opInOutRequest" message="tns:opInOut">
+    </wsdl:input>
+      <wsdl:output name="opInOutResponse" message="tns:opInOutResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TypedefIfCORBABinding" type="tns:TypedefIf">
+    <corba:binding repositoryID="IDL:TypedefIf:1.0" />
+    <wsdl:operation name="opIn">
+      <corba:operation name="opIn">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyFloat" idltype="TypedefIf.myFloat" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyDouble" idltype="TypedefIf.myDouble" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyLongDouble" idltype="TypedefIf.myLongDouble" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyShort" idltype="TypedefIf.myShort" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyLong" idltype="TypedefIf.myLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyLongLong" idltype="TypedefIf.myLongLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyUnsignedShort" idltype="TypedefIf.myUnsignedShort" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyUnsignedLong" idltype="TypedefIf.myUnsignedLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyUnsignedLongLong" idltype="TypedefIf.myUnsignedLongLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyChar" idltype="TypedefIf.myChar" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyWChar" idltype="TypedefIf.myWChar" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyBoolean" idltype="TypedefIf.myBoolean" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyOctet" idltype="TypedefIf.myOctet" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyAny" idltype="TypedefIf.myAny" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMySeqLong" idltype="TypedefIf.mySeqLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyString" idltype="TypedefIf.myString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyBoundedString" idltype="TypedefIf.myBoundedString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyFixed52" idltype="TypedefIf.myFixed52" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyStruct" idltype="TypedefIf.myStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyEnum" idltype="TypedefIf.myEnum" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyUnion" idltype="TypedefIf.myUnion" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyOtherStruct" idltype="TypedefIf.myOtherStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyOtherEnum" idltype="TypedefIf.myOtherEnum" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="in" name="inMyOtherUnion" idltype="TypedefIf.myOtherUnion" />
+      </corba:operation>
+      <wsdl:input name="opInRequest">
+      </wsdl:input>
+      <wsdl:output name="opInResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opOut">
+      <corba:operation name="opOut">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyFloat" idltype="TypedefIf.myFloat" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyDouble" idltype="TypedefIf.myDouble" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyLongDouble" idltype="TypedefIf.myLongDouble" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyShort" idltype="TypedefIf.myShort" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyLong" idltype="TypedefIf.myLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyLongLong" idltype="TypedefIf.myLongLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyUnsignedShort" idltype="TypedefIf.myUnsignedShort" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyUnsignedLong" idltype="TypedefIf.myUnsignedLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyUnsignedLongLong" idltype="TypedefIf.myUnsignedLongLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyChar" idltype="TypedefIf.myChar" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyWChar" idltype="TypedefIf.myWChar" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyBoolean" idltype="TypedefIf.myBoolean" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyOctet" idltype="TypedefIf.myOctet" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyAny" idltype="TypedefIf.myAny" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMySeqLong" idltype="TypedefIf.mySeqLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyString" idltype="TypedefIf.myString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyBoundedString" idltype="TypedefIf.myBoundedString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyFixed52" idltype="TypedefIf.myFixed52" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyStruct" idltype="TypedefIf.myStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyEnum" idltype="TypedefIf.myEnum" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyUnion" idltype="TypedefIf.myUnion" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyOtherStruct" idltype="TypedefIf.myOtherStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyOtherEnum" idltype="TypedefIf.myOtherEnum" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="out" name="outMyOtherUnion" idltype="TypedefIf.myOtherUnion" />
+      </corba:operation>
+      <wsdl:input name="opOutRequest">
+      </wsdl:input>
+      <wsdl:output name="opOutResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="opInOut">
+      <corba:operation name="opInOut">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyFloat" idltype="TypedefIf.myFloat" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyDouble" idltype="TypedefIf.myDouble" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyLongDouble" idltype="TypedefIf.myLongDouble" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyShort" idltype="TypedefIf.myShort" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyLong" idltype="TypedefIf.myLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyLongLong" idltype="TypedefIf.myLongLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyUnsignedShort" idltype="TypedefIf.myUnsignedShort" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyUnsignedLong" idltype="TypedefIf.myUnsignedLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyUnsignedLongLong" idltype="TypedefIf.myUnsignedLongLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyChar" idltype="TypedefIf.myChar" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyWChar" idltype="TypedefIf.myWChar" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyBoolean" idltype="TypedefIf.myBoolean" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyOctet" idltype="TypedefIf.myOctet" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyAny" idltype="TypedefIf.myAny" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMySeqLong" idltype="TypedefIf.mySeqLong" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyString" idltype="TypedefIf.myString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyBoundedString" idltype="TypedefIf.myBoundedString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyFixed52" idltype="TypedefIf.myFixed52" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyStruct" idltype="TypedefIf.myStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyEnum" idltype="TypedefIf.myEnum" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyUnion" idltype="TypedefIf.myUnion" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyOtherStruct" idltype="TypedefIf.myOtherStruct" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyOtherEnum" idltype="TypedefIf.myOtherEnum" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Typedef/typemap" mode="inout" name="inoutMyOtherUnion" idltype="TypedefIf.myOtherUnion" />
+      </corba:operation>
+      <wsdl:input name="opInOutRequest">
+      </wsdl:input>
+      <wsdl:output name="opInOutResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TypedefIfCORBAService">
+    <wsdl:port name="TypedefIfCORBAPort" binding="tns:TypedefIfCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

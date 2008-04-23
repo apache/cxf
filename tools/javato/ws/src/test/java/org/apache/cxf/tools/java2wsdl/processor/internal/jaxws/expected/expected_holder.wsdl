@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="HolderServiceService" targetNamespace="http://holder.fortest.tools.cxf.apache.org/" xmlns:tns="http://holder.fortest.tools.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://holder.fortest.tools.cxf.apache.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://holder.fortest.tools.cxf.apache.org/">
+<xsd:element name="echo" type="tns:echo"/>
+<xsd:complexType name="echo">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="arg0" type="xsd:string"/>
+<xsd:element minOccurs="0" name="arg1" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="echoResponse" type="tns:echoResponse"/>
+<xsd:complexType name="echoResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" type="xsd:string"/>
+<xsd:element minOccurs="0" name="return1" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="echo3" type="tns:echo3"/>
+<xsd:complexType name="echo3">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="arg1" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="header" nillable="true" type="xsd:string"/>
+<xsd:element name="echo3Response" type="tns:echo3Response"/>
+<xsd:complexType name="echo3Response">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="echo2" type="tns:echo2"/>
+<xsd:complexType name="echo2">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="arg0" type="xsd:string"/>
+<xsd:element minOccurs="0" name="arg1" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="echo2Response" type="tns:echo2Response"/>
+<xsd:complexType name="echo2Response">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" type="xsd:string"/>
+<xsd:element minOccurs="0" name="return1" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="echo">
+    <wsdl:part name="parameters" element="tns:echo">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo3Response">
+    <wsdl:part name="parameters" element="tns:echo3Response">
+    </wsdl:part>
+    <wsdl:part name="header" element="tns:header">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo2">
+    <wsdl:part name="parameters" element="tns:echo2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoResponse">
+    <wsdl:part name="parameters" element="tns:echoResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo2Response">
+    <wsdl:part name="parameters" element="tns:echo2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo3">
+    <wsdl:part name="parameters" element="tns:echo3">
+    </wsdl:part>
+    <wsdl:part name="header" element="tns:header">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HolderService">
+    <wsdl:operation name="echo">
+      <wsdl:input name="echo" message="tns:echo">
+    </wsdl:input>
+      <wsdl:output name="echoResponse" message="tns:echoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo3">
+      <wsdl:input name="echo3" message="tns:echo3">
+    </wsdl:input>
+      <wsdl:output name="echo3Response" message="tns:echo3Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo2">
+      <wsdl:input name="echo2" message="tns:echo2">
+    </wsdl:input>
+      <wsdl:output name="echo2Response" message="tns:echo2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HolderServiceServiceSoapBinding" type="tns:HolderService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="echo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo2">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echo2">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echo2Response">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo3">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echo3">
+        <soap:header message="tns:echo3" part="header" use="literal">
+        </soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echo3Response">
+        <soap:header message="tns:echo3Response" part="header" use="literal">
+        </soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HolderServiceService">
+    <wsdl:port name="HolderServicePort" binding="tns:HolderServiceServiceSoapBinding">
+      <soap:address location="http://localhost:9090"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

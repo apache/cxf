@@ -1,0 +1,38 @@
+interface Account {
+    float
+    get_balance();
+    void
+    deposit(
+        in float addition
+    );
+};
+interface Bank {
+    ::Account
+    create_account(
+        in string account_name
+    );
+    Object
+    create_epr_account(
+        in string account_name
+    );
+    ::Account
+    get_account(
+        in string account_name
+    );
+    Object
+    get_epr_account(
+        in string account_name
+    );
+    Object
+    get_account_epr_with_no_use_attribute(
+        in string account_name
+    );
+    void
+    find_account(
+        inout any account_details
+    );
+    void
+    remove_account(
+        in string account_name
+    );
+};

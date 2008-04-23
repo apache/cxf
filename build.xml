@@ -1,0 +1,81 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project name="CXF">
+
+    <!-- Targets for cruisecontrol to use -->
+    <target name="cruisecontrol.build">
+        <delete file="build.out"/>
+        <delete file="build.out.clean"/>
+        <exec executable="mvn" dir="${basedir}" failonerror="false" output="build.out.clean" logError="true">
+            <arg line="-U clean -Dmaven.repo.local=${user.home}/.m2/repository_cxf"/>
+        </exec>
+        <exec executable="mvn" dir="${basedir}" failonerror="false" resultproperty="build.result" output="build.out" logError="true">
+            <arg line="-U install -Peverything -Dmaven.repo.local=${user.home}/.m2/repository_cxf"/>
+        </exec>
+
+        <copy todir="target/surefire-reports">
+            <fileset dir="${basedir}" includes="**/target/surefire-reports/*.xml"/>
+            <regexpmapper handledirsep="true" from="(.*)/target/surefire-reports/(.*)" to="\1/\2"/>
+        </copy>
+
+        <condition property="build.failed">
+            <not>
+                <equals arg1="${build.result}" arg2="0"/>
+            </not>
+        </condition>
+        <loadfile property="build.out" srcFile="build.out">
+            <filterchain>
+                <tailfilter lines="25"/>
+            </filterchain>
+        </loadfile>
+        <antcall target="echo.failure"/>
+        <fail if="build.failed">Build Failed</fail>
+    </target>
+
+
+    <target name="cruisecontrol.build.distribution">
+        <delete file="distribution/build.out"/>
+        <delete file="distribution/build.out.clean"/>
+        <exec executable="mvn" dir="${basedir}/distribution" failonerror="false" output="distribution/build.out.clean" logError="true">
+            <arg line="clean -Drelease -Dmaven.repo.local=${user.home}/.m2/repository_cxf"/>
+        </exec>
+        <exec executable="mvn" dir="${basedir}/distribution" failonerror="false" resultproperty="build.result"
+            output="distribution/build.out" logError="true">
+            <arg line="install -Drelease -Dmaven.repo.local=${user.home}/.m2/repository_cxf"/>
+        </exec>
+
+        <condition property="build.failed">
+            <not>
+                <equals arg1="${build.result}" arg2="0"/>
+            </not>
+        </condition>
+        <loadfile property="build.out" srcFile="distribution/build.out">
+            <filterchain>
+                <tailfilter lines="25"/>
+            </filterchain>
+        </loadfile>
+        <antcall target="echo.failure"/>
+        <fail if="build.failed">Build Failed</fail>
+    </target>
+    <target name="echo.failure" if="build.failed">
+        <echo level="error" message="Tail of log: ${build.out}"/>
+    </target>
+
+
+</project>

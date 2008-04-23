@@ -1,0 +1,198 @@
+<project name="CXF JProfile" default="compile">
+
+   <property name="jprofile.home" location="/opt/jprofiler5"/>
+   <property name="cxf.dist" location="../../distribution/target/apache-cxf-2.1-SNAPSHOT.dir/apache-cxf-2.1-SNAPSHOT"/>
+
+  <target name="setNativeLibDir" depends="setPlatform">
+    <property name="nativelib.dir" location="${jprofile.home}/bin/${platform}"/>
+  </target>
+
+  <target name="setPlatform" unless="platform">
+    <condition property="platform" value="windows">
+      <os family="windows" arch="x86"/>
+    </condition>
+
+    <condition property="platform" value="windows-x64">
+      <os family="windows" arch="amd64"/>
+    </condition>
+
+    <condition property="platform" value="macos">
+      <os family="mac"/>
+    </condition>
+
+    <condition property="platform" value="linux-x86">
+      <os name="linux" arch="x86"/>
+    </condition>
+    <condition property="platform" value="linux-x64">
+      <os name="linux" arch="amd64"/>
+    </condition>
+
+    <condition property="platform" value="solaris-sparc">
+      <os name="sunos" arch="sparc"/>
+    </condition>
+    <condition property="platform" value="solaris-sparcv9">
+      <os name="sunos" arch="sparcv9"/>
+    </condition>
+    <condition property="platform" value="solaris-x86">
+      <os name="sunos" arch="x86"/>
+    </condition>
+    <condition property="platform" value="solaris-x64">
+      <os name="sunos" arch="x64"/>
+    </condition>
+
+    <condition property="platform" value="hpux-parisc">
+      <os name="hp-ux" arch="pa_risc2.0"/>
+    </condition>
+    <condition property="platform" value="hpux-parisc64">
+      <os name="hp-ux" arch="pa_risc2.0w"/>
+    </condition>
+
+    <condition property="platform" value="aix-ppc64">
+      <os name="aix" arch="ppc64"/>
+    </condition>
+    <condition property="platform" value="aix-ppc">
+      <os name="aix" arch="ppc"/>
+    </condition>
+
+    <fail unless="platform">Could not determine native library directory. Please pass the -Dplatform=...  property manually to this ant script.</fail>
+  </target>
+
+  <target name="setNativeLibEnvVar">
+
+    <property environment="env"/>
+
+    <condition property="nativelib.envvar" value="Path">
+      <and>
+        <os family="windows"/>
+        <isset property="env.Path"/>
+      </and>
+    </condition>
+
+    <condition property="nativelib.envvar" value="PATH">
+      <and>
+        <os family="windows"/>
+        <not>
+          <isset property="nativelib.envvar"/>
+        </not>
+      </and>
+    </condition>
+
+    <condition property="nativelib.envvar" value="DYLD_LIBRARY_PATH">
+      <os family="mac"/>
+    </condition>
+
+    <condition property="nativelib.envvar" value="SHLIB_PATH">
+      <os name="hp-ux"/>
+    </condition>
+
+    <condition property="nativelib.envvar" value="LIBPATH">
+      <os name="aix"/>
+    </condition>
+
+    <condition property="nativelib.envvar" value="LD_LIBRARY_PATH">
+      <not>
+        <isset property="nativelib.envvar"/>
+      </not>
+    </condition>
+
+    <setEnvvarValue varname="${nativelib.envvar}"/>
+
+  </target>
+
+  <macrodef name="setEnvvarValue">
+    <attribute name="varname"/>
+    <sequential>
+      <property environment="env"/>
+      <property name="nativelib.envvarValue" value="${env.@{varname}}"/>
+    </sequential>
+  </macrodef>
+
+  <target name="prepare">
+   <mkdir dir="bin"/>
+  </target>
+
+
+  <path id="compile-classpath">
+    <pathelement location="${jprofile.home}/bin/agent.jar"/>
+    <pathelement location="../../systests/target/classes"/>
+    <pathelement location="../../systests/target/test-classes"/>
+    <pathelement location="../../testutils/target/classes"/>
+    <fileset dir="${cxf.dist}/lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <path id="run-classpath">
+    <pathelement location="bin"/>
+    <pathelement location="../../systests/target/classes"/>
+    <pathelement location="../../systests/target/test-classes"/>
+    <pathelement location="../../testutils/target/classes"/>
+    <fileset dir="${cxf.dist}/lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="compile" depends="prepare" description="Compile the offline profiling sample">
+
+    <!-- The controller API classes are contained in agent.jar -->
+    <javac srcdir="src/main/java"
+           destdir="bin"
+      >
+      <classpath refid="compile-classpath"/>
+    </javac>
+
+  </target>
+
+  <target name="clean" description="Delete all compiled classes and saved snapshot files">
+    <delete>
+      <fileset dir="bin">
+        <include name="src/**/*.class"/>
+        <include name="*.jps"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="run-client-endpoint" depends="compile,setNativeLibDir" description="Run the offline profiling sample">
+
+    <java classname="org.apache.cxf.profile.ClientEndpointCreationLoop" fork="true">
+      <arg value="100"/>
+      <arg value="client_endpoint.jps"/>
+      <jvmarg value="-agentlib:jprofilerti=offline,id=146,config=jprofileConfig.xml"></jvmarg>
+      <jvmarg value="-Xbootclasspath/a:${jprofile.home}/bin/agent.jar"></jvmarg>
+      <env key="LD_LIBRARY_PATH" path="${nativelib.dir}:${nativelib.envvarValue}"/>
+
+      <classpath refid="run-classpath"/>
+    </java>
+  </target>
+
+  <target name="run-bus-init" depends="compile,setNativeLibDir" description="Run the offline profiling sample">
+
+    <java classname="org.apache.cxf.profile.DefaultBusInitialization" fork="true">
+      <arg value="100"/>
+      <arg value="bus_initialization.jps"/>
+<!--
+      <jvmarg value="-Dorg.apache.cxf.nofastinfoset=true"/>
+-->
+      <jvmarg value="-Dcxf.config.file=bloop.xml"/>
+      <jvmarg value="-agentlib:jprofilerti=offline,id=146,config=jprofileConfig.xml"></jvmarg>
+      <jvmarg value="-Xbootclasspath/a:${jprofile.home}/bin/agent.jar"></jvmarg>
+      <env key="LD_LIBRARY_PATH" path="${nativelib.dir}:${nativelib.envvarValue}"/>
+
+      <classpath refid="run-classpath"/>
+    </java>
+  </target>
+  <target name="run-server-endpoint" depends="compile,setNativeLibDir" description="Run the offline profiling sample">
+
+    <java classname="org.apache.cxf.profile.EndpointCreationLoop3" fork="true">
+      <arg value="10"/>
+      <arg value="ecl3.jps"/>
+      <jvmarg value="-Dcxf.config.file=bloop.xml"/>
+      <jvmarg value="-agentlib:jprofilerti=offline,id=146,config=jprofileConfig.xml"></jvmarg>
+      <jvmarg value="-Xbootclasspath/a:${jprofile.home}/bin/agent.jar"></jvmarg>
+      <env key="LD_LIBRARY_PATH" path="${nativelib.dir}:${nativelib.envvarValue}"/>
+
+      <classpath refid="run-classpath"/>
+    </java>
+  </target>
+
+</project>

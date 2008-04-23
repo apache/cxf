@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="EchoService" targetNamespace="http://cxf.apache.org/echotest" xmlns:tns="http://cxf.apache.org/echotest" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:message name="echoStringResponse">
+    <wsdl:part name="return" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoString">
+    <wsdl:part name="arg0" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Echo">
+    <wsdl:operation name="echoString">
+      <wsdl:input name="echoString" message="tns:echoString">
+    </wsdl:input>
+      <wsdl:output name="echoStringResponse" message="tns:echoStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EchoServiceSoapBinding" type="tns:Echo">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="echoString">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="echoString">
+        <soap:body use="literal" namespace="http://cxf.apache.org/echotest"/>
+      </wsdl:input>
+      <wsdl:output name="echoStringResponse">
+        <soap:body use="literal" namespace="http://cxf.apache.org/echotest"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EchoService">
+    <wsdl:port name="EchoPort" binding="tns:EchoServiceSoapBinding">
+      <soap:address location="http://localhost:9090"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

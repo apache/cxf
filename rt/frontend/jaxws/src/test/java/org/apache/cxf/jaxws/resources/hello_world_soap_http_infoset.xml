@@ -1,0 +1,14 @@
+<wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing">
+    <wsa:Address>http://localhost:8080/test</wsa:Address>
+    <wsa:ReferenceProperties></wsa:ReferenceProperties> 
+    <wsa:ReferenceParameters>
+        <testParameter1>testValue1</testParameter1>
+        <testParameter2>testValue2</testParameter2>
+    </wsa:ReferenceParameters>
+    <wsa:Metadata
+      xmlns:wsdli="http://www.w3.org/2006/01/wsdl-instance"
+      xmlns:wsaw="http://www.w3.org/2005/02/addressing/wsdl"
+      xmlns:ns="http://apache.org/hello_world_soap_http">
+        <wsaw:ServiceName EndpointName="SoapPort">ns:SOAPService</wsaw:ServiceName>
+    </wsa:Metadata>
+</wsa:EndpointReference>

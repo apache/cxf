@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<definitions name="c/epr.idl"
+ targetNamespace="http://schemas.apache.org/idl/c/epr.idl"
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:tns="http://schemas.apache.org/idl/c/epr.idl"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd1="http://schemas.apache.org/idltypes/c/epr.idl"
+ xmlns:corba="http://cxf.apache.org/bindings/corba"
+ xmlns:corbatm="http://schemas.apache.org/typemap/corba/c/epr.idl"
+ xmlns:addressing="http://www.w3.org/2005/08/addressing">
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/c/epr.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+     <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
+      <xsd:element name="xsd1:TestServer.register.cb" type="addressing:EndpointReferenceType"/>
+    </schema>
+  </types>
+  <message name="TestServer.register">
+    <part name="cb" element="xsd1:TestServer.register.cb"/>
+  </message>
+  <message name="TestServer.registerResponse"/>
+  <portType name="TestServer">
+    <operation name="register">
+      <input message="tns:TestServer.register" name="register"/>
+      <output message="tns:TestServer.registerResponse" name="registerResponse"/>
+    </operation>
+  </portType>
+</definitions>

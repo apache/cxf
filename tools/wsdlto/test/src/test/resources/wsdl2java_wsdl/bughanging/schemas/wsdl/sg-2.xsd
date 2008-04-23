@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+OASIS takes no position regarding the validity or scope of any intellectual property or other rights that might be claimed to pertain to the implementation or use of the technology described in this document or the extent to which any license under such rights might or might not be available; neither does it represent that it has made any effort to identify any such rights. Information on OASIS's procedures with respect to rights in OASIS specifications can be found at the OASIS website. Copies of claims of rights made available for publication and any assurances of licenses to be made available, or the result of an attempt made to obtain a general license or permission for the use of such proprietary rights by implementors or users of this specification, can be obtained from the OASIS Executive Director.
+
+OASIS invites any interested party to bring to its attention any copyrights, patents or patent applications, or other proprietary rights which may cover technology that may be required to implement this specification. Please address the information to the OASIS Executive Director.
+
+Copyright (C) OASIS Open (2005). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others, and derivative works that comment on or otherwise explain it or assist in its implementation may be prepared, copied, published and distributed, in whole or in part, without restriction of any kind, provided that the above copyright notice and this paragraph are included on all such copies and derivative works. However, this document itself may not be modified in any way, such as by removing the copyright notice or references to OASIS, except as needed for the purpose of developing OASIS specifications, in which case the procedures for copyrights defined in the OASIS Intellectual Property Rights document must be followed, or as required to translate it into languages other than English. 
+
+The limited permissions granted above are perpetual and will not be revoked by OASIS or its successors or assigns. 
+
+This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-->
+
+<xsd:schema 
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"   
+  xmlns:wsrf-sg="http://docs.oasis-open.org/wsrf/sg-2"  
+  xmlns:wsa="http://www.w3.org/2005/08/addressing"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified" 
+  targetNamespace="http://docs.oasis-open.org/wsrf/sg-2" >
+
+  <!-- ======================== Imports ============================ -->
+
+  <xsd:import namespace="http://www.w3.org/2005/08/addressing" 
+              schemaLocation="/schemas/wsdl/ws-addr.xsd" /> 
+  <xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+              schemaLocation="bf-2.xsd" />
+              
+  <!-- =============== Resource Property Related  =================== -->
+
+  <!-- ============ Resource Properties for ServiceGroup ============ -->
+
+  <xsd:simpleType name="AbsoluteOrRelativeTimeType">
+    <xsd:union memberTypes="xsd:dateTime xsd:duration" />
+  </xsd:simpleType>
+
+  <xsd:simpleType name="ContentElementsType">
+    <xsd:list itemType="xsd:QName" />
+  </xsd:simpleType>
+
+  <xsd:simpleType name="MemberInterfacesType">
+    <xsd:list itemType="xsd:QName" />
+  </xsd:simpleType>
+
+  <xsd:element name="MembershipContentRule">
+    <xsd:complexType>
+      <xsd:attribute name="MemberInterfaces" 
+                     type="wsrf-sg:MemberInterfacesType" />
+      <xsd:attribute name="ContentElements"
+                     type="wsrf-sg:ContentElementsType"
+                     use="required" />
+      <xsd:anyAttribute namespace="##other" 
+                        processContents="lax" />
+    </xsd:complexType>  
+  </xsd:element>     
+
+  <xsd:complexType name="RPDocType">
+    <xsd:sequence>
+      <xsd:any namespace="##any" processContents="lax"
+               minOccurs="1" maxOccurs="1" />
+    </xsd:sequence>
+    <xsd:anyAttribute namespace="##other" 
+                      processContents="lax" />
+  </xsd:complexType>
+
+  <xsd:complexType name="ContentType">
+    <xsd:sequence>
+      <xsd:element name="RPDoc"
+                   type="wsrf-sg:RPDocType"
+                   minOccurs="0" maxOccurs="1" />
+      <xsd:any namespace="##any" processContents="lax"
+               minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <xsd:anyAttribute namespace="##other" 
+                      processContents="lax" />
+  </xsd:complexType>
+
+  <xsd:complexType name="EntryType">
+    <xsd:sequence>
+      <xsd:element name="ServiceGroupEntryEPR"
+                   type="wsa:EndpointReferenceType" 
+                   minOccurs="1" maxOccurs="1"
+                   nillable="true" /> 
+      <xsd:element name="MemberServiceEPR"
+                   type="wsa:EndpointReferenceType" 
+                   minOccurs="0" maxOccurs="1" /> 
+      <xsd:element ref="wsrf-sg:Content"
+                   minOccurs="0" maxOccurs="1" />
+    </xsd:sequence> 
+    <xsd:anyAttribute namespace="##other" processContents="lax" />
+  </xsd:complexType>
+
+  <!-- ========== Resource Properties for ServiceGroupEntry ========= -->
+
+  <xsd:element name="Entry"
+               type="wsrf-sg:EntryType" />
+
+  <xsd:element name="Content"
+               type="wsrf-sg:ContentType" />
+
+  <xsd:element name="MemberEPR" 
+               type="wsa:EndpointReferenceType" />
+
+  <xsd:element name="ServiceGroupEPR" 
+               type="wsa:EndpointReferenceType" />
+
+  <!-- =============== Resource Property Related  =================== -->
+
+  <!-- ============ Resource Properties for ServiceGroup ============ -->
+
+  <xsd:element name="ServiceGroupRP">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="wsrf-sg:MembershipContentRule"
+                     minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="wsrf-sg:Entry" 
+                     minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- ========== Resource Properties for ServiceGroupEntry ========= -->   
+
+  <xsd:element name="ServiceGroupEntryRP">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="wsrf-sg:ServiceGroupEPR" 
+                     minOccurs="1" maxOccurs="1" />
+        <xsd:element ref="wsrf-sg:MemberEPR" 
+                     minOccurs="0" maxOccurs="1" />
+        <xsd:element ref="wsrf-sg:Content" 
+                     minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- ================= Message Specific Types  ==================== -->      
+
+  <!-- ======== Message Types for ServiceGroupRegistration  ========= -->
+
+  <xsd:element name="Add">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="MemberEPR" 
+                     type="wsa:EndpointReferenceType" />
+        <xsd:element ref="wsrf-sg:Content" />
+        <xsd:element name="InitialTerminationTime" 
+                     type="wsrf-sg:AbsoluteOrRelativeTimeType"
+                     minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="AddResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="ServiceGroupEntryReference" 
+                     type="wsa:EndpointReferenceType"
+                     minOccurs="1" maxOccurs="1" />
+        <xsd:element name="TerminationTime"
+                     nillable="true"
+                     type="xsd:dateTime"
+                     minOccurs="1" maxOccurs="1" />
+        <xsd:element name="CurrentTime"
+                     type="xsd:dateTime"
+                     minOccurs="1" maxOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+                     
+  <xsd:complexType name="ContentCreationFailedFaultType">
+    <xsd:complexContent>
+      <xsd:extension base="wsrf-bf:BaseFaultType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="ContentCreationFailedFault" 
+               type="wsrf-sg:ContentCreationFailedFaultType" />
+
+  <xsd:complexType name="UnsupportedMemberInterfaceFaultType">
+    <xsd:complexContent>
+      <xsd:extension base="wsrf-bf:BaseFaultType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="UnsupportedMemberInterfaceFault" 
+               type="wsrf-sg:UnsupportedMemberInterfaceFaultType" />
+
+  <xsd:complexType name="AddRefusedFaultType">
+    <xsd:complexContent>
+      <xsd:extension base="wsrf-bf:BaseFaultType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="AddRefusedFault" 
+               type="wsrf-sg:AddRefusedFaultType" />
+
+  <!-- = Messages Related to ServiceGroup Change Notification ======= -->
+
+  <xsd:complexType name="ServiceGroupModificationNotificationType">
+    <xsd:sequence>
+      <xsd:element name="ServiceGroupEntryEPR"
+                   type="wsa:EndpointReferenceType" 
+                   minOccurs="1" maxOccurs="1"
+                   nillable="true" /> 
+      <xsd:element name="MemberServiceEPR"
+                   type="wsa:EndpointReferenceType" 
+                   minOccurs="0" maxOccurs="1" /> 
+      <xsd:element ref="wsrf-sg:Content"
+                   minOccurs="0" maxOccurs="1" />          
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ServiceGroupRemovalNotificationType">
+    <xsd:complexContent>
+      <xsd:extension 
+           base="wsrf-sg:ServiceGroupModificationNotificationType">    
+        <xsd:sequence>
+          <xsd:element name="Reason" 
+                       type="xsd:string" 
+                       minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:element name="EntryAdditionNotification" 
+               type="wsrf-sg:ServiceGroupModificationNotificationType" />
+
+  <xsd:element name="EntryRemovalNotification" 
+               type="wsrf-sg:ServiceGroupRemovalNotificationType" />
+
+</xsd:schema>

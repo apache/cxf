@@ -1,0 +1,8 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Header/>
+ <env:Body xmlns="http://www.webservicex.net">
+	<GetWeatherByZipCode>
+      <ZipCode>49506</ZipCode>
+	</GetWeatherByZipCode>
+ </env:Body>
+</env:Envelope>

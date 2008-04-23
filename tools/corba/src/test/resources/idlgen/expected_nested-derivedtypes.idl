@@ -1,0 +1,308 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+struct ExtendFromEmptySequenceSequenceStruct {
+    long varInt;
+};
+struct ContainingAnonSequenceSequenceStruct {
+    long varInt;
+    string varString;
+};
+struct ContainingAnonSequence {
+    float varFloat;
+    ContainingAnonSequenceSequenceStruct ContainingAnonSequenceSequenceStruct_f;
+};
+struct ExtendFromContainingAnonSequenceSequenceStruct {
+    long varInt;
+};
+struct ExtendFromContainingAnonSequence {
+    ContainingAnonSequence ContainingAnonSequence_f;
+    ExtendFromContainingAnonSequenceSequenceStruct ExtendFromContainingAnonSequenceSequenceStruct_f;
+};
+typedef sequence<float, 3> RepeatedElement;
+struct ExtendFromRepeatedElementSequenceStruct {
+    string c;
+};
+struct ExtendFromRepeatedElement {
+    RepeatedElement RepeatedElement_f;
+    ExtendFromRepeatedElementSequenceStruct ExtendFromRepeatedElementSequenceStruct_f;
+};
+struct ExtendFromSchemaTypeSequenceStruct {
+    string varString;
+    float varFloat;
+};
+struct baseAll {
+    long e1;
+    string e2;
+};
+struct SequenceExtendedFromAllSequenceStruct {
+    float e3;
+};
+struct SequenceExtendedFromAll {
+    baseAll baseAll_f;
+    SequenceExtendedFromAllSequenceStruct SequenceExtendedFromAllSequenceStruct_f;
+};
+struct base {
+    long e1;
+    string e2;
+};
+union sub2ChoiceType switch(long) {
+    case 0:
+        double e4;
+    case 1:
+        double e5;
+};
+struct sub2 {
+    base base_f;
+    sub2ChoiceType sub2ChoiceType_f;
+};
+struct sub3SequenceStruct {
+    boolean e6;
+};
+struct sub3 {
+    sub2 sub2_f;
+    sub3SequenceStruct sub3SequenceStruct_f;
+};
+union ChoiceElem switch(long) {
+    case 0:
+        string a;
+    case 1:
+        string b;
+};
+struct ExtendFromChoiceSequenceStruct {
+    string c;
+};
+struct ExtendFromChoice {
+    ChoiceElem ChoiceElem_f;
+    ExtendFromChoiceSequenceStruct ExtendFromChoiceSequenceStruct_f;
+};
+union ChoiceDerivedFromSequenceChoiceType switch(long) {
+    case 0:
+        string a;
+    case 1:
+        string b;
+};
+typedef sequence<string, 4> sArray;
+struct RepeatedFromRepeatedElementSequenceStruct {
+    sArray s;
+};
+struct RepeatedFromRepeatedElement {
+    RepeatedElement RepeatedElement_f;
+    RepeatedFromRepeatedElementSequenceStruct RepeatedFromRepeatedElementSequenceStruct_f;
+};
+union _omg_ChoiceElem switch(long) {
+    case 0:
+        string a;
+    case 1:
+        string b;
+};
+union _omg_ChoiceDerivedFromSequenceChoiceType switch(long) {
+    case 0:
+        string a;
+    case 1:
+        string b;
+};
+struct ExtendFromEmptySequence {
+    ExtendFromEmptySequenceSequenceStruct ExtendFromEmptySequenceSequenceStruct_f;
+};
+struct sub1SequenceStruct {
+    float e3;
+};
+struct ChoiceDerivedFromSequence {
+    base base_f;
+    ChoiceDerivedFromSequenceChoiceType ChoiceDerivedFromSequenceChoiceType_f;
+};
+struct RepeatedSequenceFromRepeatedElementSequenceStruct {
+    string s;
+};
+typedef sequence<RepeatedSequenceFromRepeatedElementSequenceStruct, 4> RepeatedSequenceFromRepeatedElementSequenceStructArray;
+struct RepeatedSequenceFromRepeatedElement {
+    RepeatedElement RepeatedElement_f;
+    RepeatedSequenceFromRepeatedElementSequenceStructArray RepeatedSequenceFromRepeatedElementSequenceStructArray_f;
+};
+struct AllExtendingAllAllStruct {
+    float e3;
+};
+struct AllExtendingAll {
+    baseAll baseAll_f;
+    AllExtendingAllAllStruct AllExtendingAllAllStruct_f;
+};
+struct ChoiceInTheMiddleSequenceStruct {
+    string c;
+};
+struct ChoiceInTheMiddle {
+    ChoiceDerivedFromSequence ChoiceDerivedFromSequence_f;
+    ChoiceInTheMiddleSequenceStruct ChoiceInTheMiddleSequenceStruct_f;
+};
+struct sub1 {
+    base base_f;
+    sub1SequenceStruct sub1SequenceStruct_f;
+};
+struct ExtendFromSchemaType {
+    string attrString;
+    string string_f;
+    ExtendFromSchemaTypeSequenceStruct ExtendFromSchemaTypeSequenceStruct_f;
+};
+union _omg_sub2ChoiceType switch(long) {
+    case 0:
+        double e4;
+    case 1:
+        double e5;
+};
+interface DerivedTypesPortType {
+    struct echoAllExtendingAll {
+        ::AllExtendingAll item;
+    };
+    struct echoExtendFromContainingAnonSequence {
+        ::ExtendFromContainingAnonSequence item;
+    };
+    struct echoChoiceInTheMiddle {
+        ::ChoiceInTheMiddle item;
+    };
+    struct echoExtendFromSchemaTypeResult {
+        ::ExtendFromSchemaType return;
+    };
+    struct echoSequenceExtendedFromAll {
+        ::SequenceExtendedFromAll item;
+    };
+    struct echoBaseObj {
+        ::base item;
+    };
+    struct echoChoiceDerivedFromSequenceResult {
+        ::ChoiceDerivedFromSequence return;
+    };
+    struct echoExtendFromEmptySequenceResult {
+        ::ExtendFromEmptySequence return;
+    };
+    struct echoExtendFromChoiceResult {
+        ::ExtendFromChoice return;
+    };
+    struct echoExtendFromRepeatedElement {
+        ::ExtendFromRepeatedElement item;
+    };
+    struct echoRepeatedFromRepeatedElementResult {
+        ::RepeatedFromRepeatedElement return;
+    };
+    struct echoExtendFromSchemaType {
+        ::ExtendFromSchemaType item;
+    };
+    struct echoAllExtendingAllResult {
+        ::AllExtendingAll return;
+    };
+    struct echoExtendFromContainingAnonSequenceResult {
+        ::ExtendFromContainingAnonSequence return;
+    };
+    struct echoChoiceDerivedFromSequence {
+        ::ChoiceDerivedFromSequence item;
+    };
+    struct echoExtendFromEmptySequence {
+        ::ExtendFromEmptySequence item;
+    };
+    struct echoChoiceInTheMiddleResult {
+        ::ChoiceInTheMiddle return;
+    };
+    struct echoSub3ObjResult {
+        ::sub3 return;
+    };
+    struct echoSub2Obj {
+        ::sub2 item;
+    };
+    struct echoSub2ObjResult {
+        ::sub2 return;
+    };
+    struct echoSub1Obj {
+        ::sub1 item;
+    };
+    struct echoSequenceExtendedFromAllResult {
+        ::SequenceExtendedFromAll return;
+    };
+    struct echoSub3Obj {
+        ::sub3 item;
+    };
+    struct echoBaseObjResult {
+        ::base return;
+    };
+    struct echoExtendFromRepeatedElementResult {
+        ::ExtendFromRepeatedElement return;
+    };
+    struct echoSub1ObjResult {
+        ::sub1 return;
+    };
+    struct echoExtendFromChoice {
+        ::ExtendFromChoice item;
+    };
+    struct echoRepeatedFromRepeatedElement {
+        ::RepeatedFromRepeatedElement item;
+    };
+    ::base
+    echoBaseObj(
+        in ::base item
+    );
+    ::sub1
+    echoSub1Obj(
+        in ::sub1 item
+    );
+    ::sub2
+    echoSub2Obj(
+        in ::sub2 item
+    );
+    ::sub3
+    echoSub3Obj(
+        in ::sub3 item
+    );
+    ::ExtendFromEmptySequence
+    echoExtendFromEmptySequence(
+        in ::ExtendFromEmptySequence item
+    );
+    ::ExtendFromContainingAnonSequence
+    echoExtendFromContainingAnonSequence(
+        in ::ExtendFromContainingAnonSequence item
+    );
+    ::ExtendFromSchemaType
+    echoExtendFromSchemaType(
+        in ::ExtendFromSchemaType item
+    );
+    ::AllExtendingAll
+    echoAllExtendingAll(
+        in ::AllExtendingAll item
+    );
+    ::SequenceExtendedFromAll
+    echoSequenceExtendedFromAll(
+        in ::SequenceExtendedFromAll item
+    );
+    ::ExtendFromChoice
+    echoExtendFromChoice(
+        in ::ExtendFromChoice item
+    );
+    ::ChoiceDerivedFromSequence
+    echoChoiceDerivedFromSequence(
+        in ::ChoiceDerivedFromSequence item
+    );
+    ::ChoiceInTheMiddle
+    echoChoiceInTheMiddle(
+        in ::ChoiceInTheMiddle item
+    );
+    ::ExtendFromRepeatedElement
+    echoExtendFromRepeatedElement(
+        in ::ExtendFromRepeatedElement item
+    );
+    ::RepeatedFromRepeatedElement
+    echoRepeatedFromRepeatedElement(
+        in ::RepeatedFromRepeatedElement item
+    );
+};

@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ============= Includes ========= -->
+  <xsd:include schemaLocation="Common.xsd"/>
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/TerminationPoint.xsd"/>
+  <xsd:include schemaLocation="../networkResources/ManagedElement.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Equipment.xsd"/>
+  <!-- ============ Element Declarations ========= -->
+  <xsd:element name="getAllEquipmentNames" type="getAllEquipmentNames_T"/>
+  <xsd:element name="getAllEquipment" type="getAllEquipment_T"/>
+  <xsd:element name="getAllEquipmentResponse" type="getAllEquipmentResponse_T"/>
+  <xsd:element name="getAllSupportedPTPNames" type="getAllSupportedPTPNames_T"/>
+  <xsd:element name="getAllSupportedPTPs" type="getAllSupportedPTPs_T"/>
+  <xsd:element name="getAllSupportedPTPsResponse" type="getAllSupportedPTPsResponse_T"/>
+  <xsd:element name="getAllSupportingEquipmentNames" type="getAllSupportingEquipmentNames_T"/>
+  <xsd:element name="getAllSupportingEquipment" type="getAllSupportingEquipment_T"/>
+  <xsd:element name="getAllSupportingEquipmentResponse" type="getAllSupportingEquipmentResponse_T"/>
+  <xsd:element name="getContainedEquipment" type="getContainedEquipment_T"/>
+  <xsd:element name="getContainedEquipmentResponse" type="getContainedEquipmentResponse_T"/>
+  <xsd:element name="getEquipment" type="getEquipment_T"/>
+  <xsd:element name="getEquipmentResponse" type="getEquipmentResponse_T"/>
+  <xsd:element name="getSupportedEquipmentNames" type="getSupportedEquipmentNames_T"/>
+  <xsd:element name="getSupportedEquipment" type="getSupportedEquipment_T"/>
+  <xsd:element name="getSupportedEquipmentResponse" type="getSupportedEquipmentResponse_T"/>
+  <xsd:element name="getSupportingEquipmentNames" type="getSupportingEquipmentNames_T"/>
+  <xsd:element name="getSupportingEquipment" type="getSupportingEquipment_T"/>
+  <xsd:element name="getSupportingEquipmentResponse" type="getSupportingEquipmentResponse_T"/>
+  <!-- ===================== getAllEquipmentNames Request Messages ========= -->
+  <xsd:complexType name="getAllEquipmentNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllEquipment(), but returns the object names instead of returning the entire objects.
+          Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+          Note that the response message is handled by getObjectNamesResponse_T.
+          
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when managedElementOrEquipmentName does not reference a managed element or an equipment holder
+EXCPT_ENTITY_NOT_FOUND - Raised when managedElementOrEquipmentName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meOrHolderName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the ME or equipment holder for which to retrieve contained equipments and equipment holders.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllEquipment Request/Response Messages ========= -->
+  <xsd:complexType name="getAllEquipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request all of the equipments and equipment holders that are contained in a managed element or equipment holder.
+          Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+          
+          Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when managedElementOrEquipmentName does not reference a managed element or an equipment holder
+EXCPT_ENTITY_NOT_FOUND - Raised when managedElementOrEquipmentName references object which does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meOrHolderName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the ME or equipment holder for which to retrieve contained equipments and equipment holders.
+            </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllEquipmentResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getAllEquipment operation. See also getAllEquipment_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eqList" type="EquipmentOrHolderList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the list of all equipments
+          </xsd:documentation>
+        </xsd:annotation>
+        </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSupportedPTPNames Request Message ========= -->
+  <xsd:complexType name="getAllSupportedPTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllSupportedPTPs(), but returns the object names instead of returning the entire objects
+          Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+          Note that the response message is handled by getObjectNamesResponse_T.
+          
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentName references object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the equipment for which to retrieve supported PTPs/FTPs
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSupportedPTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllSupportedPTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service allows an NMS to request the PTPs/FTPs that are directly supported by a given equipment. The PTPs that are returned are those that share their physical layer with the primary equipment (i.e. that represent a port on the equipment or are connected by a fibre, wire, etc.). The FTPs that are returned are those which are implemented by the physical circuitry supported by the equipment and will include FTPs that are named from the specified equipment (the FTPs will depend upon the presence of that equipment for their most basic operation). 
+When there is equipment protection, this operation reports PTPs/FTPs for the primary equipment only. That is, when called on a protecting equipment (as opposed to the primary equipment), this operation returns an empty list, irrespective of the current switch status.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentName references object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the equipment for which to retrieve supported PTPs/FTPs
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllSupportedPTPsResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getAllSupportedPTPs operation. See also getAllSupportedPTPs_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpList" type="TerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of all supported PTPs and FTPs
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSupportingEquipmentNames Request Message ========= -->
+  <xsd:complexType name="getAllSupportingEquipmentNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllSupportingEquipment(), but returns the object names instead of returning the entire objects.
+          Note that the response message is handled by getObjectNamesResponse_T.
+          
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when ptpName does not reference a PTP/FTP object
+EXCPT_ENTITY_NOT_FOUND - Raised when ptpName references a PTP/FTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost 
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ptpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the PTP/FTP for which to retrieve the supporting equipments. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSupportingEquipment Request/Response Messages ========= -->
+  <xsd:complexType name="getAllSupportingEquipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      	 This service allows an NMS to request all of the equipment which implement a PTP/FTP. For a PTP, the equipments that are returned are those which support the physical layer of the PTP (i.e. have the port on them or are connected by a fibre, wire, etc.). For an FTP, the equipments returned are those which support the physical circuitry implementing the FTP and will include the equipment from which the FTP is named (the FTPs will depend upon the presence of that equipment for their most basic operation). For a particular PTP/FTP the Tx port/function and Rx port/function may be on different cards and in this case both should be returned. Equipment that are used by the PTPs/FTPs, but that do not support them directly (such as a shared DEMUX card) are not reported.
+When there is equipment protection, this operation reports the primary equipment only. The protecting equipment will not be returned by this operation
+
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when ptpName does not reference a PTP/FTP object
+EXCPT_ENTITY_NOT_FOUND - Raised when ptpName references a PTP/FTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost 
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ptpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the PTP/FTP for which to retrieve the supporting equipments. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllSupportingEquipmentResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getAllSupportingEquipment operation. See also getAllSupportingEquipment_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eqList" type="EquipmentOrHolderList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the list of equipment names (not equipment holder names) directly implementing the PTP/FTP
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedEquipment Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedEquipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns the equipments and equipment holders directly contained by a specific equipment holder. This method differs from getAllEquipment in that it only looks at the next level of the containment hierarchy.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentHolderName does not reference an equipment holder object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentHolderName references an equipment holder that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentHolderName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            name of the equipment holder for which to retrieve the directly contained equipment and equipment holders.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getContainedEquipmentResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getContainedEquipment operation. See also getContainedEquipment_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eqList" type="EquipmentOrHolderList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the directly contained equipments and equipment holders
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getEquipment Request/Response Messages ========= -->
+  <xsd:complexType name="getEquipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns the equipment or equipment holder for the given equipment or equipment holder name.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentOrHolderName does not reference an equipment nor an equipment holder
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentOrHolderName references an equipment or equipment holder that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentOrHolderName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            name of the equipment or equipment holder to retrieve
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getEquipmentResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getEquipment operation. See also getEquipment_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equip" type="EquipmentOrHolder_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the returned equipment or equipment holder
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSupportedEquipmentNames Request Message ========= -->
+  <xsd:complexType name="getSupportedEquipmentNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getSupportedEquipment(), but returns the object names instead of returning the entire objects.
+          Note that the response message is handled by getObjectNamesResponse_T.
+          
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentName references an equipment object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the equipment for which to retrieve the list of supported equipment names
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSupportedEquipment Request/Response Messages ========= -->
+  <xsd:complexType name="getSupportedEquipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service allows an NMS to request all of the pieces of equipment supported by a given piece of equipment, e.g., a power pack might support many circuit packs.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentName references an equipment object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the equipment for which to retrieve the supported equipment list
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getSupportedEquipmentResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getSupportedEquipment operation. See also getSupportedEquipment_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eqList" type="EquipmentOrHolderList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the list of equipment (not equipment holders) supported by the given piece of equipment
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSupportingEquipmentNames Request Message ========= -->
+  <xsd:complexType name="getSupportingEquipmentNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This operation has exactly the same behaviour as getSupportingEquipment(), but returns the object names instead of returning the entire objects.
+        Note that the response message is handled by getObjectNamesResponse_T.
+          
+        Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentName references an equipment object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the equipment for which to retrieve the list of supporting equipment names
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSupportingEquipment Request/Response Messages ========= -->
+  <xsd:complexType name="getSupportingEquipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service allows an NMS to request all of the equipment that supports a given piece of equipment, e.g., the power pack and synchronization card that support a given piece of equipment.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when equipmentName does not reference an equipment object
+EXCPT_ENTITY_NOT_FOUND - Raised when equipmentName references an equipment object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="equipmentName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the equipment for which to retrieve the supporting equipments.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getSupportingEquipmentResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getSupportingEquipment operation. See also getSupportingEquipment_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eqList" type="EquipmentOrHolderList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the list of equipment names (not equipment holders) that are supported by a given piece of equipment
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

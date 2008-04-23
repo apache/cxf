@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:http="http://cxf.apache.org/transports/http/configuration"
+  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" 
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
+ xsi:schemaLocation="
+        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://cxf.apache.org/jaxws                                 http://cxf.apache.org/schemas/jaxws.xsd
+        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
+        http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+ ">
+
+  <bean id="aegisBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding" scope='prototype'>
+  <property name='configuration'>
+   <bean class='org.apache.cxf.aegis.type.Configuration'>
+    <property name='defaultMinOccurs' value='1' />
+    <property name='defaultNillable' value='false' />
+   </bean>
+  </property>
+ </bean>
+
+ <!--  define a service factory that supports both JAX-WS annotations and also Aegis files. -->
+ <bean id='jaxws-and-aegis-service-factory' class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean"
+       scope='prototype'>
+  <property name="dataBinding" ref="aegisBean" />
+ </bean>
+
+ <jaxws:endpoint id="dummy-service-endpoint" 
+    implementor="org.apache.cxf.systest.http_jetty.Dummy" 
+    address="http://localhost:8808/Dummy">
+  <jaxws:serviceFactory>
+   <ref bean='jaxws-and-aegis-service-factory' />
+  </jaxws:serviceFactory>
+ </jaxws:endpoint>
+
+ <jaxws:endpoint id="dummy-8801-service-endpoint"  
+                 implementor="org.apache.cxf.systest.http_jetty.Dummy" 
+                 address="http://localhost:8801/Dummy">
+  <jaxws:serviceFactory>
+   <ref bean='jaxws-and-aegis-service-factory' />
+  </jaxws:serviceFactory>
+ </jaxws:endpoint>
+
+ <bean id="dummy-client" class="org.apache.cxf.systest.http_jetty.DummyInterface" factory-bean="clientFactory" factory-method="create" />
+
+ <bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+  <property name="serviceClass" value="org.apache.cxf.systest.http_jetty.DummyInterface" />
+  <property name="address" value="http://localhost:8808/Dummy" />
+ </bean>
+
+<bean id="dummy-client-8801" class="org.apache.cxf.systest.http_jetty.DummyInterface" factory-bean="clientFactory-8801" factory-method="create" />
+
+ <bean id="clientFactory-8801" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+  <property name="serviceClass" value="org.apache.cxf.systest.http_jetty.DummyInterface" />
+  <property name="address" value="http://localhost:8801/Dummy" />
+ </bean>
+
+</beans>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://apache.org/fault"
+    xmlns:x1="http://apache.org/fault/types"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://apache.org/fault" name="HelloWorld">
+    <wsdl:types>
+        <schema targetNamespace="http://apache.org/fault/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/fault/types" elementFormDefault="qualified">
+           
+            <element name="greetMe">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+
+
+            <element name="testDocLitFault">
+                <complexType>
+                    <sequence>
+                        <element name="faultType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="testDocLitFaultResponse">
+                <complexType>
+                    <sequence/>
+                </complexType>
+            </element>
+            <complexType name="ErrorCode">
+                <sequence>
+                    <element name="minor" type="short"/>
+                    <element name="major" type="short"/>
+                </sequence>
+            </complexType>
+            <element name="NoSuchCodeLit">
+                <complexType>
+                    <sequence>
+                        <element name="code" type="x1:ErrorCode"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="BadRecordLit" type="string"/>
+            <complexType name="BadRecord">
+                <sequence>
+                    <element name="reason" type="string"/>
+                    <element name="code" type="short"/>
+                </sequence>
+            </complexType>
+            
+        </schema>
+    </wsdl:types>
+
+    <wsdl:message name="greetMeRequest">
+        <wsdl:part name="in" element="x1:greetMe"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeResponse">
+        <wsdl:part name="out" element="x1:greetMeResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="testDocLitFaultRequest">
+        <wsdl:part name="in" element="x1:testDocLitFault"/>
+    </wsdl:message>
+    <wsdl:message name="testDocLitFaultResponse">
+        <wsdl:part name="out" element="x1:testDocLitFaultResponse"/>
+    </wsdl:message>
+    <wsdl:message name="NoSuchCodeLitFault">
+        <wsdl:part name="NoSuchCodeLit" element="x1:NoSuchCodeLit"/>
+    </wsdl:message>
+    <wsdl:message name="BadRecordLitFault">
+        <wsdl:part name="BadRecordLit" element="x1:BadRecordLit"/>
+    </wsdl:message>
+ 
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="greetMe">
+            <wsdl:input name="greetMeRequest" message="tns:greetMeRequest"/>
+            <wsdl:output name="greetMeResponse" message="tns:greetMeResponse"/>
+            <wsdl:fault name="greetMeFault" message="tns:NoSuchCodeLitFault"/>
+        </wsdl:operation>
+ 
+        <wsdl:operation name="testDocLitFault">
+            <wsdl:input name="testDocLitFaultRequest" message="tns:testDocLitFaultRequest"/>
+            <wsdl:output name="testDocLitFaultResponse" message="tns:testDocLitFaultResponse"/>
+            <wsdl:fault name="NoSuchCodeLitFault" message="tns:NoSuchCodeLitFault"/>
+            <wsdl:fault name="BadRecordLitFault" message="tns:BadRecordLitFault"/>
+        </wsdl:operation>
+       
+    </wsdl:portType>
+    <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+       
+        <wsdl:operation name="greetMe">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        
+        <wsdl:operation name="testDocLitFault">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="NoSuchCodeLitFault">
+                <soap:fault name="NoSuchCodeLitFault" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="BadRecordLitFault">
+                <soap:fault name="BadRecordLitFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        
+    </wsdl:binding>
+    <wsdl:service name="SOAPService">
+        <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>
+

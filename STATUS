@@ -1,0 +1,108 @@
+##
+## $Rev$ $Date$
+##
+
+Exit Criteria
+(put an X next to item when it is complete):
+
+Copyrights & Licensing
+
+X  -- Do all the software in the codebase has its copyright assigned to The
+     Apache Software Foundation?
+
+X  -- Do All the software in the codebase, are licensed (or multi-licensed) under the
+     Apache licence?
+
+X  -- Do all the software in the codebase,are compliant with the
+     Specifications set by Java Community Process?(Wherever applicable)
+     * This criteria has been superceded by the Exit Milestone below
+
+Distribution rights
+
+X  -- For all code included with the distribution that is not under the
+     Apache license, do we have the right to combine with Apache-licensed
+     code and redistribute?
+
+X  -- Is all source code distributed by the project covered by one or more
+     of the following approved licenses:  Apache, BSD, Artistic, MIT/X,
+     MIT/W3C, MPL 1.1, or something with essentially the same terms?
+
+Infrastructure
+
+X -- SVN modules created and committers added to avail file?
+     Yes:       https://svn.apache.org/repos/asf/incubator/cxf
+
+X  -- Are the developer,commit and user mailing lists set up and archived?
+
+X  -- Bug tracking system enabled?
+     Yes:       https://issues.apache.org/jira/browse/CXF
+
+X  -- wiki based documentation site enabled?
+     Yes:       http://cwiki.apache.org/confluence/display/CXF/Index
+
+X  -- Has the project migrated to our infrastructure?
+
+Committers:
+
+X  -- Have all of the active long-term volunteers been identified
+     and acknowledged as committers on the project?
+
+	apaibir
+	bharathganesh
+	blin
+	bmargulies
+	ddiephouse
+	dkulp
+	eglynn
+	ejohnson
+	ema
+	ffang
+	gmazza
+	gnodet
+	jgawor
+	jgenender
+	jim
+	jliu
+	maomaode
+	ningjiang
+	pjones
+	seanoc
+	ubhole
+	unrealjiang
+
+
+X  -- Have all the commiters signed the CLA?
+
+X  -- Do they have accounts on svn.apache.org?
+
+X  -- Are there three or more independent committers?
+     Yes
+
+Collaborative Development:
+
+X  -- Are project decisions being made in public by the committers?
+
+X  -- Are the decision-making guidelines published and agreed to by
+     all of the committers?
+
+X  -- Does the documentation site has enough information on the architecure, design decisions and
+     modules?
+
+  -- Has the community, the graduation/new PMC of the project to which the codebase and community
+     will move at the end of incubation (if any), and the Incubator PMC, decided the
+     expected time frame of stay in incubator?
+
+X  -- Has the community adopted the Apache voting rules and is otherwise following the Apache
+     guidelines?
+
+Exit Milestone:
+
+organisational acceptance:
+
+  -- Has the board accepted moving to a existing/new PMC?
+
+
+Incubator sign-off:
+
+  -- Has the Incubator decided that the project has accomplished all
+     of the above tasks?

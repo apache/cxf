@@ -1,0 +1,470 @@
+<examples>
+
+  This is from the JaxRpc spec 19.1.3
+  <example
+      xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+      xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      xmlns:tns="urn:Bean">
+
+
+    <home-address href="#ID-1"/>
+    <tns:Address xsi:type="tns:Address" id="ID-1">
+      <street href="#ID-2"/>
+      <city href="#ID-3"/>
+      <state href="#ID-4"/>
+      <zip href="#ID-5"/>
+    </tns:Address>
+    <soapenc:string xsi:type="xsd:string" id="ID-2">1234 Riverside Drive
+    </soapenc:string>
+    <soapenc:string xsi:type="xsd:string" id="ID-3">Gainesville
+    </soapenc:string>
+    <soapenc:string xsi:type="xsd:string" id="ID-4">Georgia
+    </soapenc:string>
+    <soapenc:string xsi:type="xsd:string" id="ID-5">30506
+    </soapenc:string>
+  </example>
+
+  WebSphere message from article about interop http://www.developerfusion.co.uk/show/4694/3/
+  <example
+      xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+      xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      >
+    <soapenv:Body soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <makeFriendResponse xmlns="http://cyclic.test">
+        <makeFriendReturn href="#id0" xmlns=""/>
+      </makeFriendResponse>
+      <multiRef id="id0"
+                soapenc:root="0"
+                soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                xsi:type="ns-520570027:Person"
+                xmlns:ns-520570027="http://cyclic.test"
+                xmlns="">
+        <name xsi:type="xsd:string">John</name>
+        <friend href="#id1"/>
+      </multiRef>
+      <multiRef id="id1"
+                soapenc:root="0"
+                soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                xsi:type="ns-520570027:Person"
+                xmlns:ns-520570027="http://cyclic.test"
+                xmlns="">
+        <name xsi:type="xsd:string">Jason</name>
+        <friend href="#id0"/>
+      </multiRef>
+    </soapenv:Body>
+  </example>
+
+  .Net message from article about interop http://www.developerfusion.co.uk/show/4694/3/
+  <example
+      xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+      xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tns="urn:Bean"
+      xmlns:types="X"
+      >
+
+    <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <tns:makeFriendsResponse>
+        <makeFriendsResult href="#id1"/>
+      </tns:makeFriendsResponse>
+      <types:Person id="id1" xsi:type="types:Person">
+        <name xsi:type="xsd:string">John</name>
+        <friend href="#id2"/>
+      </types:Person>
+      <types:Person id="id2" xsi:type="types:Person">
+        <name xsi:type="xsd:string">Jason</name>
+        <friend href="#id1"/>
+      </types:Person>
+    </soap:Body>
+  </example>
+
+  Eamples from the soap 1.1 spec http://www.w3.org/TR/2000/NOTE-SOAP-20000508/
+  5.4.1 Compound Values, Structs and References to Values
+  <exmaple xmlns:e="urn:Bean">
+    <e:Book>
+      <author>Henry Ford</author>
+      <preface>Prefatory text</preface>
+      <intro>This is a book.</intro>
+    </e:Book>
+  </example>
+  <exmaple xmlns:e="urn:Bean">
+    <e:Book>
+      <title>My Life and Work</title>
+      <author href="#Person-1"/>
+    </e:Book>
+    <e:Person id="Person-1">
+      <name>Henry Ford</name>
+      <address href="#Address-2"/>
+    </e:Person>
+    <e:Address id="Address-2">
+      <email>mailto:henryford@hotmail.com</email>
+      <web>http://www.henryford.com</web>
+    </e:Address>
+  </example>
+  <exmaple xmlns:e="urn:Bean">
+    <e:Book>
+      <title>My Life and Work</title>
+      <author>
+        <name>Henry Ford</name>
+        <address>
+          <email>mailto:henryford@hotmail.com</email>
+          <web>http://www.henryford.com</web>
+        </address>
+      </author>
+    </e:Book>
+  </example>
+  <exmaple xmlns:e="urn:Bean">
+    <e:Book>
+      <title>My Life and Work</title>
+      <firstauthor href="#Person-1"/>
+      <secondauthor href="#Person-2"/>
+    </e:Book>
+    <e:Person id="Person-1">
+      <name>Henry Ford</name>
+      <address xsi:type="m:Electronic-address">
+        <email>mailto:henryford@hotmail.com</email>
+        <web>http://www.henryford.com</web>
+      </address>
+    </e:Person>
+    <e:Person id="Person-2">
+      <name>Samuel Crowther</name>
+      <address xsi:type="n:Street-address">
+        <street>Martin Luther King Rd</street>
+        <city>Raleigh</city>
+        <state>North Carolina</state>
+      </address>
+    </e:Person>
+  </example>
+  <exmaple xmlns:e="urn:Bean">
+    <e:Book>
+      <title>Paradise Lost</title>
+      <firstauthor href="http://www.dartmouth.edu/~milton/"/>
+    </e:Book>
+  </example>
+
+  5.4.2 Arrays
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <myFavoriteNumbers SOAP-ENC:arrayType="xsd:int[2]">
+      <number>3</number>
+      <number>4</number>
+    </myFavoriteNumbers>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:ur-type[4]">
+      <thing xsi:type="xsd:int">12345</thing>
+      <thing xsi:type="xsd:decimal">6.789</thing>
+      <thing xsi:type="xsd:string">
+        Of Mans First Disobedience, and the Fruit
+        Of that Forbidden Tree, whose mortal tast
+        Brought Death into the World, and all our woe,
+      </thing>
+      <thing xsi:type="xsd:uriReference">
+        http://www.dartmouth.edu/~milton/reading_room/
+      </thing>
+    </SOAP-ENC:Array>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:ur-type[4]">
+      <SOAP-ENC:int>12345</SOAP-ENC:int>
+      <SOAP-ENC:decimal>6.789</SOAP-ENC:decimal>
+      <xsd:string>
+        Of Mans First Disobedience, and the Fruit
+        Of that Forbidden Tree, whose mortal tast
+        Brought Death into the World, and all our woe,
+      </xsd:string>
+      <SOAP-ENC:uriReference>
+        http://www.dartmouth.edu/~milton/reading_room/
+      </SOAP-ENC:uriReference>
+    </SOAP-ENC:Array>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xyz:Order[2]">
+      <Order>
+        <Product>Apple</Product>
+        <Price>1.56</Price>
+      </Order>
+      <Order>
+        <Product>Peach</Product>
+        <Price>1.48</Price>
+      </Order>
+    </SOAP-ENC:Array>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:string[][2]">
+      <item href="#array-1"/>
+      <item href="#array-2"/>
+    </SOAP-ENC:Array>
+    <SOAP-ENC:Array id="array-1" SOAP-ENC:arrayType="xsd:string[2]">
+      <item>r1c1</item>
+      <item>r1c2</item>
+      <item>r1c3</item>
+    </SOAP-ENC:Array>
+    <SOAP-ENC:Array id="array-2" SOAP-ENC:arrayType="xsd:string[2]">
+      <item>r2c1</item>
+      <item>r2c2</item>
+    </SOAP-ENC:Array>
+  </example>
+  <exmaple
+      xmlns:xyz="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <xyz:ArrayOfPhoneNumbers SOAP-ENC:arrayType="xyz:phoneNumber[2]">
+      <phoneNumber>206-555-1212</phoneNumber>
+      <phoneNumber>1-888-123-4567</phoneNumber>
+    </xyz:ArrayOfPhoneNumbers>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:string[2,3]">
+      <item>r1c1</item>
+      <item>r1c2</item>
+      <item>r1c3</item>
+      <item>r2c1</item>
+      <item>r2c2</item>
+      <item>r2c3</item>
+    </SOAP-ENC:Array>
+  </example>
+  <exmaple
+      xmlns:xyz="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <xyz:Person>
+      <name>John Hancock</name>
+      <phoneNumbers SOAP-ENC:arrayType="xyz:phoneNumber[2]">
+        <phoneNumber>206-555-1212</phoneNumber>
+        <phoneNumber>1-888-123-4567</phoneNumber>
+      </phoneNumbers>
+    </xyz:Person>
+  </example>
+  <exmaple
+      xmlns:xyz="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <xyz:PurchaseOrder>
+      <CustomerName>Henry Ford</CustomerName>
+      <ShipTo>
+        <Street>5th Ave</Street>
+        <City>New York</City>
+        <State>NY</State>
+        <Zip>10010</Zip>
+      </ShipTo>
+      <PurchaseLineItems SOAP-ENC:arrayType="Order[2]">
+        <Order>
+          <Product>Apple</Product>
+          <Price>1.56</Price>
+        </Order>
+        <Order>
+          <Product>Peach</Product>
+          <Price>1.48</Price>
+        </Order>
+      </PurchaseLineItems>
+    </xyz:PurchaseOrder>
+  </example>
+
+
+  5.4.2.1 Partially Transmitted Arrays
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:string[5]" SOAP-ENC:offset="[2]">
+      <item>The third element</item>
+      <item>The fourth element</item>
+    </SOAP-ENC:Array>
+  </example>
+
+  5.4.2.2 Sparse Arrays
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:string[,][4]">
+      <SOAP-ENC:Array href="#array-1" SOAP-ENC:position="[2]"/>
+    </SOAP-ENC:Array>
+    <SOAP-ENC:Array id="array-1" SOAP-ENC:arrayType="xsd:string[10,10]">
+      <item SOAP-ENC:position="[2,2]">Third row, third col</item>
+      <item SOAP-ENC:position="[7,2]">Eighth row, third col</item>
+    </SOAP-ENC:Array>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENC:Array SOAP-ENC:arrayType="xsd:string[,][4]">
+      <SOAP-ENC:Array SOAP-ENC:position="[2]" SOAP-ENC:arrayType="xsd:string[10,10]">
+        <item SOAP-ENC:position="[2,2]">Third row, third col</item>
+        <item SOAP-ENC:position="[7,2]">Eighth row, third col</item>
+      </SOAP-ENC:Array>
+    </SOAP-ENC:Array>
+  </example>
+
+  5.4.3 Generic Compound Types
+  <exmaple
+      xmlns:xyz="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <xyz:PurchaseOrder>
+      <CustomerName>Henry Ford</CustomerName>
+      <ShipTo>
+        <Street>5th Ave</Street>
+        <City>New York</City>
+        <State>NY</State>
+        <Zip>10010</Zip>
+      </ShipTo>
+      <PurchaseLineItems>
+        <Order>
+          <Product>Apple</Product>
+          <Price>1.56</Price>
+        </Order>
+        <Order>
+          <Product>Peach</Product>
+          <Price>1.48</Price>
+        </Order>
+      </PurchaseLineItems>
+    </xyz:PurchaseOrder>
+  </example>
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <PurchaseLineItems>
+      <Order>
+        <Product>Apple</Product>
+        <Price>1.56</Price>
+      </Order>
+      <Order>
+        <Product>Peach</Product>
+        <Price>1.48</Price>
+      </Order>
+    </PurchaseLineItems>
+  </example>
+
+  A.1 Sample Encoding of Call Requests
+  <exmaple
+      xmlns:e="urn:Bean"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Envelope
+        xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+        SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <SOAP-ENV:Body>
+        <m:GetLastTradePriceResponse xmlns:m="Some-URI">
+          <PriceAndVolume>
+            <LastTradePrice>
+              34.5
+            </LastTradePrice>
+            <DayVolume>
+              10000
+            </DayVolume>
+          </PriceAndVolume>
+        </m:GetLastTradePriceResponse>
+      </SOAP-ENV:Body>
+    </SOAP-ENV:Envelope>
+  </example>
+
+  http://interop.soaplite.com/SOAP4R_13.dump
+  <example>
+    <SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+                       SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                       xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+                       xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                       xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+      <SOAP-ENV:Body>
+        <namesp417:echoStructArray xmlns:namesp417="http://soapinterop.org/">
+          <inputStructArray SOAP-ENC:arrayType="xsd:ur-type[3]" xsi:type="SOAP-ENC:Array">
+            <item>
+              <varFloat xsi:type="xsd:float">11.02</varFloat>
+              <varString xsi:type="xsd:string">b</varString>
+              <varInt xsi:type="xsd:int">2</varInt>
+            </item>
+            <item>
+              <varFloat xsi:type="xsd:float">21.02</varFloat>
+              <varString xsi:type="xsd:string">c</varString>
+              <varInt xsi:type="xsd:int">3</varInt>
+            </item>
+            <item>
+              <varFloat xsi:type="xsd:float">31.02</varFloat>
+              <varString xsi:type="xsd:string">d</varString>
+              <varInt xsi:type="xsd:int">4</varInt>
+            </item>
+          </inputStructArray>
+        </namesp417:echoStructArray>
+      </SOAP-ENV:Body>
+    </SOAP-ENV:Envelope>
+    HTTP/1.1 200 OK
+    Cache-Control: private
+    Connection: close
+    Date: Fri, 29 Jun 2001 03:01:34 GMT
+    Server: Apache/1.3.19 (Unix)
+    Content-Length: 1285
+    Content-Type: text/xml; charset=us-ascii
+    Client-Date: Fri, 29 Jun 2001 01:47:13 GMT
+    Client-Peer: 210.233.24.119:80
+
+    <SOAP-ENV:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                       xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+        <n1:echoStructArrayResponse xmlns:n1="http://soapinterop.org/">
+          <return xmlns:n2="http://www.w3.org/1999/XMLSchema"
+                  xmlns:n3="http://schemas.xmlsoap.org/soap/encoding/" n3:arrayType="n2:ur-type[3]"
+                  xsi:type="n3:Array">
+            <ur-typeAry xmlns:n4="http://www.ruby-lang.org/xmlns/ruby/type/1.6" xsi:type="n4:Struct__Ur-type">
+              <varFloat xsi:type="xsd:string">11.02</varFloat>
+              <varString xsi:type="xsd:string">b</varString>
+              <varInt xsi:type="xsd:string">2</varInt>
+            </ur-typeAry>
+            <ur-typeAry xmlns:n5="http://www.ruby-lang.org/xmlns/ruby/type/1.6" xsi:type="n5:Struct__Ur-type">
+              <varFloat xsi:type="xsd:string">21.02</varFloat>
+              <varString xsi:type="xsd:string">c</varString>
+              <varInt xsi:type="xsd:string">3</varInt>
+            </ur-typeAry>
+            <ur-typeAry xmlns:n6="http://www.ruby-lang.org/xmlns/ruby/type/1.6" xsi:type="n6:Struct__Ur-type">
+              <varFloat xsi:type="xsd:string">31.02</varFloat>
+              <varString xsi:type="xsd:string">d</varString>
+              <varInt xsi:type="xsd:string">4</varInt>
+            </ur-typeAry>
+          </return>
+        </n1:echoStructArrayResponse>
+      </SOAP-ENV:Body>
+    </SOAP-ENV:Envelope>
+  </example>
+</examples>

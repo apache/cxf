@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:tns="http://www.apache.org/bus/demos/bank"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:xsd1="http://soapinterop.org/xsd"
+             xmlns:corba="http://cxf.apache.org/bindings/corba"
+             xmlns:ns1="http://www.apache.org/corba/typemap/BasePortType.idl"
+             xmlns:wsa="http://www.w3.org/2005/08/addressing"
+             xmlns:bank="http://www.apache.org/bus/demos/bank"
+             targetNamespace="http://www.apache.org/bus/demos/bank"
+             name="BaseService" >
+    <types>
+        
+        <schema elementFormDefault="qualified" 
+                targetNamespace="http://www.apache.org/bus/demos/bank" 
+                xmlns="http://www.w3.org/2001/XMLSchema">
+            
+            <import namespace="http://www.w3.org/2005/08/addressing" 
+		    schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
+            <complexType name="AccountNames">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="name" type="xsd:string"/>
+                </sequence>
+            </complexType>
+            <xsd:element name="AccountRef" type="wsa:EndpointReferenceType">
+                <xsd:annotation>
+                    <xsd:appinfo>corba:binding=AccountCORBABinding</xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+        </schema>
+    </types>
+    <message name="list_accounts" />
+    <message name="list_accountsResponse">
+        <part name="return" type="bank:AccountNames"/>
+    </message>
+    
+    <message name="create_account">
+        <part name="account_name" type="xsd:string"/>
+    </message>
+    <message name="create_accountResponse">
+        <part name="return" element="tns:AccountRef"/>
+    </message>
+    <message name="get_account">
+        <part name="account_name" type="xsd:string"/>
+    </message>
+    <message name="get_accountResponse">
+        <part name="return" element="tns:AccountRef"/>
+    </message>
+    <message name="delete_account">
+        <part name="account_name" type="xsd:string"/>
+    </message>
+    <message name="delete_accountResponse" />
+    
+    <message name="get_balance"/>
+    <message name="get_balanceResponse">
+        <part name="balance" type="xsd:float"/>
+    </message>
+    
+    <message name="deposit">
+        <part name="addition" type="xsd:float"/>
+    </message>
+    
+    <message name="depositResponse"/>
+    
+    
+    <portType name="Bank">        
+        <operation name="list_accounts">
+            <input name="list_accounts" message="tns:create_account"/>
+            <output name="list_accountsResponse" message="tns:list_accountsResponse"/>
+        </operation>
+        
+        <operation name="create_account">
+            <input name="create_account" message="tns:create_account"/>
+            <output name="create_accountResponse" message="tns:create_accountResponse"/>
+        </operation>
+        
+        <operation name="get_account">
+            <input name="get_account" message="tns:get_account"/>
+            <output name="get_accountResponse" message="tns:get_accountResponse"/>
+        </operation>
+        <operation name="delete_account">
+            <input name="delete_account" message="tns:delete_account"/>
+            <output name="delete_accountResponse" message="tns:delete_accountResponse"/>
+        </operation>
+        
+    </portType>
+    <portType name="Account">
+        <operation name="get_balance">
+            <input name="get_balance" message="tns:get_balance"/>
+            <output name="get_balanceResponse" message="tns:get_balanceResponse"/>
+        </operation>
+        <operation name="deposit">
+            <input name="deposit" message="tns:deposit"/>
+            <output name="depositResponse" message="tns:depositResponse"/>
+        </operation>
+    </portType>
+
+</definitions>

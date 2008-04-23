@@ -1,0 +1,75 @@
+#
+#
+#    Licensed to the Apache Software Foundation (ASF) under one
+#    or more contributor license agreements. See the NOTICE file
+#    distributed with this work for additional information
+#    regarding copyright ownership. The ASF licenses this file
+#    to you under the Apache License, Version 2.0 (the
+#    "License"); you may not use this file except in compliance
+#    with the License. You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing,
+#    software distributed under the License is distributed on an
+#    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#    KIND, either express or implied. See the License for the
+#    specific language governing permissions and limitations
+#    under the License.
+#
+#
+#!/bin/sh
+# run the Apache CXF wsdl2js tool 
+#
+# Check for irritating 'operating systems'.
+cygwin=false;
+darwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  Darwin*) darwin=true
+           if [ -z "$JAVA_HOME" ] ; then
+             JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
+           fi
+           ;;
+esac
+
+me=`basename $0`
+cxf_home=$CXF_HOME
+if [ ! -f  $cxf_home/lib/cxf-manifest.jar ]; then
+    cxf_home=`dirname $0`/..
+fi
+
+cxf_jar=$cxf_home/lib/cxf-manifest.jar
+
+if [ ! -f $cxf_jar ]; then 
+    if [ ! -f ${cxf_home}/../../../target/srcbuild_env ]; then
+        echo "ERROR: Unable to find cxf-manifest.jar in $cxf_home/lib"
+        exit 1
+    else
+        . ${cxf_home}/../../../target/srcbuild_env
+        cxf_jar=${CXF_CLASSPATH}
+    fi
+fi 
+
+log_config=$cxf_home/etc/logging.properties 
+if $cygwin; then
+  if [ "$OS" = "Windows_NT" ] && cygpath -m .>/dev/null 2>/dev/null ; then
+    format=mixed
+  else
+    format=windows
+  fi
+  cxf_classpath=`cygpath --$format "${cxf_jar}"`
+  if [ ! -z "${CLASSPATH}" ]; then
+    cxf_classpath=${cxf_classpath}\;`cygpath --$format --path "${CLASSPATH}"`
+  fi
+  log_config=`cygpath --$format "$log_config"`
+else
+   cxf_classpath=${cxf_jar}:${CLASSPATH}
+fi
+
+$JAVA_HOME/bin/java -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript "$@"
+
+
+
+
+

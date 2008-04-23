@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<project name="hello world demo" default="build" basedir=".">
+
+    <property name="wsdl.dir" location="${basedir}/../resources"/>
+    <import file="../../common_build.xml"/>     
+
+
+    <target name="generate.code">
+        <echo level="info" message="Generating corba binding using wsdltoidl..."/>
+        <wsdl2corba extraArgs="-a corbaname::localhost:1050#HelloWorld" file="../resources/HelloWorld.wsdl" />
+
+        <echo level="info" message="Generating server code using wsdl2java..."/>
+        <wsdl2java dir="build" file="HelloWorld-corba.wsdl" package="cxf.common" />
+
+        <echo level="info" message="Generating client code using idlj..."/>
+        <exec executable="idlj" dir=".">
+            <arg line="-fall -td ${build.src.dir} -pkgPrefix HelloWorld corba.client ../resources/HelloWorld.idl"/>
+        </exec>
+
+        <echo level="info" message="Generating server code using idlj..."/>
+        <exec executable="idlj" dir=".">
+            <arg line="-fall -td ${build.src.dir} -pkgPrefix HelloWorld corba.server ../resources/HelloWorld.idl"/>
+        </exec>
+    </target>
+
+    <target name="cxf.client" depends="build">
+        <cxfrun classname="cxf.client.Client"/>
+    </target>
+    <target name="corba.client" depends="build">
+        <java classname="corba.client.Client" fork="yes">
+            <classpath>
+                <pathelement path="build/classes"/>
+                <path refid="jdk.tools.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="cxf.server" depends="build">
+        <cxfrun classname="cxf.server.Server"/>
+    </target>
+
+    <target name="corba.server" depends="build">
+        <java classname="corba.server.Server" fork="yes">
+            <classpath>
+                <pathelement path="build/classes"/>
+                <path refid="jdk.tools.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <macrodef name="wsdl2corba">
+        <attribute name="file"/>
+        <attribute name="extraArgs" default=""/>
+        <sequential>
+            <java failonerror="true" classname="org.apache.cxf.tools.corba.WSDLToIDL" fork="yes">
+                <classpath>
+                    <path refid="cxf.classpath" />
+                </classpath>
+                <arg line="@{extraArgs} -d ${build.dir} -corba @{file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+</project>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/header_test/rpc" xmlns:x1="http://apache.org/header_test/rpc/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/header_test/rpc" name="TestHeaderWSDL">
+    <wsdl:types>
+        <schema targetNamespace="http://apache.org/header_test/rpc/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/header_test/rpc/types" elementFormDefault="qualified">
+            <element name="headerMessage">
+                <complexType>
+		    <sequence>
+                        <element name="headerVal" type="string"/>
+		    </sequence>
+		</complexType>
+            </element>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="testHeader1Request">
+        <wsdl:part name="in" type="xsd:string"/>
+        <wsdl:part name="inHeader" element="x1:headerMessage"/>
+    </wsdl:message>
+    <wsdl:message name="testHeader1Response">
+        <wsdl:part name="out" type="xsd:string"/>
+    </wsdl:message>
+
+    <wsdl:message name="testInOutHeaderRequest">
+        <wsdl:part name="in" type="xsd:string"/>
+        <wsdl:part name="inOutHeader" element="x1:headerMessage"/>
+    </wsdl:message>
+    <wsdl:message name="testInOutHeaderResponse">
+        <wsdl:part name="out" type="xsd:string"/>
+        <wsdl:part name="inOutHeader" element="x1:headerMessage"/>
+    </wsdl:message>
+
+    <wsdl:portType name="TestRPCHeader">
+        <wsdl:operation name="testHeader1">
+            <wsdl:input name="testHeader1Request" message="tns:testHeader1Request"/>
+            <wsdl:output name="testHeader1Response" message="tns:testHeader1Response"/>
+        </wsdl:operation>
+        <wsdl:operation name="testInOutHeader">
+            <wsdl:input name="testInOutHeaderRequest" message="tns:testInOutHeaderRequest"/>
+            <wsdl:output name="testInOutHeaderResponse" message="tns:testInOutHeaderResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="TestHeader_SOAPRPCBinding" type="tns:TestRPCHeader">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="testHeader1">
+            <soap:operation/>
+            <wsdl:input name="testHeader1Request">
+                <soap:body message="tns:testHeader1Request" parts="in" use="literal" namespace="http://apache.org/header_test"/>
+                <soap:header message="tns:testHeader1Request" part="inHeader" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="testHeader1Response">
+                <soap:body message="tns:testHeader1Response" use="literal" namespace="http://apache.org/header_test"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testInOutHeader">
+            <soap:operation/>
+            <wsdl:input>
+                <soap:body message="tns:testInOutHeaderRequest" parts="in" use="literal" namespace="http://apache.org/header_test"/>
+                <soap:header message="tns:testInOutHeaderRequest" part="inOutHeader" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body message="tns:testInOutHeaderResponse" parts="out" use="literal" namespace="http://apache.org/header_test"/>
+                <soap:header message="tns:testInOutHeaderRequest" part="inOutHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SOAPRPCHeaderService">
+        <wsdl:port name="SoapRPCHeaderPort" binding="tns:TestHeader_SOAPRPCBinding">
+            <soap:address location="http://localhost:9104/SoapHeaderRPCContext/SoapHeaderRPCPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

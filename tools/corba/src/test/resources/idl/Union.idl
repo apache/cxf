@@ -1,0 +1,87 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/ 
+enum e1 {
+ 	e1_1,
+	e1_2,
+	e1_3,
+	e1_4
+};
+struct s1 {
+    short s1_1;
+    short s1_2;
+    short s1_3;
+};
+union u1 switch (e1) {
+    case e1_1:
+	long u1_1;
+    case e1_2:
+    case e1_2: 
+    case e1_3:
+	string u1_2;
+    default:
+	s1 u1_3;
+};
+
+interface if {
+	enum e2 {
+	    e2_1,
+	    e2_2,
+	    e2_3,
+	    e2_4
+	};
+	struct s2 {
+	    short s2_1;
+	    short s2_2;
+	    short s2_3;
+	};
+	union u2 switch (e2) {
+	    case e2_1:
+		long u2_1;
+	    case e2_2:
+	    case e2_2: 
+	    case e2_3:
+		string u2_2;
+	    default:
+		s2 u2_3;
+	};
+};
+
+module m {
+	enum e3 {
+	    e3_1,
+	    e3_2,
+	    e3_3,
+	    e3_4
+	};
+	struct s3 {
+	    short s3_1;
+	    short s3_2;
+	    short s3_3;
+	};
+	union u3 switch (e3) {
+	    case e3_1:
+		long u3_1;
+	    case e3_2:
+	    case e3_2: 
+	    case e3_3:
+		string u3_2;
+	    default:
+		s3 u3_3;
+	};
+};

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/multiplebinding" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/multiplebinding" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap">
+    <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/multiplebinding" xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" repositoryID="IDL:edell/test1/num1:1.0" name="edell.test1.num1" type="ns4:edell.test1.num1">
+      <corba:member name="str1" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/multiplebinding" xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" repositoryID="IDL:edell/test2/num2:1.0" name="edell.test2.num2" type="ns4:edell.test2.num2">
+      <corba:member name="long2" idltype="corba:long" />
+    </corba:struct>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/multiplebinding" xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="edell.test1.num1">
+        <xs:sequence>
+          <xs:element name="str1" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="opNum1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in1" type="edell.test1.num1">
+            </xs:element>
+            <xs:element name="inout1" type="edell.test1.num1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opNum1Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="edell.test1.num1">
+            </xs:element>
+            <xs:element name="out1" type="edell.test1.num1">
+            </xs:element>
+            <xs:element name="inout1" type="edell.test1.num1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="edell.test2.num2">
+        <xs:sequence>
+          <xs:element name="long2" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="opNum2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in2" type="edell.test2.num2">
+            </xs:element>
+            <xs:element name="inout2" type="edell.test2.num2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opNum2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="edell.test2.num2">
+            </xs:element>
+            <xs:element name="out2" type="edell.test2.num2">
+            </xs:element>
+            <xs:element name="inout2" type="edell.test2.num2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="opNum2">
+    <wsdl:part name="inparameter" element="tns:opNum2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opNum1Response">
+    <wsdl:part name="outparameter" element="tns:opNum1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opNum1">
+    <wsdl:part name="inparameter" element="tns:opNum1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="opNum2Response">
+    <wsdl:part name="outparameter" element="tns:opNum2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="edell.test1">
+    <wsdl:operation name="opNum1">
+      <wsdl:input name="opNum1Request" message="tns:opNum1">
+    </wsdl:input>
+      <wsdl:output name="opNum1Response" message="tns:opNum1Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="edell.test2">
+    <wsdl:operation name="opNum2">
+      <wsdl:input name="opNum2Request" message="tns:opNum2">
+    </wsdl:input>
+      <wsdl:output name="opNum2Response" message="tns:opNum2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="edell.test1CORBABinding" type="tns:edell.test1">
+    <corba:binding repositoryID="IDL:edell/test1:1.0" />
+    <wsdl:operation name="opNum1">
+      <corba:operation name="opNum1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" mode="in" name="in1" idltype="edell.test1.num1" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" mode="out" name="out1" idltype="edell.test1.num1" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" mode="inout" name="inout1" idltype="edell.test1.num1" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" name="return" idltype="edell.test1.num1" />
+      </corba:operation>
+      <wsdl:input name="opNum1Request">
+      </wsdl:input>
+      <wsdl:output name="opNum1Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="edell.test2CORBABinding" type="tns:edell.test2">
+    <corba:binding repositoryID="IDL:edell/test2:1.0" />
+    <wsdl:operation name="opNum2">
+      <corba:operation name="opNum2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" mode="in" name="in2" idltype="edell.test2.num2" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" mode="out" name="out2" idltype="edell.test2.num2" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" mode="inout" name="inout2" idltype="edell.test2.num2" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/multiplebinding/typemap" name="return" idltype="edell.test2.num2" />
+      </corba:operation>
+      <wsdl:input name="opNum2Request">
+      </wsdl:input>
+      <wsdl:output name="opNum2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="edell.test1CORBAService">
+    <wsdl:port name="edell.test1CORBAPort" binding="tns:edell.test1CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="edell.test2CORBAService">
+    <wsdl:port name="edell.test2CORBAPort" binding="tns:edell.test2CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

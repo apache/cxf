@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopingOperation" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/scopingOperation" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap">
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="corba:octet" repositoryID="IDL:myType:1.0" name="myType" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="corba:short" repositoryID="IDL:bar/myType:1.0" name="bar.myType" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="corba:long" repositoryID="IDL:foo/myType:1.0" name="foo.myType" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="corba:ulong" repositoryID="IDL:foo/bar/myType:1.0" name="foo.bar.myType" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="foo.bar.myType" repositoryID="IDL:foo/top/myType1:1.0" name="foo.top.myType1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="foo.myType" repositoryID="IDL:foo/top/myType2:1.0" name="foo.top.myType2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="foo.bar.myType" repositoryID="IDL:foo/top/myType3:1.0" name="foo.top.myType3" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="bar.myType" repositoryID="IDL:foo/top/myType4:1.0" name="foo.top.myType4" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="foo.myType" repositoryID="IDL:foo/top/myType5:1.0" name="foo.top.myType5" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="foo.myType" repositoryID="IDL:foo/top/myType6:1.0" name="foo.top.myType6" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" basetype="myType" repositoryID="IDL:foo/top/myType7:1.0" name="foo.top.myType7" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopingOperation" xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="op1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type1" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op1Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type2" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type3" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="type4" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op3">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type5" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op3Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type6" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type7" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:int">
+            </xs:element>
+            <xs:element name="type8" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op5">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type9" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op5Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type10" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op6">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type11" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op6Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedInt">
+            </xs:element>
+            <xs:element name="type12" type="xs:unsignedInt">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op7">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type13" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op7Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type14" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op8">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type15" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op8Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:short">
+            </xs:element>
+            <xs:element name="type16" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op9">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type17" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op9Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type18" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op10">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type19" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op10Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:int">
+            </xs:element>
+            <xs:element name="type20" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op11">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type21" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op11Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type22" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op12">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type23" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op12Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:int">
+            </xs:element>
+            <xs:element name="type24" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op13">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type25" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op13Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type26" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op14">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="type27" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op14Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedByte">
+            </xs:element>
+            <xs:element name="type28" type="xs:unsignedByte">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="op3Response">
+    <wsdl:part name="outparameter" element="tns:op3Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op12Response">
+    <wsdl:part name="outparameter" element="tns:op12Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op14Response">
+    <wsdl:part name="outparameter" element="tns:op14Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op1Response">
+    <wsdl:part name="outparameter" element="tns:op1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op1">
+    <wsdl:part name="inparameter" element="tns:op1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op9">
+    <wsdl:part name="inparameter" element="tns:op9">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4">
+    <wsdl:part name="inparameter" element="tns:op4">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op7Response">
+    <wsdl:part name="outparameter" element="tns:op7Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op11">
+    <wsdl:part name="inparameter" element="tns:op11">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op8Response">
+    <wsdl:part name="outparameter" element="tns:op8Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op10">
+    <wsdl:part name="inparameter" element="tns:op10">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op13">
+    <wsdl:part name="inparameter" element="tns:op13">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op7">
+    <wsdl:part name="inparameter" element="tns:op7">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2Response">
+    <wsdl:part name="outparameter" element="tns:op2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op5Response">
+    <wsdl:part name="outparameter" element="tns:op5Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4Response">
+    <wsdl:part name="outparameter" element="tns:op4Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op13Response">
+    <wsdl:part name="outparameter" element="tns:op13Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op10Response">
+    <wsdl:part name="outparameter" element="tns:op10Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op6">
+    <wsdl:part name="inparameter" element="tns:op6">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op5">
+    <wsdl:part name="inparameter" element="tns:op5">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op12">
+    <wsdl:part name="inparameter" element="tns:op12">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op14">
+    <wsdl:part name="inparameter" element="tns:op14">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op8">
+    <wsdl:part name="inparameter" element="tns:op8">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op11Response">
+    <wsdl:part name="outparameter" element="tns:op11Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op9Response">
+    <wsdl:part name="outparameter" element="tns:op9Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op3">
+    <wsdl:part name="inparameter" element="tns:op3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op6Response">
+    <wsdl:part name="outparameter" element="tns:op6Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2">
+    <wsdl:part name="inparameter" element="tns:op2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="foo.top">
+    <wsdl:operation name="op1">
+      <wsdl:input name="op1Request" message="tns:op1">
+    </wsdl:input>
+      <wsdl:output name="op1Response" message="tns:op1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op2">
+      <wsdl:input name="op2Request" message="tns:op2">
+    </wsdl:input>
+      <wsdl:output name="op2Response" message="tns:op2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op3">
+      <wsdl:input name="op3Request" message="tns:op3">
+    </wsdl:input>
+      <wsdl:output name="op3Response" message="tns:op3Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4">
+      <wsdl:input name="op4Request" message="tns:op4">
+    </wsdl:input>
+      <wsdl:output name="op4Response" message="tns:op4Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op5">
+      <wsdl:input name="op5Request" message="tns:op5">
+    </wsdl:input>
+      <wsdl:output name="op5Response" message="tns:op5Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op6">
+      <wsdl:input name="op6Request" message="tns:op6">
+    </wsdl:input>
+      <wsdl:output name="op6Response" message="tns:op6Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op7">
+      <wsdl:input name="op7Request" message="tns:op7">
+    </wsdl:input>
+      <wsdl:output name="op7Response" message="tns:op7Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op8">
+      <wsdl:input name="op8Request" message="tns:op8">
+    </wsdl:input>
+      <wsdl:output name="op8Response" message="tns:op8Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op9">
+      <wsdl:input name="op9Request" message="tns:op9">
+    </wsdl:input>
+      <wsdl:output name="op9Response" message="tns:op9Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op10">
+      <wsdl:input name="op10Request" message="tns:op10">
+    </wsdl:input>
+      <wsdl:output name="op10Response" message="tns:op10Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op11">
+      <wsdl:input name="op11Request" message="tns:op11">
+    </wsdl:input>
+      <wsdl:output name="op11Response" message="tns:op11Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op12">
+      <wsdl:input name="op12Request" message="tns:op12">
+    </wsdl:input>
+      <wsdl:output name="op12Response" message="tns:op12Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op13">
+      <wsdl:input name="op13Request" message="tns:op13">
+    </wsdl:input>
+      <wsdl:output name="op13Response" message="tns:op13Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op14">
+      <wsdl:input name="op14Request" message="tns:op14">
+    </wsdl:input>
+      <wsdl:output name="op14Response" message="tns:op14Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="foo.bar">
+  </wsdl:portType>
+  <wsdl:binding name="foo.topCORBABinding" type="tns:foo.top">
+    <corba:binding repositoryID="IDL:foo/top:1.0" />
+    <wsdl:operation name="op1">
+      <corba:operation name="op1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type1" idltype="foo.bar.myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type2" idltype="foo.bar.myType" />
+      </corba:operation>
+      <wsdl:input name="op1Request">
+      </wsdl:input>
+      <wsdl:output name="op1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op2">
+      <corba:operation name="op2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type3" idltype="foo.top.myType1" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type4" idltype="foo.bar.myType" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="foo.bar.myType" />
+      </corba:operation>
+      <wsdl:input name="op2Request">
+      </wsdl:input>
+      <wsdl:output name="op2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op3">
+      <corba:operation name="op3">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type5" idltype="foo.myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type6" idltype="foo.myType" />
+      </corba:operation>
+      <wsdl:input name="op3Request">
+      </wsdl:input>
+      <wsdl:output name="op3Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4">
+      <corba:operation name="op4">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type7" idltype="foo.top.myType2" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type8" idltype="foo.top.myType2" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="foo.myType" />
+      </corba:operation>
+      <wsdl:input name="op4Request">
+      </wsdl:input>
+      <wsdl:output name="op4Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op5">
+      <corba:operation name="op5">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type9" idltype="foo.bar.myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type10" idltype="foo.bar.myType" />
+      </corba:operation>
+      <wsdl:input name="op5Request">
+      </wsdl:input>
+      <wsdl:output name="op5Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op6">
+      <corba:operation name="op6">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type11" idltype="foo.top.myType3" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type12" idltype="foo.top.myType3" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="foo.bar.myType" />
+      </corba:operation>
+      <wsdl:input name="op6Request">
+      </wsdl:input>
+      <wsdl:output name="op6Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op7">
+      <corba:operation name="op7">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type13" idltype="bar.myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type14" idltype="bar.myType" />
+      </corba:operation>
+      <wsdl:input name="op7Request">
+      </wsdl:input>
+      <wsdl:output name="op7Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op8">
+      <corba:operation name="op8">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type15" idltype="foo.top.myType4" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type16" idltype="foo.top.myType4" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="bar.myType" />
+      </corba:operation>
+      <wsdl:input name="op8Request">
+      </wsdl:input>
+      <wsdl:output name="op8Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op9">
+      <corba:operation name="op9">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type17" idltype="foo.myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type18" idltype="foo.myType" />
+      </corba:operation>
+      <wsdl:input name="op9Request">
+      </wsdl:input>
+      <wsdl:output name="op9Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op10">
+      <corba:operation name="op10">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type19" idltype="foo.top.myType5" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type20" idltype="foo.top.myType5" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="foo.myType" />
+      </corba:operation>
+      <wsdl:input name="op10Request">
+      </wsdl:input>
+      <wsdl:output name="op10Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op11">
+      <corba:operation name="op11">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type21" idltype="foo.myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type22" idltype="foo.myType" />
+      </corba:operation>
+      <wsdl:input name="op11Request">
+      </wsdl:input>
+      <wsdl:output name="op11Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op12">
+      <corba:operation name="op12">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type23" idltype="foo.top.myType6" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type24" idltype="foo.top.myType6" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="foo.myType" />
+      </corba:operation>
+      <wsdl:input name="op12Request">
+      </wsdl:input>
+      <wsdl:output name="op12Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op13">
+      <corba:operation name="op13">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type25" idltype="myType" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type26" idltype="myType" />
+      </corba:operation>
+      <wsdl:input name="op13Request">
+      </wsdl:input>
+      <wsdl:output name="op13Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op14">
+      <corba:operation name="op14">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="in" name="type27" idltype="foo.top.myType7" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" mode="out" name="type28" idltype="foo.top.myType7" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingOperation/typemap" name="return" idltype="myType" />
+      </corba:operation>
+      <wsdl:input name="op14Request">
+      </wsdl:input>
+      <wsdl:output name="op14Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="foo.barCORBABinding" type="tns:foo.bar">
+    <corba:binding repositoryID="IDL:foo/bar:1.0" />
+  </wsdl:binding>
+  <wsdl:service name="foo.topCORBAService">
+    <wsdl:port name="foo.topCORBAPort" binding="tns:foo.topCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="foo.barCORBAService">
+    <wsdl:port name="foo.barCORBAPort" binding="tns:foo.barCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

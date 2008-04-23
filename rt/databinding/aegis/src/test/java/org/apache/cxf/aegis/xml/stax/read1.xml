@@ -1,0 +1,6 @@
+<test xmlns="urn:test" one="one" two="two">
+  <child>
+    <grandchild></grandchild>
+    <grandchild></grandchild>
+  </child>
+</test>

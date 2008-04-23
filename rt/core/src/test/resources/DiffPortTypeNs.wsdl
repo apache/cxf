@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://cxf.apache.org/DiffPortTypeNs/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DiffPortTypeNs"
+    xmlns:n1="http://cxf.apache.org/DiffPortTypeNs-Import/"
+    targetNamespace="http://cxf.apache.org/DiffPortTypeNs/">
+    <wsdl:import namespace="http://cxf.apache.org/DiffPortTypeNs-Import/"
+        location="DiffPortTypeNs-Import.wsdl" />
+
+    <wsdl:binding name="DiffPortTypeNsSOAP" type="n1:DiffPortTypeNs">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="NewOperation">
+            <soap:operation soapAction="http://cxf.apache.org/DiffPortTypeNs/NewOperation" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="DiffPortTypeNs">
+        <wsdl:port binding="tns:DiffPortTypeNsSOAP" name="DiffPortTypeNsSOAP">
+            <soap:address location="http://cxf.apache.org/DiffPortTypeNs/" />
+        </wsdl:port>
+    </wsdl:service>
+
+    <wsdl:binding name="DiffPortTypeNsSOAPRpc" type="n1:DiffPortTypeNsRpc">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="NewOperationRpc">
+            <soap:operation soapAction="http://cxf.apache.org/DiffPortTypeNs/NewOperationRpc" />
+            <wsdl:input>
+                <soap:body namespace="http://cxf.apache.org/DiffPortTypeNs-Import/" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body namespace="http://cxf.apache.org/DiffPortTypeNs-Import/" use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="DiffPortTypeNsRpc">
+        <wsdl:port binding="tns:DiffPortTypeNsSOAPRpc" name="DiffPortTypeNsSOAPRpc">
+            <soap:address location="http://cxf.apache.org/DiffPortTypeNsRpc/" />
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

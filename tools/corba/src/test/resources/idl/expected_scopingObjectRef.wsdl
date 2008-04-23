@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap">
+    <corba:object xmlns="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="EndpointReferenceType" name="CORBA.Object" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef" binding="TestModule.Test2.TestObjectCORBABinding" repositoryID="IDL:TestModule/Test2/TestObject:1.0" type="ns4:EndpointReferenceType" name="TestModule.Test2.TestObject" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef" binding="foobar.fooCORBABinding" repositoryID="IDL:foobar/foo:1.0" type="ns4:EndpointReferenceType" name="foobar.foo" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef" xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="testObjectValue">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectValueResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectValueUpdate">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="value" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testObjectValueUpdateResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDefaultObjectParam">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="param" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDefaultObjectParamResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDefaultObjectReturn">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDefaultObjectReturnResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectParam">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="param" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectParamResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestModule.Test2.TestObjectRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="testCustomObjectReturn">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectReturnResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectParam2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="param" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectParam2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:boolean">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectReturn2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testCustomObjectReturn2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="barOp">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="fooPar" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="barOpResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="foobar.fooRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="testObjectValueResponse">
+    <wsdl:part name="outparameter" element="tns:testObjectValueResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectParam2Response">
+    <wsdl:part name="outparameter" element="tns:testCustomObjectParam2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectParamResponse">
+    <wsdl:part name="outparameter" element="tns:testCustomObjectParamResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="barOp">
+    <wsdl:part name="inparameter" element="tns:barOp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDefaultObjectReturnResponse">
+    <wsdl:part name="outparameter" element="tns:testDefaultObjectReturnResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectValueUpdate">
+    <wsdl:part name="inparameter" element="tns:testObjectValueUpdate">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectValue">
+    <wsdl:part name="inparameter" element="tns:testObjectValue">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectParam2">
+    <wsdl:part name="inparameter" element="tns:testCustomObjectParam2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectReturn2">
+    <wsdl:part name="inparameter" element="tns:testCustomObjectReturn2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="barOpResponse">
+    <wsdl:part name="outparameter" element="tns:barOpResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectReturnResponse">
+    <wsdl:part name="outparameter" element="tns:testCustomObjectReturnResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectReturn2Response">
+    <wsdl:part name="outparameter" element="tns:testCustomObjectReturn2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDefaultObjectReturn">
+    <wsdl:part name="inparameter" element="tns:testDefaultObjectReturn">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDefaultObjectParam">
+    <wsdl:part name="inparameter" element="tns:testDefaultObjectParam">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectParam">
+    <wsdl:part name="inparameter" element="tns:testCustomObjectParam">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testObjectValueUpdateResponse">
+    <wsdl:part name="outparameter" element="tns:testObjectValueUpdateResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDefaultObjectParamResponse">
+    <wsdl:part name="outparameter" element="tns:testDefaultObjectParamResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testCustomObjectReturn">
+    <wsdl:part name="inparameter" element="tns:testCustomObjectReturn">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="foobar.foo">
+  </wsdl:portType>
+  <wsdl:portType name="TestInterface">
+    <wsdl:operation name="testDefaultObjectParam">
+      <wsdl:input name="testDefaultObjectParamRequest" message="tns:testDefaultObjectParam">
+    </wsdl:input>
+      <wsdl:output name="testDefaultObjectParamResponse" message="tns:testDefaultObjectParamResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testDefaultObjectReturn">
+      <wsdl:input name="testDefaultObjectReturnRequest" message="tns:testDefaultObjectReturn">
+    </wsdl:input>
+      <wsdl:output name="testDefaultObjectReturnResponse" message="tns:testDefaultObjectReturnResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectParam">
+      <wsdl:input name="testCustomObjectParamRequest" message="tns:testCustomObjectParam">
+    </wsdl:input>
+      <wsdl:output name="testCustomObjectParamResponse" message="tns:testCustomObjectParamResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectReturn">
+      <wsdl:input name="testCustomObjectReturnRequest" message="tns:testCustomObjectReturn">
+    </wsdl:input>
+      <wsdl:output name="testCustomObjectReturnResponse" message="tns:testCustomObjectReturnResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectParam2">
+      <wsdl:input name="testCustomObjectParam2Request" message="tns:testCustomObjectParam2">
+    </wsdl:input>
+      <wsdl:output name="testCustomObjectParam2Response" message="tns:testCustomObjectParam2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectReturn2">
+      <wsdl:input name="testCustomObjectReturn2Request" message="tns:testCustomObjectReturn2">
+    </wsdl:input>
+      <wsdl:output name="testCustomObjectReturn2Response" message="tns:testCustomObjectReturn2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="TestModule.Test2.TestObject">
+    <wsdl:operation name="testObjectValue">
+      <wsdl:input name="testObjectValueRequest" message="tns:testObjectValue">
+    </wsdl:input>
+      <wsdl:output name="testObjectValueResponse" message="tns:testObjectValueResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectValueUpdate">
+      <wsdl:input name="testObjectValueUpdateRequest" message="tns:testObjectValueUpdate">
+    </wsdl:input>
+      <wsdl:output name="testObjectValueUpdateResponse" message="tns:testObjectValueUpdateResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="foobar.bar">
+    <wsdl:operation name="barOp">
+      <wsdl:input name="barOpRequest" message="tns:barOp">
+    </wsdl:input>
+      <wsdl:output name="barOpResponse" message="tns:barOpResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="foobar.fooCORBABinding" type="tns:foobar.foo">
+    <corba:binding repositoryID="IDL:foobar/foo:1.0" />
+  </wsdl:binding>
+  <wsdl:binding name="TestInterfaceCORBABinding" type="tns:TestInterface">
+    <corba:binding repositoryID="IDL:TestInterface:1.0" />
+    <wsdl:operation name="testDefaultObjectParam">
+      <corba:operation name="testDefaultObjectParam">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" mode="in" name="param" idltype="CORBA.Object" />
+        <corba:return name="return" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="testDefaultObjectParamRequest">
+      </wsdl:input>
+      <wsdl:output name="testDefaultObjectParamResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testDefaultObjectReturn">
+      <corba:operation name="testDefaultObjectReturn">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" name="return" idltype="CORBA.Object" />
+      </corba:operation>
+      <wsdl:input name="testDefaultObjectReturnRequest">
+      </wsdl:input>
+      <wsdl:output name="testDefaultObjectReturnResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectParam">
+      <corba:operation name="testCustomObjectParam">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" mode="in" name="param" idltype="TestModule.Test2.TestObject" />
+        <corba:return name="return" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="testCustomObjectParamRequest">
+      </wsdl:input>
+      <wsdl:output name="testCustomObjectParamResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectReturn">
+      <corba:operation name="testCustomObjectReturn">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" name="return" idltype="TestModule.Test2.TestObject" />
+      </corba:operation>
+      <wsdl:input name="testCustomObjectReturnRequest">
+      </wsdl:input>
+      <wsdl:output name="testCustomObjectReturnResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectParam2">
+      <corba:operation name="testCustomObjectParam2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" mode="in" name="param" idltype="TestModule.Test2.TestObject" />
+        <corba:return name="return" idltype="corba:boolean" />
+      </corba:operation>
+      <wsdl:input name="testCustomObjectParam2Request">
+      </wsdl:input>
+      <wsdl:output name="testCustomObjectParam2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testCustomObjectReturn2">
+      <corba:operation name="testCustomObjectReturn2">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" name="return" idltype="TestModule.Test2.TestObject" />
+      </corba:operation>
+      <wsdl:input name="testCustomObjectReturn2Request">
+      </wsdl:input>
+      <wsdl:output name="testCustomObjectReturn2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="foobar.barCORBABinding" type="tns:foobar.bar">
+    <corba:binding repositoryID="IDL:foobar/bar:1.0" />
+    <wsdl:operation name="barOp">
+      <corba:operation name="barOp">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopingObjectRef/typemap" mode="in" name="fooPar" idltype="foobar.foo" />
+      </corba:operation>
+      <wsdl:input name="barOpRequest">
+      </wsdl:input>
+      <wsdl:output name="barOpResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="TestModule.Test2.TestObjectCORBABinding" type="tns:TestModule.Test2.TestObject">
+    <corba:binding repositoryID="IDL:TestModule/Test2/TestObject:1.0" />
+    <wsdl:operation name="testObjectValue">
+      <corba:operation name="testObjectValue">
+        <corba:return name="return" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="testObjectValueRequest">
+      </wsdl:input>
+      <wsdl:output name="testObjectValueResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testObjectValueUpdate">
+      <corba:operation name="testObjectValueUpdate">
+        <corba:param mode="in" name="value" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="testObjectValueUpdateRequest">
+      </wsdl:input>
+      <wsdl:output name="testObjectValueUpdateResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TestModule.Test2.TestObjectCORBAService">
+    <wsdl:port name="TestModule.Test2.TestObjectCORBAPort" binding="tns:TestModule.Test2.TestObjectCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="foobar.fooCORBAService">
+    <wsdl:port name="foobar.fooCORBAPort" binding="tns:foobar.fooCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="foobar.barCORBAService">
+    <wsdl:port name="foobar.barCORBAPort" binding="tns:foobar.barCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="TestInterfaceCORBAService">
+    <wsdl:port name="TestInterfaceCORBAPort" binding="tns:TestInterfaceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

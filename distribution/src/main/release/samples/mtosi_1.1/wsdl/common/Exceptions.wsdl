@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-Exceptions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <!-- ===================== Include (same namespace) Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/Exceptions.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ===================== Definition of Exception Message ====================== -->
+  <wsdl:message name="ProcessingFailureException">
+    <wsdl:documentation>
+    The generic exception message.
+    </wsdl:documentation>
+    <wsdl:part name="ProcessingFailureException" element="tmf854XSD:ProcessingFailureException"/>
+  </wsdl:message>
+</wsdl:definitions>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions 
+    xmlns:tns="http://bugs.cxf/services/bug1" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    targetNamespace="http://bugs.cxf/services/bug1" 
+    name="bug1">
+    
+    <!-- customizations with global scope below it shows the default customizations -->
+    <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+	<jaxws:enableWrapperStyle>false</jaxws:enableWrapperStyle>
+	<jaxws:enableAsyncMapping>false</jaxws:enableAsyncMapping>
+    </jaxws:bindings>
+
+    <wsdl:types>
+
+	<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		elementFormDefault="qualified" 
+		attributeFormDefault="qualified" 
+		targetNamespace="http://bugs.cxf/services/bug1">
+
+	    <xsd:complexType name="requestDataType">
+		<xsd:sequence>
+		    <xsd:element name="myString1" type="xsd:string" />
+		    <xsd:element name="theSameNameFieldTheSameDataType" type="xsd:string" />
+		    <xsd:element name="theSameNameFieldDifferentDataType" type="xsd:string" />
+		</xsd:sequence>
+	    </xsd:complexType>
+
+	    <xsd:complexType name="responseDataType">
+		<xsd:sequence>
+		    <xsd:element name="theSameNameFieldTheSameDataType" type="xsd:string" />
+		    <xsd:element name="theSameNameFieldDifferentDataType" type="xsd:int" minOccurs="0" />
+		    <xsd:element name="myString2" type="xsd:string" />
+		</xsd:sequence>
+	    </xsd:complexType>
+	    
+	    <element name="myBug1" type="tns:requestDataType" />
+	    <element name="myBug1Response" type="tns:responseDataType" />		
+	</schema>
+    </wsdl:types>
+    
+    <wsdl:message name="myBug1RequestMessage">
+	<wsdl:part name="parameters" element="tns:myBug1"/>
+    </wsdl:message>
+    <wsdl:message name="myBug1ResponseMessage">
+
+	<wsdl:part name="parameters" element="tns:myBug1Response"/>
+    </wsdl:message>
+    
+    <wsdl:portType name="myBug1Port">
+	<wsdl:operation name="myBug1">
+	    <wsdl:input message="tns:myBug1RequestMessage"/>
+	    <wsdl:output message="tns:myBug1ResponseMessage"/>
+	</wsdl:operation>
+    </wsdl:portType>
+
+    
+    <wsdl:binding name="myBug1PortSoapBinding" type="tns:myBug1Port">
+	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+	<wsdl:operation name="myBug1">
+	    <soap:operation style="document"/>
+	    <wsdl:input>
+		<soap:body use="literal"/>
+	    </wsdl:input>
+	    <wsdl:output>
+
+		<soap:body use="literal"/>
+	    </wsdl:output>
+	</wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="myBug1Service">
+	<wsdl:port name="myBug1" binding="tns:myBug1PortSoapBinding">
+	    <soap:address location="http://REPLACE_WITH_HOST_INFO/myBug1" />
+	</wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

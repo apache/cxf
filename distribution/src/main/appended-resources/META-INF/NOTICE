@@ -1,0 +1,52 @@
+This product also includes schemas and specification developed by:
+      - the W3C consortium (http://www.w3c.org)
+      (http://www.w3.org/XML/1998/namespace)
+      
+This product also includes WS-* schemas developed by International
+   Business Machines Corporation, Microsoft Corporation, BEA Systems, 
+   TIBCO Software, SAP AG, Sonic Software, and VeriSign
+   (http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd)
+   (http://schemas.xmlsoap.org/ws/2004/08/addressing/)
+   (http://schemas.xmlsoap.org/wsdl/http)
+   (http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm.xsd)
+   (http://www.w3.org/2005/08/addressing/ws-addr.xsd)
+
+
+The product contains code (StaxBuilder.java) that is
+  Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
+  All rights reserved.
+  See the NOTICE.jdom file for additional information
+
+Java classes (source and binary) under org.apache.cxf.jaxws.javaee
+are generated from schema available here:
+(http://java.sun.com/xml/ns/javaee/javaee_5.xsd)
+
+This Product also includes software developed by David Heinemeier Hansson.
+(http://dev.rubyonrails.org/browser/trunk/activesupport/lib/active_support/inflections.rb)
+
+
+This product also includes MTOSI wsdl and schemas developed by the
+TeleManagement Forum (http://www.tmforum.org/browse.aspx). The original
+MTOSI wsdl and schemas can be download from
+(http://sourceforge.net/projects/mtosi-ri)
+
+Portions of the included XmlSchema library are Copyright 2006 International Business Machines Corp.
+
+Portions of the included xml-apis library were originally based on the following:
+   - software copyright (c) 1999, IBM Corporation., http://www.ibm.com.
+   - software copyright (c) 1999, Sun Microsystems., http://www.sun.com.
+   - software copyright (c) 2000 World Wide Web Consortium, http://www.w3.org
+
+Portions of the included xmlbeans library were originally based on the following:
+   - software copyright (c) 2000-2003, BEA Systems, <http://www.bea.com/>.
+
+Portions of the file cxf-utils.js derives from code marked:
+This code was written by Tyler Akins and has been placed in the
+public domain.  It would be nice if you left this header intact.
+Base64 code from Tyler Akins -- http://rumkin.com
+
+
+Additional copyright notices and license terms applicable are
+present in the licenses directory of this distribution.
+
+

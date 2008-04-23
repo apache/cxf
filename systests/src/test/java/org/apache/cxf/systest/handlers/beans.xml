@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:jaxws="http://cxf.apache.org/jaxws" 
+xmlns:cxf="http://cxf.apache.org/core" 
+xsi:schemaLocation=" 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"> 
+<import resource="classpath:META-INF/cxf/cxf.xml" /> 
+<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
+<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" /> 
+<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" /> 
+<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" /> 
+
+	<jaxws:endpoint id="cxfHandlerTestEndpoint"
+		implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers"
+		address="http://localhost:9025/SpringEndpoint">
+    	<jaxws:handlers>
+    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+    	</jaxws:handlers>
+    </jaxws:endpoint> 
+	<jaxws:server id="cxfHandlerTestServer"
+		serviceClass="org.apache.handlers.AddNumbers"
+		address="http://localhost:9025/SpringServer">
+		<jaxws:serviceBean>
+                <bean class="org.apache.cxf.systest.handlers.AddNumbersNoHandlers" />
+        </jaxws:serviceBean>
+		
+    	<jaxws:handlers>
+    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+    	</jaxws:handlers>
+    </jaxws:server>
+
+    <jaxws:client id="cxfHandlerTestClientEndpoint"
+    	serviceClass="org.apache.handlers.AddNumbers"
+    	address="http://localhost:9025/SpringEndpoint">
+    	<jaxws:handlers>
+    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+    	</jaxws:handlers>
+    </jaxws:client> 
+    <jaxws:client id="cxfHandlerTestClientEndpointNoHandler"
+    	serviceClass="org.apache.handlers.AddNumbers"
+    	address="http://localhost:9025/SpringEndpoint">
+    </jaxws:client> 
+    <jaxws:client id="cxfHandlerTestClientServer"
+    	serviceClass="org.apache.handlers.AddNumbers"
+    	address="http://localhost:9025/SpringServer">
+    	<jaxws:handlers>
+    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+    	</jaxws:handlers>
+    </jaxws:client> 
+    
+</beans> 

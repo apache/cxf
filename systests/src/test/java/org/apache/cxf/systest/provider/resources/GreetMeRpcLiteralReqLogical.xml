@@ -1,0 +1,1 @@
+<ns1:greetMe xmlns:ns1="http://apache.org/hello_world_rpclit"><in xmlns:ns2="http://apache.org/hello_world_rpclit/types">Milestone-0-ServerLogicalHandler</in></ns1:greetMe>

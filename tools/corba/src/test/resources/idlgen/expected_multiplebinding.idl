@@ -1,0 +1,36 @@
+module edell {
+    module test2 {
+        struct num2 {
+            long long2;
+        };
+    };
+    interface test1 {
+        struct num1 {
+            string str1;
+        };
+        num1
+        opNum1(
+            in num1 in1,
+            out num1 out1,
+            inout num1 inout1
+        );
+    };
+};
+module edell {
+    module test1 {
+        struct num1 {
+            string str1;
+        };
+    };
+    interface test2 {
+        struct num2 {
+            long long2;
+        };
+        num2
+        opNum2(
+            in num2 in2,
+            out num2 out2,
+            inout num2 inout2
+        );
+    };
+};

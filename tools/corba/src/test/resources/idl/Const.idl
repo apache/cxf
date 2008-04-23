@@ -1,0 +1,72 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/ 
+
+interface scope {
+
+     struct structScope {
+        long a;
+     };
+};
+
+const short              glob_short            = -12;
+const long               glob_long             = 2334;
+const long long          glob_longlong         = -123456789; 
+const unsigned short     glob_unsignedshort    = 15; 
+const unsigned long      glob_unsignedlong     = 4556;
+const unsigned long long glob_unsignedlonglong = 123456789;
+
+const char               glob_char             = 'r';  
+const wchar              glob_wchar            = L'x';  
+
+const boolean            glob_boolean          = FALSE;  
+const float              glob_float            = -67.9;  
+const double             glob_double           = -1.9e5;  
+const long double        glob_longdouble       = -3.2e8;  
+const string             glob_string           = "this is a global string";
+//const string < INT >   glob_string < INT >   = ;
+//const string<10>         glob_string           = "this is a bounded global string";
+const wstring            glob_wstring          = L"this is a global wide string";  
+//const wstring < INT >    glob_wstring < INT >  = ;  
+const fixed              glob_fixed            = 16.75D;  
+const octet              glob_octet            = 0x1;
+//const <scoped_name>      glob_<scoped_name>    = ;  
+const scope              glob_scope    = 2;  
+const scope::structScope      glob_structscope    = "scopename";  
+
+interface constInterface {
+	const short              inter_short            = -12;
+	const long               inter_long             = 2334;  
+	const long long          inter_longlong         = -123456789; 
+	const unsigned short     inter_unsignedshort    = 15; 
+	const unsigned long      inter_unsignedlong     = 4556; 
+	const unsigned long long inter_unsignedlonglong = 123456789;
+	const char               inter_char             = 'r';  
+	const wchar              inter_wchar            = L'x';  
+	const boolean            inter_boolean          = FALSE;  
+	const float              inter_float            = -67.9;  
+	const double             inter_double           = -1.9e5;  
+	const long double        inter_longdouble       = -3.2e8;  
+	const string             inter_string           = "this is a global string";  
+	//const string < INT >     inter_string < INT >   = ;
+	const wstring            inter_wstring          = L"this is a global wide string";  
+	//const wstring < INT >    inter_wstring < INT >  = ;  
+	const fixed              inter_fixed            = 16.75D;  
+	const octet              inter_octet            = 0x1;
+	//const <scoped_name>      inter_<scoped_name>    = ;  
+};

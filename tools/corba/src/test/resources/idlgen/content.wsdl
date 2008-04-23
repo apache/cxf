@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions targetNamespace="http://schemas.apache.org/" xmlns:typens="http://schemas.apache.org/xsd" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/corba/typemap/" xmlns:wsdlns="http://schemas.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/corba/typemap/">
+    <corba:struct xmlns:typens="http://schemas.apache.org/xsd" repositoryID="IDL:sub1SequenceStruct:1.0" type="typens:sub1" name="sub1SequenceStruct">
+      <corba:member name="e3" idltype="corba:float" />
+    </corba:struct>
+      <corba:struct xmlns:typens="http://schemas.apache.org/xsd" repositoryID="IDL:sub1:1.0" type="typens:sub1" name="sub1">
+        <corba:member xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="base_f" idltype="ns1:base" />
+        <corba:member xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="sub1SequenceStruct_f" idltype="ns1:sub1SequenceStruct" />
+      </corba:struct>
+        <corba:struct xmlns:typens="http://schemas.apache.org/xsd" repositoryID="IDL:base:1.0" type="typens:base" name="base">
+          <corba:member name="attr1" idltype="corba:string" />
+          <corba:member name="attr2" idltype="corba:long" />
+          <corba:member name="e1" idltype="corba:long" />
+          <corba:member name="e2" idltype="corba:string" />
+        </corba:struct>
+          <corba:struct xmlns:typens="http://schemas.apache.org/xsd" repositoryID="IDL:AllTypeAllStruct:1.0" type="typens:AllType" name="AllTypeAllStruct">
+            <corba:member name="varStringExt" idltype="corba:string" />
+            <corba:member name="varFloatExt" idltype="corba:float" />
+          </corba:struct>
+            <corba:struct xmlns:typens="http://schemas.apache.org/xsd" repositoryID="IDL:AllType:1.0" type="typens:AllType" name="AllType">
+              <corba:member xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="base_f" idltype="ns1:base" />
+              <corba:member name="AttrString" idltype="corba:string" />
+              <corba:member xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="AllTypeAllStruct_f" idltype="ns1:AllTypeAllStruct" />
+            </corba:struct>
+              <corba:union xmlns:typens="http://schemas.apache.org/xsd" discriminator="corba:long" repositoryID="IDL:sub2ChoiceType:1.0" type="typens:sub2" name="sub2ChoiceType">
+                <corba:unionbranch name="e4" idltype="corba:double" default="false">
+                  <corba:case label="0" />
+                </corba:unionbranch>
+                  <corba:unionbranch name="e6" idltype="corba:double" default="false">
+                    <corba:case label="1" />
+                  </corba:unionbranch>
+                  </corba:union>
+                    <corba:struct xmlns:typens="http://schemas.apache.org/xsd" repositoryID="IDL:sub2:1.0" type="typens:sub2" name="sub2">
+                      <corba:member xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="base_f" idltype="ns1:base" />
+                      <corba:member xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="sub2ChoiceType_f" idltype="ns1:sub2ChoiceType" />
+                    </corba:struct>
+                    </corba:typeMapping>
+  <types>
+    <schema elementFormDefault="qualified" targetNamespace="http://schemas.apache.org/xsd" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <element name="in_obj" type="typens:base"/>
+            <element name="result_obj" type="typens:base"/>
+            <element name="in_obj2" type="typens:sub1"/>
+            <element name="result_obj2" type="typens:sub2"/>
+
+            <complexType name="base">
+                <sequence>
+                    <element name="e1" type="xsd:int"/>
+                    <element name="e2" type="xsd:string"/>
+                </sequence>
+                <attribute name="attr1" type="xsd:string" use="required"/>
+                <attribute name="attr2" type="xsd:int" use="required"/>
+            </complexType>
+            <complexType name="sub1">
+                <complexContent>
+                    <extension base="typens:base">
+                        <sequence>
+                            <element name="e3" type="xsd:float"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType name="sub2">
+
+                <complexContent>
+                    <extension base="typens:base">
+                        <choice>
+                            <element name="e4" type="xsd:double"/>
+                            <element name="e6" type="xsd:double"/>
+                        </choice>
+                    </extension>
+                </complexContent>
+
+            </complexType>
+            
+            <complexType name="AllType">
+                <complexContent mixed="false">
+                    <extension base="typens:base">
+                        <attribute name="AttrString" type="xsd:string" use="required"/>
+                        <all>
+                            <element name="varStringExt" type="xsd:string"/>
+                            <element name="varFloatExt" type="xsd:float"/>
+                        </all>
+                    </extension>
+                </complexContent>
+            </complexType>
+            
+        </schema>
+  </types>
+  <message name="echoObject2Response">
+    <part name="Result" element="typens:result_obj2"/>
+  </message>
+  <message name="echoObject">
+    <part name="x" element="typens:in_obj"/>
+  </message>
+  <message name="echoObjectResponse">
+    <part name="Result" element="typens:result_obj"/>
+  </message>
+  <message name="echoObject2">
+    <part name="x" element="typens:in_obj2"/>
+  </message>
+  <portType name="ContentPortType">
+    <operation name="echoObject" parameterOrder="x">
+      <input name="echoObject" message="wsdlns:echoObject"/>
+      <output name="echoObjectResponse" message="wsdlns:echoObjectResponse"/>
+    </operation>
+    <operation name="echoObject2" parameterOrder="x">
+      <input name="echoObject2" message="wsdlns:echoObject2"/>
+      <output name="echoObject2Response" message="wsdlns:echoObject2Response"/>
+    </operation>
+  </portType>
+  <binding name="ContentCORBABinding" type="wsdlns:ContentPortType">
+    <corba:binding repositoryID="IDL:ContentPortType:1.0" />
+    <operation name="echoObject">
+      <corba:operation name="echoObject">
+        <corba:param xmlns:ns1="http://schemas.apache.org/corba/typemap/" mode="in" name="x" idltype="ns1:base" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="Result" idltype="ns1:base" />
+      </corba:operation>
+      <input name="echoObject">
+      </input>
+      <output name="echoObjectResponse">
+      </output>
+    </operation>
+    <operation name="echoObject2">
+      <corba:operation name="echoObject2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/corba/typemap/" mode="in" name="x" idltype="ns1:sub1" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/corba/typemap/" name="Result" idltype="ns1:sub2" />
+      </corba:operation>
+      <input name="echoObject2">
+      </input>
+      <output name="echoObject2Response">
+      </output>
+    </operation>
+  </binding>
+</definitions>

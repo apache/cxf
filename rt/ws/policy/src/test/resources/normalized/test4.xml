@@ -1,0 +1,5 @@
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"><wsp:ExactlyOne><wsp:All><sec:SecurityToken xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">
+                
+            <sec:TokenType xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">sec:X509v3</sec:TokenType></sec:SecurityToken></wsp:All><wsp:All><sec:SecurityToken xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">
+                
+            <sec:TokenType xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">sec:X509v3</sec:TokenType></sec:SecurityToken><ans1:SecurityHeader xmlns:ans1="http://schemas.xmlsoap.org/ws/2002/12/secext" MustPrepend="true" /></wsp:All></wsp:ExactlyOne></wsp:Policy>

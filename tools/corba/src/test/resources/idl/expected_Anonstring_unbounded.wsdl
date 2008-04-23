@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonstring/typemap">
+    <corba:array xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns="" elemtype="corba:string" elemname="item" bound="10" repositoryID="IDL:AnonStrings:1.0" type="ns4:AnonStrings" name="AnonStrings" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns="" elemtype="corba:string" elemname="item" bound="0" repositoryID="IDL:AnonStrings/SequenceBoundedString:1.0" type="ns4:AnonStrings.SequenceBoundedString" name="AnonStrings.SequenceBoundedString" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns="" elemtype="corba:string" elemname="item" bound="0" type="ns4:AnonStrings._Anon1_SequenceSequenceBoundedString" name="AnonStrings._Anon1_SequenceSequenceBoundedString" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring/typemap" xmlns="" elemtype="ns4:AnonStrings._Anon1_SequenceSequenceBoundedString" elemname="item" bound="0" repositoryID="IDL:AnonStrings/SequenceSequenceBoundedString:1.0" type="ns5:AnonStrings.SequenceSequenceBoundedString" name="AnonStrings.SequenceSequenceBoundedString" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns="" elemtype="corba:string" elemname="item" bound="20" repositoryID="IDL:AnonStrings/BoundedSequenceBoundedString:1.0" type="ns4:AnonStrings.BoundedSequenceBoundedString" name="AnonStrings.BoundedSequenceBoundedString" />
+    <corba:anonsequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns="" elemtype="corba:string" elemname="item" bound="20" type="ns4:AnonStrings._Anon1_SequenceBoundedSequenceBoundedString" name="AnonStrings._Anon1_SequenceBoundedSequenceBoundedString" />
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Anonstring/typemap" xmlns="" elemtype="ns4:AnonStrings._Anon1_SequenceBoundedSequenceBoundedString" elemname="item" bound="0" repositoryID="IDL:AnonStrings/SequenceBoundedSequenceBoundedString:1.0" type="ns5:AnonStrings.SequenceBoundedSequenceBoundedString" name="AnonStrings.SequenceBoundedSequenceBoundedString" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring" repositoryID="IDL:AnonStrings/anonStringStruct:1.0" type="AnonStrings.anonStringStruct" name="AnonStrings.anonStringStruct">
+      <corba:member name="unboundedString" idltype="corba:string" />
+      <corba:member name="anotherUnboundedString" idltype="corba:string" />
+      <corba:member name="anonBoundedString" idltype="corba:string" />
+      <corba:member name="anotherAnonBoundedString" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring" repositoryID="IDL:AnonStrings/typedefAnonStringStruct:1.0" type="AnonStrings.typedefAnonStringStruct" name="AnonStrings.typedefAnonStringStruct">
+      <corba:member name="unboundedString" idltype="corba:string" />
+      <corba:member name="anotherUnboundedString" idltype="corba:string" />
+      <corba:member name="anonBoundedString" idltype="corba:string" />
+      <corba:member name="anotherAnonBoundedString" idltype="corba:string" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring/typemap" basetype="AnonStrings.typedefAnonStringStruct" repositoryID="IDL:AnonStrings/myTypedefAnonStringStruct:1.0" name="AnonStrings.myTypedefAnonStringStruct" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring" discriminator="corba:long" repositoryID="IDL:AnonStrings/anonStringUnion:1.0" type="AnonStrings.anonStringUnion" name="AnonStrings.anonStringUnion">
+      <corba:unionbranch name="anonStringUnion1" idltype="corba:string">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="anonStringUnionDefault" idltype="corba:string" default="true" />
+    </corba:union>
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring" discriminator="corba:long" repositoryID="IDL:AnonStrings/typedefAnonStringUnion:1.0" type="AnonStrings.typedefAnonStringUnion" name="AnonStrings.typedefAnonStringUnion">
+      <corba:unionbranch name="anonStringUnion1" idltype="corba:string">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="anonStringUnionDefault" idltype="corba:string" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring/typemap" basetype="AnonStrings.typedefAnonStringUnion" repositoryID="IDL:AnonStrings/myTypedefAnonStringUnion:1.0" name="AnonStrings.myTypedefAnonStringUnion" />
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring" repositoryID="IDL:AnonStrings/anonException:1.0" type="AnonStrings.anonExceptionType" name="AnonStrings.anonException">
+      <corba:member name="unboundedString" idltype="corba:string" />
+      <corba:member name="anotherUnboundedString" idltype="corba:string" />
+      <corba:member name="anonBoundedAnonString" idltype="corba:string" />
+      <corba:member name="anotherBoundedAnonString" idltype="corba:string" />
+    </corba:exception>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns="http://cxf.apache.org/bindings/corba/idl/Anonstring" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="AnonStrings">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.SequenceBoundedString">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings._Anon1_SequenceSequenceBoundedString">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.SequenceSequenceBoundedString">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="AnonStrings._Anon1_SequenceSequenceBoundedString">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.BoundedSequenceBoundedString">
+        <xs:sequence>
+          <xs:element maxOccurs="20" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings._Anon1_SequenceBoundedSequenceBoundedString">
+        <xs:sequence>
+          <xs:element maxOccurs="20" minOccurs="0" name="item" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.SequenceBoundedSequenceBoundedString">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="AnonStrings._Anon1_SequenceBoundedSequenceBoundedString">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="anonStringOperation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="anonStringOperationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="anotherAnonStringOperation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="anotherAnonStringOperationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="AnonStrings.anonStringStruct">
+        <xs:sequence>
+          <xs:element name="unboundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anotherUnboundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anonBoundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anotherAnonBoundedString" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.typedefAnonStringStruct">
+        <xs:sequence>
+          <xs:element name="unboundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anotherUnboundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anonBoundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anotherAnonBoundedString" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.anonStringUnion">
+        <xs:choice>
+          <xs:element name="anonStringUnion1" type="xs:string">
+          </xs:element>
+          <xs:element name="anonStringUnionDefault" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="AnonStrings.typedefAnonStringUnion">
+        <xs:choice>
+          <xs:element name="anonStringUnion1" type="xs:string">
+          </xs:element>
+          <xs:element name="anonStringUnionDefault" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:element name="AnonStrings.anonException" type="AnonStrings.anonExceptionType">
+      </xs:element>
+      <xs:complexType name="AnonStrings.anonExceptionType">
+        <xs:sequence>
+          <xs:element name="unboundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anotherUnboundedString" type="xs:string">
+          </xs:element>
+          <xs:element name="anonBoundedAnonString" type="xs:string">
+          </xs:element>
+          <xs:element name="anotherBoundedAnonString" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="anonStringOperation">
+    <wsdl:part name="inparameter" element="tns:anonStringOperation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="anotherAnonStringOperation">
+    <wsdl:part name="inparameter" element="tns:anotherAnonStringOperation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AnonStrings.anonException">
+    <wsdl:part name="exception" element="tns:AnonStrings.anonException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="anotherAnonStringOperationResponse">
+    <wsdl:part name="outparameter" element="tns:anotherAnonStringOperationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="anonStringOperationResponse">
+    <wsdl:part name="outparameter" element="tns:anonStringOperationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="AnonStrings.anonStringIf">
+    <wsdl:operation name="anonStringOperation">
+      <wsdl:input name="anonStringOperationRequest" message="tns:anonStringOperation">
+    </wsdl:input>
+      <wsdl:output name="anonStringOperationResponse" message="tns:anonStringOperationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="anotherAnonStringOperation">
+      <wsdl:input name="anotherAnonStringOperationRequest" message="tns:anotherAnonStringOperation">
+    </wsdl:input>
+      <wsdl:output name="anotherAnonStringOperationResponse" message="tns:anotherAnonStringOperationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AnonStrings.anonStringIfCORBABinding" type="tns:AnonStrings.anonStringIf">
+    <corba:binding repositoryID="IDL:AnonStrings/anonStringIf:1.0" />
+    <wsdl:operation name="anonStringOperation">
+      <corba:operation name="anonStringOperation">
+        <corba:param mode="in" name="inString" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="anonStringOperationRequest">
+      </wsdl:input>
+      <wsdl:output name="anonStringOperationResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="anotherAnonStringOperation">
+      <corba:operation name="anotherAnonStringOperation">
+        <corba:param mode="in" name="inString" idltype="corba:string" />
+        <corba:return name="return" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="anotherAnonStringOperationRequest">
+      </wsdl:input>
+      <wsdl:output name="anotherAnonStringOperationResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AnonStrings.anonStringIfCORBAService">
+    <wsdl:port name="AnonStrings.anonStringIfCORBAPort" binding="tns:AnonStrings.anonStringIfCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

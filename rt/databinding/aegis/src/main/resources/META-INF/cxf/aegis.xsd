@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified" attributeFormDefault="unqualified"
+>
+
+  <xsd:element name="mappings">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="mapping" type="mappingType" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="mappingType">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="property" type="propertyType" />
+      <xsd:element name="method" type="methodType" />
+      <xsd:element name="component" type="componentTypeType" />
+    </xsd:choice>
+    <xsd:attribute name="uri" type="xsd:string" />
+    <xsd:attribute name="name" type="xsd:string" />
+  </xsd:complexType>
+  
+  <xsd:complexType name="propertyType">
+    <xsd:attributeGroup ref="mappedType" />
+    <xsd:anyAttribute namespace='##other' processContents='lax' />
+  </xsd:complexType>
+
+  <xsd:complexType name="methodType">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="return-type" type="return-typeType" />
+      <xsd:element name="parameter" type="parameterType" />
+    </xsd:choice>
+    <xsd:attribute name="name" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="return-typeType">
+    <xsd:attributeGroup ref="mappedType" />
+    <xsd:anyAttribute namespace='##other' processContents='lax' />
+  </xsd:complexType>
+
+  <xsd:complexType name="parameterType">
+    <xsd:attribute name="index" type="xsd:int" />
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attributeGroup ref="mappedType" />
+    <xsd:anyAttribute namespace='##other' processContents='lax' />
+  </xsd:complexType>
+
+  <xsd:complexType name="componentTypeType">
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attributeGroup ref="mappedType" />
+    <xsd:anyAttribute namespace='##other' processContents='lax' />
+  </xsd:complexType>
+
+  <xsd:attributeGroup name="mappedType">
+    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="type" type="xsd:string" />
+    <xsd:attribute name="typeName" type="xsd:string" />
+    <xsd:attribute name="mappedName" type="xsd:string" />
+    <xsd:attribute name="nillable" type="xsd:boolean" />
+    <xsd:attribute name="flag" type="xsd:boolean" />
+    <xsd:attribute name="ignore" type="xsd:boolean" />
+    <xsd:attribute name="componentType" type="xsd:string" />
+    <xsd:attribute name="keyType" type="xsd:string" />
+    <xsd:attribute name="valueType" type="xsd:string" />
+    <xsd:attribute name="minOccurs" type="xsd:int" />
+    <xsd:attribute name="maxOccurs" type="xsd:string" />
+    <xsd:attribute name="style">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="attribute" />
+          <xsd:enumeration value="element" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:anyAttribute namespace='##other' processContents='lax' />
+  </xsd:attributeGroup>
+</xsd:schema>

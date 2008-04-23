@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+                                                                                                                                                             
+  http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                             
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<definitions targetNamespace="http://apache.org/locator" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:ls="http://apache.org/locator" 
+    xmlns:query="http://apache.org/locator/query" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://apache.org/locator/types" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <types>
+        <xs:schema targetNamespace="http://apache.org/locator/types">
+	    		<xs:include schemaLocation="types.xsd"/>
+    	</xs:schema> 
+    </types>
+    <message name="registerPeerManagerInput">
+        <part element="tns:registerPeerManager" name="parameters"/>
+    </message>
+    <message name="registerPeerManagerOutput">
+        <part element="tns:registerPeerManagerResponse" name="parameters"/>
+    </message>
+    <message name="deregisterPeerManagerInput">
+        <part element="tns:deregisterPeerManager" name="parameters"/>
+    </message>
+    <message name="deregisterPeerManagerOutput">
+        <part element="tns:deregisterPeerManagerResponse" name="parameters"/>
+    </message>
+    <message name="registerEndpointInput">
+        <part element="tns:registerEndpoint" name="parameters"/>
+    </message>
+    <message name="registerEndpointOutput">
+        <part element="tns:registerEndpointResponse" name="parameters"/>
+    </message>
+    <message name="deregisterEndpointInput">
+        <part element="tns:deregisterEndpoint" name="parameters"/>
+    </message>
+    <message name="deregisterEndpointOutput">
+        <part element="tns:deregisterEndpointResponse" name="parameters"/>
+    </message>
+    <message name="lookupEndpointInput">
+        <part element="tns:lookupEndpoint" name="parameters"/>
+    </message>
+    <message name="lookupEndpointOutput">
+        <part element="tns:lookupEndpointResponse" name="parameters"/>
+    </message>
+    <message name="listEndpointInput">
+        <part element="tns:listEndpoints" name="parameters"/>
+    </message>
+    <message name="listEndpointOutput">
+        <part element="tns:listEndpointsResponse" name="parameters"/>
+    </message>
+    <message name="queryEndpointInput">
+        <part element="tns:queryEndpoints" name="parameters"/>
+    </message>
+    <message name="queryEndpointOutput">
+        <part element="tns:queryEndpointsResponse" name="parameters"/>
+    </message>
+    <message name="endpointNotExistFault">
+        <part element="tns:EndpointNotExistFault" name="parameters"/>
+    </message>
+    <portType name="LocatorService">
+        <operation name="registerPeerManager">
+            <xs:documentation>
+        Register a peer endpoint manager with the locator service. Once registered, 
+        the Locator associates the peer_id with the peer endpoint manager.
+      </xs:documentation>
+            <input message="ls:registerPeerManagerInput"/>
+            <output message="ls:registerPeerManagerOutput"/>
+        </operation>
+        <operation name="deregisterPeerManager">
+            <xs:documentation>
+        Deregister a peer endpoint manager with the locator service. Deregistering a
+        peer manager also deregisters all endpoints that were registered by it.
+      </xs:documentation>
+            <input message="ls:deregisterPeerManagerInput"/>
+            <output message="ls:deregisterPeerManagerOutput"/>
+        </operation>
+        <operation name="registerEndpoint">
+            <xs:documentation>
+        Register an endpoint to become available in the locator.  Once registered, an  
+        endpoint will be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints&quot; operations.
+      </xs:documentation>
+            <input message="ls:registerEndpointInput"/>
+            <output message="ls:registerEndpointOutput"/>
+        </operation>
+        <operation name="deregisterEndpoint">
+            <xs:documentation>
+        Deregister an endpoint from the locator. Once deregistered an endpoint will
+        no longer be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints operations.
+      </xs:documentation>
+            <input message="ls:deregisterEndpointInput"/>
+            <output message="ls:deregisterEndpointOutput"/>
+        </operation>
+        <operation name="lookupEndpoint">
+            <xs:documentation>Lookup an endpoint from the locator based on a QName.</xs:documentation>
+            <input message="ls:lookupEndpointInput"/>
+            <output message="ls:lookupEndpointOutput"/>
+            <fault message="ls:endpointNotExistFault" name="fault"/>
+        </operation>
+        <operation name="listEndpoints">
+            <xs:documentation>List all endpoints available in the locator.</xs:documentation>
+            <input message="ls:listEndpointInput"/>
+            <output message="ls:listEndpointOutput"/>
+        </operation>
+        <operation name="queryEndpoints">
+            <xs:documentation>List all endpoints available in the locator based on selection filters.</xs:documentation>
+            <input message="ls:queryEndpointInput"/>
+            <output message="ls:queryEndpointOutput"/>
+        </operation>
+    </portType>
+    <binding name="LocatorServiceBinding" type="ls:LocatorService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="registerPeerManager">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="deregisterPeerManager">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="registerEndpoint">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="deregisterEndpoint">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="lookupEndpoint">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="fault">
+                <soap:fault name="fault" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="listEndpoints">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="queryEndpoints">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="LocatorService">
+        <port binding="ls:LocatorServiceBinding" name="LocatorServicePort">
+            <soap:address location="http://localhost:6006/services/LocatorService"/>
+        </port>
+    </service>
+</definitions>

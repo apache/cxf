@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ============ Includes ========= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="LayerRates.xsd"/>
+  <xsd:include schemaLocation="TransmissionParameters.xsd"/>
+  <!-- ============ Global Type Declarations ========= -->
+  <xsd:simpleType name="TPProtectionAssociation_T">
+    <xsd:annotation>
+      <xsd:documentation>
+tpProtectionAssociation expresses constraints on PTPs/CTPs/FTPs for PSR connection management.
+
+In a multi-layer subnetwork, say 'a', 'b', 'c' are edge points. Suppose, for example, a three-ended connection is sought from 'a' to 'b', where 'b' is one of the endpoints. If 'c' is the constrained choice for 'b' as the other end of the three- ended connection,then 'b' and 'c' are said to be associated by a ] protectionAssociation. The tpProtectionAssociation is set to TPPA_PSR_RELATED in 'b' and 'c', and getAssociatedTP(b) returns c and getAssociatedTP(c) returns b.
+
+In all other cases, tpProtectionAssociation is set to TPPA_NA.
+            </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="TPPA_NA"/>
+      <xsd:enumeration value="TPPA_PSR_RELATED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="TPConnectionState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+A CTP/FTP may be involved in zero, one, or many connections. The value TPConnectionState indicates the degree to which a CTP/FTP is used. The values TPCS_SOURCE_CONNECTED and TPCS_SINK_CONNECTED reflect the presence of a one way connection. The value TPCS_BI_CONNECTED means that the TP is both sink and source connected.
+
+If an EMS cannot report whether the source of the TP is connected or the sink is connected, TPCS_BI_CONNECTED may be reported by that EMS.
+
+The value TPCS_NA is used for PTPs and TPPools.
+            </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="TPCS_NA"/>
+      <xsd:enumeration value="TPCS_SOURCE_CONNECTED"/>
+      <xsd:enumeration value="TPCS_SINK_CONNECTED"/>
+      <xsd:enumeration value="TPCS_BI_CONNECTED"/>
+      <xsd:enumeration value="TPCS_NOT_CONNECTED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="TerminationMode_T">
+    <xsd:annotation>
+      <xsd:documentation>
+TerminationMode has the following values: 
+TM_TERMINATED_AND_AVAILABLE_FOR_MAPPING:
+
+CTP: The CTP can be mapped and currently is (i.e., it has contained actual CTPs). This indicates that the G.805 CPs adapted from the corresponding G.805 Termination Function within the CTP aggregate are available to provide client layer capacity (e.g. STS1 terminated and mapped to VT1.5 i.e. channelized). In this state the TCP will be sourcing and sinking traffic. This is only a valid value for CTPs that support client adaptation. 
+FTP: The FTP can be mapped on the server side and currently is (i.e., it has contained actual CTPs on the server side). This indicates that the FTP supports IM (Inverse Multiplexing) and the server side contained CTPs (if any) are available for connection as the FTP is actively assembling the fragments of the IM. This value is not valid for an FTP that does not support IM. (see layering for more details). 
+PTP: This value is not valid for a PTP. 
+
+TM_NEITHER_TERMINATED_NOR_AVAILABLE_FOR_MAPPING:
+CTP: The CTP can be mapped but currently is not (i.e., it does have contained potential CTPs, but currently has no contained actual CTPs). This indicates that the G.805 CP aggregated in the CTP is not connected to a TCP (that would be aggregated in the same CTP) and therefore the CTP is available for SNC/crossconnect connectivity (e.g. STS1 not terminated and not mapped to VT1.5i.e. not channelized). 
+FTP: The FTP can be mapped on the server side but currently is not (i.e., it does have contained potential CTPs on the server side, but currently has no contained actual CTPs on the server side). This indicates that the FTP supports IM (Inverse Multiplexing) but the IM function is not active and the TCP within the FTP is available for external SNC/crossconnect connectivity. 
+PTP: This value is not valid for a PTP. 
+
+TM_NA:
+CTP: The CTP can not be mapped (i.e., it has no contained potential CTPs). This indicates that an SNC/crossconnect can be used to connect the G.805 TCP of the CTP to the connection point of another CTP/FTP. This only applies to CTPs that connect on their server side and are related to the containing PTP/FTP on their client side. 
+FTP: The FTP can not be mapped on the server side (i.e., it has no contained potential CTPs on the server side). This indicates that an SNC/crossconnect can be used to connect the G.805 TCP of the FTP to the connection point of another CTP/FTP. This only applies to FTPs that connect on their server side and do not support IM (Inverse Multiplexing). 
+PTP: This is the only legal value for a PTP
+            </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="TM_NA"/>
+      <xsd:enumeration value="TM_NEITHER_TERMINATED_NOR_AVAILABLE_FOR_MAPPING"/>
+      <xsd:enumeration value="TM_TERMINATED_AND_AVAILABLE_FOR_MAPPING"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="DescriptionOfUse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      A description of the specific use of the TP pool, in particular how its members are collected and administered. It could include, for example, the name of a TP (e.g., an ATM NI CTP) such that all TP pool members have to be collected from the set of potential client CTPs of this TP. The description of use of an ATM VP TP pool would be "VirtualUNI", if all its VP CTPs are contained in the same real user network interface (UNI) (i.e., a tributary ATM NI CTP) that is partitioned into virtual UNIs (i.e., VP TP pools).
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="NumberOfIdleMembers_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Identifies the number of currently contained idle TPs that are free to be used for the intended management purpose.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:unsignedInt"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="NumberOfMembers_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Identifies the total number of TPs currently contained in the TPPool.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:unsignedInt"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="TMDState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Contains the state of consistency between a TP and its associated TransmissionDescriptor.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="TMD_MISSING"/>
+      <xsd:enumeration value="NOT_APPLICABLE"/>
+      <xsd:enumeration value="PENDING"/>
+      <xsd:enumeration value="APPLIED"/>
+      <xsd:enumeration value="MISMATCH"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="ConnectionTerminationPoint_T">
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="direction" type="Directionality_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The direction of the Connection Termination Point.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpProtectionAssociation" type="TPProtectionAssociation_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates whether the TP has an associated protection TP and, if so, what kind of protection association exists.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="edgePoint" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates if the TP is an edge point of at least one subnetwork, i.e. if it is an end point of a potential inter-subnetwork topological link.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="networkAccessDomain" type="NetworkAccessDomain_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A free-format string used to associate the resource to a Network Access Domain. 
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="equipmentProtected" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The attribute indicates whether or not the TP is supported by a protected equipment. 
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTMDState" type="TMDState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains the state of consistency between a TP and its associated egress TransmissionDescriptor.
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTMDState" type="TMDState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains the state of consistency between a TP and its associated eingress TransmissionDescriptor.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionState" type="TPConnectionState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This attribute is only applicable to CTPs and FTPs. If the source is connected to one entity and the sink is connected to another entity then the value of this attribute is TPCS_BI_CONNECTED.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpMappingMode" type="TerminationMode_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Within the facade definition, the CTP/FTP can act as an aggregate of associated G.805 TCPs, G.805 Termination Functions and G.805 CPs at one or more LayerRates. The CTP is contained within a PTP or FTP.
+The TerminationMode attribute indicates and controls the connection of the named CP at a specified LayerRate to the dedicated G.805 TCP and associated G.805 Termination Function at the same LayerRate within the CTP/FTP.
+The TerminationMode is used, for example, to control the Termination and mapping to VT1.5 of an STS1 Trail within an OC3 port. This capability could potentially be used to terminate an STS1 backbone Trail within a lower order mux that has the capability to alternatively cross-connect the STS1 unterminated. The same capability is used in SDH and is potentially applicable to any LayerRate.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection Connection Termination Point may have an optional reference to an ingress (incoming) Transmission Descriptor. The Descriptor name will be empty if there is no associated Descriptor. It is expected that Transmission Descriptors are not mixed on a single TP. Therefore if the Ingress Descriptor name is that of a Transmission Descriptor then the Egress Descriptor name should either be that of a Transmission Descriptor or a null value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection Connection Termination Point may have an optional reference to an egress (outgoing) Transmission Descriptor. The Transmission Descriptor name will be empty if there is no associated Descriptor. It is expected that Transmission Descriptors are not mixed on a single TP. Therefore if the Egress Descriptor name is that of a Transmission Descriptor then the Ingress Descriptor name should either be that of a Transmission Descriptor or a null value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transmissionParams" type="LayeredParametersList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A list of transmission parameters which can be set and/or retrieved on the TP at a specified layer. This attribute must contain the complete set of layer rates represented by a PTP/CTP/FTP - even if they have no parameters associated with them. The layerRates are listed in the order of their client-server relationship (see layering for more details). This attribute can be set by an NMS through the managedElementManager :: ManagedElementMgr_I :: setTPData() operation and also during SNC creation. The values for the name field and the value fields of the NVSList_T are defined in Layered Parameters.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="CTPVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="FloatingTerminationPoint_T">
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="direction" type="Directionality_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The direction of the Floating Termination Point.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpProtectionAssociation" type="TPProtectionAssociation_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates whether the TP has an associated protection TP and, if so, what kind of protection association exists.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="edgePoint" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates if the TP is an edge point of at least one subnetwork, i.e. if it is an end point of a potential inter-subnetwork topological link.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="networkAccessDomain" type="NetworkAccessDomain_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A free-format string used to associate the resource to a Network Access Domain. 
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="equipmentProtected" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The attribute indicates whether or not the TP is supported by a protected equipment. 
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTMDState" type="TMDState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains the state of consistency between a TP and its associated egress TransmissionDescriptor.
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTMDState" type="TMDState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains the state of consistency between a TP and its associated eingress TransmissionDescriptor.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionState" type="TPConnectionState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This attribute is only applicable to CTPs and FTPs. If the source is connected to one entity and the sink is connected to another entity then the value of this attribute is TPCS_BI_CONNECTED.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpMappingMode" type="TerminationMode_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Within the facade definition, the CTP/FTP can act as an aggregate of associated G.805 TCPs, G.805 Termination Functions and G.805 CPs at one or more LayerRates. The CTP is contained within a PTP or FTP.
+The TerminationMode attribute indicates and controls the connection of the named CP at a specified LayerRate to the dedicated G.805 TCP and associated G.805 Termination Function at the same LayerRate within the CTP/FTP.
+The TerminationMode is used, for example, to control the Termination and mapping to VT1.5 of an STS1 Trail within an OC3 port. This capability could potentially be used to terminate an STS1 backbone Trail within a lower order mux that has the capability to alternatively cross-connect the STS1 unterminated. The same capability is used in SDH and is potentially applicable to any LayerRate.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection Floating Termination Point may have an optional reference to an ingress (incoming) Transmission Descriptor. The Descriptor name will be empty if there is no associated Descriptor. It is expected that Transmission Descriptors are not mixed on a single TP. Therefore if the Ingress Descriptor name is that of a Transmission Descriptor then the Egress Descriptor name should either be that of a Transmission Descriptor or a null value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection Floating Termination Point may have an optional reference to an egress (outgoing) Transmission Descriptor. The Transmission Descriptor name will be empty if there is no associated Descriptor. It is expected that Transmission Descriptors are not mixed on a single TP. Therefore if the Egress Descriptor name is that of a Transmission Descriptor then the Ingress Descriptor name should either be that of a Transmission Descriptor or a null value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transmissionParams" type="LayeredParametersList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A list of transmission parameters which can be set and/or retrieved on the TP at a specified layer. This attribute must contain the complete set of layer rates represented by a PTP/CTP/FTP - even if they have no parameters associated with them. The layerRates are listed in the order of their client-server relationship (see layering for more details). This attribute can be set by an NMS through the managedElementManager :: ManagedElementMgr_I :: setTPData() operation and also during SNC creation. The values for the name field and the value fields of the NVSList_T are defined in Layered Parameters.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="FTPVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="PhysicalTerminationPoint_T">
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="direction" type="Directionality_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The direction of the Physical Termination Point.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpProtectionAssociation" type="TPProtectionAssociation_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates whether the TP has an associated protection TP and, if so, what kind of protection association exists.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="edgePoint" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates if the TP is an edge point of at least one subnetwork, i.e. if it is an end point of a potential inter-subnetwork topological link.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="networkAccessDomain" type="NetworkAccessDomain_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A free-format string used to associate the resource to a Network Access Domain. 
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="equipmentProtected" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The attribute indicates whether or not the TP is supported by a protected equipment. 
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTMDState" type="TMDState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains the state of consistency between a TP and its associated egress TransmissionDescriptor.
+(potentially moved to LayerParameterList)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTMDState" type="TMDState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains the state of consistency between a TP and its associated eingress TransmissionDescriptor.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ingressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection Physical Termination Point may have an optional reference to an ingress (incoming) Transmission Descriptor. The Descriptor name will be empty if there is no associated Descriptor. It is expected that Transmission Descriptors are not mixed on a single TP. Therefore if the Ingress Descriptor name is that of a Transmission Descriptor then the Egress Descriptor name should either be that of a Transmission Descriptor or a null value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="egressTransmissionDescriptorName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A connection Physical Termination Point may have an optional reference to an egress (outgoing) Transmission Descriptor. The Transmission Descriptor name will be empty if there is no associated Descriptor. It is expected that Transmission Descriptors are not mixed on a single TP. Therefore if the Egress Descriptor name is that of a Transmission Descriptor then the Ingress Descriptor name should either be that of a Transmission Descriptor or a null value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transmissionParams" type="LayeredParametersList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A list of transmission parameters which can be set and/or retrieved on the TP at a specified layer. This attribute must contain the complete set of layer rates represented by a PTP/CTP/FTP - even if they have no parameters associated with them. The layerRates are listed in the order of their client-server relationship (see layering for more details). This attribute can be set by an NMS through the managedElementManager :: ManagedElementMgr_I :: setTPData() operation and also during SNC creation. The values for the name field and the value fields of the NVSList_T are defined in Layered Parameters.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="PTPVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TPPool_T">
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="numberOfMembers" type="NumberOfMembers_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            Refer to NumberOfMembers_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="numberOfIdleMembers" type="NumberOfIdleMembers_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Refer to NumberOfIdleMembers_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="descriptionOfUse" type="DescriptionOfUse_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            Refer to DescriptionOfUse_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="TPPoolVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Vendor extensions
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="PhysicalTerminationPointList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of PhysicalTerminationPoints
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="PTP" type="PhysicalTerminationPoint_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ConnectionTerminationPointList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of ConnectionTerminationPoints
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="CTP" type="ConnectionTerminationPoint_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="FloatingTerminationPointList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of FloatinglTerminationPoints
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="FTP" type="FloatingTerminationPoint_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TPPoolList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        a list of TPPools
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpPool" type="TPPool_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TerminationPoint_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        A union containment of all forms of TerminationPoints (PTP, FTP, and CTP)
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:element name="ptp" type="PhysicalTerminationPoint_T"/>
+      <xsd:element name="ftp" type="FloatingTerminationPoint_T"/>
+      <xsd:element name="ctp" type="ConnectionTerminationPoint_T"/>
+    </xsd:choice>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TerminationPointList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+					A heterogeneous list of TerminationPoints (PTPs, FTPs, and CTPs) with no particular order
+          </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tp" type="TerminationPoint_T" minOccurs="0" maxOccurs="unbounded">
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

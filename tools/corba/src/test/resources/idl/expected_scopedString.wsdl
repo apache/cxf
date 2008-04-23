@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopedString" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/scopedString" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap">
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:mod/int/str/myString:1.0" type="xs:string" name="mod.int.str.myString" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:mod/int/str/myWString:1.0" type="xs:string" name="mod.int.str.myWString" />
+    <corba:anonstring xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString" bound="10" type="mod.int.str.myString10" name="mod.int.str._Anon1_myString10" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/scopedString" xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" basetype="mod.int.str._Anon1_myString10" repositoryID="IDL:mod/int/str/myString10:1.0" type="ns4:mod.int.str.myString10" name="mod.int.str.myString10" />
+    <corba:anonwstring xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString" bound="10" type="mod.int.str.myWString10" name="mod.int.str._Anon1_myWString10" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/scopedString" xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" basetype="mod.int.str._Anon1_myWString10" repositoryID="IDL:mod/int/str/myWString10:1.0" type="ns4:mod.int.str.myWString10" name="mod.int.str.myWString10" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopedString" xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:simpleType name="mod.int.str.myString10">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="mod.int.str.myWString10">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="op1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in1" type="xs:string">
+            </xs:element>
+            <xs:element name="inout1" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op1Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="out1" type="xs:string">
+            </xs:element>
+            <xs:element name="inout1" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in1" type="xs:string">
+            </xs:element>
+            <xs:element name="inout1" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="out1" type="xs:string">
+            </xs:element>
+            <xs:element name="inout1" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op3">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in1" type="mod.int.str.myString10">
+            </xs:element>
+            <xs:element name="inout1" type="mod.int.str.myString10">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op3Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="mod.int.str.myString10">
+            </xs:element>
+            <xs:element name="out1" type="mod.int.str.myString10">
+            </xs:element>
+            <xs:element name="inout1" type="mod.int.str.myString10">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in1" type="mod.int.str.myWString10">
+            </xs:element>
+            <xs:element name="inout1" type="mod.int.str.myWString10">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="op4Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="mod.int.str.myWString10">
+            </xs:element>
+            <xs:element name="out1" type="mod.int.str.myWString10">
+            </xs:element>
+            <xs:element name="inout1" type="mod.int.str.myWString10">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="op1">
+    <wsdl:part name="inparameter" element="tns:op1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4Response">
+    <wsdl:part name="outparameter" element="tns:op4Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2">
+    <wsdl:part name="inparameter" element="tns:op2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op4">
+    <wsdl:part name="inparameter" element="tns:op4">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op1Response">
+    <wsdl:part name="outparameter" element="tns:op1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op2Response">
+    <wsdl:part name="outparameter" element="tns:op2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op3Response">
+    <wsdl:part name="outparameter" element="tns:op3Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="op3">
+    <wsdl:part name="inparameter" element="tns:op3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="mod.bar">
+    <wsdl:operation name="op1">
+      <wsdl:input name="op1Request" message="tns:op1">
+    </wsdl:input>
+      <wsdl:output name="op1Response" message="tns:op1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op2">
+      <wsdl:input name="op2Request" message="tns:op2">
+    </wsdl:input>
+      <wsdl:output name="op2Response" message="tns:op2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op3">
+      <wsdl:input name="op3Request" message="tns:op3">
+    </wsdl:input>
+      <wsdl:output name="op3Response" message="tns:op3Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4">
+      <wsdl:input name="op4Request" message="tns:op4">
+    </wsdl:input>
+      <wsdl:output name="op4Response" message="tns:op4Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="mod.int.str">
+  </wsdl:portType>
+  <wsdl:binding name="mod.barCORBABinding" type="tns:mod.bar">
+    <corba:binding repositoryID="IDL:mod/bar:1.0" />
+    <wsdl:operation name="op1">
+      <corba:operation name="op1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="in" name="in1" idltype="mod.int.str.myString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="out" name="out1" idltype="mod.int.str.myString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="inout" name="inout1" idltype="mod.int.str.myString" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" name="return" idltype="mod.int.str.myString" />
+      </corba:operation>
+      <wsdl:input name="op1Request">
+      </wsdl:input>
+      <wsdl:output name="op1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op2">
+      <corba:operation name="op2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="in" name="in1" idltype="mod.int.str.myWString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="out" name="out1" idltype="mod.int.str.myWString" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="inout" name="inout1" idltype="mod.int.str.myWString" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" name="return" idltype="mod.int.str.myWString" />
+      </corba:operation>
+      <wsdl:input name="op2Request">
+      </wsdl:input>
+      <wsdl:output name="op2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op3">
+      <corba:operation name="op3">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="in" name="in1" idltype="mod.int.str.myString10" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="out" name="out1" idltype="mod.int.str.myString10" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="inout" name="inout1" idltype="mod.int.str.myString10" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" name="return" idltype="mod.int.str.myString10" />
+      </corba:operation>
+      <wsdl:input name="op3Request">
+      </wsdl:input>
+      <wsdl:output name="op3Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="op4">
+      <corba:operation name="op4">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="in" name="in1" idltype="mod.int.str.myWString10" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="out" name="out1" idltype="mod.int.str.myWString10" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" mode="inout" name="inout1" idltype="mod.int.str.myWString10" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/scopedString/typemap" name="return" idltype="mod.int.str.myWString10" />
+      </corba:operation>
+      <wsdl:input name="op4Request">
+      </wsdl:input>
+      <wsdl:output name="op4Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="mod.int.strCORBABinding" type="tns:mod.int.str">
+    <corba:binding repositoryID="IDL:mod/int/str:1.0" />
+  </wsdl:binding>
+  <wsdl:service name="mod.int.strCORBAService">
+    <wsdl:port name="mod.int.strCORBAPort" binding="tns:mod.int.strCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="mod.barCORBAService">
+    <wsdl:port name="mod.barCORBAPort" binding="tns:mod.barCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,47 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/ 
+
+typedef string<10> string10;
+typedef wstring<20> wstring20;
+
+typedef string10  myString10;
+typedef wstring20 myWString20;
+
+typedef string  myString;
+typedef wstring myWString;
+
+struct strStruct {
+
+    string     unboundedStr;
+    string10   boundedStr10;
+
+    wstring     unboundedWStr;
+    wstring20   boundedWStr20;
+
+    myString  myStringStruct;
+    myWString myWStringStruct;
+
+};
+
+interface if {
+
+    myString  combineStrings (in string10  string10Parm,  in myString10  myString10Parm );
+    myWString combineWstrings(in wstring20 wstring20Parm, in myWString20 myWString20Parm);
+
+};

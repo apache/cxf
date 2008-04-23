@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap">
+    <corba:alias basetype="corba:long" repositoryID="IDL:long1:1.0" name="long1" />
+    <corba:alias basetype="corba:long" repositoryID="IDL:long2:1.0" name="long2" />
+    <corba:alias basetype="corba:long" repositoryID="IDL:long3:1.0" name="long3" />
+    <corba:alias basetype="corba:short" repositoryID="IDL:typedef_module/short1:1.0" name="typedef_module.short1" />
+    <corba:alias basetype="corba:short" repositoryID="IDL:typedef_module/short2:1.0" name="typedef_module.short2" />
+    <corba:alias basetype="corba:short" repositoryID="IDL:typedef_module/short3:1.0" name="typedef_module.short3" />
+    <corba:alias basetype="corba:ulonglong" repositoryID="IDL:ulonglong1:1.0" name="ulonglong1" />
+    <corba:alias basetype="corba:ulonglong" repositoryID="IDL:ulonglong2:1.0" name="ulonglong2" />
+    <corba:alias basetype="corba:ulonglong" repositoryID="IDL:ulonglong3:1.0" name="ulonglong3" />
+    <corba:alias basetype="corba:ushort" repositoryID="IDL:typedef_module/ushort1:1.0" name="typedef_module.ushort1" />
+    <corba:alias basetype="corba:ushort" repositoryID="IDL:typedef_module/ushort2:1.0" name="typedef_module.ushort2" />
+    <corba:alias basetype="corba:ushort" repositoryID="IDL:typedef_module/ushort3:1.0" name="typedef_module.ushort3" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:short" elemname="item" bound="12" type="ns4:_Anon1_array1" name="_Anon1_array1" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:_Anon1_array1" elemname="item" bound="11" type="ns5:_Anon2_array1" name="_Anon2_array1" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:_Anon2_array1" elemname="item" bound="10" repositoryID="IDL:array1:1.0" type="ns5:array1" name="array1" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:short" elemname="item" bound="21" type="ns4:_Anon1_array2" name="_Anon1_array2" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:_Anon1_array2" elemname="item" bound="20" repositoryID="IDL:array2:1.0" type="ns5:array2" name="array2" />
+    <corba:array xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:short" elemname="item" bound="30" repositoryID="IDL:array3:1.0" type="ns4:array3" name="array3" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:short" elemname="item" bound="12" type="ns4:array_module._Anon1_array1" name="array_module._Anon1_array1" />
+    <corba:anonarray xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:array_module._Anon1_array1" elemname="item" bound="11" type="ns5:array_module._Anon2_array1" name="array_module._Anon2_array1" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:array_module._Anon2_array1" elemname="item" bound="10" repositoryID="IDL:array_module/array1:1.0" type="ns5:array_module.array1" name="array_module.array1" />
+    <corba:anonarray xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:short" elemname="item" bound="21" type="ns4:array_module._Anon1_array2" name="array_module._Anon1_array2" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:array_module._Anon1_array2" elemname="item" bound="20" repositoryID="IDL:array_module/array2:1.0" type="ns5:array_module.array2" name="array_module.array2" />
+    <corba:array xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:short" elemname="item" bound="30" repositoryID="IDL:array_module/array3:1.0" type="ns4:array_module.array3" name="array_module.array3" />
+    <corba:alias basetype="corba:long" repositoryID="IDL:simple_long:1.0" name="simple_long" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:simple_long" elemname="item" bound="10" repositoryID="IDL:array_long:1.0" type="ns5:array_long" name="array_long" />
+    <corba:alias basetype="corba:long" repositoryID="IDL:mixed_long_module/simple_long:1.0" name="mixed_long_module.simple_long" />
+    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" xmlns="" elemtype="ns4:mixed_long_module.simple_long" elemname="item" bound="10" repositoryID="IDL:mixed_long_module/array_long:1.0" type="ns5:mixed_long_module.array_long" name="mixed_long_module.array_long" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:unboundedSeqUnsignedLongLong1:1.0" type="ns4:unboundedSeqUnsignedLongLong1" name="unboundedSeqUnsignedLongLong1" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:unboundedSeqUnsignedLongLong2:1.0" type="ns4:unboundedSeqUnsignedLongLong2" name="unboundedSeqUnsignedLongLong2" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:unboundedSeqUnsignedLongLong3:1.0" type="ns4:unboundedSeqUnsignedLongLong3" name="unboundedSeqUnsignedLongLong3" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:sequence_module/unboundedSeqUnsignedLongLong1:1.0" type="ns4:sequence_module.unboundedSeqUnsignedLongLong1" name="sequence_module.unboundedSeqUnsignedLongLong1" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:sequence_module/unboundedSeqUnsignedLongLong2:1.0" type="ns4:sequence_module.unboundedSeqUnsignedLongLong2" name="sequence_module.unboundedSeqUnsignedLongLong2" />
+    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="" elemtype="corba:ulonglong" elemname="item" bound="0" repositoryID="IDL:sequence_module/unboundedSeqUnsignedLongLong3:1.0" type="ns4:sequence_module.unboundedSeqUnsignedLongLong3" name="sequence_module.unboundedSeqUnsignedLongLong3" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" scale="2" digits="31" repositoryID="IDL:f1:1.0" type="f1" name="f1" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" scale="2" digits="31" repositoryID="IDL:f2:1.0" type="f1" name="f2" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" scale="2" digits="31" repositoryID="IDL:f3:1.0" type="f1" name="f3" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" scale="2" digits="31" repositoryID="IDL:fixed_module/f1:1.0" type="fixed_module.f1" name="fixed_module.f1" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" scale="2" digits="31" repositoryID="IDL:fixed_module/f2:1.0" type="fixed_module.f1" name="fixed_module.f2" />
+    <corba:fixed xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" scale="2" digits="31" repositoryID="IDL:fixed_module/f3:1.0" type="fixed_module.f1" name="fixed_module.f3" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string1:1.0" type="xs:string" name="string1" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string2:1.0" type="xs:string" name="string2" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string3:1.0" type="xs:string" name="string3" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string_module/string1:1.0" type="xs:string" name="string_module.string1" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string_module/string2:1.0" type="xs:string" name="string_module.string2" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string_module/string3:1.0" type="xs:string" name="string_module.string3" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:wstring1:1.0" type="xs:string" name="wstring1" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:wstring2:1.0" type="xs:string" name="wstring2" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:wstring3:1.0" type="xs:string" name="wstring3" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:string_module/wstring1:1.0" type="xs:string" name="string_module.wstring1" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:string_module/wstring2:1.0" type="xs:string" name="string_module.wstring2" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:string_module/wstring3:1.0" type="xs:string" name="string_module.wstring3" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:testStruct:1.0" type="testStruct" name="testStruct">
+      <corba:member name="aLong" idltype="corba:long" />
+      <corba:member name="aString" idltype="corba:string" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testStruct" repositoryID="IDL:struct1:1.0" name="struct1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testStruct" repositoryID="IDL:struct2:1.0" name="struct2" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:struct_module/testStruct:1.0" type="struct_module.testStruct" name="struct_module.testStruct">
+      <corba:member name="aLong" idltype="corba:long" />
+      <corba:member name="aString" idltype="corba:string" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="struct_module.testStruct" repositoryID="IDL:struct_module/struct1:1.0" name="struct_module.struct1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="struct_module.testStruct" repositoryID="IDL:struct_module/struct2:1.0" name="struct_module.struct2" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:typedefStruct:1.0" type="typedefStruct" name="typedefStruct">
+      <corba:member name="ulonglong" idltype="corba:ulonglong" />
+      <corba:member name="ushort" idltype="corba:ushort" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefStruct" repositoryID="IDL:typedefStruct1:1.0" name="typedefStruct1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefStruct" repositoryID="IDL:typedefStruct2:1.0" name="typedefStruct2" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:typedefStruct_module/typedefStruct:1.0" type="typedefStruct_module.typedefStruct" name="typedefStruct_module.typedefStruct">
+      <corba:member name="ulonglong" idltype="corba:ulonglong" />
+      <corba:member name="ushort" idltype="corba:ushort" />
+    </corba:struct>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefStruct_module.typedefStruct" repositoryID="IDL:typedefStruct_module/typedefStruct1:1.0" name="typedefStruct_module.typedefStruct1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefStruct_module.typedefStruct" repositoryID="IDL:typedefStruct_module/typedefStruct2:1.0" name="typedefStruct_module.typedefStruct2" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:aEnum:1.0" type="aEnum" name="aEnum">
+      <corba:enumerator value="e1_1" />
+      <corba:enumerator value="e1_2" />
+      <corba:enumerator value="e1_3" />
+      <corba:enumerator value="e1_4" />
+    </corba:enum>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:aStruct:1.0" type="aStruct" name="aStruct">
+      <corba:member name="s1_1" idltype="corba:short" />
+      <corba:member name="s1_2" idltype="corba:short" />
+      <corba:member name="s1_3" idltype="corba:short" />
+    </corba:struct>
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" discriminator="aEnum" repositoryID="IDL:aUnion:1.0" type="ns4:aUnion" name="aUnion">
+      <corba:unionbranch name="u1_1" idltype="corba:long">
+        <corba:case label="e1_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_2" idltype="corba:string">
+        <corba:case label="e1_3" />
+        <corba:case label="e1_2" />
+        <corba:case label="e1_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_3" idltype="aStruct" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="aUnion" repositoryID="IDL:union1:1.0" name="union1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="aUnion" repositoryID="IDL:union2:1.0" name="union2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="aUnion" repositoryID="IDL:union3:1.0" name="union3" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:union_module/aEnum:1.0" type="union_module.aEnum" name="union_module.aEnum">
+      <corba:enumerator value="e1_1" />
+      <corba:enumerator value="e1_2" />
+      <corba:enumerator value="e1_3" />
+      <corba:enumerator value="e1_4" />
+    </corba:enum>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:union_module/aStruct:1.0" type="union_module.aStruct" name="union_module.aStruct">
+      <corba:member name="s1_1" idltype="corba:short" />
+      <corba:member name="s1_2" idltype="corba:short" />
+      <corba:member name="s1_3" idltype="corba:short" />
+    </corba:struct>
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" discriminator="union_module.aEnum" repositoryID="IDL:union_module/aUnion:1.0" type="ns4:union_module.aUnion" name="union_module.aUnion">
+      <corba:unionbranch name="u1_1" idltype="corba:long">
+        <corba:case label="e1_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_2" idltype="corba:string">
+        <corba:case label="e1_3" />
+        <corba:case label="e1_2" />
+        <corba:case label="e1_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_3" idltype="union_module.aStruct" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="union_module.aUnion" repositoryID="IDL:union_module/union1:1.0" name="union_module.union1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="union_module.aUnion" repositoryID="IDL:union_module/union2:1.0" name="union_module.union2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="union_module.aUnion" repositoryID="IDL:union_module/union3:1.0" name="union_module.union3" />
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" discriminator="aEnum" repositoryID="IDL:typedefUnion:1.0" type="ns4:typedefUnion" name="typedefUnion">
+      <corba:unionbranch name="u1_1" idltype="corba:long">
+        <corba:case label="e1_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_2" idltype="corba:string">
+        <corba:case label="e1_3" />
+        <corba:case label="e1_2" />
+        <corba:case label="e1_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_3" idltype="aStruct" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefUnion" repositoryID="IDL:typedefUnion1:1.0" name="typedefUnion1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefUnion" repositoryID="IDL:typedefUnion2:1.0" name="typedefUnion2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefUnion" repositoryID="IDL:typedefUnion3:1.0" name="typedefUnion3" />
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" discriminator="aEnum" repositoryID="IDL:typedefUnion_module/typedefUnion:1.0" type="ns4:typedefUnion_module.typedefUnion" name="typedefUnion_module.typedefUnion">
+      <corba:unionbranch name="u1_1" idltype="corba:long">
+        <corba:case label="e1_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_2" idltype="corba:string">
+        <corba:case label="e1_3" />
+        <corba:case label="e1_2" />
+        <corba:case label="e1_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_3" idltype="aStruct" default="true" />
+    </corba:union>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefUnion_module.typedefUnion" repositoryID="IDL:typedefUnion_module/typedefUnion1:1.0" name="typedefUnion_module.typedefUnion1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefUnion_module.typedefUnion" repositoryID="IDL:typedefUnion_module/typedefUnion2:1.0" name="typedefUnion_module.typedefUnion2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefUnion_module.typedefUnion" repositoryID="IDL:typedefUnion_module/typedefUnion3:1.0" name="typedefUnion_module.typedefUnion3" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:testEnum:1.0" type="testEnum" name="testEnum">
+      <corba:enumerator value="te1" />
+      <corba:enumerator value="te2" />
+      <corba:enumerator value="te3" />
+    </corba:enum>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testEnum" repositoryID="IDL:enum1:1.0" name="enum1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testEnum" repositoryID="IDL:enum2:1.0" name="enum2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testEnum" repositoryID="IDL:enum3:1.0" name="enum3" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testEnum" repositoryID="IDL:testEnum_module/enum1:1.0" name="testEnum_module.enum1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testEnum" repositoryID="IDL:testEnum_module/enum2:1.0" name="testEnum_module.enum2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="testEnum" repositoryID="IDL:testEnum_module/enum3:1.0" name="testEnum_module.enum3" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:typedefEnum:1.0" type="typedefEnum" name="typedefEnum">
+      <corba:enumerator value="tde1" />
+      <corba:enumerator value="tde2" />
+      <corba:enumerator value="tde3" />
+    </corba:enum>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefEnum" repositoryID="IDL:typedefEnum1:1.0" name="typedefEnum1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefEnum" repositoryID="IDL:typedefEnum2:1.0" name="typedefEnum2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefEnum" repositoryID="IDL:typedefEnum3:1.0" name="typedefEnum3" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" repositoryID="IDL:typedefEnum_module/typedefEnum:1.0" type="typedefEnum_module.typedefEnum" name="typedefEnum_module.typedefEnum">
+      <corba:enumerator value="mtde1" />
+      <corba:enumerator value="mtde2" />
+      <corba:enumerator value="mtde3" />
+    </corba:enum>
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefEnum_module.typedefEnum" repositoryID="IDL:typedefEnum_module/typedefEnum1:1.0" name="typedefEnum_module.typedefEnum1" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefEnum_module.typedefEnum" repositoryID="IDL:typedefEnum_module/typedefEnum2:1.0" name="typedefEnum_module.typedefEnum2" />
+    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators/typemap" basetype="typedefEnum_module.typedefEnum" repositoryID="IDL:typedefEnum_module/typedefEnum3:1.0" name="typedefEnum_module.typedefEnum3" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns="http://cxf.apache.org/bindings/corba/idl/Declarators" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="_Anon1_array1">
+        <xs:sequence>
+          <xs:element maxOccurs="12" minOccurs="12" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon2_array1">
+        <xs:sequence>
+          <xs:element maxOccurs="11" minOccurs="11" name="item" type="_Anon1_array1">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array1">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="_Anon2_array1">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_array2">
+        <xs:sequence>
+          <xs:element maxOccurs="21" minOccurs="21" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array2">
+        <xs:sequence>
+          <xs:element maxOccurs="20" minOccurs="20" name="item" type="_Anon1_array2">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array3">
+        <xs:sequence>
+          <xs:element maxOccurs="30" minOccurs="30" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_module._Anon1_array1">
+        <xs:sequence>
+          <xs:element maxOccurs="12" minOccurs="12" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_module._Anon2_array1">
+        <xs:sequence>
+          <xs:element maxOccurs="11" minOccurs="11" name="item" type="array_module._Anon1_array1">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_module.array1">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="array_module._Anon2_array1">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_module._Anon1_array2">
+        <xs:sequence>
+          <xs:element maxOccurs="21" minOccurs="21" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_module.array2">
+        <xs:sequence>
+          <xs:element maxOccurs="20" minOccurs="20" name="item" type="array_module._Anon1_array2">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_module.array3">
+        <xs:sequence>
+          <xs:element maxOccurs="30" minOccurs="30" name="item" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="array_long">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="mixed_long_module.array_long">
+        <xs:sequence>
+          <xs:element maxOccurs="10" minOccurs="10" name="item" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="unboundedSeqUnsignedLongLong1">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="unboundedSeqUnsignedLongLong2">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="unboundedSeqUnsignedLongLong3">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequence_module.unboundedSeqUnsignedLongLong1">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequence_module.unboundedSeqUnsignedLongLong2">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sequence_module.unboundedSeqUnsignedLongLong3">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:unsignedLong">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="f1">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="f2">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="f3">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="fixed_module.f1">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="fixed_module.f2">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="fixed_module.f3">
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="31">
+          </xs:totalDigits>
+          <xs:fractionDigits fixed="true" value="2">
+          </xs:fractionDigits>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="testStruct">
+        <xs:sequence>
+          <xs:element name="aLong" type="xs:int">
+          </xs:element>
+          <xs:element name="aString" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="struct_module.testStruct">
+        <xs:sequence>
+          <xs:element name="aLong" type="xs:int">
+          </xs:element>
+          <xs:element name="aString" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="typedefStruct">
+        <xs:sequence>
+          <xs:element name="ulonglong" type="xs:unsignedLong">
+          </xs:element>
+          <xs:element name="ushort" type="xs:unsignedShort">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="typedefStruct_module.typedefStruct">
+        <xs:sequence>
+          <xs:element name="ulonglong" type="xs:unsignedLong">
+          </xs:element>
+          <xs:element name="ushort" type="xs:unsignedShort">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="aEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e1_1">
+          </xs:enumeration>
+          <xs:enumeration value="e1_2">
+          </xs:enumeration>
+          <xs:enumeration value="e1_3">
+          </xs:enumeration>
+          <xs:enumeration value="e1_4">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="aStruct">
+        <xs:sequence>
+          <xs:element name="s1_1" type="xs:short">
+          </xs:element>
+          <xs:element name="s1_2" type="xs:short">
+          </xs:element>
+          <xs:element name="s1_3" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="aUnion">
+        <xs:choice>
+          <xs:element name="u1_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u1_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u1_3" type="aStruct">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:simpleType name="union_module.aEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e1_1">
+          </xs:enumeration>
+          <xs:enumeration value="e1_2">
+          </xs:enumeration>
+          <xs:enumeration value="e1_3">
+          </xs:enumeration>
+          <xs:enumeration value="e1_4">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="union_module.aStruct">
+        <xs:sequence>
+          <xs:element name="s1_1" type="xs:short">
+          </xs:element>
+          <xs:element name="s1_2" type="xs:short">
+          </xs:element>
+          <xs:element name="s1_3" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="union_module.aUnion">
+        <xs:choice>
+          <xs:element name="u1_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u1_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u1_3" type="union_module.aStruct">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="typedefUnion">
+        <xs:choice>
+          <xs:element name="u1_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u1_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u1_3" type="aStruct">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="typedefUnion_module.typedefUnion">
+        <xs:choice>
+          <xs:element name="u1_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u1_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u1_3" type="aStruct">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:simpleType name="testEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="te1">
+          </xs:enumeration>
+          <xs:enumeration value="te2">
+          </xs:enumeration>
+          <xs:enumeration value="te3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="typedefEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="tde1">
+          </xs:enumeration>
+          <xs:enumeration value="tde2">
+          </xs:enumeration>
+          <xs:enumeration value="tde3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="typedefEnum_module.typedefEnum">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="mtde1">
+          </xs:enumeration>
+          <xs:enumeration value="mtde2">
+          </xs:enumeration>
+          <xs:enumeration value="mtde3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="_get_ull1">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ull1Result">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ull2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ull2Result">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ull3">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_ull3Result">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedLong">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_short1">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_short1Result">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_short1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="_arg" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_short1Result">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_short2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_short2Result">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_short2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="_arg" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_short2Result">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_short3">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_short3Result">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_short3">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="_arg" type="xs:unsignedShort">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_set_short3Result">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="_get_short3">
+    <wsdl:part name="parameters" element="tns:_get_short3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_short1">
+    <wsdl:part name="parameters" element="tns:_set_short1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_short2Response">
+    <wsdl:part name="parameters" element="tns:_get_short2Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ull2Response">
+    <wsdl:part name="parameters" element="tns:_get_ull2Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_short3Response">
+    <wsdl:part name="parameters" element="tns:_get_short3Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_short2">
+    <wsdl:part name="parameters" element="tns:_set_short2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ull3">
+    <wsdl:part name="parameters" element="tns:_get_ull3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_short2">
+    <wsdl:part name="parameters" element="tns:_get_short2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ull3Response">
+    <wsdl:part name="parameters" element="tns:_get_ull3Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_short2Response">
+    <wsdl:part name="parameters" element="tns:_set_short2Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_short1Response">
+    <wsdl:part name="parameters" element="tns:_set_short1Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ull2">
+    <wsdl:part name="parameters" element="tns:_get_ull2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_short3Response">
+    <wsdl:part name="parameters" element="tns:_set_short3Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_set_short3">
+    <wsdl:part name="parameters" element="tns:_set_short3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_short1Response">
+    <wsdl:part name="parameters" element="tns:_get_short1Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ull1Response">
+    <wsdl:part name="parameters" element="tns:_get_ull1Result">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_ull1">
+    <wsdl:part name="parameters" element="tns:_get_ull1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_short1">
+    <wsdl:part name="parameters" element="tns:_get_short1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="multiple_attributes">
+    <wsdl:operation name="_get_ull1">
+      <wsdl:input name="_get_ull1" message="tns:_get_ull1">
+    </wsdl:input>
+      <wsdl:output name="_get_ull1Response" message="tns:_get_ull1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_ull2">
+      <wsdl:input name="_get_ull2" message="tns:_get_ull2">
+    </wsdl:input>
+      <wsdl:output name="_get_ull2Response" message="tns:_get_ull2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_ull3">
+      <wsdl:input name="_get_ull3" message="tns:_get_ull3">
+    </wsdl:input>
+      <wsdl:output name="_get_ull3Response" message="tns:_get_ull3Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_short1">
+      <wsdl:input name="_get_short1" message="tns:_get_short1">
+    </wsdl:input>
+      <wsdl:output name="_get_short1Response" message="tns:_get_short1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_short1">
+      <wsdl:input name="_set_short1" message="tns:_set_short1">
+    </wsdl:input>
+      <wsdl:output name="_set_short1Response" message="tns:_set_short1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_short2">
+      <wsdl:input name="_get_short2" message="tns:_get_short2">
+    </wsdl:input>
+      <wsdl:output name="_get_short2Response" message="tns:_get_short2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_short2">
+      <wsdl:input name="_set_short2" message="tns:_set_short2">
+    </wsdl:input>
+      <wsdl:output name="_set_short2Response" message="tns:_set_short2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_short3">
+      <wsdl:input name="_get_short3" message="tns:_get_short3">
+    </wsdl:input>
+      <wsdl:output name="_get_short3Response" message="tns:_get_short3Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_short3">
+      <wsdl:input name="_set_short3" message="tns:_set_short3">
+    </wsdl:input>
+      <wsdl:output name="_set_short3Response" message="tns:_set_short3Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="multiple_attributesCORBABinding" type="tns:multiple_attributes">
+    <corba:binding repositoryID="IDL:multiple_attributes:1.0" />
+    <wsdl:operation name="_get_ull1">
+      <corba:operation name="_get_ull1">
+        <corba:return name="return" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="_get_ull1">
+      </wsdl:input>
+      <wsdl:output name="_get_ull1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_ull2">
+      <corba:operation name="_get_ull2">
+        <corba:return name="return" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="_get_ull2">
+      </wsdl:input>
+      <wsdl:output name="_get_ull2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_ull3">
+      <corba:operation name="_get_ull3">
+        <corba:return name="return" idltype="corba:ulonglong" />
+      </corba:operation>
+      <wsdl:input name="_get_ull3">
+      </wsdl:input>
+      <wsdl:output name="_get_ull3Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_short1">
+      <corba:operation name="_get_short1">
+        <corba:return name="return" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="_get_short1">
+      </wsdl:input>
+      <wsdl:output name="_get_short1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_short1">
+      <corba:operation name="_set_short1">
+        <corba:param mode="in" name="_arg" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="_set_short1">
+      </wsdl:input>
+      <wsdl:output name="_set_short1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_short2">
+      <corba:operation name="_get_short2">
+        <corba:return name="return" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="_get_short2">
+      </wsdl:input>
+      <wsdl:output name="_get_short2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_short2">
+      <corba:operation name="_set_short2">
+        <corba:param mode="in" name="_arg" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="_set_short2">
+      </wsdl:input>
+      <wsdl:output name="_set_short2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_get_short3">
+      <corba:operation name="_get_short3">
+        <corba:return name="return" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="_get_short3">
+      </wsdl:input>
+      <wsdl:output name="_get_short3Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="_set_short3">
+      <corba:operation name="_set_short3">
+        <corba:param mode="in" name="_arg" idltype="corba:ushort" />
+      </corba:operation>
+      <wsdl:input name="_set_short3">
+      </wsdl:input>
+      <wsdl:output name="_set_short3Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="multiple_attributesCORBAService">
+    <wsdl:port name="multiple_attributesCORBAPort" binding="tns:multiple_attributesCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

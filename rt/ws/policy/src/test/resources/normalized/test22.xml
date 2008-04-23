@@ -1,0 +1,3 @@
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"><wsp:ExactlyOne><wsp:All><sec:SecurityToken xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">
+                
+            <sec:TokenType xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">sec:X509v3</sec:TokenType></sec:SecurityToken></wsp:All></wsp:ExactlyOne></wsp:Policy>

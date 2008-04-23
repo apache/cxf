@@ -1,0 +1,66 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/ 
+
+typedef octet myType;
+
+module bar {
+    typedef short myType;
+};
+
+module foo {
+    typedef long myType;
+    interface bar {
+            typedef unsigned long myType;
+    };
+
+    interface top {
+          typedef foo::bar::myType myType1; // unsigned long
+          typedef myType myType2;           // long
+          typedef bar::myType myType3;      // unsigned long
+          typedef ::bar::myType myType4;    // short
+          typedef foo::myType myType5;      // long
+          typedef ::foo::myType myType6;    // long
+          typedef ::myType myType7;         // octet
+
+
+
+        void op1(in foo::bar::myType type1, out foo::bar::myType type2);
+        foo::bar::myType op2(in myType1 type3, out foo::bar::myType type4);
+
+        void op3(in myType type5, out myType type6);
+        myType op4(in myType2 type7, out myType2 type8);
+
+        void op5(in bar::myType type9, out bar::myType type10);
+        bar::myType op6(in myType3 type11, out myType3 type12);
+
+        void op7(in ::bar::myType type13, out ::bar::myType type14);
+        ::bar::myType op8(in myType4 type15, out myType4 type16);
+
+        void op9(in foo::myType type17, out foo::myType type18);
+        foo::myType op10(in myType5 type19, out myType5 type20);
+
+        void op11(in ::foo::myType type21, out ::foo::myType type22);
+        ::foo::myType op12(in myType6 type23, out myType6 type24);
+
+        void op13(in ::myType type25, out ::myType type26);
+        ::myType op14(in myType7 type27, out myType7 type28);
+
+    };
+};
+

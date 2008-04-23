@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<!-- 
+OASIS takes no position regarding the validity or scope of any intellectual property or other rights that might be claimed to pertain to the implementation or use of the technology described in this document or the extent to which any license under such rights might or might not be available; neither does it represent that it has made any effort to identify any such rights. Information on OASIS's procedures with respect to rights in OASIS specifications can be found at the OASIS website. Copies of claims of rights made available for publication and any assurances of licenses to be made available, or the result of an attempt made to obtain a general license or permission for the use of such proprietary rights by implementors or users of this specification, can be obtained from the OASIS Executive Director.
+
+OASIS invites any interested party to bring to its attention any copyrights, patents or patent applications, or other proprietary rights which may cover technology that may be required to implement this specification. Please address the information to the OASIS Executive Director.
+
+Copyright (C) OASIS Open (2005). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others, and derivative works that comment on or otherwise explain it or assist in its implementation may be prepared, copied, published and distributed, in whole or in part, without restriction of any kind, provided that the above copyright notice and this paragraph are included on all such copies and derivative works. However, this document itself may not be modified in any way, such as by removing the copyright notice or references to OASIS, except as needed for the purpose of developing OASIS specifications, in which case the procedures for copyrights defined in the OASIS Intellectual Property Rights document must be followed, or as required to translate it into languages other than English. 
+
+The limited permissions granted above are perpetual and will not be revoked by OASIS or its successors or assigns. 
+
+This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-->
+
+<wsdl:definitions name="WS-ResourceProperties"
+  xmlns="http://schemas.xmlsoap.org/wsdl/" 
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns:wsa="http://www.w3.org/2005/08/addressing"
+  xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
+  xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2" 
+  xmlns:wsrf-rpw="http://docs.oasis-open.org/wsrf/rpw-2" 
+  xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2"
+  targetNamespace="http://docs.oasis-open.org/wsrf/rpw-2">
+  
+  <!-- ========================== Imports =========================== -->
+
+  <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rw-2" 
+               location="rw-2.wsdl" />
+
+  <!-- ===================== Types Definitions ====================== -->
+
+  <wsdl:types>
+    <xsd:schema>
+      <xsd:import namespace="http://docs.oasis-open.org/wsrf/rp-2" 
+                  schemaLocation="../schemas/wsdl/rp-2.xsd" />
+    </xsd:schema>
+  </wsdl:types>
+  
+  <!-- ================== GetResourcePropertyDocument ===============
+    GetResourcePropertyDocument()
+    returns: any
+  -->
+
+  <wsdl:message name="GetResourcePropertyDocumentRequest">
+    <wsdl:part name="GetResourcePropertyDocumentRequest" 
+               element="wsrf-rp:GetResourcePropertyDocument" />
+  </wsdl:message>
+
+  <wsdl:message name="GetResourcePropertyDocumentResponse">
+    <wsdl:part name="GetResourcePropertyDocumentResponse" 
+               element="wsrf-rp:GetResourcePropertyDocumentResponse" />
+  </wsdl:message>
+
+  <!-- ===================== GetResourceProperty ==================== 
+    GetResourceProperty(QName)
+    returns: any
+  -->
+
+  <wsdl:message name="GetResourcePropertyRequest">
+    <wsdl:part name="GetResourcePropertyRequest" 
+               element="wsrf-rp:GetResourceProperty" />
+  </wsdl:message>
+  
+  <wsdl:message name="GetResourcePropertyResponse">
+    <wsdl:part name="GetResourcePropertyResponse" 
+               element="wsrf-rp:GetResourcePropertyResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="InvalidResourcePropertyQNameFault">
+    <wsdl:part name="InvalidResourcePropertyQNameFault"
+               element="wsrf-rp:InvalidResourcePropertyQNameFault" />
+  </wsdl:message> 
+
+  <!-- ==============GetMultipleResourceProperties ================== 
+    GetMultipleResourceProperties(list of QName)
+    returns: sequence of any
+  -->
+
+  <wsdl:message name="GetMultipleResourcePropertiesRequest">
+    <wsdl:part name="GetMultipleResourcePropertiesRequest" 
+               element="wsrf-rp:GetMultipleResourceProperties" />
+  </wsdl:message>
+  
+  <wsdl:message name="GetMultipleResourcePropertiesResponse">
+    <wsdl:part name="GetMultipleResourcePropertiesResponse" 
+               element="wsrf-rp:GetMultipleResourcePropertiesResponse" />
+  </wsdl:message>
+
+  <!-- ================== PutResourcePropertyDocument ===============
+    PutResourcePropertyDocument(any)
+    returns: any?
+  -->
+
+  <wsdl:message name="PutResourcePropertyDocumentRequest">
+    <wsdl:part name="PutResourcePropertyDocumentRequest" 
+               element="wsrf-rp:PutResourcePropertyDocument" />
+  </wsdl:message>
+
+  <wsdl:message name="PutResourcePropertyDocumentResponse">
+    <wsdl:part name="PutResourcePropertyDocumentResponse" 
+               element="wsrf-rp:PutResourcePropertyDocumentResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="UnableToPutResourcePropertyDocumentFault">
+    <wsdl:part name="UnableToPutResourcePropertyDocumentFault"
+               element="wsrf-rp:UnableToPutResourcePropertyDocumentFault" />
+  </wsdl:message>
+
+  <!-- ================= SetResourceProperties ====================== 
+    SetResourceProperties(
+    { insert (any)* |
+     update (any)* |
+     delete@QName } + 
+    )
+    returns: empty
+  -->
+
+  <wsdl:message name="SetResourcePropertiesRequest">
+    <wsdl:part name="SetResourcePropertiesRequest" 
+               element="wsrf-rp:SetResourceProperties" />
+  </wsdl:message>
+  
+  <wsdl:message name="SetResourcePropertiesResponse">
+    <wsdl:part name="SetResourcePropertiesResponse" 
+               element="wsrf-rp:SetResourcePropertiesResponse" />
+  </wsdl:message>
+  
+  <wsdl:message name="InvalidModificationFault">
+    <wsdl:part name="InvalidModificationFault"
+               element="wsrf-rp:InvalidModificationFault" />
+  </wsdl:message> 
+
+  <wsdl:message name="UnableToModifyResourcePropertyFault">
+    <wsdl:part name="UnableToModifyResourcePropertyFault"
+               element="wsrf-rp:UnableToModifyResourcePropertyFault" />
+  </wsdl:message> 
+
+  <wsdl:message name="SetResourcePropertyRequestFailedFault">
+    <wsdl:part name="SetResourcePropertyRequestFailedFault"
+               element="wsrf-rp:SetResourcePropertyRequestFailedFault" />
+  </wsdl:message> 
+
+  <!-- =============== InsertResourceProperties ===================== 
+    InsertResourceProperties((any)* )
+    returns: empty
+  -->
+
+  <wsdl:message name="InsertResourcePropertiesRequest">
+    <wsdl:part name="InsertResourcePropertiesRequest" 
+               element="wsrf-rp:InsertResourceProperties" />
+  </wsdl:message>
+  
+  <wsdl:message name="InsertResourcePropertiesResponse">
+    <wsdl:part name="InsertResourcePropertiesResponse" 
+               element="wsrf-rp:InsertResourcePropertiesResponse" /> 
+  </wsdl:message>
+
+  <wsdl:message name="InsertResourcePropertiesRequestFailedFault">
+    <wsdl:part name="InsertResourcePropertiesRequestFailedFault"
+               element="wsrf-rp:InsertResourcePropertiesRequestFailedFault" />
+  </wsdl:message> 
+
+  <!-- =============== UpdateResourceProperties ===================== 
+    UpdateResourceProperties((any)* )
+    returns: empty
+  -->
+
+  <wsdl:message name="UpdateResourcePropertiesRequest">
+    <wsdl:part name="UpdateResourcePropertiesRequest" 
+               element="wsrf-rp:UpdateResourceProperties" />
+  </wsdl:message>
+  
+  <wsdl:message name="UpdateResourcePropertiesResponse">
+    <wsdl:part name="UpdateResourcePropertiesResponse" 
+               element="wsrf-rp:UpdateResourcePropertiesResponse" /> 
+  </wsdl:message>
+
+  <wsdl:message name="UpdateResourcePropertiesRequestFailedFault">
+    <wsdl:part name="UpdateResourcePropertiesRequestFailedFault"
+               element="wsrf-rp:UpdateResourcePropertiesRequestFailedFault" />
+  </wsdl:message> 
+
+  <!-- =============== DeleteResourceProperties ===================== 
+    DeleteResourceProperties( ResourceProperty )
+    returns: empty
+  -->
+
+  <wsdl:message name="DeleteResourcePropertiesRequest">
+    <wsdl:part name="DeleteResourcePropertiesRequest" 
+               element="wsrf-rp:DeleteResourceProperties" />
+  </wsdl:message>
+  
+  <wsdl:message name="DeleteResourcePropertiesResponse">
+    <wsdl:part name="DeleteResourcePropertiesResponse" 
+               element="wsrf-rp:DeleteResourcePropertiesResponse" /> 
+  </wsdl:message>
+
+  <wsdl:message name="DeleteResourcePropertiesRequestFailedFault">
+    <wsdl:part name="DeleteResourcePropertiesRequestFailedFault"
+               element="wsrf-rp:DeleteResourcePropertiesRequestFailedFault" />
+  </wsdl:message>
+
+  <!-- ================ QueryResourceProperties ===================== 
+    QueryResourceProperties(QueryExpression)
+    returns: any
+  -->
+
+  <wsdl:message name="QueryResourcePropertiesRequest">
+    <wsdl:part name="QueryResourcePropertiesRequest" 
+               element="wsrf-rp:QueryResourceProperties" />
+  </wsdl:message>
+  
+  <wsdl:message name="QueryResourcePropertiesResponse">
+    <wsdl:part name="QueryResourcePropertiesResponse" 
+               element="wsrf-rp:QueryResourcePropertiesResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="UnknownQueryExpressionDialectFault">
+    <wsdl:part name="UnknownQueryExpressionDialectFault"
+               element="wsrf-rp:UnknownQueryExpressionDialectFault" />
+  </wsdl:message> 
+
+  <wsdl:message name="InvalidQueryExpressionFault">
+    <wsdl:part name="InvalidQueryExpressionFault"
+               element="wsrf-rp:InvalidQueryExpressionFault" />
+  </wsdl:message> 
+
+  <wsdl:message name="QueryEvaluationErrorFault">
+    <wsdl:part name="QueryEvaluationErrorFault"
+               element="wsrf-rp:QueryEvaluationErrorFault" />
+  </wsdl:message> 
+
+  <!-- =================== PortType Definitions ===================== -->
+
+  <wsdl:portType name="GetResourcePropertyDocument">
+    <wsdl:operation name="GetResourcePropertyDocument">
+     <wsdl:input name="GetResourcePropertyDocumentRequest"
+                 message="wsrf-rpw:GetResourcePropertyDocumentRequest" />
+     <wsdl:output name="GetResourcePropertyDocumentResponse"
+                  message="wsrf-rpw:GetResourcePropertyDocumentResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:portType name="GetResourceProperty">  
+    <wsdl:operation name="GetResourceProperty">
+     <wsdl:input name="GetResourcePropertyRequest" 
+                 message="wsrf-rpw:GetResourcePropertyRequest" />
+     <wsdl:output name="GetResourcePropertyResponse" 
+                  message="wsrf-rpw:GetResourcePropertyResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:portType name="GetMultipleResourceProperties">
+    <wsdl:operation name="GetMultipleResourceProperties">
+     <wsdl:input name="GetMultipleResourcePropertiesRequest" 
+                 message="wsrf-rpw:GetMultipleResourcePropertiesRequest" />
+     <wsdl:output name="GetMultipleResourcePropertiesResponse" 
+                  message="wsrf-rpw:GetMultipleResourcePropertiesResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:portType name="PutResourcePropertyDocument">  
+    <wsdl:operation name="PutResourcePropertyDocument">
+     <wsdl:input name="PutResourcePropertyDocumentRequest" 
+                 message="wsrf-rpw:PutResourcePropertyDocumentRequest" />
+     <wsdl:output name="PutResourcePropertyDocumentResponse" 
+                  message="wsrf-rpw:PutResourcePropertyDocumentResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="UnableToPutResourcePropertyDocumentFault" 
+                 message="wsrf-rpw:UnableToPutResourcePropertyDocumentFault" />     
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:portType name="SetResourceProperties"> 
+    <wsdl:operation name="SetResourceProperties">
+     <wsdl:input name="SetResourcePropertiesRequest" 
+                 message="wsrf-rpw:SetResourcePropertiesRequest" />
+     <wsdl:output name="SetResourcePropertiesResponse" 
+                  message="wsrf-rpw:SetResourcePropertiesResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidModificationFault" 
+                 message="wsrf-rpw:InvalidModificationFault" />     
+     <wsdl:fault name="UnableToModifyResourcePropertyFault" 
+                 message="wsrf-rpw:UnableToModifyResourcePropertyFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+     <wsdl:fault name="SetResourcePropertyRequestFailedFault" 
+                 message="wsrf-rpw:SetResourcePropertyRequestFailedFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:portType name="InsertResourceProperties"> 
+    <wsdl:operation name="InsertResourceProperties">
+     <wsdl:input name="InsertResourcePropertiesRequest" 
+                 message="wsrf-rpw:InsertResourcePropertiesRequest" />
+     <wsdl:output name="InsertResourcePropertiesResponse" 
+                  message="wsrf-rpw:InsertResourcePropertiesResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidModificationFault" 
+                 message="wsrf-rpw:InvalidModificationFault" />     
+     <wsdl:fault name="UnableToModifyResourcePropertyFault" 
+                 message="wsrf-rpw:UnableToModifyResourcePropertyFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+     <wsdl:fault name="InsertResourcePropertiesRequestFailedFault" 
+                 message="wsrf-rpw:InsertResourcePropertiesRequestFailedFault" />
+    </wsdl:operation>
+  </wsdl:portType>  
+  
+  <wsdl:portType name="UpdateResourceProperties"> 
+    <wsdl:operation name="UpdateResourceProperties">
+     <wsdl:input name="UpdateResourcePropertiesRequest" 
+                 message="wsrf-rpw:UpdateResourcePropertiesRequest" />
+     <wsdl:output name="UpdateResourcePropertiesResponse" 
+                  message="wsrf-rpw:UpdateResourcePropertiesResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidModificationFault" 
+                 message="wsrf-rpw:InvalidModificationFault" />     
+     <wsdl:fault name="UnableToModifyResourcePropertyFault" 
+                 message="wsrf-rpw:UnableToModifyResourcePropertyFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+     <wsdl:fault name="UpdateResourcePropertiesRequestFailedFault" 
+                 message="wsrf-rpw:UpdateResourcePropertiesRequestFailedFault" />
+    </wsdl:operation>
+  </wsdl:portType>  
+
+  <wsdl:portType name="DeleteResourceProperties"> 
+    <wsdl:operation name="DeleteResourceProperties">
+     <wsdl:input name="DeleteResourcePropertiesRequest" 
+                 message="wsrf-rpw:DeleteResourcePropertiesRequest" />
+     <wsdl:output name="DeleteResourcePropertiesResponse" 
+                  message="wsrf-rpw:DeleteResourcePropertiesResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidModificationFault" 
+                 message="wsrf-rpw:InvalidModificationFault" />     
+     <wsdl:fault name="UnableToModifyResourcePropertyFault" 
+                 message="wsrf-rpw:UnableToModifyResourcePropertyFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+     <wsdl:fault name="DeleteResourcePropertiesRequestFailedFault" 
+                 message="wsrf-rpw:DeleteResourcePropertiesRequestFailedFault" /> 
+    </wsdl:operation>
+  </wsdl:portType>  
+
+  <wsdl:portType name="QueryResourceProperties" 
+      wsrf-rp:ResourceProperties="wsrf-rp:QueryExpressionRPDocument">
+    <wsdl:operation name="QueryResourceProperties">
+     <wsdl:input name="QueryResourcePropertiesRequest" 
+                 message="wsrf-rpw:QueryResourcePropertiesRequest" />
+     <wsdl:output name="QueryResourcePropertiesResponse" 
+                  message="wsrf-rpw:QueryResourcePropertiesResponse" />
+     <wsdl:fault name="ResourceUnknownFault" 
+                 message="wsrf-rw:ResourceUnknownFault" />
+     <wsdl:fault name="ResourceUnavailableFault" 
+                 message="wsrf-rw:ResourceUnavailableFault" />
+     <wsdl:fault name="InvalidResourcePropertyQNameFault" 
+                 message="wsrf-rpw:InvalidResourcePropertyQNameFault" />     
+     <wsdl:fault name="UnknownQueryExpressionDialectFault" 
+                 message="wsrf-rpw:UnknownQueryExpressionDialectFault" />
+     <wsdl:fault name="InvalidQueryExpressionFault" 
+                 message="wsrf-rpw:InvalidQueryExpressionFault" />
+     <wsdl:fault name="QueryEvaluationErrorFault" 
+                 message="wsrf-rpw:QueryEvaluationErrorFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+</wsdl:definitions>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<wsdl:definitions name="MTOSI-ConfigurationService" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ===================== Import Interfaces (Messages & PortTypes) Definitions ====================== -->
+  <wsdl:import location="InventoryRetrieval.wsdl" namespace="tmf854.v1.ws"/>
+  <wsdl:import location="ManagedElementMgr.wsdl" namespace="tmf854.v1.ws"/>
+  <wsdl:import location="ProtectionMgr.wsdl" namespace="tmf854.v1.ws"/>
+  <wsdl:import location="EquipmentInventoryMgr.wsdl" namespace="tmf854.v1.ws"/>
+  <wsdl:import location="MultiLayerSubnetworkMgr.wsdl" namespace="tmf854.v1.ws"/>
+  <wsdl:import location="OperationsSystemMgr.wsdl" namespace="tmf854.v1.ws"/>
+  <wsdl:import location="TransmissionDescriptorMgr.wsdl" namespace="tmf854.v1.ws"/>
+</wsdl:definitions>

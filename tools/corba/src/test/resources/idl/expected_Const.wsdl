@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Const" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Const" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Const/typemap">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Const" repositoryID="IDL:scope/structScope:1.0" type="scope.structScope" name="scope.structScope">
+      <corba:member name="a" idltype="corba:long" />
+    </corba:struct>
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-12" idltype="corba:short" type="xs:short" name="glob_short" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="2334" idltype="corba:long" type="xs:int" name="glob_long" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-123456789" idltype="corba:longlong" type="xs:long" name="glob_longlong" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="15" idltype="corba:ushort" type="xs:unsignedShort" name="glob_unsignedshort" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="4556" idltype="corba:ulong" type="xs:unsignedInt" name="glob_unsignedlong" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="123456789" idltype="corba:ulonglong" type="xs:unsignedLong" name="glob_unsignedlonglong" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="r" idltype="corba:char" type="xs:byte" name="glob_char" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="x" idltype="corba:wchar" type="xs:string" name="glob_wchar" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="FALSE" idltype="corba:boolean" type="xs:boolean" name="glob_boolean" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-67.9" idltype="corba:float" type="xs:float" name="glob_float" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-1.9e5" idltype="corba:double" type="xs:double" name="glob_double" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-3.2e8" idltype="corba:longdouble" type="xs:double" name="glob_longdouble" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="this is a global string" idltype="corba:string" type="xs:string" name="glob_string" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="this is a global wide string" idltype="corba:wstring" type="xs:string" name="glob_wstring" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="16.75D" idltype="corba:fixed" type="xs:decimal" name="glob_fixed" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="0x1" idltype="corba:octet" type="xs:unsignedByte" name="glob_octet" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/Const" binding="scopeCORBABinding" repositoryID="IDL:scope:1.0" type="ns4:EndpointReferenceType" name="scope" />
+    <corba:const xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/Const/typemap" value="2" idltype="scope" type="ns4:EndpointReferenceType" name="glob_scope" />
+    <corba:const xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Const" xmlns="http://cxf.apache.org/bindings/corba/idl/Const/typemap" value="scopename" idltype="scope.structScope" type="ns4:scope.structScope" name="glob_structscope" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-12" idltype="corba:short" type="xs:short" name="constInterface.inter_short" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="2334" idltype="corba:long" type="xs:int" name="constInterface.inter_long" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-123456789" idltype="corba:longlong" type="xs:long" name="constInterface.inter_longlong" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="15" idltype="corba:ushort" type="xs:unsignedShort" name="constInterface.inter_unsignedshort" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="4556" idltype="corba:ulong" type="xs:unsignedInt" name="constInterface.inter_unsignedlong" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="123456789" idltype="corba:ulonglong" type="xs:unsignedLong" name="constInterface.inter_unsignedlonglong" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="r" idltype="corba:char" type="xs:byte" name="constInterface.inter_char" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="x" idltype="corba:wchar" type="xs:string" name="constInterface.inter_wchar" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="FALSE" idltype="corba:boolean" type="xs:boolean" name="constInterface.inter_boolean" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-67.9" idltype="corba:float" type="xs:float" name="constInterface.inter_float" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-1.9e5" idltype="corba:double" type="xs:double" name="constInterface.inter_double" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-3.2e8" idltype="corba:longdouble" type="xs:double" name="constInterface.inter_longdouble" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="this is a global string" idltype="corba:string" type="xs:string" name="constInterface.inter_string" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="this is a global wide string" idltype="corba:wstring" type="xs:string" name="constInterface.inter_wstring" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="16.75D" idltype="corba:fixed" type="xs:decimal" name="constInterface.inter_fixed" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="0x1" idltype="corba:octet" type="xs:unsignedByte" name="constInterface.inter_octet" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Const" xmlns="http://cxf.apache.org/bindings/corba/idl/Const" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:complexType name="scope.structScope">
+        <xs:sequence>
+          <xs:element name="a" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="scopeRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:portType name="scope">
+  </wsdl:portType>
+  <wsdl:portType name="constInterface">
+  </wsdl:portType>
+  <wsdl:binding name="scopeCORBABinding" type="tns:scope">
+    <corba:binding repositoryID="IDL:scope:1.0" />
+  </wsdl:binding>
+  <wsdl:binding name="constInterfaceCORBABinding" type="tns:constInterface">
+    <corba:binding repositoryID="IDL:constInterface:1.0" />
+  </wsdl:binding>
+  <wsdl:service name="scopeCORBAService">
+    <wsdl:port name="scopeCORBAPort" binding="tns:scopeCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="constInterfaceCORBAService">
+    <wsdl:port name="constInterfaceCORBAPort" binding="tns:constInterfaceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

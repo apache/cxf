@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_xml_http/bare" 
+		  xmlns="http://schemas.xmlsoap.org/wsdl/"
+		  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+		  xmlns:xformat="http://cxf.apache.org/bindings/xformat" 
+		  xmlns:tns="http://apache.org/hello_world_xml_http/bare"
+		  xmlns:x1="http://apache.org/hello_world_xml_http/bare/types"
+		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+		  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <wsdl:types>
+	<schema targetNamespace="http://apache.org/hello_world_xml_http/bare/types" 
+		xmlns="http://www.w3.org/2001/XMLSchema" 
+		elementFormDefault="qualified">
+
+	    <element name="responseType" type="xsd:string"/>
+	    <element name="requestType" type="xsd:string"/>      
+	    <element name="myComplexStruct" type="x1:myComplexStructType"/>     
+	    
+	    <complexType name="myComplexStructType">
+		<sequence>
+		    <element name="elem1" type="xsd:string"/>
+		    <element name="elem2" type="xsd:string"/>
+		    <element name="elem3" type="xsd:int"/>
+		</sequence>
+	    </complexType>
+	</schema>
+    </wsdl:types>
+    
+    <wsdl:message name="sayHiRequest"/>
+    
+    <wsdl:message name="sayHiResponse">
+	<wsdl:part type="xsd:string" name="out"/>
+    </wsdl:message>
+    
+    <wsdl:message name="greetMeRequest">
+	<wsdl:part element="x1:requestType" name="me"/>
+    </wsdl:message>
+    
+    <wsdl:message name="greetMeResponse">
+	<wsdl:part element="x1:responseType" name="theResponse"/>
+    </wsdl:message>
+    
+    <wsdl:message name="sendReceiveDataRequest">
+	<wsdl:part type="x1:myComplexStructType" name="in"/>
+    </wsdl:message>
+    
+    <wsdl:message name="sendReceiveDataResponse">
+	<wsdl:part type="x1:myComplexStructType" name="out"/>
+    </wsdl:message>
+
+    <wsdl:message name="multiParamPartRequest">
+	<wsdl:part element="x1:requestType" name="in1"/>
+	<wsdl:part element="x1:myComplexStruct" name="in2"/>
+    </wsdl:message>
+    
+    <wsdl:message name="multiParamPartResponse">
+	<wsdl:part element="x1:responseType" name="out1"/>
+    </wsdl:message>
+
+    <wsdl:portType name="Greeter">
+	<wsdl:operation name="sayHi">
+	    <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
+	    <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
+	</wsdl:operation>
+	<wsdl:operation name="greetMe">
+	    <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
+	    <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
+	</wsdl:operation>
+	<wsdl:operation name="sendReceiveData">
+	    <wsdl:input message="tns:sendReceiveDataRequest" name="SendReceiveDataRequest"/>
+	    <wsdl:output message="tns:sendReceiveDataResponse" name="SendReceiveDataResponse"/>
+	</wsdl:operation>
+	<wsdl:operation name="testMultiParamPart" parameterOrder="in2 in1">
+	    <wsdl:input message="tns:multiParamPartRequest" name="multiParamPartRequest"/>
+	    <wsdl:output message="tns:multiParamPartResponse" name="multiParamPartResponse"/>
+	</wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:binding name="Greeter_XMLBinding" type="tns:Greeter">
+
+	<xformat:binding/>
+
+	<wsdl:operation name="sayHi">
+	    <wsdl:input>
+		<xformat:body rootNode="tns:sayHi"/>
+	    </wsdl:input>
+	    <wsdl:output/>
+	</wsdl:operation>
+	
+	<wsdl:operation name="greetMe">
+	    <wsdl:input/>
+	    <wsdl:output/>
+	</wsdl:operation>
+	
+	<wsdl:operation name="sendReceiveData">
+	    <wsdl:input/>
+	    <wsdl:output/>
+	</wsdl:operation>
+
+	<wsdl:operation name="testMultiParamPart">
+	    <wsdl:input>
+		<xformat:body rootNode="tns:multiParamRootReq"/>
+	    </wsdl:input>
+	    <wsdl:output/>
+	</wsdl:operation>
+
+    </wsdl:binding>
+    
+    <wsdl:service name="XMLService">
+	<wsdl:port binding="tns:Greeter_XMLBinding" name="XMLPort">
+	    <http:address location="http://localhost:9000/XMLService/XMLPort"/>
+	</wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

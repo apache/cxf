@@ -1,0 +1,36 @@
+<wsp:Policy 
+	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+	xmlns:tst="http://sample.org/Assertions">
+  <wsp:ExactlyOne>	
+    <wsp:All>
+      <tst:A>A</tst:A>
+      <tst:B>B</tst:B>
+      <tst:C>C</tst:C>
+    </wsp:All>
+    <wsp:All>
+      <tst:A>A</tst:A>
+    </wsp:All>
+    <wsp:All>
+      <tst:B>B</tst:B>
+    </wsp:All>
+    <wsp:All>
+      <tst:C>C</tst:C>
+    </wsp:All>
+    <wsp:All>
+      <tst:A>A</tst:A>
+      <tst:B>B</tst:B>     
+    </wsp:All>
+    <wsp:All>
+      <tst:A>A</tst:A>     
+      <tst:C>C</tst:C>
+    </wsp:All>
+    <wsp:All>      
+      <tst:B>B</tst:B>
+      <tst:C>C</tst:C>
+    </wsp:All>
+    <wsp:All>      
+    </wsp:All>    
+  </wsp:ExactlyOne>
+</wsp:Policy>
+
+

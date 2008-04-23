@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="../common/Definitions.xsd"/>
+  <!-- ============== All Global Type Declarations ========= -->
+  <xsd:complexType name="ProbableCause_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The MTOSI alarm probable causes. For details refer to the supporting document: ProbableCauses.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="ru" type="xsd:boolean" default="false" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This boolean parameter stands for Remote Unit (RU). It indicates the location of the network resource the alarm probable cause is associated with.
+          The default setting (false) is for an alarm detected with a local network resource. And, the value is "true" when the alarm is associated with a remote network resource.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="contra" type="xsd:boolean" default="false" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This is a boolean parameter used to distinguish the direction of the signal related alarm. The default setting (false) is for an alarm detected on the signal that is related to the sink atomic function. And, the value is "true" for an alarm detected on the signal that is related to the source atomic function.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="type">
+        <xsd:annotation>
+          <xsd:documentation>
+          This is the probable cause specific value.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleType>
+          <xsd:union>
+            <xsd:simpleType>
+              <xsd:annotation>
+                <xsd:documentation>
+                All the MTOSI extensions in a minor version.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_-))*"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+              <xsd:annotation>
+                <xsd:documentation>
+                All the vendor specific extensions must start with the prefix "PROP_"
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_-))*"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+              <xsd:annotation>
+                <xsd:documentation>
+                All the MTOSI pre-defined probable causes.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="UNIDENTIFIED"/>
+                <xsd:enumeration value="AIS"/>
+                <xsd:enumeration value="AMS"/>
+                <xsd:enumeration value="ATPC_FAIL"/>
+                <xsd:enumeration value="AU-AIS"/>
+                <xsd:enumeration value="BER_SD"/>
+                <xsd:enumeration value="BER_SF"/>
+                <xsd:enumeration value="BLOCKED_FE"/>
+                <xsd:enumeration value="CFG_ABORT"/>
+                <xsd:enumeration value="CFG_ABORT_FE"/>
+                <xsd:enumeration value="DCC_FAILURE"/>
+                <xsd:enumeration value="DEMODULATION_FAIL"/>
+                <xsd:enumeration value="EMS"/>
+                <xsd:enumeration value="EMS_ALM_LOSS"/>
+                <xsd:enumeration value="EMS_LIFECYCLE_LOSS"/>
+                <xsd:enumeration value="EMS_ALM_AND_LIFECYCLE_LOSS"/>
+                <xsd:enumeration value="EQPT"/>
+                <xsd:enumeration value="ENV"/>
+                <xsd:enumeration value="FF"/>
+                <xsd:enumeration value="FOP_APS"/>
+                <xsd:enumeration value="INSUFF_LINKS"/>
+                <xsd:enumeration value="INSUFF_LINKS_FE"/>
+                <xsd:enumeration value="LCD"/>
+                <xsd:enumeration value="LIF"/>
+                <xsd:enumeration value="LOA"/>
+                <xsd:enumeration value="LOC"/>
+                <xsd:enumeration value="LODS"/>
+                <xsd:enumeration value="LOF"/>
+                <xsd:enumeration value="LOM"/>
+                <xsd:enumeration value="LOP"/>
+                <xsd:enumeration value="LOPC"/>
+                <xsd:enumeration value="LOS"/>
+                <xsd:enumeration value="LOTC"/>
+                <xsd:enumeration value="MODULATION_FAIL"/>
+                <xsd:enumeration value="MS-AIS"/>
+                <xsd:enumeration value="OS"/>
+                <xsd:enumeration value="OS_ALM_LOSS"/>
+                <xsd:enumeration value="OS_LIFECYCLE_LOSS"/>
+                <xsd:enumeration value="OS_ALM_AND_LIFECYCLE_LOSS"/>
+                <xsd:enumeration value="OSC-AIS"/>
+                <xsd:enumeration value="OSC_BER_SF"/>
+                <xsd:enumeration value="OSC_FERF"/>
+                <xsd:enumeration value="OSC_LOF"/>
+                <xsd:enumeration value="OSC_LOS"/>
+                <xsd:enumeration value="OSC_SD"/>
+                <xsd:enumeration value="PLM"/>
+                <xsd:enumeration value="RAI"/>
+                <xsd:enumeration value="RX_FAIL"/>
+                <xsd:enumeration value="RX_MIS_CONNECT"/>
+                <xsd:enumeration value="RX_UNUSABLE_FE"/>
+                <xsd:enumeration value="SECURITY_VIOLATION"/>
+                <xsd:enumeration value="SQL"/>
+                <xsd:enumeration value="SSF"/>
+                <xsd:enumeration value="STARTUP_FE"/>
+                <xsd:enumeration value="TCF"/>
+                <xsd:enumeration value="TCFE"/>
+                <xsd:enumeration value="TCFI"/>
+                <xsd:enumeration value="TIM"/>
+                <xsd:enumeration value="TIMING_SYNCH"/>
+                <xsd:enumeration value="TSD"/>
+                <xsd:enumeration value="TSF"/>
+                <xsd:enumeration value="TU-AIS"/>
+                <xsd:enumeration value="TX_DEGRADE"/>
+                <xsd:enumeration value="TX_FAIL"/>
+                <xsd:enumeration value="TX_MIS_CONNECT"/>
+                <xsd:enumeration value="TX_UNUSABLE_FE"/>
+                <xsd:enumeration value="UAT"/>
+                <xsd:enumeration value="UNEQ"/>
+                <xsd:enumeration value="VC-AIS"/>
+                <xsd:enumeration value="VC-RDI"/>
+                <xsd:enumeration value="VP-AIS"/>
+                <xsd:enumeration value="VP-RDI"/>
+                <xsd:enumeration value="XPIC_FAIL"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+              <xsd:annotation>
+                <xsd:documentation>
+                All the MTOSI pre-defined specific TCM probable causes.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="TCM(_(AIS|LOS|OAI|RAI|SD|SSF|TIM|UNEQ|(LEVEL[1-6]_(LCK|LOS|OCI|RAI|SD|SSF|TIM))))?"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:union>
+        </xsd:simpleType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="overlap" type="xsd:string" use="optional"/>
+    <xsd:attribute name="qualifier" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ProbableCauseList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      List of probable causes ProbableCause_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="probableCause" type="ProbableCause_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

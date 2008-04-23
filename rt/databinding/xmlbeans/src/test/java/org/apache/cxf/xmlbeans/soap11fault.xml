@@ -1,0 +1,10 @@
+<SOAP-ENV:Fault xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <faultcode>SOAP-ENV:Server</faultcode>
+    <faultstring>Server Error</faultstring>
+    <detail>
+        <e:myfaultdetails xmlns:e="urn:detailsns">
+            <message> My application didn't work </message>
+            <errorcode> 1001 </errorcode>
+        </e:myfaultdetails>
+    </detail>
+</SOAP-ENV:Fault>

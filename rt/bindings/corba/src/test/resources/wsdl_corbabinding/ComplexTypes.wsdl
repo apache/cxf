@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<!-- To be replace by a Yoko generated IDLtoWSDL once types supported -->
+<definitions
+ targetNamespace="http://cxf.apache.org/bindings/corba/ComplexTypes"
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:tns="http://cxf.apache.org/bindings/corba/ComplexTypes"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd1="http://cxf.apache.org/bindings/corba/ComplexTypes/types"
+ xmlns:corba="http://cxf.apache.org/bindings/corba"
+ xmlns:corbatm="http://cxf.apache.org/bindings/corba/ComplexTypes/idl_types">
+  <types>
+    <schema targetNamespace="http://cxf.apache.org/bindings/corba/ComplexTypes/types"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType name="TestArray">
+        <xsd:sequence>
+          <xsd:element name="item" type="xsd:int" minOccurs="5" maxOccurs="5"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TestSequence">
+        <xsd:sequence>
+          <xsd:element name="item" type="xsd:short" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TestBoundedSequence">
+        <xsd:sequence>
+          <xsd:element name="item" type="xsd:short" minOccurs="0" maxOccurs="5"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="TestEnum">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="RED"/>
+          <xsd:enumeration value="GREEN"/>
+          <xsd:enumeration value="BLUE"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:complexType name="TestStruct">
+        <xsd:sequence>
+          <xsd:element name="boolMember" type="xsd:boolean"/>
+          <xsd:element name="stringMember" type="xsd:string"/>
+          <xsd:element name="floatMember" type="xsd:float"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TestUnion">
+        <xsd:choice>
+          <xsd:element name="case0" type="xsd:unsignedByte"/>
+          <xsd:element name="case12" type="xsd:string"/>
+          <xsd:element name="caseDef" type="xsd:long"/>
+        </xsd:choice>
+      </xsd:complexType>
+      <xsd:complexType name="_omg_TestUnion">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="discriminator" type="xsd:short"/>
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="case0" type="xsd:unsignedByte"/>
+            <xsd:element name="case12" type="xsd:string"/>
+            <xsd:element name="caseDef" type="xsd:long"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="testOp">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="testOpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </schema>
+  </types>
+  <message name="testOp">
+    <part name="parameters" element="xsd1:testOp"/>
+  </message>
+  <message name="testOpResponse">
+    <part name="parameters" element="xsd1:testOpResult"/>
+  </message>
+  <portType name="ComplexTypes">
+    <operation name="testOp">
+      <input message="tns:testOp" name="testOp"/>
+      <output message="tns:testOpResponse" name="testOpResponse"/>
+    </operation>
+  </portType>
+  <binding name="ComplexTypesCORBABinding" type="tns:ComplexTypes">
+    <corba:binding repositoryID="IDL:ComplexTypes:1.0"/>
+    <operation name="testOp">
+      <corba:operation name="testOp"/>
+      <input/>
+      <output/>
+    </operation>
+  </binding>
+  <service name="ComplexTypesCORBAService">
+    <port name="ComplexTypesCORBAPort" binding="tns:ComplexTypesCORBABinding">
+      <corba:address location="corbaloc::localhost:50000/ComplexTypes"/>
+    </port>
+  </service>
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/ComplexTypes/idl_types">
+    <corba:array name="TestArray" repositoryID="IDL:TestArray:1.0" type="xsd1:TestArray" elemtype="corba:long" bound="5"/>
+    <corba:sequence name="TestSequence" repositoryID="IDL:TestSequence:1.0" type="xsd1:TestSequence" elemtype="corba:short" bound="0"/>
+    <corba:sequence name="TestBoundedSequence" repositoryID="IDL:TestBoundedSequence:1.0" type="xsd1:TestBoundedSequence" elemtype="corba:short" bound="5"/>
+    <corba:fixed name="TestFixed" repositoryID="IDL:TestFixed:1.0" type="xsd:decimal" digits="5" scale="2"/>
+    <corba:enum name="TestEnum" type="xsd1:TestEnum" repositoryID="IDL:TestEnum:1.0">
+      <corba:enumerator value="RED"/>
+      <corba:enumerator value="GREEN"/>
+      <corba:enumerator value="BLUE"/>
+    </corba:enum>
+    <corba:struct name="TestStruct" type="xsd1:TestStruct" repositoryID="IDL:TestStruct:1.0">
+      <corba:member name="boolMember" idltype="corba:boolean"/>
+      <corba:member name="stringMember" idltype="corba:string"/>
+      <corba:member name="floatMember" idltype="corba:float"/>
+    </corba:struct>
+    <corba:union name="TestUnion" type="xsd1:TestUnion" discriminator="corba:short" repositoryID="IDL:TestUnion:1.0">
+      <corba:unionbranch name="case0" idltype="corba:octet">
+        <corba:case label="0"/>
+      </corba:unionbranch>
+      <corba:unionbranch name="case12" idltype="corba:wchar">
+        <corba:case label="1"/>
+        <corba:case label="2"/>
+      </corba:unionbranch>
+      <corba:unionbranch name="caseDef" idltype="corba:longlong" default="true"/>
+    </corba:union>
+  </corba:typeMapping>
+</definitions>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="multipart.idl" targetNamespace="http://schemas.apache.org/idl/multipart.idl" xmlns:tns="http://schemas.apache.org/idl/multipart.idl" xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/multipart.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/multipart.idl/corba/typemap/">
+    <corba:union xmlns:tns="http://schemas.apache.org/idl/multipart.idl" discriminator="corba:boolean" repositoryID="IDL:string_nil:1.0" type="tns:address" name="string_nil">
+      <corba:unionbranch name="value" idltype="corba:string" default="false">
+        <corba:case label="TRUE" />
+      </corba:unionbranch>
+      </corba:union>
+        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl" repositoryID="IDL:Details:1.0" type="xsd1:Details" name="Details">
+          <corba:member name="name" idltype="corba:string" />
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/multipart.idl/corba/typemap/" name="address" idltype="ns1:string_nil" />
+        </corba:struct>
+          <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl" discriminator="corba:boolean" repositoryID="IDL:long_nil:1.0" type="xsd1:PEl" name="long_nil">
+            <corba:unionbranch name="value" idltype="corba:long" default="false">
+              <corba:case label="TRUE" />
+            </corba:unionbranch>
+            </corba:union>
+            </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/multipart.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+     
+            <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Details">
+                <xsd:sequence>
+                   <xsd:element name="name" type="xsd:string"/>
+                   <xsd:element name="address" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DetailsEl" type="xsd1:Details"/>
+            <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PEl" nillable="true" type="xsd:int"/>
+        </schema>
+  </types>
+  <message name="test_nillable">
+    <part name="x" element="xsd1:PEl"/>
+  </message>
+  <message name="test_nillableResponse">
+    <part name="p" element="xsd1:DetailsEl"/>
+  </message>
+  <portType name="NillablePortType">
+    <operation name="test_nillable">
+      <input name="test_union" message="tns:test_nillable"/>
+      <output name="test_unionResponse" message="tns:test_nillableResponse"/>
+    </operation>
+  </portType>
+  <binding name="NillableCORBABinding" type="tns:NillablePortType">
+    <corba:binding repositoryID="IDL:NillablePortType:1.0" />
+    <operation name="test_nillable">
+      <corba:operation name="test_nillable">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/multipart.idl/corba/typemap/" mode="in" name="x" idltype="ns1:long_nil" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/multipart.idl/corba/typemap/" name="p" idltype="ns1:Details" />
+      </corba:operation>
+      <input name="test_union">
+      </input>
+      <output name="test_unionResponse">
+      </output>
+    </operation>
+  </binding>
+</definitions>

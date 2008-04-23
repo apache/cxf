@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:foo="http://cxf.apache.org/configuration/foo"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
+    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
+    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
+    
+    <bean id="org.apache.cxf.resource.ResourceManager" class="org.apache.cxf.bus.resource.ResourceManagerImpl">
+       <constructor-arg>
+            <list>
+                <bean class="org.apache.cxf.resource.ClasspathResolver"/>
+                <bean class="org.apache.cxf.resource.ClassLoaderResolver"/>
+                <bean class="org.apache.cxf.bus.spring.BusApplicationContextResourceResolver"/>
+            </list>
+       </constructor-arg>
+       <property name="bus" ref="cxf"/>
+    </bean>
+    <bean id="org.apache.cxf.configuration.Configurer" 
+    	class="org.apache.cxf.configuration.spring.ConfigurerImpl">
+    </bean>    
+        
+    <bean id="org.apache.cxf.binding.BindingFactoryManager" class="org.apache.cxf.binding.BindingFactoryManagerImpl">
+        <constructor-arg>
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
+              <property name="type" value="org.apache.cxf.binding.BindingFactory"/>
+              <property name="idsProperty" value="activationNamespaces"/>
+            </bean>
+        </constructor-arg>
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.transport.DestinationFactoryManager" class="org.apache.cxf.transport.DestinationFactoryManagerImpl">
+        <constructor-arg>
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
+              <property name="type" value="org.apache.cxf.transport.DestinationFactory"/>
+              <property name="idsProperty" value="transportIds"/>
+            </bean>
+        </constructor-arg>
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.transport.ConduitInitiatorManager" class="org.apache.cxf.transport.ConduitInitiatorManagerImpl">
+        <constructor-arg>
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
+              <property name="type" value="org.apache.cxf.transport.ConduitInitiator"/>
+              <property name="idsProperty" value="transportIds"/>
+            </bean>
+        </constructor-arg>
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.wsdl.WSDLManager" class="org.apache.cxf.wsdl11.WSDLManagerImpl">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.phase.PhaseManager" class="org.apache.cxf.phase.PhaseManagerImpl">
+        
+    </bean>
+    
+    <bean id="org.apache.cxf.workqueue.WorkQueueManager" class="org.apache.cxf.workqueue.WorkQueueManagerImpl">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.buslifecycle.BusLifeCycleManager" class="org.apache.cxf.buslifecycle.CXFBusLifeCycleManager">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.endpoint.ServerRegistry" class="org.apache.cxf.endpoint.ServerRegistryImpl">
+        <property name="bus" ref="cxf"/>
+    </bean>
+
+    <bean id="org.apache.cxf.endpoint.ServerLifeCycleManager" class="org.apache.cxf.endpoint.ServerLifeCycleManagerImpl"/>
+    <bean id="org.apache.cxf.endpoint.ClientLifeCycleManager" class="org.apache.cxf.endpoint.ClientLifeCycleManagerImpl"/>
+        
+
+    <bean id="org.apache.cxf.transports.http.QueryHandlerRegistry" class="org.apache.cxf.transport.http.QueryHandlerRegistryImpl">
+        <constructor-arg ref="cxf"/>
+        <constructor-arg>
+        	<list>
+        		<bean class="org.apache.cxf.transport.http.WSDLQueryHandler">
+			        <constructor-arg ref="cxf"/>
+        		</bean>	
+        	</list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="org.apache.cxf.endpoint.EndpointResolverRegistry" class="org.apache.cxf.endpoint.EndpointResolverRegistryImpl">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    <bean id="org.apache.cxf.headers.HeaderManager" class="org.apache.cxf.headers.HeaderManagerImpl">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    <bean id="org.apache.cxf.catalog.OASISCatalogManager" class="org.apache.cxf.catalog.OASISCatalogManager">
+        <property name="bus" ref="cxf"/>
+    </bean>
+
+    <bean id="org.apache.cxf.endpoint.ServiceContractResolverRegistry" class="org.apache.cxf.endpoint.ServiceContractResolverRegistryImpl">
+        <property name="bus" ref="cxf"/>
+    </bean>
+</beans>

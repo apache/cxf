@@ -1,0 +1,142 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+union string_nil switch(boolean) {
+    case TRUE:
+        string value;
+};
+union long_nil switch(boolean) {
+    case TRUE:
+        long value;
+};
+struct SimpleStruct {
+    string_nil varAttrString;
+    long_nil varAttrIntOptional;
+    float varFloat;
+    long varInt;
+    string varString;
+};
+typedef long FixedArray[3];
+union DerivedChoice_BaseStructChoiceType switch(long) {
+    case 0:
+        string varStringExt;
+    case 1:
+        float varFloatExt;
+};
+struct DerivedChoice_BaseStruct {
+    SimpleStruct SimpleStruct_f;
+    string_nil attrString;
+    DerivedChoice_BaseStructChoiceType DerivedChoice_BaseStructChoiceType_f;
+};
+typedef fixed<31, 6> fixed_1;
+struct OrderNumber {
+    fixed_1 _simpleTypeValue;
+};
+struct SimpleAll {
+    string_nil varAttrString;
+    float varFloat;
+    long varInt;
+    string varString;
+};
+struct SimpleChoice {
+    string_nil varAttrString;
+    float varFloat;
+    long varInt;
+    string varString;
+};
+typedef sequence<string> UnboundedArray;
+typedef sequence<float, 3> BoundedArray;
+struct NestedStruct {
+    string varString;
+    long varInt;
+    float varFloat;
+    SimpleStruct varStruct;
+};
+struct InternationalPrice {
+    fixed_1 _simpleTypeValue;
+    string_nil currency;
+};
+typedef sequence<UnboundedArray> NestedArray;
+interface TypeTestPortType {
+    ::SimpleStruct
+    test_SimpleStruct(
+        in ::SimpleStruct x,
+        inout ::SimpleStruct y,
+        out ::SimpleStruct z
+    );
+    ::NestedStruct
+    test_NestedStruct(
+        in ::NestedStruct x,
+        inout ::NestedStruct y,
+        out ::NestedStruct z
+    );
+    ::FixedArray
+    test_FixedArray(
+        in ::FixedArray x,
+        inout ::FixedArray y,
+        out ::FixedArray z
+    );
+    ::UnboundedArray
+    test_UnboundedArray(
+        in ::UnboundedArray x,
+        inout ::UnboundedArray y,
+        out ::UnboundedArray z
+    );
+    ::BoundedArray
+    test_BoundedArray(
+        in ::BoundedArray x,
+        inout ::BoundedArray y,
+        out ::BoundedArray z
+    );
+    ::NestedArray
+    test_NestedArray(
+        in ::NestedArray x,
+        inout ::NestedArray y,
+        out ::NestedArray z
+    );
+    ::OrderNumber
+    test_OrderNumber(
+        in ::OrderNumber x,
+        inout ::OrderNumber y,
+        out ::OrderNumber z
+    );
+    ::InternationalPrice
+    test_InternationalPrice(
+        in ::InternationalPrice x,
+        inout ::InternationalPrice y,
+        out ::InternationalPrice z
+    );
+    ::SimpleChoice
+    test_SimpleChoice(
+        in ::SimpleChoice x,
+        inout ::SimpleChoice y,
+        out ::SimpleChoice z
+    );
+    ::SimpleAll
+    test_SimpleAll(
+        in ::SimpleAll x,
+        inout ::SimpleAll y,
+        out ::SimpleAll z
+    );
+    ::DerivedChoice_BaseStruct
+    test_DerivedChoice_BaseStruct(
+        in ::DerivedChoice_BaseStruct x,
+        inout ::DerivedChoice_BaseStruct y,
+        out ::DerivedChoice_BaseStruct z
+    );
+};

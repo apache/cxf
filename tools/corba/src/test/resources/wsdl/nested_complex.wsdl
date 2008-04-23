@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="nested_complex" 
+    targetNamespace="http://schemas.apache.org/idl/nested_complex.idl" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://schemas.apache.org/bindings/corba" 
+    xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_complex.idl" 
+    xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl">
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/idltypes/nested_complex.idl" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified">
+            <complexType name="obj">
+                <sequence>
+                    <element name="s" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="S1">
+                <sequence>
+                    <element maxOccurs="25" minOccurs="25" name="item" type="xsd1:obj"/>
+                </sequence>
+            </complexType>
+            <complexType name="obj2">
+                <sequence>
+                    <element name="aa" type="xsd1:S1"/>
+                </sequence>
+            </complexType>
+            <simpleType name="color">
+                <restriction base="string">
+                    <enumeration value="RED"/>
+                    <enumeration value="GREEN"/>
+                    <enumeration value="BLUE"/>
+                </restriction>
+            </simpleType>
+            <complexType name="nested_choice">
+                <choice>
+                    <element name="e" type="string"/>
+                    <element name="f" type="float"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_nested_choice">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="e" type="string"/>
+                        <element name="f" type="float"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="structOne">
+                <sequence>
+                    <element name="s" type="short"/>
+                    <element name="l" type="int"/>
+                </sequence>
+            </complexType>
+            <complexType name="structTwo">
+                <sequence>
+                    <element name="white" type="xsd1:color"/>
+                    <element name="nested_choice_f" type="xsd1:nested_choice"/>
+                    <element name="structOne_f" type="xsd1:structOne"/>
+                </sequence>
+            </complexType>
+            <complexType name="unionTwo">
+                <choice>
+                    <element name="nested_choice_f" type="xsd1:nested_choice"/>
+                    <element name="color_f" type="xsd1:color"/>
+                    <element name="structOne_f" type="xsd1:structOne"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_unionTwo">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="nested_choice_f" type="xsd1:nested_choice"/>
+                        <element name="color_f" type="xsd1:color"/>
+                        <element name="structOne_f" type="xsd1:structOne"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="unionThree">
+                <choice>
+                    <element name="unionTwo_f" type="xsd1:unionTwo"/>
+                    <element name="obj2_f" type="xsd1:obj2"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_unionThree">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="unionTwo_f" type="xsd1:unionTwo"/>
+                        <element name="obj2_f" type="xsd1:obj2"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <element name="X.op_obj2">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:obj2"/>
+                        <element name="p2" type="xsd1:obj2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_obj2Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:obj2"/>
+                        <element name="p2" type="xsd1:obj2"/>
+                        <element name="p3" type="xsd1:obj2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_structTwo">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:structTwo"/>
+                        <element name="p2" type="xsd1:structTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_structTwoResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:structTwo"/>
+                        <element name="p2" type="xsd1:structTwo"/>
+                        <element name="p3" type="xsd1:structTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionTwo">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:unionTwo"/>
+                        <element name="p2" type="xsd1:unionTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionTwoResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:unionTwo"/>
+                        <element name="p2" type="xsd1:unionTwo"/>
+                        <element name="p3" type="xsd1:unionTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_color">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:color"/>
+                        <element name="p2" type="xsd1:color"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_colorResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:color"/>
+                        <element name="p2" type="xsd1:color"/>
+                        <element name="p3" type="xsd1:color"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionThree">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:unionThree"/>
+                        <element name="p2" type="xsd1:unionThree"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionThreeResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:unionThree"/>
+                        <element name="p2" type="xsd1:unionThree"/>
+                        <element name="p3" type="xsd1:unionThree"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
+    <message name="X.op_obj2">
+        <part element="xsd1:X.op_obj2" name="parameters"/>
+    </message>
+    <message name="X.op_obj2Response">
+        <part element="xsd1:X.op_obj2Result" name="parameters"/>
+    </message>
+    <message name="X.op_structTwo">
+        <part element="xsd1:X.op_structTwo" name="parameters"/>
+    </message>
+    <message name="X.op_structTwoResponse">
+        <part element="xsd1:X.op_structTwoResult" name="parameters"/>
+    </message>
+    <message name="X.op_unionTwo">
+        <part element="xsd1:X.op_unionTwo" name="parameters"/>
+    </message>
+    <message name="X.op_unionTwoResponse">
+        <part element="xsd1:X.op_unionTwoResult" name="parameters"/>
+    </message>
+    <message name="X.op_color">
+        <part element="xsd1:X.op_color" name="parameters"/>
+    </message>
+    <message name="X.op_colorResponse">
+        <part element="xsd1:X.op_colorResult" name="parameters"/>
+    </message>
+    <message name="X.op_unionThree">
+        <part element="xsd1:X.op_unionThree" name="parameters"/>
+    </message>
+    <message name="X.op_unionThreeResponse">
+        <part element="xsd1:X.op_unionThreeResult" name="parameters"/>
+    </message>
+    <portType name="X">
+        <operation name="op_obj2">
+            <input message="tns:X.op_obj2" name="op_obj2"/>
+            <output message="tns:X.op_obj2Response" name="op_obj2Response"/>
+        </operation>
+        <operation name="op_structTwo">
+            <input message="tns:X.op_structTwo" name="op_structTwo"/>
+            <output message="tns:X.op_structTwoResponse" name="op_structTwoResponse"/>
+        </operation>
+        <operation name="op_unionTwo">
+            <input message="tns:X.op_unionTwo" name="op_unionTwo"/>
+            <output message="tns:X.op_unionTwoResponse" name="op_unionTwoResponse"/>
+        </operation>
+        <operation name="op_color">
+            <input message="tns:X.op_color" name="op_color"/>
+            <output message="tns:X.op_colorResponse" name="op_colorResponse"/>
+        </operation>
+        <operation name="op_unionThree">
+            <input message="tns:X.op_unionThree" name="op_unionThree"/>
+            <output message="tns:X.op_unionThreeResponse" name="op_unionThreeResponse"/>
+        </operation>
+    </portType>
+</definitions>

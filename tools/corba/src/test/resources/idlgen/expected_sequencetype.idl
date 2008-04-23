@@ -1,0 +1,392 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+module IACC {
+    struct OneAttribute {
+        long level;
+        string name;
+        string value;
+    };
+    typedef sequence<OneAttribute> IACCList;
+    struct Subscriber {
+        IACCList info;
+        long request_id;
+    };
+    typedef sequence<Subscriber> IACCLists;
+    exception RemoteException {
+    };
+    exception IACCException {
+    };
+    exception ConnectionNotAvailableException {
+    };
+    exception ConnectionExhaustedException {
+    };
+    exception TimeoutException {
+    };
+    interface Server {
+        struct makeAllowanceResult {
+            ::IACC::IACCList return;
+        };
+        struct setSNParserClass {
+            string parserName;
+        };
+        struct cancelReservationResult {
+            ::IACC::IACCList return;
+        };
+        struct cancelReservation2 {
+            ::IACC::IACCLists attributes;
+        };
+        struct commitReservation2 {
+            ::IACC::IACCLists attributes;
+        };
+        struct getVersionResult {
+            string return;
+        };
+        struct makeTopUp {
+            ::IACC::IACCList attributes;
+        };
+        struct commitReservation2Result {
+            ::IACC::IACCLists return;
+        };
+        struct makeTopUpResult {
+            ::IACC::IACCList return;
+        };
+        struct hasCreditResult {
+            ::IACC::IACCList return;
+        };
+        struct setDatabaseHostPort {
+            string port;
+        };
+        struct setDatabaseHostName {
+            string hostname;
+        };
+        struct cancelReservation2Result {
+            ::IACC::IACCLists return;
+        };
+        struct hasCredit2 {
+            ::IACC::IACCLists attributes;
+            long operation;
+        };
+        struct setPassword {
+            string password;
+        };
+        struct refreshAllowance {
+            ::IACC::IACCList attributes;
+        };
+        struct commitReservation {
+            ::IACC::IACCList attributes;
+        };
+        struct isServerUp2Result {
+            ::IACC::IACCList return;
+        };
+        struct cancelAllowanceResult {
+            ::IACC::IACCList return;
+        };
+        struct setConnectionInstances {
+            string number;
+        };
+        struct makeAllowance {
+            ::IACC::IACCList attributes;
+        };
+        struct setServiceNameSelector {
+            string option;
+        };
+        struct commitAllowance {
+            ::IACC::IACCList attributes;
+        };
+        struct cancelAllowance {
+            ::IACC::IACCList attributes;
+        };
+        struct isServerUpResult {
+            string return;
+        };
+        struct cancelReservation {
+            ::IACC::IACCList attributes;
+        };
+        struct commitAllowanceResult {
+            ::IACC::IACCList return;
+        };
+        struct getUsernameResult {
+            string return;
+        };
+        struct getDatabaseHostPortResult {
+            string return;
+        };
+        struct getServiceNameSelectorResult {
+            string return;
+        };
+        struct hasCredit {
+            ::IACC::IACCList attributes;
+            long operation;
+        };
+        struct hasCredit2Result {
+            ::IACC::IACCLists return;
+        };
+        struct getSNParserClassResult {
+            string return;
+        };
+        struct setLoginType {
+            string logintype;
+        };
+        struct getPasswordResult {
+            string return;
+        };
+        struct getDatabaseHostNameResult {
+            string return;
+        };
+        struct isServerUp2 {
+            ::IACC::IACCList attributes;
+        };
+        struct getConnectionInstancesResult {
+            string return;
+        };
+        struct setUsername {
+            string username;
+        };
+        struct isProxyUpResult {
+            string return;
+        };
+        struct refreshAllowanceResult {
+            ::IACC::IACCList return;
+        };
+        struct getLoginTypeResult {
+            string return;
+        };
+        struct commitReservationResult {
+            ::IACC::IACCList return;
+        };
+        void
+        updateConfigParameters() raises(
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        hasCredit(
+            in ::IACC::IACCList attributes,
+            in long operation
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCLists
+        hasCredit2(
+            in ::IACC::IACCLists attributes,
+            in long operation
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        commitReservation(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCLists
+        commitReservation2(
+            in ::IACC::IACCLists attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        cancelReservation(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCLists
+        cancelReservation2(
+            in ::IACC::IACCLists attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        makeAllowance(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        refreshAllowance(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        commitAllowance(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        cancelAllowance(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        makeTopUp(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException,
+            ::IACC::ConnectionNotAvailableException,
+            ::IACC::ConnectionExhaustedException,
+            ::IACC::TimeoutException,
+            ::IACC::RemoteException
+        );
+        void
+        setConnectionInstances(
+            in string number
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getConnectionInstances() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setDatabaseHostName(
+            in string hostname
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getDatabaseHostName() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setDatabaseHostPort(
+            in string port
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getDatabaseHostPort() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setUsername(
+            in string username
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getUsername() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setPassword(
+            in string password
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getPassword() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setLoginType(
+            in string logintype
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getLoginType() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setSNParserClass(
+            in string parserName
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getSNParserClass() raises(
+            ::IACC::RemoteException
+        );
+        void
+        setServiceNameSelector(
+            in string option
+        ) raises(
+            ::IACC::RemoteException
+        );
+        string
+        getServiceNameSelector() raises(
+            ::IACC::RemoteException
+        );
+        void
+        shutdown() raises(
+            ::IACC::RemoteException
+        );
+        string
+        isServerUp() raises(
+            ::IACC::RemoteException
+        );
+        string
+        isProxyUp() raises(
+            ::IACC::RemoteException
+        );
+        string
+        getVersion() raises(
+            ::IACC::RemoteException
+        );
+        ::IACC::IACCList
+        isServerUp2(
+            in ::IACC::IACCList attributes
+        ) raises(
+            ::IACC::IACCException
+        );
+    };
+};

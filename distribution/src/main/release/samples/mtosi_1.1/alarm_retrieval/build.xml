@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+                                                                                                                                                             
+  http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                             
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<project name="MTOSI 1.1 fault demo" default="build" basedir=".">
+
+    <property name="wsdl.dir" location="${basedir}/../wsdl"/>
+    <import file="../../common_build.xml"/>
+        
+    <target name="client" description="run demo client" depends="build">
+        <property name="op" value="all"/>
+        <property name="param" value=""/>
+        <cxfrun classname="org.apache.cxf.alarm_retrieval.client.Client"
+        param1="${basedir}/../wsdl/transport/http/FaultServiceSOAP_HTTP.wsdl"
+        param2="${op}" param3="${param}"/>
+    </target> 
+        
+    <target name="server" description="run demo server" depends="build">
+        <cxfrun classname="org.apache.cxf.alarm_retrieval.server.Server"
+        param1="${basedir}/../wsdl/transport/http/FaultServiceSOAP_HTTP.wsdl"/>
+    </target>
+        
+    <target name="generate.code">
+        <copy file="${basedir}/../wsdl/async_binding.xml.tmpl"
+            tofile="${basedir}/build/async_binding.xml"
+            overwrite="yes">
+            <filterset>
+                <filter token="WSDL_LOCATION" value="../../wsdl/transport/http/FaultServiceSOAP_HTTP.wsdl"/>
+            </filterset>
+        </copy>
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java
+            file="FaultServiceSOAP_HTTP.wsdl"
+            dir="${wsdl.dir}/transport/http"
+            package="tmf854.v1.ws=ws.v1.tmf854.fault.http -p tmf854.v1=v1.tmf854.fault"
+            bindingfile="${basedir}/build/async_binding.xml"/>
+    </target>
+</project>
+

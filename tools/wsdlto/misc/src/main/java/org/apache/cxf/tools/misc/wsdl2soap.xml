@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
+	  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
+	  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
+	  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
+
+    <annotation>
+Examples :
+
+wsdl2soap -i GreetPortType -n http://apache.org/hello_world_doc_lit -o Greeting.wsdl -style rpc -use literal TestGreeting.wsdl
+    </annotation>
+
+	<usage>
+		<optionGroup id="options">				
+			<option id="porttype" minOccurs="1" maxOccurs="1">
+                        <annotation>
+		            Specifies the name of the port type being mapped to a SOAP binding
+		        </annotation>
+				<switch>i</switch>
+				<associatedArgument placement="afterSpace">
+					<annotation>port-type-name</annotation>
+				</associatedArgument>
+			</option>
+			
+			<option id="binding" maxOccurs="1">
+			<annotation>
+		            Specifies the name for the generated SOAP binding.  Defaults to 
+		            portType_SOAPBinding
+		        </annotation>
+				<switch>b</switch>
+				<associatedArgument placement="afterSpace">
+					<annotation>binding-name</annotation>
+				</associatedArgument>
+			</option>
+
+			<option id="soap12" maxOccurs="1">
+			    <annotation>
+				Generate SOAP 1.2 binding
+			    </annotation>
+			    <switch>soap12</switch>
+			</option>
+			
+			<option id="outputdir" maxOccurs="1">
+                        <annotation>
+                            The directory in which the generated wsdl is placed
+                        </annotation>
+				<switch>d</switch>
+				<associatedArgument placement="afterSpace">
+				  	<annotation>output-directory</annotation>
+				</associatedArgument>
+			</option>
+			
+			<option id="outputfile" maxOccurs="1">
+			<annotation>
+			    The output wsdl file name.
+			 </annotation>
+				<switch>o</switch>
+				<associatedArgument placement="afterSpace">
+				  	<annotation>output-file</annotation>
+				</associatedArgument>
+			</option>
+			
+			<option id="namespace" maxOccurs="1">
+			<annotation>
+			    For RPC style, specifies the soap body namespace
+			</annotation>
+				<switch>n</switch>
+				<associatedArgument placement="afterSpace">
+				  	<annotation>soap-body-namespace(only for rpc style)</annotation>
+				</associatedArgument>
+			</option>
+			
+			<option id="style" maxOccurs="1">
+		        <annotation>
+                            Specifies the binding style (document or RPC) to use 
+		            in the SOAP binding (default is document)
+		        </annotation>
+				<switch>style</switch>
+				<associatedArgument placement="afterSpace">
+				  	<annotation>soap binding/operation style(document/rpc)</annotation>
+				  	<valueenum>document|rpc</valueenum>
+				</associatedArgument>
+			</option>
+			
+			<option id="use" maxOccurs="1">
+			<annotation>
+			    Specifies the binding use (encoded/literal) to use in 
+			    the soap binding.(default : Literal)
+			</annotation>
+				<switch>use</switch>
+				<associatedArgument placement="afterSpace">
+				  	<annotation>soap body use(literal/encoded)</annotation>
+				  	<valueenum>literal|encoded</valueenum>
+				</associatedArgument>
+			</option>		
+		</optionGroup>
+		
+		<optionGroup id="common_options">
+		
+		    <option id="help" maxOccurs="1">
+		         <annotation>
+		            Display detailed information for options.
+		         </annotation>
+				<switch>h</switch>
+				<switch>?</switch>
+				<switch>help</switch>
+		    </option>
+		    
+		    <option id="version">
+		         <annotation>
+		            Display the version of the tool.
+		         </annotation>
+				<switch>v</switch>
+		    </option>
+	
+		    <option id="verbose">
+		         <annotation>
+		            Verbose mode
+		         </annotation>
+				<switch>verbose</switch>
+				<switch>V</switch>
+		    </option>
+	
+		    <option id="quiet">
+			  <annotation>
+			    Quiet mode
+			   </annotation>
+				<switch>quiet</switch>
+				<switch>q</switch>
+		    </option>
+
+		</optionGroup>
+		
+		<argument id="wsdlurl" minOccurs="1" maxOccurs="1">
+			<annotation>
+			    WSDL URL
+			 </annotation>
+		</argument>
+	</usage>    
+
+</toolspec>

@@ -1,0 +1,83 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:Header="http://tempuri.org/Header" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://tempuri.org/FooBar" 
+    targetNamespace="http://tempuri.org/FooBar">
+
+    <types>
+	<schema elementFormDefault="qualified" 
+		targetNamespace="http://tempuri.org/Header" 
+		xmlns:Header="http://tempuri.org/Header" 
+		xmlns="http://www.w3.org/2001/XMLSchema">
+	    
+	    <element name="WSHeader">
+		<complexType>
+		    <sequence>
+			<element minOccurs="0" name="id" type="string"/>
+		    </sequence>
+		</complexType>
+	    </element>			
+	</schema>
+	
+	<schema  elementFormDefault="qualified"
+		 targetNamespace="http://tempuri.org/FooBar" 
+		 xmlns:Header="http://tempuri.org/Header" 
+		 xmlns="http://www.w3.org/2001/XMLSchema">
+	    
+	    <import namespace="http://tempuri.org/Header"/>
+	    <element name="FooRequest">
+		<complexType>
+		    <sequence>
+			<element ref="Header:WSHeader"/>
+		    </sequence>
+		</complexType>
+	    </element>
+	</schema>
+    </types>
+    
+    <message name="FooRequest">
+	<part name="FooRequest" element="tns:FooRequest"/>
+    </message>
+    
+    
+    <portType name="FooBarPortType">
+	<operation name="Foo">
+	    <input name="FooRequest" message="tns:FooRequest"/>
+	</operation>
+	
+    </portType>
+    <binding name="FooBarSOAPBinding" type="tns:FooBarPortType">
+	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+	<operation name="Foo">
+	    <soap:operation/>
+	    <input>
+		<soap:body use="literal"/>
+	    </input>
+	</operation>
+	
+    </binding>
+    <service name="httpService">
+	<port name="SOAPPort" binding="tns:FooBarSOAPBinding">
+	    <soap:address location="http://localhost:9000/FooService"/>
+	</port>
+    </service>
+</definitions>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap">
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" xmlns="" elemtype="ns4:BasicTest" elemname="item" bound="0" type="ns5:BasicTest" name="_Anon1_BasicTest" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" discriminator="corba:short" repositoryID="IDL:BasicTest:1.0" type="BasicTest" name="BasicTest">
+      <corba:unionbranch name="case1" idltype="corba:long">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" name="case2" idltype="ns4:_Anon1_BasicTest">
+        <corba:case label="2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="caseDef" idltype="corba:string" default="true" />
+    </corba:union>
+    <corba:anonsequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" xmlns="" elemtype="ns4:ForwardTest" elemname="item" bound="0" type="ns5:ForwardTest" name="_Anon1_ForwardTest" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" discriminator="corba:short" repositoryID="IDL:ForwardTest:1.0" type="ForwardTest" name="ForwardTest">
+      <corba:unionbranch name="case1" idltype="corba:long">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" name="case2" idltype="ns4:_Anon1_ForwardTest">
+        <corba:case label="2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="caseDef" idltype="corba:string" default="true" />
+    </corba:union>
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" xmlns="" elemtype="ns4:ForwardSeqTest" elemname="item" bound="0" repositoryID="IDL:ForwardSeqTestSeq:1.0" type="ns5:ForwardSeqTest" name="ForwardSeqTestSeq" />
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" discriminator="corba:short" repositoryID="IDL:ForwardSeqTest:1.0" type="ForwardSeqTest" name="ForwardSeqTest">
+      <corba:unionbranch name="case1" idltype="corba:long">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" name="case2" idltype="ns4:ForwardSeqTestSeq">
+        <corba:case label="2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="caseDef" idltype="corba:string" default="true" />
+    </corba:union>
+    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" xmlns="" elemtype="ns4:NestedTestOuter" elemname="item" bound="0" repositoryID="IDL:NestedTestOuterSeq:1.0" type="ns5:NestedTestOuter" name="NestedTestOuterSeq" />
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" repositoryID="IDL:NestedTestOuter/NestedTestInner:1.0" type="NestedTestOuter.NestedTestInner" name="NestedTestOuter.NestedTestInner">
+      <corba:member name="member1" idltype="corba:string" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" name="member2" idltype="ns4:NestedTestOuterSeq" />
+    </corba:struct>
+    <corba:union xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" discriminator="corba:short" repositoryID="IDL:NestedTestOuter:1.0" type="NestedTestOuter" name="NestedTestOuter">
+      <corba:unionbranch name="case1" idltype="corba:long">
+        <corba:case label="1" />
+      </corba:unionbranch>
+      <corba:unionbranch xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion/typemap" name="case2" idltype="ns4:NestedTestOuter.NestedTestInner">
+        <corba:case label="2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="caseDef" idltype="corba:string" default="true" />
+    </corba:union>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveUnion" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="_Anon1_BasicTest">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="BasicTest">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="BasicTest">
+        <xs:choice>
+          <xs:element name="case1" type="xs:int">
+          </xs:element>
+          <xs:element name="case2" type="_Anon1_BasicTest">
+          </xs:element>
+          <xs:element name="caseDef" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="_Anon1_ForwardTest">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ForwardTest">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ForwardTest">
+        <xs:choice>
+          <xs:element name="case1" type="xs:int">
+          </xs:element>
+          <xs:element name="case2" type="_Anon1_ForwardTest">
+          </xs:element>
+          <xs:element name="caseDef" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="ForwardSeqTestSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ForwardSeqTest">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ForwardSeqTest">
+        <xs:choice>
+          <xs:element name="case1" type="xs:int">
+          </xs:element>
+          <xs:element name="case2" type="ForwardSeqTestSeq">
+          </xs:element>
+          <xs:element name="caseDef" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:complexType name="NestedTestOuterSeq">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="NestedTestOuter">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="NestedTestOuter.NestedTestInner">
+        <xs:sequence>
+          <xs:element name="member1" type="xs:string">
+          </xs:element>
+          <xs:element name="member2" type="NestedTestOuterSeq">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="NestedTestOuter">
+        <xs:choice>
+          <xs:element name="case1" type="xs:int">
+          </xs:element>
+          <xs:element name="case2" type="NestedTestOuter.NestedTestInner">
+          </xs:element>
+          <xs:element name="caseDef" type="xs:string">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:portType name="TestInterface">
+  </wsdl:portType>
+  <wsdl:binding name="TestInterfaceCORBABinding" type="tns:TestInterface">
+    <corba:binding repositoryID="IDL:TestInterface:1.0" />
+  </wsdl:binding>
+  <wsdl:service name="TestInterfaceCORBAService">
+    <wsdl:port name="TestInterfaceCORBAPort" binding="tns:TestInterfaceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,2 @@
+<wsp:PolicyReference URI="http://sample.org/test.wsdl#PolicyA" 
+	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"/>

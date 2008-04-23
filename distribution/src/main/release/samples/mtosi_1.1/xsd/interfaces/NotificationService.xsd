@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Notifications.xsd"/>
+  <!--  ======= Declaration of all NS operation elements ======= -->
+  <xsd:element name="subscribe" type="Subscribe_T"/>
+  <xsd:element name="subscribeResponse" type="SubscribeResponse_T"/>
+  <xsd:element name="unsubscribe" type="Unsubscribe_T"/>
+  <xsd:element name="unsubscribeResponse" type="UnsubscribeResponse_T"/>
+  <xsd:element name="notify" type="Notify_T"/>
+  <!--  ======= Declaration of all NS operation parameter types  ======= -->
+  <xsd:simpleType name="TopicType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      To define the enumeration of all the supported topic types.
+      Note that topic types are logical categories of events.
+      The following MTOSI events are not bound to any topic types; Heartbeat, EventLossOccured, EventLossCleared
+      Refer to the Event_T definition.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Inventory">
+        <xsd:annotation>
+          <xsd:documentation>
+          The topic type for these events; ObjectCreation, ObjectDeletion, AttributeValueChange, StateChange, ObjectDiscovery.  
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Fault">
+        <xsd:annotation>
+          <xsd:documentation>
+          The topic type for these events; Alarm.  
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Protection">
+        <xsd:annotation>
+          <xsd:documentation>
+          The topic type for these events; ProtectionSwitch, EProtectionSwitch.  
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FileTransferStatus">
+        <xsd:annotation>
+          <xsd:documentation>
+          The topic type for these events; FileTransferStatus.  
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!--  ============== -->
+  <xsd:simpleType name="EndPointReference_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      the unique service end point address on the CCV.  
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:anyURI"/>
+  </xsd:simpleType>
+  <!--  ============== -->
+  <xsd:simpleType name="SubscriptionIdentifier_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      the identifier to uniquely identify a valid subscription.  
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!--  ============== -->
+  <xsd:simpleType name="TopicExpression_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      the unique name of topic instance published on the CCV.  
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!--  ============== -->
+  <xsd:simpleType name="QueryDialectType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      the enumeration of all the supported query dialect types.  
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ANSI-92"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!--  ============== -->
+  <xsd:complexType name="QueryExpression_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      the notification filter
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="dialect" type="QueryDialectType_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          the dialect of the given query expression
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="query" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          the query expression in the language specified by the dialect attribute  
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType mixed="true">
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!--  ======= Declaration of all NS operation types  ======= -->
+  <!--  ======= Notify operation (one-way)  ======= -->
+  <xsd:complexType name="Notify_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation provides the notification message from the server OS to Client OSs
+      via a Broker (service provider). .
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="topic" type="TopicExpression_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          it is the unique name of the topic on which the notification "message" was published. The topic is based on a TopicExpression, which is associated as a unique JNDI entry. In MTOSI Release 1, it represents the address of a JMS topic instance created at deployment.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="message" type="Event_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          the notification payload which can be one of the supported MTOSI events
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!--  ======= Subscribe operation (request/response)  ======= -->
+  <xsd:complexType name="Subscribe_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation allows the client OS to subscribe with the NotificationBroker for a given topic using the given selector.
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INVALID_FILTER_DEFINITION ¬ Raised when the filter is invalid
+EXCPT_INVALID_TOPIC ¬ Raised when the topic is not supported
+EXCPT_INVALID_INPUT - Raised when another input parameter is invalid
+EXCPT_NOTIFICATION_SERVICE_PROBLEM ¬ Raised when there is a failure with the Broker
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="consumerEPR" type="EndPointReference_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          the notification consumer endpoint (callback handler) that the broker will call to send the notification
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="topic" type="TopicExpression_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          the unique name of the topic object of the subscription
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="selector" type="QueryExpression_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          it is the optional "filter" expression to restrict the flow of messages sent to the notification consumer. By default, an empty selector defines the desire to be notified of all events for the given topic.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SubscribeResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the Subscribe operation. See also Subscribe_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="subscriptionID" type="SubscriptionIdentifier_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          A unique subscription identifier is returned to the Subscriber Client OS to be used when invoking the unsubscribe() for the given topic. Note that it must uniquely identify the request signature by its three elements; consumerEPR , topic, and selector.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!--  ======= Unsubscribe operation (request/response)  ======= -->
+  <xsd:complexType name="Unsubscribe_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation allows the client OS to unsubscribe the given consumer with the NotificationBroker for a subscription based on the given topic.
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INVALID_INPUT - Raised when another input parameter is invalid
+EXCPT_NOTIFICATION_SERVICE_PROBLEM ¬ Raised when there is a failure with the Broker
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="subscriptionID" type="SubscriptionIdentifier_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          It is the same subscription identifier that was returned on successful subscription of the Subscriber Client OS with the NotificationBroker.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="topic" type="TopicExpression_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          it is the unique name of the topic object of the unsubscription.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="UnsubscribeResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the Unsubscribe operation. See also Unsubscribe_T.
+        Note that it is an empty payload. Failure should be handled as an exception.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,606 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+enum BillingElementEnum {
+    BillingElementEnum_BVOIP,
+    BillingElementEnum_TOLLFREE
+};
+enum OrderReleaseStatusEnum {
+    OrderReleaseStatusEnum_Release
+};
+enum BillingResultEnum {
+    BillingResultEnum_COMPLETE,
+    BillingResultEnum_ERROR
+};
+enum OrderTypeEnum {
+    OrderTypeEnum_BVOIP,
+    OrderTypeEnum_TFAF
+};
+typedef sequence<string, 1> SrNumberArray;
+struct OrderSrPair {
+    string OrderNumber;
+    SrNumberArray SrNumber;
+    OrderReleaseStatusEnum ReleaseStatus;
+};
+typedef sequence<OrderSrPair> ArrayOfOrderSrPairs;
+typedef sequence<string, 1> USRPOrderNumberArray;
+enum OrderStatusEnum {
+    OrderStatusEnum_0,
+    OrderStatusEnum_1,
+    OrderStatusEnum_2,
+    OrderStatusEnum_3,
+    OrderStatusEnum_4
+};
+enum ProductEnum {
+    ProductEnum_BVOIP
+};
+enum TargetSystemEnum {
+    TargetSystemEnum_LNP,
+    TargetSystemEnum_SPP
+};
+enum TargetSystemActionEnum {
+    TargetSystemActionEnum_APRQ,
+    TargetSystemActionEnum_CancelVPR,
+    TargetSystemActionEnum_PPRQ,
+    TargetSystemActionEnum_VPR
+};
+enum TargetSystemResultEnum {
+    TargetSystemResultEnum_ACK,
+    TargetSystemResultEnum_COMPLETE,
+    TargetSystemResultEnum_CONFLICT,
+    TargetSystemResultEnum_ERROR,
+    TargetSystemResultEnum_FOC
+};
+typedef sequence<long, 1> TargetSystemErrorCodeArray;
+typedef sequence<string, 1> TargetSystemErrorMessageArray;
+typedef sequence<string, 1> TNStartArray;
+typedef sequence<string, 1> TNEndArray;
+struct SendTargetSystemResultRequestType {
+    ProductEnum Product;
+    string GIOMOrderNumber;
+    string PackageName;
+    TargetSystemEnum TargetSystem;
+    TargetSystemActionEnum TargetSystemAction;
+    TargetSystemResultEnum TargetSystemResult;
+    TargetSystemErrorCodeArray TargetSystemErrorCode;
+    TargetSystemErrorMessageArray TargetSystemErrorMessage;
+    TNStartArray TNStart;
+    TNEndArray TNEnd;
+};
+enum BillingSystemEnum {
+    BillingSystemEnum_CADM,
+    BillingSystemEnum_WAT_SOP
+};
+enum BillingActionEnum {
+    BillingActionEnum_START
+};
+typedef sequence<string, 1> BillingErrorCodeArray;
+typedef sequence<string, 1> BillingErrorMessageArray;
+struct SendBillingResultRequestType {
+    ProductEnum Product;
+    string GIOMOrderNumber;
+    string PackageName;
+    BillingSystemEnum BillingSystem;
+    BillingActionEnum BillingAction;
+    BillingElementEnum BillingElement;
+    BillingResultEnum BillingResult;
+    BillingErrorCodeArray BillingErrorCode;
+    BillingErrorMessageArray BillingErrorMessage;
+};
+enum RequestOptionEnum {
+    RequestOptionEnum_0,
+    RequestOptionEnum_1,
+    RequestOptionEnum_2,
+    RequestOptionEnum_3,
+    RequestOptionEnum_4,
+    RequestOptionEnum_5,
+    RequestOptionEnum_7,
+    RequestOptionEnum_8,
+    RequestOptionEnum_9
+};
+struct ActivityItem {
+    RequestOptionEnum RequestOption;
+};
+typedef sequence<ActivityItem> ArrayOfActivityItems;
+typedef sequence<string, 1> GRCArray;
+enum CountryCodeEnum {
+    CountryCodeEnum_AF,
+    CountryCodeEnum_AL,
+    CountryCodeEnum_DZ,
+    CountryCodeEnum_AS,
+    CountryCodeEnum_AD,
+    CountryCodeEnum_AO,
+    CountryCodeEnum_AI,
+    CountryCodeEnum_AQ,
+    CountryCodeEnum_AG,
+    CountryCodeEnum_AR,
+    CountryCodeEnum_AM,
+    CountryCodeEnum_AW,
+    CountryCodeEnum_AU,
+    CountryCodeEnum_AT,
+    CountryCodeEnum_AZ,
+    CountryCodeEnum_BS,
+    CountryCodeEnum_BH,
+    CountryCodeEnum_BD,
+    CountryCodeEnum_BB,
+    CountryCodeEnum_BY,
+    CountryCodeEnum_BE,
+    CountryCodeEnum_BZ,
+    CountryCodeEnum_BJ,
+    CountryCodeEnum_BM,
+    CountryCodeEnum_BT,
+    CountryCodeEnum_BO,
+    CountryCodeEnum_BA,
+    CountryCodeEnum_BW,
+    CountryCodeEnum_BV,
+    CountryCodeEnum_BR,
+    CountryCodeEnum_IO,
+    CountryCodeEnum_VG,
+    CountryCodeEnum_BN,
+    CountryCodeEnum_BG,
+    CountryCodeEnum_BF,
+    CountryCodeEnum_BI,
+    CountryCodeEnum_KH,
+    CountryCodeEnum_CM,
+    CountryCodeEnum_CA,
+    CountryCodeEnum_CV,
+    CountryCodeEnum_KY,
+    CountryCodeEnum_CF,
+    CountryCodeEnum_TD,
+    CountryCodeEnum_CL,
+    CountryCodeEnum_CN,
+    CountryCodeEnum_CX,
+    CountryCodeEnum_CC,
+    CountryCodeEnum_CO,
+    CountryCodeEnum_KM,
+    CountryCodeEnum_CD,
+    CountryCodeEnum_CG,
+    CountryCodeEnum_CK,
+    CountryCodeEnum_CR,
+    CountryCodeEnum_CI,
+    CountryCodeEnum_CU,
+    CountryCodeEnum_CY,
+    CountryCodeEnum_CZ,
+    CountryCodeEnum_DK,
+    CountryCodeEnum_DJ,
+    CountryCodeEnum_DM,
+    CountryCodeEnum_DO,
+    CountryCodeEnum_EC,
+    CountryCodeEnum_EG,
+    CountryCodeEnum_SV,
+    CountryCodeEnum_GQ,
+    CountryCodeEnum_ER,
+    CountryCodeEnum_EE,
+    CountryCodeEnum_ET,
+    CountryCodeEnum_FO,
+    CountryCodeEnum_FK,
+    CountryCodeEnum_FJ,
+    CountryCodeEnum_FI,
+    CountryCodeEnum_FR,
+    CountryCodeEnum_GF,
+    CountryCodeEnum_PF,
+    CountryCodeEnum_TF,
+    CountryCodeEnum_GA,
+    CountryCodeEnum_GM,
+    CountryCodeEnum_GE,
+    CountryCodeEnum_DE,
+    CountryCodeEnum_GH,
+    CountryCodeEnum_GI,
+    CountryCodeEnum_GR,
+    CountryCodeEnum_GL,
+    CountryCodeEnum_GD,
+    CountryCodeEnum_GP,
+    CountryCodeEnum_GU,
+    CountryCodeEnum_GT,
+    CountryCodeEnum_GN,
+    CountryCodeEnum_GW,
+    CountryCodeEnum_GY,
+    CountryCodeEnum_HT,
+    CountryCodeEnum_HM,
+    CountryCodeEnum_VA,
+    CountryCodeEnum_HN,
+    CountryCodeEnum_HK,
+    CountryCodeEnum_HR,
+    CountryCodeEnum_HU,
+    CountryCodeEnum_IS,
+    CountryCodeEnum_IN,
+    CountryCodeEnum_ID,
+    CountryCodeEnum_IR,
+    CountryCodeEnum_IQ,
+    CountryCodeEnum_IE,
+    CountryCodeEnum_IL,
+    CountryCodeEnum_IT,
+    CountryCodeEnum_JM,
+    CountryCodeEnum_JP,
+    CountryCodeEnum_JO,
+    CountryCodeEnum_KZ,
+    CountryCodeEnum_KE,
+    CountryCodeEnum_KI,
+    CountryCodeEnum_KP,
+    CountryCodeEnum_KR,
+    CountryCodeEnum_KW,
+    CountryCodeEnum_KG,
+    CountryCodeEnum_LA,
+    CountryCodeEnum_LV,
+    CountryCodeEnum_LB,
+    CountryCodeEnum_LS,
+    CountryCodeEnum_LR,
+    CountryCodeEnum_LY,
+    CountryCodeEnum_LI,
+    CountryCodeEnum_LT,
+    CountryCodeEnum_LU,
+    CountryCodeEnum_MO,
+    CountryCodeEnum_MK,
+    CountryCodeEnum_MG,
+    CountryCodeEnum_MW,
+    CountryCodeEnum_MY,
+    CountryCodeEnum_MV,
+    CountryCodeEnum_ML,
+    CountryCodeEnum_MT,
+    CountryCodeEnum_MH,
+    CountryCodeEnum_MQ,
+    CountryCodeEnum_MR,
+    CountryCodeEnum_MU,
+    CountryCodeEnum_YT,
+    CountryCodeEnum_MX,
+    CountryCodeEnum_FM,
+    CountryCodeEnum_MD,
+    CountryCodeEnum_MC,
+    CountryCodeEnum_MN,
+    CountryCodeEnum_MS,
+    CountryCodeEnum_MA,
+    CountryCodeEnum_MZ,
+    CountryCodeEnum_MM,
+    CountryCodeEnum_NA,
+    CountryCodeEnum_NR,
+    CountryCodeEnum_NP,
+    CountryCodeEnum_AN,
+    CountryCodeEnum_NL,
+    CountryCodeEnum_NC,
+    CountryCodeEnum_NZ,
+    CountryCodeEnum_NI,
+    CountryCodeEnum_NE,
+    CountryCodeEnum_NG,
+    CountryCodeEnum_NU,
+    CountryCodeEnum_NF,
+    CountryCodeEnum_MP,
+    CountryCodeEnum_NO,
+    CountryCodeEnum_OM,
+    CountryCodeEnum_PK,
+    CountryCodeEnum_PW,
+    CountryCodeEnum_PS,
+    CountryCodeEnum_PA,
+    CountryCodeEnum_PG,
+    CountryCodeEnum_PY,
+    CountryCodeEnum_PE,
+    CountryCodeEnum_PH,
+    CountryCodeEnum_PN,
+    CountryCodeEnum_PL,
+    CountryCodeEnum_PT,
+    CountryCodeEnum_PR,
+    CountryCodeEnum_QA,
+    CountryCodeEnum_RE,
+    CountryCodeEnum_RO,
+    CountryCodeEnum_RU,
+    CountryCodeEnum_RW,
+    CountryCodeEnum_SH,
+    CountryCodeEnum_KN,
+    CountryCodeEnum_LC,
+    CountryCodeEnum_PM,
+    CountryCodeEnum_VC,
+    CountryCodeEnum_WS,
+    CountryCodeEnum_SM,
+    CountryCodeEnum_ST,
+    CountryCodeEnum_SA,
+    CountryCodeEnum_SN,
+    CountryCodeEnum_CS,
+    CountryCodeEnum_SC,
+    CountryCodeEnum_SL,
+    CountryCodeEnum_SG,
+    CountryCodeEnum_SK,
+    CountryCodeEnum_SI,
+    CountryCodeEnum_SB,
+    CountryCodeEnum_SO,
+    CountryCodeEnum_ZA,
+    CountryCodeEnum_GS,
+    CountryCodeEnum_ES,
+    CountryCodeEnum_LK,
+    CountryCodeEnum_SD,
+    CountryCodeEnum_SR,
+    CountryCodeEnum_SJ,
+    CountryCodeEnum_SZ,
+    CountryCodeEnum_SE,
+    CountryCodeEnum_CH,
+    CountryCodeEnum_SY,
+    CountryCodeEnum_TW,
+    CountryCodeEnum_TJ,
+    CountryCodeEnum_TZ,
+    CountryCodeEnum_TH,
+    CountryCodeEnum_TL,
+    CountryCodeEnum_TG,
+    CountryCodeEnum_TK,
+    CountryCodeEnum_TO,
+    CountryCodeEnum_TT,
+    CountryCodeEnum_TN,
+    CountryCodeEnum_TR,
+    CountryCodeEnum_TM,
+    CountryCodeEnum_TC,
+    CountryCodeEnum_TV,
+    CountryCodeEnum_VI,
+    CountryCodeEnum_UG,
+    CountryCodeEnum_UA,
+    CountryCodeEnum_AE,
+    CountryCodeEnum_GB,
+    CountryCodeEnum_UM,
+    CountryCodeEnum_US,
+    CountryCodeEnum_UY,
+    CountryCodeEnum_UZ,
+    CountryCodeEnum_VU,
+    CountryCodeEnum_VE,
+    CountryCodeEnum_VN,
+    CountryCodeEnum_WF,
+    CountryCodeEnum_EH,
+    CountryCodeEnum_YE,
+    CountryCodeEnum_ZM,
+    CountryCodeEnum_ZW,
+    CountryCodeEnum_X_CA_N,
+    CountryCodeEnum_X_CA_S,
+    CountryCodeEnum_X_GB_E,
+    CountryCodeEnum_X_AN_C,
+    CountryCodeEnum_X_UK_E
+};
+typedef sequence<string, 1> GCSMSolutionNumberArray;
+struct SendOrderReadyRequestType {
+    ProductEnum Product;
+    string GIOMOrderNumber;
+    long GIOMOrderVersion;
+    string PackageName;
+    string<12>  CreatedDateandTime;
+    USRPOrderNumberArray USRPOrderNumber;
+    GCSMSolutionNumberArray GCSMSolutionNumber;
+    OrderTypeEnum OrderType;
+};
+enum YesNoEnum {
+    YesNoEnum_N,
+    YesNoEnum_Y
+};
+enum OrderStateEnum {
+    OrderStateEnum_Deleted,
+    OrderStateEnum_Not_Processed,
+    OrderStateEnum_Processed
+};
+struct FullOrder {
+    string OrderNumber;
+    long long ToSiteOriginalKey;
+    YesNoEnum IsCheckedOut;
+    OrderStateEnum OrderState;
+    ArrayOfActivityItems ActivityList;
+};
+struct GetOrderStatusRequestType {
+    ProductEnum Product;
+    string GIOMOrderNumber;
+    string PackageName;
+};
+typedef sequence<string, 1> SolutionCrNumberArray;
+enum UserTypeEnum {
+    UserTypeEnum_1,
+    UserTypeEnum_2
+};
+struct CreateCrRequestType {
+    ProductEnum Product;
+    SolutionCrNumberArray SolutionCrNumber;
+    string CrNumber;
+    string MCN;
+    GRCArray GRC;
+    string ContractNumber;
+    string CustomerName;
+    string AuthentId;
+    YesNoEnum AttTnInd;
+    UserTypeEnum UserType;
+};
+enum SuppActionEnum {
+    SuppActionEnum_Add,
+    SuppActionEnum_Change,
+    SuppActionEnum_Delete
+};
+typedef sequence<string, 1> SuiteArray;
+typedef sequence<string, 1> BuildingArray;
+typedef sequence<string, 1> CountyArray;
+typedef sequence<string, 1> StateArray;
+typedef sequence<string, 1> PostalCodeArray;
+struct SiteAddress {
+    string StreetAddress;
+    string Room;
+    string Floor;
+    SuiteArray Suite;
+    BuildingArray Building;
+    string City;
+    CountyArray County;
+    StateArray State;
+    PostalCodeArray PostalCode;
+    CountryCodeEnum Country;
+};
+enum ObjectTypeEnum {
+    ObjectTypeEnum_Activity,
+    ObjectTypeEnum_CR,
+    ObjectTypeEnum_Order,
+    ObjectTypeEnum_SolutionCR,
+    ObjectTypeEnum_SR
+};
+struct CancelObjectRequestType {
+    ObjectTypeEnum ObjectType;
+    string ObjectId;
+    string Reason;
+};
+enum EventEnum {
+    EventEnum_Cancel,
+    EventEnum_LNS_Prov_Status,
+    EventEnum_Ten_D_Trigger_Remove_Status,
+    EventEnum_VoIP_NE_Prov_Status
+};
+struct CreateSrResponseType {
+    ArrayOfOrderSrPairs SrNumberList;
+};
+enum EventStatusEnum {
+    EventStatusEnum_failure,
+    EventStatusEnum_success
+};
+struct NotifySvcOrderActStatusRequestType {
+    ProductEnum Product;
+    string OrderNumber;
+    long VersionNumber;
+    EventEnum Event;
+    EventStatusEnum EventStatus;
+    string SPP_Link;
+};
+struct Site {
+    long long SiteOriginalKey;
+    string SiteName;
+    SiteAddress Address;
+};
+struct ReviewSuppRequestType {
+    ProductEnum Product;
+    string GIOMOrderNumber;
+    long GIOMOrderVersion;
+    string PackageName;
+    string<12>  CreatedDateandTime;
+    OrderTypeEnum OrderType;
+};
+exception WSException {
+};
+struct GetOrderStatusResponseType {
+    OrderStatusEnum OrderStatus;
+    YesNoEnum SuppInd;
+    YesNoEnum CancelInd;
+};
+typedef sequence<Site> ArrayOfSites;
+typedef sequence<FullOrder> ArrayOfFullOrders;
+struct CreateSrRequestType {
+    ProductEnum Product;
+    string CrNumber;
+    ArrayOfSites SiteList;
+    ArrayOfFullOrders OrderList;
+};
+interface BVOIPPortType {
+    void
+    CancelObject(
+        in ::ObjectTypeEnum ObjectType,
+        in string ObjectId,
+        in string Reason
+    ) raises(
+        ::WSException
+    );
+    void
+    CreateCr(
+        in ::ProductEnum Product,
+        in ::SolutionCrNumberArray SolutionCrNumber,
+        in string CrNumber,
+        in string MCN,
+        in ::GRCArray GRC,
+        in string ContractNumber,
+        in string CustomerName,
+        in string AuthentId,
+        in ::YesNoEnum AttTnInd,
+        in ::UserTypeEnum UserType
+    ) raises(
+        ::WSException
+    );
+    ::ArrayOfOrderSrPairs
+    CreateSr(
+        in ::ProductEnum Product,
+        in string CrNumber,
+        in ::ArrayOfSites SiteList,
+        in ::ArrayOfFullOrders OrderList
+    ) raises(
+        ::WSException
+    );
+    ::OrderStatusEnum
+    GetOrderStatus(
+        in ::ProductEnum Product,
+        in string GIOMOrderNumber,
+        in string PackageName,
+        out ::YesNoEnum SuppInd,
+        out ::YesNoEnum CancelInd
+    ) raises(
+        ::WSException
+    );
+    void
+    NotifySvcOrderActStatus(
+        in ::ProductEnum Product,
+        in string OrderNumber,
+        in long VersionNumber,
+        in ::EventEnum Event,
+        in ::EventStatusEnum EventStatus,
+        in string SPP_Link
+    ) raises(
+        ::WSException
+    );
+    void
+    ReviewSupp(
+        in ::ProductEnum Product,
+        in string GIOMOrderNumber,
+        in long GIOMOrderVersion,
+        in string PackageName,
+        in string<12>  CreatedDateandTime,
+        in ::OrderTypeEnum OrderType
+    ) raises(
+        ::WSException
+    );
+    void
+    SendBillingResult(
+        in ::ProductEnum Product,
+        in string GIOMOrderNumber,
+        in string PackageName,
+        in ::BillingSystemEnum BillingSystem,
+        in ::BillingActionEnum BillingAction,
+        in ::BillingElementEnum BillingElement,
+        in ::BillingResultEnum BillingResult,
+        in ::BillingErrorCodeArray BillingErrorCode,
+        in ::BillingErrorMessageArray BillingErrorMessage
+    ) raises(
+        ::WSException
+    );
+    void
+    SendOrderReady(
+        in ::ProductEnum Product,
+        in string GIOMOrderNumber,
+        in long GIOMOrderVersion,
+        in string PackageName,
+        in string<12>  CreatedDateandTime,
+        in ::USRPOrderNumberArray USRPOrderNumber,
+        in ::GCSMSolutionNumberArray GCSMSolutionNumber,
+        in ::OrderTypeEnum OrderType
+    ) raises(
+        ::WSException
+    );
+    void
+    SendTargetSystemResult(
+        in ::ProductEnum Product,
+        in string GIOMOrderNumber,
+        in string PackageName,
+        in ::TargetSystemEnum TargetSystem,
+        in ::TargetSystemActionEnum TargetSystemAction,
+        in ::TargetSystemResultEnum TargetSystemResult,
+        in ::TargetSystemErrorCodeArray TargetSystemErrorCode,
+        in ::TargetSystemErrorMessageArray TargetSystemErrorMessage,
+        in ::TNStartArray TNStart,
+        in ::TNEndArray TNEnd
+    ) raises(
+        ::WSException
+    );
+};

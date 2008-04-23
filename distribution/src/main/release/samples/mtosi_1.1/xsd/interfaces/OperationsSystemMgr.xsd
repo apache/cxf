@@ -1,0 +1,987 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ===================== Includes ========= -->
+  <xsd:include schemaLocation="Common.xsd"/>
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Inventory.xsd"/>
+  <!-- ===================== Element Declarations ========= -->
+  <xsd:element name="getAllMDNames" type="getAllMDNames_T"/>
+  <xsd:element name="getAllMDs" type="getAllMDs_T"/>
+  <xsd:element name="getAllMDsResponse" type="getAllMDsResponse_T"/>
+  <xsd:element name="getAllMENamesPassingFilter" type="getAllMENamesPassingFilter_T"/>
+  <xsd:element name="getAllMEsPassingFilter" type="getAllMEsPassingFilter_T"/>
+  <xsd:element name="getAllMEsPassingFilterResponse" type="getAllMEsPassingFilterResponse_T"/>
+  <xsd:element name="getAllMENamesWrtOS" type="getAllMENamesWrtOS_T"/>
+  <xsd:element name="getAllMEsWrtOS" type="getAllMEsWrtOS_T"/>
+  <xsd:element name="getAllMEsWrtOSResponse" type="getAllMEsWrtOSResponse_T"/>
+  <xsd:element name="getAllOSNames" type="getAllOSNames_T"/>
+  <xsd:element name="getAllOSs" type="getAllOSs_T"/>
+  <xsd:element name="getAllOSsResponse" type="getAllOSsResponse_T"/>
+  <xsd:element name="getAllSNNamesWrtOS" type="getAllSNNamesWrtOS_T"/>
+  <xsd:element name="getAllSNsWrtOS" type="getAllSNsWrtOS_T"/>
+  <xsd:element name="getAllSNsWrtOSResponse" type="getAllSNsWrtOSResponse_T"/>
+  <xsd:element name="getAllTLNamesBetweenMDs" type="getAllTLNamesBetweenMDs_T"/>
+  <xsd:element name="getAllTLsBetweenMDs" type="getAllTLsBetweenMDs_T"/>
+  <xsd:element name="getAllTLsBetweenMDsResponse" type="getAllTLsBetweenMDsResponse_T"/>
+  <xsd:element name="getAllTLNamesWrtOS" type="getAllTLNamesWrtOS_T"/>
+  <xsd:element name="getAllTLsWrtOS" type="getAllTLsWrtOS_T"/>
+  <xsd:element name="getAllTLsWrtOSResponse" type="getAllTLsWrtOSResponse_T"/>
+  <xsd:element name="getAllTMDNamesWrtOS" type="getAllTMDNamesWrtOS_T"/>
+  <xsd:element name="getAllTMDsWrtOS" type="getAllTMDsWrtOS_T"/>
+  <xsd:element name="getAllTMDsWrtOSResponse" type="getAllTMDsWrtOSResponse_T"/>
+  <xsd:element name="getAllTopLevelSubnetworkNames" type="getAllTopLevelSubnetworkNames_T"/>
+  <xsd:element name="getAllTopLevelSubnetworks" type="getAllTopLevelSubnetworks_T"/>
+  <xsd:element name="getAllTopLevelSubnetworksResponse" type="getAllTopLevelSubnetworksResponse_T"/>
+  <xsd:element name="getAllTopLevelTopologicalLinkNames" type="getAllTopLevelTopologicalLinkNames_T"/>
+  <xsd:element name="getAllTopLevelTopologicalLinks" type="getAllTopLevelTopologicalLinks_T"/>
+  <xsd:element name="getAllTopLevelTopologicalLinksResponse" type="getAllTopLevelTopologicalLinksResponse_T"/>
+  <xsd:element name="getMD" type="getMD_T"/>
+  <xsd:element name="getMDResponse" type="getMDResponse_T"/>
+  <xsd:element name="getOS" type="getOS_T"/>
+  <xsd:element name="getOSResponse" type="getOSResponse_T"/>
+  <xsd:element name="getSubordinateOS" type="getSubordinateOS_T"/>
+  <xsd:element name="getSubordinateOSResponse" type="getSubordinateOSResponse_T"/>
+  <xsd:element name="getTopLevelTopologicalLink" type="getTopLevelTopologicalLink_T"/>
+  <xsd:element name="getTopLevelTopologicalLinkResponse" type="getTopLevelTopologicalLinkResponse_T"/>
+  <!-- ======== Global Type Declarations ========= -->
+  <xsd:complexType name="MEFilter_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        Me Filter
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="location" type="Location_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The location is the geographical location of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="manufacturer" type="Manufacturer_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The manufacturer attribute identifies the managed element manufacturer name.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="productName" type="ProductName_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The productName identifies the managed element product/type name.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" minOccurs="0"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllMDNames Request Message ========= -->
+  <xsd:complexType name="getAllMDNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each Management Domain (MD) associated with a top-level OS.
+      This operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllMDs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllMDs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure for each Management Domain (MD) associated with a top-level OS.
+      This operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllMDsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllMDs operation. See also getAllMDs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdList" type="ManagementDomainList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of all the management domains (complete data structure) associated with the top-level OS to which the request is directed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllMENamesPassingFilter Request Message ========= -->
+  <xsd:complexType name="getAllMENamesPassingFilter_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the names of all ManagedElements (MEs) contained by a specific Management Domain that pass a given filter condition. The filter condition should test for equality based on any combination of location, manufacturer, productName and resourceState. The matching is based in "AND", i.e., all the supplied filter conditions must be met. If the filter is left empty, then the names of all the MEs contained by the given MD are returned.
+      The operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose contained objects are being requested
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="filter" type="MEFilter_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of any combination of a location, manufacturer, productName and resourceState. The matching is based on "AND", i.e., all the supplied filter conditions must be met
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllMEsPassingFilter Request/Response Messages ========= -->
+  <xsd:complexType name="getAllMEsPassingFilter_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns all ManagedElements (MEs) contained by a specific Management Domain that pass a given filter condition. The filter condition should test for equality based on any combination of location, manufacturer, productName and resourceState. The matching is based in "AND", i.e., all the supplied filter conditions must be met. If the filter is left empty, then all the MEs contained by the given MD are returned.
+      The operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose contained objects are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="filter" type="MEFilter_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of any combination of a location, manufacturer, productName and resourceState. The matching is based on "AND", i.e., all the supplied filter conditions must be met.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllMEsPassingFilterResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllMEsPassingFilter operation. See also getAllMEsPassingFilter_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meList" type="ManagedElementList_T" minOccurs="0">
+      <xsd:annotation>
+        <xsd:documentation>
+        A list of all the MEs (complete data structures) that match the filter.
+        </xsd:documentation>
+      </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllMENamesWrtOS Request Message ========= -->
+  <xsd:complexType name="getAllMENamesWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each ManagedElement (ME) managed by a given subordinate OS AND contained by a specific Management Domain.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+       
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS or the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+	       The name of the subordinate OS whose contained MEs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose contained MEs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllMEsWrtOS Request/Response Messages ========= -->
+  <xsd:complexType name="getAllMEsWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure for each ManagedElement (ME) managed by a given subordinate OS AND contained by a specific Management Domain.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS or the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the subordinate OS whose contained MEs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose contained MEs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllMEsWrtOSResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllMEsWrtOS operation. See also getAllMEsWrtOS_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meList" type="ManagedElementList_T" minOccurs="0">
+      <xsd:annotation>
+        <xsd:documentation>
+        A list of all the MEs (complete data structures).
+        </xsd:documentation>
+      </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllOSNames Request Message ========= -->
+  <xsd:complexType name="getAllOSNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each OS known to the top-level OS to which the operation is directed. The data structure corresponding to the top-level OS is also returned. This operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllOSs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllOSs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure for each OS known to the top-level OS to which the operation is directed. The data structure corresponding to the top-level OS is also returned. This operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllOSsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllOSs operation. See also getAllOSs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osList" type="OperationsSystemList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of all the OSs (complete data structure) known to the top-level OS to which the request is directed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSNNamesWrtOS Request/Response Messages ========= -->
+  <xsd:complexType name="getAllSNNamesWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each MultiLayerSubnetwork (MLSN) managed by a given subordinate OS AND contained by a specific Management Domain.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS or the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the subordinate OS whose associated MLSNs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+            <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose associated MLSNs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllSNsWrtOS Request/Response Messages ========= -->
+  <xsd:complexType name="getAllSNsWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure for each MultiLayerSubnetwork (MLSN) managed by a given subordinate OS AND contained by a specific Management Domain.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS or the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the subordinate OS whose associated MLSNs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+            <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose associated MLSNs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllSNsWrtOSResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllSNsWrtOS operation. See also getAllSNsWrtOS_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="snList" type="MultiLayerSubnetworkList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of all subnetworks (complete data structures) associated with the OS to which the operation is directed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTLNamesBetweenMDs Request Message ========= -->
+  <xsd:complexType name="getAllTLNamesBetweenMDs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each TopologicalLink (TL) with end points in two different ManagementDomains (MDs) which are managed by the addressed top-level OS.
+      The operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTLsBetweenMDs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTLsBetweenMDs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns all the TopologicalLink (TL) objects with end points in two different ManagementDomains (MDs) which are managed by the addressed top-level OS.
+      The operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+            
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTLsBetweenMDsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllTLsBetweenMDs operation. See also getAllTLsBetweenMDs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="topoList" type="TopologicalLinkList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of all the TLs with end points in two different MDs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTLNamesWrtOS Request Message ========= -->
+  <xsd:complexType name="getAllTLNamesWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each Topological Link (TL) managed by a given subordinate OS AND contained by a specific Management Domain.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS or the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the subordinate OS whose associated TLs requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose contained TLs are requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTLsWrtOS Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTLsWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure for each Topological Link (TL) managed by a given subordinate OS AND contained by a specific Management Domain.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS or the provided MD does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the subordinate OS whose associated TLs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Management Domain whose contained TLs are requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTLsWrtOSResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllTLsWrtOS operation. See also getAllTLsWrtOS_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="topoList" type="TopologicalLinkList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of all the TLs known to the top-level OS to which the request is directed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTMDNamesWrtOS Request Message ========= -->
+  <xsd:complexType name="getAllTMDNamesWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the name of each Transmission Descriptor (TMD) associated with a given subordinate OS.
+      Note that Wrt in the name of the operation stands for "with respect to".
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the OS whose associated TLs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTMDsWrtOS Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTMDsWrtOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure for each Transmission Descriptor (TMD) associated with a given subordinate OS.
+      Note that Wrt in the name of the operation stands for "with respect to". 
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when the provided subordinate OS does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the OS whose associated TLs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTMDsWrtOSResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllTMDsWrtOS operation. See also getAllTMDsWrtOS_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tmdList" type="TransmissionDescriptorList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of all the TMDs known to the top-level OS to which the request is directed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTopLevelSubnetworkNames Request Message ========= -->
+  <xsd:complexType name="getAllTopLevelSubnetworkNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the subnetwork names for the subnetworks contained by the MD to which the operation is directed.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the MD for which associated top level MLSN Names are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTopLevelSubnetworks Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTopLevelSubnetworks_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the subnetworks contained by the MD to which the operation is directed.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the MD for which associated top level MLSNs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTopLevelSubnetworksResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getAllTopLevelSubnetworks operation. See also getAllTopLevelSubnetworks_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mlsnList" type="MultiLayerSubnetworkList_T" minOccurs="0">
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTopLevelTopologicalLinkNames Request Message ========= -->
+  <xsd:complexType name="getAllTopLevelTopologicalLinkNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the names of the TLs between the subnetworks contained by the MD to which the operation is directed.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the MD for which associated top level TL names are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTopLevelTopologicalLinks Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTopLevelTopologicalLinks_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the TLs between the subnetworks contained by the MD to which the operation is directed.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+For details on how topological links should be modelled, see layering supporting document.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the MD for which associated top level TLs are being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTopLevelTopologicalLinksResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllTopLevelTopologicalLinks operation. See also getAllTopLevelTopologicalLinks_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="topoList" type="TopologicalLinkList_T" minOccurs="0">
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getOS Request/Response Messages ========= -->
+  <xsd:complexType name="getOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure associated with the addessed OS.
+      This operation may only be directed to a top-level OS and not to a subordinate OS.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getOSResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getOS operation. See also getOS_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="os" type="OperationsSystem_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The OS data structure of this OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getMD Request/Response Messages ========= -->
+  <xsd:complexType name="getMD_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure associated with a given Management Domain (MD) identified by the provided mdName.
+      The operation can only be directed to a top-level OS and not to a subordinate OS.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when mdName references an MD object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the MD being requested.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getMDResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getMD operation. See also getMD_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="md" type="ManagementDomain_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The MD data structure.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getSubordinateOS Request/Response Messages ========= -->
+  <xsd:complexType name="getSubordinateOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation returns the data structure associated with a given subordinate OS identified by the provided subordinateOSName. The operation can only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when subordinateOSName references a subordinate OS object that does not exist
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getSubordinateOSResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getSubordinateOS operation. See also getSubordinateOS_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="os" type="OperationsSystem_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The OS data structure of this OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+    <!-- ===================== getTopLevelTopologicalLink  Request/Response Messages ========= -->
+  <xsd:complexType name="getTopLevelTopologicalLink_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This service returns a top level topological link given its name.
+      
+      Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when any input parameter is syntactically incorrect
+EXCPT_ENTITY_NOT_FOUND - Raised when topoLinkName references a top level topological link object that does not exist
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="topoLinkName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the top level topological link to retrieve.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getTopLevelTopologicalLinkResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getTopLevelTopologicalLink operation. See also getTopLevelTopologicalLink_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="topoLink" type="TopologicalLink_T" minOccurs="0">
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

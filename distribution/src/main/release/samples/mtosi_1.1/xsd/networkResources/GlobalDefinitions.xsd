@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1" xmlns="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="../common/Definitions.xsd"/>
+  <!-- ======== Global Type Declarations ========= -->
+  <xsd:simpleType name="ProtectionType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The protection type identifies whether a protection switch is an MS protection switch or an SNCP protection switch. 
+It should be noted that although the term MSP was chosen as the original specific protection scheme to which the related behaviour applied was Multiplex Section Protection, the label is now more generally applied to any 1+1 or 1:N Trail protection scheme.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="PT_MSP_APS"/>
+          <xsd:enumeration value="PT_SNCP"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="EProtectionGroupType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The equipment protection group type is a string that identifies the type of equipment protection. The string can take on the following value: "M_FOR_N." M:N equipment protection means that M pieces of equipment protect N pieces of equipment
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="M_FOR_N"/>
+          <xsd:enumeration value="M:N"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ProtectionRole_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Protection role type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="NA"/>
+          <xsd:enumeration value="PRIMARY"/>
+          <xsd:enumeration value="BACKUP"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ProtectionSchemeState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The protection scheme state identifies the state in which the protection scheme is in.
+Individual locks can be reported through transmission parameters on the appropriate TPs or equipment instances.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="PSS_UNKNOWN">
+            <xsd:annotation>
+              <xsd:documentation>
+          Protection scheme state is unknown by the system.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="PSS_AUTOMATIC">
+            <xsd:annotation>
+              <xsd:documentation>
+          It indicates partial locking of the entire group.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="PSS_FORCED_OR_LOCKED_OUT">
+            <xsd:annotation>
+              <xsd:documentation>
+          It indicates that the entire group is locked.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ESwitchReason_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The equipment switch reason reflects the reason why a switch occurred. EswitchReason is a string that can take the following values.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="SR_NA">
+            <xsd:annotation>
+              <xsd:documentation>
+          It is used, if a more precise value is not available.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_E_FAILURE">
+            <xsd:annotation>
+              <xsd:documentation>
+          It is used when an instance of equipment has failed.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_MANUAL">
+            <xsd:annotation>
+              <xsd:documentation>
+          It indicates a switch that was requested by the operator and includes forced switches.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="SwitchReason_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The switch reason reflects the reason why a switch occurred.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="SR_NA">
+            <xsd:annotation>
+              <xsd:documentation>
+          It is used upon retrieval of switch data for non-revertive groups, if a more precise value is not available.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_RESTORED">
+            <xsd:annotation>
+              <xsd:documentation>
+          It is used for revertive groups to indicate a return to the normal state.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_SIGNAL_FAIL">
+            <xsd:annotation>
+              <xsd:documentation>
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_SIGNAL_MISMATCH">
+            <xsd:annotation>
+              <xsd:documentation>
+          It is used in the case the signal is ok, but is identified as coming from an incorrect source: TRAIL_TRACE_IDENTIFIER_MISMATCH, Signal Label Mismatch, etc.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_SIGNAL_DEGRADE">
+            <xsd:annotation>
+              <xsd:documentation>
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_AUTOMATIC_SWITCH">
+            <xsd:annotation>
+              <xsd:documentation>
+          It is used when the exact switch reason is unknown, in retrievals of switch data if a protection switch is currently active or in protection switch notifications.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="SR_MANUAL">
+            <xsd:annotation>
+              <xsd:documentation>
+          It indicates a switch that was requested by the operator and includes forced switches.
+          </xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ConnectionDirection_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Direction of a subnetwork connection, cross-connects, or topological link.
+For a detailed description of the use of this attribute see SNC Types supporting document.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="CD_UNI">
+        <xsd:annotation>
+          <xsd:documentation>
+          UNIdirectional, i.e. source TP to sink TP. Note: creation of unidirectional connections is supported even when CTPs/FTPs are modelled as bidirectional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CD_BI">
+        <xsd:annotation>
+          <xsd:documentation>
+          BIdirectional, i.e. bidirectional TP to bidirectional TP, a.k.a. two-way.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="Directionality_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Direction for a TerminationPoint: 
+
+The directionality of PTPs is defined from an external point of view, while the directionality of CTPs is defined from an internal point of view. Consequently, sink PTPs generate source CTPs, and sink CTPs form source PTPs. Refer to SNC Types and to layers for further information on termination point and connection directionality.
+
+Note that ATM termination points (LR_ATM_NI, LR_ATM_VP and LR_ATM_VC) are always bi-directional even though the traffic may be asymmetric (and eventually null in one of the two directions).
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="D_NA">
+        <xsd:annotation>
+          <xsd:documentation>
+          Used when the directionality specification is not necessary.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="D_BIDIRECTIONAL">
+        <xsd:annotation>
+          <xsd:documentation>
+          source and sink (transmit and receive).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="D_SOURCE">
+        <xsd:annotation>
+          <xsd:documentation>
+          source (transmit).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="D_SINK">
+        <xsd:annotation>
+          <xsd:documentation>
+          sink (receive).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="DiscoveredName_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the name of the object when its existence is first published on the CCV but only in the case where the OS that publishes the object on the CCV is not the naming OS. If the naming OS first publishes the object on the CCV, this attribute may be left empty. 
+The discovered name is assumed to be unique from the perspective of the publishing OS. 
+The discovered name published on the CCV does not necessarily need to be the name of the object as discovered by the OS from the subtending network.
+There are no specific rules concerning the relationship between the "name" and "discovered name" of the object. They could be set to the same value or they could be different.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="Manufacturer_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The resource manufacturer name.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="NamingOS_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the object attribute definition to identify the name of the OS that provided the unique MTOSI name for the object. It is assumed that each object (that is published on the CCV) has a unique naming OS. This attribute is optional in a point to point NMS-EMS paradigm.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="NetworkAccessDomain_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      A free-format string used to associate a resource to a Network Access Domain.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ObjectAcronym_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The network resoures acronym
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="MD"/>
+      <xsd:enumeration value="ME"/>
+      <xsd:enumeration value="EH"/>
+      <xsd:enumeration value="EQ"/>
+      <xsd:enumeration value="PTP"/>
+      <xsd:enumeration value="FTP"/>
+      <xsd:enumeration value="CTP"/>
+      <xsd:enumeration value="TPPool"/>
+      <xsd:enumeration value="EPGP"/>
+      <xsd:enumeration value="PGP"/>
+      <xsd:enumeration value="SNC"/>
+      <xsd:enumeration value="RT"/>
+      <xsd:enumeration value="CC"/>
+      <xsd:enumeration value="MLSN"/>
+      <xsd:enumeration value="TL"/>
+      <xsd:enumeration value="OS"/>
+      <xsd:enumeration value="TMD"/>
+      <xsd:enumeration value="VO"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="Owner_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the object attribute that represents an identifier for the owner of the object.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ProductName_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The product/type name
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ResourceStateEnum_T">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="PLANNED"/>
+      <xsd:enumeration value="INSTALLED"/>
+      <xsd:enumeration value="RETIRED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="ResourceState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the object attribute that indicates the state of the resource Note: this object attribute accepts Overlap or Qualifiable extensions.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="ResourceStateEnum_T">
+        <xsd:attribute name="overlap" type="xsd:string" use="optional"/>
+        <xsd:attribute name="qualifier" type="xsd:string" use="optional"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:simpleType name="ServiceStateEnum_T">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="IN_SERVICE">
+        <xsd:annotation>
+          <xsd:documentation>
+          The entity has been put into operation and is operating as provisioned (completely or partially).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="OUT_OF_SERVICE">
+        <xsd:annotation>
+          <xsd:documentation>
+          The entity is entirely not capable of performing its provisioned functions and is not restricted by administrative actions.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="OUT_OF_SERVICE_BY_MAINTENANCE">
+        <xsd:annotation>
+          <xsd:documentation>
+          The entity has been taken intentionally out of service by a management action.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SERV_NA">
+        <xsd:annotation>
+          <xsd:documentation>
+          The service state is not applicable.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="ServiceState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This object attribute indicates basic administration state of equipment and OS objects.
+      Also, this object attribute accepts Qualifiable extension.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="ServiceStateEnum_T">
+        <xsd:attribute name="qualifier" type="xsd:string" use="optional"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:simpleType name="SourceEnum_T">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="networkME">
+        <xsd:annotation>
+          <xsd:documentation>
+          the object was discovered directly from the ME.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="OS">
+        <xsd:annotation>
+          <xsd:documentation>
+          the object was entered into an OS on the CCV, e.g., OS GUI or file transfer to the OS from some other system.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="networkEMS">
+        <xsd:annotation>
+          <xsd:documentation>
+          the object was discovered from an EMS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="Source_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the object attribute that indicates whether the object was discovered from the network, or was entered into the OS's inventory. Note: This object attribute accepts a Qualifiable extension.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="SourceEnum_T">
+        <xsd:attribute name="qualifier" type="xsd:string" use="optional"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:simpleType name="UserLabel_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the object attribute that represents a provisionable, "user friendly" name for the object. The user label is filled by the naming OS.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="Location_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The location is the geographic location of the equipment holder. This is
+normally used for managed elements that have equipment holders in several
+different geographic locations. This is a free format string and can be an
+empty string. The attribute has no impact on the operation of the system. It
+is a readonly attribute.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="AliasName_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The alias name in AliasNameList_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="AliasValue_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The alias value in AliasNameList_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="AliasNameList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the object attribute that contains the list of aliases for the network entity. The attribute is a name-value list. The name refers to the type of alias (e.g., nativeEMSname) and the value component holds the alias itself
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="alias" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="aliasName" type="AliasName_T"/>
+            <xsd:element name="aliasValue" type="AliasValue_T"/>
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="NameAndStringValue_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Specifies a generic name and value pair
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:element name="value" type="xsd:string"/>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="NVSList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        A list of NameAndStringValue
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="nvs" type="NameAndStringValue_T" maxOccurs="unbounded" minOccurs="0"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:simpleType name="NameValue_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The strings used for the value field of a hierarchical name will be at most 1024 characters (from ISO8859) long with white space character allowed in the value but with no leading or trailing spaces. Value strings are case sensitive.
+      Refer to the MTOSI supporting document SD2-7.
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="1024"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="NamingAttributes_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the definition of the name attribute, which represents a unique identifier for the MTOSI object on the CCV. Once set by the naming OS, the name is invariant for the life of the object and should be used when referring to the object over the CCV. Name attribute of an object instance shall always be assigned a value, unless the object instance is first discovered by an OS that is not the naming OS for the object instance. In such a case, the discovering OS shall provide a value for the Discovered Name attribute of the object. The naming OS shall provide a value for the Name attribute of the object once it becomes aware of the new object
+      Refer to the MTOSI supporting document SD2-7.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="osNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Os Name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mdNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Management Domain name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="meNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Managed Element name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ehNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Equipment Holder name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="eqNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Equipment name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ptpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>PTP name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ftpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>FTP name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ctpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>CTP name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tppoolNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>TPool name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="pgpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Protection Group name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="epgpNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Equipment Protection Group name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mlsnNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>MultiLayer Subnetwork name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="sncNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Subnetwork Connection name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tmdNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Tranmission Descriptor component of hierarchical name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tlNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Topological Link component of hierarchical name.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aidNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>AID component of hierarchical name.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="propNm" type="NameValue_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Proprietary vendor object component of hierarchical name.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="NamingAttributesList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The is the definition for the list of MTOSI object names.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="name" type="NamingAttributes_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

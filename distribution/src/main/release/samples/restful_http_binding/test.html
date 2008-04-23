@@ -1,0 +1,104 @@
+<html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+ <head>
+   <title>Jettison/CXF AJAX Demo</title>
+   <script>
+function getCustomers() {
+    var xmlhttp = null;
+	if (window.XMLHttpRequest) {
+	  xmlhttp = new XMLHttpRequest();
+	  if ( typeof xmlhttp.overrideMimeType != 'undefined') {
+	    xmlhttp.overrideMimeType('text/plain');
+	  }
+	} else if (window.ActiveXObject) {
+	  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	} else {
+	  alert('Perhaps your browser does not support xmlhttprequests?');
+	}
+
+	xmlhttp.onreadystatechange = function() {
+	  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+	    var res = '(' + xmlhttp.responseText + ')';
+	    var customers = eval(res);
+	    customers = customers['acme.Customers'];
+
+	    var customer = customers['acme.customer'];
+		var t = document.getElementById("customertable");
+		while(t.rows.length > 1) {
+		 t.deleteRow(t.rows.length-1);
+		}
+		if (customer.length) {
+		  for (var i = 0; i < customer.length; i++) {
+		    addCustomer(customer[i]);
+		  }
+		} else {
+		  addCustomer(customer);
+
+        }
+	  } else {
+	    // wait for the call to complete
+	  }
+	};
+
+	xmlhttp.open('GET', "http://localhost:8080/json/customers", true);
+    xmlhttp.send(null);
+}
+
+function addCustomer(c) {
+  var t = document.getElementById("customertable");
+
+  var tr = document.createElement("tr");
+  var td = document.createElement("td");
+  var id = document.createTextNode(c['acme.id']);
+  td.appendChild(id);
+  tr.appendChild(td);
+  td = document.createElement("td");
+  var name = document.createTextNode(c['acme.name']);
+  td.appendChild(name);
+  tr.appendChild(td);
+  t.getElementsByTagName("tbody")[0].appendChild(tr);
+  //t.appendChild(tr);
+}
+   </script>
+ </head>
+ <body>
+   <h1>Jettison/CXF AJAX Demo</h1>
+   <p>
+     The button below will go and hit the URL
+     <a href="http://localhost:8080/json/customers">http://localhost:8080/json/customers</a>
+     and list the customers below in a table.
+   <p>
+   <p>
+     <input type="button" value="Get Customers!" onClick="javascript: getCustomers();" />
+   <p>
+   <p>
+     <h1>Customers</h1>
+     <!-- Yes, this is using a table because I'm incompotent with HTML! -->
+     <table id="customertable">
+	  <tbody>
+       <tr>
+         <td><strong>ID</strong></td>
+         <td><strong>Customer Name</strong></td>
+       </tr>
+	  </tbody>
+     </table>
+   </p>
+ </body>
+</html>

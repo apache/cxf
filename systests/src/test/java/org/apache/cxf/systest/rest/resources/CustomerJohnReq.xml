@@ -1,0 +1,3 @@
+<tns:Customer xmlns:tns="http://apache.org/hello_world_soap_http/types">
+  <tns:CustomerID>123456</tns:CustomerID>
+</tns:Customer>

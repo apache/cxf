@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="anon.idl"
+    targetNamespace="http://schemas.apache.org/idl/anon.idl"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:tns="http://schemas.apache.org/idl/anon.idl"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd1="http://schemas.apache.org/idltypes/anon.idl"
+    xmlns:corba="http://schemas.apache.org/bindings/corba"
+    xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap">
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/idltypes/anon.idl"
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="ArrayType">
+                <sequence>
+                    <element name="p1" type="xsd:string"/>  <!-- This is a single part -->
+                    <element name="p2" type="xsd:string" minOccurs="0"/> <!-- This is mapped to a bound
+ed sequence with bound 1 -->
+                    <element name="p3" type="xsd:string" minOccurs="5" maxOccurs="5"/> <!-- This should
+ be mapped to a corba array -->
+                    <element name="p4" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> <!-- Thi
+s should be mapped to a corba sequence -->
+                    <element name="p5" type="xsd:string" minOccurs="0" maxOccurs="15"/> <!-- This is cu
+rrently mapped to a corba sequence -->
+                    <element name="p6" type="xsd:string" minOccurs="2" maxOccurs="unbounded"/>  <!-- Th
+is is currently mapped to a corba sequence -->
+                    <element name="p7" type="xsd:string" minOccurs="3" maxOccurs="10"/> <!-- This is cu
+rrently mapped to a corba sequence -->
+                </sequence>
+            </complexType>
+
+        </schema>
+    </types>
+    <message name="X.op_a">
+        <part name="part1" type="xsd1:ArrayType"/>
+    </message>
+    <message name="X.op_aResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+
+    <portType name="X">
+        <operation name="op_a">
+            <input message="tns:X.op_a" name="op_a"/>
+            <output message="tns:X.op_aResponse" name="op_aResponse"/>
+        </operation>
+    </portType>
+</definitions>

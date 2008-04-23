@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Union" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Union" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Union/typemap">
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:e1:1.0" type="e1" name="e1">
+      <corba:enumerator value="e1_1" />
+      <corba:enumerator value="e1_2" />
+      <corba:enumerator value="e1_3" />
+      <corba:enumerator value="e1_4" />
+    </corba:enum>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:s1:1.0" type="s1" name="s1">
+      <corba:member name="s1_1" idltype="corba:short" />
+      <corba:member name="s1_2" idltype="corba:short" />
+      <corba:member name="s1_3" idltype="corba:short" />
+    </corba:struct>
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="e1" repositoryID="IDL:u1:1.0" type="ns4:u1" name="u1">
+      <corba:unionbranch name="u1_1" idltype="corba:long">
+        <corba:case label="e1_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_2" idltype="corba:string">
+        <corba:case label="e1_3" />
+        <corba:case label="e1_2" />
+        <corba:case label="e1_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u1_3" idltype="s1" default="true" />
+    </corba:union>
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:if/e2:1.0" type="if.e2" name="if.e2">
+      <corba:enumerator value="e2_1" />
+      <corba:enumerator value="e2_2" />
+      <corba:enumerator value="e2_3" />
+      <corba:enumerator value="e2_4" />
+    </corba:enum>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:if/s2:1.0" type="if.s2" name="if.s2">
+      <corba:member name="s2_1" idltype="corba:short" />
+      <corba:member name="s2_2" idltype="corba:short" />
+      <corba:member name="s2_3" idltype="corba:short" />
+    </corba:struct>
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="if.e2" repositoryID="IDL:if/u2:1.0" type="ns4:if.u2" name="if.u2">
+      <corba:unionbranch name="u2_1" idltype="corba:long">
+        <corba:case label="e2_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u2_2" idltype="corba:string">
+        <corba:case label="e2_3" />
+        <corba:case label="e2_2" />
+        <corba:case label="e2_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u2_3" idltype="if.s2" default="true" />
+    </corba:union>
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:m/e3:1.0" type="m.e3" name="m.e3">
+      <corba:enumerator value="e3_1" />
+      <corba:enumerator value="e3_2" />
+      <corba:enumerator value="e3_3" />
+      <corba:enumerator value="e3_4" />
+    </corba:enum>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:m/s3:1.0" type="m.s3" name="m.s3">
+      <corba:member name="s3_1" idltype="corba:short" />
+      <corba:member name="s3_2" idltype="corba:short" />
+      <corba:member name="s3_3" idltype="corba:short" />
+    </corba:struct>
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="m.e3" repositoryID="IDL:m/u3:1.0" type="ns4:m.u3" name="m.u3">
+      <corba:unionbranch name="u3_1" idltype="corba:long">
+        <corba:case label="e3_1" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u3_2" idltype="corba:string">
+        <corba:case label="e3_3" />
+        <corba:case label="e3_2" />
+        <corba:case label="e3_2" />
+      </corba:unionbranch>
+      <corba:unionbranch name="u3_3" idltype="m.s3" default="true" />
+    </corba:union>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Union" xmlns="http://cxf.apache.org/bindings/corba/idl/Union" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:simpleType name="e1">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e1_1">
+          </xs:enumeration>
+          <xs:enumeration value="e1_2">
+          </xs:enumeration>
+          <xs:enumeration value="e1_3">
+          </xs:enumeration>
+          <xs:enumeration value="e1_4">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="s1">
+        <xs:sequence>
+          <xs:element name="s1_1" type="xs:short">
+          </xs:element>
+          <xs:element name="s1_2" type="xs:short">
+          </xs:element>
+          <xs:element name="s1_3" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="u1">
+        <xs:choice>
+          <xs:element name="u1_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u1_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u1_3" type="s1">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:simpleType name="if.e2">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e2_1">
+          </xs:enumeration>
+          <xs:enumeration value="e2_2">
+          </xs:enumeration>
+          <xs:enumeration value="e2_3">
+          </xs:enumeration>
+          <xs:enumeration value="e2_4">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="if.s2">
+        <xs:sequence>
+          <xs:element name="s2_1" type="xs:short">
+          </xs:element>
+          <xs:element name="s2_2" type="xs:short">
+          </xs:element>
+          <xs:element name="s2_3" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="if.u2">
+        <xs:choice>
+          <xs:element name="u2_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u2_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u2_3" type="if.s2">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:simpleType name="m.e3">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e3_1">
+          </xs:enumeration>
+          <xs:enumeration value="e3_2">
+          </xs:enumeration>
+          <xs:enumeration value="e3_3">
+          </xs:enumeration>
+          <xs:enumeration value="e3_4">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="m.s3">
+        <xs:sequence>
+          <xs:element name="s3_1" type="xs:short">
+          </xs:element>
+          <xs:element name="s3_2" type="xs:short">
+          </xs:element>
+          <xs:element name="s3_3" type="xs:short">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="m.u3">
+        <xs:choice>
+          <xs:element name="u3_1" type="xs:int">
+          </xs:element>
+          <xs:element name="u3_2" type="xs:string">
+          </xs:element>
+          <xs:element name="u3_3" type="m.s3">
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:portType name="if">
+  </wsdl:portType>
+  <wsdl:binding name="ifCORBABinding" type="tns:if">
+    <corba:binding repositoryID="IDL:if:1.0" />
+  </wsdl:binding>
+  <wsdl:service name="ifCORBAService">
+    <wsdl:port name="ifCORBAPort" binding="tns:ifCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,7 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+  </soap:Header>
+  <soap:Body>
+    <sayHi xmlns="http://apache.org/hello_world_soap_http/types"/>
+  </soap:Body>
+</soap:Envelope>

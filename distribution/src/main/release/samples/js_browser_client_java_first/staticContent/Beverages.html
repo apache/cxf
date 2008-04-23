@@ -1,0 +1,95 @@
+<html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<head>
+<title>JAX-WS/Complex Type JavaScript Client Sample</title>
+<!-- Generate and retrieve a JavaScript client for the server. -->
+<script type="text/javascript" src="/beverages?js"></script>
+<script type="text/javascript">
+// Create an object that talks to the server.
+var server = new urn_cxf_apache_org_jsjaxws_JavascriptExample();
+// Set the URL for the service. No cross-scripting allowed. 
+server.url = "/beverages";
+
+var responseSpan;
+
+// This is the function called upon success.
+function beverageListResponse(response)
+{
+    responseSpan = document.getElementById('beverages');
+    var beverages = response.getItem();
+    var str = '';
+    for(b in beverages) {
+    	str = str + beverages[b].getName();
+    	str = str + ' ';
+    }
+    responseSpan.firstChild.nodeValue = str;
+}
+
+// This is the function called for an error.
+function onerror(error)
+{
+      alert('error ' + error);
+}
+
+// This function is invoked from the button press to run the service.
+function invokeCategoryQuery()
+{
+    responseSpan = document.getElementById('beverages');
+    responseSpan.firstChild.nodeValue = " - pending - ";
+    var catControl = document.getElementById('category'); 
+    var category = catControl.options[catControl.selectedIndex].value;
+    server.getBeverageWithIngredientCategory(beverageListResponse, onerror, category);
+}
+</script>
+</head>
+<body>
+<h1>
+Hello World Sample
+</h1>
+<form>
+<div>
+	<table>
+	<tr>
+	<td>Category
+	</td>
+	<td>
+	<select id='category'>
+	<option value="">Choose a Category...</option>
+    <option value="Animal">Animal</option>
+	<option value="Vegetable">Vegetable</option>
+	<option value="Mineral">Mineral</option>
+    </select>
+	</td>
+	</tr>
+	  <tr>
+	    <td>Query by Category</td>
+	    <td><input type="button" 
+                       value="invoke" name="categoryQuery" 
+		       onClick="invokeCategoryQuery()">
+	  </tr>
+	  <tr>
+	    <td>Beverages</td>
+	    <td><span id='beverages'>- not yet invoked -</span></td>
+	  </tr>
+	</table>
+</div>
+</form>
+</body>
+</html>

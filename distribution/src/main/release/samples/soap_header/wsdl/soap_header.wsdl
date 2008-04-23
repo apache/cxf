@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+                                                                                                                                                             
+  http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                             
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<definitions name="soap_header" targetNamespace="http://apache.org/headers" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://apache.org/headers" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <types>
+        <schema targetNamespace="http://apache.org/headers" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+            <complexType name="SOAPHeaderData">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="originator" type="string"/>
+                    <element maxOccurs="1" minOccurs="1" name="message" type="string"/>
+                </sequence>
+            </complexType>
+            <element name="SOAPHeaderInfo" type="tns:SOAPHeaderData"/>
+
+        <element name="inHeader">
+           <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+        </element>
+        <element name="inHeaderResponse">
+           <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+        </element>
+
+        <element name="outHeader">
+           <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+        </element>
+        <element name="outHeaderResponse">
+           <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+        </element>
+
+        <element name="inoutHeader">
+           <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+        </element>
+        <element name="inoutHeaderResponse">
+           <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+        </element>
+
+        </schema>
+    </types>
+
+    <message name="inHeaderRequest">
+        <part element="tns:inHeader" name="me"/>
+        <part element="tns:SOAPHeaderInfo" name="header_info"/>
+    </message>
+    <message name="inHeaderResponse">
+        <part element="tns:inHeaderResponse" name="the_response"/>
+    </message>
+    <message name="outHeaderRequest">
+        <part element="tns:outHeader" name="me"/>
+    </message>
+    <message name="outHeaderResponse">
+        <part element="tns:outHeaderResponse" name="the_response"/>
+        <part element="tns:SOAPHeaderInfo" name="header_info"/>
+    </message>
+    <message name="inoutHeaderRequest">
+        <part element="tns:inoutHeader" name="me"/>
+        <part element="tns:SOAPHeaderInfo" name="header_info"/>
+    </message>
+    <message name="inoutHeaderResponse">
+        <part element="tns:inoutHeaderResponse" name="the_response"/>
+        <part element="tns:SOAPHeaderInfo" name="header_info"/>
+    </message>
+
+    <portType name="headerTester">
+        <operation name="inHeader">
+            <input message="tns:inHeaderRequest" name="inHeaderRequest"/>
+            <output message="tns:inHeaderResponse" name="inHeaderResponse"/>
+        </operation>
+        <operation name="outHeader">
+            <input message="tns:outHeaderRequest" name="outHeaderRequest"/>
+            <output message="tns:outHeaderResponse" name="outHeaderResponse"/>
+        </operation>
+        <operation name="inoutHeader">
+            <input message="tns:inoutHeaderRequest" name="inoutHeaderRequest"/>
+            <output message="tns:inoutHeaderResponse" name="inoutHeaderResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="headerTesterSOAPBinding" type="tns:headerTester">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="inHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="inHeaderRequest">
+                <soap:body parts="me" use="literal"/>
+                <soap:header message="tns:inHeaderRequest" part="header_info" 
+                    use="literal"/>
+            </input>
+            <output name="inHeaderResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="outHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="outHeaderRequest">
+                <soap:body use="literal"/>
+            </input>
+            <output name="outHeaderResponse">
+                <soap:body parts="the_response" use="literal"/>
+                <soap:header message="tns:outHeaderResponse" part="header_info" 
+                    use="literal"/>
+            </output>
+        </operation>
+        <operation name="inoutHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="inoutHeaderRequest">
+                <soap:body parts="me" use="literal"/>
+                <soap:header message="tns:inoutHeaderRequest" part="header_info" 
+                    use="literal"/>
+            </input>
+            <output name="inoutHeaderResponse">
+                <soap:body parts="the_response" use="literal"/>
+                <soap:header message="tns:inoutHeaderResponse" part="header_info" 
+                    use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="HeaderService">
+        <port binding="tns:headerTesterSOAPBinding" name="SoapPort">
+            <soap:address location="http://localhost:9000/headers"/>
+        </port>
+    </service>
+</definitions>

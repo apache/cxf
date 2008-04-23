@@ -1,0 +1,45 @@
+# 1 B.idl 1
+# 1 A.idl 1
+
+
+
+
+# 1 A.idl 1
+
+
+
+
+
+
+
+
+module a
+{
+  interface A {
+    const boolean tt = TRUE;
+  };
+};
+
+
+
+# 6 A.idl 2
+
+
+
+
+
+
+
+
+
+
+
+
+# 2 B.idl 2
+
+module a
+{
+  interface B {
+    const boolean ff = FALSE;
+  };
+};

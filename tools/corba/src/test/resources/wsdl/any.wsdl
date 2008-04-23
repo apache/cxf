@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="any.idl"
+ targetNamespace="http://schemas.apache.org/idl/any.idl"
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:tns="http://schemas.apache.org/idl/any.idl"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd1="http://schemas.apache.org/idltypes/any.idl"
+ xmlns:corba="http://schemas.apache.org/bindings/corba"
+ xmlns:corbatm="http://schemas.apache.org/typemap/corba/any.idl"
+ xmlns:references="http://schemas.apache.org/references">
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/any.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType name="anyInterface.SimpleStruct">
+        <xsd:sequence>
+          <xsd:element name="varFloat" type="xsd:float"/>
+          <xsd:element name="varAny" type="xsd:anyType"/>
+          <xsd:element name="varString" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="anyInterface.PrimitiveStruct">
+        <xsd:sequence>
+          <xsd:element name="varLong" type="xsd:int"/>
+          <xsd:element name="varShort" type="xsd:short"/>
+          <xsd:element name="varFloat" type="xsd:float"/>
+          <xsd:element name="varDouble" type="xsd:double"/>
+          <xsd:element name="varChar" type="xsd:byte"/>
+          <xsd:element name="varBoolean" type="xsd:boolean"/>
+          <xsd:element name="varOctet" type="xsd:unsignedByte"/>
+          <xsd:element name="varString" type="xsd:string"/>
+          <xsd:element name="varUlong" type="xsd:unsignedInt"/>
+          <xsd:element name="varUshort" type="xsd:unsignedShort"/>
+          <xsd:element name="varAny" type="xsd:anyType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="anyInterface.SimpleUnion">
+        <xsd:choice>
+          <xsd:element name="varString" type="xsd:string"/>
+          <xsd:element name="varAny" type="xsd:anyType"/>
+          <xsd:element name="varFloat" type="xsd:float"/>
+        </xsd:choice>
+      </xsd:complexType>
+      <xsd:complexType name="anyInterface._omg_SimpleUnion">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="discriminator" type="xsd:int"/>
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="varString" type="xsd:string"/>
+            <xsd:element name="varAny" type="xsd:anyType"/>
+            <xsd:element name="varFloat" type="xsd:float"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="anyInterface.ErrorInfoEnh">
+        <xsd:sequence>
+          <xsd:element name="errorCode" type="xsd:int"/>
+          <xsd:element name="errorMessage" type="xsd:string"/>
+          <xsd:element name="errorData" type="xsd:anyType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="anyInterface.test_any.p" type="xsd:string"/>
+      <xsd:element name="anyInterface.test_any.x" type="xsd:anyType"/>
+      <xsd:element name="anyInterface.test_any.y" type="xsd:anyType"/>
+      <xsd:element name="anyInterface.test_any.z" type="xsd:anyType"/>
+      <xsd:element name="anyInterface.test_any.return" type="xsd:anyType"/>
+    </schema>
+  </types>
+  <message name="anyInterface.test_any">
+    <part name="p" element="xsd1:anyInterface.test_any.p"/>
+    <part name="x" element="xsd1:anyInterface.test_any.x"/>
+    <part name="y" element="xsd1:anyInterface.test_any.y"/>
+  </message>
+  <message name="anyInterface.test_anyResponse">
+    <part name="return" element="xsd1:anyInterface.test_any.return"/>
+    <part name="y" element="xsd1:anyInterface.test_any.y"/>
+    <part name="z" element="xsd1:anyInterface.test_any.z"/>
+  </message>
+  <portType name="anyInterface">
+    <operation name="test_any">
+      <input message="tns:anyInterface.test_any" name="test_any"/>
+      <output message="tns:anyInterface.test_anyResponse" name="test_anyResponse"/>
+    </operation>
+  </portType>
+</definitions>

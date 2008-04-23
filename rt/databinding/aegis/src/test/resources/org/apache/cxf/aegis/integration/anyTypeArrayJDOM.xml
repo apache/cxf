@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" 
+                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+ <soap-env:Body xmlns:jns0='urn:Array' >
+  <jns0:submitJDOMArray>
+   <jns0:before>before items</jns0:before>
+   <jns0:anything>
+       <jns0:anyType><walrus xmlns='uri:iam'>tusks</walrus></jns0:anyType>
+       <jns0:anyType><penguin xmlns='uri:linux'>emperor</penguin></jns0:anyType>
+       <jns0:anyType><moon xmlns='uri:planets'>blue</moon></jns0:anyType>
+    </jns0:anything>
+    <jns0:after>after items</jns0:after>
+    </jns0:submitJDOMArray>
+  </soap-env:Body>
+</soap-env:Envelope>

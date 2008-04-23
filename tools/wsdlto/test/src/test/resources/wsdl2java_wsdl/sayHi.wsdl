@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions targetNamespace="http://apache.org/sayHi" name="SayHiService" xmlns:tns="http://apache.org/sayHi" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://apache.org/sayHi" schemaLocation="sayhi-schema1.xsd"/>
+      <xsd:import namespace="http://apache.org/sayHi" schemaLocation="sayhi-schema2.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="sayHi">
+    <part name="parameters" element="tns:sayHi"/>
+  </message>
+  <message name="sayHiResponse">
+    <part name="parameters" element="tns:sayHiResponse"/>
+  </message>
+  <message name="sayHiArray">
+    <part name="parameters" element="tns:sayHiArray"/>
+  </message>
+  <message name="sayHiArrayResponse">
+    <part name="parameters" element="tns:sayHiArrayResponse"/>
+  </message>
+  <portType name="SayHi">
+    <operation name="sayHi">
+      <input message="tns:sayHi"/>
+      <output message="tns:sayHiResponse"/>
+    </operation>
+    <operation name="sayHiArray">
+      <input message="tns:sayHiArray"/>
+      <output message="tns:sayHiArrayResponse"/>
+    </operation>
+  </portType>
+  <binding name="SayHiPortBinding" type="tns:SayHi">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="sayHi">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="sayHiArray">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="SayHiService">
+    <port name="SayHiPort" binding="tns:SayHiPortBinding">
+      <soap:address location="http://localhost:9090/sayHi"/>
+    </port>
+  </service>
+</definitions>
+

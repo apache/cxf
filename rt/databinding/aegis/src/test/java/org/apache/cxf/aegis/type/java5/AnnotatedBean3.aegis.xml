@@ -1,0 +1,5 @@
+<mappings>
+  <mapping>
+    <property name="attributeProperty" mappedName="attProp"/>
+  </mapping>
+</mappings>

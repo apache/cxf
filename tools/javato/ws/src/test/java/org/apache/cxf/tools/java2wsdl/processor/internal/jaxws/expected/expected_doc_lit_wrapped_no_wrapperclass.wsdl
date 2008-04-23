@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="HelloWrappedService" targetNamespace="http://cxf.com/" xmlns:tns="http://cxf.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.com/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.com/">
+<xsd:element name="sayHiWithoutWrapperClass" type="tns:sayHiWithoutWrapperClass"/>
+<xsd:complexType name="sayHiWithoutWrapperClass">
+<xsd:sequence/>
+</xsd:complexType>
+<xsd:element name="sayHiWithoutWrapperClassResponse" type="tns:sayHiWithoutWrapperClassResponse"/>
+<xsd:complexType name="sayHiWithoutWrapperClassResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="sayHiWithoutWrapperClass">
+    <wsdl:part name="parameters" element="tns:sayHiWithoutWrapperClass">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHiWithoutWrapperClassResponse">
+    <wsdl:part name="parameters" element="tns:sayHiWithoutWrapperClassResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Hello">
+    <wsdl:operation name="sayHiWithoutWrapperClass">
+      <wsdl:input name="sayHiWithoutWrapperClass" message="tns:sayHiWithoutWrapperClass">
+    </wsdl:input>
+      <wsdl:output name="sayHiWithoutWrapperClassResponse" message="tns:sayHiWithoutWrapperClassResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HelloWrappedServiceSoapBinding" type="tns:Hello">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHiWithoutWrapperClass">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHiWithoutWrapperClass">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHiWithoutWrapperClassResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HelloWrappedService">
+    <wsdl:port name="HelloPort" binding="tns:HelloWrappedServiceSoapBinding">
+      <soap:address location="http://localhost:9090"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

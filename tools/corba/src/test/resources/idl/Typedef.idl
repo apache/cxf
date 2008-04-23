@@ -1,0 +1,185 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+interface TypedefIf {
+
+    // "typedef" <type_declarator>
+    // <type_declarator ::= <type_spec> <declarator>
+    // <type_spec> ::= <simple_type_spec> | <constr_type_spec>
+
+    // <simple_type_spec> <base_type_spec>
+    typedef float              myFloat;
+    typedef double             myDouble;
+    typedef long double        myLongDouble;
+    typedef short              myShort;
+    typedef long               myLong;
+    typedef long long          myLongLong;
+    typedef unsigned short     myUnsignedShort;
+    typedef unsigned long      myUnsignedLong;
+    typedef unsigned long long myUnsignedLongLong;
+    typedef char               myChar;
+    typedef wchar              myWChar;
+    typedef boolean            myBoolean;
+    typedef octet              myOctet;
+    typedef any                myAny;
+
+    // <simple_type_spec> <template_type_spec>
+    typedef sequence<long>     SeqLong;
+    typedef string             aString;
+    typedef string<10>         aBoundedString;
+    typedef fixed<5,2>         Fixed52;
+
+    typedef SeqLong            mySeqLong;
+    typedef aString            myString;
+    typedef aBoundedString     myBoundedString;
+    typedef Fixed52            myFixed52;
+
+
+    // <constr_type_spec>
+    typedef struct aStruct {
+        myLong aStructMyLong;
+        long   aLong;
+    } myStruct;
+    typedef enum aEnum {
+        aEnum1,
+        aEnum2
+    } myEnum;
+    typedef union aUnion switch (myEnum) {
+      case aEnum1:
+        myLong    aUnionMyLong;
+      case aEnum2:
+        long      aUnionLong;
+      default:
+        myBoolean aUnionMyBoolean;
+    } myUnion;
+
+
+    struct anotherStruct {
+        myLong myOtherLong;
+        long   anotherLong;
+    };
+    typedef anotherStruct myOtherStruct;
+
+    enum anotherEnum {
+        anotherEnum1,
+        anotherEnum2
+    };
+    typedef anotherEnum myOtherEnum;
+
+    union anotherUnion switch (myOtherEnum) {
+      case anotherEnum1:
+        myLong    anotherUnionMyLong;
+      case anotherEnum2:
+        long      anotherUnionLong;
+      default:
+        myBoolean anotherUnionMyBoolean;
+    };
+    typedef anotherUnion myOtherUnion;
+
+
+    void opIn(	
+                in myFloat            inMyFloat,
+                in myDouble           inMyDouble,
+                in myLongDouble       inMyLongDouble,
+                in myShort            inMyShort,
+                in myLong             inMyLong,
+                in myLongLong         inMyLongLong,
+                in myUnsignedShort    inMyUnsignedShort,
+                in myUnsignedLong     inMyUnsignedLong,
+                in myUnsignedLongLong inMyUnsignedLongLong,
+                in myChar             inMyChar,
+                in myWChar            inMyWChar,
+                in myBoolean          inMyBoolean,
+                in myOctet            inMyOctet,
+                in myAny              inMyAny,
+
+                in mySeqLong          inMySeqLong,
+                in myString           inMyString,
+                in myBoundedString    inMyBoundedString,
+                in myFixed52          inMyFixed52,
+
+                in myStruct           inMyStruct,
+                in myEnum             inMyEnum,
+                in myUnion            inMyUnion,
+
+                in myOtherStruct      inMyOtherStruct,
+                in myOtherEnum        inMyOtherEnum,
+                in myOtherUnion       inMyOtherUnion
+    );
+
+    void opOut(	
+                out myFloat            outMyFloat,
+                out myDouble           outMyDouble,
+                out myLongDouble       outMyLongDouble,
+                out myShort            outMyShort,
+                out myLong             outMyLong,
+                out myLongLong         outMyLongLong,
+                out myUnsignedShort    outMyUnsignedShort,
+                out myUnsignedLong     outMyUnsignedLong,
+                out myUnsignedLongLong outMyUnsignedLongLong,
+                out myChar             outMyChar,
+                out myWChar            outMyWChar,
+                out myBoolean          outMyBoolean,
+                out myOctet            outMyOctet,
+                out myAny              outMyAny,
+
+                out mySeqLong          outMySeqLong,
+                out myString           outMyString,
+                out myBoundedString    outMyBoundedString,
+                out myFixed52          outMyFixed52,
+
+                out myStruct           outMyStruct,
+                out myEnum             outMyEnum,
+                out myUnion            outMyUnion,
+
+                out myOtherStruct      outMyOtherStruct,
+                out myOtherEnum        outMyOtherEnum,
+                out myOtherUnion       outMyOtherUnion
+    );
+
+    void opInOut(
+                 inout myFloat            inoutMyFloat,
+                 inout myDouble           inoutMyDouble,
+                 inout myLongDouble       inoutMyLongDouble,
+                 inout myShort            inoutMyShort,
+                 inout myLong             inoutMyLong,
+                 inout myLongLong         inoutMyLongLong,
+                 inout myUnsignedShort    inoutMyUnsignedShort,
+                 inout myUnsignedLong     inoutMyUnsignedLong,
+                 inout myUnsignedLongLong inoutMyUnsignedLongLong,
+                 inout myChar             inoutMyChar,
+                 inout myWChar            inoutMyWChar,
+                 inout myBoolean          inoutMyBoolean,
+                 inout myOctet            inoutMyOctet,
+                 inout myAny              inoutMyAny,
+
+                 inout mySeqLong          inoutMySeqLong,
+                 inout myString           inoutMyString,
+                 inout myBoundedString    inoutMyBoundedString,
+                 inout myFixed52          inoutMyFixed52,
+
+                 inout myStruct           inoutMyStruct,
+                 inout myEnum             inoutMyEnum,
+                 inout myUnion            inoutMyUnion,
+
+                 inout myOtherStruct      inoutMyOtherStruct,
+                 inout myOtherEnum        inoutMyOtherEnum,
+                 inout myOtherUnion       inoutMyOtherUnion
+    );
+
+};

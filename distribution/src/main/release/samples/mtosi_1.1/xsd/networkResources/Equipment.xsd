@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ============ Includes ========= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <!-- ============ Global Type Declarations ========= -->
+  <xsd:simpleType name="EquipmentHolderType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Equipment holder type
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="rack"/>
+          <xsd:enumeration value="shelf"/>
+          <xsd:enumeration value="sub_shelf"/>
+          <xsd:enumeration value="slot"/>
+          <xsd:enumeration value="sub_slot"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="EquipmentObjectType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Type of equipment object in equipment holder. Values are vendor-specific.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="HolderState_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Holder State Type
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="EMPTY">
+        <xsd:annotation>
+          <xsd:documentation>no equipment is installed and no expected equipment has been identified</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="INSTALLED_AND_EXPECTED">
+        <xsd:annotation>
+          <xsd:documentation>expected and currently installed</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="EXPECTED_AND_NOT_INSTALLED">
+        <xsd:annotation>
+          <xsd:documentation>expected but not currently installed</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="INSTALLED_AND_NOT_EXPECTED">
+        <xsd:annotation>
+          <xsd:documentation>physically inserted in the ME but not expected</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="MISMATCH_OF_INSTALLED_AND_EXPECTED">
+        <xsd:annotation>
+          <xsd:documentation>there is an inconsistency between the expected equipment and the installed equipment</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="UNAVAILABLE">
+        <xsd:annotation>
+          <xsd:documentation>this holder cannot accept the installation or provisioning of equipment (this is typically caused by a double width card installed next to this slot)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="UNKNOWN">
+        <xsd:annotation>
+          <xsd:documentation>the OS does not know the state of the equipment</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="InstalledPartNumber_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This is the resource part number (PN) of the installed equipment. If not available (or there is no installed equipment), an empty string shall be used.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="InstalledSerialNumber_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Defines the serial number of the installed equipment. If not available (or there is no installed equipment), an empty string shall be used.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="InstalledVersion_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Firmware version of the installed equipment. If not available (or there is no installed equipment), an empty string shall be used.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="Equipment_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This aggregate defines the Equipment object.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="alarmReportingIndicator" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Provides an indication whether alarm reporting for this instance is active or not.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="expectedEquipmentObjectType" type="EquipmentObjectType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Defines the type of expected equipment. This is an empty string if there is no expected equipment.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="installedEquipmentObjectType" type="EquipmentObjectType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Defines the type of installed equipment. This is an empty string if there is no installed equipment.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="installedPartNumber" type="InstalledPartNumber_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Refer to the InstalledPartNumber_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="installedSerialNumber" type="InstalledSerialNumber_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Refer to InstalledSerialNumber_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="serviceState" type="ServiceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Current state of the equipment.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="installedVersion" type="InstalledVersion_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Refer to InstalledVersion_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="manufacturer" type="Manufacturer_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The manufacturer attribute identifies the equipment manufacturer name. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectionRole" type="ProtectionRole_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This attribute defines the protection role that this equipment plays in case it takes part in an equipment protection scheme. 
+In case the equipment is not protected, the value "NA" shall be used. 
+(promoted from MTNM V 3 .0 additional Info)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectionSchemeState" type="ProtectionSchemeState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The protection scheme state identifies the individual lock of this equipment when it is participating in an equipment protection scheme. 
+In case the equipment is not protected, the value "UNKNOWN" shall also be used. 
+(promoted from MTNM V 3 .0 additional Info)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="manufacturerDate" type="xsd:string" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The manufacturerDate attribute identifies the production date of the Equipment in the format of YYYYMMDD where YYYY = the 4-digit year of manufacture, MM is the 2-digit month, and DD is the 2-digit date.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>            
+      <xsd:element name="vendorExtensions" type="EqVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EquipmentHolder_T">
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="alarmReportingIndicator" type="xsd:boolean" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Provides an indication whether alarm reporting for this instance is active or not.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="holderType" type="EquipmentHolderType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates the type of equipment holder.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="acceptableEquipmentTypeList" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Represents the types of equipment objects that can be supported directly by the equipment holder. This is an empty list if the equipment holder can only contain other equipment holders.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="acceptableEquipmentType" type="EquipmentObjectType_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+Type of equipment object in equipment holder. Values are vendor-specific.
+                   </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="expectedOrInstalledEquipment" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The equipment object expected or installed in the equipment holder, if any. NULL if the equipment holder is empty or if it only contains other equipment holders.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="holderState" type="HolderState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This attribute identifies the state of the Equipment Holder such as empty or installed. It is applied when the Equipment Holder instance represents a slot or any other holder that can accept various equipments.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="location" type="Location_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Location
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="manufacturer" type="Manufacturer_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+		  	The manufacturer attribute identifies the equipment manufacturer name. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>      
+      <xsd:element name="manufacturerDate" type="xsd:string" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          	The manufacturerDate attribute identifies the production date of the Equipment in the format of YYYYMMDD where YYYY = the 4-digit year of manufacture, MM is the 2-digit month, and DD is the 2-digit date.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>      
+      <xsd:element name="vendorExtensions" type="EHVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EquipmentOrHolder_T">
+    <xsd:choice>
+      <xsd:element name="eq" type="Equipment_T"/>
+      <xsd:element name="eh" type="EquipmentHolder_T"/>
+    </xsd:choice>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EquipmentOrHolderList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+					List of EquipmentOrHolder_T
+          </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eoh" type="EquipmentOrHolder_T" minOccurs="0" maxOccurs="unbounded">
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

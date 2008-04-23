@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="nested" 
+    targetNamespace="http://schemas.apache.org/idl/nested.idl" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://schemas.apache.org/bindings/corba" 
+    xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested.idl" 
+    xmlns:tns="http://schemas.apache.org/idl/nested.idl" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl">
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/idltypes/nested.idl" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="base">
+                <sequence>
+                    <element name="attr1" type="string"/>
+                    <element name="attr2" type="int"/>
+                    <element name="e1" type="int"/>
+                    <element name="e2" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub2ChoiceType">
+                <choice>
+                    <element name="e4" type="double"/>
+                    <element name="e6" type="double"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_sub2ChoiceType">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="e4" type="double"/>
+                        <element name="e6" type="double"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="sub2">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub2ChoiceType_f" type="xsd1:sub2ChoiceType"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1SequenceStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub1SequenceStruct_f" type="xsd1:sub1SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3SequenceStruct">
+                <sequence>
+                    <element name="e5" type="boolean"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3">
+                <sequence>
+                    <element name="sub2_f" type="xsd1:sub2"/>
+                    <element name="sub3SequenceStruct_f" type="xsd1:sub3SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="SimpleStruct">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="testStructType">
+                <sequence>
+                    <element name="attrString" type="string"/>
+                    <element name="SimpleStruct_f" type="xsd1:SimpleStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct1">
+                <sequence>
+                    <element name="varString" type="int"/>
+                    <element name="varFloat" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct1Type">
+                <sequence>
+                    <element name="attrString" type="string"/>
+                    <element name="SimpleStruct_f" type="xsd1:SimpleStruct"/>
+                    <element name="typeSequenceStruct1_f" type="xsd1:typeSequenceStruct1"/>
+                </sequence>
+            </complexType>
+            <simpleType name="_1_attrib2Type_nil">
+                <restriction base="string">
+                    <maxLength value="2"/>
+                </restriction>
+            </simpleType>
+            <complexType name="typeSequenceStruct2">
+                <sequence>
+                    <element name="attrib1" nillable="true" type="int"/>
+                    <element name="attrib2" nillable="true" 
+                        type="xsd1:_1_attrib2Type_nil"/>
+                    <element name="simpleTypeValue" type="short"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct3">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct3Type">
+                <sequence>
+                    <element name="attrString1" type="string"/>
+                    <element name="attrString2" type="string"/>
+                    <element name="SimpleStruct_f" type="xsd1:SimpleStruct"/>
+                    <element name="typeSequenceStruct3_f" type="xsd1:typeSequenceStruct3"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct4">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct5">
+                <sequence>
+                    <element name="varStringExt" type="string"/>
+                    <element name="varFloatExt" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct5Type">
+                <sequence>
+                    <element name="AttrString" type="string"/>
+                    <element name="any_f" type="anyType"/>
+                    <element name="typeSequenceStruct5_f" type="xsd1:typeSequenceStruct5"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStructr6">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="typeSequenceStruct4_f" type="xsd1:typeSequenceStruct4"/>
+                </sequence>
+            </complexType>
+            <element name="TypeInheritancePortType.echoObject">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObjectResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject2">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd1:sub1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject2Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject3">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd1:sub3"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject3Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
+    <message name="TypeInheritancePortType.echoObject">
+        <part element="xsd1:TypeInheritancePortType.echoObject" name="parameters"/>
+    </message>
+    <message name="TypeInheritancePortType.echoObjectResponse">
+        <part element="xsd1:TypeInheritancePortType.echoObjectResult" name="parameters"/>
+    </message>
+    <message name="TypeInheritancePortType.echoObject2">
+        <part element="xsd1:TypeInheritancePortType.echoObject2" name="parameters"/>
+    </message>
+    <message name="TypeInheritancePortType.echoObject2Response">
+        <part element="xsd1:TypeInheritancePortType.echoObject2Result" name="parameters"/>
+    </message>
+    <message name="TypeInheritancePortType.echoObject3">
+        <part element="xsd1:TypeInheritancePortType.echoObject3" name="parameters"/>
+    </message>
+    <message name="TypeInheritancePortType.echoObject3Response">
+        <part element="xsd1:TypeInheritancePortType.echoObject3Result" name="parameters"/>
+    </message>
+    <portType name="TypeInheritancePortType">
+        <operation name="echoObject">
+            <input message="tns:TypeInheritancePortType.echoObject" name="echoObject"/>
+            <output message="tns:TypeInheritancePortType.echoObjectResponse" 
+                name="echoObjectResponse"/>
+        </operation>
+        <operation name="echoObject2">
+            <input message="tns:TypeInheritancePortType.echoObject2" name="echoObject2"/>
+            <output message="tns:TypeInheritancePortType.echoObject2Response" 
+                name="echoObject2Response"/>
+        </operation>
+        <operation name="echoObject3">
+            <input message="tns:TypeInheritancePortType.echoObject3" name="echoObject3"/>
+            <output message="tns:TypeInheritancePortType.echoObject3Response" 
+                name="echoObject3Response"/>
+        </operation>
+    </portType>
+</definitions>

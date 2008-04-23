@@ -1,0 +1,15 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Header/>
+ <env:Body>
+  <ns1:echoAddress xmlns:ns1="http://basic.xmlbeans.cxf.apache.org/">
+  	<ns1:ad>
+  		<addressLine1>30 Foo Drive</addressLine1>
+  		<addressLine2></addressLine2>
+  		<city>Bar</city>
+  		<stateProvinceRegion>SN</stateProvinceRegion>
+  		<ZIPPostalCode>12345</ZIPPostalCode>
+  		<country>Mars</country>	   
+  	</ns1:ad>
+  </ns1:echoAddress>
+ </env:Body>
+</env:Envelope>

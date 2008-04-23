@@ -1,0 +1,981 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="mf" targetNamespace="http://schemas.apache.org/idl/mf.idl" xmlns:tns="http://schemas.apache.org/idl/mf.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/mf.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/mf.idl/corba/typemap/">
+    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromEmptySequenceSequenceStruct:1.0" type="xsd1:ExtendFromEmptySequenceSequenceStruct" name="ExtendFromEmptySequenceSequenceStruct">
+      <corba:member name="varInt" idltype="corba:long" />
+    </corba:struct>
+      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromContainingAnonSequence:1.0" type="xsd1:ExtendFromContainingAnonSequence" name="ExtendFromContainingAnonSequence">
+        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ContainingAnonSequence_f" idltype="ns1:ContainingAnonSequence" />
+        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ExtendFromContainingAnonSequenceSequenceStruct_f" idltype="ns1:ExtendFromContainingAnonSequenceSequenceStruct" />
+      </corba:struct>
+        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromRepeatedElement:1.0" type="xsd1:ExtendFromRepeatedElement" name="ExtendFromRepeatedElement">
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="RepeatedElement_f" idltype="ns1:RepeatedElement" />
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ExtendFromRepeatedElementSequenceStruct_f" idltype="ns1:ExtendFromRepeatedElementSequenceStruct" />
+        </corba:struct>
+          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromSchemaTypeSequenceStruct:1.0" type="xsd1:ExtendFromSchemaTypeSequenceStruct" name="ExtendFromSchemaTypeSequenceStruct">
+            <corba:member name="varString" idltype="corba:string" />
+            <corba:member name="varFloat" idltype="corba:float" />
+          </corba:struct>
+            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:SequenceExtendedFromAll:1.0" type="xsd1:SequenceExtendedFromAll" name="SequenceExtendedFromAll">
+              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="baseAll_f" idltype="ns1:baseAll" />
+              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="SequenceExtendedFromAllSequenceStruct_f" idltype="ns1:SequenceExtendedFromAllSequenceStruct" />
+            </corba:struct>
+              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:sub3:1.0" type="xsd1:sub3" name="sub3">
+                <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="sub2_f" idltype="ns1:sub2" />
+                <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="sub3SequenceStruct_f" idltype="ns1:sub3SequenceStruct" />
+              </corba:struct>
+                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromChoice:1.0" type="xsd1:ExtendFromChoice" name="ExtendFromChoice">
+                  <corba:member xmlns:tns="http://schemas.apache.org/idl/mf.idl" name="ChoiceElem_f" idltype="tns:ChoiceElem" />
+                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ExtendFromChoiceSequenceStruct_f" idltype="ns1:ExtendFromChoiceSequenceStruct" />
+                </corba:struct>
+                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ContainingAnonSequence:1.0" type="xsd1:ContainingAnonSequence" name="ContainingAnonSequence">
+                    <corba:member name="varFloat" idltype="corba:float" />
+                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ContainingAnonSequenceSequenceStruct_f" idltype="ns1:ContainingAnonSequenceSequenceStruct" />
+                  </corba:struct>
+                    <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/mf.idl" discriminator="corba:long" repositoryID="IDL:ChoiceDerivedFromSequenceChoiceType:1.0" type="ns3:ChoiceDerivedFromSequenceChoiceType" name="ChoiceDerivedFromSequenceChoiceType">
+                      <corba:unionbranch name="a" idltype="corba:string" default="false">
+                        <corba:case label="0" />
+                      </corba:unionbranch>
+                        <corba:unionbranch name="b" idltype="corba:string" default="false">
+                          <corba:case label="1" />
+                        </corba:unionbranch>
+                        </corba:union>
+                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:base:1.0" type="xsd1:base" name="base">
+                            <corba:member name="e1" idltype="corba:long" />
+                            <corba:member name="e2" idltype="corba:string" />
+                          </corba:struct>
+                            <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/mf.idl" discriminator="corba:long" repositoryID="IDL:ChoiceElem:1.0" type="ns3:ChoiceElem" name="ChoiceElem">
+                              <corba:unionbranch name="a" idltype="corba:string" default="false">
+                                <corba:case label="0" />
+                              </corba:unionbranch>
+                                <corba:unionbranch name="b" idltype="corba:string" default="false">
+                                  <corba:case label="1" />
+                                </corba:unionbranch>
+                                </corba:union>
+                                  <corba:sequence xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" elemtype="corba:string" bound="4" repositoryID="IDL:sArray:1.0" type="xsd1:sArray" name="sArray" />
+                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:RepeatedFromRepeatedElement:1.0" type="xsd1:RepeatedFromRepeatedElement" name="RepeatedFromRepeatedElement">
+                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="RepeatedElement_f" idltype="ns1:RepeatedElement" />
+                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="RepeatedFromRepeatedElementSequenceStruct_f" idltype="ns1:RepeatedFromRepeatedElementSequenceStruct" />
+                                  </corba:struct>
+                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:RepeatedFromRepeatedElementSequenceStruct:1.0" type="xsd1:RepeatedFromRepeatedElementSequenceStruct" name="RepeatedFromRepeatedElementSequenceStruct">
+                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="s" idltype="ns1:sArray" />
+                                    </corba:struct>
+                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromContainingAnonSequenceSequenceStruct:1.0" type="xsd1:ExtendFromContainingAnonSequenceSequenceStruct" name="ExtendFromContainingAnonSequenceSequenceStruct">
+                                        <corba:member name="varInt" idltype="corba:long" />
+                                      </corba:struct>
+                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:sub2:1.0" type="xsd1:sub2" name="sub2">
+                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="base_f" idltype="ns1:base" />
+                                          <corba:member xmlns:tns="http://schemas.apache.org/idl/mf.idl" name="sub2ChoiceType_f" idltype="tns:sub2ChoiceType" />
+                                        </corba:struct>
+                                          <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" discriminator="corba:long" repositoryID="IDL:_omg_ChoiceElem:1.0" type="xsd1:_omg_ChoiceElem" name="_omg_ChoiceElem">
+                                            <corba:unionbranch name="a" idltype="corba:string" default="false">
+                                              <corba:case label="0" />
+                                            </corba:unionbranch>
+                                              <corba:unionbranch name="b" idltype="corba:string" default="false">
+                                                <corba:case label="1" />
+                                              </corba:unionbranch>
+                                              </corba:union>
+                                                <corba:sequence xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" elemtype="corba:float" bound="3" repositoryID="IDL:RepeatedElement:1.0" type="xsd1:RepeatedElement" name="RepeatedElement" />
+                                                <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" discriminator="corba:long" repositoryID="IDL:_omg_ChoiceDerivedFromSequenceChoiceType:1.0" type="xsd1:_omg_ChoiceDerivedFromSequenceChoiceType" name="_omg_ChoiceDerivedFromSequenceChoiceType">
+                                                  <corba:unionbranch name="a" idltype="corba:string" default="false">
+                                                    <corba:case label="0" />
+                                                  </corba:unionbranch>
+                                                    <corba:unionbranch name="b" idltype="corba:string" default="false">
+                                                      <corba:case label="1" />
+                                                    </corba:unionbranch>
+                                                    </corba:union>
+                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromEmptySequence:1.0" type="xsd1:ExtendFromEmptySequence" name="ExtendFromEmptySequence">
+                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ExtendFromEmptySequenceSequenceStruct_f" idltype="ns1:ExtendFromEmptySequenceSequenceStruct" />
+                                                      </corba:struct>
+                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:sub1SequenceStruct:1.0" type="xsd1:sub1SequenceStruct" name="sub1SequenceStruct">
+                                                          <corba:member name="e3" idltype="corba:float" />
+                                                        </corba:struct>
+                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ChoiceDerivedFromSequence:1.0" type="xsd1:ChoiceDerivedFromSequence" name="ChoiceDerivedFromSequence">
+                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="base_f" idltype="ns1:base" />
+                                                            <corba:member xmlns:tns="http://schemas.apache.org/idl/mf.idl" name="ChoiceDerivedFromSequenceChoiceType_f" idltype="tns:ChoiceDerivedFromSequenceChoiceType" />
+                                                          </corba:struct>
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:RepeatedSequenceFromRepeatedElement:1.0" type="xsd1:RepeatedSequenceFromRepeatedElement" name="RepeatedSequenceFromRepeatedElement">
+                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="RepeatedElement_f" idltype="ns1:RepeatedElement" />
+                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="RepeatedSequenceFromRepeatedElementSequenceStructArray_f" idltype="ns1:RepeatedSequenceFromRepeatedElementSequenceStructArray" />
+                                                            </corba:struct>
+                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ContainingAnonSequenceSequenceStruct:1.0" type="xsd1:ContainingAnonSequenceSequenceStruct" name="ContainingAnonSequenceSequenceStruct">
+                                                                <corba:member name="varInt" idltype="corba:long" />
+                                                                <corba:member name="varString" idltype="corba:string" />
+                                                              </corba:struct>
+                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromChoiceSequenceStruct:1.0" type="xsd1:ExtendFromChoiceSequenceStruct" name="ExtendFromChoiceSequenceStruct">
+                                                                  <corba:member name="c" idltype="corba:string" />
+                                                                </corba:struct>
+                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:SequenceExtendedFromAllSequenceStruct:1.0" type="xsd1:SequenceExtendedFromAllSequenceStruct" name="SequenceExtendedFromAllSequenceStruct">
+                                                                    <corba:member name="e3" idltype="corba:float" />
+                                                                  </corba:struct>
+                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:AllExtendingAll:1.0" type="xsd1:AllExtendingAll" name="AllExtendingAll">
+                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="baseAll_f" idltype="ns1:baseAll" />
+                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="AllExtendingAllAllStruct_f" idltype="ns1:AllExtendingAllAllStruct" />
+                                                                    </corba:struct>
+                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ChoiceInTheMiddle:1.0" type="xsd1:ChoiceInTheMiddle" name="ChoiceInTheMiddle">
+                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ChoiceDerivedFromSequence_f" idltype="ns1:ChoiceDerivedFromSequence" />
+                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ChoiceInTheMiddleSequenceStruct_f" idltype="ns1:ChoiceInTheMiddleSequenceStruct" />
+                                                                      </corba:struct>
+                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromRepeatedElementSequenceStruct:1.0" type="xsd1:ExtendFromRepeatedElementSequenceStruct" name="ExtendFromRepeatedElementSequenceStruct">
+                                                                          <corba:member name="c" idltype="corba:string" />
+                                                                        </corba:struct>
+                                                                          <corba:sequence xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" elemtype="ns1:RepeatedSequenceFromRepeatedElementSequenceStruct" bound="4" repositoryID="IDL:RepeatedSequenceFromRepeatedElementSequenceStructArray:1.0" type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStructArray" name="RepeatedSequenceFromRepeatedElementSequenceStructArray" />
+                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ChoiceInTheMiddleSequenceStruct:1.0" type="xsd1:ChoiceInTheMiddleSequenceStruct" name="ChoiceInTheMiddleSequenceStruct">
+                                                                            <corba:member name="c" idltype="corba:string" />
+                                                                          </corba:struct>
+                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:baseAll:1.0" type="xsd1:baseAll" name="baseAll">
+                                                                              <corba:member name="e1" idltype="corba:long" />
+                                                                              <corba:member name="e2" idltype="corba:string" />
+                                                                            </corba:struct>
+                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:AllExtendingAllAllStruct:1.0" type="xsd1:AllExtendingAllAllStruct" name="AllExtendingAllAllStruct">
+                                                                                <corba:member name="e3" idltype="corba:float" />
+                                                                              </corba:struct>
+                                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:RepeatedSequenceFromRepeatedElementSequenceStruct:1.0" type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStruct" name="RepeatedSequenceFromRepeatedElementSequenceStruct">
+                                                                                  <corba:member name="s" idltype="corba:string" />
+                                                                                </corba:struct>
+                                                                                  <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/mf.idl" discriminator="corba:long" repositoryID="IDL:sub2ChoiceType:1.0" type="ns3:sub2ChoiceType" name="sub2ChoiceType">
+                                                                                    <corba:unionbranch name="e4" idltype="corba:double" default="false">
+                                                                                      <corba:case label="0" />
+                                                                                    </corba:unionbranch>
+                                                                                      <corba:unionbranch name="e5" idltype="corba:double" default="false">
+                                                                                        <corba:case label="1" />
+                                                                                      </corba:unionbranch>
+                                                                                      </corba:union>
+                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:sub1:1.0" type="xsd1:sub1" name="sub1">
+                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="base_f" idltype="ns1:base" />
+                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="sub1SequenceStruct_f" idltype="ns1:sub1SequenceStruct" />
+                                                                                        </corba:struct>
+                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:ExtendFromSchemaType:1.0" type="xsd1:ExtendFromSchemaType" name="ExtendFromSchemaType">
+                                                                                            <corba:member name="attrString" idltype="corba:string" />
+                                                                                            <corba:member name="string_f" idltype="corba:string" />
+                                                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="ExtendFromSchemaTypeSequenceStruct_f" idltype="ns1:ExtendFromSchemaTypeSequenceStruct" />
+                                                                                          </corba:struct>
+                                                                                            <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" discriminator="corba:long" repositoryID="IDL:_omg_sub2ChoiceType:1.0" type="xsd1:_omg_sub2ChoiceType" name="_omg_sub2ChoiceType">
+                                                                                              <corba:unionbranch name="e4" idltype="corba:double" default="false">
+                                                                                                <corba:case label="0" />
+                                                                                              </corba:unionbranch>
+                                                                                                <corba:unionbranch name="e5" idltype="corba:double" default="false">
+                                                                                                  <corba:case label="1" />
+                                                                                                </corba:unionbranch>
+                                                                                                </corba:union>
+                                                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:sub3SequenceStruct:1.0" type="xsd1:sub3SequenceStruct" name="sub3SequenceStruct">
+                                                                                                    <corba:member name="e6" idltype="corba:boolean" />
+                                                                                                  </corba:struct>
+                                                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoAllExtendingAll:1.0" type="xsd1:DerivedTypesPortType.echoAllExtendingAll" name="DerivedTypesPortType.echoAllExtendingAll">
+                                                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:AllExtendingAll" />
+                                                                                                    </corba:struct>
+                                                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromContainingAnonSequence:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequence" name="DerivedTypesPortType.echoExtendFromContainingAnonSequence">
+                                                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ExtendFromContainingAnonSequence" />
+                                                                                                      </corba:struct>
+                                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoChoiceInTheMiddle:1.0" type="xsd1:DerivedTypesPortType.echoChoiceInTheMiddle" name="DerivedTypesPortType.echoChoiceInTheMiddle">
+                                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ChoiceInTheMiddle" />
+                                                                                                        </corba:struct>
+                                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromSchemaTypeResult:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromSchemaTypeResult" name="DerivedTypesPortType.echoExtendFromSchemaTypeResult">
+                                                                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromSchemaType" />
+                                                                                                          </corba:struct>
+                                                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSequenceExtendedFromAll:1.0" type="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAll" name="DerivedTypesPortType.echoSequenceExtendedFromAll">
+                                                                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:SequenceExtendedFromAll" />
+                                                                                                            </corba:struct>
+                                                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoBaseObj:1.0" type="xsd1:DerivedTypesPortType.echoBaseObj" name="DerivedTypesPortType.echoBaseObj">
+                                                                                                                <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:base" />
+                                                                                                              </corba:struct>
+                                                                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoChoiceDerivedFromSequenceResult:1.0" type="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequenceResult" name="DerivedTypesPortType.echoChoiceDerivedFromSequenceResult">
+                                                                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ChoiceDerivedFromSequence" />
+                                                                                                                </corba:struct>
+                                                                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromEmptySequenceResult:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromEmptySequenceResult" name="DerivedTypesPortType.echoExtendFromEmptySequenceResult">
+                                                                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromEmptySequence" />
+                                                                                                                  </corba:struct>
+                                                                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromChoiceResult:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromChoiceResult" name="DerivedTypesPortType.echoExtendFromChoiceResult">
+                                                                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromChoice" />
+                                                                                                                    </corba:struct>
+                                                                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromRepeatedElement:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElement" name="DerivedTypesPortType.echoExtendFromRepeatedElement">
+                                                                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ExtendFromRepeatedElement" />
+                                                                                                                      </corba:struct>
+                                                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoRepeatedFromRepeatedElementResult:1.0" type="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElementResult" name="DerivedTypesPortType.echoRepeatedFromRepeatedElementResult">
+                                                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:RepeatedFromRepeatedElement" />
+                                                                                                                        </corba:struct>
+                                                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromSchemaType:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromSchemaType" name="DerivedTypesPortType.echoExtendFromSchemaType">
+                                                                                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ExtendFromSchemaType" />
+                                                                                                                          </corba:struct>
+                                                                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoAllExtendingAllResult:1.0" type="xsd1:DerivedTypesPortType.echoAllExtendingAllResult" name="DerivedTypesPortType.echoAllExtendingAllResult">
+                                                                                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:AllExtendingAll" />
+                                                                                                                            </corba:struct>
+                                                                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromContainingAnonSequenceResult:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult" name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult">
+                                                                                                                                <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromContainingAnonSequence" />
+                                                                                                                              </corba:struct>
+                                                                                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoChoiceDerivedFromSequence:1.0" type="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequence" name="DerivedTypesPortType.echoChoiceDerivedFromSequence">
+                                                                                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ChoiceDerivedFromSequence" />
+                                                                                                                                </corba:struct>
+                                                                                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromEmptySequence:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromEmptySequence" name="DerivedTypesPortType.echoExtendFromEmptySequence">
+                                                                                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ExtendFromEmptySequence" />
+                                                                                                                                  </corba:struct>
+                                                                                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoChoiceInTheMiddleResult:1.0" type="xsd1:DerivedTypesPortType.echoChoiceInTheMiddleResult" name="DerivedTypesPortType.echoChoiceInTheMiddleResult">
+                                                                                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ChoiceInTheMiddle" />
+                                                                                                                                    </corba:struct>
+                                                                                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSub3ObjResult:1.0" type="xsd1:DerivedTypesPortType.echoSub3ObjResult" name="DerivedTypesPortType.echoSub3ObjResult">
+                                                                                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:sub3" />
+                                                                                                                                      </corba:struct>
+                                                                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSub2Obj:1.0" type="xsd1:DerivedTypesPortType.echoSub2Obj" name="DerivedTypesPortType.echoSub2Obj">
+                                                                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:sub2" />
+                                                                                                                                        </corba:struct>
+                                                                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSub2ObjResult:1.0" type="xsd1:DerivedTypesPortType.echoSub2ObjResult" name="DerivedTypesPortType.echoSub2ObjResult">
+                                                                                                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:sub2" />
+                                                                                                                                          </corba:struct>
+                                                                                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSub1Obj:1.0" type="xsd1:DerivedTypesPortType.echoSub1Obj" name="DerivedTypesPortType.echoSub1Obj">
+                                                                                                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:sub1" />
+                                                                                                                                            </corba:struct>
+                                                                                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSequenceExtendedFromAllResult:1.0" type="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAllResult" name="DerivedTypesPortType.echoSequenceExtendedFromAllResult">
+                                                                                                                                                <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:SequenceExtendedFromAll" />
+                                                                                                                                              </corba:struct>
+                                                                                                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSub3Obj:1.0" type="xsd1:DerivedTypesPortType.echoSub3Obj" name="DerivedTypesPortType.echoSub3Obj">
+                                                                                                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:sub3" />
+                                                                                                                                                </corba:struct>
+                                                                                                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoBaseObjResult:1.0" type="xsd1:DerivedTypesPortType.echoBaseObjResult" name="DerivedTypesPortType.echoBaseObjResult">
+                                                                                                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:base" />
+                                                                                                                                                  </corba:struct>
+                                                                                                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromRepeatedElementResult:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElementResult" name="DerivedTypesPortType.echoExtendFromRepeatedElementResult">
+                                                                                                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromRepeatedElement" />
+                                                                                                                                                    </corba:struct>
+                                                                                                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoSub1ObjResult:1.0" type="xsd1:DerivedTypesPortType.echoSub1ObjResult" name="DerivedTypesPortType.echoSub1ObjResult">
+                                                                                                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:sub1" />
+                                                                                                                                                      </corba:struct>
+                                                                                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoExtendFromChoice:1.0" type="xsd1:DerivedTypesPortType.echoExtendFromChoice" name="DerivedTypesPortType.echoExtendFromChoice">
+                                                                                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:ExtendFromChoice" />
+                                                                                                                                                        </corba:struct>
+                                                                                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" repositoryID="IDL:DerivedTypesPortType/echoRepeatedFromRepeatedElement:1.0" type="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElement" name="DerivedTypesPortType.echoRepeatedFromRepeatedElement">
+                                                                                                                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="item" idltype="ns1:RepeatedFromRepeatedElement" />
+                                                                                                                                                          </corba:struct>
+                                                                                                                                                          </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/mf.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="base">
+                <sequence>
+                    <element name="e1" type="int"/>
+                    <element name="e2" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1SequenceStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub1SequenceStruct_f" type="xsd1:sub1SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub2ChoiceType">
+                <choice>
+                    <element name="e4" type="double"/>
+                    <element name="e5" type="double"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_sub2ChoiceType">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="e4" type="double"/>
+                        <element name="e5" type="double"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="sub2">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub2ChoiceType_f" type="xsd1:sub2ChoiceType"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3SequenceStruct">
+                <sequence>
+                    <element name="e6" type="boolean"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3">
+                <sequence>
+                    <element name="sub2_f" type="xsd1:sub2"/>
+                    <element name="sub3SequenceStruct_f" type="xsd1:sub3SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromEmptySequenceSequenceStruct">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromEmptySequence">
+                <sequence>
+                    <element name="ExtendFromEmptySequenceSequenceStruct_f" type="xsd1:ExtendFromEmptySequenceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ContainingAnonSequenceSequenceStruct">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ContainingAnonSequence">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="ContainingAnonSequenceSequenceStruct_f" type="xsd1:ContainingAnonSequenceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromContainingAnonSequenceSequenceStruct">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromContainingAnonSequence">
+                <sequence>
+                    <element name="ContainingAnonSequence_f" type="xsd1:ContainingAnonSequence"/>
+                    <element name="ExtendFromContainingAnonSequenceSequenceStruct_f" type="xsd1:ExtendFromContainingAnonSequenceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromSchemaTypeSequenceStruct">
+                <sequence>
+                    <element name="varString" type="string"/>
+                    <element name="varFloat" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromSchemaType">
+                <sequence>
+                    <element name="attrString" type="string"/>
+                    <element name="string_f" type="string"/>
+                    <element name="ExtendFromSchemaTypeSequenceStruct_f" type="xsd1:ExtendFromSchemaTypeSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="baseAll">
+                <sequence>
+                    <element name="e1" type="int"/>
+                    <element name="e2" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="AllExtendingAllAllStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="AllExtendingAll">
+                <sequence>
+                    <element name="baseAll_f" type="xsd1:baseAll"/>
+                    <element name="AllExtendingAllAllStruct_f" type="xsd1:AllExtendingAllAllStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="SequenceExtendedFromAllSequenceStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="SequenceExtendedFromAll">
+                <sequence>
+                    <element name="baseAll_f" type="xsd1:baseAll"/>
+                    <element name="SequenceExtendedFromAllSequenceStruct_f" type="xsd1:SequenceExtendedFromAllSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceElem">
+                <choice>
+                    <element name="a" type="string"/>
+                    <element name="b" type="string"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_ChoiceElem">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="a" type="string"/>
+                        <element name="b" type="string"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromChoiceSequenceStruct">
+                <sequence>
+                    <element name="c" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromChoice">
+                <sequence>
+                    <element name="ChoiceElem_f" type="xsd1:ChoiceElem"/>
+                    <element name="ExtendFromChoiceSequenceStruct_f" type="xsd1:ExtendFromChoiceSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceDerivedFromSequenceChoiceType">
+                <choice>
+                    <element name="a" type="string"/>
+                    <element name="b" type="string"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_ChoiceDerivedFromSequenceChoiceType">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="a" type="string"/>
+                        <element name="b" type="string"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceDerivedFromSequence">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="ChoiceDerivedFromSequenceChoiceType_f" type="xsd1:ChoiceDerivedFromSequenceChoiceType"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceInTheMiddleSequenceStruct">
+                <sequence>
+                    <element name="c" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ChoiceInTheMiddle">
+                <sequence>
+                    <element name="ChoiceDerivedFromSequence_f" type="xsd1:ChoiceDerivedFromSequence"/>
+                    <element name="ChoiceInTheMiddleSequenceStruct_f" type="xsd1:ChoiceInTheMiddleSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedElement">
+                <sequence>
+                    <element maxOccurs="3" minOccurs="0" name="item" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromRepeatedElementSequenceStruct">
+                <sequence>
+                    <element name="c" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="ExtendFromRepeatedElement">
+                <sequence>
+                    <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
+                    <element name="ExtendFromRepeatedElementSequenceStruct_f" type="xsd1:ExtendFromRepeatedElementSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="sArray">
+                <sequence>
+                    <element maxOccurs="4" minOccurs="0" name="item" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedFromRepeatedElementSequenceStruct">
+                <sequence>
+                    <element name="s" type="xsd1:sArray"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedFromRepeatedElement">
+                <sequence>
+                    <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
+                    <element name="RepeatedFromRepeatedElementSequenceStruct_f" type="xsd1:RepeatedFromRepeatedElementSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedSequenceFromRepeatedElementSequenceStruct">
+                <sequence>
+                    <element name="s" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedSequenceFromRepeatedElementSequenceStructArray">
+                <sequence>
+                    <element maxOccurs="4" minOccurs="0" name="item" type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="RepeatedSequenceFromRepeatedElement">
+                <sequence>
+                    <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
+                    <element name="RepeatedSequenceFromRepeatedElementSequenceStructArray_f" type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStructArray"/>
+                </sequence>
+            </complexType>
+            <element name="DerivedTypesPortType.echoBaseObj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoBaseObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub1Obj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:sub1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub1ObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub2Obj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub2ObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub3Obj">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:sub3"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSub3ObjResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub3"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromEmptySequence">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromEmptySequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromEmptySequenceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromEmptySequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromContainingAnonSequence">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromContainingAnonSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromContainingAnonSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromSchemaType">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromSchemaType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromSchemaTypeResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromSchemaType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoAllExtendingAll">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:AllExtendingAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoAllExtendingAllResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:AllExtendingAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSequenceExtendedFromAll">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:SequenceExtendedFromAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoSequenceExtendedFromAllResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:SequenceExtendedFromAll"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromChoice">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromChoice"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromChoiceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromChoice"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceDerivedFromSequence">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ChoiceDerivedFromSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceDerivedFromSequenceResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ChoiceDerivedFromSequence"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceInTheMiddle">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ChoiceInTheMiddle"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoChoiceInTheMiddleResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ChoiceInTheMiddle"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromRepeatedElement">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:ExtendFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoExtendFromRepeatedElementResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:ExtendFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoRepeatedFromRepeatedElement">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="xsd1:RepeatedFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="DerivedTypesPortType.echoRepeatedFromRepeatedElementResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:RepeatedFromRepeatedElement"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+  </types>
+  <message name="DerivedTypesPortType.echoAllExtendingAll">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoAllExtendingAll"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromChoiceResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromChoiceResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoRepeatedFromRepeatedElement">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElement"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromSchemaType">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromSchemaType"/>
+  </message>
+  <message name="DerivedTypesPortType.echoChoiceInTheMiddleResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddleResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoChoiceInTheMiddle">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddle"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSequenceExtendedFromAll">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAll"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSequenceExtendedFromAllResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAllResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSub1ObjResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSub1ObjResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequenceResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSub2ObjResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSub2ObjResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSub3ObjResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSub3ObjResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoAllExtendingAllResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoAllExtendingAllResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromContainingAnonSequence">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequence"/>
+  </message>
+  <message name="DerivedTypesPortType.echoChoiceDerivedFromSequence">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequence"/>
+  </message>
+  <message name="DerivedTypesPortType.echoBaseObjResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoBaseObjResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromRepeatedElementResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElementResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoBaseObj">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoBaseObj"/>
+  </message>
+  <message name="DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElementResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSub2Obj">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSub2Obj"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromEmptySequenceResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequenceResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSub1Obj">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSub1Obj"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromSchemaTypeResponse">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromSchemaTypeResult"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromEmptySequence">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequence"/>
+  </message>
+  <message name="DerivedTypesPortType.echoSub3Obj">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoSub3Obj"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromChoice">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromChoice"/>
+  </message>
+  <message name="DerivedTypesPortType.echoExtendFromRepeatedElement">
+    <part name="parameters" element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElement"/>
+  </message>
+  <portType name="DerivedTypesPortType">
+    <operation name="echoBaseObj">
+      <input name="echoBaseObj" message="tns:DerivedTypesPortType.echoBaseObj"/>
+      <output name="echoBaseObjResponse" message="tns:DerivedTypesPortType.echoBaseObjResponse"/>
+    </operation>
+    <operation name="echoSub1Obj">
+      <input name="echoSub1Obj" message="tns:DerivedTypesPortType.echoSub1Obj"/>
+      <output name="echoSub1ObjResponse" message="tns:DerivedTypesPortType.echoSub1ObjResponse"/>
+    </operation>
+    <operation name="echoSub2Obj">
+      <input name="echoSub2Obj" message="tns:DerivedTypesPortType.echoSub2Obj"/>
+      <output name="echoSub2ObjResponse" message="tns:DerivedTypesPortType.echoSub2ObjResponse"/>
+    </operation>
+    <operation name="echoSub3Obj">
+      <input name="echoSub3Obj" message="tns:DerivedTypesPortType.echoSub3Obj"/>
+      <output name="echoSub3ObjResponse" message="tns:DerivedTypesPortType.echoSub3ObjResponse"/>
+    </operation>
+    <operation name="echoExtendFromEmptySequence">
+      <input name="echoExtendFromEmptySequence" message="tns:DerivedTypesPortType.echoExtendFromEmptySequence"/>
+      <output name="echoExtendFromEmptySequenceResponse" message="tns:DerivedTypesPortType.echoExtendFromEmptySequenceResponse"/>
+    </operation>
+    <operation name="echoExtendFromContainingAnonSequence">
+      <input name="echoExtendFromContainingAnonSequence" message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequence"/>
+      <output name="echoExtendFromContainingAnonSequenceResponse" message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse"/>
+    </operation>
+    <operation name="echoExtendFromSchemaType">
+      <input name="echoExtendFromSchemaType" message="tns:DerivedTypesPortType.echoExtendFromSchemaType"/>
+      <output name="echoExtendFromSchemaTypeResponse" message="tns:DerivedTypesPortType.echoExtendFromSchemaTypeResponse"/>
+    </operation>
+    <operation name="echoAllExtendingAll">
+      <input name="echoAllExtendingAll" message="tns:DerivedTypesPortType.echoAllExtendingAll"/>
+      <output name="echoAllExtendingAllResponse" message="tns:DerivedTypesPortType.echoAllExtendingAllResponse"/>
+    </operation>
+    <operation name="echoSequenceExtendedFromAll">
+      <input name="echoSequenceExtendedFromAll" message="tns:DerivedTypesPortType.echoSequenceExtendedFromAll"/>
+      <output name="echoSequenceExtendedFromAllResponse" message="tns:DerivedTypesPortType.echoSequenceExtendedFromAllResponse"/>
+    </operation>
+    <operation name="echoExtendFromChoice">
+      <input name="echoExtendFromChoice" message="tns:DerivedTypesPortType.echoExtendFromChoice"/>
+      <output name="echoExtendFromChoiceResponse" message="tns:DerivedTypesPortType.echoExtendFromChoiceResponse"/>
+    </operation>
+    <operation name="echoChoiceDerivedFromSequence">
+      <input name="echoChoiceDerivedFromSequence" message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequence"/>
+      <output name="echoChoiceDerivedFromSequenceResponse" message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse"/>
+    </operation>
+    <operation name="echoChoiceInTheMiddle">
+      <input name="echoChoiceInTheMiddle" message="tns:DerivedTypesPortType.echoChoiceInTheMiddle"/>
+      <output name="echoChoiceInTheMiddleResponse" message="tns:DerivedTypesPortType.echoChoiceInTheMiddleResponse"/>
+    </operation>
+    <operation name="echoExtendFromRepeatedElement">
+      <input name="echoExtendFromRepeatedElement" message="tns:DerivedTypesPortType.echoExtendFromRepeatedElement"/>
+      <output name="echoExtendFromRepeatedElementResponse" message="tns:DerivedTypesPortType.echoExtendFromRepeatedElementResponse"/>
+    </operation>
+    <operation name="echoRepeatedFromRepeatedElement">
+      <input name="echoRepeatedFromRepeatedElement" message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElement"/>
+      <output name="echoRepeatedFromRepeatedElementResponse" message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse"/>
+    </operation>
+  </portType>
+  <binding name="DerivedTypesCORBABinding" type="tns:DerivedTypesPortType">
+    <corba:binding repositoryID="IDL:DerivedTypesPortType:1.0" />
+    <operation name="echoBaseObj">
+      <corba:operation name="echoBaseObj">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:base" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:base" />
+      </corba:operation>
+      <input name="echoBaseObj">
+      </input>
+      <output name="echoBaseObjResponse">
+      </output>
+    </operation>
+    <operation name="echoSub1Obj">
+      <corba:operation name="echoSub1Obj">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:sub1" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:sub1" />
+      </corba:operation>
+      <input name="echoSub1Obj">
+      </input>
+      <output name="echoSub1ObjResponse">
+      </output>
+    </operation>
+    <operation name="echoSub2Obj">
+      <corba:operation name="echoSub2Obj">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:sub2" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:sub2" />
+      </corba:operation>
+      <input name="echoSub2Obj">
+      </input>
+      <output name="echoSub2ObjResponse">
+      </output>
+    </operation>
+    <operation name="echoSub3Obj">
+      <corba:operation name="echoSub3Obj">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:sub3" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:sub3" />
+      </corba:operation>
+      <input name="echoSub3Obj">
+      </input>
+      <output name="echoSub3ObjResponse">
+      </output>
+    </operation>
+    <operation name="echoExtendFromEmptySequence">
+      <corba:operation name="echoExtendFromEmptySequence">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ExtendFromEmptySequence" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromEmptySequence" />
+      </corba:operation>
+      <input name="echoExtendFromEmptySequence">
+      </input>
+      <output name="echoExtendFromEmptySequenceResponse">
+      </output>
+    </operation>
+    <operation name="echoExtendFromContainingAnonSequence">
+      <corba:operation name="echoExtendFromContainingAnonSequence">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ExtendFromContainingAnonSequence" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromContainingAnonSequence" />
+      </corba:operation>
+      <input name="echoExtendFromContainingAnonSequence">
+      </input>
+      <output name="echoExtendFromContainingAnonSequenceResponse">
+      </output>
+    </operation>
+    <operation name="echoExtendFromSchemaType">
+      <corba:operation name="echoExtendFromSchemaType">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ExtendFromSchemaType" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromSchemaType" />
+      </corba:operation>
+      <input name="echoExtendFromSchemaType">
+      </input>
+      <output name="echoExtendFromSchemaTypeResponse">
+      </output>
+    </operation>
+    <operation name="echoAllExtendingAll">
+      <corba:operation name="echoAllExtendingAll">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:AllExtendingAll" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:AllExtendingAll" />
+      </corba:operation>
+      <input name="echoAllExtendingAll">
+      </input>
+      <output name="echoAllExtendingAllResponse">
+      </output>
+    </operation>
+    <operation name="echoSequenceExtendedFromAll">
+      <corba:operation name="echoSequenceExtendedFromAll">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:SequenceExtendedFromAll" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:SequenceExtendedFromAll" />
+      </corba:operation>
+      <input name="echoSequenceExtendedFromAll">
+      </input>
+      <output name="echoSequenceExtendedFromAllResponse">
+      </output>
+    </operation>
+    <operation name="echoExtendFromChoice">
+      <corba:operation name="echoExtendFromChoice">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ExtendFromChoice" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromChoice" />
+      </corba:operation>
+      <input name="echoExtendFromChoice">
+      </input>
+      <output name="echoExtendFromChoiceResponse">
+      </output>
+    </operation>
+    <operation name="echoChoiceDerivedFromSequence">
+      <corba:operation name="echoChoiceDerivedFromSequence">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ChoiceDerivedFromSequence" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ChoiceDerivedFromSequence" />
+      </corba:operation>
+      <input name="echoChoiceDerivedFromSequence">
+      </input>
+      <output name="echoChoiceDerivedFromSequenceResponse">
+      </output>
+    </operation>
+    <operation name="echoChoiceInTheMiddle">
+      <corba:operation name="echoChoiceInTheMiddle">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ChoiceInTheMiddle" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ChoiceInTheMiddle" />
+      </corba:operation>
+      <input name="echoChoiceInTheMiddle">
+      </input>
+      <output name="echoChoiceInTheMiddleResponse">
+      </output>
+    </operation>
+    <operation name="echoExtendFromRepeatedElement">
+      <corba:operation name="echoExtendFromRepeatedElement">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:ExtendFromRepeatedElement" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:ExtendFromRepeatedElement" />
+      </corba:operation>
+      <input name="echoExtendFromRepeatedElement">
+      </input>
+      <output name="echoExtendFromRepeatedElementResponse">
+      </output>
+    </operation>
+    <operation name="echoRepeatedFromRepeatedElement">
+      <corba:operation name="echoRepeatedFromRepeatedElement">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" mode="in" name="item" idltype="ns1:RepeatedFromRepeatedElement" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/mf.idl/corba/typemap/" name="return" idltype="ns1:RepeatedFromRepeatedElement" />
+      </corba:operation>
+      <input name="echoRepeatedFromRepeatedElement">
+      </input>
+      <output name="echoRepeatedFromRepeatedElementResponse">
+      </output>
+    </operation>
+  </binding>
+</definitions>

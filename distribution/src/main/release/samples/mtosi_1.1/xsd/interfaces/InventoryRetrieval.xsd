@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- =========== Includes ========= -->
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Inventory.xsd"/>
+  <xsd:include schemaLocation="../networkResources/VendorObject.xsd"/>
+  <!-- =========== Element Declarations ========= -->
+  <xsd:element name="getInventory" type="getInventory_T"/>
+  <xsd:element name="getInventoryResponse" type="getInventoryResponse_T"/>
+  <xsd:element name="MTOSI_InventoryData" type="InventoryData_T"/>
+  <!-- =========== Type Definitions ========= -->
+  <xsd:simpleType name="Granularity_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Filter attribute used to select the granularity of the Inventory report.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="NAME">
+        <xsd:annotation>
+          <xsd:documentation>
+          Retrieve the name only.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ATTRS">
+        <xsd:annotation>
+          <xsd:documentation>
+          Retrieve the name and the other object attributes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FULL">
+        <xsd:annotation>
+          <xsd:documentation>
+          Retrieve the name, the object attributes adn all the relationsship object pointers.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="SimpleFilter_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The data structure of the Inventory Retrieval filter. Some examples are listed in the following table.
+        <table cellspacing="0" cellpadding="0">
+        <tr>
+          <td valign="top">
+          <p><b>Filter Constraint</b></p>
+          </td>
+          <td valign="top">
+          <p><b>Simple Filter</b></p>
+          </td>
+        </tr>
+         <tr>
+          <td valign="top">
+          <p>Given an ME name (e.g., md1/ME123), get all the EHs and Equipment
+          Attributes</p>
+          </td>
+          <td valign="top">
+          <p>BaseInstanceList: { (MD=md1;ME=ME123)}</p>
+          <p>IncludedObjectTypes: { (EH, ATTRS), (EQ, ATTRS) }</p>
+          </td>
+         </tr>
+         <tr>
+          <td valign="top">
+          <p>Given an ME name
+          (e.g., md1/ME123), get all the contained Ehs Attributes and the ME attibutes</p>
+          </td>
+          <td valign="top">
+          <p>BaseInstanceList: { (MD=md1;ME=ME123) }</p>
+          <p>IncludedObjectTypes: { (ME, ATTRS), (EH, ATTRS) }</p>
+          </td>
+         </tr>
+         <tr>
+          <td valign="top">
+          <p>Get all MEs and
+          associated attributes (within the entire inventory known to the target OS)</p>
+          </td>
+          <td valign="top">
+          <p>BaseInstanceList: { }</p>
+          <p>IncludedObjectTypes { (ME, ATTRS) }</p>
+          </td>
+         </tr>
+         <tr>
+          <td valign="top">
+          <p>Get all ME, OS
+          and MD names (within the entire inventory known to the target OS)</p>
+          </td>
+          <td valign="top">
+          <p>BaseInstanceList: { }</p>
+          <p>IncludedObjectTypes: { (ME, NAME), (MD, NAME), (OS, NAME) }</p>
+          </td>
+         </tr>
+         <tr>
+          <td valign="top">
+          <p>Given an EH name
+          (e.g., md1/ME123/ACME7), get all the contained Equipment (and relationship
+          pointers)</p>
+          </td>
+          <td valign="top">
+          <p>BaseInstanceList: { (MD=md1;ME=ME123;EH=ACME7) }</p>
+          <p>IncludedObjectTypes: { (EQ,FULL)}</p>
+          </td>
+         </tr>
+         <tr>
+          <td valign="top">
+          <p>Given a PTP name
+          (e.g., md1/ME123/PTPxyz), get the PTP Attributes</p>
+          </td>
+          <td valign="top">
+          <p>BaseInstanceList: { (MD=md1;ME=ME123;PTP=PTPxyz) }</p>
+          <p>IncludedObjectTypes: { (PTP, ATTRS) }</p>
+          </td>
+         </tr>
+        </table>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="baseInstance" type="NamingAttributes_T" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            This attribute identifies a list of base object instances for the subtrees to be retrieved. BaseInstanceList is a list of serialized MTOSI names. If the BaseInstanceList is left empty then all the nodes at the top of the MTOSI instance tree are selected (i.e., all MDs, TMDs, and OSs are selected). Specification of the BaseInstanceList does not select any objects in and of itself. In order to select specific objects, one needs to specify the IncludedObjectTypes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="includedObjectType" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            <p>This attribute identifies the type of objects contained under the selected base object instances that are to be included in the returned inventory file. The base object itself is included only if the type of the base instance appears in the IncludedObjectTypes list. If no included object types are listed, then the entire subtree under the base object instance is returned. For each included object type, one needs to indicate whether.
+            <ul>
+            <li>just the name,</li>
+            <li>all the associated attributes (including the name), or</li>
+            <li>the associated attributes and relationship pointers are to be returned for each instance.</li>
+            </ul>
+            The IncludedObjectTypes need to be picked such that each selected base class has a single (connected) subtree below it. For example, if all the EHs under a given MD where needed, the requesting OS would need to list the given MD as a base instance and put ME and EH in the IncludedObjectTypes list. The requesting OS could just request the names of the MEs to reduce the size of the returned file.
+            </p>
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="objectType" type="ObjectAcronym_T">
+              <xsd:annotation>
+                <xsd:documentation>
+                Specify the object type acronym.  The ";" is used as a separator, and "=" is used to associate a value with a type of object. For example, MD=md1;ME=ME123;EH=ACME7 identifies an equipment holder within managed element ME123 within management domain md1. The relative name of the equipment holder is ACME7.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="granularity" type="Granularity_T">
+              <xsd:annotation>
+                <xsd:documentation>
+                Specify the granularity of the inventory report.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ==================== -->
+  <xsd:complexType name="InventoryData_T">
+    <xsd:all>
+      <xsd:element name="mdList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of Management Domain inventories.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="md" type="MD_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>An MD inventory with the OS relationship</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="topLevelTlList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of top level TL inventories.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="topLevelTopLink" type="TL_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>A TL inventory with the OS relationship</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tmdList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of top level TMD inventories.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tmd" type="TMD_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>A TMD inventory with the OS relationship</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="osList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of OS inventories.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="os" type="OS_Inventory_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>An OS inventory</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="voList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of Vendor Objects.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="VendorObject" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>A vendor proprietary object</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getInventory Request/Response Messages ========= -->
+  <xsd:complexType name="getInventory_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This operation returns a specified portion of the inventory data from the OS to which the request is directed (i.e., the target OS). The target OS returns all objects satisfying the scope and filter constraints of the requesting OS that have a modification date equal to or later than the Diff Date and Time.
+      		The operation can only be directed to a top-level OS and not to a subordinate OS.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_UNSUPPORTED_COMPRESSION_FORMAT - Raised when the specified file compression format is not supported
+EXCPT_UNSUPPORTED_PACKING_FORMAT - Raised when the specified file packing format is not supported
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when an invalid input parameter is provided 
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="filter" type="SimpleFilter_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          defines the subset of the total inventory to be returned to the requesting OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="diffDateAndTime" type="ITU-Time_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          All objects with a modification date equal to or greater than this value are in scope of this operation.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getInventoryResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getInventory operation. See also getInventory_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="inventoryData" type="InventoryData_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The inventory data which may vary based on the MEP. Refer to the TMF 854 XML Solution Set for more details. Also, note that the atomic elements of the inventory data XML representation are all the following top-level objects: MD, ME, MLSN, OS, TL, and TMD. It means that all top-level object instances must be fully encapsulated in one batch when the MEP involves multiple responses.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

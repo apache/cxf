@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="SoapInteropCompound" targetNamespace="http://schemas.apache.org/"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:typens="http://schemas.apache.org/xsd" xmlns:wsdlns="http://schemas.apache.org/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <types>
+        <schema elementFormDefault="qualified"
+            targetNamespace="http://schemas.apache.org/xsd"
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <element name="in_obj" type="typens:base"/>
+            <element name="result_obj" type="typens:base"/>
+            <element name="in_obj2" type="typens:sub1"/>
+            <element name="result_obj2" type="typens:sub2"/>
+            <element name="in_obj3" type="typens:sub3"/>
+            <element name="result_obj3" type="typens:sub2"/>
+
+            <complexType name="base">
+                <sequence>
+                    <element name="e1" type="xsd:int"/>
+                    <element name="e2" type="xsd:string"/>
+                </sequence>
+                <attribute name="attr1" type="xsd:string" use="required"/>
+                <attribute name="attr2" type="xsd:int" use="required"/>
+            </complexType>
+            <complexType name="sub1">
+                <complexContent>
+                    <extension base="typens:base">
+                        <sequence>
+                            <element name="e3" type="xsd:float"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType name="sub2">
+
+                <complexContent>
+                    <extension base="typens:base">
+                        <choice>
+                            <element name="e4" type="xsd:double"/>
+                            <element name="e6" type="xsd:double"/>
+                        </choice>
+                    </extension>
+                </complexContent>
+
+            </complexType>
+            <complexType name="sub3">
+                <complexContent>
+                    <extension base="typens:sub2">
+                        <sequence>
+                            <element name="e5" type="xsd:boolean"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            
+            <complexType name="SimpleStruct">
+                <sequence>
+                    <element name="varFloat" type="xsd:float"/>
+                    <element name="varInt" type="xsd:int"/>
+                    <element name="varString" type="xsd:string"/>
+                </sequence>
+            </complexType>
+
+            <complexType name="Type1">
+                <complexContent>
+                    <extension base="typens:SimpleStruct">
+                        <sequence>
+                            <element name="varString" type="xsd:int"/>
+                            <element name="varFloat" type="xsd:float"/>
+                        </sequence>
+                        <attribute name="attrString" type="xsd:string" use="required"/>
+                    </extension>
+                </complexContent>
+            </complexType>
+
+            <complexType name="Type2">
+                <complexContent>
+                    <extension base="typens:SimpleStruct">
+                        <sequence>
+                            <element name="varFloat" type="xsd:float"/>
+                        </sequence>
+                        <attribute name="attrString1" type="xsd:string" use="required"/>
+                    </extension>
+                </complexContent>
+                <attribute name="attrString2" type="xsd:string" use="required"/>
+            </complexType>
+
+            <complexType name="Type3">
+                <complexContent>
+                    <extension base="typens:SimpleStruct">
+                        <attribute name="attrString" type="xsd:string" use="required"/>
+                    </extension>
+                </complexContent>
+            </complexType>
+
+            <complexType name="Type4">
+                <complexContent mixed="false">
+                    <extension base="xsd:anyType">
+                        <all>
+                            <element name="varStringExt" type="xsd:string"/>
+                            <element name="varFloatExt" type="xsd:float"/>
+                        </all>
+                        <attribute name="AttrString" type="xsd:string" use="required"/>
+                    </extension>
+                </complexContent>
+            </complexType> 
+
+            <complexType name="Type5">
+                <sequence>
+                    <element name="varFloat" type="xsd:float"/>
+                    <sequence>
+                        <element name="varInt" type="xsd:int"/>
+                        <element name="varString" type="xsd:string"/>
+                    </sequence>
+                </sequence>
+            </complexType>                     
+            <complexType name="Type6">
+                <simpleContent>
+                    <extension base="xsd:short">
+                        <attribute name="attrib1" use="optional" type="xsd:int"/>
+                    </extension>
+                </simpleContent>
+                <attribute name="attrib2">
+                    <simpleType>
+                        <restriction base="xsd:string">   // xsd:string
+                            <maxLength value="2"/>
+                    </restriction>
+                    </simpleType>
+                </attribute>                                    
+            </complexType>
+        </schema>
+    </types>
+    <message name="echoObject">
+        <part element="typens:in_obj" name="x"/>
+    </message>
+    <message name="echoObjectResponse">
+        <part element="typens:result_obj" name="Result"/>
+    </message>
+    <message name="echoObject2">
+        <part element="typens:in_obj2" name="x"/>
+    </message>
+    <message name="echoObject2Response">
+        <part element="typens:result_obj2" name="Result"/>
+    </message>
+    <message name="echoObject3">
+        <part element="typens:in_obj3" name="x"/>
+    </message>
+    <message name="echoObject3Response">
+        <part element="typens:result_obj3" name="Result"/>
+    </message>
+    <portType name="TypeInheritancePortType">
+        <operation name="echoObject" parameterOrder="x">
+            <input message="wsdlns:echoObject" name="echoObject"/>
+            <output message="wsdlns:echoObjectResponse" name="echoObjectResponse"/>
+        </operation>
+        <operation name="echoObject2" parameterOrder="x">
+            <input message="wsdlns:echoObject2" name="echoObject2"/>
+            <output message="wsdlns:echoObject2Response" name="echoObject2Response"/>
+        </operation>
+        <operation name="echoObject3" parameterOrder="x">
+            <input message="wsdlns:echoObject3" name="echoObject3"/>
+            <output message="wsdlns:echoObject3Response" name="echoObject3Response"/>
+        </operation>
+    </portType>
+    
+</definitions>

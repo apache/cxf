@@ -1,0 +1,45 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+
+enum e_type1 {e1_1, e1_2, e1_3};
+
+interface if1 {
+	enum e_type2 {e2_1, e2_2, e2_3};
+
+	void if1_op1(in e_type2 in_e_type2);
+	void if1_op2(out e_type2 out_e_type2);
+	void if1_op3(inout e_type2 inout_e_type2);
+};
+
+interface if2 {
+	void if2_op1(in e_type1 in_e_type1);
+	void if2_op2(out e_type1 out_e_type1);
+	void if2_op3(inout e_type1 inout_e_type1);
+};
+
+module m1
+{
+        enum e_type3 {e3_1, e3_2, e3_3};
+        interface if3 {
+                enum e_type4 {e4_1, e4_2, e4_3};
+		void if3_op1(in e_type3 in_e_type3);
+                void if3_op2(in e_type4 in_e_type4);
+        };
+
+};

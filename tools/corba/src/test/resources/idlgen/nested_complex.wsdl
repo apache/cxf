@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="nested_complex" targetNamespace="http://schemas.apache.org/idl/nested_complex.idl" xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_complex.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/">
+    <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/nested_complex.idl" discriminator="corba:long" repositoryID="IDL:nested_choice:1.0" type="ns3:nested_choice" name="nested_choice">
+      <corba:unionbranch name="e" idltype="corba:string" default="false">
+        <corba:case label="0" />
+      </corba:unionbranch>
+        <corba:unionbranch name="f" idltype="corba:float" default="false">
+          <corba:case label="1" />
+        </corba:unionbranch>
+        </corba:union>
+          <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/nested_complex.idl" discriminator="corba:long" repositoryID="IDL:unionTwo:1.0" type="ns3:unionTwo" name="unionTwo">
+            <corba:unionbranch xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="nested_choice_f" idltype="tns:nested_choice" default="false">
+              <corba:case label="0" />
+            </corba:unionbranch>
+              <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="color_f" idltype="ns1:color" default="false">
+                <corba:case label="1" />
+              </corba:unionbranch>
+                <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="structOne_f" idltype="ns1:structOne" default="false">
+                  <corba:case label="2" />
+                </corba:unionbranch>
+                </corba:union>
+                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:structOne:1.0" type="xsd1:structOne" name="structOne">
+                    <corba:member name="s" idltype="corba:short" />
+                    <corba:member name="l" idltype="corba:long" />
+                  </corba:struct>
+                    <corba:enum xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:color:1.0" type="xsd1:color" name="color">
+                      <corba:enumerator value="RED" />
+                      <corba:enumerator value="GREEN" />
+                      <corba:enumerator value="BLUE" />
+                    </corba:enum>
+                      <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/nested_complex.idl" discriminator="corba:long" repositoryID="IDL:unionThree:1.0" type="ns3:unionThree" name="unionThree">
+                        <corba:unionbranch xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="unionTwo_f" idltype="tns:unionTwo" default="false">
+                          <corba:case label="0" />
+                        </corba:unionbranch>
+                          <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="obj2_f" idltype="ns1:obj2" default="false">
+                            <corba:case label="1" />
+                          </corba:unionbranch>
+                          </corba:union>
+                            <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" discriminator="corba:long" repositoryID="IDL:_omg_nested_choice:1.0" type="xsd1:_omg_nested_choice" name="_omg_nested_choice">
+                              <corba:unionbranch name="e" idltype="corba:string" default="false">
+                                <corba:case label="0" />
+                              </corba:unionbranch>
+                                <corba:unionbranch name="f" idltype="corba:float" default="false">
+                                  <corba:case label="1" />
+                                </corba:unionbranch>
+                                </corba:union>
+                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:obj2:1.0" type="xsd1:obj2" name="obj2">
+                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="aa" idltype="ns1:S1" />
+                                  </corba:struct>
+                                    <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" discriminator="corba:long" repositoryID="IDL:_omg_unionTwo:1.0" type="xsd1:_omg_unionTwo" name="_omg_unionTwo">
+                                      <corba:unionbranch xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="nested_choice_f" idltype="tns:nested_choice" default="false">
+                                        <corba:case label="0" />
+                                      </corba:unionbranch>
+                                        <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="color_f" idltype="ns1:color" default="false">
+                                          <corba:case label="1" />
+                                        </corba:unionbranch>
+                                          <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="structOne_f" idltype="ns1:structOne" default="false">
+                                            <corba:case label="2" />
+                                          </corba:unionbranch>
+                                          </corba:union>
+                                            <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" discriminator="corba:long" repositoryID="IDL:_omg_unionThree:1.0" type="xsd1:_omg_unionThree" name="_omg_unionThree">
+                                              <corba:unionbranch xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="unionTwo_f" idltype="tns:unionTwo" default="false">
+                                                <corba:case label="0" />
+                                              </corba:unionbranch>
+                                                <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="obj2_f" idltype="ns1:obj2" default="false">
+                                                  <corba:case label="1" />
+                                                </corba:unionbranch>
+                                                </corba:union>
+                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:structTwo:1.0" type="xsd1:structTwo" name="structTwo">
+                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="white" idltype="ns1:color" />
+                                                    <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="nested_choice_f" idltype="tns:nested_choice" />
+                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="structOne_f" idltype="ns1:structOne" />
+                                                  </corba:struct>
+                                                    <corba:array xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" elemtype="ns1:obj" bound="25" repositoryID="IDL:S1:1.0" type="xsd1:S1" name="S1" />
+                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:obj:1.0" type="xsd1:obj" name="obj">
+                                                      <corba:member name="s" idltype="corba:string" />
+                                                    </corba:struct>
+                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_unionTwoResult:1.0" type="xsd1:X.op_unionTwoResult" name="X.op_unionTwoResult">
+                                                        <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="return" idltype="tns:unionTwo" />
+                                                        <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p2" idltype="tns:unionTwo" />
+                                                        <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p3" idltype="tns:unionTwo" />
+                                                      </corba:struct>
+                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_obj2Result:1.0" type="xsd1:X.op_obj2Result" name="X.op_obj2Result">
+                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="return" idltype="ns1:obj2" />
+                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p2" idltype="ns1:obj2" />
+                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p3" idltype="ns1:obj2" />
+                                                        </corba:struct>
+                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_structTwo:1.0" type="xsd1:X.op_structTwo" name="X.op_structTwo">
+                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p1" idltype="ns1:structTwo" />
+                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p2" idltype="ns1:structTwo" />
+                                                          </corba:struct>
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_color:1.0" type="xsd1:X.op_color" name="X.op_color">
+                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p1" idltype="ns1:color" />
+                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p2" idltype="ns1:color" />
+                                                            </corba:struct>
+                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_unionThree:1.0" type="xsd1:X.op_unionThree" name="X.op_unionThree">
+                                                                <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p1" idltype="tns:unionThree" />
+                                                                <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p2" idltype="tns:unionThree" />
+                                                              </corba:struct>
+                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_obj2:1.0" type="xsd1:X.op_obj2" name="X.op_obj2">
+                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p1" idltype="ns1:obj2" />
+                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p2" idltype="ns1:obj2" />
+                                                                </corba:struct>
+                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_colorResult:1.0" type="xsd1:X.op_colorResult" name="X.op_colorResult">
+                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="return" idltype="ns1:color" />
+                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p2" idltype="ns1:color" />
+                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p3" idltype="ns1:color" />
+                                                                  </corba:struct>
+                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_unionThreeResult:1.0" type="xsd1:X.op_unionThreeResult" name="X.op_unionThreeResult">
+                                                                      <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="return" idltype="tns:unionThree" />
+                                                                      <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p2" idltype="tns:unionThree" />
+                                                                      <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p3" idltype="tns:unionThree" />
+                                                                    </corba:struct>
+                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_unionTwo:1.0" type="xsd1:X.op_unionTwo" name="X.op_unionTwo">
+                                                                        <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p1" idltype="tns:unionTwo" />
+                                                                        <corba:member xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="p2" idltype="tns:unionTwo" />
+                                                                      </corba:struct>
+                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" repositoryID="IDL:X/op_structTwoResult:1.0" type="xsd1:X.op_structTwoResult" name="X.op_structTwoResult">
+                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="return" idltype="ns1:structTwo" />
+                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p2" idltype="ns1:structTwo" />
+                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="p3" idltype="ns1:structTwo" />
+                                                                        </corba:struct>
+                                                                        </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/nested_complex.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="obj">
+                <sequence>
+                    <element name="s" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="S1">
+                <sequence>
+                    <element maxOccurs="25" minOccurs="25" name="item" type="xsd1:obj"/>
+                </sequence>
+            </complexType>
+            <complexType name="obj2">
+                <sequence>
+                    <element name="aa" type="xsd1:S1"/>
+                </sequence>
+            </complexType>
+            <simpleType name="color">
+                <restriction base="string">
+                    <enumeration value="RED"/>
+                    <enumeration value="GREEN"/>
+                    <enumeration value="BLUE"/>
+                </restriction>
+            </simpleType>
+            <complexType name="nested_choice">
+                <choice>
+                    <element name="e" type="string"/>
+                    <element name="f" type="float"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_nested_choice">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="e" type="string"/>
+                        <element name="f" type="float"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="structOne">
+                <sequence>
+                    <element name="s" type="short"/>
+                    <element name="l" type="int"/>
+                </sequence>
+            </complexType>
+            <complexType name="structTwo">
+                <sequence>
+                    <element name="white" type="xsd1:color"/>
+                    <element name="nested_choice_f" type="xsd1:nested_choice"/>
+                    <element name="structOne_f" type="xsd1:structOne"/>
+                </sequence>
+            </complexType>
+            <complexType name="unionTwo">
+                <choice>
+                    <element name="nested_choice_f" type="xsd1:nested_choice"/>
+                    <element name="color_f" type="xsd1:color"/>
+                    <element name="structOne_f" type="xsd1:structOne"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_unionTwo">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="nested_choice_f" type="xsd1:nested_choice"/>
+                        <element name="color_f" type="xsd1:color"/>
+                        <element name="structOne_f" type="xsd1:structOne"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="unionThree">
+                <choice>
+                    <element name="unionTwo_f" type="xsd1:unionTwo"/>
+                    <element name="obj2_f" type="xsd1:obj2"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_unionThree">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="unionTwo_f" type="xsd1:unionTwo"/>
+                        <element name="obj2_f" type="xsd1:obj2"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <element name="X.op_obj2">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:obj2"/>
+                        <element name="p2" type="xsd1:obj2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_obj2Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:obj2"/>
+                        <element name="p2" type="xsd1:obj2"/>
+                        <element name="p3" type="xsd1:obj2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_structTwo">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:structTwo"/>
+                        <element name="p2" type="xsd1:structTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_structTwoResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:structTwo"/>
+                        <element name="p2" type="xsd1:structTwo"/>
+                        <element name="p3" type="xsd1:structTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionTwo">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:unionTwo"/>
+                        <element name="p2" type="xsd1:unionTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionTwoResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:unionTwo"/>
+                        <element name="p2" type="xsd1:unionTwo"/>
+                        <element name="p3" type="xsd1:unionTwo"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_color">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:color"/>
+                        <element name="p2" type="xsd1:color"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_colorResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:color"/>
+                        <element name="p2" type="xsd1:color"/>
+                        <element name="p3" type="xsd1:color"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionThree">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:unionThree"/>
+                        <element name="p2" type="xsd1:unionThree"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_unionThreeResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:unionThree"/>
+                        <element name="p2" type="xsd1:unionThree"/>
+                        <element name="p3" type="xsd1:unionThree"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+  </types>
+  <message name="X.op_unionTwoResponse">
+    <part name="parameters" element="xsd1:X.op_unionTwoResult"/>
+  </message>
+  <message name="X.op_obj2Response">
+    <part name="parameters" element="xsd1:X.op_obj2Result"/>
+  </message>
+  <message name="X.op_unionTwo">
+    <part name="parameters" element="xsd1:X.op_unionTwo"/>
+  </message>
+  <message name="X.op_color">
+    <part name="parameters" element="xsd1:X.op_color"/>
+  </message>
+  <message name="X.op_structTwoResponse">
+    <part name="parameters" element="xsd1:X.op_structTwoResult"/>
+  </message>
+  <message name="X.op_unionThreeResponse">
+    <part name="parameters" element="xsd1:X.op_unionThreeResult"/>
+  </message>
+  <message name="X.op_structTwo">
+    <part name="parameters" element="xsd1:X.op_structTwo"/>
+  </message>
+  <message name="X.op_obj2">
+    <part name="parameters" element="xsd1:X.op_obj2"/>
+  </message>
+  <message name="X.op_colorResponse">
+    <part name="parameters" element="xsd1:X.op_colorResult"/>
+  </message>
+  <message name="X.op_unionThree">
+    <part name="parameters" element="xsd1:X.op_unionThree"/>
+  </message>
+  <portType name="X">
+    <operation name="op_obj2">
+      <input name="op_obj2" message="tns:X.op_obj2"/>
+      <output name="op_obj2Response" message="tns:X.op_obj2Response"/>
+    </operation>
+    <operation name="op_structTwo">
+      <input name="op_structTwo" message="tns:X.op_structTwo"/>
+      <output name="op_structTwoResponse" message="tns:X.op_structTwoResponse"/>
+    </operation>
+    <operation name="op_unionTwo">
+      <input name="op_unionTwo" message="tns:X.op_unionTwo"/>
+      <output name="op_unionTwoResponse" message="tns:X.op_unionTwoResponse"/>
+    </operation>
+    <operation name="op_color">
+      <input name="op_color" message="tns:X.op_color"/>
+      <output name="op_colorResponse" message="tns:X.op_colorResponse"/>
+    </operation>
+    <operation name="op_unionThree">
+      <input name="op_unionThree" message="tns:X.op_unionThree"/>
+      <output name="op_unionThreeResponse" message="tns:X.op_unionThreeResponse"/>
+    </operation>
+  </portType>
+  <binding name="XCORBABinding" type="tns:X">
+    <corba:binding repositoryID="IDL:X:1.0" />
+    <operation name="op_obj2">
+      <corba:operation name="op_obj2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="in" name="p1" idltype="ns1:obj2" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="out" name="p3" idltype="ns1:obj2" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="inout" name="p2" idltype="ns1:obj2" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="return" idltype="ns1:obj2" />
+      </corba:operation>
+      <input name="op_obj2">
+      </input>
+      <output name="op_obj2Response">
+      </output>
+    </operation>
+    <operation name="op_structTwo">
+      <corba:operation name="op_structTwo">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="in" name="p1" idltype="ns1:structTwo" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="out" name="p3" idltype="ns1:structTwo" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="inout" name="p2" idltype="ns1:structTwo" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="return" idltype="ns1:structTwo" />
+      </corba:operation>
+      <input name="op_structTwo">
+      </input>
+      <output name="op_structTwoResponse">
+      </output>
+    </operation>
+    <operation name="op_unionTwo">
+      <corba:operation name="op_unionTwo">
+        <corba:param xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" mode="in" name="p1" idltype="tns:unionTwo" />
+        <corba:param xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" mode="out" name="p3" idltype="tns:unionTwo" />
+        <corba:param xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" mode="inout" name="p2" idltype="tns:unionTwo" />
+        <corba:return xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="return" idltype="tns:unionTwo" />
+      </corba:operation>
+      <input name="op_unionTwo">
+      </input>
+      <output name="op_unionTwoResponse">
+      </output>
+    </operation>
+    <operation name="op_color">
+      <corba:operation name="op_color">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="in" name="p1" idltype="ns1:color" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="out" name="p3" idltype="ns1:color" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" mode="inout" name="p2" idltype="ns1:color" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested_complex.idl/corba/typemap/" name="return" idltype="ns1:color" />
+      </corba:operation>
+      <input name="op_color">
+      </input>
+      <output name="op_colorResponse">
+      </output>
+    </operation>
+    <operation name="op_unionThree">
+      <corba:operation name="op_unionThree">
+        <corba:param xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" mode="in" name="p1" idltype="tns:unionThree" />
+        <corba:param xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" mode="out" name="p3" idltype="tns:unionThree" />
+        <corba:param xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" mode="inout" name="p2" idltype="tns:unionThree" />
+        <corba:return xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" name="return" idltype="tns:unionThree" />
+      </corba:operation>
+      <input name="op_unionThree">
+      </input>
+      <output name="op_unionThreeResponse">
+      </output>
+    </operation>
+  </binding>
+</definitions>

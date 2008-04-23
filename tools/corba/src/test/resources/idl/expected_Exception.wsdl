@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Exception" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Exception" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Exception/typemap">
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/Exception" repositoryID="IDL:ExternalException:1.0" type="ExternalExceptionType" name="ExternalException">
+      <corba:member name="description" idltype="corba:string" />
+    </corba:exception>
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/Exception" repositoryID="IDL:InterfaceWithExceptions/EmptyException:1.0" type="InterfaceWithExceptions.EmptyExceptionType" name="InterfaceWithExceptions.EmptyException" />
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/Exception" repositoryID="IDL:InterfaceWithExceptions/LongException:1.0" type="InterfaceWithExceptions.LongExceptionType" name="InterfaceWithExceptions.LongException">
+      <corba:member name="error" idltype="corba:string" />
+      <corba:member name="code" idltype="corba:long" />
+    </corba:exception>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Exception" xmlns="http://cxf.apache.org/bindings/corba/idl/Exception" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="ExternalException" type="ExternalExceptionType">
+      </xs:element>
+      <xs:complexType name="ExternalExceptionType">
+        <xs:sequence>
+          <xs:element name="description" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="InterfaceWithExceptions.EmptyException" type="InterfaceWithExceptions.EmptyExceptionType">
+      </xs:element>
+      <xs:complexType name="InterfaceWithExceptions.EmptyExceptionType">
+        <xs:sequence>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="InterfaceWithExceptions.LongException" type="InterfaceWithExceptions.LongExceptionType">
+      </xs:element>
+      <xs:complexType name="InterfaceWithExceptions.LongExceptionType">
+        <xs:sequence>
+          <xs:element name="error" type="xs:string">
+          </xs:element>
+          <xs:element name="code" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="method">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_string" type="xs:string">
+            </xs:element>
+            <xs:element name="inout_short" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="methodResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="out_long" type="xs:int">
+            </xs:element>
+            <xs:element name="inout_short" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="raiseExternalException">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="aString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="raiseExternalExceptionResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="InterfaceWithExceptions.LongException">
+    <wsdl:part name="exception" element="tns:InterfaceWithExceptions.LongException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="method">
+    <wsdl:part name="inparameter" element="tns:method">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="methodResponse">
+    <wsdl:part name="outparameter" element="tns:methodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ExternalException">
+    <wsdl:part name="exception" element="tns:ExternalException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="raiseExternalExceptionResponse">
+    <wsdl:part name="outparameter" element="tns:raiseExternalExceptionResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InterfaceWithExceptions.EmptyException">
+    <wsdl:part name="exception" element="tns:InterfaceWithExceptions.EmptyException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="raiseExternalException">
+    <wsdl:part name="inparameter" element="tns:raiseExternalException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="InterfaceWithExceptions">
+    <wsdl:operation name="method">
+      <wsdl:input name="methodRequest" message="tns:method">
+    </wsdl:input>
+      <wsdl:output name="methodResponse" message="tns:methodResponse">
+    </wsdl:output>
+      <wsdl:fault name="InterfaceWithExceptions.EmptyException" message="tns:InterfaceWithExceptions.EmptyException">
+    </wsdl:fault>
+      <wsdl:fault name="InterfaceWithExceptions.LongException" message="tns:InterfaceWithExceptions.LongException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="raiseExternalException">
+      <wsdl:input name="raiseExternalExceptionRequest" message="tns:raiseExternalException">
+    </wsdl:input>
+      <wsdl:output name="raiseExternalExceptionResponse" message="tns:raiseExternalExceptionResponse">
+    </wsdl:output>
+      <wsdl:fault name="ExternalException" message="tns:ExternalException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="InterfaceWithExceptionsCORBABinding" type="tns:InterfaceWithExceptions">
+    <corba:binding repositoryID="IDL:InterfaceWithExceptions:1.0" />
+    <wsdl:operation name="method">
+      <corba:operation name="method">
+        <corba:param mode="in" name="in_string" idltype="corba:string" />
+        <corba:param mode="out" name="out_long" idltype="corba:long" />
+        <corba:param mode="inout" name="inout_short" idltype="corba:short" />
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/typemap" exception="InterfaceWithExceptions.LongException" />
+        <corba:raises xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/typemap" exception="InterfaceWithExceptions.EmptyException" />
+      </corba:operation>
+      <wsdl:input name="methodRequest">
+      </wsdl:input>
+      <wsdl:output name="methodResponse">
+      </wsdl:output>
+      <wsdl:fault name="InterfaceWithExceptions.EmptyException">
+      </wsdl:fault>
+      <wsdl:fault name="InterfaceWithExceptions.LongException">
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="raiseExternalException">
+      <corba:operation name="raiseExternalException">
+        <corba:param mode="in" name="aString" idltype="corba:string" />
+        <corba:raises xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/typemap" exception="ExternalException" />
+      </corba:operation>
+      <wsdl:input name="raiseExternalExceptionRequest">
+      </wsdl:input>
+      <wsdl:output name="raiseExternalExceptionResponse">
+      </wsdl:output>
+      <wsdl:fault name="ExternalException">
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="InterfaceWithExceptionsCORBAService">
+    <wsdl:port name="InterfaceWithExceptionsCORBAPort" binding="tns:InterfaceWithExceptionsCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

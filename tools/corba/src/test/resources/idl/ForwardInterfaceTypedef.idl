@@ -1,0 +1,79 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+
+module TypedefIf {
+
+    interface IpCall;
+
+    interface typedefCall {
+	    typedef IpCall             myIpCall;
+	    typedef IpCall             myIpCallArray[2];
+	    typedef sequence<IpCall>   mySeqIpCall;
+	
+	    typedef struct aStruct {
+	        myIpCall aStructMyLong;
+	    } myStruct;
+	
+	
+	    typedef union aUnion switch (long) {
+	      case 1:
+	        myIpCall    aUnionMyLong;
+	      default:
+	         boolean aUnionMyBoolean;
+	    } myUnion;
+	
+	
+	    struct anotherStruct {
+	        IpCall myOtherLong;
+	        long   anotherLong;
+	    };
+	    typedef anotherStruct myOtherStruct;
+	
+	
+	    void opIn(
+	                in myIpCall            inMyIpCall,
+	                in mySeqIpCall         inMySeqIpCall,
+	                in myStruct            inMyStruct,
+	                in myUnion             inMyUnion,
+	                in myOtherStruct       inMyOtherStruct
+	    );
+	
+	    void opOut(
+	                out myIpCall           outMyIpCall,
+	                out mySeqIpCall        outMySeqIpCall,
+	                out myStruct           outMyStruct,
+	                out myUnion            outMyUnion,
+	                out myOtherStruct      outMyOtherStruct
+	    );
+	
+	    void opInOut(
+	                inout myIpCall         inoutMyIpCall,
+	                inout mySeqIpCall      inoutMySeqIpCall,	
+	                inout myStruct         inoutMyStruct,
+	                inout myUnion          inoutMyUnion,
+	                inout myOtherStruct    inoutMyOtherStruct
+	    );
+
+    };
+
+    interface IpCall {
+        void method();
+    };
+
+};

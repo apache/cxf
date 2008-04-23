@@ -1,0 +1,5 @@
+<data xmlns="urn:MyInterface">
+  <name>junk</name>
+  <useless>true</useless>
+  <FOO>foo</FOO>
+</data>

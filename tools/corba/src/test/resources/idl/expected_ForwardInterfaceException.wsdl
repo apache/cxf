@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException/typemap">
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" repositoryID="IDL:ExternalException:1.0" type="ExternalExceptionType" name="ExternalException">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException/typemap" name="description" idltype="ns4:IpCall" />
+    </corba:exception>
+    <corba:exception xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" repositoryID="IDL:InterfaceWithExceptions/LongException:1.0" type="InterfaceWithExceptions.LongExceptionType" name="InterfaceWithExceptions.LongException">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException/typemap" name="error" idltype="ns4:IpCall" />
+      <corba:member name="code" idltype="corba:long" />
+    </corba:exception>
+    <corba:alias basetype="corba:long" repositoryID="IDL:IpCall/myLong:1.0" name="IpCall.myLong" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" binding="IpCallCORBABinding" repositoryID="IDL:IpCall:1.0" type="ns4:EndpointReferenceType" name="IpCall" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="ExternalException" type="ExternalExceptionType">
+      </xs:element>
+      <xs:complexType name="ExternalExceptionType">
+        <xs:sequence>
+          <xs:element name="description" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="InterfaceWithExceptions.LongException" type="InterfaceWithExceptions.LongExceptionType">
+      </xs:element>
+      <xs:complexType name="InterfaceWithExceptions.LongExceptionType">
+        <xs:sequence>
+          <xs:element name="error" nillable="true" type="wsa:EndpointReferenceType">
+          </xs:element>
+          <xs:element name="code" type="xs:int">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="method">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_string" type="xs:string">
+            </xs:element>
+            <xs:element name="inout_short" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="methodResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+            <xs:element name="out_long" type="xs:int">
+            </xs:element>
+            <xs:element name="inout_short" type="xs:short">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="raiseExternalException">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="aString" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="raiseExternalExceptionResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IpCallRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="ExternalException">
+    <wsdl:part name="exception" element="tns:ExternalException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="methodResponse">
+    <wsdl:part name="outparameter" element="tns:methodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="method">
+    <wsdl:part name="inparameter" element="tns:method">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="raiseExternalExceptionResponse">
+    <wsdl:part name="outparameter" element="tns:raiseExternalExceptionResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="raiseExternalException">
+    <wsdl:part name="inparameter" element="tns:raiseExternalException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InterfaceWithExceptions.LongException">
+    <wsdl:part name="exception" element="tns:InterfaceWithExceptions.LongException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="InterfaceWithExceptions">
+    <wsdl:operation name="method">
+      <wsdl:input name="methodRequest" message="tns:method">
+    </wsdl:input>
+      <wsdl:output name="methodResponse" message="tns:methodResponse">
+    </wsdl:output>
+      <wsdl:fault name="InterfaceWithExceptions.LongException" message="tns:InterfaceWithExceptions.LongException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="raiseExternalException">
+      <wsdl:input name="raiseExternalExceptionRequest" message="tns:raiseExternalException">
+    </wsdl:input>
+      <wsdl:output name="raiseExternalExceptionResponse" message="tns:raiseExternalExceptionResponse">
+    </wsdl:output>
+      <wsdl:fault name="ExternalException" message="tns:ExternalException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="IpCall">
+  </wsdl:portType>
+  <wsdl:binding name="IpCallCORBABinding" type="tns:IpCall">
+    <corba:binding repositoryID="IDL:IpCall:1.0" />
+  </wsdl:binding>
+  <wsdl:binding name="InterfaceWithExceptionsCORBABinding" type="tns:InterfaceWithExceptions">
+    <corba:binding repositoryID="IDL:InterfaceWithExceptions:1.0" />
+    <wsdl:operation name="method">
+      <corba:operation name="method">
+        <corba:param mode="in" name="in_string" idltype="corba:string" />
+        <corba:param mode="out" name="out_long" idltype="corba:long" />
+        <corba:param mode="inout" name="inout_short" idltype="corba:short" />
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException/typemap" exception="InterfaceWithExceptions.LongException" />
+      </corba:operation>
+      <wsdl:input name="methodRequest">
+      </wsdl:input>
+      <wsdl:output name="methodResponse">
+      </wsdl:output>
+      <wsdl:fault name="InterfaceWithExceptions.LongException">
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="raiseExternalException">
+      <corba:operation name="raiseExternalException">
+        <corba:param mode="in" name="aString" idltype="corba:string" />
+        <corba:raises xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceException/typemap" exception="ExternalException" />
+      </corba:operation>
+      <wsdl:input name="raiseExternalExceptionRequest">
+      </wsdl:input>
+      <wsdl:output name="raiseExternalExceptionResponse">
+      </wsdl:output>
+      <wsdl:fault name="ExternalException">
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="IpCallCORBAService">
+    <wsdl:port name="IpCallCORBAPort" binding="tns:IpCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="InterfaceWithExceptionsCORBAService">
+    <wsdl:port name="InterfaceWithExceptionsCORBAPort" binding="tns:InterfaceWithExceptionsCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

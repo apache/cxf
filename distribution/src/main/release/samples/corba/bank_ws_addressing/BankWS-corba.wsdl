@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap">
+        <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank" binding="AccountCORBABinding" repositoryID="IDL:Account:1.0" type="ns4:EndpointReferenceType" name="Account" />
+        <corba:object xmlns="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="EndpointReferenceType" name="CORBA.Object" />
+    </corba:typeMapping>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+            </xs:import>
+            <xs:element name="get_balance">
+                <xs:complexType>
+                    <xs:sequence>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_balanceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:float">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deposit">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="addition" type="xs:float">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="depositResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="create_account">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_name" type="xs:string">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="create_accountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="AccountRef" type="wsa:EndpointReferenceType">
+                <xs:annotation>
+                    <xs:appinfo>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="create_epr_account">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_name" type="xs:string">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="create_epr_accountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_account">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_name" type="xs:string">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_accountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_epr_account">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_name" type="xs:string">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_epr_accountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_account_epr_with_no_use_attribute">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_name" type="xs:string">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get_account_epr_with_no_use_attributeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="find_account">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_details" type="xs:anyType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="find_accountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_details" type="xs:anyType">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="remove_account">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="account_name" type="xs:string">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="remove_accountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="remove_account">
+        <wsdl:part name="inparameter" element="tns:remove_account">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="create_epr_accountResponse">
+        <wsdl:part name="outparameter" element="tns:create_epr_accountResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_account">
+        <wsdl:part name="inparameter" element="tns:get_account">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_epr_accountResponse">
+        <wsdl:part name="outparameter" element="tns:get_epr_accountResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_balanceResponse">
+        <wsdl:part name="outparameter" element="tns:get_balanceResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_epr_account">
+        <wsdl:part name="inparameter" element="tns:get_epr_account">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_accountResponse">
+        <wsdl:part name="outparameter" element="tns:get_accountResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_balance">
+        <wsdl:part name="inparameter" element="tns:get_balance">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="create_account">
+        <wsdl:part name="inparameter" element="tns:create_account">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="remove_accountResponse">
+        <wsdl:part name="outparameter" element="tns:remove_accountResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deposit">
+        <wsdl:part name="inparameter" element="tns:deposit">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="create_accountResponse">
+        <wsdl:part name="outparameter" element="tns:create_accountResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="find_accountResponse">
+        <wsdl:part name="outparameter" element="tns:find_accountResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_account_epr_with_no_use_attributeResponse">
+        <wsdl:part name="outparameter" element="tns:get_account_epr_with_no_use_attributeResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="find_account">
+        <wsdl:part name="inparameter" element="tns:find_account">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="create_epr_account">
+        <wsdl:part name="inparameter" element="tns:create_epr_account">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="get_account_epr_with_no_use_attribute">
+        <wsdl:part name="inparameter" element="tns:get_account_epr_with_no_use_attribute">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="depositResponse">
+        <wsdl:part name="outparameter" element="tns:depositResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="Bank">
+        <wsdl:operation name="create_account">
+            <wsdl:input name="create_accountRequest" message="tns:create_account">
+            </wsdl:input>
+            <wsdl:output name="create_accountResponse" message="tns:create_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="create_epr_account">
+            <wsdl:input name="create_epr_accountRequest" message="tns:create_epr_account">
+            </wsdl:input>
+            <wsdl:output name="create_epr_accountResponse" message="tns:create_epr_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get_account">
+            <wsdl:input name="get_accountRequest" message="tns:get_account">
+            </wsdl:input>
+            <wsdl:output name="get_accountResponse" message="tns:get_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get_epr_account">
+            <wsdl:input name="get_epr_accountRequest" message="tns:get_epr_account">
+            </wsdl:input>
+            <wsdl:output name="get_epr_accountResponse" message="tns:get_epr_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get_account_epr_with_no_use_attribute">
+            <wsdl:input name="get_account_epr_with_no_use_attributeRequest" message="tns:get_account_epr_with_no_use_attribute">
+            </wsdl:input>
+            <wsdl:output name="get_account_epr_with_no_use_attributeResponse" message="tns:get_account_epr_with_no_use_attributeResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="find_account">
+            <wsdl:input name="find_accountRequest" message="tns:find_account">
+            </wsdl:input>
+            <wsdl:output name="find_accountResponse" message="tns:find_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="remove_account">
+            <wsdl:input name="remove_accountRequest" message="tns:remove_account">
+            </wsdl:input>
+            <wsdl:output name="remove_accountResponse" message="tns:remove_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="Account">
+        <wsdl:operation name="get_balance">
+            <wsdl:input name="get_balanceRequest" message="tns:get_balance">
+            </wsdl:input>
+            <wsdl:output name="get_balanceResponse" message="tns:get_balanceResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deposit">
+            <wsdl:input name="depositRequest" message="tns:deposit">
+            </wsdl:input>
+            <wsdl:output name="depositResponse" message="tns:depositResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="BankCORBABinding" type="tns:Bank">
+        <corba:binding repositoryID="IDL:Bank:1.0" />
+        <wsdl:operation name="create_account">
+            <corba:operation name="create_account">
+                <corba:param mode="in" name="account_name" idltype="corba:string" />
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="Account" />
+            </corba:operation>
+            <wsdl:input name="create_accountRequest">
+            </wsdl:input>
+            <wsdl:output name="create_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="create_epr_account">
+            <corba:operation name="create_epr_account">
+                <corba:param mode="in" name="account_name" idltype="corba:string" />
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object" />
+            </corba:operation>
+            <wsdl:input name="create_epr_accountRequest">
+            </wsdl:input>
+            <wsdl:output name="create_epr_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get_account">
+            <corba:operation name="get_account">
+                <corba:param mode="in" name="account_name" idltype="corba:string" />
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="Account" />
+            </corba:operation>
+            <wsdl:input name="get_accountRequest">
+            </wsdl:input>
+            <wsdl:output name="get_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get_epr_account">
+            <corba:operation name="get_epr_account">
+                <corba:param mode="in" name="account_name" idltype="corba:string" />
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object" />
+            </corba:operation>
+            <wsdl:input name="get_epr_accountRequest">
+            </wsdl:input>
+            <wsdl:output name="get_epr_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get_account_epr_with_no_use_attribute">
+            <corba:operation name="get_account_epr_with_no_use_attribute">
+                <corba:param mode="in" name="account_name" idltype="corba:string" />
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object" />
+            </corba:operation>
+            <wsdl:input name="get_account_epr_with_no_use_attributeRequest">
+            </wsdl:input>
+            <wsdl:output name="get_account_epr_with_no_use_attributeResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="find_account">
+            <corba:operation name="find_account">
+                <corba:param mode="inout" name="account_details" idltype="corba:any" />
+            </corba:operation>
+            <wsdl:input name="find_accountRequest">
+            </wsdl:input>
+            <wsdl:output name="find_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="remove_account">
+            <corba:operation name="remove_account">
+                <corba:param mode="in" name="account_name" idltype="corba:string" />
+            </corba:operation>
+            <wsdl:input name="remove_accountRequest">
+            </wsdl:input>
+            <wsdl:output name="remove_accountResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AccountCORBABinding" type="tns:Account">
+        <corba:binding repositoryID="IDL:Account:1.0" />
+        <wsdl:operation name="get_balance">
+            <corba:operation name="get_balance">
+                <corba:return name="return" idltype="corba:float" />
+            </corba:operation>
+            <wsdl:input name="get_balanceRequest">
+            </wsdl:input>
+            <wsdl:output name="get_balanceResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deposit">
+            <corba:operation name="deposit">
+                <corba:param mode="in" name="addition" idltype="corba:float" />
+            </corba:operation>
+            <wsdl:input name="depositRequest">
+            </wsdl:input>
+            <wsdl:output name="depositResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AccountCORBAService">
+        <wsdl:port name="AccountCORBAPort" binding="tns:AccountCORBABinding">
+            <corba:address location="corbaname::localhost:1050#Account" />
+        </wsdl:port>
+    </wsdl:service>
+    <wsdl:service name="BankCORBAService">
+        <wsdl:port name="BankCORBAPort" binding="tns:BankCORBABinding">
+            <corba:address location="corbaname::localhost:1050#Bank" />
+            <corba:policy poaname="Bank" serviceid="Bank" persistent="true" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

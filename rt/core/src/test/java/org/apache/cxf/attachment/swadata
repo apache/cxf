@@ -1,0 +1,13 @@
+------=_Part_0_14158819.1167275505862
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: binary
+Content-Id: <86048FF3556694F7DA1918466DDF8143>
+
+<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body><echoData xmlns=""><text>hi</text><data href="cid:02506EC1DE5431C3D3BF8E780FC4A65A"/></echoData></soapenv:Body></soapenv:Envelope>
+------=_Part_0_14158819.1167275505862
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: binary
+Content-Id: <02506EC1DE5431C3D3BF8E780FC4A65A>
+
+foobar
+------=_Part_0_14158819.1167275505862--

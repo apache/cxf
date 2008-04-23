@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<definitions name="Calculator"  
+	     targetNamespace="http://apache.org/cxf/calculator"
+	     xmlns:tns="http://apache.org/cxf/calculator"
+	     xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	     xmlns:x1="http://apache.org/cxf/calculator/types"
+	     xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+    <types>
+	<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		    elementFormDefault="qualified" 
+		    targetNamespace="http://apache.org/cxf/calculator/types">
+
+	    <complexType name="addNumbersResponse">
+		<sequence>
+		    <element name="return" type="xsd:int" />
+		</sequence>
+	    </complexType>
+	    <element name="addNumbersResponse" type="x1:addNumbersResponse" />
+
+	    <complexType name="addNumbers">
+		<sequence>
+		    <element name="arg0" type="xsd:int" />
+		    <element name="arg1" type="xsd:int" />
+		</sequence>
+	    </complexType>
+	    <element name="add" type="x1:addNumbers" />
+
+	    <element name="CalculatorFault" type="x1:CalculatorFault" />
+	    <complexType name="CalculatorFault">
+		<sequence>
+		    <element name="faultInfo" type="xsd:string" />
+		    <element name="message" type="xsd:string" />
+		</sequence>
+	    </complexType>
+	</xsd:schema>
+    </types>
+    <message name="add">
+	<part name="parameters" element="x1:add" />
+    </message>
+    <message name="addNumbersResponse">
+	<part name="result" element="x1:addNumbersResponse" />
+    </message>
+    <message name="addNumbersFault">
+	<part name="CalculatorFault" element="x1:CalculatorFault" />
+    </message>
+
+    <portType name="CalculatorPortType">
+	<operation name="add">
+	    <input message="tns:add"/>
+	    <output message="tns:addNumbersResponse"/>
+	    <fault name="addNumbersFault" message="tns:addNumbersFault"/>
+	</operation>
+    </portType>
+
+</definitions>

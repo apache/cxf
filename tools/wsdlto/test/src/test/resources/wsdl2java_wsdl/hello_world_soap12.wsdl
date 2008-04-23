@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<definitions name="HelloWorld"
+	     xmlns="http://schemas.xmlsoap.org/wsdl/"
+	     xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap12_http"
+	     xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap12_http/types"
+	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	     targetNamespace="http://cxf.apache.org/w2j/hello_world_soap12_http"
+	     xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+    <wsdl:types>
+	<schema targetNamespace="http://cxf.apache.org/w2j/hello_world_soap12_http/types" 
+		xmlns="http://www.w3.org/2001/XMLSchema" 
+		xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap12_http/types" 
+		elementFormDefault="qualified">
+	    <element name="sayHi">
+		<complexType/>
+	    </element>
+	    <element name="sayHiResponse">
+		<complexType>
+		    <sequence>
+			<element name="responseType" type="string"/>
+		    </sequence>
+		</complexType>
+	    </element>
+	    <element name="pingMe">
+		<complexType/>
+	    </element>
+	    <element name="pingMeResponse">
+		<complexType/>
+	    </element>
+	    <element name="faultDetail">
+		<complexType>
+		    <sequence>
+			<element name="minor" type="short"/>
+			<element name="major" type="short"/>
+		    </sequence>
+                </complexType>
+	    </element>
+        </schema>
+    </wsdl:types>
+
+    <wsdl:message name="sayHiRequest">
+        <wsdl:part name="in" element="x1:sayHi"/>
+    </wsdl:message>
+    <wsdl:message name="sayHiResponse">
+        <wsdl:part name="out" element="x1:sayHiResponse"/>
+    </wsdl:message>
+    <wsdl:message name="pingMeRequest">
+	<wsdl:part name="in" element="x1:pingMe"/>
+    </wsdl:message>
+    <wsdl:message name="pingMeResponse">
+        <wsdl:part name="out" element="x1:pingMeResponse"/>
+    </wsdl:message>		
+    <wsdl:message name="pingMeFault">
+	<wsdl:part name="faultDetail" element="x1:faultDetail"/>
+    </wsdl:message>
+
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="sayHi">
+            <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
+            <wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
+        </wsdl:operation>
+	<wsdl:operation name="pingMe">
+	    <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
+	    <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
+	    <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
+        </wsdl:operation> 
+    </wsdl:portType>
+
+    <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
+	<soap12:binding transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" style="document" />
+	<operation name="sayHi">
+	    <soap12:operation style="document" soapAction=""/>
+	    <input>
+		<soap12:body use="literal" />
+	    </input>
+	    <output>
+		<soap12:body use="literal" />
+	    </output>
+	</operation>
+	<operation name="pingMe">
+	    <soap12:operation style="document"/>
+	    <input>
+                <soap12:body use="literal"/>
+            </input>
+            <output>
+                <soap12:body use="literal"/>
+            </output>
+            <fault name="pingMeFault">
+                <soap12:fault name="pingMeFault" use="literal"/>
+            </fault>
+        </operation>
+    </wsdl:binding>
+
+    <wsdl:service name="SOAPService">
+        <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+            <soap12:address location="http://localhost:9000/SoapContext/SoapPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</definitions>

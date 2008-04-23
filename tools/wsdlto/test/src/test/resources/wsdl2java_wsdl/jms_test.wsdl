@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions name="HelloWorldService" targetNamespace="http://cxf.apache.org/hello_world_jms" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:jms="http://cxf.apache.org/transports/jms" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://cxf.apache.org/hello_world_jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://cxf.apache.org/hello_world_jms/xsd">
+    <message name="greetMe">
+        <part name="stringParam0" type="xsd:string"/>
+    </message>
+    <message name="greetMeResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="sayHi"/>
+    <message name="sayHiResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="greetMeOneWay">
+        <part name="stringParam0" type="xsd:string"/>
+    </message>
+    
+    <portType name="HelloWorldPortType">
+        <operation name="greetMe">
+            <input message="tns:greetMe" name="greetMe"/>
+            <output message="tns:greetMeResponse" name="greetMeResponse"/>
+        </operation>
+        <operation name="sayHi">
+            <input message="tns:sayHi" name="sayHi"/>
+            <output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </operation>
+        <operation name="greetMeOneWay">
+            <input message="tns:greetMeOneWay" name="greetMeOneWay"/>
+        </operation>
+    </portType>
+    
+    <portType name="HelloWorldOneWayPort">
+        <operation name="greetMeOneWay">
+            <input message="tns:greetMeOneWay" name="greetMeOneWay"/>
+        </operation>
+    </portType>
+    
+    <portType name="HelloWorldPubSubPort">
+        <operation name="greetMeOneWay">
+            <input message="tns:greetMeOneWay" name="greetMeOneWay"/>
+        </operation>
+    </portType>
+    
+    <binding name="HelloWorldPortBinding" type="tns:HelloWorldPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="greetMe">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="greetMe">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+            <output name="greetMeResponse">
+                <soap:body  
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </output>
+        </operation>
+        <operation name="sayHi">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="sayHi">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+            <output name="sayHiResponse">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </output>
+        </operation>
+        <operation name="greetMeOneWay">
+            <soap:operation style="rpc"/>
+            <input name="greetMeOneWay">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+        </operation>
+    </binding>
+
+    <binding name="HelloWorldQueueBinMsgBinding" type="tns:HelloWorldPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="greetMe">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="greetMe">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+            <output name="greetMeResponse">
+                <soap:body  
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </output>
+        </operation>
+        <operation name="sayHi">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="sayHi">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+            <output name="sayHiResponse">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </output>
+        </operation>
+        <operation name="greetMeOneWay">
+            <soap:operation style="rpc"/>
+            <input name="greetMeOneWay">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+        </operation>
+    </binding>
+    
+    
+    <binding name="HelloWorldOneWayBinding" type="tns:HelloWorldOneWayPort">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="greetMeOneWay">
+            <soap:operation style="rpc"/>
+            <input name="greetMeOneWay">
+                <soap:body 
+                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+        </operation>
+    </binding>
+    
+     <binding name="HelloWorldPubSubBinding" type="tns:HelloWorldPubSubPort">
+            <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+            <operation name="greetMeOneWay">
+                <soap:operation style="rpc"/>
+                <input name="greetMeOneWay">
+                    <soap:body 
+                        namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                </input>
+            </operation>
+    </binding>
+    
+    <service name="HelloWorldQueueBinMsgService">
+        <port binding="tns:HelloWorldQueueBinMsgBinding" name="HelloWorldQueueBinMsgPort">
+            <jms:address 
+               destinationStyle="queue" 
+               jndiProviderURL="tcp://localhost:61616" 
+               initialContextFactory="org.activemq.jndi.ActiveMQInitialContextFactory" 
+               jndiConnectionFactoryName="ConnectionFactory" 
+               jndiDestinationName="dynamicQueues/test.jmstransport"
+               messageType="binary"
+               useMessageIDAsCorrelationID="true"
+               durableSubscriberName="CXF_subscriber"
+            />
+            <soap:address location="http://cxf.apache.org/transports/jms"/>
+        </port>
+    </service>
+    
+    <service name="HelloWorldService">
+           <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
+              
+               <jms:address 
+                   destinationStyle="queue" 
+                   jndiProviderURL="tcp://localhost:61616" 
+                   initialContextFactory="org.activemq.jndi.ActiveMQInitialContextFactory" 
+                   jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport"
+                   messageType="text"
+                   useMessageIDAsCorrelationID="true"   
+                   durableSubscriberName="CXF_subscriber"
+                   />
+               <soap:address location="http://cxf.apache.org/transports/jms"/>
+           </port>
+    </service>
+    
+    <service name="HelloWorldOneWayQueueService">
+        <port binding="tns:HelloWorldOneWayBinding" name="HelloWorldOneWayQueuePort">
+            <jms:address
+                destinationStyle="queue" 
+                jndiProviderURL="tcp://localhost:61616"
+                initialContextFactory="org.activemq.jndi.ActiveMQInitialContextFactory" 
+                jndiConnectionFactoryName="ConnectionFactory" 
+                jndiDestinationName="dynamicQueues/test.jmstransport.oneway"
+                messageType="text"
+                useMessageIDAsCorrelationID="true"   
+                durableSubscriberName="CXF_Queue_subscriber"
+            />
+            <soap:address location="http://cxf.apache.org/transports/jms"/>
+        </port>
+    </service>
+    
+    <service name="HelloWorldPubSubService">
+            <port binding="tns:HelloWorldPubSubBinding" name="HelloWorldPubSubPort">
+                <jms:address
+                    destinationStyle="topic" 
+                    jndiProviderURL="tcp://localhost:61616"
+                    initialContextFactory="org.activemq.jndi.ActiveMQInitialContextFactory" 
+                    jndiConnectionFactoryName="ConnectionFactory" 
+                    jndiDestinationName="dynamicTopics/test.jmstransport.oneway.topic"
+                    messageType="text"
+                    useMessageIDAsCorrelationID="true"   
+                />
+                <soap:address location="http://cxf.apache.org/transports/jms"/>
+            </port>
+    </service>
+    
+</definitions>
+
+

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="HandlerTest" targetNamespace="http://apache.org/handler_test" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://apache.org/handler_test"
+    xmlns:x1="http://apache.org/handler_test/types"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <wsdl:types>
+        <schema targetNamespace="http://apache.org/handler_test/types" 
+            xmlns="http://www.w3.org/2001/XMLSchema" 
+            xmlns:x1="http://apache.org/handler_test/types" elementFormDefault="qualified">
+            <element name="ping">
+	      <complexType/>
+            </element>
+            <element name="pingOneWay">
+                <complexType/>
+            </element>
+            <element name="pingWithArgs">
+                <complexType>
+		  <sequence>
+		    <!-- client uses this to instruct a server side handler to do something funky -->
+		    <element name="HandlersCommand" type="xsd:string"/>
+		  </sequence>
+		</complexType>
+            </element>
+            <element name="pingResponse">
+                <complexType>
+                    <sequence>
+		      <element minOccurs="1" maxOccurs="unbounded" name="HandlersInfo" type="xsd:string"/>
+                    </sequence>
+		</complexType>
+	    </element>
+            <element name="PingFaultDetails">
+                <complexType>
+                    <sequence>
+                        <element name="detail" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+
+	</schema>
+    </wsdl:types>
+    <wsdl:message name="pingRequest">
+        <wsdl:part element="x1:ping" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="pingOneWayRequest">
+        <wsdl:part element="x1:pingOneWay" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="pingWithArgsRequest">
+        <wsdl:part element="x1:pingWithArgs" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="pingResponse">
+        <wsdl:part element="x1:pingResponse" name="out"/>
+    </wsdl:message>
+    <wsdl:message name="PingException">
+        <wsdl:part element="x1:PingFaultDetails" name="PingFaultDetails"/>
+    </wsdl:message>
+    <wsdl:portType name="HandlerTest">
+        <wsdl:operation name="ping">
+            <wsdl:input message="tns:pingRequest" name="pingRequest"/>
+            <wsdl:output message="tns:pingResponse" name="pingResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="pingOneWay">
+            <wsdl:input message="tns:pingOneWayRequest" name="pingOneWayRequest"/>
+        </wsdl:operation>
+        <wsdl:operation name="pingWithArgs">
+            <wsdl:input message="tns:pingWithArgsRequest" name="pingWithArgsRequest"/>
+            <wsdl:output message="tns:pingResponse" name="pingResponse"/>
+	    <wsdl:fault  message="tns:PingException" name="PingException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="HandlerTest_SOAPBinding" type="tns:HandlerTest">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="ping">
+	  <soap:operation soapAction="" style="document"/>
+	  <wsdl:input name="pingRequest">
+	    <soap:body use="literal"/>
+	  </wsdl:input>
+	  <wsdl:output name="pingResponse">
+	    <soap:body use="literal"/>
+	  </wsdl:output>
+	</wsdl:operation>
+	<wsdl:operation name="pingOneWay">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="pingOneWay">
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+	<wsdl:operation name="pingWithArgs">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="pingWithArgsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="pingResponse">
+                <soap:body use="literal"/>
+	    </wsdl:output>
+	    <wsdl:fault name="PingException">
+	      <soap:fault name="PingException" use="literal" /> 
+	    </wsdl:fault>
+	</wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="HandlerTestService">
+        <wsdl:port binding="tns:HandlerTest_SOAPBinding" name="SoapPort">
+            <soap:address location="http://localhost:9000/HandlerTest/SoapPort"/>
+            <http-conf:client/>
+            <http-conf:server/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

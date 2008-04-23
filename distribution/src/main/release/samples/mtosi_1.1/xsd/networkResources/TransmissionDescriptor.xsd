@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ============ Includes ========= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="TransmissionParameters.xsd"/>
+  <!-- ============ Global Type Declarations ========= -->
+  <xsd:simpleType name="ExternalRepresentationReference_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      A means to store at the EMS a reference to the external representation of the TMD (e.g., an XML file name).
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="TransmissionDescriptor_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This aggregate defines the TransmissionDescriptor Object
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transmissionParams" type="LayeredParametersList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A list of transmission parameters which can be set and retrieved at a specified layer on a TP having this TMD assigned as egress or ingress TMD
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="additionalTPInfo" type="NVSList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Additional info parameters which can be set and/or retrieved on a TP having this TMD assigned as egress or ingress TMD
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="containingTMDName" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The NamingAttributes_T structure is used as a naming scheme between the NMS and EMS interface
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="externalRepresentationReference" type="ExternalRepresentationReference_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Refer to ExternalRepresentationReference_T.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="TMDVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="TransmissionDescriptorList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      List of TransmissionDescriptors
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tmd" type="TransmissionDescriptor_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

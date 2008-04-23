@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_doc_lit_bare" xmlns:x1="http://cxf.apache.org/w2j/hello_world_doc_lit_bare/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_doc_lit_bare" name="DocLitBare">
+    <wsdl:types>
+        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_doc_lit_bare/types" xmlns:tns="http://cxf.apache.org/w2j/hello_world_doc_lit_bare/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <complexType name="TradePriceData">
+                <sequence>
+                    <element name="tickerSymbol" type="xsd:string"/>
+                    <element name="tickerPrice" type="xsd:float"/>
+                </sequence>
+            </complexType>
+            <element name="in" type="tns:TradePriceData"/>
+            <element name="inout" type="tns:TradePriceData"/>
+            <element name="stringRespType" type="xsd:string"/>
+        </schema>
+    </wsdl:types>
+    <message name="PutLastTradedPriceInput">
+        <part name="body" element="x1:in"/>
+    </message>
+    <message name="PutLastTradedPriceOutput"/>
+
+    <message name="SayHiInput">
+        <part name="body" element="x1:inout"/>
+    </message>
+    <message name="SayHiOutput">
+        <part name="body" element="x1:inout"/>
+    </message>
+    
+    <message name="bareNoParamRequest"/>
+    
+    <message name="bareNoParamResponse">
+        <part element="x1:stringRespType" name="theResponse"/>
+    </message>
+
+    <portType name="PutLastTradedPricePortType">
+
+        <operation name="SayHi">
+            <input message="tns:SayHiInput"/>
+            <output message="tns:SayHiOutput"/>
+        </operation>
+    
+        <operation name="PutLastTradedPrice">
+            <input message="tns:PutLastTradedPriceInput"/>
+            <output message="tns:PutLastTradedPriceOutput"/>
+        </operation>
+    
+        <operation name="bareNoParam">
+            <input message="tns:bareNoParamRequest"/>
+            <output message="tns:bareNoParamResponse"/>
+        </operation>
+        
+    </portType>
+    
+    <binding name="PutLastTradedPriceSoapBinding" type="tns:PutLastTradedPricePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <operation name="SayHi">
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        
+        <operation name="PutLastTradedPrice">
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        
+        <operation name="bareNoParam">
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>        
+    </binding>
+    <wsdl:service name="SOAPService">
+        <wsdl:port name="SoapPort" binding="tns:PutLastTradedPriceSoapBinding">
+            <soap:address location="http://localhost:9107/SOAPDocLitBareService/SoapPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,39 @@
+
+package org.apache.cxf.tools.fortest.jaxws.rpc.types;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+/**
+ * 
+ */
+
+@XmlRootElement(namespace = "http://rpc.jaxws.fortest.tools.cxf.apache.org/", name = "PingMeFault")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(namespace = "http://rpc.jaxws.fortest.tools.cxf.apache.org/", name = "PingMeFault", propOrder = {"code", "message"})
+
+public class FaultDetail {
+
+    private int code;
+    private java.lang.String message;
+
+    public int getCode ()     {
+	           return this.code;
+        }
+
+    public void setCode (   int newCode  )     {
+	           this.code = newCode;
+        }
+
+    public java.lang.String getMessage ()     {
+	           return this.message;
+        }
+
+    public void setMessage (   java.lang.String newMessage  )     {
+	           this.message = newMessage;
+        }
+
+}
+

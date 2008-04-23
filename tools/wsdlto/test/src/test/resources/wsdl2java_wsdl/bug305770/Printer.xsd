@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	Copyright (C) OASIS Open (2004). All Rights Reserved.
+	 
+	This document and translations of it may be copied and furnished to others, and derivative works that comment on or otherwise explain it or assist in its implementation may be prepared, copied, published and distributed, in whole or in part, without restriction of any kind, provided that the above copyright notice and this paragraph are included on all such copies and derivative works. However, this document itself may not be modified in any way, such as by removing the copyright notice or references to OASIS, except as needed for the purpose of developing OASIS specifications, in which case the procedures for copyrights defined in the OASIS Intellectual Property Rights document must be followed, or as required to translate it into languages other than English. 
+	
+	The limited permissions granted above are perpetual and will not be revoked by OASIS or its successors or assigns. 
+	
+	This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+	
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:pr="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.xsd" 
+targetNamespace="http://docs.oasis-open.org/wsrf/primer-1.2-examples-cd-02/Printer/Printer.xsd" 
+xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2" 
+xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2" 
+xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2"
+attributeFormDefault="unqualified" elementFormDefault="qualified">
+	
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2" 
+	   schemaLocation="./bf-2.xsd" />
+	<xsd:import namespace="http://www.w3.org/2005/08/addressing" 
+	   schemaLocation="/schemas/wsdl/ws-addr.xsd" />
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/rl-2" 
+	   schemaLocation="./rl-2.xsd" />	
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/rp-2" 
+	   schemaLocation="./rp-2.xsd" />
+	
+		
+	<xsd:element name="printer_name" type="pr:printer_nameType" />
+	<xsd:simpleType name="printer_nameType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1" />
+			<xsd:maxLength value="127" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="job_id" type="xsd:integer"/>
+
+	<!-- Printer Resource Properties document Schema 	-->
+
+	<xsd:element name="PrinterRP">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pr:printer_reference" />
+				<xsd:element ref="pr:printer_name" />
+				<xsd:element ref="pr:printer_state" />
+				<xsd:element ref="pr:printer_is_accepting_jobs" />
+				<xsd:element ref="pr:queued_job_count" />				
+				<xsd:element ref="pr:document_format_supported" />
+				<xsd:element ref="pr:job_hold_until_default" minOccurs="0"/>
+				<xsd:element ref="pr:job_hold_until_supported" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="wsrf-rp:QueryExpressionDialect" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="pr:job_properties" minOccurs="0" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="printer_reference" type="wsa:EndpointReferenceType" />
+	
+	<xsd:element name="printer_state" type="pr:printerStateType" />
+	<xsd:element name="printer_is_accepting_jobs" type="xsd:boolean" />
+	<xsd:element name="queued_job_count" type="xsd:integer" />
+	<xsd:element name="document_format_supported" type="pr:mimeMediaTypes" />
+	<xsd:simpleType name="name">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1" />
+			<xsd:maxLength value="127" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="printerStateType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Idle" />
+			<xsd:enumeration value="Processing" />
+			<xsd:enumeration value="Stopped" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="mimeMediaTypeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="text/plain" />
+			<xsd:enumeration value="application/postscript" />
+			<xsd:enumeration value="application/vnd.hp-PCL" />
+			<xsd:enumeration value="application/octet-stream" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="mimeMediaType" type="pr:mimeMediaTypeType" />
+	<xsd:complexType name="mimeMediaTypes">
+		<xsd:sequence>
+			<xsd:element ref="pr:mimeMediaType" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:element name="job_hold_until_default" type="pr:holdPeriod" />
+	<xsd:element name="job_hold_until_supported" type="pr:holdPeriod" />
+	<xsd:simpleType name="holdPeriod">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="No-Hold" />
+			<xsd:pattern value="Overnight" />
+			<xsd:pattern value="[A-Z,a-z,-,0-9]{1,10}" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="printer_message_from_operator" type="xsd:string" />
+	
+
+	<!-- Job ResourceProperties Document schema -->
+	
+	<xsd:element name="job_properties">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pr:job_reference" />
+				<xsd:element ref="pr:job_printer_reference" />
+				<xsd:element ref="pr:job_name" />
+				<xsd:element ref="pr:job_id" />
+				<xsd:element ref="pr:job_originating_user_name" />
+				<xsd:element ref="pr:job_state" />
+				<xsd:element ref="wsrf-rl:CurrentTime" />
+				<xsd:element ref="wsrf-rl:TerminationTime" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>	
+
+	<xsd:element name="job_reference" type="wsa:EndpointReferenceType" />
+	<xsd:element name="job_printer_reference" type="wsa:EndpointReferenceType" />
+	<xsd:element name="job_name" type="pr:jobNameType"/>
+	<xsd:element name="job_originating_user_name" type="pr:userNameType" />
+	<xsd:element name="job_state" type="pr:jobStateType" />
+	<xsd:simpleType name="jobNameType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1" />
+			<xsd:maxLength value="1023" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="userNameType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1" />
+			<xsd:maxLength value="1023" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="jobStateType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="pending" />
+			<xsd:enumeration value="pending-held" />
+			<xsd:enumeration value="processing" />
+			<xsd:enumeration value="processing-stopped" />
+			<xsd:enumeration value="canceled" />
+			<xsd:enumeration value="aborted" />
+			<xsd:enumeration value="completed" />
+		</xsd:restriction>
+	</xsd:simpleType>
+ 
+    <xsd:complexType name="DocumentContentType">
+		<xsd:sequence>
+			<xsd:element name="Base64Data" type="xsd:base64Binary" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+
+  <!-- Message Definitions -->
+
+
+   <xsd:element name="Print_JobRequest">	
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pr:printer_name" minOccurs="0"/>
+				<xsd:element ref="pr:job_name" />
+				<xsd:element name="document_format" type="pr:mimeMediaTypeType" />
+				<xsd:element name="document_content" type="pr:DocumentContentType" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	
+	<xsd:element name="JobCreationResponse">
+ 		<xsd:annotation>
+			<xsd:documentation>"Used for responses to Print-Job, Create-Job
+			 and Send-Document"</xsd:documentation>
+		</xsd:annotation>
+	  	<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pr:job_id" minOccurs="0"/>
+				<xsd:element ref="pr:SuccessStatusCode" />
+				<xsd:element ref="pr:job_reference"/>
+				<xsd:element ref="pr:job_state" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="Create_JobRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pr:job_name" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="Send_DocumentRequest">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element name="last_document" type="xsd:boolean" />
+			<xsd:element name="document_format" type="xsd:string" />
+			<xsd:element name="document_content" type="pr:DocumentContentType" />
+		</xsd:sequence>
+	</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="client_error_not_possibleFault" type="pr:client_error_not_possibleFaultType"/>
+ 	<xsd:complexType name="client_error_not_possibleFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsrf-bf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:element name="SuccessStatusCode" type="xsd:string"/>
+	
+	<xsd:element name="Job_stateChangeNotification">
+	 <xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref="pr:printer_name"/>
+			<xsd:element ref="pr:job_name"/>
+			<xsd:element ref="wsrf-rp:ResourcePropertyValueChangeNotification" />
+		</xsd:sequence>
+	</xsd:complexType>
+	</xsd:element>
+	
+	
+</xsd:schema>

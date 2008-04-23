@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:simple="http://cxf.apache.org/simple"
+      xmlns:soap="http://cxf.apache.org/bindings/soap"
+      xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
+
+  <import resource="classpath:META-INF/cxf/cxf.xml"/>
+  <import resource="classpath:META-INF/cxf/cxf-extension-xml.xml"/>
+  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+    
+  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+      <property name="transportIds">
+          <list>
+              <value>http://cxf.apache.org/transports/local</value>
+              <value>http://schemas.xmlsoap.org/soap/http</value>
+              <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+              <value>http://schemas.xmlsoap.org/wsdl/http/</value>
+          </list>
+      </property>
+  </bean>
+  
+  <simple:server id="simple" serviceBean="#greeter"/>
+
+  <bean id="greeter" class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+
+  <simple:server id="simpleWithAddress" 
+    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"/>
+  
+  <simple:server id="simpleWithBindingId" 
+    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"
+    bindingId="http://cxf.apache.org/bindings/xformat"/>
+    
+  <simple:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress">
+    <simple:serviceBean>
+      <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+    </simple:serviceBean>
+  </simple:server>
+  
+  <simple:server id="inlineInvoker" 
+    serviceClass="org.apache.cxf.service.factory.HelloServiceImpl"
+    address="http://localhost:8080/simpleWithAddress">
+    <simple:invoker>
+      <bean class="org.apache.cxf.service.invoker.BeanInvoker">
+        <constructor-arg>
+          <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+        </constructor-arg>
+      </bean>
+    </simple:invoker>
+    
+  </simple:server>
+  
+  <simple:server id="inlineSoapBinding" 
+    serviceClass="org.apache.cxf.service.factory.HelloService"
+    serviceBean="#greeter"
+    address="http://localhost:8080/test"   
+    serviceName="t:HelloService"
+    xmlns:t="http://apache.org/hello_world_soap_http"
+    endpointName="t:HelloPort"
+    >
+    <simple:binding>
+      <soap:soapBinding mtomEnabled="true" version="1.2"/>
+    </simple:binding>
+  </simple:server>
+</beans>

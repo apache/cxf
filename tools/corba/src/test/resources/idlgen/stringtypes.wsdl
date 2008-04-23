@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions
+ targetNamespace="http://schemas.apache.org/tests" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://schemas.apache.org/tests" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/tests">
+ 
+  <corba:typeMapping 
+      targetNamespace="http://schemas.apache.org/tests/corba/typemap/">
+  </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/stringtypes.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element name="BasePortType.echoNormalizedString.input" type="xsd:normalizedString"/>
+      <xsd:element name="BasePortType.echoNormalizedString.return" type="xsd:normalizedString"/>
+      <xsd:element name="BasePortType.echoToken.input" type="xsd:token"/>
+      <xsd:element name="BasePortType.echoToken.return" type="xsd:token"/>
+      <xsd:element name="BasePortType.echoLanguage.input" type="xsd:language"/>
+      <xsd:element name="BasePortType.echoLanguage.return" type="xsd:language"/>
+      <xsd:element name="BasePortType.echoNMTOKEN.input" type="xsd:NMTOKEN"/>
+      <xsd:element name="BasePortType.echoNMTOKEN.return" type="xsd:NMTOKEN"/>
+      <xsd:element name="BasePortType.echoName.input" type="xsd:Name"/>
+      <xsd:element name="BasePortType.echoName.return" type="xsd:Name"/>
+      <xsd:element name="BasePortType.echoNCName.input" type="xsd:NCName"/>
+      <xsd:element name="BasePortType.echoNCName.return" type="xsd:NCName"/>
+      <xsd:element name="BasePortType.echoID.input" type="xsd:ID"/>
+      <xsd:element name="BasePortType.echoID.return" type="xsd:ID"/>
+      <xsd:element name="BasePortType.echoAnyURI.input" type="xsd:anyURI"/>
+      <xsd:element name="BasePortType.echoAnyURI.return" type="xsd:anyURI"/>
+    </schema>
+  </types>
+  <message name="BasePortType.echoNormalizedString">
+    <part name="inputNormalizedString" element="xsd1:BasePortType.echoNormalizedString.input"/>
+  </message>
+  <message name="BasePortType.echoNormalizedStringResponse">
+    <part name="return" element="xsd1:BasePortType.echoNormalizedString.return"/>
+  </message>
+  <message name="BasePortType.echoToken">
+    <part name="inputToken" element="xsd1:BasePortType.echoToken.input"/>
+  </message>
+  <message name="BasePortType.echoTokenResponse">
+    <part name="return" element="xsd1:BasePortType.echoToken.return"/>
+  </message>
+  <message name="BasePortType.echoLanguage">
+    <part name="inputLanguage" element="xsd1:BasePortType.echoLanguage.input"/>
+  </message>
+  <message name="BasePortType.echoLanguageResponse">
+    <part name="return" element="xsd1:BasePortType.echoLanguage.return"/>
+  </message>
+  <message name="BasePortType.echoNMTOKEN">
+    <part name="inputNMTOKEN" element="xsd1:BasePortType.echoNMTOKEN.input"/>
+  </message>
+  <message name="BasePortType.echoNMTOKENResponse">
+    <part name="return" element="xsd1:BasePortType.echoNMTOKEN.return"/>
+  </message>
+  <message name="BasePortType.echoName">
+    <part name="inputName" element="xsd1:BasePortType.echoName.input"/>
+  </message>
+  <message name="BasePortType.echoNameResponse">
+    <part name="return" element="xsd1:BasePortType.echoName.return"/>
+  </message>
+  <message name="BasePortType.echoNCName">
+    <part name="inputNCName" element="xsd1:BasePortType.echoNCName.input"/>
+  </message>
+  <message name="BasePortType.echoNCNameResponse">
+    <part name="return" element="xsd1:BasePortType.echoNCName.return"/>
+  </message>
+  <message name="BasePortType.echoID">
+    <part name="inputID" element="xsd1:BasePortType.echoID.input"/>
+  </message>
+  <message name="BasePortType.echoIDResponse">
+    <part name="return" element="xsd1:BasePortType.echoID.return"/>
+  </message>
+  <message name="BasePortType.echoAnyURI">
+    <part name="inputAnyURI" element="xsd1:BasePortType.echoAnyURI.input"/>
+  </message>
+  <message name="BasePortType.echoAnyURIResponse">
+    <part name="return" element="xsd1:BasePortType.echoAnyURI.return"/>
+  </message>
+  <portType name="BasePortType">
+    <operation name="echoNormalizedString">
+      <input message="tns:BasePortType.echoNormalizedString" name="echoNormalizedString"/>
+      <output message="tns:BasePortType.echoNormalizedStringResponse" name="echoNormalizedStringResponse"/>
+    </operation>
+    <operation name="echoToken">
+      <input message="tns:BasePortType.echoToken" name="echoToken"/>
+      <output message="tns:BasePortType.echoTokenResponse" name="echoTokenResponse"/>
+    </operation>
+    <operation name="echoLanguage">
+      <input message="tns:BasePortType.echoLanguage" name="echoLanguage"/>
+      <output message="tns:BasePortType.echoLanguageResponse" name="echoLanguageResponse"/>
+    </operation>
+    <operation name="echoNMTOKEN">
+      <input message="tns:BasePortType.echoNMTOKEN" name="echoNMTOKEN"/>
+      <output message="tns:BasePortType.echoNMTOKENResponse" name="echoNMTOKENResponse"/>
+    </operation>
+    <operation name="echoName">
+      <input message="tns:BasePortType.echoName" name="echoName"/>
+      <output message="tns:BasePortType.echoNameResponse" name="echoNameResponse"/>
+    </operation>
+    <operation name="echoNCName">
+      <input message="tns:BasePortType.echoNCName" name="echoNCName"/>
+      <output message="tns:BasePortType.echoNCNameResponse" name="echoNCNameResponse"/>
+    </operation>
+    <operation name="echoID">
+      <input message="tns:BasePortType.echoID" name="echoID"/>
+      <output message="tns:BasePortType.echoIDResponse" name="echoIDResponse"/>
+    </operation>
+    <operation name="echoAnyURI">
+      <input message="tns:BasePortType.echoAnyURI" name="echoAnyURI"/>
+      <output message="tns:BasePortType.echoAnyURIResponse" name="echoAnyURIResponse"/>
+    </operation>
+  </portType>
+  <binding name="BasePortTypeCORBABinding" type="tns:BasePortType">
+    <corba:binding repositoryID="IDL:BasePortType:1.0"/>
+    <operation name="echoNormalizedString">
+      <corba:operation name="echoNormalizedString">
+        <corba:param name="inputNormalizedString" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoToken">
+      <corba:operation name="echoToken">
+        <corba:param name="inputToken" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoLanguage">
+      <corba:operation name="echoLanguage">
+        <corba:param name="inputLanguage" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoNMTOKEN">
+      <corba:operation name="echoNMTOKEN">
+        <corba:param name="inputNMTOKEN" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoName">
+      <corba:operation name="echoName">
+        <corba:param name="inputName" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoNCName">
+      <corba:operation name="echoNCName">
+        <corba:param name="inputNCName" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoID">
+      <corba:operation name="echoID">
+        <corba:param name="inputID" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoAnyURI">
+      <corba:operation name="echoAnyURI">
+        <corba:param name="inputAnyURI" mode="in" idltype="corba:string"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+  </binding>
+  <service name="BasePortTypeCORBAService">
+    <port name="BasePortTypeCORBAPort" binding="tns:BasePortTypeCORBABinding">
+      <corba:address location="..."/>
+    </port>
+  </service>
+</definitions>

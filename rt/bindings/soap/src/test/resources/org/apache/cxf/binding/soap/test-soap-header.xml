@@ -1,0 +1,56 @@
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership. The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
+    <!-- before header test for processing comment here -->
+    <env:Header>
+        <!-- header test for processing comment here -->
+        <m:reservation xmlns:m="http://travelcompany.example.org/reservation"
+            env:role="http://www.w3.org/2003/05/soap-envelope/role/next" env:mustUnderstand="true">
+            <m:reference>uuid:093a2da1-q345-739r-ba5d-pqff98fe8j7d</m:reference>
+            <m:dateAndTime>2001-11-29T13:20:00.000-05:00</m:dateAndTime>
+        </m:reservation>
+        <n:passenger xmlns:n="http://mycompany.example.com/employees"
+            env:role="http://www.w3.org/2003/05/soap-envelope/role/next" env:mustUnderstand="true">
+            <n:name>Bob</n:name>
+        </n:passenger>
+    </env:Header>
+    <!-- before body test for processing comment here -->
+    <env:Body>
+        <!-- boyd test for processing comment here -->
+        <p:itinerary xmlns:p="http://travelcompany.example.org/reservation/travel">
+            <p:departure>
+                <p:departing>New York</p:departing>
+                <p:arriving>Los Angeles</p:arriving>
+                <p:departureDate>2001-12-14</p:departureDate>
+                <p:departureTime>late afternoon</p:departureTime>
+                <p:seatPreference>aisle</p:seatPreference>
+            </p:departure>
+            <p:return>
+                <p:departing>Los Angeles</p:departing>
+                <p:arriving>New York</p:arriving>
+                <p:departureDate>2001-12-20</p:departureDate>
+                <p:departureTime>mid-morning</p:departureTime>
+                <p:seatPreference />
+            </p:return>
+        </p:itinerary>
+        <q:lodging xmlns:q="http://travelcompany.example.org/reservation/hotels">
+            <q:preference>none</q:preference>
+        </q:lodging>
+    </env:Body>
+</env:Envelope>

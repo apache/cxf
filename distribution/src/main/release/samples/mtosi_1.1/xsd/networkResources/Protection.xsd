@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ============ Includes ========= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="LayerRates.xsd"/>
+  <xsd:include schemaLocation="PGPParameters.xsd"/>
+  <!-- ============ Global Type Declarations ========= -->
+  <xsd:simpleType name="ReversionMode_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Reversion mode is used to indicate whether, after repair of a failed resource, an additional switch should be made to revert to the preferred resource. Revertive modes may require a wait to restore (WTR) time setting.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="RM_UNKNOWN"/>
+      <xsd:enumeration value="RM_NON_REVERTIVE"/>
+      <xsd:enumeration value="RM_REVERTIVE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ProtectionGroupType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The protection group type identifies the type of the protection Group. 
+
+It should be noted that although the term MSP was chosen as the original specific protection scheme to which the related behaviour applied was Multiplex Section Protection, the label is now more generally applied to any 1+1 or 1:N Trail protection scheme
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="PGT_MSP_1_PLUS_1"/>
+          <xsd:enumeration value="PGT_MSP_1_FOR_N"/>
+          <xsd:enumeration value="PGT_2_FIBER_BLSR"/>
+          <xsd:enumeration value="PGT_4_FIBER_BLSR"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="G_774_3_APSfunction_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Indicates if the switching function is based on APS standardized protocol or on a proprietary protocol.  "G.783" is set in case of K1/K2 based APS, and "Legacy" is set in case of proprietary protocol, as for radio equipment for example.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="G.783"/>
+          <xsd:enumeration value="Legacy"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="EPGPParameters_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The definition of the list of EPGP parameters.
+      Note that there are no pre-defined parameters in MTOSI R1.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="vendorExtensions" type="EPGPParametersExt_T" minOccurs="0"/>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EProtectionGroup_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This aggregate defines the EquipmentProtectionGroup Object
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="eProtectionGroupType" type="EProtectionGroupType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Defines the type of scheme this group represents (so far, only M:N equipment protection has been identified). It is a readonly attribute.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectionSchemeState" type="ProtectionSchemeState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the current protection scheme state. It is a readonly attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="reversionMode" type="ReversionMode_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Defines whether the protection scheme is revertive or not. It is a readonly attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ePgpParameters" type="EPGPParameters_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The epgpParameters contains a list of the associated parameters for the equipment protection group. It is a readonly attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectedList" type="NamingAttributesList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This provides a list of the protected equipment instances. For M:N equipment protection, this list would have N elements
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectingList" type="NamingAttributesList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This provides a list of the protecting equipment instances. For M:N equipment protection, this list would have M elements
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="G_774_3_APSfunction" type="G_774_3_APSfunction_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+G_774_3_APSfunction
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="EPGVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ESwitchData_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This structure is used to respond to queries regarding the current protection switch status of an equipment protection group.
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="eProtectionGroupType" type="EProtectionGroupType_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The type of protection
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="eSwitchReason" type="ESwitchReason_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The reason that the last switch occurred
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ePGPName" type="NamingAttributes_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the equipment protection group for which protection switch status is being reported
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectedE" type="NamingAttributes_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+This attributes identifies the protected equipment. 
+For a retrieval of an M:N group, protectedE always identifies a worker equipment instance. In this case, N ESwitchData_T are returned as a result of retrieveESwitchData (one for each worker equipment instance).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchToE" type="NamingAttributes_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+This identifies the equipment instance that is working after the switch, or currently working if no protection switch is currently active.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="ESwitchDataExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ESwitchDataList_T">
+    <xsd:sequence>
+      <xsd:element name="eSwitchData" type="ESwitchData_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ProtectionGroup_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This aggregate defines the ProtectionGroup Object
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectionGroupType" type="ProtectionGroupType_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Defines the type of scheme this group represents (e.g. 2f,4f blsr etc). It is a readonly attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectionSchemeState" type="ProtectionSchemeState_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the current protection scheme state. It is a readonly attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="reversionMode" type="ReversionMode_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Defines whether the protection scheme is revertive or not. It is a readonly attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="rate" type="LayerRate_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Line rate of the PTPs of the protection group. It is a readonly attribute.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="pgpParameters" type="PGPParameters_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The pgpParameters contains a list for the known parameters of the protection group. Non-applicable parameters and parameters for which the value is unknown to the EMS may be left out
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="pgpTPList" type="NamingAttributesList_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+This is the list of TPs that belong in the protection group. The list of TPs is partially ordered. The protecting TP always trails its worker TPs. The East TPs are always contiguous in the list, as well as West TPs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="G_774_3_APSfunction" type="G_774_3_APSfunction_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates if the switching function is based on APS standardized protocol or on a proprietary protocol.  "G.783" is set in case of K1/K2 based APS, and "Legacy" is set in case of proprietary protocol, as for radio equipment for example (values "G.783", "Legacy")
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="PGVendorExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="SwitchData_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This structure is used to respond to queries regarding the current protection switch status of an equipment protection group.
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="protectionType" type="ProtectionType_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The type of protection
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SwitchReason" type="SwitchReason_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The reason that the last switch occurred
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRate" type="LayerRate_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+The layer which this switch is relevant to
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="groupName" type="NamingAttributes_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the protectionGroup for which protection switch status is being reported. NULL if protectionType is SNCP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectedTP" type="NamingAttributes_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+This is the TP that is protected. The protected (worker) and protecting TPs are fixed in a revertive protection group, the worker can be active or not at any point in time. In a non-revertive protection group, there is no fixed worker/protecting distinction. The worker TP is indeed always the active TP; after a switch, the worker and protecting TPs exchange their roles.
+For an SNCP, this is always the reliable TP.
+For a retrieval of a 2F BLSR, each TP is protected, and two SwitchData_T are returned.
+For a retrieval of a 4FMSSPR, each worker TP is protected, and two SwitchData_T are returned.
+For a retrieval of a 1:N MSP, each worker TP is protected, and N SwitchData_T are returned.
+For a revertive 1+1 MSP, this is always the worker TP.
+For a retrieval of a non-revertive 1+1 MSP switch, this is the active TP.
+Note: The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchToTP" type="NamingAttributes_T" nillable="true">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the TP which is being switched to.
+This identifies the TP that is the active source after the switch, or currently active if no protection switch is currently active. Note: The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="SwitchDataExtensions_T" nillable="true" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Allows for additional information to be modeled
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="SwitchDataList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      List of SwitchData
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="switchData" type="SwitchData_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EProtectionGroupList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      List of EProtectionGroups
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="epgp" type="EProtectionGroup_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ProtectionGroupList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      List of ProtectionGroups
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="pgp" type="ProtectionGroup_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

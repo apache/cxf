@@ -1,0 +1,11 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Body>
+  <m:echo xmlns:m="http://mtom.systest.cxf.apache.org">
+    <m:Data>
+      <m:someData>
+        ABCDEF0123456789
+      </m:someData>
+    </m:Data>
+  </m:echo>
+ </env:Body>
+</env:Envelope>

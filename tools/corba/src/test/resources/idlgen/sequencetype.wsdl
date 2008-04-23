@@ -1,0 +1,1656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions targetNamespace="http://schemas.apache.org/idl/iacc.idl" xmlns:tns="http://schemas.apache.org/idl/iacc.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/iacc.idl" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" xmlns:references="http://schemas.apache.org/references" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/iacc.idl/corba/typemap/">
+    <corba:sequence xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" elemtype="ns1:IACC.Subscriber" bound="0" repositoryID="IDL:IACC/IACCLists:1.0" type="xsd1:IACC.IACCLists" name="IACC.IACCLists" />
+    <corba:sequence xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" elemtype="ns1:IACC.OneAttribute" bound="0" repositoryID="IDL:IACC/IACCList:1.0" type="xsd1:IACC.IACCList" name="IACC.IACCList" />
+    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Subscriber:1.0" type="xsd1:IACC.Subscriber" name="IACC.Subscriber">
+      <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="info" idltype="ns1:IACC.IACCList" />
+      <corba:member name="request_id" idltype="corba:long" />
+    </corba:struct>
+      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/IACClassNotLoadedException:1.0" type="xsd1:IACC.IACClassNotLoadedException" name="IACC.IACClassNotLoadedException" />
+      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/ConnectionNotClosedException:1.0" type="xsd1:IACC.ConnectionNotClosedException" name="IACC.ConnectionNotClosedException" />
+      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/OneAttribute:1.0" type="xsd1:IACC.OneAttribute" name="IACC.OneAttribute">
+        <corba:member name="level" idltype="corba:long" />
+        <corba:member name="name" idltype="corba:string" />
+        <corba:member name="value" idltype="corba:string" />
+      </corba:struct>
+        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setPasswordResult:1.0" type="xsd1:IACC.Server.setPasswordResult" name="IACC.Server.setPasswordResult" />
+        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/makeAllowanceResult:1.0" type="xsd1:IACC.Server.makeAllowanceResult" name="IACC.Server.makeAllowanceResult">
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        </corba:struct>
+          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setSNParserClass:1.0" type="xsd1:IACC.Server.setSNParserClass" name="IACC.Server.setSNParserClass">
+            <corba:member name="parserName" idltype="corba:string" />
+          </corba:struct>
+            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getConnectionInstances:1.0" type="xsd1:IACC.Server.getConnectionInstances" name="IACC.Server.getConnectionInstances" />
+            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/cancelReservationResult:1.0" type="xsd1:IACC.Server.cancelReservationResult" name="IACC.Server.cancelReservationResult">
+              <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+            </corba:struct>
+              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/cancelReservation2:1.0" type="xsd1:IACC.Server.cancelReservation2" name="IACC.Server.cancelReservation2">
+                <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCLists" />
+              </corba:struct>
+                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/updateConfigParametersResult:1.0" type="xsd1:IACC.Server.updateConfigParametersResult" name="IACC.Server.updateConfigParametersResult" />
+                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/commitReservation2:1.0" type="xsd1:IACC.Server.commitReservation2" name="IACC.Server.commitReservation2">
+                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCLists" />
+                </corba:struct>
+                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getVersion:1.0" type="xsd1:IACC.Server.getVersion" name="IACC.Server.getVersion" />
+                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getVersionResult:1.0" type="xsd1:IACC.Server.getVersionResult" name="IACC.Server.getVersionResult">
+                    <corba:member name="return" idltype="corba:string" />
+                  </corba:struct>
+                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getServiceNameSelector:1.0" type="xsd1:IACC.Server.getServiceNameSelector" name="IACC.Server.getServiceNameSelector" />
+                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getLoginType:1.0" type="xsd1:IACC.Server.getLoginType" name="IACC.Server.getLoginType" />
+                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/makeTopUp:1.0" type="xsd1:IACC.Server.makeTopUp" name="IACC.Server.makeTopUp">
+                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                    </corba:struct>
+                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/commitReservation2Result:1.0" type="xsd1:IACC.Server.commitReservation2Result" name="IACC.Server.commitReservation2Result">
+                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCLists" />
+                      </corba:struct>
+                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/makeTopUpResult:1.0" type="xsd1:IACC.Server.makeTopUpResult" name="IACC.Server.makeTopUpResult">
+                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                        </corba:struct>
+                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/hasCreditResult:1.0" type="xsd1:IACC.Server.hasCreditResult" name="IACC.Server.hasCreditResult">
+                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                          </corba:struct>
+                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setDatabaseHostPort:1.0" type="xsd1:IACC.Server.setDatabaseHostPort" name="IACC.Server.setDatabaseHostPort">
+                              <corba:member name="port" idltype="corba:string" />
+                            </corba:struct>
+                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setDatabaseHostName:1.0" type="xsd1:IACC.Server.setDatabaseHostName" name="IACC.Server.setDatabaseHostName">
+                                <corba:member name="hostname" idltype="corba:string" />
+                              </corba:struct>
+                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/cancelReservation2Result:1.0" type="xsd1:IACC.Server.cancelReservation2Result" name="IACC.Server.cancelReservation2Result">
+                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCLists" />
+                                </corba:struct>
+                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/hasCredit2:1.0" type="xsd1:IACC.Server.hasCredit2" name="IACC.Server.hasCredit2">
+                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCLists" />
+                                    <corba:member name="operation" idltype="corba:long" />
+                                  </corba:struct>
+                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setPassword:1.0" type="xsd1:IACC.Server.setPassword" name="IACC.Server.setPassword">
+                                      <corba:member name="password" idltype="corba:string" />
+                                    </corba:struct>
+                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/refreshAllowance:1.0" type="xsd1:IACC.Server.refreshAllowance" name="IACC.Server.refreshAllowance">
+                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                      </corba:struct>
+                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/commitReservation:1.0" type="xsd1:IACC.Server.commitReservation" name="IACC.Server.commitReservation">
+                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                        </corba:struct>
+                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/isServerUp2Result:1.0" type="xsd1:IACC.Server.isServerUp2Result" name="IACC.Server.isServerUp2Result">
+                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                                          </corba:struct>
+                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/cancelAllowanceResult:1.0" type="xsd1:IACC.Server.cancelAllowanceResult" name="IACC.Server.cancelAllowanceResult">
+                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                                            </corba:struct>
+                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setConnectionInstances:1.0" type="xsd1:IACC.Server.setConnectionInstances" name="IACC.Server.setConnectionInstances">
+                                                <corba:member name="number" idltype="corba:string" />
+                                              </corba:struct>
+                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/makeAllowance:1.0" type="xsd1:IACC.Server.makeAllowance" name="IACC.Server.makeAllowance">
+                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                                </corba:struct>
+                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setServiceNameSelector:1.0" type="xsd1:IACC.Server.setServiceNameSelector" name="IACC.Server.setServiceNameSelector">
+                                                    <corba:member name="option" idltype="corba:string" />
+                                                  </corba:struct>
+                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/commitAllowance:1.0" type="xsd1:IACC.Server.commitAllowance" name="IACC.Server.commitAllowance">
+                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                                    </corba:struct>
+                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/cancelAllowance:1.0" type="xsd1:IACC.Server.cancelAllowance" name="IACC.Server.cancelAllowance">
+                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                                      </corba:struct>
+                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setServiceNameSelectorResult:1.0" type="xsd1:IACC.Server.setServiceNameSelectorResult" name="IACC.Server.setServiceNameSelectorResult" />
+                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/updateConfigParameters:1.0" type="xsd1:IACC.Server.updateConfigParameters" name="IACC.Server.updateConfigParameters" />
+                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/isServerUpResult:1.0" type="xsd1:IACC.Server.isServerUpResult" name="IACC.Server.isServerUpResult">
+                                                          <corba:member name="return" idltype="corba:string" />
+                                                        </corba:struct>
+                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/shutdown:1.0" type="xsd1:IACC.Server.shutdown" name="IACC.Server.shutdown" />
+                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getUsername:1.0" type="xsd1:IACC.Server.getUsername" name="IACC.Server.getUsername" />
+                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/cancelReservation:1.0" type="xsd1:IACC.Server.cancelReservation" name="IACC.Server.cancelReservation">
+                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                                          </corba:struct>
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getDatabaseHostPort:1.0" type="xsd1:IACC.Server.getDatabaseHostPort" name="IACC.Server.getDatabaseHostPort" />
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getPassword:1.0" type="xsd1:IACC.Server.getPassword" name="IACC.Server.getPassword" />
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/isProxyUp:1.0" type="xsd1:IACC.Server.isProxyUp" name="IACC.Server.isProxyUp" />
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/commitAllowanceResult:1.0" type="xsd1:IACC.Server.commitAllowanceResult" name="IACC.Server.commitAllowanceResult">
+                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                                                            </corba:struct>
+                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setDatabaseHostPortResult:1.0" type="xsd1:IACC.Server.setDatabaseHostPortResult" name="IACC.Server.setDatabaseHostPortResult" />
+                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getUsernameResult:1.0" type="xsd1:IACC.Server.getUsernameResult" name="IACC.Server.getUsernameResult">
+                                                                <corba:member name="return" idltype="corba:string" />
+                                                              </corba:struct>
+                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setLoginTypeResult:1.0" type="xsd1:IACC.Server.setLoginTypeResult" name="IACC.Server.setLoginTypeResult" />
+                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getDatabaseHostPortResult:1.0" type="xsd1:IACC.Server.getDatabaseHostPortResult" name="IACC.Server.getDatabaseHostPortResult">
+                                                                  <corba:member name="return" idltype="corba:string" />
+                                                                </corba:struct>
+                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/isServerUp:1.0" type="xsd1:IACC.Server.isServerUp" name="IACC.Server.isServerUp" />
+                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getServiceNameSelectorResult:1.0" type="xsd1:IACC.Server.getServiceNameSelectorResult" name="IACC.Server.getServiceNameSelectorResult">
+                                                                    <corba:member name="return" idltype="corba:string" />
+                                                                  </corba:struct>
+                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/hasCredit:1.0" type="xsd1:IACC.Server.hasCredit" name="IACC.Server.hasCredit">
+                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                                                      <corba:member name="operation" idltype="corba:long" />
+                                                                    </corba:struct>
+                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/hasCredit2Result:1.0" type="xsd1:IACC.Server.hasCredit2Result" name="IACC.Server.hasCredit2Result">
+                                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCLists" />
+                                                                      </corba:struct>
+                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getSNParserClass:1.0" type="xsd1:IACC.Server.getSNParserClass" name="IACC.Server.getSNParserClass" />
+                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getSNParserClassResult:1.0" type="xsd1:IACC.Server.getSNParserClassResult" name="IACC.Server.getSNParserClassResult">
+                                                                          <corba:member name="return" idltype="corba:string" />
+                                                                        </corba:struct>
+                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setLoginType:1.0" type="xsd1:IACC.Server.setLoginType" name="IACC.Server.setLoginType">
+                                                                            <corba:member name="logintype" idltype="corba:string" />
+                                                                          </corba:struct>
+                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setDatabaseHostNameResult:1.0" type="xsd1:IACC.Server.setDatabaseHostNameResult" name="IACC.Server.setDatabaseHostNameResult" />
+                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getPasswordResult:1.0" type="xsd1:IACC.Server.getPasswordResult" name="IACC.Server.getPasswordResult">
+                                                                              <corba:member name="return" idltype="corba:string" />
+                                                                            </corba:struct>
+                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getDatabaseHostName:1.0" type="xsd1:IACC.Server.getDatabaseHostName" name="IACC.Server.getDatabaseHostName" />
+                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getDatabaseHostNameResult:1.0" type="xsd1:IACC.Server.getDatabaseHostNameResult" name="IACC.Server.getDatabaseHostNameResult">
+                                                                                <corba:member name="return" idltype="corba:string" />
+                                                                              </corba:struct>
+                                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setUsernameResult:1.0" type="xsd1:IACC.Server.setUsernameResult" name="IACC.Server.setUsernameResult" />
+                                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/isServerUp2:1.0" type="xsd1:IACC.Server.isServerUp2" name="IACC.Server.isServerUp2">
+                                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="attributes" idltype="ns1:IACC.IACCList" />
+                                                                                </corba:struct>
+                                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getConnectionInstancesResult:1.0" type="xsd1:IACC.Server.getConnectionInstancesResult" name="IACC.Server.getConnectionInstancesResult">
+                                                                                    <corba:member name="return" idltype="corba:string" />
+                                                                                  </corba:struct>
+                                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setUsername:1.0" type="xsd1:IACC.Server.setUsername" name="IACC.Server.setUsername">
+                                                                                      <corba:member name="username" idltype="corba:string" />
+                                                                                    </corba:struct>
+                                                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/isProxyUpResult:1.0" type="xsd1:IACC.Server.isProxyUpResult" name="IACC.Server.isProxyUpResult">
+                                                                                        <corba:member name="return" idltype="corba:string" />
+                                                                                      </corba:struct>
+                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setSNParserClassResult:1.0" type="xsd1:IACC.Server.setSNParserClassResult" name="IACC.Server.setSNParserClassResult" />
+                                                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/refreshAllowanceResult:1.0" type="xsd1:IACC.Server.refreshAllowanceResult" name="IACC.Server.refreshAllowanceResult">
+                                                                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                                                                                        </corba:struct>
+                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/setConnectionInstancesResult:1.0" type="xsd1:IACC.Server.setConnectionInstancesResult" name="IACC.Server.setConnectionInstancesResult" />
+                                                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/getLoginTypeResult:1.0" type="xsd1:IACC.Server.getLoginTypeResult" name="IACC.Server.getLoginTypeResult">
+                                                                                            <corba:member name="return" idltype="corba:string" />
+                                                                                          </corba:struct>
+                                                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/commitReservationResult:1.0" type="xsd1:IACC.Server.commitReservationResult" name="IACC.Server.commitReservationResult">
+                                                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+                                                                                            </corba:struct>
+                                                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/Server/shutdownResult:1.0" type="xsd1:IACC.Server.shutdownResult" name="IACC.Server.shutdownResult" />
+                                                                                              <corba:exception xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/RemoteException:1.0" type="xsd1:IACC.RemoteException" name="IACC.RemoteException" />
+                                                                                              <corba:exception xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/IACCException:1.0" type="xsd1:IACC.IACCException" name="IACC.IACCException" />
+                                                                                              <corba:exception xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/ConnectionNotAvailableException:1.0" type="xsd1:IACC.ConnectionNotAvailableException" name="IACC.ConnectionNotAvailableException" />
+                                                                                              <corba:exception xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/ConnectionExhaustedException:1.0" type="xsd1:IACC.ConnectionExhaustedException" name="IACC.ConnectionExhaustedException" />
+                                                                                              <corba:exception xmlns:xsd1="http://schemas.apache.org/idltypes/iacc.idl" repositoryID="IDL:IACC/TimeoutException:1.0" type="xsd1:IACC.TimeoutException" name="IACC.TimeoutException" />
+                                                                                            </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/iacc.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.IACCException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.ConnectionExhaustedException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.ConnectionNotAvailableException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.RemoteException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.TimeoutException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.ConnectionNotClosedException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.IACClassNotLoadedException">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.OneAttribute">
+        <xsd:sequence>
+          <xsd:element name="level" type="xsd:int"/>
+          <xsd:element name="name" type="xsd:string"/>
+          <xsd:element name="value" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.IACCList">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:IACC.OneAttribute"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Subscriber">
+        <xsd:sequence>
+          <xsd:element name="info" type="xsd1:IACC.IACCList"/>
+          <xsd:element name="request_id" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.IACCLists">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:IACC.Subscriber"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.updateConfigParameters">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.updateConfigParametersResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.RemoteException" type="xsd1:IACC.RemoteException"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.hasCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+            <xsd:element name="operation" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.hasCreditResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.IACCException" type="xsd1:IACC.IACCException"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.ConnectionExhaustedException" type="xsd1:IACC.ConnectionExhaustedException"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.ConnectionNotAvailableException" type="xsd1:IACC.ConnectionNotAvailableException"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.TimeoutException" type="xsd1:IACC.TimeoutException"/>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.hasCredit2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCLists"/>
+            <xsd:element name="operation" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.hasCredit2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.commitReservation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.commitReservationResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.commitReservation2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.commitReservation2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.cancelReservation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.cancelReservationResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.cancelReservation2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.cancelReservation2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCLists"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.makeAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.makeAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.refreshAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.refreshAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.commitAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.commitAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.cancelAllowance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.cancelAllowanceResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.makeTopUp">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.makeTopUpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setConnectionInstances">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="number" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setConnectionInstancesResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getConnectionInstances">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getConnectionInstancesResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setDatabaseHostName">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="hostname" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setDatabaseHostNameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getDatabaseHostName">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getDatabaseHostNameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setDatabaseHostPort">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="port" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setDatabaseHostPortResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getDatabaseHostPort">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getDatabaseHostPortResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setUsername">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="username" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setUsernameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getUsername">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getUsernameResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setPassword">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="password" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setPasswordResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getPassword">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getPasswordResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setLoginType">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="logintype" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setLoginTypeResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getLoginType">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getLoginTypeResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setSNParserClass">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="parserName" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setSNParserClassResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getSNParserClass">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getSNParserClassResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setServiceNameSelector">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="option" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.setServiceNameSelectorResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getServiceNameSelector">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getServiceNameSelectorResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.shutdown">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.shutdownResult">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.isServerUp">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.isServerUpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.isProxyUp">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.isProxyUpResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getVersion">
+        <xsd:complexType>
+          <xsd:sequence>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.getVersionResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.isServerUp2">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attributes" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IACC.Server.isServerUp2Result">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="xsd1:IACC.IACCList"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </schema>
+  </types>
+  <message name="IACC.Server.setDatabaseHostName">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostName"/>
+  </message>
+  <message name="IACC.Server.cancelReservation">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservation"/>
+  </message>
+  <message name="IACC.ConnectionNotAvailableException">
+    <part name="exception" element="xsd1:IACC.ConnectionNotAvailableException"/>
+  </message>
+  <message name="IACC.Server.commitAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.commitAllowance"/>
+  </message>
+  <message name="IACC.Server.setConnectionInstancesResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setConnectionInstancesResult"/>
+  </message>
+  <message name="IACC.Server.hasCredit2Response">
+    <part name="parameters" element="xsd1:IACC.Server.hasCredit2Result"/>
+  </message>
+  <message name="IACC.Server.shutdownResponse">
+    <part name="parameters" element="xsd1:IACC.Server.shutdownResult"/>
+  </message>
+  <message name="IACC.Server.getPassword">
+    <part name="parameters" element="xsd1:IACC.Server.getPassword"/>
+  </message>
+  <message name="IACC.Server.setLoginType">
+    <part name="parameters" element="xsd1:IACC.Server.setLoginType"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostPort">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostPort"/>
+  </message>
+  <message name="IACC.Server.refreshAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.refreshAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.cancelAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.cancelAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.setUsername">
+    <part name="parameters" element="xsd1:IACC.Server.setUsername"/>
+  </message>
+  <message name="IACC.Server.getSNParserClassResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getSNParserClassResult"/>
+  </message>
+  <message name="IACC.Server.setServiceNameSelector">
+    <part name="parameters" element="xsd1:IACC.Server.setServiceNameSelector"/>
+  </message>
+  <message name="IACC.Server.getServiceNameSelectorResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getServiceNameSelectorResult"/>
+  </message>
+  <message name="IACC.Server.getUsername">
+    <part name="parameters" element="xsd1:IACC.Server.getUsername"/>
+  </message>
+  <message name="IACC.Server.setServiceNameSelectorResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setServiceNameSelectorResult"/>
+  </message>
+  <message name="IACC.Server.getSNParserClass">
+    <part name="parameters" element="xsd1:IACC.Server.getSNParserClass"/>
+  </message>
+  <message name="IACC.Server.getConnectionInstances">
+    <part name="parameters" element="xsd1:IACC.Server.getConnectionInstances"/>
+  </message>
+  <message name="IACC.IACCException">
+    <part name="exception" element="xsd1:IACC.IACCException"/>
+  </message>
+  <message name="IACC.Server.setPassword">
+    <part name="parameters" element="xsd1:IACC.Server.setPassword"/>
+  </message>
+  <message name="IACC.Server.updateConfigParametersResponse">
+    <part name="parameters" element="xsd1:IACC.Server.updateConfigParametersResult"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostNameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostNameResult"/>
+  </message>
+  <message name="IACC.Server.commitReservation2">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservation2"/>
+  </message>
+  <message name="IACC.Server.setUsernameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setUsernameResult"/>
+  </message>
+  <message name="IACC.Server.isServerUp2">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUp2"/>
+  </message>
+  <message name="IACC.ConnectionExhaustedException">
+    <part name="exception" element="xsd1:IACC.ConnectionExhaustedException"/>
+  </message>
+  <message name="IACC.Server.getLoginTypeResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getLoginTypeResult"/>
+  </message>
+  <message name="IACC.Server.getVersionResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getVersionResult"/>
+  </message>
+  <message name="IACC.Server.cancelAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.cancelAllowance"/>
+  </message>
+  <message name="IACC.Server.commitReservation">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservation"/>
+  </message>
+  <message name="IACC.Server.getServiceNameSelector">
+    <part name="parameters" element="xsd1:IACC.Server.getServiceNameSelector"/>
+  </message>
+  <message name="IACC.TimeoutException">
+    <part name="exception" element="xsd1:IACC.TimeoutException"/>
+  </message>
+  <message name="IACC.Server.shutdown">
+    <part name="parameters" element="xsd1:IACC.Server.shutdown"/>
+  </message>
+  <message name="IACC.Server.commitAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.commitAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.makeAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.makeAllowance"/>
+  </message>
+  <message name="IACC.Server.makeAllowanceResponse">
+    <part name="parameters" element="xsd1:IACC.Server.makeAllowanceResult"/>
+  </message>
+  <message name="IACC.Server.commitReservation2Response">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservation2Result"/>
+  </message>
+  <message name="IACC.Server.getVersion">
+    <part name="parameters" element="xsd1:IACC.Server.getVersion"/>
+  </message>
+  <message name="IACC.Server.getLoginType">
+    <part name="parameters" element="xsd1:IACC.Server.getLoginType"/>
+  </message>
+  <message name="IACC.Server.makeTopUp">
+    <part name="parameters" element="xsd1:IACC.Server.makeTopUp"/>
+  </message>
+  <message name="IACC.Server.cancelReservation2Response">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservation2Result"/>
+  </message>
+  <message name="IACC.RemoteException">
+    <part name="exception" element="xsd1:IACC.RemoteException"/>
+  </message>
+  <message name="IACC.Server.commitReservationResponse">
+    <part name="parameters" element="xsd1:IACC.Server.commitReservationResult"/>
+  </message>
+  <message name="IACC.Server.setLoginTypeResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setLoginTypeResult"/>
+  </message>
+  <message name="IACC.Server.updateConfigParameters">
+    <part name="parameters" element="xsd1:IACC.Server.updateConfigParameters"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostName">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostName"/>
+  </message>
+  <message name="IACC.Server.getPasswordResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getPasswordResult"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostPortResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostPortResult"/>
+  </message>
+  <message name="IACC.Server.setSNParserClassResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setSNParserClassResult"/>
+  </message>
+  <message name="IACC.Server.setDatabaseHostNameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setDatabaseHostNameResult"/>
+  </message>
+  <message name="IACC.Server.refreshAllowance">
+    <part name="parameters" element="xsd1:IACC.Server.refreshAllowance"/>
+  </message>
+  <message name="IACC.Server.isServerUp2Response">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUp2Result"/>
+  </message>
+  <message name="IACC.Server.hasCredit2">
+    <part name="parameters" element="xsd1:IACC.Server.hasCredit2"/>
+  </message>
+  <message name="IACC.Server.isProxyUpResponse">
+    <part name="parameters" element="xsd1:IACC.Server.isProxyUpResult"/>
+  </message>
+  <message name="IACC.Server.isProxyUp">
+    <part name="parameters" element="xsd1:IACC.Server.isProxyUp"/>
+  </message>
+  <message name="IACC.Server.getUsernameResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getUsernameResult"/>
+  </message>
+  <message name="IACC.Server.isServerUpResponse">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUpResult"/>
+  </message>
+  <message name="IACC.Server.setConnectionInstances">
+    <part name="parameters" element="xsd1:IACC.Server.setConnectionInstances"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostPort">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostPort"/>
+  </message>
+  <message name="IACC.Server.hasCreditResponse">
+    <part name="parameters" element="xsd1:IACC.Server.hasCreditResult"/>
+  </message>
+  <message name="IACC.Server.setSNParserClass">
+    <part name="parameters" element="xsd1:IACC.Server.setSNParserClass"/>
+  </message>
+  <message name="IACC.Server.cancelReservationResponse">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservationResult"/>
+  </message>
+  <message name="IACC.Server.getConnectionInstancesResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getConnectionInstancesResult"/>
+  </message>
+  <message name="IACC.Server.isServerUp">
+    <part name="parameters" element="xsd1:IACC.Server.isServerUp"/>
+  </message>
+  <message name="IACC.Server.getDatabaseHostPortResponse">
+    <part name="parameters" element="xsd1:IACC.Server.getDatabaseHostPortResult"/>
+  </message>
+  <message name="IACC.Server.makeTopUpResponse">
+    <part name="parameters" element="xsd1:IACC.Server.makeTopUpResult"/>
+  </message>
+  <message name="IACC.Server.hasCredit">
+    <part name="parameters" element="xsd1:IACC.Server.hasCredit"/>
+  </message>
+  <message name="IACC.Server.setPasswordResponse">
+    <part name="parameters" element="xsd1:IACC.Server.setPasswordResult"/>
+  </message>
+  <message name="IACC.Server.cancelReservation2">
+    <part name="parameters" element="xsd1:IACC.Server.cancelReservation2"/>
+  </message>
+  <portType name="IACC.Server">
+    <operation name="updateConfigParameters">
+      <input name="updateConfigParameters" message="tns:IACC.Server.updateConfigParameters"/>
+      <output name="updateConfigParametersResponse" message="tns:IACC.Server.updateConfigParametersResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="hasCredit">
+      <input name="hasCredit" message="tns:IACC.Server.hasCredit"/>
+      <output name="hasCreditResponse" message="tns:IACC.Server.hasCreditResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="hasCredit2">
+      <input name="hasCredit2" message="tns:IACC.Server.hasCredit2"/>
+      <output name="hasCredit2Response" message="tns:IACC.Server.hasCredit2Response"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="commitReservation">
+      <input name="commitReservation" message="tns:IACC.Server.commitReservation"/>
+      <output name="commitReservationResponse" message="tns:IACC.Server.commitReservationResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="commitReservation2">
+      <input name="commitReservation2" message="tns:IACC.Server.commitReservation2"/>
+      <output name="commitReservation2Response" message="tns:IACC.Server.commitReservation2Response"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="cancelReservation">
+      <input name="cancelReservation" message="tns:IACC.Server.cancelReservation"/>
+      <output name="cancelReservationResponse" message="tns:IACC.Server.cancelReservationResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="cancelReservation2">
+      <input name="cancelReservation2" message="tns:IACC.Server.cancelReservation2"/>
+      <output name="cancelReservation2Response" message="tns:IACC.Server.cancelReservation2Response"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="makeAllowance">
+      <input name="makeAllowance" message="tns:IACC.Server.makeAllowance"/>
+      <output name="makeAllowanceResponse" message="tns:IACC.Server.makeAllowanceResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="refreshAllowance">
+      <input name="refreshAllowance" message="tns:IACC.Server.refreshAllowance"/>
+      <output name="refreshAllowanceResponse" message="tns:IACC.Server.refreshAllowanceResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="commitAllowance">
+      <input name="commitAllowance" message="tns:IACC.Server.commitAllowance"/>
+      <output name="commitAllowanceResponse" message="tns:IACC.Server.commitAllowanceResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="cancelAllowance">
+      <input name="cancelAllowance" message="tns:IACC.Server.cancelAllowance"/>
+      <output name="cancelAllowanceResponse" message="tns:IACC.Server.cancelAllowanceResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="makeTopUp">
+      <input name="makeTopUp" message="tns:IACC.Server.makeTopUp"/>
+      <output name="makeTopUpResponse" message="tns:IACC.Server.makeTopUpResponse"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+      <fault name="IACC.ConnectionNotAvailableException" message="tns:IACC.ConnectionNotAvailableException"/>
+      <fault name="IACC.ConnectionExhaustedException" message="tns:IACC.ConnectionExhaustedException"/>
+      <fault name="IACC.TimeoutException" message="tns:IACC.TimeoutException"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setConnectionInstances">
+      <input name="setConnectionInstances" message="tns:IACC.Server.setConnectionInstances"/>
+      <output name="setConnectionInstancesResponse" message="tns:IACC.Server.setConnectionInstancesResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getConnectionInstances">
+      <input name="getConnectionInstances" message="tns:IACC.Server.getConnectionInstances"/>
+      <output name="getConnectionInstancesResponse" message="tns:IACC.Server.getConnectionInstancesResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setDatabaseHostName">
+      <input name="setDatabaseHostName" message="tns:IACC.Server.setDatabaseHostName"/>
+      <output name="setDatabaseHostNameResponse" message="tns:IACC.Server.setDatabaseHostNameResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getDatabaseHostName">
+      <input name="getDatabaseHostName" message="tns:IACC.Server.getDatabaseHostName"/>
+      <output name="getDatabaseHostNameResponse" message="tns:IACC.Server.getDatabaseHostNameResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setDatabaseHostPort">
+      <input name="setDatabaseHostPort" message="tns:IACC.Server.setDatabaseHostPort"/>
+      <output name="setDatabaseHostPortResponse" message="tns:IACC.Server.setDatabaseHostPortResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getDatabaseHostPort">
+      <input name="getDatabaseHostPort" message="tns:IACC.Server.getDatabaseHostPort"/>
+      <output name="getDatabaseHostPortResponse" message="tns:IACC.Server.getDatabaseHostPortResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setUsername">
+      <input name="setUsername" message="tns:IACC.Server.setUsername"/>
+      <output name="setUsernameResponse" message="tns:IACC.Server.setUsernameResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getUsername">
+      <input name="getUsername" message="tns:IACC.Server.getUsername"/>
+      <output name="getUsernameResponse" message="tns:IACC.Server.getUsernameResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setPassword">
+      <input name="setPassword" message="tns:IACC.Server.setPassword"/>
+      <output name="setPasswordResponse" message="tns:IACC.Server.setPasswordResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getPassword">
+      <input name="getPassword" message="tns:IACC.Server.getPassword"/>
+      <output name="getPasswordResponse" message="tns:IACC.Server.getPasswordResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setLoginType">
+      <input name="setLoginType" message="tns:IACC.Server.setLoginType"/>
+      <output name="setLoginTypeResponse" message="tns:IACC.Server.setLoginTypeResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getLoginType">
+      <input name="getLoginType" message="tns:IACC.Server.getLoginType"/>
+      <output name="getLoginTypeResponse" message="tns:IACC.Server.getLoginTypeResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setSNParserClass">
+      <input name="setSNParserClass" message="tns:IACC.Server.setSNParserClass"/>
+      <output name="setSNParserClassResponse" message="tns:IACC.Server.setSNParserClassResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getSNParserClass">
+      <input name="getSNParserClass" message="tns:IACC.Server.getSNParserClass"/>
+      <output name="getSNParserClassResponse" message="tns:IACC.Server.getSNParserClassResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="setServiceNameSelector">
+      <input name="setServiceNameSelector" message="tns:IACC.Server.setServiceNameSelector"/>
+      <output name="setServiceNameSelectorResponse" message="tns:IACC.Server.setServiceNameSelectorResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getServiceNameSelector">
+      <input name="getServiceNameSelector" message="tns:IACC.Server.getServiceNameSelector"/>
+      <output name="getServiceNameSelectorResponse" message="tns:IACC.Server.getServiceNameSelectorResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="shutdown">
+      <input name="shutdown" message="tns:IACC.Server.shutdown"/>
+      <output name="shutdownResponse" message="tns:IACC.Server.shutdownResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="isServerUp">
+      <input name="isServerUp" message="tns:IACC.Server.isServerUp"/>
+      <output name="isServerUpResponse" message="tns:IACC.Server.isServerUpResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="isProxyUp">
+      <input name="isProxyUp" message="tns:IACC.Server.isProxyUp"/>
+      <output name="isProxyUpResponse" message="tns:IACC.Server.isProxyUpResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="getVersion">
+      <input name="getVersion" message="tns:IACC.Server.getVersion"/>
+      <output name="getVersionResponse" message="tns:IACC.Server.getVersionResponse"/>
+      <fault name="IACC.RemoteException" message="tns:IACC.RemoteException"/>
+    </operation>
+    <operation name="isServerUp2">
+      <input name="isServerUp2" message="tns:IACC.Server.isServerUp2"/>
+      <output name="isServerUp2Response" message="tns:IACC.Server.isServerUp2Response"/>
+      <fault name="IACC.IACCException" message="tns:IACC.IACCException"/>
+    </operation>
+  </portType>
+  <binding name="IACC.ServerCORBABinding" type="tns:IACC.Server">
+    <corba:binding repositoryID="IDL:IACC/Server:1.0" />
+    <operation name="updateConfigParameters">
+      <corba:operation name="updateConfigParameters">
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="updateConfigParameters">
+      </input>
+      <output name="updateConfigParametersResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="hasCredit">
+      <corba:operation name="hasCredit">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:param mode="in" name="operation" idltype="corba:long" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="hasCredit">
+      </input>
+      <output name="hasCreditResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="hasCredit2">
+      <corba:operation name="hasCredit2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCLists" />
+        <corba:param mode="in" name="operation" idltype="corba:long" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCLists" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="hasCredit2">
+      </input>
+      <output name="hasCredit2Response">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="commitReservation">
+      <corba:operation name="commitReservation">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="commitReservation">
+      </input>
+      <output name="commitReservationResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="commitReservation2">
+      <corba:operation name="commitReservation2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCLists" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCLists" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="commitReservation2">
+      </input>
+      <output name="commitReservation2Response">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="cancelReservation">
+      <corba:operation name="cancelReservation">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="cancelReservation">
+      </input>
+      <output name="cancelReservationResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="cancelReservation2">
+      <corba:operation name="cancelReservation2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCLists" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCLists" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="cancelReservation2">
+      </input>
+      <output name="cancelReservation2Response">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="makeAllowance">
+      <corba:operation name="makeAllowance">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="makeAllowance">
+      </input>
+      <output name="makeAllowanceResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="refreshAllowance">
+      <corba:operation name="refreshAllowance">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="refreshAllowance">
+      </input>
+      <output name="refreshAllowanceResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="commitAllowance">
+      <corba:operation name="commitAllowance">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="commitAllowance">
+      </input>
+      <output name="commitAllowanceResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="cancelAllowance">
+      <corba:operation name="cancelAllowance">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="cancelAllowance">
+      </input>
+      <output name="cancelAllowanceResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="makeTopUp">
+      <corba:operation name="makeTopUp">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionNotAvailableException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.ConnectionExhaustedException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.TimeoutException" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="makeTopUp">
+      </input>
+      <output name="makeTopUpResponse">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+      <fault name="IACC.ConnectionExhaustedException">
+      </fault>
+      <fault name="IACC.ConnectionNotAvailableException">
+      </fault>
+      <fault name="IACC.RemoteException">
+      </fault>
+      <fault name="IACC.TimeoutException">
+      </fault>
+    </operation>
+    <operation name="setConnectionInstances">
+      <corba:operation name="setConnectionInstances">
+        <corba:param mode="in" name="number" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setConnectionInstances">
+      </input>
+      <output name="setConnectionInstancesResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getConnectionInstances">
+      <corba:operation name="getConnectionInstances">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getConnectionInstances">
+      </input>
+      <output name="getConnectionInstancesResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setDatabaseHostName">
+      <corba:operation name="setDatabaseHostName">
+        <corba:param mode="in" name="hostname" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setDatabaseHostName">
+      </input>
+      <output name="setDatabaseHostNameResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getDatabaseHostName">
+      <corba:operation name="getDatabaseHostName">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getDatabaseHostName">
+      </input>
+      <output name="getDatabaseHostNameResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setDatabaseHostPort">
+      <corba:operation name="setDatabaseHostPort">
+        <corba:param mode="in" name="port" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setDatabaseHostPort">
+      </input>
+      <output name="setDatabaseHostPortResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getDatabaseHostPort">
+      <corba:operation name="getDatabaseHostPort">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getDatabaseHostPort">
+      </input>
+      <output name="getDatabaseHostPortResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setUsername">
+      <corba:operation name="setUsername">
+        <corba:param mode="in" name="username" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setUsername">
+      </input>
+      <output name="setUsernameResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getUsername">
+      <corba:operation name="getUsername">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getUsername">
+      </input>
+      <output name="getUsernameResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setPassword">
+      <corba:operation name="setPassword">
+        <corba:param mode="in" name="password" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setPassword">
+      </input>
+      <output name="setPasswordResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getPassword">
+      <corba:operation name="getPassword">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getPassword">
+      </input>
+      <output name="getPasswordResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setLoginType">
+      <corba:operation name="setLoginType">
+        <corba:param mode="in" name="logintype" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setLoginType">
+      </input>
+      <output name="setLoginTypeResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getLoginType">
+      <corba:operation name="getLoginType">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getLoginType">
+      </input>
+      <output name="getLoginTypeResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setSNParserClass">
+      <corba:operation name="setSNParserClass">
+        <corba:param mode="in" name="parserName" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setSNParserClass">
+      </input>
+      <output name="setSNParserClassResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getSNParserClass">
+      <corba:operation name="getSNParserClass">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getSNParserClass">
+      </input>
+      <output name="getSNParserClassResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="setServiceNameSelector">
+      <corba:operation name="setServiceNameSelector">
+        <corba:param mode="in" name="option" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="setServiceNameSelector">
+      </input>
+      <output name="setServiceNameSelectorResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getServiceNameSelector">
+      <corba:operation name="getServiceNameSelector">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getServiceNameSelector">
+      </input>
+      <output name="getServiceNameSelectorResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="shutdown">
+      <corba:operation name="shutdown">
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="shutdown">
+      </input>
+      <output name="shutdownResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="isServerUp">
+      <corba:operation name="isServerUp">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="isServerUp">
+      </input>
+      <output name="isServerUpResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="isProxyUp">
+      <corba:operation name="isProxyUp">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="isProxyUp">
+      </input>
+      <output name="isProxyUpResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="getVersion">
+      <corba:operation name="getVersion">
+        <corba:return name="return" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.RemoteException" />
+      </corba:operation>
+      <input name="getVersion">
+      </input>
+      <output name="getVersionResponse">
+      </output>
+      <fault name="IACC.RemoteException">
+      </fault>
+    </operation>
+    <operation name="isServerUp2">
+      <corba:operation name="isServerUp2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" mode="in" name="attributes" idltype="ns1:IACC.IACCList" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" name="return" idltype="ns1:IACC.IACCList" />
+        <corba:raises xmlns:ns1="http://schemas.apache.org/idl/iacc.idl/corba/typemap/" exception="ns1:IACC.IACCException" />
+      </corba:operation>
+      <input name="isServerUp2">
+      </input>
+      <output name="isServerUp2Response">
+      </output>
+      <fault name="IACC.IACCException">
+      </fault>
+    </operation>
+  </binding>
+</definitions>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<wsdl:definitions xmlns:tmf854WS="tmf854.v1.ws" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="tmf854.v1.ws" name="TMF854-NotificationService-SOAP-JMS">
+	<wsdl:import namespace="tmf854.v1.ws" location="../../common/NotificationService.wsdl" />
+	<wsdl:binding name="NotificationBrokerSoapJMSBinding" type="tmf854WS:NotificationBroker">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/jms" />
+
+		<wsdl:operation name="subscribe">
+			<wsdl:input>
+				<soap:header message="tmf854WS:subscribe" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:subscribeResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+				<soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+		        <soap:fault name="ProcessingFailureException" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="unsubscribe">
+			<wsdl:input>
+				<soap:header message="tmf854WS:unsubscribe" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:unsubscribeResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+				<soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+		        <soap:fault name="ProcessingFailureException" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="notify">
+			<wsdl:input>
+				<soap:header message="tmf854WS:notify" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:binding name="NotificationConsumerSoapJMSBinding" type="tmf854WS:NotificationConsumer">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/jms" />
+
+		<wsdl:operation name="notify">
+			<wsdl:input>
+				<soap:header message="tmf854WS:notify" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:binding name="NotificationBrokerInterfaceSoapJMSBinding" type="tmf854WS:NotificationBrokerInterface">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/jms" />
+    <!-- ===================== This binding is deprecated in 1.1 ========= -->
+
+		<wsdl:operation name="subscribe">
+			<wsdl:input>
+				<soap:header message="tmf854WS:subscribe" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:subscribeResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+				<soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+		        <soap:fault name="ProcessingFailureException" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="unsubscribe">
+			<wsdl:input>
+				<soap:header message="tmf854WS:unsubscribe" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="tmf854WS:unsubscribeResponse" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="ProcessingFailureException">
+				<soap:header message="tmf854WS:ProcessingFailureException" part="mtosiHeader" use="literal"/>
+		        <soap:fault name="ProcessingFailureException" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="notify">
+			<wsdl:input>
+				<soap:header message="tmf854WS:notify" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:binding name="NotificationConsumerInterfaceSoapJMSBinding" type="tmf854WS:NotificationConsumerInterface">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/jms" />
+    <!-- ===================== This binding is deprecated in 1.1 ========= -->
+    
+		<wsdl:operation name="notify">
+			<wsdl:input>
+				<soap:header message="tmf854WS:notify" part="mtosiHeader" use="literal" />
+				<soap:body parts="mtosiBody" use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+</wsdl:definitions>

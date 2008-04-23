@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="BaseService"    
+    targetNamespace="http://schemas.apache.org/tests" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://schemas.apache.org/tests" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/tests">
+   
+<!--       xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" -->
+    <corba:typeMapping targetNamespace="http://schemas.apache.org/tests/corba/typemap/"/>
+        
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/tests"
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <import namespace="http://schemas.xmlsoap.org/wsdl/"/>
+<!--            <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>-->
+        </schema>
+    </types>
+    <message name="test_oneway">
+        <part name="inType" type="xsd:string"/>
+    </message>
+    <portType name="BasePortType">
+        <operation name="test_oneway">
+            <input message="tns:test_oneway" name="test_oneway"/>
+        </operation>
+    </portType>
+    <binding name="BaseCORBABinding" type="tns:BasePortType">
+        <corba:binding repositoryID="IDL:BasePortType:1.0"/>
+        <operation name="test_oneway">
+            <corba:operation name="test_oneway">
+                <corba:param idltype="corba:string" mode="in" name="inType"/>
+            </corba:operation>
+            <input name="test_oneway"/>
+        </operation>
+    </binding>
+
+</definitions>

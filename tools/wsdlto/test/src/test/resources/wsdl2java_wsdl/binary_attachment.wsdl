@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="binary_attachment" 
+    targetNamespace="http://apache.org/binary_attachment" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" 
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://apache.org/binary_attachment"  
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd1="http://xmlbus.com/AttachmentAppService/xsd"
+    xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+    <wsdl:message name="echoImageRequest">
+        <wsdl:part name="para0" type="xsd:base64Binary"/>
+    </wsdl:message>
+    <wsdl:message name="echoImageResponse">
+        <wsdl:part name="retn" type="xsd:base64Binary"/>
+    </wsdl:message>
+    <wsdl:message name="echoMultipleImageRequest">
+        <wsdl:part name="para0" type="xsd:base64Binary"/>
+        <wsdl:part name="para1" type="xsd:base64Binary"/>
+    </wsdl:message>
+    <wsdl:message name="echoMultipleImageResponse">
+        <wsdl:part name="retn0" type="xsd:base64Binary"/>
+        <wsdl:part name="retn1" type="xsd:base64Binary"/>
+    </wsdl:message>
+    <wsdl:portType name="binaryAttachmentPortType">
+        <wsdl:operation name="echoImage">
+            <wsdl:input message="tns:echoImageRequest" name="echoImageRequest"/>
+            <wsdl:output message="tns:echoImageResponse" name="echoImageResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="echoMultipleImage">
+            <wsdl:input message="tns:echoMultipleImageRequest" 
+                name="echoMultipleImageRequest"/>
+            <wsdl:output message="tns:echoMultipleImageResponse" 
+                name="echoMultipleImageResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="binaryAttachmentPortType_SOAPBinding" 
+        type="tns:binaryAttachmentPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="echoImage">
+            <soap:operation soapAction="urn:AttachmentService/echoImage" style="rpc"/>
+            <jaxws:bindings>
+                <enableMIMEContent>false</enableMIMEContent>
+            </jaxws:bindings>
+            <wsdl:input name="echoImageRequest">
+                <mime:multipartRelated>
+                    <mime:part name="part1">
+                        <soap:body 
+                            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+                            namespace="urn:AttachmentService" use="literal"/>
+                    </mime:part>
+                    <mime:part name="part2">
+                        <mime:content part="para0" type="image/jpeg"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:input>
+            <wsdl:output name="echoImageResponse">
+                <mime:multipartRelated>
+                    <mime:part name="part1">
+                        <soap:body 
+                            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+                            namespace="urn:AttachmentService" use="literal"/>
+                    </mime:part>
+                    <mime:part name="part2">
+                        <mime:content part="retn" type="image/jpeg"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echoMultipleImage">
+            <soap:operation soapAction="urn:AttachmentService/echoMultipleImage" style="rpc"/>
+    	    <wsdl:input name="echoMultipleImageRequest">
+                <mime:multipartRelated>
+                    <mime:part name="part1">
+                        <soap:body 
+                            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+                            namespace="urn:AttachmentService" use="literal"/>
+                    </mime:part>
+                    <mime:part name="part2">
+                        <mime:content part="para0" type="image/jpeg"/>
+                    </mime:part>
+                    <mime:part name="part3">
+		        <mime:content part="para1" type="image/jpeg"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:input>
+            <wsdl:output name="echoMultipleImageResponse">
+                <mime:multipartRelated>
+                    <mime:part name="part1">
+                        <soap:body 
+                            encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+                            namespace="urn:AttachmentService" use="literal"/>
+                    </mime:part>
+                    <mime:part name="part2">
+                        <mime:content part="retn0" type="image/jpeg"/>
+                    </mime:part>
+                    <mime:part name="part3">
+		        		<mime:content part="retn1" type="image/jpeg"/>
+		    			<mime:content part="retn1" type="image/gif"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SWAService">
+        <wsdl:port binding="tns:binaryAttachmentPortType_SOAPBinding" name="SWAPort">
+            <soap:address location="http://localhost:9000"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

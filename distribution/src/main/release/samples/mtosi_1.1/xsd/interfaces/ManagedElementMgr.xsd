@@ -1,0 +1,1207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1" xmlns="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ===================== Includes ========= -->
+  <xsd:include schemaLocation="Common.xsd"/>
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/ManagedElement.xsd"/>
+  <xsd:include schemaLocation="../networkResources/TerminationPoint.xsd"/>
+  <xsd:include schemaLocation="../networkResources/SubnetworkConnection.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Notifications.xsd"/>
+  <!-- ===================== Element Declarations ========= -->
+  <xsd:element name="getAllActiveAlarms" type="getAllActiveAlarms_T"/>
+  <xsd:element name="getAllActiveAlarmsResponse" type="getAllActiveAlarmsResponse_T"/>
+  <xsd:element name="getAllCrossConnections" type="getAllCrossConnections_T"/>
+  <xsd:element name="getAllCrossConnectionsResponse" type="getAllCrossConnectionsResponse_T"/>
+  <xsd:element name="getAllFixedCrossConnections" type="getAllFixedCrossConnections_T"/>
+  <xsd:element name="getAllFixedCrossConnectionsResponse" type="getAllFixedCrossConnectionsResponse_T"/>
+  <xsd:element name="getAllFTPNames" type="getAllFTPNames_T"/>
+  <xsd:element name="getAllFTPs" type="getAllFTPs_T"/>
+  <xsd:element name="getAllFTPsResponse" type="getAllFTPsResponse_T"/>
+  <xsd:element name="getAllManagedElementNames" type="getAllManagedElementNames_T"/>
+  <xsd:element name="getAllManagedElements" type="getAllManagedElements_T"/>
+  <xsd:element name="getAllManagedElementsResponse" type="getAllManagedElementsResponse_T"/>
+  <xsd:element name="getAllPTPNames" type="getAllPTPNames_T"/>
+  <xsd:element name="getAllPTPs" type="getAllPTPs_T"/>
+  <xsd:element name="getAllPTPsResponse" type="getAllPTPsResponse_T"/>
+  <xsd:element name="getAllPTPNamesWithoutFTPs" type="getAllPTPNamesWithoutFTPs_T"/>
+  <xsd:element name="getAllPTPsWithoutFTPs" type="getAllPTPsWithoutFTPs_T"/>
+  <xsd:element name="getAllPTPsWithoutFTPsResponse" type="getAllPTPsWithoutFTPsResponse_T"/>
+  <xsd:element name="getAllUnacknowledgedActiveAlarms" type="getAllUnacknowledgedActiveAlarms_T"/>
+  <xsd:element name="getAllUnacknowledgedActiveAlarmsResponse" type="getAllUnacknowledgedActiveAlarmsResponse_T"/>
+  <xsd:element name="getContainedCurrentCTPNames" type="getContainedCurrentCTPNames_T"/>
+  <xsd:element name="getContainedCurrentCTPs" type="getContainedCurrentCTPs_T"/>
+  <xsd:element name="getContainedCurrentCTPsResponse" type="getContainedCurrentCTPsResponse_T"/>
+  <xsd:element name="getContainedInUseCTPNames" type="getContainedInUseCTPNames_T"/>
+  <xsd:element name="getContainedInUseCTPs" type="getContainedInUseCTPs_T"/>
+  <xsd:element name="getContainedInUseCTPsResponse" type="getContainedInUseCTPsResponse_T"/>
+  <xsd:element name="getContainedPotentialCTPNames" type="getContainedPotentialCTPNames_T"/>
+  <xsd:element name="getContainedPotentialCTPs" type="getContainedPotentialCTPs_T"/>
+  <xsd:element name="getContainedPotentialCTPsResponse" type="getContainedPotentialCTPsResponse_T"/>
+  <xsd:element name="getContainingSubnetworkNames" type="getContainingSubnetworkNames_T"/>
+  <xsd:element name="getContainingTPNames" type="getContainingTPNames_T"/>
+  <xsd:element name="getContainingTPs" type="getContainingTPs_T"/>
+  <xsd:element name="getContainingTPsResponse" type="getContainingTPsResponse_T"/>
+  <xsd:element name="getManagedElement" type="getManagedElement_T"/>
+  <xsd:element name="getManagedElementResponse" type="getManagedElementResponse_T"/>
+  <xsd:element name="getPotentialFixedCCs" type="getPotentialFixedCCs_T"/>
+  <xsd:element name="getPotentialFixedCCsResponse" type="getPotentialFixedCCsResponse_T"/>
+  <xsd:element name="getTP" type="getTP_T"/>
+  <xsd:element name="getTPResponse" type="getTPResponse_T"/>
+  <!-- ===================== getAllActiveAlarms Request/Response Messages ========= -->
+  <xsd:complexType name="getAllActiveAlarms_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      	This allows an NMS to request all of the active alarms for the specified managed element. Alarms that are not reported by the ME to the EMS should not be reported by this operation. Some alarms may be filtered out (excluded) by specifying their probable causes or severities. 
+
+The result of this operation is independent of the filtering set up by the NMS for the notification service.
+
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object or excludeProbCauseList or excludeSeverityList contains undefined values.
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the Managed Element for which to retrieve active alarms.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="excludeProbCauseList" type="ProbableCauseList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of probable causes to exclude from the output list. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="excludeSeverityList" type="PerceivedSeverityList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of severities to exclude from the output list. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllActiveAlarmsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllActiveAlarms  operation. See also getAllActiveAlarms_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="activeAlarmList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>List of active alarms based on the provided filter.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="activeAlarm" type="Alarm_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>An Active alarm</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllCrossConnections Request/Response Messages ========= -->
+  <xsd:complexType name="getAllCrossConnections_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request a list of the cross-connects for the specified managed element at the specified layer rates. This operation returns cross-connects between CTPs/FTPs.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised if connectionRateList is empty or contains invalid rates, or if meName does not reference a managed element.
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the Managed Element for which to retrieve CCs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates for which to retrieve CCs. This must not be an empty list. In this case an INVALID_INPUT exception is thrown. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllCrossConnectionsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllCrossConnections operation. See also getAllCrossConnections_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ccList" type="CrossConnectList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of retrieved CCs.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllFixedCrossConnections_T Request/Response Messages ========= -->
+  <xsd:complexType name="getAllFixedCrossConnections_T">
+    <xsd:annotation>
+      <xsd:documentation>
+This operation has exactly the same behaviour as getAllCrossConnections(), but instead returns only fixed Cross Connection object structures. See Subnetwork Connection Types for an explanation of fixed SNCs.
+A cross connection is identified as fixed using additional information. See Additional Information Usage for detail on additional information for SNCs, cross connections and TPs.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised if connectionRateList is empty or contains invalid rates, or if meName does not reference a managed element.
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the Managed Element for which to retrieve CCs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of rates for which to retrieve CCs. This must not be an empty list. In this case an INVALID_INPUT exception is thrown. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllFixedCrossConnectionsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllFixedCrossConnections operation. See also getAllFixedCrossConnections_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ccList" type="CrossConnectList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of retrieved CCs.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllFTPNames Request/Response Messages ========= -->
+  <xsd:complexType name="getAllFTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllFTPs(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object, or tpLayerRateList or connectionLayerRateList contain undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of FTP layer rates for which the FTPs are to be fetched. A FTP must contain at least one of the layer rates specified to be reported. If the list is empty then all FTPs (of all rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the FTPs are to be fetched. A FTP must support connections for at least one of the layer rates specified to be reported. If the list is empty then all FTPs (for all connection rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllFTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllFTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllPTPs(), but instead of returning both PTPs and FTPs it returns solely FTPs.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object, or tpLayerRateList or connectionLayerRateList contain undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of FTP layer rates for which the FTPs are to be fetched. A FTP must contain at least one of the layer rates specified to be reported. If the list is empty then all FTPs (of all rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the FTPs are to be fetched. A FTP must support connections for at least one of the layer rates specified to be reported. If the list is empty then all FTPs (for all connection rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllFTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllFTPs operation. See also getAllFTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ftpList" type="FloatingTerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of FTPs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllManagedElementNames Request Message ========= -->
+  <xsd:complexType name="getAllManagedElementNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllManagedElements(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the Management Domain whose contained MEs are being requested
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllManagedElements Request/Response Messages ========= -->
+  <xsd:complexType name="getAllManagedElements_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request a list of all the known ManagedElements in the given MD.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="mdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the Management Domain whose contained MEs are being requested
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllManagedElementsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllManagedElements operation. See also getAllManagedElements_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meList" type="ManagedElementList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of MEs</xsd:documentation>
+        </xsd:annotation>
+        </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllPTPNames Request/Response Messages ========= -->
+  <xsd:complexType name="getAllPTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllPTPs(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object, or tpLayerRateList or connectionLayerRateList contain undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of PTP layer rates for which the PTPs are to be fetched. A PTP must contain at least one of the layer rates specified to be reported. If the list is empty then all PTPs (of all rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the PTPs are to be fetched. A PTP must support connections for at least one of the layer rates specified to be reported. If the list is empty then all PTPs (for all connection rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllPTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllPTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request all of the PTPs and FTPs on the specified Managed Element, that contain one or more of the NMS-specified PTP/FTP layer rates, and that are capable of supporting one or more of the NMS- specified connection layer rates. If there are no PTPs/FTPs that match the layer constraints, an empty list is returned. A PTP/FTP will be returned regardless of connectivity to other managed elements and regardless of position in the subnetwork (both edgepoints of the subnetwork and the PTPs/FTPs that are internal to the subnetwork are reported).
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object, or tpLayerRateList or connectionLayerRateList contain undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of PTP layer rates for which the PTPs are to be fetched. A PTP must contain at least one of the layer rates specified to be reported. If the list is empty then all PTPs (of all rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the PTPs are to be fetched. A PTP must support connections for at least one of the layer rates specified to be reported. If the list is empty then all PTPs (for all connection rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllPTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllPTPs operation. See also getAllPTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpList" type="TerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of all PTPs and FTPs.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllPTPNamesWithoutFTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllPTPNamesWithoutFTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllPTPsWithoutFTP, but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object, or tpLayerRateList or connectionLayerRateList contain undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of PTP layer rates for which the PTPs are to be fetched. A PTP must contain at least one of the layer rates specified to be reported. If the list is empty then all PTPs (of all rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the PTPs are to be fetched. A PTP must support connections for at least one of the layer rates specified to be reported. If the list is empty then all PTPs (for all connection rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllPTPsWithoutFTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getAllPTPsWithoutFTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getAllPTPs() but instead of returning both PTPs and FTPs it returns solely PTPs.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object, or tpLayerRateList or connectionLayerRateList contain undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="tpLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of PTP layer rates for which the PTPs are to be fetched. A PTP must contain at least one of the layer rates specified to be reported. If the list is empty then all PTPs (of all rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="connectionLayerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of connection layer rates for which the PTPs are to be fetched. A PTP must support connections for at least one of the layer rates specified to be reported. If the list is empty then all PTPs (for all connection rates) are returned.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllPTPsWithoutFTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllPTPsWithoutFTPs operation. See also getAllPTPsWithoutFTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ptpList" type="PhysicalTerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of PTPs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllUnacknowledgedActiveAlarms Request/Response Messages ========= -->
+  <xsd:complexType name="getAllUnacknowledgedActiveAlarms_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      	This allows an NMS to request all of the active alarms for the specified managed element that have not been acknowledged. Alarms that are not reported by the ME to the EMS should not be reported by this operation. Some alarms may be filtered out (excluded) by specifying their probable causes or severities. 
+
+The result of this operation is independent of the filtering set up by the NMS for the notification service
+
+        Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object or excludeProbCauseList or excludeSeverityList contains undefined values.
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the Managed Element for which to retrieve unacknowledged alarms.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="excludeProbCauseList" type="ProbableCauseList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of probable causes to exclude from the output list. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="excludeSeverityList" type="PerceivedSeverityList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            List of severities to exclude from the output list. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllUnacknowledgedActiveAlarmsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getAllUnacknowledgedActiveAlarms operation. See also getAllUnacknowledgedActiveAlarms_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="activeAlarmList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>List of active alarms based on the provided filter.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="activeAlarm" type="Alarm_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>An Active alarm</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedCurrentCTPNames Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedCurrentCTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getContainedCurrentTPs(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a PTP, FTP or CTP object or layerRateList contains undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a PTP, FTP or CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the PTP, FTP or CTP for which to get current contained CTPs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of rates of the current contained CTPS to be returned. An empty list indicates to get all current contained CTPs (of all rates).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedCurrentCTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedCurrentCTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service is used to retrieve the "current" CTPs that are contained within a specific PTP, FTP or CTP, at specific layer rates. A "current" CTP is defined as a CTP that is either cross-connectable or cross-connected,in the current mapping configuration.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a PTP, FTP or CTP object or layerRateList contains undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a PTP, FTP or CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the PTP, FTP or CTP for which to get current contained CTPs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of rates of the current contained CTPS to be returned. An empty list indicates to get all current contained CTPs (of all rates).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getContainedCurrentCTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getContainedCurrentCTPs operation. See also getContainedCurrentCTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ctpList" type="ConnectionTerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of CTPs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedInUseCTPNames Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedInUseCTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getContainedInUseCTPs(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a PTP, FTP or CTP object or layerRateList contains undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a PTP, FTP or CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TP for which to get contained in use TPs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of rates of the contained in use CTPs to be returned. An empty list indicates to get all contained in use CTPs (of all rates). 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedInUseCTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedInUseCTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service is used to retrieve the "in use" CTPs that are contained within a specific PTP, FTP or CTP, at specific layer rates. An "in use" CTP is defined as a CTP that is used by an SNC in any state (including pending), either as a CM end point or as an intermediate connection point, or a CTP that is terminated and mapped. This operation will be used when there are a large number of potential CTPs (e.g., in ATM).
+      		Example of usage with respect to ATM:
+To retrieve all actual ATM Network Interfaces associated with a PTP, this operation will be invoked using the PTP name as the tpName and LR_ATM_NI as the only layer rate in the layerRateList. The VPI and VCI ranges that are specified in the returned ATM Network Interface transmissionParams (i.e., Max_VPI_Bits and Max_VCI_Bits) can then be used to determine the potential VPI/VCI range. A subsequent invocation of this operation using an ATM Network Interface CTP as input can be used to determine which VPIs/VCIs are actually in use (with LR_ATM_VP and LR_ATM_VC included in the connectionRateList).
+Example of usage with respect to SONET/SDH:
+Consider an STM4 PTP with layerRate: LR_Optical_OC12_and_STM4. Assume that the set of CTPs returned by operation getContainedPotentialTPs() contains one CTP with layerRate LR_STS3c_and_AU4_VC4 that is terminating an SNC (layerRate LR_STS3c_and_AU4_VC4), and another CTP with layerRate LR_STS3c_and_AU4_VC4 that is terminated and mapped (attribute tpMappingMode is set to TM_TERMINATED_AND_AVAILABLE_FOR_MAPPING). The CTP with layerRate LR_STS3c_and_AU4_VC4 that is terminated and mapped contains one CTP with layerRate LR_VT2_and_TU12_VC12 that is involved in an SNC. None of the other contained CTPs have attribute tpMappingMode set to TM_TERMINATED_AND_AVAILABLE_FOR_MAPPING, or are involved in an SNC.
+Operation getContainedInUseTPs then returns three CTPs:
+- The CTP with layerRate LR_STS3c_and_AU4_VC4 that is terminating an SNC. 
+- The CTP with layerRate LR_STS3c_and_AU4_VC4 that has attribute tpMappingMode set to TM_TERMINATED_AND_AVAILABLE_FOR_MAPPING. 
+- The CTP with layerRate LR_VT2_and_TU12_VC12 that is terminating an SNC. 
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a PTP, FTP or CTP object or layerRateList contains undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a PTP, FTP or CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the TP for which to get contained in use TPs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of rates of the contained in use CTPs to be returned. An empty list indicates to get all contained in use CTPs (of all rates).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getContainedInUseCTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getContainedInUseCTPs operation. See also getContainedInUseCTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ctpList" type="ConnectionTerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of CTPs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedPotentialCTPNames Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedPotentialCTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getContainedPotentialCTPs(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a PTP, FTP or CTP object or layerRateList contains undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a PTP, FTP or CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the PTP, FTP or CTP for which to get contained CTPs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the list of the rates of the contained CTPs to be reported. An empty list indicates to get all contained CTPs (of all rates).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainedPotentialCTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getContainedPotentialCTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This allows an NMS to request all of the CTPs that it is potentially capable of supporting in all possible mapping configurations, at the specified rates and that are contained by the specified termination point.
+      		This service returns all potential contained CTPs for a given TP. The TP may be a PTP, an FTP or a CTP. If the layerRateList is empty then contained CTPs at all flexible and/or static LayerRates are returned.
+
+For an OC3 PTP that has the potential of mapping to VT1.5 the response would contain 3 STS1 CTPs and 84 VT1.5 CTPs; on a T1 PTP, the contained TPs would be one T1 CTP; for an STS1 CTP the response would contain 28 VT1.5 CTPs. In the case where an OC3 PTP supports mapping to T1s and VT1.5, then the contained list for the OC3 PTP could be 1 STS3c, 3 STS1, 84 VT1.5 and 84 T1 CTPs; if a VT1.5 CTP is provided, 1 T1 CTP is returned; if a T1 CTP is provided, the result is an empty list.
+
+Whenever a protection group is involved, the behaviour of this service is described below:
+
+Scenario 1: Before the Protection Group is created  
+- Query On Worker TPs returns list of all CTPs
+- Query On Protection TPs returns list of all CTPs  
+Scenario 2: After ProtectionGroup is created, if extra (preemptible/non-pre-emptible) traffic is allowed.
+- Query On Worker TPs returns list of all CTPs
+- Query On Protection TPs returns list of all CTPs  
+Scenario 3: After ProtectionGroup is created, if extra (preemptible/non-pre-emptible) traffic is not allowed
+- Query On Worker TPs returns list of CTPs that allow protected traffic
+- Query On Protection TPs returns an empty list (regardless of the switch status)  
+
+In case the protection group is created after a query is made, no object delete notification is made, the NMS is expected to query the ports in the protection group to find the list of contained CTPs.
+
+When ATM, this operation needs to be used with caution. The reason for this is that, in ATM, there can be a prohibitively large number of potential VP and VC CTPs returned by this operation. For retrieving ATM CTPs, the getContainedInUseTPs() operation should be considered.
+
+If DWDM, SONET and/or SDH is combined with ATM, it is advisable that this operation be used with the appropriate DWDM, SONET and/or SDH layer rates entered into the layerRateList. Otherwise, ATM CTPs will be returned and the resulting list of contained TPs could get prohibitive
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a PTP, FTP or CTP object or layerRateList contains undefined rates
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a PTP, FTP or CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the PTP, FTP or CTP for which to get contained CTPs. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRateList" type="LayerRateList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of rates of the contained in use CTPs to be returned. An empty list indicates to get all contained in use CTPs (of all rates).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getContainedPotentialCTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getContainedPotentialCTPs operation. See also getContainedPotentialCTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="ctpList" type="ConnectionTerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>The list of CTPs</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainingSubnetworkNames Request/Response Messages ========= -->
+  <xsd:complexType name="getContainingSubnetworkNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns the list of subnetwork names that the Managed Element supplied as an input parameter belongs to.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The name of the managed element for which to retrieve the containing subnetwork names.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainingTPNames Request/Response Messages ========= -->
+  <xsd:complexType name="getContainingTPNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation has exactly the same behaviour as getContainingTPs(), but instead of returning the entire object structures, this operation returns their names.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a CTP object
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the CTP for which containing CTPs and PTP/FTP are to be reported. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getContainingTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getContainingTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns a list of the containing TPs given a CTP. This will return an PTP or FTP where there is only one level of containment. In a case of deeper containment this will return a list of CTPs and a PTP or FTP. Using the UPSR OC3 example used in getContainedPotentialTPs, getContainingTPs on the working T1 CTP will return a working STS1 CTP and a working OC3PTP. If the OC3 was in APS, then getContainingTPs on the T1 CTP would return an STS1 CTP, an OC3 working PTP and an OC3 protect PTP.
+      		Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if OS cannot support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a CTP object
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a CTP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            Name of the CTP for which containing CTPs and PTP/FTP are to be reported. The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getContainingTPsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getContainingTPs operation. See also getContainingTPs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpList" type="TerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            The list of PTPs, FTPs, and CTPs containing the given the given CTPs.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getManagedElement Request/Response Messages ========= -->
+  <xsd:complexType name="getManagedElement_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This service returns the Managed Element for the given managed element name
+      Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when meName does not reference a managed element object
+EXCPT_ENTITY_NOT_FOUND - Raised when meName references an ME object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          Name of the ME to retrieve
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getManagedElementResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getManagedElement operation. See also getManagedElement_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="me" type="ManagedElement_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The retrieved ME
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getPotentialFixedCCs Request/Response Messages ========= -->
+  <xsd:complexType name="getPotentialFixedCCs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The operation is used to retrieve fixed connection schemes related to normal and inverse multiplexing. See Subnetwork Connection Types for an explanation of fixed SNCs.
+
+The operation takes as an input a TP and if this TP may be or is involved in a multiplexing or inverse multiplexing scheme, it will report:
+
+- The TP containing the fixed layer. 
+- the list of potential fixed cross connects that will exist if the containing TP's clientConnectivity or serverConnectivity is set to "Connected" (i.e. If the containing TP is set to multiplexing or inverse multiplexing). 
+
+If the clientConnectivity (resp. serverConnectivity) of the TP is currently set to "Connected", the potentialCCList matches the list of active fixed cross connects that involve its client TPs (resp. server TPs).
+
+If the TP client layer (resp. server layer) is always fixed cross connected (hard-wired), the potentialCCList always matches the list of active fixed cross connects that involve the client TPs (resp. server TPs).
+      		
+Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised if inputTP does not reference a TP.
+EXCPT_ENTITY_NOT_FOUND - Raised when inputTP references a TP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+EXCPT_UNABLE_TO_COMPLY - Raised when TP is neither a higher order TP that supports fixed multiplexing nor a lower order TP that supports fixed inverse multiplexing
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="inputTP" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          any TP name of the ME. The operation will return the multiplexing or inverse multiplexing scheme in which this TP is involved. The input TP may be either the containing TP or one of the end TPs of the portentialCCList.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getPotentialFixedCCsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getPotentialFixedCCs operation. See also getPotentialFixedCCs_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="containingTP" type="NamingAttributes_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The TP supporting the attribute clientConnectivity or serverConnectivity 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="portentialCCList" type="NamingAttributes_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The list of fixed Cross Connect of that multiplexing scheme, i.e. the list of cross connects that will exist when the containing TP clientConnectivity or serverConnectiivty is set to "Connected". The A_end TPs of the cross connects should be the low order TPs that can be flexibly cross connected, and the Z_end TPs the TP client of the high order TP. The list of cross connect does not take any specific order. If there are no potential fixed cross connects and empty list is returned. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getTP Request/Response Messages ========= -->
+  <xsd:complexType name="getTP_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This service returns the termination point structure for the given TP name (CTP, FTP or PTP). The termination point name must be explicit (a generic endpoint specification may not be used in this case). See Object Naming for further detail on FTP naming. The termination point structure contains transmission parameters. The transmission parameters returned will be the parameters in place on the actual termination point on the NE. If there are no transmission parameters or the TP does not actually exist on the NE, then transmissionParams will be empty. The field transmissionParams will also be empty for "potential" ATM VP/VC CTPs.
+
+      		Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tpName does not reference a termination point object
+EXCPT_ENTITY_NOT_FOUND - Raised when tpName references a TP object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            The retrieved TP name
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getTPResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+        This is the response of the getTP operation. See also getTP_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:element name="PTP" type="PhysicalTerminationPoint_T"/>
+      <xsd:element name="FTP" type="FloatingTerminationPoint_T"/>
+      <xsd:element name="CTP" type="ConnectionTerminationPoint_T"/>
+    </xsd:choice>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

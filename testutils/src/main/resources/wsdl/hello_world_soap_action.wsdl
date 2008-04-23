@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:xformat="http://cxf.apache.org/bindings/xformat"
+  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+  xmlns:jms="http://cxf.apache.org/transports/jms"
+  xmlns:tns="http://apache.org/hello_world_soap_action"
+  xmlns:x1="http://apache.org/hello_world_soap_action/types"
+  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+  targetNamespace="http://apache.org/hello_world_soap_action"
+  name="HelloWorld">
+  <wsdl:types>
+    <schema
+      targetNamespace="http://apache.org/hello_world_soap_action/types"
+      xmlns="http://www.w3.org/2001/XMLSchema"
+      elementFormDefault="qualified">
+      <element name="text" type="xsd:string" />
+      <element name="text2" type="xsd:string" />
+    </schema>
+  </wsdl:types>
+  <wsdl:message name="sayHiRequest">
+    <wsdl:part name="in" element="x1:text" />
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse">
+    <wsdl:part name="out" element="x1:text" />
+  </wsdl:message>
+  <wsdl:message name="sayHiRequest2">
+    <wsdl:part name="in" element="x1:text2" />
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse2">
+    <wsdl:part name="out" element="x1:text" />
+  </wsdl:message>
+
+  <wsdl:portType name="Greeter">
+    <wsdl:operation name="sayHi">
+      <wsdl:input name="sayHiRequest" message="tns:sayHiRequest" />
+      <wsdl:output name="sayHiResponse" message="tns:sayHiResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="sayHi2">
+      <wsdl:input name="sayHiRequest2" message="tns:sayHiRequest2" />
+      <wsdl:output name="sayHiResponse2" message="tns:sayHiResponse2" />
+    </wsdl:operation>
+
+  </wsdl:portType>
+  <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
+    <soap:binding style="document"
+      transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="sayHi">
+      <soap:operation style="document" soapAction="SAY_HI_1" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHi2">
+      <soap:operation style="document" soapAction="SAY_HI_2" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+  <wsdl:binding name="Greeter_SOAP12Binding" type="tns:Greeter">
+    <soap12:binding style="document"
+      transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" />
+    <wsdl:operation name="sayHi">
+      <soap12:operation soapAction="SAY_HI_1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHi2">
+      <soap12:operation soapAction="SAY_HI_2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    
+  </wsdl:binding>
+  <wsdl:service name="SOAPService">
+    <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+      <soap:address
+        location="http://localhost:9001/SOAPDocLitService/SoapPort" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="SOAP12Service">
+    <wsdl:port name="Soap12Port" binding="tns:Greeter_SOAP12Binding">
+      <soap:address
+        location="http://localhost:9001/SOAPDocLitService/Soap12Port" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

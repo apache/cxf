@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ns1="http://cxf.apache.org/routing/configuration" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/HWRouter" xmlns:tns1="http://cxf.apache.org/w2j/hello_world_doc_lit" targetNamespace="http://apache.org/HWRouter" name="HWRouter">
+	<import namespace="http://cxf.apache.org/w2j/hello_world_doc_lit" location="./hello_world_doc_lit_router.wsdl"/>
+	<service name="HTTPSoapServiceSource">
+		<port name="HTTPSoapPortSource" binding="tns1:Greeter_SOAPBinding">
+			<soap:address location="http://localhost:9001/SOAPDocLitService/SoapPort"/>
+		</port>
+	</service>
+	<service name="HTTPSoapServiceDestination">
+		<port name="HTTPSoapPortDestination" binding="tns1:Greeter_SOAPBinding">
+			<soap:address location="http://localhost:9003/HTTPSoapServiceDestination/HTTPSoapPortDestination"/>
+		</port>
+	</service>
+	<service name="HTTPXMLServiceSource">
+		<port name="HTTPXMLPortSource" binding="tns1:Greeter_XMLBinding">
+		    <http:address location="http://localhost:9003"/>
+		</port>
+	</service>
+	<ns1:route name="route_0">
+		<ns1:source port="HTTPSoapPortSource" service="tns:HTTPSoapServiceSource"/>
+		<ns1:destination port="HTTPSoapPortDestination" service="tns:HTTPSoapServiceDestination"/>
+	</ns1:route>
+	<ns1:route name="route_1">
+		<ns1:source port="HTTPXMLPortSource" service="tns:HTTPXMLServiceSource"/>
+		<ns1:destination port="HTTPSoapPortDestination" service="tns:HTTPSoapServiceDestination"/>
+	</ns1:route>
+</definitions>

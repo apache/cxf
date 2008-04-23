@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions
+ targetNamespace="http://schemas.apache.org/idl/datetime.idl"
+ xmlns="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:tns="http://schemas.apache.org/idl/datetime.idl"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd1="http://schemas.apache.org/idltypes/datetime.idl"
+ xmlns:corba="http://schemas.apache.org/bindings/corba"
+ xmlns:corbatm="http://schemas.apache.org/typemap/corba/datetime.idl"
+ xmlns:references="http://schemas.apache.org/references">
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/datetime.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:complexType name="TimeBase.IntervalT">
+        <xsd:sequence>
+          <xsd:element name="lower_bound" type="xsd:unsignedLong"/>
+          <xsd:element name="upper_bound" type="xsd:unsignedLong"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="BasePortType.SimpleStruct">
+        <xsd:sequence>
+          <xsd:element name="varUTCTime" type="xsd:dateTime"/>
+          <xsd:element name="varInt" type="xsd:int"/>
+          <xsd:element name="varTime" type="xsd:unsignedLong"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="BasePortType.SimpleUnion">
+        <xsd:choice>
+          <xsd:element name="varUTCTime" type="xsd:dateTime"/>
+          <xsd:element name="varInt" type="xsd:int"/>
+          <xsd:element name="varFloat" type="xsd:float"/>
+        </xsd:choice>
+      </xsd:complexType>
+      <xsd:complexType name="BasePortType._omg_SimpleUnion">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="discriminator" type="xsd:int"/>
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="varUTCTime" type="xsd:dateTime"/>
+            <xsd:element name="varInt" type="xsd:int"/>
+            <xsd:element name="varFloat" type="xsd:float"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="BasePortType.echoDateTime.input" type="xsd:dateTime"/>
+      <xsd:element name="BasePortType.echoDateTime.return" type="xsd:dateTime"/>
+      <xsd:element name="BasePortType.echoDate.input" type="xsd:date"/>
+      <xsd:element name="BasePortType.echoDate.return" type="xsd:date"/>
+      <xsd:element name="BasePortType.echoTime.input" type="xsd:time"/>
+      <xsd:element name="BasePortType.echoTime.return" type="xsd:time"/>
+      <xsd:element name="BasePortType.echoGYearMonth.input" type="xsd:gYearMonth"/>
+      <xsd:element name="BasePortType.echoGYearMonth.return" type="xsd:gYearMonth"/>
+      <xsd:element name="BasePortType.echoGYear.input" type="xsd:gYear"/>
+      <xsd:element name="BasePortType.echoGYear.return" type="xsd:gYear"/>
+      <xsd:element name="BasePortType.echoGMonthDay.input" type="xsd:gMonthDay"/>
+      <xsd:element name="BasePortType.echoGMonthDay.return" type="xsd:gMonthDay"/>
+      <xsd:element name="BasePortType.echoGMonth.input" type="xsd:gMonth"/>
+      <xsd:element name="BasePortType.echoGMonth.return" type="xsd:gMonth"/>
+      <xsd:element name="BasePortType.echoGDay.input" type="xsd:gDay"/>
+      <xsd:element name="BasePortType.echoGDay.return" type="xsd:gDay"/>
+      <xsd:element name="BasePortType.set_interval.interval" type="xsd1:TimeBase.IntervalT"/>
+    </schema>
+  </types>
+  <message name="BasePortType.echoDateTime">
+    <part name="inputDateTime" element="xsd1:BasePortType.echoDateTime.input"/>
+  </message>
+  <message name="BasePortType.echoDateTimeResponse">
+    <part name="return" element="xsd1:BasePortType.echoDateTime.return"/>
+  </message>
+  <message name="BasePortType.echoDate">
+    <part name="inputDate" element="xsd1:BasePortType.echoDate.input"/>
+  </message>
+  <message name="BasePortType.echoDateResponse">
+    <part name="return" element="xsd1:BasePortType.echoDate.return"/>
+  </message>
+  <message name="BasePortType.echoTime">
+    <part name="inputTime" element="xsd1:BasePortType.echoTime.input"/>
+  </message>
+  <message name="BasePortType.echoTimeResponse">
+    <part name="return" element="xsd1:BasePortType.echoTime.return"/>
+  </message>
+  <message name="BasePortType.echoGYearMonth">
+    <part name="inputGYearMonth" element="xsd1:BasePortType.echoGYearMonth.input"/>
+  </message>
+  <message name="BasePortType.echoGYearMonthResponse">
+    <part name="return" element="xsd1:BasePortType.echoGYearMonth.return"/>
+  </message>
+  <message name="BasePortType.echoGYear">
+    <part name="inputGYear" element="xsd1:BasePortType.echoGYear.input"/>
+  </message>
+  <message name="BasePortType.echoGYearResponse">
+    <part name="return" element="xsd1:BasePortType.echoGYear.return"/>
+  </message>
+  <message name="BasePortType.echoGMonthDay">
+    <part name="inputGMonthDay" element="xsd1:BasePortType.echoGMonthDay.input"/>
+  </message>
+  <message name="BasePortType.echoGMonthDayResponse">
+    <part name="return" element="xsd1:BasePortType.echoGMonthDay.return"/>
+  </message>
+  <message name="BasePortType.echoGMonth">
+    <part name="inputGMonth" element="xsd1:BasePortType.echoGMonth.input"/>
+  </message>
+  <message name="BasePortType.echoGMonthResponse">
+    <part name="return" element="xsd1:BasePortType.echoGMonth.return"/>
+  </message>
+  <message name="BasePortType.echoGDay">
+    <part name="inputGDay" element="xsd1:BasePortType.echoGDay.input"/>
+  </message>
+  <message name="BasePortType.echoGDayResponse">
+    <part name="return" element="xsd1:BasePortType.echoGDay.return"/>
+  </message>
+  <message name="BasePortType.set_interval">
+    <part name="interval" element="xsd1:BasePortType.set_interval.interval"/>
+  </message>
+  <message name="BasePortType.set_intervalResponse"/>
+  <portType name="BasePortType">
+    <operation name="echoDateTime">
+      <input message="tns:BasePortType.echoDateTime" name="echoDateTime"/>
+      <output message="tns:BasePortType.echoDateTimeResponse" name="echoDateTimeResponse"/>
+    </operation>
+    <operation name="echoDate">
+      <input message="tns:BasePortType.echoDate" name="echoDate"/>
+      <output message="tns:BasePortType.echoDateResponse" name="echoDateResponse"/>
+    </operation>
+    <operation name="echoTime">
+      <input message="tns:BasePortType.echoTime" name="echoTime"/>
+      <output message="tns:BasePortType.echoTimeResponse" name="echoTimeResponse"/>
+    </operation>
+    <operation name="echoGYearMonth">
+      <input message="tns:BasePortType.echoGYearMonth" name="echoGYearMonth"/>
+      <output message="tns:BasePortType.echoGYearMonthResponse" name="echoGYearMonthResponse"/>
+    </operation>
+    <operation name="echoGYear">
+      <input message="tns:BasePortType.echoGYear" name="echoGYear"/>
+      <output message="tns:BasePortType.echoGYearResponse" name="echoGYearResponse"/>
+    </operation>
+    <operation name="echoGMonthDay">
+      <input message="tns:BasePortType.echoGMonthDay" name="echoGMonthDay"/>
+      <output message="tns:BasePortType.echoGMonthDayResponse" name="echoGMonthDayResponse"/>
+    </operation>
+    <operation name="echoGMonth">
+      <input message="tns:BasePortType.echoGMonth" name="echoGMonth"/>
+      <output message="tns:BasePortType.echoGMonthResponse" name="echoGMonthResponse"/>
+    </operation>
+    <operation name="echoGDay">
+      <input message="tns:BasePortType.echoGDay" name="echoGDay"/>
+      <output message="tns:BasePortType.echoGDayResponse" name="echoGDayResponse"/>
+    </operation>
+    <operation name="set_interval">
+      <input message="tns:BasePortType.set_interval" name="set_interval"/>
+      <output message="tns:BasePortType.set_intervalResponse" name="set_intervalResponse"/>
+    </operation>
+  </portType>
+</definitions>

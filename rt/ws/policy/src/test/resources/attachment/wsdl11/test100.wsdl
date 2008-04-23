@@ -1,0 +1,88 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions name="Calculator"
+   targetNamespace="http://apache.org/cxf/calculato/test"
+   xmlns:tns="http://apache.org/cxf/calculator/test"
+   xmlns:calc="http://apache.org/cxf/calculator"
+   xmlns:rmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
+   xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+   xmlns="http://schemas.xmlsoap.org/wsdl/"
+   xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+   xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+   xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" >
+
+  <wsp:Policy wsu:Id="RmPolicy" >
+    <rmp:RMAssertion>
+      <rmp:InactivityTimeout Milliseconds="600000" />
+      <rmp:BaseRetransmissionInterval Milliseconds="3000" />
+      <rmp:ExponentialBackoff />
+      <rmp:AcknowledgementInterval Milliseconds="200" />
+    </rmp:RMAssertion>
+  </wsp:Policy>
+
+    <wsp:Policy wsu:Id="X509EndpointPolicy" >
+      <sp:AsymmetricBinding>
+        <wsp:Policy>
+          <!-- Details omitted for readability -->
+          <sp:IncludeTimestamp />
+          <sp:OnlySignEntireHeadersAndBody />
+        </wsp:Policy>
+      </sp:AsymmetricBinding>
+    </wsp:Policy>
+
+    <wsp:Policy wsu:Id="SecureMessagePolicy" >
+      <sp:SignedParts>
+        <sp:Body />
+      </sp:SignedParts>
+      <sp:EncryptedParts>
+        <sp:Body />
+      </sp:EncryptedParts>
+    </wsp:Policy>
+
+    <import namespace="http://apache.org/cxf/calculator"
+       location="calculator.wsdl" />
+
+    <binding name="CalculatorBinding" type="calc:CalculatorPortType" >
+      <soap12:binding style="document"
+         transport="http://schemas.xmlsoap.org/soap/http" />
+      <wsp:PolicyReference URI="#RmPolicy" required="true" />
+      <wsp:PolicyReference URI="#X509EndpointPolicy" required="true" />
+      <operation name="add" >
+        <soap12:operation soapAction="http://apache.org/cxf/calculator/Calculator/add" />
+          <input>
+            <soap12:body use="literal"/>
+            <wsp:PolicyReference URI="#SecureMessagePolicy"
+                                 required="true" />
+          </input>
+          <output>
+            <soap12:body use="literal"/>
+            <wsp:PolicyReference URI="#SecureMessagePolicy"
+            <wsp:PolicyReference URI="#SecureMessagePolicy"
+                                 required="true" />
+          </output>
+      </operation>
+    </binding>
+
+    <service name="CalculatorService">
+	<port name="CalculatorPort" binding="tns:CalculatorBinding">
+	    <soap12:address location="http://localhost:9000/CalculatorService/SoapPort" />
+	</port>
+    </service>
+
+</definitions>

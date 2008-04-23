@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ===================== Includes ========= -->
+  <xsd:include schemaLocation="Common.xsd"/>
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/TransmissionDescriptor.xsd"/>
+  <xsd:include schemaLocation="../networkResources/TerminationPoint.xsd"/>
+  <!-- ===================== Element Declarations ========= -->
+  <xsd:element name="getAllTransmissionDescriptorNames" type="getAllTransmissionDescriptorNames_T"/>
+  <xsd:element name="getAllTransmissionDescriptors" type="getAllTransmissionDescriptors_T"/>
+  <xsd:element name="getAllTransmissionDescriptorsResponse" type="getAllTransmissionDescriptorsResponse_T"/>
+  <xsd:element name="getAssociatedTPs" type="getAssociatedTPs_T"/>
+  <xsd:element name="getAssociatedTPsResponse" type="getAssociatedTPsResponse_T"/>
+  <xsd:element name="getTransmissionDescriptor" type="getTransmissionDescriptor_T"/>
+  <xsd:element name="getTransmissionDescriptorResponse" type="getTransmissionDescriptorResponse_T"/>
+  <!-- ===================== getAllTransmissionDescriptorNames Request Message ========= -->
+  <xsd:complexType name="getAllTransmissionDescriptorNames_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Get the list of existing TransmissionDescriptor names.
+      This operation may only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      Note that the response message is handled by getObjectNamesResponse_T.
+
+      Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAllTransmissionDescriptors Request/Response Messages ========= -->
+  <xsd:complexType name="getAllTransmissionDescriptors_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Get the list of existing TransmissionDescriptors and their associated distinguishing information.
+      This operation may only be directed to a top-level OS and not to a subordinate OS.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+      
+      Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_NOT_IMPLEMENTED - Raised if the OS does not support this service
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAllTransmissionDescriptorsResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getAllTransmissionDescriptors operation. See also getAllTransmissionDescriptors_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tmdList" type="TransmissionDescriptorList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            a list of all TMDs (complete data structures) 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getAssociatedTPs Request/Response Messages ========= -->
+  <xsd:complexType name="getAssociatedTPs_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      This operation allows an OS to request all of the TPs associated with the specified Transmission Descriptor.
+      If there are no TPs which are associated with the specified Transmission Descriptor, then an empty list is returned.
+      Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+
+      Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tmdName does not reference a Transmission Descriptor object
+EXCPT_ENTITY_NOT_FOUND - Raised when transmissionDescriptorName references an object that does not exist
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tmdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the Transmission Descriptor
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getAssociatedTPsResponse_T">
+      <xsd:annotation>
+      	<xsd:documentation>
+      		This is the response of the getAssociatedTPs operation. See also getAssociatedTPs_T.
+      	</xsd:documentation>
+      </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tpList" type="TerminationPointList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            a list of all TPs associated to the given TMD
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getTransmissionDescriptor Request/Response Messages ========= -->
+  <xsd:complexType name="getTransmissionDescriptor_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      Get a specific TransmissionDescriptor and its associated distinguishing information.
+      This operation may only be directed to a top-level OS and not to a subordinate OS.
+      
+      Raises ProcessingFailureException 
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when tmdName does not reference a Transmission Descriptor object
+EXCPT_ENTITY_NOT_FOUND - Raised when transmissionDescriptorName references an object that does not exist
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="tmdName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+            the name of the Transmission Descriptor
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getTransmissionDescriptorResponse_T">
+    <xsd:sequence>
+      <xsd:element name="tmd" type="TransmissionDescriptor_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            the returned Transmission Descriptor
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

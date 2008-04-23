@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ===================== Includes ========= -->
+  <xsd:include schemaLocation="../common/Header.xsd"/>
+  <xsd:include schemaLocation="../networkResources/Notifications.xsd"/>
+  <!-- ===================== Element Declarations ========= -->
+  <xsd:element name="getActiveAlarmsCount" type="getActiveAlarmsCount_T"/>
+  <xsd:element name="getActiveAlarmsCountResponse" type="getActiveAlarmsCountResponse_T"/>
+  <xsd:element name="getActiveAlarms" type="getActiveAlarms_T"/>
+  <xsd:element name="getActiveAlarmsResponse" type="getActiveAlarmsResponse_T"/>
+  <!-- ===================== Type Definitions ========= -->
+  <xsd:simpleType name="AlarmSource_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The source of the alarm with respect to the OS receiving this request. This is one of  the active alarm filter criteria.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="INTERNAL"/>
+      <xsd:enumeration value="EXTERNAL"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="ActiveAlarmFilter_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The active alarm filter data structure.
+      Default interpretation (filter criteria is missing or is an empty list) indicates that it is not relevant to the query. All the filter criteria possible enumerations are applicable.
+      Examples:
+      #1: All filter criteria missing -> Retrieve all alarms associated with all MEs and this OS
+      #2: source=internal, all other criteria missing -> Retrieve all alarms associated with this OS only
+      #3: source=external, all other criteria missing -> Retrieve all alarms associated with the MEs only
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="source" type="AlarmSource_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute filters the alarms based on their source (with respect to the OS receiving this request). Possible values are INTERNAL, EXTERNAL, NOT_APPLICABLE. The value NOT_APPLICABLE means there is no filtering on the alarm source; i.e., internal and external alarms are in the scope.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="scope" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute filters the alarms based on a list of managed elements. The listed managed elements are in the scope. 
+If no managed element is provided, alarms from all managed elements are in scope.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="perceivedSeverityList" type="PerceivedSeverityList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute filters the alarms based on a list of severities (see ITU-T X.733 definitions). The listed severities are in the scope. 
+If no severity is provided, alarms with any severity are in scope.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="probableCauseList" type="ProbableCauseList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute filters the alarms based on a list of probable causes (for details refer to the supporting document: ProbableCauses). The listed probable causes are in the scope. If no probable cause is provided, alarms with any probable cause are in scope.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="acknowledgeIndication" type="AcknowledgeIndication_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          This attribute filters the alarms based on its acknowledge indication. Possible values are EVENT_ACKNOWLEDGED, EVENT_UNACKNOWLEDGED, and NOT_APPLICABLE. The value NOT_APPLICABLE indicates that alarms with any acknowledge indication are in scope.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getActiveAlarmsCount Request/Response Messages ========= -->
+  <xsd:complexType name="getActiveAlarmsCount_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation asks the target top-level OS to count the number of active alarms as restricted by the provided filter. The target OS sends the result to the requesting OS.
+      		The operation can only be directed to a top-level OS and not to a subordinate OS.
+      		
+      		Raises ProcessingFailureException 
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when an invalid input parameter is provided 
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="filter" type="ActiveAlarmFilter_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          Defines the subset of the set of active alarms known to the target OS that are to be counted
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getActiveAlarmsCountResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This is the response of the getActiveAlarmsCount operation. See also getActiveAlarmsCount_T.
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="activeAlarmCount" type="xsd:unsignedInt">
+        <xsd:annotation>
+          <xsd:documentation>
+              The number of active alarms that pass the filter conditions.
+            </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ===================== getActiveAlarms Request/Response Messages ========= -->
+  <xsd:complexType name="getActiveAlarms_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This operation returns (to the requesting OS) a specified subset of the active alarms known to the target OS. The target OS returns all alarms satisfying the filter constraints of the requesting OS.
+      		This operation can only be directed to a top-level OS and not to a subordinate OS.
+          Refer to the TMF 854 XML Solution Set document for details on the Message Exchange Pattern controls (multiple batch response).
+          
+      		Raises ProcessingFailureException 
+EXCPT_UNSUPPORTED_COMPRESSION_FORMAT - Raised when the specified file compression format is not supported
+EXCPT_UNSUPPORTED_PACKING_FORMAT - Raised when the specified file packing format is not supported
+EXCPT_NOT_IMPLEMENTED - Raised when the OS does not support this operation
+EXCPT_INTERNAL_ERROR - Raised in case of non-specific OS internal failure
+EXCPT_INVALID_INPUT - Raised when an invalid input parameter is provided 
+EXCPT_COMM_FAILURE - Raised when communication to an entity (needed to help fulfill the request) is lost
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="filter" type="ActiveAlarmFilter_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Defines the subset of the set of active alarms known to the target OS that are to be returned to the requesting OS
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="getActiveAlarmsResponse_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      		This is the response of the getActiveAlarms operation. See also getActiveAlarms_T.
+      	</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="activeAlarmList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>List of active alarms based on the provided filter.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="activeAlarm" type="Alarm_T" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>An Active alarm</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

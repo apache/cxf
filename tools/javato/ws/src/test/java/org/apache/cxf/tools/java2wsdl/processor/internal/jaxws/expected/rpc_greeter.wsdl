@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="GreeterService" targetNamespace="http://cxf.apache.org/" xmlns:tns="http://cxf.apache.org/" xmlns:ns1="http://jaxb.dev.java.net/array" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jaxb.dev.java.net/array" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://jaxb.dev.java.net/array">
+<xs:complexType final="#all" name="stringArray">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="echoStringArrayResponse">
+    <wsdl:part name="return" type="ns1:stringArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoStringArray">
+    <wsdl:part name="arg0" type="ns1:stringArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Hello">
+    <wsdl:operation name="echoStringArray">
+      <wsdl:input name="echoStringArray" message="tns:echoStringArray">
+    </wsdl:input>
+      <wsdl:output name="echoStringArrayResponse" message="tns:echoStringArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GreeterServiceSoapBinding" type="tns:Hello">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="echoStringArray">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="echoStringArray">
+        <soap:body use="literal" namespace="http://cxf.apache.org/"/>
+      </wsdl:input>
+      <wsdl:output name="echoStringArrayResponse">
+        <soap:body use="literal" namespace="http://cxf.apache.org/"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GreeterService">
+    <wsdl:port name="HelloPort" binding="tns:GreeterServiceSoapBinding">
+      <soap:address location="http://localhost:9090"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

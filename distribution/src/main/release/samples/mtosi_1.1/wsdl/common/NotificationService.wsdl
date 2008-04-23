@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<wsdl:definitions name="TMF854-NotificationService" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  
+  <!-- ===================== Import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/NotificationService.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  
+  <!-- ===================== Import Exception Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  
+  <!-- ===================== Definition of Subscribe Request/Response Messages ========= -->
+  <wsdl:message name="subscribe">
+    <wsdl:documentation>
+    The Subscribe request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:subscribe"/>
+  </wsdl:message>
+  <wsdl:message name="subscribeResponse">
+    <wsdl:documentation>
+    The Subscribe response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:subscribeResponse"/>
+  </wsdl:message>
+  
+  <!-- ===================== Definition of Unsubscribe Request/Response Messages ========= -->
+  <wsdl:message name="unsubscribe">
+    <wsdl:documentation>
+    The Unsubscribe request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:unsubscribe"/>
+  </wsdl:message>
+  <wsdl:message name="unsubscribeResponse">
+    <wsdl:documentation>
+    The Unsubscribe response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:unsubscribeResponse"/>
+  </wsdl:message>
+  
+  <!-- ===================== Definition of Notify Request (one way) Message ========= -->
+  <wsdl:message name="notify">
+    <wsdl:documentation>
+    The Notify message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:notify"/>
+  </wsdl:message>
+    
+  <!-- ===================== Port Type Definitions ====================== -->
+  
+  <!-- ===================== NotificationBroker Port Type  ===================== -->
+  <wsdl:portType name="NotificationBroker">
+    <wsdl:documentation>
+    The MTOSI NotificationBroker interface (porttype)
+    </wsdl:documentation>
+    <wsdl:operation name="subscribe">
+      <wsdl:input message="tmf854WS:subscribe"/>
+      <wsdl:output message="tmf854WS:subscribeResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribe">
+      <wsdl:input message="tmf854WS:unsubscribe"/>
+      <wsdl:output message="tmf854WS:unsubscribeResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="notify">
+      <wsdl:input message="tmf854WS:notify"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <!-- ===================== NotificationConsumer Port Type  ===================== -->
+  <wsdl:portType name="NotificationConsumer">
+    <wsdl:documentation>
+    The MTOSI NotificationConsumer interface (porttype)
+    </wsdl:documentation>
+    <wsdl:operation name="notify">
+      <wsdl:input message="tmf854WS:notify"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+   <!-- ===================== NotificationBrokerInterface Port Type  ===================== -->
+   <!-- ===================== This portType is deprecated as of MTOSI 1.1  ===================== -->
+  <wsdl:portType name="NotificationBrokerInterface">
+    <wsdl:documentation>
+    The MTOSI NotificationBroker interface (porttype)
+    </wsdl:documentation>
+    <wsdl:operation name="subscribe">
+      <wsdl:input message="tmf854WS:subscribe"/>
+      <wsdl:output message="tmf854WS:subscribeResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribe">
+      <wsdl:input message="tmf854WS:unsubscribe"/>
+      <wsdl:output message="tmf854WS:unsubscribeResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="notify">
+      <wsdl:input message="tmf854WS:notify"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <!-- ===================== NotificationConsumerInterface Port Type  ===================== -->
+  <!-- ===================== This portType is deprecated as of MTOSI 1.1  ===================== -->
+  <wsdl:portType name="NotificationConsumerInterface">
+    <wsdl:documentation>
+    The MTOSI NotificationConsumer interface (porttype)
+    </wsdl:documentation>
+    <wsdl:operation name="notify">
+      <wsdl:input message="tmf854WS:notify"/>
+    </wsdl:operation>
+  </wsdl:portType>
+ 
+</wsdl:definitions>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="NumberFactoryService"
+	targetNamespace="http://cxf.apache.org/factory_pattern"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:jms="http://cxf.apache.org/transports/jms"
+	xmlns:ns1="http://factory_pattern.cxf.apache.org/"
+	xmlns:tns="http://cxf.apache.org/factory_pattern"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://factory_pattern.cxf.apache.org/">
+			<xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>	
+			<xsd:element name="create">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="id" nillable="false"
+							type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="createResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" nillable="false"
+							type="wsa:EndpointReferenceType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="isEvenResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="even" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="create">
+		<wsdl:part name="create" element="ns1:create" />
+	</wsdl:message>
+	<wsdl:message name="createResponse">
+		<wsdl:part name="createResponse" element="ns1:createResponse" />
+	</wsdl:message>
+	<wsdl:message name="isEven" />
+	<wsdl:message name="isEvenResponse">
+		<wsdl:part name="isEvenResponse" element="ns1:isEvenResponse" />
+	</wsdl:message>
+
+	<wsdl:portType name="NumberFactory">
+		<wsdl:operation name="create">
+			<wsdl:input message="tns:create" />
+			<wsdl:output message="tns:createResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:portType name="Number">
+		<wsdl:operation name="isEven">
+			<wsdl:input message="tns:isEven" />
+			<wsdl:output message="tns:isEvenResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="NumberFactoryServiceSoapBinding"
+		type="tns:NumberFactory">
+		<wsdlsoap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="create">
+			<wsdlsoap:operation soapAction="" style="document" />
+			<wsdl:input>
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="NumberServiceSoapHttpBinding" type="tns:Number">
+		<wsdlsoap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="isEven">
+			<wsdlsoap:operation soapAction="" style="document" />
+			<wsdl:input>
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="NumberServiceSoapJmsBinding" type="tns:Number">
+		<wsdlsoap:binding style="document"
+			transport="http://cxf.apache.org/transports/jms" />
+		<wsdl:operation name="isEven">
+			<wsdlsoap:operation soapAction="" style="document" />
+			<wsdl:input>
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="NumberFactoryService">
+		<wsdl:port name="NumberFactoryPort"
+			binding="tns:NumberFactoryServiceSoapBinding">
+			<wsdlsoap:address
+				location="http://localhost:9006/NumberFactoryService/NumberFactoryPort" />
+			<wswa:UsingAddressing
+				xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl" />
+		</wsdl:port>
+	</wsdl:service>
+	<wsdl:service name="NumberService">
+		<wsdl:port name="NumberPort"
+			binding="tns:NumberServiceSoapHttpBinding">
+			<wsdlsoap:address
+				location="http://localhost:9006/NumberService/NumberPort/" />
+			<wswa:UsingAddressing
+				xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl" />
+		</wsdl:port>
+		<wsdl:port name="NumberPortJMS"
+			binding="tns:NumberServiceSoapJmsBinding">
+			<jms:address destinationStyle="queue"
+				jndiConnectionFactoryName="ConnectionFactory"
+				jndiDestinationName="dynamicQueues/test.cxf.factory_pattern.queue">
+				<jms:JMSNamingProperty
+					name="java.naming.factory.initial"
+					value="org.apache.activemq.jndi.ActiveMQInitialContextFactory" />
+				<jms:JMSNamingProperty name="java.naming.provider.url"
+					value="tcp://localhost:61500" />
+			</jms:address>
+			<wswa:UsingAddressing
+				xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

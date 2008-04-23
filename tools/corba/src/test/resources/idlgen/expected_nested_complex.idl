@@ -1,0 +1,156 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+union nested_choice switch(long) {
+    case 0:
+        string e;
+    case 1:
+        float f;
+};
+enum color {
+    color_RED,
+    color_GREEN,
+    color_BLUE
+};
+struct structOne {
+    short s;
+    long l;
+};
+union unionTwo switch(long) {
+    case 0:
+        nested_choice nested_choice_f;
+    case 1:
+        color color_f;
+    case 2:
+        structOne structOne_f;
+};
+struct obj {
+    string s;
+};
+typedef obj S1[25];
+struct obj2 {
+    S1 aa;
+};
+union unionThree switch(long) {
+    case 0:
+        unionTwo unionTwo_f;
+    case 1:
+        obj2 obj2_f;
+};
+union _omg_nested_choice switch(long) {
+    case 0:
+        string e;
+    case 1:
+        float f;
+};
+union _omg_unionTwo switch(long) {
+    case 0:
+        nested_choice nested_choice_f;
+    case 1:
+        color color_f;
+    case 2:
+        structOne structOne_f;
+};
+union _omg_unionThree switch(long) {
+    case 0:
+        unionTwo unionTwo_f;
+    case 1:
+        obj2 obj2_f;
+};
+struct structTwo {
+    color white;
+    nested_choice nested_choice_f;
+    structOne structOne_f;
+};
+interface X {
+    struct op_unionTwoResult {
+        ::unionTwo return;
+        ::unionTwo p2;
+        ::unionTwo p3;
+    };
+    struct op_obj2Result {
+        ::obj2 return;
+        ::obj2 p2;
+        ::obj2 p3;
+    };
+    struct op_structTwo {
+        ::structTwo p1;
+        ::structTwo p2;
+    };
+    struct op_color {
+        ::color p1;
+        ::color p2;
+    };
+    struct op_unionThree {
+        ::unionThree p1;
+        ::unionThree p2;
+    };
+    struct op_obj2 {
+        ::obj2 p1;
+        ::obj2 p2;
+    };
+    struct op_colorResult {
+        ::color return;
+        ::color p2;
+        ::color p3;
+    };
+    struct op_unionThreeResult {
+        ::unionThree return;
+        ::unionThree p2;
+        ::unionThree p3;
+    };
+    struct op_unionTwo {
+        ::unionTwo p1;
+        ::unionTwo p2;
+    };
+    struct op_structTwoResult {
+        ::structTwo return;
+        ::structTwo p2;
+        ::structTwo p3;
+    };
+    ::obj2
+    op_obj2(
+        in ::obj2 p1,
+        out ::obj2 p3,
+        inout ::obj2 p2
+    );
+    ::structTwo
+    op_structTwo(
+        in ::structTwo p1,
+        out ::structTwo p3,
+        inout ::structTwo p2
+    );
+    ::unionTwo
+    op_unionTwo(
+        in ::unionTwo p1,
+        out ::unionTwo p3,
+        inout ::unionTwo p2
+    );
+    ::color
+    op_color(
+        in ::color p1,
+        out ::color p3,
+        inout ::color p2
+    );
+    ::unionThree
+    op_unionThree(
+        in ::unionThree p1,
+        out ::unionThree p3,
+        inout ::unionThree p2
+    );
+};

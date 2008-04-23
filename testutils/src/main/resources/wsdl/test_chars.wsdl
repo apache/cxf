@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="TestInterfacePort" targetNamespace="http://cxf.apache.org/test" 
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+    xmlns:ns1="http://cxf.apache.org/test" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://cxf.apache.org/org.apache.cxf.test.TestInterface/xsd">
+    <wsdl:types>
+        <schema targetNamespace="http://cxf.apache.org/org.apache.cxf.test.TestInterface/xsd" 
+            xmlns="http://www.w3.org/2001/XMLSchema">
+            
+	    <simpleType name="charType">
+		<restriction base="xsd:string">
+		    <maxLength value="1"/>
+		</restriction>
+	    </simpleType>
+            <element name="getMessage" type="xsd1:charType"/>
+            <element name="getMessageResponse" type="xsd1:charType"/>
+            <element name="setMessage">
+                <simpleType>
+                    <restriction base="xsd:string">
+                        <maxLength value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="setMessageResponse">
+                <simpleType>
+                    <restriction base="xsd:string">
+                        <maxLength value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+
+            <element name="charEl_x" type="xsd1:charType"/>
+            <element name="charEl_y" type="xsd1:charType"/>
+            <element name="charEl_z" type="xsd1:charType"/>
+            <element name="charEl_return">
+                <complexType>
+		    <sequence>
+			<element name="varChar" type="xsd1:charType"/>
+			<element name="varInt" type="xsd:int"/>
+			<element name="varString" type="xsd:string"/>
+		    </sequence>
+		</complexType>
+            </element>
+            
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="getMessage">
+        <wsdl:part element="xsd1:getMessage" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getMessageResponse">
+        <wsdl:part element="xsd1:getMessageResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="setMessage">
+        <wsdl:part element="xsd1:setMessage" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="setMessageResponse">
+        <wsdl:part element="xsd1:setMessageResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="echoChar">
+        <wsdl:part name="x" element="xsd1:charEl_x"/>
+        <wsdl:part name="y" element="xsd1:charEl_y"/>
+    </wsdl:message>
+    <wsdl:message name="echoCharResponse">
+        <wsdl:part name="return" element="xsd1:charEl_return"/>
+        <wsdl:part name="y" element="xsd1:charEl_y"/>
+        <wsdl:part name="z" element="xsd1:charEl_z"/>
+    </wsdl:message>
+    <wsdl:portType name="TestInterfacePort">
+        <wsdl:operation name="getMessage">
+            <wsdl:input message="ns1:getMessage" name="getMessage"/>
+            <wsdl:output message="ns1:getMessageResponse" name="getMessageResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setMessage">
+            <wsdl:input message="ns1:setMessage" name="setMessage"/>
+            <wsdl:output message="ns1:setMessageResponse" name="setMessageResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="echoChar">
+            <wsdl:input message="ns1:echoChar"/>
+            <wsdl:output message="ns1:echoCharResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="TestInterfacePortSOAPBinding" type="ns1:TestInterfacePort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getMessage">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="getMessage">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getMessageResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setMessage">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="setMessage">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="setMessageResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echoChar">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="TestService">
+        <wsdl:port binding="ns1:TestInterfacePortSOAPBinding" name="newPort">
+            <http:address location="http://localhost:9000"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

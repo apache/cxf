@@ -1,0 +1,58 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/ 
+
+module  mod {
+
+     module int  {
+          interface str {
+             typedef long typeInt;
+             typedef char typeChar;
+             typedef wchar typeWChar;
+             typedef boolean typeBoolean;
+             typedef float typeFloat;
+             typedef string typeString;
+             typedef wstring typeWString;
+             typedef string<10> typeString10;
+             typedef wstring<10> typeWString10;    
+             typedef octet typeOctet;
+         };
+         enum Color { red, green, blue };
+     };
+
+    const int::str::typeInt num1  = 1;
+    const int::str::typeChar num2 = 'a';
+    const int::str::typeWChar num3 = L'c';
+    const int::str::typeBoolean num4= TRUE;
+    const int::str::typeFloat num5 = 23.3;
+    const int::str::typeString num6 = "hello";
+    const int::str::typeWString num7 = L"hello again";
+    const int::str::typeString10 num8 = "bound hello";
+    const int::str::typeWString10 num9 = L"bound hello again";    
+    const int::str::typeOctet num10= 0x1;
+
+    const int::Color FAVORITE_COLOR = int::red;
+};
+
+
+module M {
+    enum Size { small, medium, large };
+};
+
+const M::Size MYSIZE = M::medium;
+

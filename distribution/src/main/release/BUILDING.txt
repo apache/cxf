@@ -1,0 +1,43 @@
+Building Apache CXF
+=====================
+
+Initial Setup
+-------------
+
+1) Install J2SE 5.0 SDK, which can be downloaded from 
+   http://java.sun.com/j2se/1.5.0/download.jsp. Use version of 1.5.0_13 JDK.
+   Note: CXF 2.1 does build on Java 6 update 4 and later.  It will not build on 
+   updates prior to update 4.
+
+2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
+   JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
+   $JAVA_HOME$/bin (unix).
+
+3) Install Maven 2.0.6, which can be downloaded from 
+   http://maven.apache.org/download.html. Make sure that your PATH includes 
+   the MVN_HOME/bin directory. 
+
+
+Building
+--------
+
+1) Change to the top level directory of Apache CXF source distribution.
+2) Run
+	$> mvn.
+   This will compile Apache CXF and run all of the tests in the Apache CXF source
+   distribution. Alternatively, you can run
+         $> mvn -Pfastinstall.
+   This will compile Apache CXF without running the tests and takes less
+   time to build.
+   Depending on the load of remote Maven 2.0 repositories, you may have 
+   to run "mvn" several times utill the required dependencies are 
+   all located in your local maven repository. It usually takes some time for 
+   maven to download required dependencies in the first build.
+
+Building kit
+------------
+1) Change to the "distribution" directory of Apache CXF source distribution.
+2) Run 
+         $> mvn
+   This will build an Apache CXF distribution kit under "distribution/target"
+   directory.

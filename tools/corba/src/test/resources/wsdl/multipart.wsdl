@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<definitions name="multipartService"    
+    targetNamespace="http://schemas.apache.org/tests" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://schemas.apache.org/tests" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/tests">
+    
+    <types>
+        <schema targetNamespace="http://schemas.apache.org/tests" 
+	     xmlns="http://www.w3.org/2001/XMLSchema"
+	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <xsd:simpleType name="Test.MultiPart.Name">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="Test.MultiPart.NickName">
+                <xsd:restriction base="xsd1:Test.MultiPart.Name"/>
+            </xsd:simpleType> 
+            <xsd:simpleType name="Test.MultiPart.Colour">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="RED"/>
+                    <xsd:enumeration value="GREEN"/>
+                    <xsd:enumeration value="BLUE"/>
+                </xsd:restriction>
+            </xsd:simpleType>            
+            <xsd:element name="Test.MultiPart._get_string_attribute.return" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart._get_test_id.return" type="xsd:float"/>
+            <xsd:element name="Test.MultiPart._set_test_id._arg" type="xsd:float"/>
+            <xsd:element name="Test.MultiPart.test_short.x" type="xsd:short"/>
+            <xsd:element name="Test.MultiPart.test_short.y" type="xsd:short"/>
+            <xsd:element name="Test.MultiPart.test_short.z" type="xsd:short"/>
+            <xsd:element name="Test.MultiPart.test_short.return" type="xsd:short"/>
+            <xsd:element name="Test.MultiPart.test_long.x" type="xsd:int"/>
+            <xsd:element name="Test.MultiPart.test_long.y" type="xsd:int"/>
+            <xsd:element name="Test.MultiPart.test_long.z" type="xsd:int"/>
+            <xsd:element name="Test.MultiPart.test_long.return" type="xsd:int"/>
+            <xsd:element name="Test.MultiPart.test_longlong.x" type="xsd:long"/>
+            <xsd:element name="Test.MultiPart.test_longlong.y" type="xsd:long"/>
+            <xsd:element name="Test.MultiPart.test_longlong.z" type="xsd:long"/>
+            <xsd:element name="Test.MultiPart.test_longlong.return" type="xsd:long"/>
+            <xsd:element name="Test.MultiPart.test_ushort.x" type="xsd:unsignedShort"/>
+            <xsd:element name="Test.MultiPart.test_ushort.y" type="xsd:unsignedShort"/>
+            <xsd:element name="Test.MultiPart.test_ushort.z" type="xsd:unsignedShort"/>
+            <xsd:element name="Test.MultiPart.test_ushort.return" type="xsd:unsignedShort"/>
+            <xsd:element name="Test.MultiPart.test_ulong.x" type="xsd:unsignedInt"/>
+            <xsd:element name="Test.MultiPart.test_ulong.y" type="xsd:unsignedInt"/>
+            <xsd:element name="Test.MultiPart.test_ulong.z" type="xsd:unsignedInt"/>
+            <xsd:element name="Test.MultiPart.test_ulong.return" type="xsd:unsignedInt"/>
+            <xsd:element name="Test.MultiPart.test_ulonglong.x" type="xsd:unsignedLong"/>
+            <xsd:element name="Test.MultiPart.test_ulonglong.y" type="xsd:unsignedLong"/>
+            <xsd:element name="Test.MultiPart.test_ulonglong.z" type="xsd:unsignedLong"/>
+            <xsd:element name="Test.MultiPart.test_ulonglong.return" type="xsd:unsignedLong"/>
+            <xsd:element name="Test.MultiPart.test_float.x" type="xsd:float"/>
+            <xsd:element name="Test.MultiPart.test_float.y" type="xsd:float"/>
+            <xsd:element name="Test.MultiPart.test_float.z" type="xsd:float"/>
+            <xsd:element name="Test.MultiPart.test_float.return" type="xsd:float"/>
+            <xsd:element name="Test.MultiPart.test_double.x" type="xsd:double"/>
+            <xsd:element name="Test.MultiPart.test_double.y" type="xsd:double"/>
+            <xsd:element name="Test.MultiPart.test_double.z" type="xsd:double"/>
+            <xsd:element name="Test.MultiPart.test_double.return" type="xsd:double"/>
+            <xsd:element name="Test.MultiPart.test_octet.x" type="xsd:unsignedByte"/>
+            <xsd:element name="Test.MultiPart.test_octet.y" type="xsd:unsignedByte"/>
+            <xsd:element name="Test.MultiPart.test_octet.z" type="xsd:unsignedByte"/>
+            <xsd:element name="Test.MultiPart.test_octet.return" type="xsd:unsignedByte"/>
+            <xsd:element name="Test.MultiPart.test_boolean.x" type="xsd:boolean"/>
+            <xsd:element name="Test.MultiPart.test_boolean.y" type="xsd:boolean"/>
+            <xsd:element name="Test.MultiPart.test_boolean.z" type="xsd:boolean"/>
+            <xsd:element name="Test.MultiPart.test_boolean.return" type="xsd:boolean"/>
+            <xsd:element name="Test.MultiPart.test_char.x" type="xsd:byte"/>
+            <xsd:element name="Test.MultiPart.test_char.y" type="xsd:byte"/>
+            <xsd:element name="Test.MultiPart.test_char.z" type="xsd:byte"/>
+            <xsd:element name="Test.MultiPart.test_char.return" type="xsd:byte"/>
+            <xsd:element name="Test.MultiPart.test_string.x" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_string.y" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_string.z" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_string.return" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_name.x" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_name.y" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_name.z" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_name.return" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_nick_name.x" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_nick_name.y" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_nick_name.z" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_nick_name.return" type="xsd:string"/>
+            <xsd:element name="Test.MultiPart.test_enum.x" type="xsd1:Test.MultiPart.Colour"/>
+            <xsd:element name="Test.MultiPart.test_enum.y" type="xsd1:Test.MultiPart.Colour"/>
+            <xsd:element name="Test.MultiPart.test_enum.z" type="xsd1:Test.MultiPart.Colour"/>
+            <xsd:element name="Test.MultiPart.test_enum.return" type="xsd1:Test.MultiPart.Colour"/>          
+         
+            <xsd:element name="Test.MultiPart.test_integer.x" type="xsd:integer"/>
+            <xsd:element name="Test.MultiPart.test_integer.y" type="xsd:integer"/>
+            <xsd:element name="Test.MultiPart.test_integer.z" type="xsd:integer"/>
+            <xsd:element name="Test.MultiPart.test_integer.return" type="xsd:integer"/>
+            <xsd:element name="Test.MultiPart.test_nonNegativeInteger.x" type="xsd:nonNegativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonNegativeInteger.y" type="xsd:nonNegativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonNegativeInteger.z" type="xsd:nonNegativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonNegativeInteger.return" type="xsd:nonNegativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_positiveInteger.x" type="xsd:positiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_positiveInteger.y" type="xsd:positiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_positiveInteger.z" type="xsd:positiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_positiveInteger.return" type="xsd:positiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonPositiveInteger.x" type="xsd:nonPositiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonPositiveInteger.y" type="xsd:nonPositiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonPositiveInteger.z" type="xsd:nonPositiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_nonPositiveInteger.return" type="xsd:nonPositiveInteger"/>
+            <xsd:element name="Test.MultiPart.test_negativeInteger.x" type="xsd:negativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_negativeInteger.y" type="xsd:negativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_negativeInteger.z" type="xsd:negativeInteger"/>
+            <xsd:element name="Test.MultiPart.test_negativeInteger.return" type="xsd:negativeInteger"/>
+
+            <xsd:element name="Test.MultiPart.test_normalizedString.x" type="xsd:normalizedString"/>
+            <xsd:element name="Test.MultiPart.test_normalizedString.y" type="xsd:normalizedString"/>
+            <xsd:element name="Test.MultiPart.test_normalizedString.z" type="xsd:normalizedString"/>
+            <xsd:element name="Test.MultiPart.test_normalizedString.return" type="xsd:normalizedString"/>
+            <xsd:element name="Test.MultiPart.test_token.x" type="xsd:token"/>
+            <xsd:element name="Test.MultiPart.test_token.y" type="xsd:token"/>
+            <xsd:element name="Test.MultiPart.test_token.z" type="xsd:token"/>
+            <xsd:element name="Test.MultiPart.test_token.return" type="xsd:token"/>
+            <xsd:element name="Test.MultiPart.test_language.x" type="xsd:language"/>
+            <xsd:element name="Test.MultiPart.test_language.y" type="xsd:language"/>
+            <xsd:element name="Test.MultiPart.test_language.z" type="xsd:language"/>
+            <xsd:element name="Test.MultiPart.test_language.return" type="xsd:language"/>
+            <xsd:element name="Test.MultiPart.test_Name.x" type="xsd:Name"/>
+            <xsd:element name="Test.MultiPart.test_Name.y" type="xsd:Name"/>
+            <xsd:element name="Test.MultiPart.test_Name.z" type="xsd:Name"/>
+            <xsd:element name="Test.MultiPart.test_Name.return" type="xsd:Name"/>
+            <xsd:element name="Test.MultiPart.test_NCName.x" type="xsd:NCName"/>
+            <xsd:element name="Test.MultiPart.test_NCName.y" type="xsd:NCName"/>
+            <xsd:element name="Test.MultiPart.test_NCName.z" type="xsd:NCName"/>
+            <xsd:element name="Test.MultiPart.test_NCName.return" type="xsd:NCName"/>
+            <xsd:element name="Test.MultiPart.test_ID.x" type="xsd:ID"/>
+            <xsd:element name="Test.MultiPart.test_ID.y" type="xsd:ID"/>
+            <xsd:element name="Test.MultiPart.test_ID.z" type="xsd:ID"/>
+            <xsd:element name="Test.MultiPart.test_ID.return" type="xsd:ID"/>
+            <xsd:element name="Test.MultiPart.test_NMTOKEN.x" type="xsd:NMTOKEN"/>
+            <xsd:element name="Test.MultiPart.test_NMTOKEN.y" type="xsd:NMTOKEN"/>
+            <xsd:element name="Test.MultiPart.test_NMTOKEN.z" type="xsd:NMTOKEN"/>
+            <xsd:element name="Test.MultiPart.test_NMTOKEN.return" type="xsd:NMTOKEN"/>
+            <xsd:element name="Test.MultiPart.test_anyURI.x" type="xsd:anyURI"/>
+            <xsd:element name="Test.MultiPart.test_anyURI.y" type="xsd:anyURI"/>
+            <xsd:element name="Test.MultiPart.test_anyURI.z" type="xsd:anyURI"/>
+            <xsd:element name="Test.MultiPart.test_anyURI.return" type="xsd:anyURI"/>
+        </schema>
+    </types>
+    <message name="Test.MultiPart._get_string_attribute"/>
+    <message name="Test.MultiPart._get_string_attributeResponse">
+        <part name="return" element="xsd1:Test.MultiPart._get_string_attribute.return"/>
+    </message>
+    <message name="Test.MultiPart._get_test_id"/>
+    <message name="Test.MultiPart._get_test_idResponse">
+        <part name="return" element="xsd1:Test.MultiPart._get_test_id.return"/>
+    </message>
+    <message name="Test.MultiPart._set_test_id">
+        <part name="_arg" element="xsd1:Test.MultiPart._set_test_id._arg"/>
+    </message>
+    <message name="Test.MultiPart._set_test_idResponse"/>
+    <message name="Test.MultiPart.test_void"/>
+    <message name="Test.MultiPart.test_voidResponse"/>
+    <message name="Test.MultiPart.test_short">
+        <part name="x" element="xsd1:Test.MultiPart.test_short.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_short.y"/>
+    </message>
+    <message name="Test.MultiPart.test_shortResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_short.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_short.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_short.z"/>
+    </message>
+    <message name="Test.MultiPart.test_long">
+        <part name="x" element="xsd1:Test.MultiPart.test_long.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_long.y"/>
+    </message>
+    <message name="Test.MultiPart.test_longResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_long.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_long.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_long.z"/>
+    </message>
+    <message name="Test.MultiPart.test_longlong">
+        <part name="x" element="xsd1:Test.MultiPart.test_longlong.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_longlong.y"/>
+    </message>
+    <message name="Test.MultiPart.test_longlongResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_longlong.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_longlong.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_longlong.z"/>
+    </message>
+    <message name="Test.MultiPart.test_ushort">
+        <part name="x" element="xsd1:Test.MultiPart.test_ushort.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ushort.y"/>
+    </message>
+    <message name="Test.MultiPart.test_ushortResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_ushort.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ushort.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_ushort.z"/>
+    </message>
+    <message name="Test.MultiPart.test_ulong">
+        <part name="x" element="xsd1:Test.MultiPart.test_ulong.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ulong.y"/>
+    </message>
+    <message name="Test.MultiPart.test_ulongResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_ulong.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ulong.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_ulong.z"/>
+    </message>
+    <message name="Test.MultiPart.test_ulonglong">
+        <part name="x" element="xsd1:Test.MultiPart.test_ulonglong.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ulonglong.y"/>
+    </message>
+    <message name="Test.MultiPart.test_ulonglongResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_ulonglong.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ulonglong.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_ulonglong.z"/>
+    </message>
+    <message name="Test.MultiPart.test_float">
+        <part name="x" element="xsd1:Test.MultiPart.test_float.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_float.y"/>
+    </message>
+    <message name="Test.MultiPart.test_floatResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_float.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_float.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_float.z"/>
+    </message>
+    <message name="Test.MultiPart.test_double">
+        <part name="x" element="xsd1:Test.MultiPart.test_double.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_double.y"/>
+    </message>
+    <message name="Test.MultiPart.test_doubleResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_double.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_double.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_double.z"/>
+    </message>
+    <message name="Test.MultiPart.test_octet">
+        <part name="x" element="xsd1:Test.MultiPart.test_octet.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_octet.y"/>
+    </message>
+    <message name="Test.MultiPart.test_octetResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_octet.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_octet.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_octet.z"/>
+    </message>
+    <message name="Test.MultiPart.test_boolean">
+        <part name="x" element="xsd1:Test.MultiPart.test_boolean.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_boolean.y"/>
+    </message>
+    <message name="Test.MultiPart.test_booleanResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_boolean.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_boolean.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_boolean.z"/>
+    </message>
+    <message name="Test.MultiPart.test_char">
+        <part name="x" element="xsd1:Test.MultiPart.test_char.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_char.y"/>
+    </message>
+    <message name="Test.MultiPart.test_charResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_char.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_char.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_char.z"/>
+    </message>
+    <message name="Test.MultiPart.test_string">
+        <part name="x" element="xsd1:Test.MultiPart.test_string.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_string.y"/>
+    </message>
+    <message name="Test.MultiPart.test_stringResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_string.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_string.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_string.z"/>
+    </message>
+    <message name="Test.MultiPart.test_name">
+        <part name="x" element="xsd1:Test.MultiPart.test_name.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_name.y"/>
+    </message>
+    <message name="Test.MultiPart.test_nameResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_name.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_name.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_name.z"/>
+    </message>
+    <message name="Test.MultiPart.test_nick_name">
+        <part name="x" element="xsd1:Test.MultiPart.test_nick_name.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_nick_name.y"/>
+    </message>
+    <message name="Test.MultiPart.test_nick_nameResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_nick_name.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_nick_name.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_nick_name.z"/>
+    </message>
+    <message name="Test.MultiPart.test_enum">
+        <part name="x" element="xsd1:Test.MultiPart.test_enum.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_enum.y"/>
+    </message>
+    <message name="Test.MultiPart.test_enumResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_enum.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_enum.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_enum.z"/>
+    </message>    
+    <message name="Test.MultiPart.test_integer">
+        <part name="x" element="xsd1:Test.MultiPart.test_integer.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_integer.y"/>
+    </message>
+    <message name="Test.MultiPart.test_integerResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_integer.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_integer.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_integer.z"/>
+    </message>
+    <message name="Test.MultiPart.test_nonNegativeInteger">
+        <part name="x" element="xsd1:Test.MultiPart.test_nonNegativeInteger.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_nonNegativeInteger.y"/>
+    </message>
+    <message name="Test.MultiPart.test_nonNegativeIntegerResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_nonNegativeInteger.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_nonNegativeInteger.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_nonNegativeInteger.z"/>
+    </message>
+    <message name="Test.MultiPart.test_positiveInteger">
+        <part name="x" element="xsd1:Test.MultiPart.test_positiveInteger.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_positiveInteger.y"/>
+    </message>
+    <message name="Test.MultiPart.test_positiveIntegerResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_positiveInteger.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_positiveInteger.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_positiveInteger.z"/>
+    </message>
+    <message name="Test.MultiPart.test_nonPositiveInteger">
+        <part name="x" element="xsd1:Test.MultiPart.test_nonPositiveInteger.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_nonPositiveInteger.y"/>
+    </message>
+    <message name="Test.MultiPart.test_nonPositiveIntegerResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_nonPositiveInteger.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_nonPositiveInteger.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_nonPositiveInteger.z"/>
+    </message>
+    <message name="Test.MultiPart.test_negativeInteger">
+        <part name="x" element="xsd1:Test.MultiPart.test_negativeInteger.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_negativeInteger.y"/>
+    </message>
+    <message name="Test.MultiPart.test_negativeIntegerResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_negativeInteger.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_negativeInteger.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_negativeInteger.z"/>
+    </message>
+    <message name="Test.MultiPart.test_normalizedString">
+        <part name="x" element="xsd1:Test.MultiPart.test_normalizedString.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_normalizedString.y"/>
+    </message>
+    <message name="Test.MultiPart.test_normalizedStringResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_normalizedString.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_normalizedString.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_normalizedString.z"/>
+    </message>
+    <message name="Test.MultiPart.test_token">
+        <part name="x" element="xsd1:Test.MultiPart.test_token.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_token.y"/>
+    </message>
+    <message name="Test.MultiPart.test_tokenResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_token.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_token.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_token.z"/>
+    </message>
+    <message name="Test.MultiPart.test_language">
+        <part name="x" element="xsd1:Test.MultiPart.test_language.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_language.y"/>
+    </message>
+    <message name="Test.MultiPart.test_languageResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_language.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_language.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_language.z"/>
+    </message>
+    <message name="Test.MultiPart.test_Name">
+        <part name="x" element="xsd1:Test.MultiPart.test_Name.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_Name.y"/>
+    </message>
+    <message name="Test.MultiPart.test_NameResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_Name.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_Name.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_Name.z"/>
+    </message>
+    <message name="Test.MultiPart.test_NCName">
+        <part name="x" element="xsd1:Test.MultiPart.test_NCName.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_NCName.y"/>
+    </message>
+    <message name="Test.MultiPart.test_NCNameResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_NCName.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_NCName.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_NCName.z"/>
+    </message>
+    <message name="Test.MultiPart.test_ID">
+        <part name="x" element="xsd1:Test.MultiPart.test_ID.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ID.y"/>
+    </message>
+    <message name="Test.MultiPart.test_IDResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_ID.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_ID.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_ID.z"/>
+    </message>
+    <message name="Test.MultiPart.test_NMTOKEN">
+        <part name="x" element="xsd1:Test.MultiPart.test_NMTOKEN.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_NMTOKEN.y"/>
+    </message>
+    <message name="Test.MultiPart.test_NMTOKENResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_NMTOKEN.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_NMTOKEN.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_NMTOKEN.z"/>
+    </message>
+    <message name="Test.MultiPart.test_anyURI">
+        <part name="x" element="xsd1:Test.MultiPart.test_anyURI.x"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_anyURI.y"/>
+    </message>
+    <message name="Test.MultiPart.test_anyURIResponse">
+        <part name="return" element="xsd1:Test.MultiPart.test_anyURI.return"/>
+        <part name="y" element="xsd1:Test.MultiPart.test_anyURI.y"/>
+        <part name="z" element="xsd1:Test.MultiPart.test_anyURI.z"/>
+    </message>
+    <portType name="Test.MultiPart">
+        <operation name="_get_string_attribute">
+            <input message="tns:Test.MultiPart._get_string_attribute" name="_get_string_attribute"/>
+            <output message="tns:Test.MultiPart._get_string_attributeResponse" name="_get_string_attributeResponse"/>
+        </operation>
+        <operation name="_get_test_id">
+            <input message="tns:Test.MultiPart._get_test_id" name="_get_test_id"/>
+            <output message="tns:Test.MultiPart._get_test_idResponse" name="_get_test_idResponse"/>
+        </operation>
+        <operation name="_set_test_id">
+            <input message="tns:Test.MultiPart._set_test_id" name="_set_test_id"/>
+            <output message="tns:Test.MultiPart._set_test_idResponse" name="_set_test_idResponse"/>
+        </operation>
+        <operation name="test_void">
+            <input message="tns:Test.MultiPart.test_void" name="test_void"/>
+            <output message="tns:Test.MultiPart.test_voidResponse" name="test_voidResponse"/>
+        </operation>
+        <operation name="test_short">
+            <input message="tns:Test.MultiPart.test_short" name="test_short"/>
+            <output message="tns:Test.MultiPart.test_shortResponse" name="test_shortResponse"/>
+        </operation>
+        <operation name="test_long">
+            <input message="tns:Test.MultiPart.test_long" name="test_long"/>
+            <output message="tns:Test.MultiPart.test_longResponse" name="test_longResponse"/>
+        </operation>
+        <operation name="test_longlong">
+            <input message="tns:Test.MultiPart.test_longlong" name="test_longlong"/>
+            <output message="tns:Test.MultiPart.test_longlongResponse" name="test_longlongResponse"/>
+        </operation>
+        <operation name="test_ushort">
+            <input message="tns:Test.MultiPart.test_ushort" name="test_ushort"/>
+            <output message="tns:Test.MultiPart.test_ushortResponse" name="test_ushortResponse"/>
+        </operation>
+        <operation name="test_ulong">
+            <input message="tns:Test.MultiPart.test_ulong" name="test_ulong"/>
+            <output message="tns:Test.MultiPart.test_ulongResponse" name="test_ulongResponse"/>
+        </operation>
+        <operation name="test_ulonglong">
+            <input message="tns:Test.MultiPart.test_ulonglong" name="test_ulonglong"/>
+            <output message="tns:Test.MultiPart.test_ulonglongResponse" name="test_ulonglongResponse"/>
+        </operation>
+        <operation name="test_float">
+            <input message="tns:Test.MultiPart.test_float" name="test_float"/>
+            <output message="tns:Test.MultiPart.test_floatResponse" name="test_floatResponse"/>
+        </operation>
+        <operation name="test_double">
+            <input message="tns:Test.MultiPart.test_double" name="test_double"/>
+            <output message="tns:Test.MultiPart.test_doubleResponse" name="test_doubleResponse"/>
+        </operation>
+        <operation name="test_octet">
+            <input message="tns:Test.MultiPart.test_octet" name="test_octet"/>
+            <output message="tns:Test.MultiPart.test_octetResponse" name="test_octetResponse"/>
+        </operation>
+        <operation name="test_boolean">
+            <input message="tns:Test.MultiPart.test_boolean" name="test_boolean"/>
+            <output message="tns:Test.MultiPart.test_booleanResponse" name="test_booleanResponse"/>
+        </operation>
+        <operation name="test_char">
+            <input message="tns:Test.MultiPart.test_char" name="test_char"/>
+            <output message="tns:Test.MultiPart.test_charResponse" name="test_charResponse"/>
+        </operation>
+        <operation name="test_string">
+            <input message="tns:Test.MultiPart.test_string" name="test_string"/>
+            <output message="tns:Test.MultiPart.test_stringResponse" name="test_stringResponse"/>
+        </operation>
+        <operation name="test_name">
+            <input message="tns:Test.MultiPart.test_name" name="test_name"/>
+            <output message="tns:Test.MultiPart.test_nameResponse" name="test_nameResponse"/>
+        </operation>
+        <operation name="test_nick_name">
+            <input message="tns:Test.MultiPart.test_nick_name" name="test_nick_name"/>
+            <output message="tns:Test.MultiPart.test_nick_nameResponse" name="test_nick_nameResponse"/>
+        </operation>
+        <operation name="test_enum">
+            <input message="tns:Test.MultiPart.test_enum" name="test_enum"/>
+            <output message="tns:Test.MultiPart.test_enumResponse" name="test_enumResponse"/>
+        </operation>
+        <operation name="test_integer">
+            <input message="tns:Test.MultiPart.test_integer" name="test_integer"/>
+            <output message="tns:Test.MultiPart.test_integerResponse" name="test_integerResponse"/>
+        </operation>
+        <operation name="test_nonNegativeInteger">
+            <input message="tns:Test.MultiPart.test_nonNegativeInteger" name="test_nonNegativeInteger"/>
+            <output message="tns:Test.MultiPart.test_nonNegativeIntegerResponse" name="test_nonNegativeIntegerResponse"/>
+        </operation>
+        <operation name="test_positiveInteger">
+            <input message="tns:Test.MultiPart.test_positiveInteger" name="test_positiveInteger"/>
+            <output message="tns:Test.MultiPart.test_positiveIntegerResponse" name="test_positiveIntegerResponse"/>
+        </operation>
+        <operation name="test_nonPositiveInteger">
+            <input message="tns:Test.MultiPart.test_nonPositiveInteger" name="test_nonPositiveInteger"/>
+            <output message="tns:Test.MultiPart.test_nonPositiveIntegerResponse" name="test_nonPositiveIntegerResponse"/>
+        </operation>
+        <operation name="test_negativeInteger">
+            <input message="tns:Test.MultiPart.test_negativeInteger" name="test_negativeInteger"/>
+            <output message="tns:Test.MultiPart.test_negativeIntegerResponse" name="test_negativeIntegerResponse"/>
+        </operation>
+        <operation name="test_normalizedString">
+            <input message="tns:Test.MultiPart.test_normalizedString" name="test_normalizedString"/>
+            <output message="tns:Test.MultiPart.test_normalizedStringResponse" name="test_normalizedStringResponse"/>
+        </operation>
+        <operation name="test_token">
+            <input message="tns:Test.MultiPart.test_token" name="test_token"/>
+            <output message="tns:Test.MultiPart.test_tokenResponse" name="test_tokenResponse"/>
+        </operation>
+        <operation name="test_language">
+            <input message="tns:Test.MultiPart.test_language" name="test_language"/>
+            <output message="tns:Test.MultiPart.test_languageResponse" name="test_languageResponse"/>
+        </operation>
+        <operation name="test_Name">
+            <input message="tns:Test.MultiPart.test_Name" name="test_Name"/>
+            <output message="tns:Test.MultiPart.test_NameResponse" name="test_NameResponse"/>
+        </operation>
+        <operation name="test_NCName">
+            <input message="tns:Test.MultiPart.test_NCName" name="test_NCName"/>
+            <output message="tns:Test.MultiPart.test_NCNameResponse" name="test_NCNameResponse"/>
+        </operation>
+        <operation name="test_ID">
+            <input message="tns:Test.MultiPart.test_ID" name="test_ID"/>
+            <output message="tns:Test.MultiPart.test_IDResponse" name="test_IDResponse"/>
+        </operation>
+        <operation name="test_NMTOKEN">
+            <input message="tns:Test.MultiPart.test_NMTOKEN" name="test_NMTOKEN"/>
+            <output message="tns:Test.MultiPart.test_NMTOKENResponse" name="test_NMTOKENResponse"/>
+        </operation>
+        <operation name="test_anyURI">
+            <input message="tns:Test.MultiPart.test_anyURI" name="test_anyURI"/>
+            <output message="tns:Test.MultiPart.test_anyURIResponse" name="test_anyURIResponse"/>
+        </operation>
+    </portType>
+</definitions>

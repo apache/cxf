@@ -1,0 +1,198 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+
+
+typedef long long1, long2, long3;
+module typedef_module {
+    typedef short short1, short2, short3;
+};
+
+
+
+
+typedef unsigned long long ulonglong1, ulonglong2, ulonglong3;
+module typedef_module {
+    typedef unsigned short ushort1, ushort2, ushort3;
+};
+
+
+
+typedef short array1[10][11][12], array2[20][21], array3[30];
+module array_module {
+    typedef short array1[10][11][12], array2[20][21], array3[30];
+};
+
+
+
+
+typedef long simple_long, array_long[10];
+module mixed_long_module {
+    typedef long simple_long, array_long[10];
+};
+
+
+
+typedef sequence< unsigned long long > unboundedSeqUnsignedLongLong1, unboundedSeqUnsignedLongLong2, unboundedSeqUnsignedLongLong3;
+module sequence_module {
+    typedef sequence< unsigned long long > unboundedSeqUnsignedLongLong1, unboundedSeqUnsignedLongLong2, unboundedSeqUnsignedLongLong3;
+};
+
+
+
+
+typedef fixed <31, 2> f1, f2, f3;
+module fixed_module {
+    typedef fixed <31, 2> f1, f2, f3;
+};
+
+
+
+
+typedef string string1, string2, string3;
+module string_module {
+    typedef string string1, string2, string3;
+};
+typedef wstring wstring1, wstring2, wstring3;
+module string_module {
+    typedef wstring wstring1, wstring2, wstring3;
+};
+
+
+
+
+struct testStruct {
+    long aLong;
+    string aString;
+};
+typedef testStruct struct1, struct2;
+module struct_module {
+    struct testStruct {
+        long aLong;
+        string aString;
+    };
+    typedef testStruct struct1, struct2;
+};
+
+
+
+
+typedef struct typedefStruct {
+    unsigned long long ulonglong;
+    unsigned short ushort;
+} typedefStruct1, typedefStruct2;
+
+module typedefStruct_module {
+    typedef struct typedefStruct {
+        unsigned long long ulonglong;
+        unsigned short ushort;
+    } typedefStruct1, typedefStruct2;
+};
+
+
+
+enum aEnum { e1_1, e1_2, e1_3, e1_4 };
+struct aStruct {
+    short s1_1;
+    short s1_2;
+    short s1_3;
+};
+union aUnion switch (aEnum) {
+    case e1_1:
+	long u1_1;
+    case e1_2:
+    case e1_2: 
+    case e1_3:
+	string u1_2;
+    default:
+	aStruct u1_3;
+};
+typedef aUnion union1, union2, union3;
+module union_module {
+    enum aEnum { e1_1, e1_2, e1_3, e1_4 };
+    struct aStruct {
+        short s1_1;
+        short s1_2;
+        short s1_3;
+    };
+    union aUnion switch (aEnum) {
+      case e1_1:
+        long u1_1;
+      case e1_2:
+      case e1_2: 
+      case e1_3:
+        string u1_2;
+      default:
+        aStruct u1_3;
+    };
+    typedef aUnion union1, union2, union3;
+};
+typedef union typedefUnion switch (aEnum) {
+    case e1_1:
+	long u1_1;
+    case e1_2:
+    case e1_2: 
+    case e1_3:
+	string u1_2;
+    default:
+	aStruct u1_3;
+} typedefUnion1, typedefUnion2, typedefUnion3;
+module typedefUnion_module {
+    typedef union typedefUnion switch (aEnum) {
+      case e1_1:
+        long u1_1;
+      case e1_2:
+      case e1_2: 
+      case e1_3:
+        string u1_2;
+      default:
+        aStruct u1_3;
+    } typedefUnion1, typedefUnion2, typedefUnion3;
+};
+
+
+
+enum testEnum {
+    te1,
+    te2,
+    te3
+};
+typedef testEnum enum1, enum2, enum3;
+module testEnum_module {
+    typedef testEnum enum1, enum2, enum3;
+};
+
+typedef enum typedefEnum {
+    tde1,
+    tde2,
+    tde3
+} typedefEnum1, typedefEnum2, typedefEnum3;
+module typedefEnum_module {
+    typedef enum typedefEnum {
+        mtde1,
+        mtde2,
+        mtde3
+    } typedefEnum1, typedefEnum2, typedefEnum3;
+};
+
+
+
+interface multiple_attributes {
+    readonly attribute unsigned long long ull1, ull2, ull3;
+    attribute unsigned short short1, short2, short3;
+};

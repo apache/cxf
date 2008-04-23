@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+
+<!-- The xhtml namespace is for usage documentation -->
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
+  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification 
+                      http://cxf.apache.org/schema/xutil/tool-specification.xsd"
+  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
+  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
+  <annotation> Examples :
+        wsdltoidl HelloWorld.wsdl
+        wsdltoidl -corba -i GreetPortType -o Greeting.wsdl TestGreeting.wsdl
+        wsdltoidl -idl -b TestBinding Test.wsdl
+  </annotation>
+
+  <usage>
+
+    <optionGroup id="options">
+
+      <option id="corba" maxOccurs="1">
+        <annotation>Generates CORBA Binding.</annotation>
+        <switch>corba</switch>
+      </option>
+
+      <option id="idl" maxOccurs="1">
+        <annotation>Generates a idl from a wsdl.</annotation>
+        <switch>idl</switch>
+      </option>
+
+      <option id="porttype" maxOccurs="1">
+        <annotation>Specify the portType to use.</annotation>
+        <switch>i</switch>
+        <associatedArgument placement="afterSpace">
+          <annotation>port-type-name</annotation>
+        </associatedArgument>
+      </option>
+
+      <option id="binding" maxOccurs="1">
+        <annotation>Specify the binding to use.</annotation>
+        <switch>b</switch>
+        <associatedArgument placement="afterSpace">
+          <annotation>binding-name</annotation>
+        </associatedArgument>
+      </option>
+
+      <option id="outputdir" maxOccurs="1">
+        <annotation>The directory in which the generated wsdl/idl is placed</annotation>
+        <switch>d</switch>
+        <associatedArgument placement="afterSpace">
+          <annotation>output-directory</annotation>
+        </associatedArgument>
+      </option>
+      
+      <option id="outputfile" maxOccurs="2">
+        <annotation>The wsdl/idl output file name.(can be specified twice)</annotation>
+        <switch>o</switch>
+        <associatedArgument placement="afterSpace">
+          <annotation>output-file</annotation>
+        </associatedArgument>
+      </option>
+
+      <option id="namespace" maxOccurs="1">
+        <annotation>The corba type-map namespace.</annotation>
+        <switch>props</switch>
+        <associatedArgument placement="afterSpace">
+          <annotation>corba-typemap-namespace</annotation>
+        </associatedArgument>
+      </option>
+
+     <option id="wrapped" maxOccurs="1">
+      <annotation>Generate corba binding operation using wrapper types instead of unwrapping into separa
+te parameters.</annotation>
+      <switch>wrapped</switch>
+    </option>
+
+    <option id="license" maxOccurs="1">
+        <annotation>Specify the license file</annotation>
+        <switch>L</switch>
+        <associatedArgument placement="afterSpace">
+          <annotation>license-file</annotation>
+        </associatedArgument>
+    </option>
+
+    </optionGroup>
+    <optionGroup id="common_options">
+		
+	    <option id="help" maxOccurs="1">
+			<annotation>Display detailed information for options.</annotation>
+			<switch>h</switch>
+			<switch>?</switch>
+			<switch>help</switch>
+	    </option>
+		    
+	    <option id="version">
+			<annotation>Display the version of the tool.</annotation>
+			<switch>v</switch>
+	    </option>
+	
+	    <option id="verbose">
+			<annotation>Verbose mode</annotation>
+			<switch>verbose</switch>
+			<switch>V</switch>
+	    </option>
+	
+	    <option id="quiet">
+			<annotation>Quiet mode</annotation>
+			<switch>quiet</switch>
+			<switch>q</switch>
+	    </option>
+
+	</optionGroup>
+
+    <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
+       <annotation>WSDL URL</annotation>
+    </argument>
+  </usage>
+
+</toolspec>

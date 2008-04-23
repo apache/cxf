@@ -1,0 +1,722 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.cxf.wsdl11;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+
+import javax.wsdl.Binding;
+import javax.wsdl.BindingFault;
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.Fault;
+import javax.wsdl.Import;
+import javax.wsdl.Input;
+import javax.wsdl.Message;
+import javax.wsdl.Operation;
+import javax.wsdl.Output;
+import javax.wsdl.Part;
+import javax.wsdl.Port;
+import javax.wsdl.PortType;
+import javax.wsdl.Service;
+import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
+import org.apache.cxf.binding.BindingFactory;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.service.model.AbstractMessageContainer;
+import org.apache.cxf.service.model.AbstractPropertiesHolder;
+import org.apache.cxf.service.model.BindingFaultInfo;
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingMessageInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.DescriptionInfo;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.FaultInfo;
+import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.service.model.ServiceSchemaInfo;
+import org.apache.cxf.service.model.UnwrappedOperationInfo;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
+import org.apache.ws.commons.schema.XmlSchemaComplexType;
+import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
+import org.apache.ws.commons.schema.XmlSchemaSequence;
+
+import static org.apache.cxf.helpers.CastUtils.cast;
+
+public class WSDLServiceBuilder {
+
+    public static final String WSDL_SCHEMA_LIST = WSDLServiceBuilder.class.getName() + ".SCHEMA";
+    public static final String WSDL_DEFINITION = WSDLServiceBuilder.class.getName() + ".DEFINITION";
+    public static final String WSDL_SERVICE = WSDLServiceBuilder.class.getName() + ".SERVICE";
+    public static final String WSDL_PORTTYPE = WSDLServiceBuilder.class.getName() + ".WSDL_PORTTYPE";
+    public static final String WSDL_PORT = WSDLServiceBuilder.class.getName() + ".PORT";
+    public static final String WSDL_BINDING = WSDLServiceBuilder.class.getName() + ".BINDING";
+    public static final String WSDL_SCHEMA_ELEMENT_LIST = WSDLServiceBuilder.class.getName()
+                                                          + ".SCHEMA_ELEMENTS";
+    public static final String WSDL_OPERATION = WSDLServiceBuilder.class.getName() + ".OPERATION";
+    public static final String WSDL_BINDING_OPERATION = WSDLServiceBuilder.class.getName()
+                                                        + ".BINDING_OPERATION";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceBuilder.class);
+    private Bus bus;
+    private Map<String, Element> schemaList = new HashMap<String, Element>();
+    private Map<String, String> catalogResolvedMap;
+
+    public WSDLServiceBuilder(Bus bus) {
+        this.bus = bus;
+    }
+
+    private void copyExtensors(AbstractPropertiesHolder info, List<?> extList) {
+        if (info != null) {
+            for (ExtensibilityElement ext : cast(extList, ExtensibilityElement.class)) {
+                info.addExtensor(ext);
+            }
+        }
+    }
+
+    private void copyExtensionAttributes(AbstractPropertiesHolder info,
+                                         javax.wsdl.extensions.AttributeExtensible ae) {
+        Map<QName, Object> attrs = CastUtils.cast(ae.getExtensionAttributes());
+        if (!attrs.isEmpty()) {
+            info.setExtensionAttributes(attrs);
+        }
+    }
+
+    public List<ServiceInfo> buildServices(Definition d) {
+        DescriptionInfo description = new DescriptionInfo();
+        description.setProperty(WSDL_DEFINITION, d);
+        description.setName(d.getQName());
+        description.setBaseURI(d.getDocumentBaseURI());
+        copyExtensors(description, d.getExtensibilityElements());
+        copyExtensionAttributes(description, d);
+
+        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
+        for (java.util.Iterator<QName> ite = CastUtils.cast(d.getServices().keySet().iterator()); ite
+            .hasNext();) {
+            QName qn = ite.next();
+            serviceList.addAll(buildServices(d, qn, description));
+        }
+        return serviceList;
+    }
+
+    public List<ServiceInfo> buildServices(Definition d, QName name) {
+        return buildServices(d, name, null);
+    }
+
+    private List<ServiceInfo> buildServices(Definition d, QName name, DescriptionInfo description) {
+        Service service = d.getService(name);
+        return buildServices(d, service, description);
+    }
+
+    public List<ServiceInfo> buildServices(Definition def, Service serv) {
+        return buildServices(def, serv, null);
+    }
+
+    public List<ServiceInfo> buildMockServices(Definition d) {
+        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
+        List<Definition> defList = new ArrayList<Definition>();
+        defList.add(d);
+        parseImports(d, defList);
+        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class); 
+        for (Definition def : defList) {
+
+            for (Iterator ite = def.getPortTypes().entrySet().iterator(); ite.hasNext();) {
+                Entry entry = (Entry)ite.next();
+                PortType portType = def.getPortType((QName)entry.getKey());
+                ServiceInfo serviceInfo = this.buildMockService(def, portType);
+                serviceList.add(serviceInfo);
+            }
+
+            if (def.getPortTypes().size() == 0) {
+
+                DescriptionInfo description = new DescriptionInfo();
+                description.setProperty(WSDL_DEFINITION, def);
+                description.setName(def.getQName());
+                description.setBaseURI(def.getDocumentBaseURI());
+                copyExtensors(description, def.getExtensibilityElements());
+                copyExtensionAttributes(description, def);
+
+                ServiceInfo service = new ServiceInfo();
+                service.setDescription(description);
+                service.setProperty(WSDL_DEFINITION, def);
+                getSchemas(def, service);
+                if (wsdlManager != null) {
+                    ServiceSchemaInfo serviceSchemaInfo = new ServiceSchemaInfo();
+                    serviceSchemaInfo.setSchemaCollection(service.getXmlSchemaCollection());
+                    serviceSchemaInfo.setSchemaInfoList(service.getSchemas());
+                    wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
+                }
+
+                service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
+                serviceList.add(service);
+            }
+        }
+        return serviceList;
+    }
+
+    public ServiceInfo buildMockService(Definition def, PortType p) {
+        DescriptionInfo description = new DescriptionInfo();
+        description.setProperty(WSDL_DEFINITION, def);
+        description.setName(def.getQName());
+        description.setBaseURI(def.getDocumentBaseURI());
+        copyExtensors(description, def.getExtensibilityElements());
+        copyExtensionAttributes(description, def);
+
+        ServiceInfo service = new ServiceInfo();
+        service.setDescription(description);
+        service.setProperty(WSDL_DEFINITION, def);
+        getSchemas(def, service);
+
+        service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
+
+        buildInterface(service, p);
+
+        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class); 
+        if (wsdlManager != null) {
+            ServiceSchemaInfo serviceSchemaInfo = new ServiceSchemaInfo();
+            serviceSchemaInfo.setSchemaCollection(service.getXmlSchemaCollection());
+            serviceSchemaInfo.setSchemaInfoList(service.getSchemas());
+            wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
+        }
+
+        return service;
+    }
+
+    private List<ServiceInfo> buildServices(Definition def, Service serv, DescriptionInfo d) {
+        Map<QName, ServiceInfo> services = new LinkedHashMap<QName, ServiceInfo>();
+
+        DescriptionInfo description = d;
+        if (null == description) {
+            description = new DescriptionInfo();
+            description.setProperty(WSDL_DEFINITION, def);
+            description.setName(def.getQName());
+            description.setBaseURI(def.getDocumentBaseURI());
+            copyExtensors(description, def.getExtensibilityElements());
+            copyExtensionAttributes(description, def);
+        }
+
+        for (Port port : cast(serv.getPorts().values(), Port.class)) {
+            Binding binding = port.getBinding();
+            PortType bindingPt = binding.getPortType();
+            //TODO: wsdl4j's bug. if there is recursive import,
+            //wsdl4j can not get operation input message
+            PortType pt = def.getPortType(bindingPt.getQName());
+            if (pt == null) {
+                pt = bindingPt;
+            }
+            ServiceInfo service = services.get(pt.getQName());
+            if (service == null) {
+                service = new ServiceInfo();
+                service.setDescription(description);
+                description.getDescribed().add(service);
+                service.setProperty(WSDL_DEFINITION, def);
+                service.setProperty(WSDL_SERVICE, serv);
+                WSDLManager wsdlManager = bus.getExtension(WSDLManager.class); 
+                ServiceSchemaInfo serviceSchemaInfo = null;
+                if (wsdlManager != null) {
+                    serviceSchemaInfo = wsdlManager.getSchemasForDefinition(def);
+                }
+                
+                if (serviceSchemaInfo != null) {
+                    service.setServiceSchemaInfo(serviceSchemaInfo);
+                } else {
+                    getSchemas(def, service);
+                    if (wsdlManager != null) {
+                        serviceSchemaInfo = new ServiceSchemaInfo();
+                        serviceSchemaInfo.setSchemaCollection(service.getXmlSchemaCollection());
+                        serviceSchemaInfo.setSchemaInfoList(service.getSchemas());
+                        wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
+                    }
+                }
+
+                service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
+                service.setTargetNamespace(def.getTargetNamespace());
+                service.setName(serv.getQName());
+                copyExtensors(service, serv.getExtensibilityElements());
+                copyExtensionAttributes(service, serv);
+
+                buildInterface(service, pt);
+
+                services.put(pt.getQName(), service);
+            }
+
+            BindingInfo bi = service.getBinding(binding.getQName());
+            if (bi == null) {
+                bi = buildBinding(service, binding);
+            }
+            buildEndpoint(service, bi, port);
+        }
+
+        return new ArrayList<ServiceInfo>(services.values());
+    }
+
+    private void getSchemas(Definition def, ServiceInfo serviceInfo) {
+        SchemaUtil schemaUtil = new SchemaUtil(bus, this.schemaList);
+        schemaUtil.setCatalogResolvedMap(this.catalogResolvedMap);
+        schemaUtil.getSchemas(def, serviceInfo);
+    }
+
+    private void parseImports(Definition def, List<Definition> defList) {
+        List<Import> importList = new ArrayList<Import>();
+
+        Collection<List<Import>> ilist = cast(def.getImports().values());
+        for (List<Import> list : ilist) {
+            importList.addAll(list);
+        }
+        for (Import impt : importList) {
+            if (!defList.contains(impt.getDefinition())) {
+                defList.add(impt.getDefinition());
+                parseImports(impt.getDefinition(), defList);
+            }
+        }
+    }
+
+    public EndpointInfo buildEndpoint(ServiceInfo service, BindingInfo bi, Port port) {
+        List elements = port.getExtensibilityElements();
+        String ns = null;
+
+        DestinationFactory factory = null;
+        EndpointInfo ei = null;
+
+        if (null != elements && elements.size() > 0) {
+            for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
+                ns = el.getElementType().getNamespaceURI();
+                try {
+                    factory = bus.getExtension(DestinationFactoryManager.class).getDestinationFactory(ns);
+                } catch (BusException e) {
+                    // do nothing
+                }
+                if (factory != null) {
+                    break;
+                }
+            }
+            if (factory == null) {
+                ns = ((ExtensibilityElement)elements.get(0)).getElementType().getNamespaceURI();
+            }
+        }
+
+        if (factory == null) { // get the transport id from bindingInfo
+            elements = port.getBinding().getExtensibilityElements();
+            if (null != elements && elements.size() > 0) {
+                for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
+                    if (el instanceof SOAPBinding) {
+                        ns = (String)((SOAPBinding)el).getTransportURI();
+                        break;
+                    } else if (el instanceof SOAP12Binding) {
+                        ns = (String)((SOAP12Binding)el).getTransportURI();
+                        break;
+                        // TODO: this is really ugly, but how to link between
+                        // this binding and this transport ?
+                    } else if ("http://cxf.apache.org/bindings/jbi".equals(el.getElementType()
+                        .getNamespaceURI())) {
+                        ns = "http://cxf.apache.org/transports/jbi";
+                        break;
+                    }
+                }
+            }
+            if (ns == null) {
+                throw new RuntimeException("Can non find the destination factory, check the port "
+                                           + " //wsdl:port[@name='" + port.getName() + "']");
+            }
+            try {
+                factory = bus.getExtension(DestinationFactoryManager.class).getDestinationFactory(ns);
+            } catch (BusException e) {
+                // do nothing
+            }
+        }
+        if (factory instanceof WSDLEndpointFactory) {
+            WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
+            ei = wFactory.createEndpointInfo(service, bi, port);
+        }
+
+        if (ei == null) {
+            ei = new EndpointInfo(service, ns);
+        }
+
+        ei.setName(new QName(service.getName().getNamespaceURI(), port.getName()));
+        ei.setBinding(bi);
+        copyExtensors(ei, port.getExtensibilityElements());
+        copyExtensionAttributes(ei, port);
+
+        service.addEndpoint(ei);
+        DescriptionInfo d = service.getDescription();
+        if (null != d) {
+            ei.setDescription(d);
+            d.getDescribed().add(ei);
+        }
+        return ei;
+    }
+
+    public BindingInfo buildBinding(ServiceInfo service, Binding binding) {
+        BindingInfo bi = null;
+        StringBuffer ns = new StringBuffer(100);
+        BindingFactory factory = WSDLServiceUtils.getBindingFactory(binding, bus, ns);
+        if (factory instanceof WSDLBindingFactory) {
+            WSDLBindingFactory wFactory = (WSDLBindingFactory)factory;
+            bi = wFactory.createBindingInfo(service, binding, ns.toString());
+            copyExtensors(bi, binding.getExtensibilityElements());
+            copyExtensionAttributes(bi, binding);
+        }
+        if (bi == null) {
+            bi = new BindingInfo(service, ns.toString());
+            bi.setName(binding.getQName());
+            copyExtensors(bi, binding.getExtensibilityElements());
+            copyExtensionAttributes(bi, binding);
+
+            for (BindingOperation bop : cast(binding.getBindingOperations(), BindingOperation.class)) {
+                LOG.fine("binding operation name is " + bop.getName());
+                String inName = null;
+                String outName = null;
+                if (bop.getBindingInput() != null) {
+                    inName = bop.getBindingInput().getName();
+                }
+                if (bop.getBindingOutput() != null) {
+                    outName = bop.getBindingOutput().getName();
+                }
+                BindingOperationInfo bop2 = bi.buildOperation(new QName(service.getName().getNamespaceURI(),
+                                                                        bop.getName()), inName, outName);
+                if (bop2 != null) {
+
+                    copyExtensors(bop2, bop.getExtensibilityElements());
+                    copyExtensionAttributes(bop2, bop);
+                    bi.addOperation(bop2);
+                    if (bop.getBindingInput() != null) {
+                        copyExtensors(bop2.getInput(), bop.getBindingInput().getExtensibilityElements());
+                        copyExtensionAttributes(bop2.getInput(), bop.getBindingInput());
+                        handleHeader(bop2.getInput());
+                    }
+                    if (bop.getBindingOutput() != null) {
+                        copyExtensors(bop2.getOutput(), bop.getBindingOutput().getExtensibilityElements());
+                        copyExtensionAttributes(bop2.getOutput(), bop.getBindingOutput());
+                        handleHeader(bop2.getOutput());
+                    }
+                    for (BindingFault f : cast(bop.getBindingFaults().values(), BindingFault.class)) {
+                        BindingFaultInfo bif = bop2.getFault(new QName(service.getTargetNamespace(), f
+                            .getName()));
+                        copyExtensors(bif, bop.getBindingFault(f.getName()).getExtensibilityElements());
+                        copyExtensionAttributes(bif, bop.getBindingFault(f.getName()));
+                    }
+                }
+
+            }
+        }
+
+        service.addBinding(bi);
+        DescriptionInfo d = service.getDescription();
+        if (null != d) {
+            bi.setDescription(d);
+            d.getDescribed().add(bi);
+        }
+        return bi;
+    }
+
+    private void handleHeader(BindingMessageInfo bindingMessageInfo) {
+        // mark all message part which should be in header
+        List<ExtensibilityElement> extensiblilityElement = bindingMessageInfo
+            .getExtensors(ExtensibilityElement.class);
+        // for non-soap binding, the extensiblilityElement could be null
+        if (extensiblilityElement == null) {
+            return;
+        }
+        // for (ExtensibilityElement element : extensiblilityElement) {
+        // LOG.info("the extensibility is " + element.getClass().getName());
+        // if (element instanceof SOAPHeader) {
+        // LOG.info("the header is " + ((SOAPHeader)element).getPart());
+        // }
+        // }
+    }
+
+    public void buildInterface(ServiceInfo si, PortType p) {
+        InterfaceInfo inf = si.createInterface(p.getQName());
+        DescriptionInfo d = si.getDescription();
+        if (null != d) {
+            inf.setDescription(si.getDescription());
+            d.getDescribed().add(inf);
+        }
+        this.copyExtensors(inf, p.getExtensibilityElements());
+        this.copyExtensionAttributes(inf, p);
+        inf.setProperty(WSDL_PORTTYPE, p);
+        for (Operation op : cast(p.getOperations(), Operation.class)) {
+            buildInterfaceOperation(inf, op);
+        }
+
+    }
+
+    private void buildInterfaceOperation(InterfaceInfo inf, Operation op) {
+        OperationInfo opInfo = inf.addOperation(new QName(inf.getName().getNamespaceURI(), op.getName()));
+        opInfo.setProperty(WSDL_OPERATION, op);
+        List<String> porderList = CastUtils.cast((List)op.getParameterOrdering());
+        opInfo.setParameterOrdering(porderList);
+        this.copyExtensors(opInfo, op.getExtensibilityElements());
+        this.copyExtensionAttributes(opInfo, op);
+        Input input = op.getInput();
+        if (input != null) {
+            MessageInfo minfo = opInfo.createMessage(input.getMessage().getQName(), MessageInfo.Type.INPUT);
+            opInfo.setInput(input.getName(), minfo);
+            buildMessage(minfo, input.getMessage());
+            copyExtensors(minfo, input.getExtensibilityElements());
+            copyExtensionAttributes(minfo, input);
+        }
+        Output output = op.getOutput();
+        if (output != null) {
+            MessageInfo minfo = opInfo.createMessage(output.getMessage().getQName(), MessageInfo.Type.OUTPUT);
+            opInfo.setOutput(output.getName(), minfo);
+            buildMessage(minfo, output.getMessage());
+            copyExtensors(minfo, output.getExtensibilityElements());
+            copyExtensionAttributes(minfo, output);
+        }
+        Map<?, ?> m = op.getFaults();
+        for (Map.Entry<?, ?> rawentry : m.entrySet()) {
+            Map.Entry<String, Fault> entry = cast(rawentry, String.class, Fault.class);
+            FaultInfo finfo = opInfo.addFault(new QName(inf.getName().getNamespaceURI(), entry.getKey()),
+                                              entry.getValue().getMessage().getQName());
+            buildMessage(finfo, entry.getValue().getMessage());
+            copyExtensors(finfo, entry.getValue().getExtensibilityElements());
+            copyExtensionAttributes(finfo, entry.getValue());
+        }
+        checkForWrapped(opInfo, false);
+    }
+
+    public static void checkForWrapped(OperationInfo opInfo, boolean relaxed) {
+        MessageInfo inputMessage = opInfo.getInput();
+        MessageInfo outputMessage = opInfo.getOutput();
+        boolean passedRule = true;
+        // RULE No.1:
+        // The operation's input and output message (if present) each contain
+        // only a single part
+        // input message must exist
+        if (inputMessage == null || inputMessage.size() != 1
+            || (outputMessage != null && outputMessage.size() > 1)) {
+            passedRule = false;
+        }
+
+        if (!passedRule) {
+            return;
+        }
+        SchemaCollection schemas = opInfo.getInterface().getService().getXmlSchemaCollection();
+        XmlSchemaElement inputEl = null;
+        XmlSchemaElement outputEl = null;
+
+        // RULE No.2:
+        // The input message part refers to a global element decalration whose
+        // localname
+        // is equal to the operation name
+        MessagePartInfo inputPart = inputMessage.getMessagePartByIndex(0);
+        if (!inputPart.isElement()) {
+            passedRule = false;
+        } else {
+            QName inputElementName = inputPart.getElementQName();
+            inputEl = schemas.getElementByQName(inputElementName);
+            if (inputEl == null) {
+                passedRule = false;
+            } else if (!opInfo.getName().getLocalPart().equals(inputElementName.getLocalPart())) {
+                passedRule = relaxed;
+            }
+        }
+
+        if (!passedRule) {
+            return;
+        }
+        // RULE No.3:
+        // The output message part refers to a global element declaration
+        MessagePartInfo outputPart = null;
+        if (outputMessage != null && outputMessage.size() == 1) {
+            outputPart = outputMessage.getMessagePartByIndex(0);
+            if (outputPart != null) {
+                if (!outputPart.isElement()
+                    || schemas.getElementByQName(outputPart.getElementQName()) == null) {
+                    passedRule = false;
+                } else {
+                    outputEl = schemas.getElementByQName(outputPart.getElementQName());
+                }
+            }
+        }
+
+        if (!passedRule) {
+            return;
+        }
+        // RULE No.4 and No5:
+        // wrapper element should be pure complex type
+
+        // Now lets see if we have any attributes...
+        // This should probably look at the restricted and substitute types too.
+        OperationInfo unwrapped = new UnwrappedOperationInfo(opInfo);
+        MessageInfo unwrappedInput = new MessageInfo(unwrapped, MessageInfo.Type.INPUT,
+                                                     inputMessage.getName()); 
+        MessageInfo unwrappedOutput = null;
+
+        XmlSchemaComplexType xsct = null;
+        if (inputEl.getSchemaType() instanceof XmlSchemaComplexType) {
+            
+            xsct = (XmlSchemaComplexType)inputEl.getSchemaType();
+            if (hasAttributes(xsct)
+                || (inputEl.isNillable() && !relaxed)
+                || !isWrappableSequence(xsct, inputEl.getQName().getNamespaceURI(),
+                                        unwrappedInput, relaxed)) {
+                passedRule = false;
+            }
+        } else {
+            passedRule = false;
+        }
+
+        if (!passedRule) {
+            return;
+        }
+
+        if (outputMessage != null) {
+            unwrappedOutput = new MessageInfo(unwrapped, MessageInfo.Type.OUTPUT, outputMessage.getName());
+
+            if (outputEl != null && outputEl.getSchemaType() instanceof XmlSchemaComplexType) {
+                xsct = (XmlSchemaComplexType)outputEl.getSchemaType();
+                if (xsct.isAbstract()) {
+                    passedRule = false;
+                }
+                if (hasAttributes(xsct)
+                    || (outputEl.isNillable() && !relaxed)
+                    || !isWrappableSequence(xsct, outputEl.getQName().getNamespaceURI(), unwrappedOutput,
+                                            relaxed)) {
+                    passedRule = false;
+                }
+            } else {
+                passedRule = false;
+            }
+        }
+
+        if (!passedRule) {
+            return;
+        }
+        // we are wrappable!!
+        opInfo.setUnwrappedOperation(unwrapped);
+        unwrapped.setInput(opInfo.getInputName(), unwrappedInput);
+        if (outputMessage != null) {
+            unwrapped.setOutput(opInfo.getOutputName(), unwrappedOutput);
+        }
+    }
+
+    private static boolean hasAttributes(XmlSchemaComplexType complexType) {
+        // Now lets see if we have any attributes...
+        // This should probably look at the restricted and substitute types too.
+        if (complexType.getAnyAttribute() != null || complexType.getAttributes().getCount() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isWrappableSequence(XmlSchemaComplexType type, String namespaceURI,
+                                               MessageInfo wrapper, boolean allowRefs) {
+        if (type.getParticle() instanceof XmlSchemaSequence) {
+            XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
+            XmlSchemaObjectCollection items = seq.getItems();
+            boolean ret = true;
+            for (int x = 0; x < items.getCount(); x++) {
+                XmlSchemaObject o = items.getItem(x);
+                if (!(o instanceof XmlSchemaElement)) {
+                    return false;
+                }
+                XmlSchemaElement el = (XmlSchemaElement)o;
+
+                if (el.getSchemaTypeName() != null) {
+                    MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
+                    mpi.setTypeQName(el.getSchemaTypeName());
+                    mpi.setConcreteName(el.getQName());
+                    mpi.setElement(true);
+                    mpi.setElementQName(el.getQName());
+                    mpi.setXmlSchema(el);
+                } else if (el.getRefName() != null) {
+                    MessagePartInfo mpi = wrapper.addMessagePart(el.getRefName());
+                    mpi.setTypeQName(el.getRefName());
+                    mpi.setElementQName(el.getRefName());
+                    mpi.setElement(true);
+                    mpi.setXmlSchema(el);
+                    // element reference is not permitted for wrapper element
+                    if (!allowRefs) {
+                        ret = false;
+                    }
+                } else {
+                    // anonymous type
+                    MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
+                    mpi.setConcreteName(el.getQName());
+                    mpi.setElementQName(mpi.getName());
+                    mpi.setElement(true);
+                    mpi.setXmlSchema(el);
+                }
+            }
+
+            return ret;
+        } else if (type.getParticle() == null) {
+            if (type.getContentModel() == null) {
+                return true;
+            }
+            if (type.getContentModel().getContent() instanceof XmlSchemaComplexContentExtension) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void buildMessage(AbstractMessageContainer minfo, Message msg) {
+        SchemaCollection schemas = minfo.getOperation().getInterface().getService()
+            .getXmlSchemaCollection();
+        List orderedParam = msg.getOrderedParts(null);
+        for (Part part : cast(orderedParam, Part.class)) {
+            MessagePartInfo pi = minfo.addMessagePart(new QName(minfo.getName().getNamespaceURI(), part
+                .getName()));
+            if (part.getTypeName() != null) {
+                pi.setTypeQName(part.getTypeName());
+                pi.setElement(false);
+                pi.setXmlSchema(schemas.getTypeByQName(part.getTypeName()));
+            } else {
+                pi.setElementQName(part.getElementName());
+                pi.setElement(true);
+                pi.setXmlSchema(schemas.getElementByQName(part.getElementName()));
+            }
+        }
+    }
+    
+    public void setCatalogResolvedMap(Map<String, String> resolvedMap) {
+        catalogResolvedMap = resolvedMap;
+    }
+
+}

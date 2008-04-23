@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="nested" targetNamespace="http://schemas.apache.org/idl/nested.idl" xmlns:tns="http://schemas.apache.org/idl/nested.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/nested.idl/corba/typemap/">
+    <corba:union xmlns:ns3="http://schemas.apache.org/idltypes/nested.idl" discriminator="corba:long" repositoryID="IDL:sub2ChoiceType:1.0" type="ns3:sub2ChoiceType" name="sub2ChoiceType">
+      <corba:unionbranch name="e4" idltype="corba:double" default="false">
+        <corba:case label="0" />
+      </corba:unionbranch>
+        <corba:unionbranch name="e6" idltype="corba:double" default="false">
+          <corba:case label="1" />
+        </corba:unionbranch>
+        </corba:union>
+          <corba:union xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" discriminator="corba:long" repositoryID="IDL:_omg_sub2ChoiceType:1.0" type="xsd1:_omg_sub2ChoiceType" name="_omg_sub2ChoiceType">
+            <corba:unionbranch name="e4" idltype="corba:double" default="false">
+              <corba:case label="0" />
+            </corba:unionbranch>
+              <corba:unionbranch name="e6" idltype="corba:double" default="false">
+                <corba:case label="1" />
+              </corba:unionbranch>
+              </corba:union>
+                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStructr6:1.0" type="xsd1:typeSequenceStructr6" name="typeSequenceStructr6">
+                  <corba:member name="varFloat" idltype="corba:float" />
+                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="typeSequenceStruct4_f" idltype="ns1:typeSequenceStruct4" />
+                </corba:struct>
+                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct1Type:1.0" type="xsd1:typeSequenceStruct1Type" name="typeSequenceStruct1Type">
+                    <corba:member name="attrString" idltype="corba:string" />
+                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="typeSequenceStruct1_f" idltype="ns1:typeSequenceStruct1" />
+                  </corba:struct>
+                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct5:1.0" type="xsd1:typeSequenceStruct5" name="typeSequenceStruct5">
+                      <corba:member name="varStringExt" idltype="corba:string" />
+                      <corba:member name="varFloatExt" idltype="corba:float" />
+                    </corba:struct>
+                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:sub3SequenceStruct:1.0" type="xsd1:sub3SequenceStruct" name="sub3SequenceStruct">
+                        <corba:member name="e5" idltype="corba:boolean" />
+                      </corba:struct>
+                        <corba:union xmlns:tns="http://schemas.apache.org/idl/nested.idl" discriminator="corba:boolean" repositoryID="IDL:long_nil:1.0" type="tns:attrib1" name="long_nil">
+                          <corba:unionbranch name="value" idltype="corba:long" default="false">
+                            <corba:case label="TRUE" />
+                          </corba:unionbranch>
+                          </corba:union>
+                            <corba:union xmlns:tns="http://schemas.apache.org/idl/nested.idl" discriminator="corba:boolean" repositoryID="IDL:_1_attrib2Type_nil_nil:1.0" type="tns:attrib2" name="_1_attrib2Type_nil_nil">
+                              <corba:unionbranch xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="value" idltype="ns1:_1_attrib2Type_nil" default="false">
+                                <corba:case label="TRUE" />
+                              </corba:unionbranch>
+                              </corba:union>
+                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct2:1.0" type="xsd1:typeSequenceStruct2" name="typeSequenceStruct2">
+                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="attrib1" idltype="ns1:long_nil" />
+                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="attrib2" idltype="ns1:_1_attrib2Type_nil_nil" />
+                                  <corba:member name="simpleTypeValue" idltype="corba:short" />
+                                </corba:struct>
+                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:SimpleStruct:1.0" type="xsd1:SimpleStruct" name="SimpleStruct">
+                                    <corba:member name="varFloat" idltype="corba:float" />
+                                    <corba:member name="varInt" idltype="corba:long" />
+                                    <corba:member name="varString" idltype="corba:string" />
+                                  </corba:struct>
+                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:sub1SequenceStruct:1.0" type="xsd1:sub1SequenceStruct" name="sub1SequenceStruct">
+                                      <corba:member name="e3" idltype="corba:float" />
+                                    </corba:struct>
+                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct1:1.0" type="xsd1:typeSequenceStruct1" name="typeSequenceStruct1">
+                                        <corba:member name="varString" idltype="corba:long" />
+                                        <corba:member name="varFloat" idltype="corba:float" />
+                                      </corba:struct>
+                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:sub3:1.0" type="xsd1:sub3" name="sub3">
+                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="sub2_f" idltype="ns1:sub2" />
+                                          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="sub3SequenceStruct_f" idltype="ns1:sub3SequenceStruct" />
+                                        </corba:struct>
+                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:base:1.0" type="xsd1:base" name="base">
+                                            <corba:member name="attr1" idltype="corba:string" />
+                                            <corba:member name="attr2" idltype="corba:long" />
+                                            <corba:member name="e1" idltype="corba:long" />
+                                            <corba:member name="e2" idltype="corba:string" />
+                                          </corba:struct>
+                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct4:1.0" type="xsd1:typeSequenceStruct4" name="typeSequenceStruct4">
+                                              <corba:member name="varInt" idltype="corba:long" />
+                                              <corba:member name="varString" idltype="corba:string" />
+                                            </corba:struct>
+                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:testStructType:1.0" type="xsd1:testStructType" name="testStructType">
+                                                <corba:member name="attrString" idltype="corba:string" />
+                                                <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+                                              </corba:struct>
+                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:sub2:1.0" type="xsd1:sub2" name="sub2">
+                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="base_f" idltype="ns1:base" />
+                                                  <corba:member xmlns:tns="http://schemas.apache.org/idl/nested.idl" name="sub2ChoiceType_f" idltype="tns:sub2ChoiceType" />
+                                                </corba:struct>
+                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct5Type:1.0" type="xsd1:typeSequenceStruct5Type" name="typeSequenceStruct5Type">
+                                                    <corba:member name="AttrString" idltype="corba:string" />
+                                                    <corba:member name="any_f" idltype="corba:any" />
+                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="typeSequenceStruct5_f" idltype="ns1:typeSequenceStruct5" />
+                                                  </corba:struct>
+                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct3Type:1.0" type="xsd1:typeSequenceStruct3Type" name="typeSequenceStruct3Type">
+                                                      <corba:member name="attrString1" idltype="corba:string" />
+                                                      <corba:member name="attrString2" idltype="corba:string" />
+                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="SimpleStruct_f" idltype="ns1:SimpleStruct" />
+                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="typeSequenceStruct3_f" idltype="ns1:typeSequenceStruct3" />
+                                                    </corba:struct>
+                                                      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:sub1:1.0" type="xsd1:sub1" name="sub1">
+                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="base_f" idltype="ns1:base" />
+                                                        <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="sub1SequenceStruct_f" idltype="ns1:sub1SequenceStruct" />
+                                                      </corba:struct>
+                                                        <corba:anonstring bound="2" type="corba:string" name="_1_attrib2Type_nil" />
+                                                        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:typeSequenceStruct3:1.0" type="xsd1:typeSequenceStruct3" name="typeSequenceStruct3">
+                                                          <corba:member name="varFloat" idltype="corba:float" />
+                                                        </corba:struct>
+                                                          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:TypeInheritancePortType/echoObjectResult:1.0" type="xsd1:TypeInheritancePortType.echoObjectResult" name="TypeInheritancePortType.echoObjectResult">
+                                                            <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="return" idltype="ns1:base" />
+                                                          </corba:struct>
+                                                            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:TypeInheritancePortType/echoObject2Result:1.0" type="xsd1:TypeInheritancePortType.echoObject2Result" name="TypeInheritancePortType.echoObject2Result">
+                                                              <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="return" idltype="ns1:sub2" />
+                                                            </corba:struct>
+                                                              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:TypeInheritancePortType/echoObject:1.0" type="xsd1:TypeInheritancePortType.echoObject" name="TypeInheritancePortType.echoObject">
+                                                                <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="x" idltype="ns1:base" />
+                                                              </corba:struct>
+                                                                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:TypeInheritancePortType/echoObject3Result:1.0" type="xsd1:TypeInheritancePortType.echoObject3Result" name="TypeInheritancePortType.echoObject3Result">
+                                                                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="return" idltype="ns1:sub2" />
+                                                                </corba:struct>
+                                                                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:TypeInheritancePortType/echoObject3:1.0" type="xsd1:TypeInheritancePortType.echoObject3" name="TypeInheritancePortType.echoObject3">
+                                                                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="x" idltype="ns1:sub3" />
+                                                                  </corba:struct>
+                                                                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" repositoryID="IDL:TypeInheritancePortType/echoObject2:1.0" type="xsd1:TypeInheritancePortType.echoObject2" name="TypeInheritancePortType.echoObject2">
+                                                                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="x" idltype="ns1:sub1" />
+                                                                    </corba:struct>
+                                                                    </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/nested.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="base">
+                <sequence>
+                    <element name="attr1" type="string"/>
+                    <element name="attr2" type="int"/>
+                    <element name="e1" type="int"/>
+                    <element name="e2" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub2ChoiceType">
+                <choice>
+                    <element name="e4" type="double"/>
+                    <element name="e6" type="double"/>
+                </choice>
+            </complexType>
+            <complexType name="_omg_sub2ChoiceType">
+                <sequence>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="int"/>
+                    <choice maxOccurs="1" minOccurs="0">
+                        <element name="e4" type="double"/>
+                        <element name="e6" type="double"/>
+                    </choice>
+                </sequence>
+            </complexType>
+            <complexType name="sub2">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub2ChoiceType_f" type="xsd1:sub2ChoiceType"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1SequenceStruct">
+                <sequence>
+                    <element name="e3" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub1">
+                <sequence>
+                    <element name="base_f" type="xsd1:base"/>
+                    <element name="sub1SequenceStruct_f" type="xsd1:sub1SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3SequenceStruct">
+                <sequence>
+                    <element name="e5" type="boolean"/>
+                </sequence>
+            </complexType>
+            <complexType name="sub3">
+                <sequence>
+                    <element name="sub2_f" type="xsd1:sub2"/>
+                    <element name="sub3SequenceStruct_f" type="xsd1:sub3SequenceStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="SimpleStruct">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="testStructType">
+                <sequence>
+                    <element name="attrString" type="string"/>
+                    <element name="SimpleStruct_f" type="xsd1:SimpleStruct"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct1">
+                <sequence>
+                    <element name="varString" type="int"/>
+                    <element name="varFloat" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct1Type">
+                <sequence>
+                    <element name="attrString" type="string"/>
+                    <element name="SimpleStruct_f" type="xsd1:SimpleStruct"/>
+                    <element name="typeSequenceStruct1_f" type="xsd1:typeSequenceStruct1"/>
+                </sequence>
+            </complexType>
+            <simpleType name="_1_attrib2Type_nil">
+                <restriction base="string">
+                    <maxLength value="2"/>
+                </restriction>
+            </simpleType>
+            <complexType name="typeSequenceStruct2">
+                <sequence>
+                    <element name="attrib1" nillable="true" type="int"/>
+                    <element name="attrib2" nillable="true" type="xsd1:_1_attrib2Type_nil"/>
+                    <element name="simpleTypeValue" type="short"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct3">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct3Type">
+                <sequence>
+                    <element name="attrString1" type="string"/>
+                    <element name="attrString2" type="string"/>
+                    <element name="SimpleStruct_f" type="xsd1:SimpleStruct"/>
+                    <element name="typeSequenceStruct3_f" type="xsd1:typeSequenceStruct3"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct4">
+                <sequence>
+                    <element name="varInt" type="int"/>
+                    <element name="varString" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct5">
+                <sequence>
+                    <element name="varStringExt" type="string"/>
+                    <element name="varFloatExt" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStruct5Type">
+                <sequence>
+                    <element name="AttrString" type="string"/>
+                    <element name="any_f" type="anyType"/>
+                    <element name="typeSequenceStruct5_f" type="xsd1:typeSequenceStruct5"/>
+                </sequence>
+            </complexType>
+            <complexType name="typeSequenceStructr6">
+                <sequence>
+                    <element name="varFloat" type="float"/>
+                    <element name="typeSequenceStruct4_f" type="xsd1:typeSequenceStruct4"/>
+                </sequence>
+            </complexType>
+            <element name="TypeInheritancePortType.echoObject">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObjectResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:base"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject2">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd1:sub1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject2Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject3">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd1:sub3"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="TypeInheritancePortType.echoObject3Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:sub2"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+  </types>
+  <message name="TypeInheritancePortType.echoObject3">
+    <part name="parameters" element="xsd1:TypeInheritancePortType.echoObject3"/>
+  </message>
+  <message name="TypeInheritancePortType.echoObjectResponse">
+    <part name="parameters" element="xsd1:TypeInheritancePortType.echoObjectResult"/>
+  </message>
+  <message name="TypeInheritancePortType.echoObject3Response">
+    <part name="parameters" element="xsd1:TypeInheritancePortType.echoObject3Result"/>
+  </message>
+  <message name="TypeInheritancePortType.echoObject">
+    <part name="parameters" element="xsd1:TypeInheritancePortType.echoObject"/>
+  </message>
+  <message name="TypeInheritancePortType.echoObject2Response">
+    <part name="parameters" element="xsd1:TypeInheritancePortType.echoObject2Result"/>
+  </message>
+  <message name="TypeInheritancePortType.echoObject2">
+    <part name="parameters" element="xsd1:TypeInheritancePortType.echoObject2"/>
+  </message>
+  <portType name="TypeInheritancePortType">
+    <operation name="echoObject">
+      <input name="echoObject" message="tns:TypeInheritancePortType.echoObject"/>
+      <output name="echoObjectResponse" message="tns:TypeInheritancePortType.echoObjectResponse"/>
+    </operation>
+    <operation name="echoObject2">
+      <input name="echoObject2" message="tns:TypeInheritancePortType.echoObject2"/>
+      <output name="echoObject2Response" message="tns:TypeInheritancePortType.echoObject2Response"/>
+    </operation>
+    <operation name="echoObject3">
+      <input name="echoObject3" message="tns:TypeInheritancePortType.echoObject3"/>
+      <output name="echoObject3Response" message="tns:TypeInheritancePortType.echoObject3Response"/>
+    </operation>
+  </portType>
+  <binding name="TypeInheritanceCORBABinding" type="tns:TypeInheritancePortType">
+    <corba:binding repositoryID="IDL:TypeInheritancePortType:1.0" />
+    <operation name="echoObject">
+      <corba:operation name="echoObject">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" mode="in" name="x" idltype="ns1:base" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="return" idltype="ns1:base" />
+      </corba:operation>
+      <input name="echoObject">
+      </input>
+      <output name="echoObjectResponse">
+      </output>
+    </operation>
+    <operation name="echoObject2">
+      <corba:operation name="echoObject2">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" mode="in" name="x" idltype="ns1:sub1" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="return" idltype="ns1:sub2" />
+      </corba:operation>
+      <input name="echoObject2">
+      </input>
+      <output name="echoObject2Response">
+      </output>
+    </operation>
+    <operation name="echoObject3">
+      <corba:operation name="echoObject3">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" mode="in" name="x" idltype="ns1:sub3" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested.idl/corba/typemap/" name="return" idltype="ns1:sub2" />
+      </corba:operation>
+      <input name="echoObject3">
+      </input>
+      <output name="echoObject3Response">
+      </output>
+    </operation>
+  </binding>
+</definitions>

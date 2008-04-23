@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<project name="Inbound Connection Demo" default="build" basedir=".">
+    <property environment="env"/>
+    <condition property="jboss.home" value="${env.JBOSS_HOME}">
+        <isset property="env.JBOSS_HOME"/>
+    </condition>
+
+    <fail message="this sample need to use jboss, please setup JBOSS_HOME in your environment" unless="jboss.home"/>
+
+    <property environment="env"/>
+    <condition property="cxf.home" value="${env.CXF_HOME}">
+        <isset property="env.CXF_HOME"/>
+    </condition>
+
+    <fail message="this sample need to use CXF_HOME enviroment, please setup CXF_HOME in your environment" unless="cxf.home"/>
+
+    <property name="j2ee.resources.dir" location="${basedir}/../common/resources"/>
+    <property name="build.archives" value="${basedir}/j2ee-archives"/>
+    <property name="ejb.xml" location="./etc/ejb.xml"/>
+    <property name="servants.props.file" location="${cxf.home}/etc/ejb_servants.properties"/>
+    <property file="${servants.props.file}"/>
+    <property name="j2ee.archives" value="j2ee-archives"/>
+    <property name="demos.current.dir" value="."/>
+    <property name="build.classes.dir" value="${basedir}/build"/>
+
+    <import file="../../../common_build.xml"/>
+
+
+    <path id="other.classpath">
+        <fileset dir="${cxf.home}/modules/integration" >
+            <include name="cxf-integration-jca-*.jar"/>
+        </fileset>
+        <pathelement location="${jboss.home}/client/jbossall-client.jar"/>
+    </path>
+
+    <target name="prepare">
+        <replace file="${cxf.home}/etc/ra.xml" token="CXF_HOME" value="${cxf.home}"/>
+    </target>
+
+
+    <target name="init">
+        <!--mkdir dir="${build.classes.dir}"/-->
+        <mkdir dir="${build.classes.dir}/cxf-rar/META-INF"/>
+        <mkdir dir="${build.classes.dir}/lib"/>
+        <mkdir dir="${j2ee.archives}"/>
+    </target>
+
+    <target name="update.jboss.endorsed">
+        <copy todir="${jboss.home}/lib/endorsed">
+            <fileset dir="${cxf.home}/lib">
+                <include name="*annotation*" />
+                <include name="*ws-metadata*" />
+                <include name="*activation*" />
+                <include name="jaxb*" />
+                <include name="stax*" />
+                <include name="geronimo-stax-api*" />
+                <include name="saaj*" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="deploy.cxf.rar" description="deploy cxf.rar" depends="generate.rar">
+        <copy todir="${jboss.home}/server/default/deploy">
+            <fileset dir="${build.classes.dir}/lib" includes="cxf.rar"/>
+            <fileset dir="${basedir}/etc" includes="cxfj2ee_1_5-ds.xml"/>
+        </copy>
+    </target>
+
+    <target name="generate.rar" depends="prepare,update.jboss.endorsed,init">
+        <copy file="${cxf.home}/etc/ra.xml" todir="${build.classes.dir}/cxf-rar/META-INF"/>
+        <copy todir="${build.classes.dir}/cxf-rar">
+            <fileset dir="${cxf.home}/lib">
+                <include name="*.jar"/>
+                <exclude name="cxf*.jar"/>
+            </fileset>
+            <fileset dir="${cxf.home}/modules">
+                <include name="*.jar"/>
+                <exclude name="*manifest*.jar"/>
+            </fileset>
+            <fileset dir="${cxf.home}/modules/integration">
+                <include name="*.jar"/>
+                <exclude name="*-jbi-*.jar"/>
+            </fileset>
+        </copy>
+        <jar destfile="${build.classes.dir}/lib/cxf.rar"
+         basedir="${build.classes.dir}/cxf-rar"/>
+    </target>
+
+
+    <target name="build" description="compile the code" depends="init,j2ee.compile,build.ejb.jar"/>
+
+
+    <target name="j2ee.compile">
+        <javac srcdir="${basedir}/src" destdir="${build.classes.dir}" debug="true" fork="yes">
+            <include name="**/*.java"/>
+            <classpath>
+                <pathelement location="${cxf.home}/modules/cxf-manifest.jar"/>
+                <pathelement location="${build.classes.dir}"/>
+                <path refid="cxf.classpath"/>
+                <path refid="other.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="clean">
+        <delete failonerror="no">
+            <fileset dir="./build" includes="**/*.class"/>
+            <fileset dir="./build" includes="**/*.jar"/>
+            <fileset dir="./build/lib" includes="**/*.rar"/>
+            <fileset dir="${build.classes.dir}/cxf-rar" includes="**/*"/>
+        </delete>
+    </target>
+
+    <target name="build.ejb.jar">
+        <jar destfile="${j2ee.archives}/greeterejb.jar">
+            <metainf dir="./etc">
+                <include name="*ejb*.xml"/>
+            </metainf>
+            <fileset dir="${build.classes.dir}/" includes="org/**/*.class"/>
+            <fileset dir="${build.classes.dir}">
+                <include name="**/ejb/*.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="deploy.ejb.jar" depends="build.ejb.jar" description="deploy the ejb bean" >
+        <copy todir="${jboss.home}/server/default/deploy">
+            <fileset dir="${j2ee.archives}" includes="greeterejb.jar"/>
+        </copy>
+    </target>
+
+    <!-- 
+     this target appends the necessary entry to ejb_servants.properties 
+     to activate the web services facade for the greeterejb.jar application.
+    -->
+    <target name="activate" description="updates ejb_servants.properties for demo " unless="GreeterBean">
+        <property name="servant.definition"
+          value="GreeterBean={http://apache.org/hello_world_soap_http}Greeter@"/>
+        <echo message="updating ${servants.props.file}" />
+
+        <echo file="${servants.props.file}" append="true">
+            # entry for the j2ee inbound demo
+            ${servant.definition}
+        </echo>
+        <replace file="${servants.props.file}" token="\" value="/"/>
+    </target>
+
+
+    <target name="client" description="run the client side demo " >
+        <java classname="demo.client.GreeterClient" fork="true">
+            <sysproperty key="java.util.logging.config.file" value="${cxf.home}/etc/logging.properties"/>
+            <arg value="${wsdl.location}"/>
+            <classpath>
+                <pathelement location="${build.classes.dir}"/>
+                <path refid="cxf.classpath"/>
+            </classpath>
+        </java>
+    </target>
+</project>

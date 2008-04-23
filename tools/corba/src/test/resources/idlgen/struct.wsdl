@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct/typemap">
+    <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" repositoryID="IDL:OutsideStruct:1.0" type="ns4:OutsideStruct" name="OutsideStruct">
+      <corba:member name="number" idltype="corba:long" />
+      <corba:member name="word" idltype="corba:string" />
+    </corba:struct>
+    </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="OutsideStruct">
+        <xs:sequence>
+          <xs:element name="number" type="xs:int">
+          </xs:element>
+          <xs:element name="word" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="simple">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outside" type="OutsideStruct">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="simpleResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outside" type="OutsideStruct">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="simpleResponse">
+    <wsdl:part name="outparameter" element="tns:simpleResponse"/>
+  </wsdl:message>
+  <wsdl:message name="simple">
+    <wsdl:part name="inparameter" element="tns:simple"/>
+  </wsdl:message>
+  <wsdl:portType name="StructTest">
+    <wsdl:operation name="simple">
+      <wsdl:input name="simpleRequest" message="tns:simple"/>
+      <wsdl:output name="simpleResponse" message="tns:simpleResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="StructTestCORBABinding" type="tns:StructTest">
+    <corba:binding repositoryID="IDL:StructTest:1.0" />
+    <wsdl:operation name="simple">
+      <corba:operation name="simple">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" mode="inout" name="outside" idltype="OutsideStruct" />
+      </corba:operation>
+      <wsdl:input name="simpleRequest">
+      </wsdl:input>
+      <wsdl:output name="simpleResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="StructTestCORBAService">
+    <wsdl:port name="StructTestCORBAPort" binding="tns:StructTestCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service> 
+</wsdl:definitions>

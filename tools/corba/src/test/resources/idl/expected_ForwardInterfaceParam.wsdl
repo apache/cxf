@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam/typemap">
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam" binding="org.cc.IpCallCORBABinding" repositoryID="IDL:org/cc/IpCall:1.0" type="ns4:EndpointReferenceType" name="org.cc.IpCall" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="routeCAllParam">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+            <xs:element name="inoutTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeCAllParamResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+            <xs:element name="outTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+            <xs:element name="inoutTp" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeReq">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inDouble" type="xs:double">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="routeReqResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="outShort" type="xs:short">
+            </xs:element>
+            <xs:element name="inoutLong" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="org.cc.IpCallRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="routeReq">
+    <wsdl:part name="inparameter" element="tns:routeReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCAllParamResponse">
+    <wsdl:part name="outparameter" element="tns:routeCAllParamResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeCAllParam">
+    <wsdl:part name="inparameter" element="tns:routeCAllParam">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="routeReqResponse">
+    <wsdl:part name="outparameter" element="tns:routeReqResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="org.cc.IpAppCall">
+    <wsdl:operation name="routeCAllParam">
+      <wsdl:input name="routeCAllParamRequest" message="tns:routeCAllParam">
+    </wsdl:input>
+      <wsdl:output name="routeCAllParamResponse" message="tns:routeCAllParamResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="org.cc.IpCall">
+    <wsdl:operation name="routeReq">
+      <wsdl:input name="routeReqRequest" message="tns:routeReq">
+    </wsdl:input>
+      <wsdl:output name="routeReqResponse" message="tns:routeReqResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="org.cc.IpCallCORBABinding" type="tns:org.cc.IpCall">
+    <corba:binding repositoryID="IDL:org/cc/IpCall:1.0" />
+    <wsdl:operation name="routeReq">
+      <corba:operation name="routeReq">
+        <corba:param mode="in" name="inDouble" idltype="corba:double" />
+        <corba:param mode="out" name="outShort" idltype="corba:short" />
+        <corba:param mode="inout" name="inoutLong" idltype="corba:long" />
+      </corba:operation>
+      <wsdl:input name="routeReqRequest">
+      </wsdl:input>
+      <wsdl:output name="routeReqResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="org.cc.IpAppCallCORBABinding" type="tns:org.cc.IpAppCall">
+    <corba:binding repositoryID="IDL:org/cc/IpAppCall:1.0" />
+    <wsdl:operation name="routeCAllParam">
+      <corba:operation name="routeCAllParam">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam/typemap" mode="in" name="inTp" idltype="org.cc.IpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam/typemap" mode="out" name="outTp" idltype="org.cc.IpCall" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam/typemap" mode="inout" name="inoutTp" idltype="org.cc.IpCall" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterfaceParam/typemap" name="return" idltype="org.cc.IpCall" />
+      </corba:operation>
+      <wsdl:input name="routeCAllParamRequest">
+      </wsdl:input>
+      <wsdl:output name="routeCAllParamResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="org.cc.IpAppCallCORBAService">
+    <wsdl:port name="org.cc.IpAppCallCORBAPort" binding="tns:org.cc.IpAppCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="org.cc.IpCallCORBAService">
+    <wsdl:port name="org.cc.IpCallCORBAPort" binding="tns:org.cc.IpCallCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

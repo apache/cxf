@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-ProtectionMgrInterfaces" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ======= Import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/ProtectionMgr.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ======= Import Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ======= Definition of getAllEProtectionGroups Request/Response Messages ========= -->
+  <wsdl:message name="getAllEProtectionGroups">
+    <wsdl:documentation>
+    The getAllEProtectionGroups request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEProtectionGroups"/>
+  </wsdl:message>
+  <wsdl:message name="getAllEProtectionGroupsResponse">
+    <wsdl:documentation>
+    The getAllEProtectionGroups response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEProtectionGroupsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllNUTTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllNUTTPNames">
+    <wsdl:documentation>
+    The getAllNUTTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllNUTTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllNUTTPNamesResponse">
+    <wsdl:documentation>
+    The getAllNUTTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllPreemptibleTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllPreemptibleTPNames">
+    <wsdl:documentation>
+    The getAllPreemptibleTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllPreemptibleTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllPreemptibleTPNamesResponse">
+    <wsdl:documentation>
+    The getAllPreemptibleTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllProtectedTPNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllProtectedTPNames">
+    <wsdl:documentation>
+    The getAllProtectedTPNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllProtectedTPNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllProtectedTPNamesResponse">
+    <wsdl:documentation>
+    The getAllProtectedTPNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllProtectionGroups Request/Response Messages ========= -->
+  <wsdl:message name="getAllProtectionGroups">
+    <wsdl:documentation>
+    The getAllProtectionGroups request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllProtectionGroups"/>
+  </wsdl:message>
+  <wsdl:message name="getAllProtectionGroupsResponse">
+    <wsdl:documentation>
+    The getAllProtectionGroups response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllProtectionGroupsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getContainingPGNames Request/Response Messages ========= -->
+  <wsdl:message name="getContainingPGNames">
+    <wsdl:documentation>
+    The getContainingPGNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getContainingPGNames"/>
+  </wsdl:message>
+  <wsdl:message name="getContainingPGNamesResponse">
+    <wsdl:documentation>
+    The getContainingPGNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getEProtectionGroup Request/Response Messages ========= -->
+  <wsdl:message name="getEProtectionGroup">
+    <wsdl:documentation>
+    The getEProtectionGroup request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getEProtectionGroup"/>
+  </wsdl:message>
+  <wsdl:message name="getEProtectionGroupResponse">
+    <wsdl:documentation>
+    The getEProtectionGroup response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getEProtectionGroupResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getProtectionGroup Request/Response Messages ========= -->
+  <wsdl:message name="getProtectionGroup">
+    <wsdl:documentation>
+    The getProtectionGroup request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getProtectionGroup"/>
+  </wsdl:message>
+  <wsdl:message name="getProtectionGroupResponse">
+    <wsdl:documentation>
+    The getProtectionGroup response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getProtectionGroupResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of retrieveESwitchData Request/Response Messages ========= -->
+  <wsdl:message name="retrieveESwitchData">
+    <wsdl:documentation>
+    The retrieveESwitchData request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:retrieveESwitchData"/>
+  </wsdl:message>
+  <wsdl:message name="retrieveESwitchDataResponse">
+    <wsdl:documentation>
+    The retrieveESwitchData response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:retrieveESwitchDataResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of retrieveSwitchData Request/Response Messages ========= -->
+  <wsdl:message name="retrieveSwitchData">
+    <wsdl:documentation>
+    The retrieveSwitchData request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:retrieveSwitchData"/>
+  </wsdl:message>
+  <wsdl:message name="retrieveSwitchDataResponse">
+    <wsdl:documentation>
+    The retrieveSwitchData response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:retrieveSwitchDataResponse"/>
+  </wsdl:message>
+  <!-- ======= Port Type Definitions ====================== -->
+  <!-- ======= ProtectionMgr Port Type  ===================== -->
+  <wsdl:portType name="ProtectionMgr">
+    <wsdl:documentation>
+The MTOSI ProtectionMgr porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getAllEProtectionGroups">
+      <wsdl:documentation>
+        This is the getAllEProtectionGroups request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllEProtectionGroups"/>
+      <wsdl:output message="tmf854WS:getAllEProtectionGroupsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllNUTTPNames">
+      <wsdl:documentation>
+        This is the getAllNUTTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllNUTTPNames"/>
+      <wsdl:output message="tmf854WS:getAllNUTTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllPreemptibleTPNames">
+      <wsdl:documentation>
+        This is the getAllPreemptibleTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllPreemptibleTPNames"/>
+      <wsdl:output message="tmf854WS:getAllPreemptibleTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllProtectedTPNames">
+      <wsdl:documentation>
+        This is the getAllProtectedTPNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllProtectedTPNames"/>
+      <wsdl:output message="tmf854WS:getAllProtectedTPNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllProtectionGroups">
+      <wsdl:documentation>
+        This is the getAllProtectionGroups request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllProtectionGroups"/>
+      <wsdl:output message="tmf854WS:getAllProtectionGroupsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getContainingPGNames">
+      <wsdl:documentation>
+        This is the getContainingPGNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getContainingPGNames"/>
+      <wsdl:output message="tmf854WS:getContainingPGNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getEProtectionGroup">
+      <wsdl:documentation>
+        This is the getEProtectionGroup request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getEProtectionGroup"/>
+      <wsdl:output message="tmf854WS:getEProtectionGroupResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getProtectionGroup">
+      <wsdl:documentation>
+        This is the getProtectionGroup request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getProtectionGroup"/>
+      <wsdl:output message="tmf854WS:getProtectionGroupResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveESwitchData">
+      <wsdl:documentation>
+        This is the retrieveESwitchData request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:retrieveESwitchData"/>
+      <wsdl:output message="tmf854WS:retrieveESwitchDataResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveSwitchData">
+      <wsdl:documentation>
+        This is the retrieveSwitchData request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:retrieveSwitchData"/>
+      <wsdl:output message="tmf854WS:retrieveSwitchDataResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

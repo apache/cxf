@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions name="soap_header" targetNamespace="http://apache.org/headers/doc_lit" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xformat="http://cxf.apache.org/bindings/xformat" xmlns:tns="http://apache.org/headers/doc_lit" xmlns:x1="http://apache.org/headers/coloc/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <types>
+        <schema targetNamespace="http://apache.org/headers/doc_lit" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/headers/coloc/types" schemaLocation="./header.xsd"/>
+        </schema>
+    </types>
+    <message name="inHeaderRequest">
+        <part element="x1:inHeader" name="in"/>
+        <part element="x1:header" name="header"/>
+    </message>
+    <message name="inHeaderResponse">
+        <part element="x1:inHeaderResponse" name="out"/>
+    </message>
+    <message name="outHeaderRequest">
+        <part element="x1:outHeader" name="in"/>
+    </message>
+    <message name="outHeaderResponse">
+        <part element="x1:outHeaderResponse" name="out"/>
+        <part element="x1:header" name="header"/>
+    </message>
+    <message name="inoutHeaderRequest">
+        <part element="x1:inoutHeader" name="inout"/>
+        <part element="x1:header" name="header"/>
+    </message>
+    <message name="inoutHeaderResponse">
+        <part element="x1:inoutHeaderResponse" name="inout"/>
+        <part element="x1:header" name="header"/>
+    </message>
+    <message name="pingMeRequest">
+        <part element="x1:pingMe" name="in"/>
+    </message>
+    <message name="pingMeResponse">
+        <part element="x1:pingMeResponse" name="out"/>
+    </message>
+    <message name="pingMeFault">
+        <part element="x1:faultDetail" name="faultDetail"/>
+    </message>
+    <portType name="headerTester">
+        <operation name="inHeader">
+            <input message="tns:inHeaderRequest" name="inHeaderRequest"/>
+            <output message="tns:inHeaderResponse" name="inHeaderResponse"/>
+        </operation>
+        <operation name="outHeader">
+            <input message="tns:outHeaderRequest" name="outHeaderRequest"/>
+            <output message="tns:outHeaderResponse" name="outHeaderResponse"/>
+        </operation>
+        <operation name="inoutHeader">
+            <input message="tns:inoutHeaderRequest" name="inoutHeaderRequest"/>
+            <output message="tns:inoutHeaderResponse" name="inoutHeaderResponse"/>
+        </operation>
+        <operation name="pingMe">
+            <input message="tns:pingMeRequest" name="pingMeRequest"/>
+            <output message="tns:pingMeResponse" name="pingMeResponse"/>
+            <fault message="tns:pingMeFault" name="pingMeFault"/>
+        </operation>
+    </portType>
+    <binding name="headerTesterSOAPBinding" type="tns:headerTester">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="inHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="inHeaderRequest">
+                <soap:body parts="in" use="literal"/>
+                <soap:header message="tns:inHeaderRequest" part="header" use="literal"/>
+            </input>
+            <output name="inHeaderResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="outHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="outHeaderRequest">
+                <soap:body use="literal"/>
+            </input>
+            <output name="outHeaderResponse">
+                <soap:body parts="out" use="literal"/>
+                <soap:header message="tns:outHeaderResponse" part="header" use="literal"/>
+            </output>
+        </operation>
+        <operation name="inoutHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="inoutHeaderRequest">
+                <soap:body parts="in" use="literal"/>
+                <soap:header message="tns:inoutHeaderRequest" part="header" use="literal"/>
+            </input>
+            <output name="inoutHeaderResponse">
+                <soap:body parts="out" use="literal"/>
+                <soap:header message="tns:inoutHeaderResponse" part="header" use="literal"/>
+            </output>
+        </operation>
+        <operation name="pingMe">
+            <soap:operation soapAction="" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="pingMeFault">
+                <soap:fault name="pingMeFault" use="literal"/>
+            </fault>
+        </operation>
+    </binding>
+    <wsdl:binding name="headerTesterXMLBinding" type="tns:headerTester">
+        <xformat:binding/>
+        <wsdl:operation name="inHeader">
+            <wsdl:input>
+                <xformat:body rootNode="tns:inHeaderReqNode"/>
+            </wsdl:input>
+            <wsdl:output/>
+        </wsdl:operation>
+        <wsdl:operation name="outHeader">
+            <wsdl:input/>
+            <wsdl:output>
+                <xformat:body rootNode="tns:outHeaderRespNode"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="inoutHeader">
+            <wsdl:input>
+                <xformat:body rootNode="tns:inoutHeaderNode"/>
+            </wsdl:input>
+            <wsdl:output>
+                <xformat:body rootNode="tns:inoutHeaderNode"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="pingMe">
+            <wsdl:input>
+                <!-- RootNode needed because the part name "in" is used in multiple message -->
+                <xformat:body rootNode="tns:pingMe"/>
+            </wsdl:input>
+            <wsdl:output/>
+            <wsdl:fault name="pingMeFault"/>
+        </wsdl:operation>
+    </wsdl:binding>
+    <service name="XMLHeaderService">
+        <port binding="tns:headerTesterXMLBinding" name="XMLPort9000">
+            <http:address location="http://localhost:9111/XMLContext/XMLPort"/>
+        </port>
+        <port binding="tns:headerTesterXMLBinding" name="XMLPortJms">
+            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.xml.jmstransport.queue">
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
+            </jms:address>
+        </port>
+    </service>
+    <service name="SOAPHeaderService">
+        <port binding="tns:headerTesterSOAPBinding" name="SoapPort9000">
+            <soap:address location="http://localhost:9111/headers"/>
+        </port>
+        <port binding="tns:headerTesterSOAPBinding" name="SoapPortJms">
+            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.celtix.jmstransport.queue">
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
+            </jms:address>
+        </port>
+    </service>
+</definitions>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="ImageSender2Service" targetNamespace="http://fortest.tools.cxf.apache.org/" xmlns:tns="http://fortest.tools.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://fortest.tools.cxf.apache.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://fortest.tools.cxf.apache.org/">
+    <xs:complexType name="myImage">
+        <xs:sequence>
+            <xs:element xmlns:ns1="http://www.w3.org/2005/05/xmlmime" minOccurs="0" name="myPhoto" ns1:expectedContentTypes="image/png" type="xs:base64Binary"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="sendImage2" type="sendImage2"/>
+    <xs:complexType name="sendImage2">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="arg0" type="myImage"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="sendImage2Response" type="sendImage2Response"/>
+    <xs:complexType name="sendImage2Response">
+        <xs:sequence/>
+    </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sendImage2">
+    <wsdl:part name="parameters" element="tns:sendImage2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendImage2Response">
+    <wsdl:part name="parameters" element="tns:sendImage2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ImageSender2">
+    <wsdl:operation name="sendImage2">
+      <wsdl:input name="sendImage2" message="tns:sendImage2">
+    </wsdl:input>
+      <wsdl:output name="sendImage2Response" message="tns:sendImage2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ImageSender2ServiceSoapBinding" type="tns:ImageSender2">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sendImage2">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendImage2">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendImage2Response">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ImageSender2Service">
+    <wsdl:port name="ImageSender2Port" binding="tns:ImageSender2ServiceSoapBinding">
+      <soap:address location="http://localhost:9090/ImageSender2Port"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

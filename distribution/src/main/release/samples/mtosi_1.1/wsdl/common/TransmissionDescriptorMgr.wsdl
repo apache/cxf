@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-TransmissionDescriptorMgrInterfaces" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ======= Import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/TransmissionDescriptorMgr.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ======= Import Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ======= Definition of getAllTransmissionDescriptorNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllTransmissionDescriptorNames">
+    <wsdl:documentation>
+    The getAllTransmissionDescriptorNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTransmissionDescriptorNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllTransmissionDescriptorNamesResponse">
+    <wsdl:documentation>
+    The getAllTransmissionDescriptorNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllTransmissionDescriptors Request/Response Messages ========= -->
+  <wsdl:message name="getAllTransmissionDescriptors">
+    <wsdl:documentation>
+    The getAllTransmissionDescriptors request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTransmissionDescriptors"/>
+  </wsdl:message>
+  <wsdl:message name="getAllTransmissionDescriptorsResponse">
+    <wsdl:documentation>
+    The getAllTransmissionDescriptors response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTransmissionDescriptorsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAssociatedTPs Request/Response Messages ========= -->
+  <wsdl:message name="getAssociatedTPs">
+    <wsdl:documentation>
+    The getAssociatedTPs request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAssociatedTPs"/>
+  </wsdl:message>
+  <wsdl:message name="getAssociatedTPsResponse">
+    <wsdl:documentation>
+    The getAssociatedTPs response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAssociatedTPsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getTransmissionDescriptor Request/Response Messages ========= -->
+  <wsdl:message name="getTransmissionDescriptor">
+    <wsdl:documentation>
+    The getTransmissionDescriptor request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTransmissionDescriptor"/>
+  </wsdl:message>
+  <wsdl:message name="getTransmissionDescriptorResponse">
+    <wsdl:documentation>
+    The getTransmissionDescriptor response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTransmissionDescriptorResponse"/>
+  </wsdl:message>
+  <!-- ======= Port Type Definitions ====================== -->
+  <!-- ======= TransmissionDescriptor Port Type  ===================== -->
+  <wsdl:portType name="TransmissionDescriptorMgr">
+    <wsdl:documentation>
+    The MTOSI TransmissionDescriptorMgr porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getAllTransmissionDescriptorNames">
+      <wsdl:documentation>
+        This is the getAllTransmissionDescriptorNames request/response operation.
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllTransmissionDescriptorNames"/>
+      <wsdl:output message="tmf854WS:getAllTransmissionDescriptorNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTransmissionDescriptors">
+      <wsdl:documentation>
+        This is the getAllTransmissionDescriptors request/response operation.
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllTransmissionDescriptors"/>
+      <wsdl:output message="tmf854WS:getAllTransmissionDescriptorsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAssociatedTPs">
+      <wsdl:documentation>
+        This is the getAssociatedTPs request/response operation.
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAssociatedTPs"/>
+      <wsdl:output message="tmf854WS:getAssociatedTPsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getTransmissionDescriptor">
+      <wsdl:documentation>
+        This is the getTransmissionDescriptor request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getTransmissionDescriptor"/>
+      <wsdl:output message="tmf854WS:getTransmissionDescriptorResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

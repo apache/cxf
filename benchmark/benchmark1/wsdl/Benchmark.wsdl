@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns:impl="http://www.extreme.indiana.edu/wsdl/Benchmark1" xmlns:intf="http://www.extreme.indiana.edu/wsdl/Benchmark1" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.extreme.indiana.edu/wsdl/Benchmark1">
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.extreme.indiana.edu/wsdl/Benchmark1" elementFormDefault="qualified">
+			<element name="echoVoid">
+				<complexType/>
+			</element>
+			<element name="echoVoidResponse">
+				<complexType/>
+			</element>
+			<element name="echoBase64">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:base64Binary"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoBase64Response">
+				<complexType>
+					<sequence>
+						<element name="echoBase64Return" type="xsd:base64Binary"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoStrings">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:string" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoStringsResponse">
+				<complexType>
+					<sequence>
+						<element name="echoStringsReturn" type="xsd:string" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoInts">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:int" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoIntsResponse">
+				<complexType>
+					<sequence>
+						<element name="echoIntsReturn" type="xsd:int" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoDoubles">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:double" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoDoublesResponse">
+				<complexType>
+					<sequence>
+						<element name="echoDoublesReturn" type="xsd:double" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveBase64">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:base64Binary"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveBase64Response">
+				<complexType>
+					<sequence>
+						<element name="receiveBase64Return" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveStrings">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:string" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveStringsResponse">
+				<complexType>
+					<sequence>
+						<element name="receiveStringsReturn" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveInts">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:int" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveIntsResponse">
+				<complexType>
+					<sequence>
+						<element name="receiveIntsReturn" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveDoubles">
+				<complexType>
+					<sequence>
+						<element name="input" type="xsd:double" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveDoublesResponse">
+				<complexType>
+					<sequence>
+						<element name="receiveDoublesReturn" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveSimpleEventsRequest">
+				<complexType>
+					<sequence>
+						<element name="input" type="impl:ArrayOfSimpleEvent"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveMeshInterfaceObjectsRequest">
+				<complexType>
+					<sequence>
+						<element name="input" type="impl:ArrayOfMeshInterfaceObject"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveSimpleEventsResponse">
+				<complexType>
+					<sequence>
+						<element name="receiveSimpleEventsReturn" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveMeshInterfaceObjectsResponse">
+				<complexType>
+					<sequence>
+						<element name="receiveMeshInterfaceObjectsReturn" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendBase64">
+				<complexType>
+					<sequence>
+						<element name="size" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendBase64Response">
+				<complexType>
+					<sequence>
+						<element name="sendBase64Return" type="xsd:base64Binary"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendStrings">
+				<complexType>
+					<sequence>
+						<element name="size" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendStringsResponse">
+				<complexType>
+					<sequence>
+						<element name="sendStringsReturn" type="xsd:string" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendInts">
+				<complexType>
+					<sequence>
+						<element name="size" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendIntsResponse">
+				<complexType>
+					<sequence>
+						<element name="sendIntsReturn" type="xsd:int" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendDoubles">
+				<complexType>
+					<sequence>
+						<element name="size" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendDoublesResponse">
+				<complexType>
+					<sequence>
+						<element name="sendDoublesReturn" type="xsd:double" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendSimpleEventsRequest">
+				<complexType>
+					<sequence>
+						<element name="size" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendSimpleEventsResponse">
+				<complexType>
+					<sequence>
+						<element name="sendSimpleEventsReturn" type="impl:ArrayOfSimpleEvent"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendMeshInterfaceObjectsRequest">
+				<complexType>
+					<sequence>
+						<element name="size" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendMeshInterfaceObjectsResponse">
+				<complexType>
+					<sequence>
+						<element name="sendMeshInterfaceObjectsReturn" type="impl:ArrayOfMeshInterfaceObject"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoSimpleEventsRequest">
+				<complexType>
+					<sequence>
+						<element name="input" type="impl:ArrayOfSimpleEvent"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoSimpleEventsResponse">
+				<complexType>
+					<sequence>
+						<element name="echoSimpleEventsReturn" type="impl:ArrayOfSimpleEvent"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoMeshInterfaceObjectsRequest">
+				<complexType>
+					<sequence>
+						<element name="input" type="impl:MeshInterfaceObject" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="echoMeshInterfaceObjectsResponse">
+				<complexType>
+					<sequence>
+						<element name="echoMeshInterfaceObjectReturn" type="impl:MeshInterfaceObject" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="SimpleEvent" type="impl:SimpleEvent"/>
+			<xsd:complexType name="SimpleEvent">
+				<xsd:all>
+					<xsd:element name="sequenceNumber" type="xsd:int"/>
+					<xsd:element name="timestamp" type="xsd:double"/>
+					<xsd:element name="message" type="xsd:string"/>
+				</xsd:all>
+			</xsd:complexType>
+			<element name="ArrayOfSimpleEvent" type="impl:ArrayOfSimpleEvent"/>
+			<complexType name="ArrayOfSimpleEvent">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="item" nillable="true" type="impl:SimpleEvent"/>
+				</xsd:sequence>
+			</complexType>
+			<element name="MeshInterfaceObject" type="impl:MeshInterfaceObject"/>
+			<xsd:complexType name="MeshInterfaceObject">
+				<xsd:all>
+					<xsd:element name="x" type="xsd:int"/>
+					<xsd:element name="y" type="xsd:int"/>
+					<xsd:element name="value" type="xsd:double"/>
+				</xsd:all>
+			</xsd:complexType>
+			<element name="ArrayOfMeshInterfaceObject" type="impl:ArrayOfMeshInterfaceObject"/>
+			<complexType name="ArrayOfMeshInterfaceObject">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="item" nillable="true" type="impl:MeshInterfaceObject"/>
+				</xsd:sequence>
+			</complexType>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="echoIntsRequest">
+		<wsdl:part name="parameters" element="impl:echoInts"/>
+	</wsdl:message>
+	<wsdl:message name="echoBase64Request">
+		<wsdl:part name="parameters" element="impl:echoBase64"/>
+	</wsdl:message>
+	<wsdl:message name="echoVoidResponse">
+		<wsdl:part name="parameters" element="impl:echoVoidResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveDoublesRequest">
+		<wsdl:part name="parameters" element="impl:receiveDoubles"/>
+	</wsdl:message>
+	<wsdl:message name="sendBase64Response">
+		<wsdl:part name="parameters" element="impl:sendBase64Response"/>
+	</wsdl:message>
+	<wsdl:message name="echoStringsRequest">
+		<wsdl:part name="parameters" element="impl:echoStrings"/>
+	</wsdl:message>
+	<wsdl:message name="sendStringsRequest">
+		<wsdl:part name="parameters" element="impl:sendStrings"/>
+	</wsdl:message>
+	<wsdl:message name="sendIntsRequest">
+		<wsdl:part name="parameters" element="impl:sendInts"/>
+	</wsdl:message>
+	<wsdl:message name="receiveStringsRequest">
+		<wsdl:part name="parameters" element="impl:receiveStrings"/>
+	</wsdl:message>
+	<wsdl:message name="echoBase64Response">
+		<wsdl:part name="parameters" element="impl:echoBase64Response"/>
+	</wsdl:message>
+	<wsdl:message name="receiveIntsRequest">
+		<wsdl:part name="parameters" element="impl:receiveInts"/>
+	</wsdl:message>
+	<wsdl:message name="sendIntsResponse">
+		<wsdl:part name="parameters" element="impl:sendIntsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveBase64Request">
+		<wsdl:part name="parameters" element="impl:receiveBase64"/>
+	</wsdl:message>
+	<wsdl:message name="sendDoublesResponse">
+		<wsdl:part name="parameters" element="impl:sendDoublesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveBase64Response">
+		<wsdl:part name="parameters" element="impl:receiveBase64Response"/>
+	</wsdl:message>
+	<wsdl:message name="echoIntsResponse">
+		<wsdl:part name="parameters" element="impl:echoIntsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="echoDoublesRequest">
+		<wsdl:part name="parameters" element="impl:echoDoubles"/>
+	</wsdl:message>
+	<wsdl:message name="sendDoublesRequest">
+		<wsdl:part name="parameters" element="impl:sendDoubles"/>
+	</wsdl:message>
+	<wsdl:message name="sendStringsResponse">
+		<wsdl:part name="parameters" element="impl:sendStringsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="echoStringsResponse">
+		<wsdl:part name="parameters" element="impl:echoStringsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveIntsResponse">
+		<wsdl:part name="parameters" element="impl:receiveIntsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveDoublesResponse">
+		<wsdl:part name="parameters" element="impl:receiveDoublesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="echoVoidRequest">
+		<wsdl:part name="parameters" element="impl:echoVoid"/>
+	</wsdl:message>
+	<wsdl:message name="receiveStringsResponse">
+		<wsdl:part name="parameters" element="impl:receiveStringsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="sendBase64Request">
+		<wsdl:part name="parameters" element="impl:sendBase64"/>
+	</wsdl:message>
+	<wsdl:message name="echoDoublesResponse">
+		<wsdl:part name="parameters" element="impl:echoDoublesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="echoSimpleEventsRequest">
+		<wsdl:part name="input" element="impl:echoSimpleEventsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="echoSimpleEventsResponse">
+		<wsdl:part name="output" element="impl:echoSimpleEventsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="echoMeshInterfaceObjectsRequest">
+		<wsdl:part name="input" element="impl:echoMeshInterfaceObjectsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="echoMeshInterfaceObjectsResponse">
+		<wsdl:part name="output" element="impl:echoMeshInterfaceObjectsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveSimpleEventsRequest">
+		<wsdl:part name="input" element="impl:receiveSimpleEventsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="receiveSimpleEventsResponse">
+		<wsdl:part name="size" element="impl:receiveSimpleEventsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="receiveMeshInterfaceObjectsRequest">
+		<wsdl:part name="input" element="impl:receiveMeshInterfaceObjectsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="receiveMeshInterfaceObjectsResponse">
+		<wsdl:part name="size" element="impl:receiveMeshInterfaceObjectsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="sendSimpleEventsRequest">
+		<wsdl:part name="size" element="impl:sendSimpleEventsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="sendSimpleEventsResponse">
+		<wsdl:part name="output" element="impl:sendSimpleEventsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="sendMeshInterfaceObjectsRequest">
+		<wsdl:part name="size" element="impl:sendMeshInterfaceObjectsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="sendMeshInterfaceObjectsResponse">
+		<wsdl:part name="output" element="impl:sendMeshInterfaceObjectsResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="Benchmark">
+		<wsdl:operation name="echoVoid">
+			<wsdl:input name="echoVoidRequest" message="impl:echoVoidRequest"/>
+			<wsdl:output name="echoVoidResponse" message="impl:echoVoidResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="echoBase64">
+			<wsdl:input name="echoBase64Request" message="impl:echoBase64Request"/>
+			<wsdl:output name="echoBase64Response" message="impl:echoBase64Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="echoStrings">
+			<wsdl:input name="echoStringsRequest" message="impl:echoStringsRequest"/>
+			<wsdl:output name="echoStringsResponse" message="impl:echoStringsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="echoInts">
+			<wsdl:input name="echoIntsRequest" message="impl:echoIntsRequest"/>
+			<wsdl:output name="echoIntsResponse" message="impl:echoIntsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="echoDoubles">
+			<wsdl:input name="echoDoublesRequest" message="impl:echoDoublesRequest"/>
+			<wsdl:output name="echoDoublesResponse" message="impl:echoDoublesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="echoSimpleEvents">
+			<wsdl:input name="echoSimpleEventsRequest" message="impl:echoSimpleEventsRequest"/>
+			<wsdl:output name="echoSimpleEventsResponse" message="impl:echoSimpleEventsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="echoMeshInterfaceObjects">
+			<wsdl:input name="echoMeshInterfaceObjectsRequest" message="impl:echoMeshInterfaceObjectsRequest"/>
+			<wsdl:output name="echoMeshInterfaceObjectsResponse" message="impl:echoMeshInterfaceObjectsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveBase64">
+			<wsdl:input name="receiveBase64Request" message="impl:receiveBase64Request"/>
+			<wsdl:output name="receiveBase64Response" message="impl:receiveBase64Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveStrings">
+			<wsdl:input name="receiveStringsRequest" message="impl:receiveStringsRequest"/>
+			<wsdl:output name="receiveStringsResponse" message="impl:receiveStringsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveInts">
+			<wsdl:input name="receiveIntsRequest" message="impl:receiveIntsRequest"/>
+			<wsdl:output name="receiveIntsResponse" message="impl:receiveIntsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveDoubles">
+			<wsdl:input name="receiveDoublesRequest" message="impl:receiveDoublesRequest"/>
+			<wsdl:output name="receiveDoublesResponse" message="impl:receiveDoublesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveSimpleEvents">
+			<wsdl:input name="receiveSimpleEventsRequest" message="impl:receiveSimpleEventsRequest"/>
+			<wsdl:output name="receiveSimpleEventsResponse" message="impl:receiveSimpleEventsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveMeshInterfaceObjects">
+			<wsdl:input name="receiveMeshInterfaceObjectsRequest" message="impl:receiveMeshInterfaceObjectsRequest"/>
+			<wsdl:output name="receiveMeshInterfaceObjectsResponse" message="impl:receiveMeshInterfaceObjectsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendBase64">
+			<wsdl:input name="sendBase64Request" message="impl:sendBase64Request"/>
+			<wsdl:output name="sendBase64Response" message="impl:sendBase64Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendStrings">
+			<wsdl:input name="sendStringsRequest" message="impl:sendStringsRequest"/>
+			<wsdl:output name="sendStringsResponse" message="impl:sendStringsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendInts">
+			<wsdl:input name="sendIntsRequest" message="impl:sendIntsRequest"/>
+			<wsdl:output name="sendIntsResponse" message="impl:sendIntsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendDoubles">
+			<wsdl:input name="sendDoublesRequest" message="impl:sendDoublesRequest"/>
+			<wsdl:output name="sendDoublesResponse" message="impl:sendDoublesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendSimpleEvents">
+			<wsdl:input name="sendSimpleEventsRequest" message="impl:sendSimpleEventsRequest"/>
+			<wsdl:output name="sendSimpleEventsResponse" message="impl:sendSimpleEventsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendMeshInterfaceObjects">
+			<wsdl:input name="sendMeshInterfaceObjectsRequest" message="impl:sendMeshInterfaceObjectsRequest"/>
+			<wsdl:output name="sendMeshInterfaceObjectsResponse" message="impl:sendMeshInterfaceObjectsResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="BenchmarkSoapBinding" type="impl:Benchmark">
+		<wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="echoVoid">
+			<wsdlsoap:operation soapAction="echoVoid"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="echoBase64">
+			<wsdlsoap:operation soapAction="echoBase64"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="echoStrings">
+			<wsdlsoap:operation soapAction="echoStrings"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="echoInts">
+			<wsdlsoap:operation soapAction="echoInts"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="echoDoubles">
+			<wsdlsoap:operation soapAction="echoDoubles"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="echoSimpleEvents">
+			<wsdlsoap:operation soapAction="echoSimpleEvents"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="echoMeshInterfaceObjects">
+			<wsdlsoap:operation soapAction="echoMeshInterfaceObjects"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveBase64">
+			<wsdlsoap:operation soapAction="receiveBase64"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveStrings">
+			<wsdlsoap:operation soapAction="receiveStrings"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveInts">
+			<wsdlsoap:operation soapAction="receiveInts"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveDoubles">
+			<wsdlsoap:operation soapAction="receiveDoubles"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveSimpleEvents">
+			<wsdlsoap:operation soapAction="receiveSimpleEvents"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveMeshInterfaceObjects">
+			<wsdlsoap:operation soapAction="receiveMeshInterfaceObjects"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendBase64">
+			<wsdlsoap:operation soapAction="sendBase64"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendStrings">
+			<wsdlsoap:operation soapAction="sendStrings"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendInts">
+			<wsdlsoap:operation soapAction="sendInts"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendDoubles">
+			<wsdlsoap:operation soapAction="sendDoubles"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendSimpleEvents">
+			<wsdlsoap:operation soapAction="sendSimpleEvents"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendMeshInterfaceObjects">
+			<wsdlsoap:operation soapAction="sendMeshInterfaceObjects"/>
+			<wsdl:input>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="Benchmark">
+		<wsdl:port name="Benchmark" binding="impl:BenchmarkSoapBinding">
+			<wsdlsoap:address location="http://localhost:8080/cxf/services/Benchmark"/>
+		</wsdl:port>
+	</wsdl:service>
+	<!--WSDL created by Apache Axis version: 1.4
+Built on Jan 01, 2006 (10:17:00 EST)-->
+</wsdl:definitions>

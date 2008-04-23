@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap">
+    <corba:alias basetype="corba:long" repositoryID="IDL:mod/int/str/typeInt:1.0" name="mod.int.str.typeInt" />
+    <corba:alias basetype="corba:char" repositoryID="IDL:mod/int/str/typeChar:1.0" name="mod.int.str.typeChar" />
+    <corba:alias basetype="corba:wchar" repositoryID="IDL:mod/int/str/typeWChar:1.0" name="mod.int.str.typeWChar" />
+    <corba:alias basetype="corba:boolean" repositoryID="IDL:mod/int/str/typeBoolean:1.0" name="mod.int.str.typeBoolean" />
+    <corba:alias basetype="corba:float" repositoryID="IDL:mod/int/str/typeFloat:1.0" name="mod.int.str.typeFloat" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:mod/int/str/typeString:1.0" type="xs:string" name="mod.int.str.typeString" />
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:mod/int/str/typeWString:1.0" type="xs:string" name="mod.int.str.typeWString" />
+    <corba:anonstring xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename" bound="10" type="mod.int.str.typeString10" name="mod.int.str._Anon1_typeString10" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" basetype="mod.int.str._Anon1_typeString10" repositoryID="IDL:mod/int/str/typeString10:1.0" type="ns4:mod.int.str.typeString10" name="mod.int.str.typeString10" />
+    <corba:anonwstring xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename" bound="10" type="mod.int.str.typeWString10" name="mod.int.str._Anon1_typeWString10" />
+    <corba:alias xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" basetype="mod.int.str._Anon1_typeWString10" repositoryID="IDL:mod/int/str/typeWString10:1.0" type="ns4:mod.int.str.typeWString10" name="mod.int.str.typeWString10" />
+    <corba:alias basetype="corba:octet" repositoryID="IDL:mod/int/str/typeOctet:1.0" name="mod.int.str.typeOctet" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename" repositoryID="IDL:mod/int/Color:1.0" type="mod.int.Color" name="mod.int.Color">
+      <corba:enumerator value="red" />
+      <corba:enumerator value="green" />
+      <corba:enumerator value="blue" />
+    </corba:enum>
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="1" idltype="mod.int.str.typeInt" type="xs:int" name="mod.num1" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="a" idltype="mod.int.str.typeChar" type="xs:byte" name="mod.num2" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="c" idltype="mod.int.str.typeWChar" type="xs:string" name="mod.num3" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="TRUE" idltype="mod.int.str.typeBoolean" type="xs:boolean" name="mod.num4" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="23.3" idltype="mod.int.str.typeFloat" type="xs:float" name="mod.num5" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="hello" idltype="mod.int.str.typeString" type="xs:string" name="mod.num6" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="hello again" idltype="mod.int.str.typeWString" type="xs:string" name="mod.num7" />
+    <corba:const xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="bound hello" idltype="mod.int.str.typeString10" type="ns4:mod.int.str.typeString10" name="mod.num8" />
+    <corba:const xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="bound hello again" idltype="mod.int.str.typeWString10" type="ns4:mod.int.str.typeWString10" name="mod.num9" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="0x1" idltype="mod.int.str.typeOctet" type="xs:unsignedByte" name="mod.num10" />
+    <corba:const xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="intred" idltype="mod.int.Color" type="ns4:mod.int.Color" name="mod.FAVORITE_COLOR" />
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename" repositoryID="IDL:M/Size:1.0" type="M.Size" name="M.Size">
+      <corba:enumerator value="small" />
+      <corba:enumerator value="medium" />
+      <corba:enumerator value="large" />
+    </corba:enum>
+    <corba:const xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename/typemap" value="Mmedium" idltype="M.Size" type="ns4:M.Size" name="MYSIZE" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns="http://cxf.apache.org/bindings/corba/idl/ConstScopename" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:simpleType name="mod.int.str.typeString10">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="mod.int.str.typeWString10">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10">
+          </xs:maxLength>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="mod.int.Color">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="red">
+          </xs:enumeration>
+          <xs:enumeration value="green">
+          </xs:enumeration>
+          <xs:enumeration value="blue">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="M.Size">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="small">
+          </xs:enumeration>
+          <xs:enumeration value="medium">
+          </xs:enumeration>
+          <xs:enumeration value="large">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:portType name="mod.int.str">
+  </wsdl:portType>
+  <wsdl:binding name="mod.int.strCORBABinding" type="tns:mod.int.str">
+    <corba:binding repositoryID="IDL:mod/int/str:1.0" />
+  </wsdl:binding>
+  <wsdl:service name="mod.int.strCORBAService">
+    <wsdl:port name="mod.int.strCORBAPort" binding="tns:mod.int.strCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Enum" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Enum" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Enum/typemap">
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Enum" repositoryID="IDL:e_type1:1.0" type="e_type1" name="e_type1">
+      <corba:enumerator value="e1_1" />
+      <corba:enumerator value="e1_2" />
+      <corba:enumerator value="e1_3" />
+    </corba:enum>
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Enum" repositoryID="IDL:if1/e_type2:1.0" type="if1.e_type2" name="if1.e_type2">
+      <corba:enumerator value="e2_1" />
+      <corba:enumerator value="e2_2" />
+      <corba:enumerator value="e2_3" />
+    </corba:enum>
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Enum" repositoryID="IDL:m1/e_type3:1.0" type="m1.e_type3" name="m1.e_type3">
+      <corba:enumerator value="e3_1" />
+      <corba:enumerator value="e3_2" />
+      <corba:enumerator value="e3_3" />
+    </corba:enum>
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Enum" repositoryID="IDL:m1/if3/e_type4:1.0" type="m1.if3.e_type4" name="m1.if3.e_type4">
+      <corba:enumerator value="e4_1" />
+      <corba:enumerator value="e4_2" />
+      <corba:enumerator value="e4_3" />
+    </corba:enum>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Enum" xmlns="http://cxf.apache.org/bindings/corba/idl/Enum" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:simpleType name="e_type1">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e1_1">
+          </xs:enumeration>
+          <xs:enumeration value="e1_2">
+          </xs:enumeration>
+          <xs:enumeration value="e1_3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="if1.e_type2">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e2_1">
+          </xs:enumeration>
+          <xs:enumeration value="e2_2">
+          </xs:enumeration>
+          <xs:enumeration value="e2_3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="if1_op1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_e_type2" type="if1.e_type2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if1_op1Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if1_op2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if1_op2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="out_e_type2" type="if1.e_type2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if1_op3">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inout_e_type2" type="if1.e_type2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if1_op3Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inout_e_type2" type="if1.e_type2">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if2_op1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_e_type1" type="e_type1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if2_op1Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if2_op2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if2_op2Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="out_e_type1" type="e_type1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if2_op3">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inout_e_type1" type="e_type1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if2_op3Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inout_e_type1" type="e_type1">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="m1.e_type3">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e3_1">
+          </xs:enumeration>
+          <xs:enumeration value="e3_2">
+          </xs:enumeration>
+          <xs:enumeration value="e3_3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="m1.if3.e_type4">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="e4_1">
+          </xs:enumeration>
+          <xs:enumeration value="e4_2">
+          </xs:enumeration>
+          <xs:enumeration value="e4_3">
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="if3_op1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_e_type3" type="m1.e_type3">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if3_op1Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if3_op2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="in_e_type4" type="m1.if3.e_type4">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="if3_op2Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="if2_op2">
+    <wsdl:part name="inparameter" element="tns:if2_op2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if1_op1">
+    <wsdl:part name="inparameter" element="tns:if1_op1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if2_op1">
+    <wsdl:part name="inparameter" element="tns:if2_op1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if2_op1Response">
+    <wsdl:part name="outparameter" element="tns:if2_op1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if1_op3">
+    <wsdl:part name="inparameter" element="tns:if1_op3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if2_op3">
+    <wsdl:part name="inparameter" element="tns:if2_op3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if1_op2">
+    <wsdl:part name="inparameter" element="tns:if1_op2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if2_op2Response">
+    <wsdl:part name="outparameter" element="tns:if2_op2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if1_op2Response">
+    <wsdl:part name="outparameter" element="tns:if1_op2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if1_op1Response">
+    <wsdl:part name="outparameter" element="tns:if1_op1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if3_op2Response">
+    <wsdl:part name="outparameter" element="tns:if3_op2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if3_op1Response">
+    <wsdl:part name="outparameter" element="tns:if3_op1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if1_op3Response">
+    <wsdl:part name="outparameter" element="tns:if1_op3Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if3_op1">
+    <wsdl:part name="inparameter" element="tns:if3_op1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if2_op3Response">
+    <wsdl:part name="outparameter" element="tns:if2_op3Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="if3_op2">
+    <wsdl:part name="inparameter" element="tns:if3_op2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="m1.if3">
+    <wsdl:operation name="if3_op1">
+      <wsdl:input name="if3_op1Request" message="tns:if3_op1">
+    </wsdl:input>
+      <wsdl:output name="if3_op1Response" message="tns:if3_op1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if3_op2">
+      <wsdl:input name="if3_op2Request" message="tns:if3_op2">
+    </wsdl:input>
+      <wsdl:output name="if3_op2Response" message="tns:if3_op2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="if2">
+    <wsdl:operation name="if2_op1">
+      <wsdl:input name="if2_op1Request" message="tns:if2_op1">
+    </wsdl:input>
+      <wsdl:output name="if2_op1Response" message="tns:if2_op1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if2_op2">
+      <wsdl:input name="if2_op2Request" message="tns:if2_op2">
+    </wsdl:input>
+      <wsdl:output name="if2_op2Response" message="tns:if2_op2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if2_op3">
+      <wsdl:input name="if2_op3Request" message="tns:if2_op3">
+    </wsdl:input>
+      <wsdl:output name="if2_op3Response" message="tns:if2_op3Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="if1">
+    <wsdl:operation name="if1_op1">
+      <wsdl:input name="if1_op1Request" message="tns:if1_op1">
+    </wsdl:input>
+      <wsdl:output name="if1_op1Response" message="tns:if1_op1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if1_op2">
+      <wsdl:input name="if1_op2Request" message="tns:if1_op2">
+    </wsdl:input>
+      <wsdl:output name="if1_op2Response" message="tns:if1_op2Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if1_op3">
+      <wsdl:input name="if1_op3Request" message="tns:if1_op3">
+    </wsdl:input>
+      <wsdl:output name="if1_op3Response" message="tns:if1_op3Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="m1.if3CORBABinding" type="tns:m1.if3">
+    <corba:binding repositoryID="IDL:m1/if3:1.0" />
+    <wsdl:operation name="if3_op1">
+      <corba:operation name="if3_op1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="in" idltype="m1.e_type3" name="in_e_type3" />
+      </corba:operation>
+      <wsdl:input name="if3_op1Request">
+      </wsdl:input>
+      <wsdl:output name="if3_op1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if3_op2">
+      <corba:operation name="if3_op2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="in" idltype="m1.if3.e_type4" name="in_e_type4" />
+      </corba:operation>
+      <wsdl:input name="if3_op2Request">
+      </wsdl:input>
+      <wsdl:output name="if3_op2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="if1CORBABinding" type="tns:if1">
+    <corba:binding repositoryID="IDL:if1:1.0" />
+    <wsdl:operation name="if1_op1">
+      <corba:operation name="if1_op1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="in" idltype="if1.e_type2" name="in_e_type2" />
+      </corba:operation>
+      <wsdl:input name="if1_op1Request">
+      </wsdl:input>
+      <wsdl:output name="if1_op1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if1_op2">
+      <corba:operation name="if1_op2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="out" idltype="if1.e_type2" name="out_e_type2" />
+      </corba:operation>
+      <wsdl:input name="if1_op2Request">
+      </wsdl:input>
+      <wsdl:output name="if1_op2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if1_op3">
+      <corba:operation name="if1_op3">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="inout" idltype="if1.e_type2" name="inout_e_type2" />
+      </corba:operation>
+      <wsdl:input name="if1_op3Request">
+      </wsdl:input>
+      <wsdl:output name="if1_op3Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="if2CORBABinding" type="tns:if2">
+    <corba:binding repositoryID="IDL:if2:1.0" />
+    <wsdl:operation name="if2_op1">
+      <corba:operation name="if2_op1">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="in" idltype="e_type1" name="in_e_type1" />
+      </corba:operation>
+      <wsdl:input name="if2_op1Request">
+      </wsdl:input>
+      <wsdl:output name="if2_op1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if2_op2">
+      <corba:operation name="if2_op2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="out" idltype="e_type1" name="out_e_type1" />
+      </corba:operation>
+      <wsdl:input name="if2_op2Request">
+      </wsdl:input>
+      <wsdl:output name="if2_op2Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="if2_op3">
+      <corba:operation name="if2_op3">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Enum/typemap" mode="inout" idltype="e_type1" name="inout_e_type1" />
+      </corba:operation>
+      <wsdl:input name="if2_op3Request">
+      </wsdl:input>
+      <wsdl:output name="if2_op3Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="if2CORBAService">
+    <wsdl:port name="if2CORBAPort" binding="tns:if2CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="m1.if3CORBAService">
+    <wsdl:port name="m1.if3CORBAPort" binding="tns:m1.if3CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="if1CORBAService">
+    <wsdl:port name="if1CORBAPort" binding="tns:if1CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

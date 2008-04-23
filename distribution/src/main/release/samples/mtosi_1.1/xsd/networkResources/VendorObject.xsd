@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <!-- ======= All includes  ======= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <!-- ========= ManagedElement_T Declaration ======== -->
+  <xsd:element name="VendorObject" final="#all">
+    <xsd:annotation>
+      <xsd:documentation>
+      The default vendor object.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element name="name" type="NamingAttributes_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          This attribute represents a unique identifier for the object on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="discoveredName" type="DiscoveredName_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          This attribute represents a unique identifier for the object when its existence is first published on the CCV. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="namingOS" type="NamingOS_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          This attribute contains the name of the OS that provided the unique MTOSI name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="userLabel" type="UserLabel_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          "User-friendly" name for the object. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="source" type="Source_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          Indicates whether the object was discovered or entered in OS inventory. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="owner" type="Owner_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          Identifier for the owner of the object. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="aliasNameList" type="AliasNameList_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          List of aliases for the network entity. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="resourceState" type="ResourceState_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          Indicates the state of the resource. Refer to the type definition for more details.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="vendorObjectType" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+          The vendor proprietary definition of an object type.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="vendorExtensions" type="VendorObjectExtensions_T" nillable="true" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+          The confinement for all vendor proprietary object information to be modeled in the vendor's namespace.
+          </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:all>
+      <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+      <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+      <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

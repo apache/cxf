@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
+      xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
+      xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
+      xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
+
+    <annotation>
+Examples:
+        wsdl2java -client HelloWorld.wsdl
+    </annotation>
+
+    <usage>
+        <optionGroup id="options">
+            <option id="wsdlversion" maxOccurs="unbounded">
+                <annotation>
+                    WSDL version, default is WSDL1.1
+                </annotation>
+                <switch>wv</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>[wsdl version]</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="jspackageprefix" maxOccurs="unbounded">
+                <annotation>
+                    The JavaScript function name prefix to use for the generated code.
+					Specify each prefix mapping with with the format
+					URI=prefix.
+                </annotation>
+                <switch>p</switch>
+                <associatedArgument placement="afterSpace">
+                    <valuetype>NameSpacePrefixString</valuetype>
+                    <annotation>[wsdl namespace =]prefix</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="catalog" maxOccurs="1">
+                <annotation>
+                    Specify catalog file to map the imported wsdl/schema
+                </annotation>
+                <switch>catalog</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>catalog-file-name</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="outputdir" maxOccurs="1">
+                <annotation>
+                    The directory in which the code is placed</annotation>
+                <switch>d</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>output-directory</annotation>
+                </associatedArgument>
+            </option>
+
+            <option id="client" maxOccurs="1">
+                <annotation>
+                    Generates the client code.</annotation>
+                <switch>client</switch>
+            </option>
+
+            <option id="validate" maxOccurs="1">
+                <annotation>
+                    To validate the wsdl before generating the code.  Usage of 
+                    this option is highly recommended.
+                </annotation>
+                <switch>validate</switch>
+            </option>
+
+        </optionGroup>
+        <optionGroup id="common_options">
+            <option id="help" maxOccurs="1">
+                <annotation>
+                    Display detailed information for options.</annotation>
+                <switch>h</switch>
+                <switch>?</switch>
+                <switch>help</switch>
+            </option>
+
+            <option id="version">
+                <annotation>
+                    Display the version of the tool.</annotation>
+                <switch>v</switch>
+            </option>
+
+            <option id="verbose">
+                <annotation>
+                    Verbose mode</annotation>
+                <switch>verbose</switch>
+                <switch>V</switch>
+            </option>
+
+            <option id="quiet">
+                <annotation>
+                    Quiet mode</annotation>
+                <switch>quiet</switch>
+                <switch>q</switch>
+            </option>
+
+        </optionGroup>
+        <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
+            <annotation>
+                WSDL URL</annotation>
+        </argument>
+    </usage>
+</toolspec>

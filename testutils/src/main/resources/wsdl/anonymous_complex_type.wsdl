@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership. The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://cxf.apache.org/anonymous_complex_type/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="anonymous_complex_type"
+    targetNamespace="http://cxf.apache.org/anonymous_complex_type/">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://cxf.apache.org/anonymous_complex_type/">
+            <xsd:element name="SplitNameResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="names">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="first" type="xsd:string" />
+                                    <xsd:element name="second" type="xsd:string" />
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="SplitName">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="name" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="RefSplitNameResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:SplitNameResponse" />
+                    </xsd:sequence>
+                </xsd:complexType> 
+            </xsd:element>
+            <xsd:element name="RefSplitName">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:SplitName" />
+                    </xsd:sequence>
+                </xsd:complexType> 
+	    </xsd:element>
+
+
+        </xsd:schema>
+
+    </wsdl:types>
+    <wsdl:message name="SplitNameResponse">
+        <wsdl:part element="tns:SplitNameResponse" name="SplitNameResponse" />
+    </wsdl:message>
+    <wsdl:message name="SplitNameRequest">
+        <wsdl:part element="tns:SplitName" name="SplitName" />
+    </wsdl:message>
+    <wsdl:message name="RefSplitNameResponse">
+        <wsdl:part element="tns:RefSplitNameResponse" name="RefSplitNameResponse" />
+    </wsdl:message>
+    <wsdl:message name="RefSplitNameRequest">
+        <wsdl:part element="tns:RefSplitName" name="RefSplitName" />
+    </wsdl:message>
+    <wsdl:portType name="anonymous_complex_type">
+        <wsdl:operation name="SplitName">
+            <wsdl:input message="tns:SplitNameRequest" />
+            <wsdl:output message="tns:SplitNameResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RefSplitName">
+            <wsdl:input message="tns:RefSplitNameRequest" />
+            <wsdl:output message="tns:RefSplitNameResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="anonymous_complex_typeSOAP" type="tns:anonymous_complex_type">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="SplitName">
+            <soap:operation />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RefSplitName">
+            <soap:operation />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="anonymous_complex_type_service">
+        <wsdl:port binding="tns:anonymous_complex_typeSOAP" name="anonymous_complex_typeSOAP">
+            <soap:address location="http://localhost:9000/anonymous_complex_typeSOAP" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

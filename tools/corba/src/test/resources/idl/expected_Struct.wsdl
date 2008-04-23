@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct/typemap">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:OutsideStruct:1.0" type="OutsideStruct" name="OutsideStruct">
+      <corba:member name="number" idltype="corba:long" />
+      <corba:member name="word" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/Employee:1.0" type="StructTest.Employee" name="StructTest.Employee">
+      <corba:member name="name" idltype="corba:string" />
+      <corba:member name="dept" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/Compensation:1.0" type="StructTest.Compensation" name="StructTest.Compensation">
+      <corba:member name="amount" idltype="corba:long" />
+      <corba:member name="currency" idltype="corba:string" />
+      <corba:member name="praise" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/NestedOutsideStruct:1.0" type="StructTest.NestedOutsideStruct" name="StructTest.NestedOutsideStruct">
+      <corba:member name="aShort" idltype="corba:short" />
+      <corba:member name="aLong" idltype="corba:long" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" name="outsider" idltype="ns4:OutsideStruct" />
+    </corba:struct>
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/NestedStructs:1.0" type="StructTest.NestedStructs" name="StructTest.NestedStructs">
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" name="employStruct" idltype="ns4:StructTest.Employee" />
+      <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" name="compensationStruct" idltype="ns4:StructTest.Compensation" />
+    </corba:struct>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="OutsideStruct">
+        <xs:sequence>
+          <xs:element name="number" type="xs:int">
+          </xs:element>
+          <xs:element name="word" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="StructTest.Employee">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string">
+          </xs:element>
+          <xs:element name="dept" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="StructTest.Compensation">
+        <xs:sequence>
+          <xs:element name="amount" type="xs:int">
+          </xs:element>
+          <xs:element name="currency" type="xs:string">
+          </xs:element>
+          <xs:element name="praise" type="xs:string">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="congratulate">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="emp" type="StructTest.Employee">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="congratulateResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="reward" type="StructTest.Compensation">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getCompensation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="emp2" type="StructTest.Employee">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getCompensationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="StructTest.Compensation">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="StructTest.NestedOutsideStruct">
+        <xs:sequence>
+          <xs:element name="aShort" type="xs:short">
+          </xs:element>
+          <xs:element name="aLong" type="xs:int">
+          </xs:element>
+          <xs:element name="outsider" type="OutsideStruct">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="StructTest.NestedStructs">
+        <xs:sequence>
+          <xs:element name="employStruct" type="StructTest.Employee">
+          </xs:element>
+          <xs:element name="compensationStruct" type="StructTest.Compensation">
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="congratulate">
+    <wsdl:part name="inparameter" element="tns:congratulate">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCompensationResponse">
+    <wsdl:part name="outparameter" element="tns:getCompensationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCompensation">
+    <wsdl:part name="inparameter" element="tns:getCompensation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="congratulateResponse">
+    <wsdl:part name="outparameter" element="tns:congratulateResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="StructTest">
+    <wsdl:operation name="congratulate">
+      <wsdl:input name="congratulateRequest" message="tns:congratulate">
+    </wsdl:input>
+      <wsdl:output name="congratulateResponse" message="tns:congratulateResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCompensation">
+      <wsdl:input name="getCompensationRequest" message="tns:getCompensation">
+    </wsdl:input>
+      <wsdl:output name="getCompensationResponse" message="tns:getCompensationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="StructTestCORBABinding" type="tns:StructTest">
+    <corba:binding repositoryID="IDL:StructTest:1.0" />
+    <wsdl:operation name="congratulate">
+      <corba:operation name="congratulate">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" mode="in" idltype="StructTest.Employee" name="emp" />
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" mode="out" idltype="StructTest.Compensation" name="reward" />
+      </corba:operation>
+      <wsdl:input name="congratulateRequest">
+      </wsdl:input>
+      <wsdl:output name="congratulateResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCompensation">
+      <corba:operation name="getCompensation">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" mode="in" idltype="StructTest.Employee" name="emp2" />
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" idltype="StructTest.Compensation" name="return" />
+      </corba:operation>
+      <wsdl:input name="getCompensationRequest">
+      </wsdl:input>
+      <wsdl:output name="getCompensationResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="StructTestCORBAService">
+    <wsdl:port name="StructTestCORBAPort" binding="tns:StructTestCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

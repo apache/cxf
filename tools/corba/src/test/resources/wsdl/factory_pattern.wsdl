@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<wsdl:definitions name="NumberFactoryService"
+	targetNamespace="http://cxf.apache.org/factory_pattern"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:jms="http://cxf.apache.org/transports/jms"
+	xmlns:ns1="http://factory_pattern.cxf.apache.org/"
+	xmlns:tns="http://cxf.apache.org/factory_pattern"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://factory_pattern.cxf.apache.org/">
+			<xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="wsaddressing.xsd"/>	
+			<xsd:element name="create">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="id" nillable="false"
+							type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="createResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" nillable="false"
+							type="wsa:EndpointReferenceType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="isEvenResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="even" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="create">
+		<wsdl:part name="create" element="ns1:create" />
+	</wsdl:message>
+	<wsdl:message name="createResponse">
+		<wsdl:part name="createResponse" element="ns1:createResponse" />
+	</wsdl:message>
+	<wsdl:message name="isEven" />
+	<wsdl:message name="isEvenResponse">
+		<wsdl:part name="isEvenResponse" element="ns1:isEvenResponse" />
+	</wsdl:message>
+
+	<wsdl:portType name="NumberFactory">
+		<wsdl:operation name="create">
+			<wsdl:input message="tns:create" />
+			<wsdl:output message="tns:createResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:portType name="Number">
+		<wsdl:operation name="isEven">
+			<wsdl:input message="tns:isEven" />
+			<wsdl:output message="tns:isEvenResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+</wsdl:definitions>
+

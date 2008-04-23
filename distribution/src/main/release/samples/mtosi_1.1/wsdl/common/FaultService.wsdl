@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-FaultService" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ===================== Import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/AlarmRetrieval.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ===================== Import Exception Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ===================== Definition of getActiveAlarmsCount Request/Response Messages ========= -->
+  <wsdl:message name="getActiveAlarmsCount">
+    <wsdl:documentation>
+    The getActiveAlarmsCount request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getActiveAlarmsCount"/>
+  </wsdl:message>
+  <wsdl:message name="getActiveAlarmsCountResponse">
+    <wsdl:documentation>
+    The getActiveAlarmsCount response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getActiveAlarmsCountResponse"/>
+  </wsdl:message>
+  <!-- ===================== Definition of getActiveAlarms Request/Response Messages ========= -->
+  <wsdl:message name="getActiveAlarms">
+    <wsdl:documentation>
+    The getActiveAlarms request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getActiveAlarms"/>
+  </wsdl:message>
+  <wsdl:message name="getActiveAlarmsResponse">
+    <wsdl:documentation>
+    The getActiveAlarms response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getActiveAlarmsResponse"/>
+  </wsdl:message>
+  <!-- ===================== Port Type Definitions ====================== -->
+  <!-- ===================== AlarmRetrieval Port Type  ===================== -->
+  <wsdl:portType name="AlarmRetrieval">
+    <wsdl:documentation>
+    The MTOSI AlarmRetrievalServer porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getActiveAlarmsCount">
+      <wsdl:documentation>
+        This is the getActiveAlarmsCount request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getActiveAlarmsCount"/>
+      <wsdl:output message="tmf854WS:getActiveAlarmsCountResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getActiveAlarms">
+      <wsdl:documentation>
+        This is the getActiveAlarms request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getActiveAlarms"/>
+      <wsdl:output message="tmf854WS:getActiveAlarmsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

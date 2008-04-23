@@ -1,0 +1,1 @@
+<Book><id>123</id><name>CXF in Action - 3</name></Book>

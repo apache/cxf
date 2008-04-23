@@ -1,0 +1,1062 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005, 2006 -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="tmf854.v1" targetNamespace="tmf854.v1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <!-- ============== Includes ========= -->
+  <xsd:include schemaLocation="GlobalDefinitions.xsd"/>
+  <xsd:include schemaLocation="VendorExtensions.xsd"/>
+  <xsd:include schemaLocation="LayerRates.xsd"/>
+  <xsd:include schemaLocation="ProbableCauses.xsd"/>
+  <!-- ============== Element Declarations ========= -->
+  <xsd:element name="eventList" type="EventList_T"/>
+  <xsd:element name="event" type="Event_T"/>
+  <!-- ============== Simple Type Declarations ========= -->
+  <xsd:simpleType name="ObjectType_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Defines value of a filterable field attribute for most of the notifications to allow simple filtering based on the object type.
+
+A notification must be reported against the correct object if it this object is modelled.
+
+For alarms, the objectType OT_AID (Alarm Identifier) is used to represent the OS object types that are not modelled but can emit alarms. Other notifications types should not be reported against AIDs.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="OT_OS"/>
+      <xsd:enumeration value="OT_MANAGEMENT_DOMAIN"/>
+      <xsd:enumeration value="OT_MANAGED_ELEMENT"/>
+      <xsd:enumeration value="OT_MULTILAYER_SUBNETWORK"/>
+      <xsd:enumeration value="OT_TOPOLOGICAL_LINK"/>
+      <xsd:enumeration value="OT_SUBNETWORK_CONNECTION"/>
+      <xsd:enumeration value="OT_PHYSICAL_TERMINATION_POINT"/>
+      <xsd:enumeration value="OT_CONNECTION_TERMINATION_POINT"/>
+      <xsd:enumeration value="OT_TERMINATION_POINT_POOL"/>
+      <xsd:enumeration value="OT_EQUIPMENT_HOLDER"/>
+      <xsd:enumeration value="OT_EQUIPMENT"/>
+      <xsd:enumeration value="OT_PROTECTION_GROUP"/>
+      <xsd:enumeration value="OT_EPROTECTION_GROUP"/>
+      <xsd:enumeration value="OT_TRANSMISSION_DESCRIPTOR"/>
+      <xsd:enumeration value="OT_AID"/>
+      <xsd:enumeration value="OT_VENDOR_OBJECT"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="PerceivedSeverity_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The PerceivedSeverity_T values are consistent with ITU-T X.733 definitions.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="MINOR_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="PROP_([a-z]|[A-Z]|[0-9]|(_|-))*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="PS_INDETERMINATE"/>
+          <xsd:enumeration value="PS_CRITICAL"/>
+          <xsd:enumeration value="PS_MAJOR"/>
+          <xsd:enumeration value="PS_MINOR"/>
+          <xsd:enumeration value="PS_WARNING"/>
+          <xsd:enumeration value="PS_CLEARED"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="AcknowledgeIndication_T">
+    <xsd:annotation>
+      <xsd:documentation>
+AcknowledgeIndication_T describes the event acknowledge state. 
+AI_EVENT_ACKNOWLEDGED - provided in case of manual or auto acknowledgement
+AI_EVENT_UNACKNOWLEDGED - provided if the event has not been acknowledged but the OS supports acknowledgement for this event or in the case that the alarm has been previously acknowledged and then unacknowledged
+AI_NA provided in case the OS does not support acknowledgement for this event or does not support acknowledgement at all
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="AI_EVENT_ACKNOWLEDGED"/>
+      <xsd:enumeration value="AI_EVENT_UNACKNOWLEDGED"/>
+      <xsd:enumeration value="AI_NA"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ServiceAffecting_T">
+    <xsd:annotation>
+      <xsd:documentation>
+ServiceAffecting_T describes the impact of a fault on monitored entities 
+SA_UNKNOWN: The OS cannot determine if the condition affects service or not.
+SA_SERVICE_AFFECTING: The OS determines that the condition affects service.
+SA_NON_SERVICE_AFFECTING: TheOS determines that the condition does not affect service.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="SA_UNKNOWN"/>
+      <xsd:enumeration value="SA_SERVICE_AFFECTING"/>
+      <xsd:enumeration value="SA_NON_SERVICE_AFFECTING"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="SpecificProblem_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Element of SpecificProblemList_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="ProposedRepairAction_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Element of ProposedRepairActionList_T.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:simpleType name="FileTransferStatusEnum_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Describe transfer status type. This is used for file transfer protocol notifications.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="FT_IN_PROGRESS"/>
+      <xsd:enumeration value="FT_FAILED"/>
+      <xsd:enumeration value="FT_COMPLETED"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- ================= -->
+  <xsd:complexType name="AnyList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+A generic list of any type of elements. Used in AVC, SC and Alarm notifications.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:any namespace="##any" processContents="lax" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="NotifIDList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+List of notification IDs  (free string). Also,  the value found in notificationId field of the event.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="notificationId" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="CorrelatedNotifications_T">
+    <xsd:annotation>
+      <xsd:documentation>
+Correlated notifications are identified by the object that emitted the notification and the notification IDs. Both are included in case the Notification IDs are not unique across objects.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="name" type="NamingAttributes_T"/>
+      <xsd:element name="notifIDs" type="NotifIDList_T"/>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="CorrelatedNotificationList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+List of CorrelatedNotifications_T elements.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="correlatedNotifications" type="CorrelatedNotifications_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="PerceivedSeverityList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+ List of PerceivedSeverity_T elements.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="perceivedSeverity" type="PerceivedSeverity_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ProposedRepairActionList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+List of ProposedRepairAction_T elements.
+The optional "X.733::ProposedRepairActions" parameter uses this type.
+When present in an alarm notification, it indicates if the cause is known and the system being managed can suggest one or more solutions (such as switch in standby equipment, retry, replace media). This is consistent with the ITU-T X.733 definition.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="proposedRepairAction" type="ProposedRepairAction_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="SpecificProblemList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+List of SpecificProblem_T elements.
+The optional "X.733::SpecificProblems" parameter uses that type.
+When present in an alarm notification, it identifies further refinements to the probable cause of the alarm. This is consistent with the ITU-T X.733 definition.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="specificProblem" type="SpecificProblem_T" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EventInformation_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the  .
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the name of the object associated with the event.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectType" type="ObjectType_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the type of the object associated with the event.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="osTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The time at which the event was reported by the OS system.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="neTime" type="ITU-Time_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The time provided by the NE. In a case where the NE does not report time, this field is optional or an empty string can
+be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="edgePointRelated" type="xsd:boolean" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+TRUE if this event relates to a PTP that is an edge point or to a PGP that contains a PTP that is an edge point. FALSE otherwise; this field is optional in this case.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- =========== ObjectCreation_T ====== -->
+  <xsd:complexType name="ObjectCreation_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Object Creation (OC) event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="eventInfo" type="EventInformation_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The set of event information attributes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="ObjectCreationExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the OC notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ========== ObjectDeletion_T ======= -->
+  <xsd:complexType name="ObjectDeletion_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Object Deletion (OD) event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="eventInfo" type="EventInformation_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The set of event information attributes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="ObjectDeletionExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the OD notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- =========== AttributeValueChange_T ====== -->
+  <xsd:complexType name="AttributeValueChange_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Attribute Value Change (AVC) event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="eventInfo" type="EventInformation_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The set of event information attributes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="attributeList" type="AnyList_T">
+        <xsd:annotation>
+          <xsd:documentation>
+This container only encapsulates the new values of the attributes that have changed for the specified object. Each top-level children of this container shall match  an attribute schema of the designated object. In the case of complex type attributes such as "transmissionParams" and "vendorExtensions", only the attributes that have changed are to be included within the appropriate context (with layerRate for transmissionParams). The usage convention to indicate the deletion of an attribute from a complex type object attribute is the "-" value.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="AttributeValueChangeExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the AVC notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- =========== StateChange_T ====== -->
+  <xsd:complexType name="StateChange_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the State Change (SC) event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="eventInfo" type="EventInformation_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The set of event information attributes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="attributeList" type="AnyList_T">
+        <xsd:annotation>
+          <xsd:documentation>
+This container only encapsulates the new values of the state attributes that have changed for the specified object. Each top-level children of this container shall match the state attribute schema of the designated object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="StateChangeExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the State Change notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ObjectDiscovery_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Object Discovery (ODsc) event type.
+            </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed. If the optional parameter "X.733::CorrelatedNotifications" is supported by the OS, notification identifiers must be chosen to be unique across all notifications from a particular objectName throughout the time that correlation is significant.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="discoveredName" type="DiscoveredName_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the name of the object associated with the event.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectType" type="ObjectType_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the type of the object associated with the event.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="osTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The time at which the event was reported by the OS system.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="neTime" type="ITU-Time_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The time provided by the NE. In a case where the NE does not report time, this field is optional or an empty string can be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="edgePointRelated" type="xsd:boolean" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+TRUE if this event relates to a PTP that is an edge point or to a PGP that contains a PTP that is an edge point. FALSE otherwise; this field is optional in this case.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="ObjectDiscoveryExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the ODsc notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="ProtectionSwitch_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Protection Switch (PS) event type.
+            </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="osTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The time at which the event was reported by the OS system.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="neTime" type="ITU-Time_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The time provided by the NE. In a case where the NE does not report time, this field is optional or an empty string can be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectionType" type="ProtectionType_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The type of the protection.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchReason" type="SwitchReason_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The reason the switch occurred.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRate" type="LayerRate_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The layer which this switch is relevant to.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="groupName" type="NamingAttributes_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the protectionGroup emitting the switch. If protectionType is SNCP, this field is optional or an empty name can be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectedTP" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the TP that was protected when the switch occurred.
+For an SNCP, this is always the reliable TP. For a 2F BLSR ring switch notification, this is the TP that is/was inactive during the switch.
+For a 4FMSSP ring switch notification, this is the worker TP that is/was inactive during the switch.
+For a 1:N MSP switch notification, this is the worker TP for which the protection switch occurred.
+For a revertive 1+1 MSP, this is always the worker TP.
+For a non-revertive 1+1 MSP switch notification, this is the TP that was active before the switch (note that after the switch the protected TP changes).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchAwayFromTP" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the TP being switched away from.
+For a 2F MSSPRING ring switch, this is the TP that switched.
+For a 4-Fiber MSSPRING span switch, this is one of the TPs in the MSP 1:N groups (worker or protection).
+For a 4-Fiber ring switch, this is the worker TP of the span that switched; for example if the East span switches to the West span then this TP is the East-Worker.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchToTP" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the TP which is being switched to. This identifies the TP that is the active source after the switch, or currently active if no protection switch is currently active.
+For a 2F BLSR, when the state returns to normal, this is the TP that had switched.
+For a 4F BLSR ring switch, when the state returns to normal, this is the worker TP of the span that had switched; for example, if the East span had switched to the West span, then this is the East worker TP.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="ProtectionSwitchExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the PS notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EProtectionSwitch_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Equipment Protection Switch (EPS) event type.
+            </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="osTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The time at which the event was reported by the OS system.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="neTime" type="ITU-Time_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The time provided by the NE. In a case where the NE does not report time, this field is optional or an empty string can be reported.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="eProtectionGroupType" type="EProtectionGroupType_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The type of the equipment protection. If omitted, M:N is assumed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="eSwitchReason" type="ESwitchReason_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The reason the switch occurred.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="groupName" type="NamingAttributes_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the equipment protection group emitting the switch.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="protectedE" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the equipment that was protected when the switch occurred.
+For an M:N group, protectedE always identifies the worker equipment instance for which the switch occurred.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchAwayFromE" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the equipment instance being switched away from.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="switchToE" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the equipment instance which is being switched to.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="EProtectionSwitchExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the EPS notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="Alarm_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Alarm notification.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="eventInfo" type="EventInformation_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The set of event information attributes.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="isClearable" type="xsd:boolean">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates if the event is clearable (or is itself a clear).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="aliasNameList" type="AliasNameList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies all the object list of aliases to describe the network entity as portrayed on the OS user interface.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="layerRate" type="LayerRate_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The layer which this alarm is relevant to.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="probableCause" type="ProbableCause_T">
+        <xsd:annotation>
+          <xsd:documentation>
+No other string than the ones defined by the TM Forum should be used for this field.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="nativeProbableCause" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the probableCause as portrayed on the OS user interface.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="additionalText" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+More information about the alarm. such as, "Unit is mismounted".
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="perceivedSeverity" type="PerceivedSeverity_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates the severity of the alarm.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="affectedTPList" type="NamingAttributesList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+A list of affected TPs. Contained CTPs are not listed. This field is optional for all alarms except for alarms on equipment.
+This is used to indicate a list of TPs affected by an equipment failure for example. If the alarm is an alarm on an equipment that supports PTPs, then the ports (PTPs) supported by this equipment will be listed in this field (irrespective of whether the alarm is Service Affecting or not).
+The list should be ordered by PTP names (ASCII order).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="serviceAffecting" type="ServiceAffecting_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates whether the alarm has affected service
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="rcaiIndicator" type="xsd:boolean">
+        <xsd:annotation>
+          <xsd:documentation>
+The RCAI indicator has two values, i.e.,
+TRUE (meaning that the alarm is a Root Cause Alarm Indication) or
+FALSE (meaning the alarm is a raw alarm).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="acknowledgeIndication" type="AcknowledgeIndication_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The acknowledge indication state.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_EventType" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Classifies the alarm into one of the five basic categories specified in ITU-T X.733.
+Value is one of the following: "communicationsAlarm", "environmentalAlarm", "equipmentAlarm", "processingErrorAlarm", "qualityofServiceAlarm"
+This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_SpecificProblems" type="SpecificProblemList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies further refinements to the Probable cause of the alarm. (Similar to ProbableCauseQualifier, but this parameter is designed to be human readable and compatible with ITU usage.) This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_BackedUpStatus" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Specifies whether or not the object emitting the alarm has been backed-up, and services provided to the user have, therefore, not been disrupted.
+Value is one of the following: "BACKED_UP", "NOT_BACKED_UP"
+This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_BackUpObject" type="NamingAttributes_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Specifies the object that is providing back-up services for the object about which the notification pertains.
+This parameter shall be present when the X733::BackedupStatus parameter is present and has the value "BACKED_UP". 
+This field is optional otherwise.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_TrendIndication" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Specifies the current severity trend of the object. If present it indicates that there are one or more alarms ("outstanding alarms") which have not been cleared, and pertain to the same object as that to which this alarm ("current alarm") pertains.
+Value is one of the following: "MORE_SEVERE", "NO_CHANGE", "LESS_SEVERE"
+This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_CorrelatedNotifications" type="CorrelatedNotificationList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Contains a set of Notification identifiers and, if necessary, their associated object names.
+This set is defined to be the set of all notifications to which this notification is considered to be correlated.
+This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_MonitoredAttributes" type="AnyList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Defines one or more attributes of the managed object and their corresponding values at the time of the alarm.
+This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="X733_ProposedRepairActions" type="ProposedRepairActionList_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+Used if the cause is known and the system being managed can suggest one or more solutions (such as switch in standby equipment, retry, replace media).
+This field is optional.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="AlarmExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the Alarm notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="Heartbeat_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the Heartbeat event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectType" type="xsd:string" fixed="OT_OS">
+        <xsd:annotation>
+          <xsd:documentation>
+Always OT_OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the OS sending the heartbeat.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="osTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+The time at which the heartbeat notification was generated by the OS system.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="HeartbeatExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the Heartbeat notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="FileTransferStatus_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the File Transfer Status event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="fileName" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+Name of the file being transferred (this will include the path name) as provided in the file Location URI input parameter of a bulk retrieval operation.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="transferStatus" type="FileTransferStatusEnum_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates file transfer status.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="percentComplete" type="xsd:unsignedInt">
+        <xsd:annotation>
+          <xsd:documentation>
+Indicates percent of file transfer complete must be in the range 0..100.
+Only applies if transferStatus is FT_IN_PROGRESS or FT_COMPLETED.
+This field is optional otherwise.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="failureReason" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+This string will contain the failure reason. Only applies if transferStatus is FT_FAILED
+This field is optional otherwise.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="FileTransferStatusExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the File Transfer Status notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EventLossOccured_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the EventLossOccured event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectType" type="xsd:string" fixed="OT_OS">
+        <xsd:annotation>
+          <xsd:documentation>
+Always OT_OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the OS sending the heartbeat.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="startTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          The time of the first notification lost.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="firstEvenlLostNotificationId" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          The notificationId of the first notification lost
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="EventLossOccuredExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the EventLossOccured notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EventLossCleared_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the EventLossCleared event type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectType" type="xsd:string" fixed="OT_OS">
+        <xsd:annotation>
+          <xsd:documentation>
+Always OT_OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="objectName" type="NamingAttributes_T">
+        <xsd:annotation>
+          <xsd:documentation>
+Identifies the OS sending the heartbeat.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="endTime" type="ITU-Time_T">
+        <xsd:annotation>
+          <xsd:documentation>
+          The time of the end of the event loss period, as determined by the notification producer OS.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="EventLossClearedExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the EventLossCleared notification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="VendorNotification_T">
+    <xsd:annotation>
+      <xsd:documentation>
+The structure of the generic vendor notification type.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:all>
+      <xsd:element name="notificationId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+The uniqueness and the sequence of the notificationId are not guaranteed.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorNotificationType" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Free string to allow the vendor to specify the notification type.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="vendorExtensions" type="VendorNotificationExt_T" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+The specific containment for vendor extensions of the VendorNotification object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:group name="EventGroup_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      The generic encapsulation of an event.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice>
+      <xsd:element name="ObjectCreation" type="ObjectCreation_T"/>
+      <xsd:element name="ObjectDeletion" type="ObjectDeletion_T"/>
+      <xsd:element name="AttributeValueChange" type="AttributeValueChange_T"/>
+      <xsd:element name="StateChange" type="StateChange_T"/>
+      <xsd:element name="ObjectDiscovery" type="ObjectDiscovery_T"/>
+      <xsd:element name="EProtectionSwitch" type="EProtectionSwitch_T"/>
+      <xsd:element name="ProtectionSwitch" type="ProtectionSwitch_T"/>
+      <xsd:element name="Heartbeat" type="Heartbeat_T"/>
+      <xsd:element name="Alarm" type="Alarm_T"/>
+      <xsd:element name="FileTransferStatus" type="FileTransferStatus_T"/>
+      <xsd:element name="EventLossOccured" type="EventLossOccured_T"/>
+      <xsd:element name="EventLossCleared" type="EventLossCleared_T"/>
+      <xsd:element name="VendorNotification" type="VendorNotification_T"/>
+    </xsd:choice>
+  </xsd:group>
+  <!-- ================= -->
+  <xsd:complexType name="Event_T">
+    <xsd:sequence>
+      <xsd:group ref="EventGroup_T"/>
+    </xsd:sequence>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+  <!-- ================= -->
+  <xsd:complexType name="EventList_T">
+    <xsd:annotation>
+      <xsd:documentation>
+      A list of events.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+      <xsd:group ref="EventGroup_T"/>
+    </xsd:sequence>
+    <xsd:attribute name="extAuthor" type="xsd:string" use="optional"/>
+    <xsd:attribute name="extVersion" type="xsd:string" use="optional"/>
+    <xsd:attribute name="tmf854Version" type="TMF854_Version_T" use="optional"/>
+  </xsd:complexType>
+</xsd:schema>

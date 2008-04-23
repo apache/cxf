@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterface/typemap">
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" binding="mod.intCORBABinding" repositoryID="IDL:mod/int:1.0" type="ns4:EndpointReferenceType" name="mod.int" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" binding="mod2.testCORBABinding" repositoryID="IDL:mod2/test:1.0" type="ns4:EndpointReferenceType" name="mod2.test" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" binding="mod3.intfCORBABinding" repositoryID="IDL:mod3/intf:1.0" type="ns4:EndpointReferenceType" name="mod3.intf" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="method2">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inint" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="method2Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="method">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="methodResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="mod.intRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="testMethod">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="intest" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testMethodResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="mod2.testRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="emptyMethod">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="emptyMethodResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="mod3_intf2_testMethod">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="inparam" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="mod3_intf2_testMethodResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="mod3.intfRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="testMethod">
+    <wsdl:part name="inparameter" element="tns:testMethod">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="emptyMethod">
+    <wsdl:part name="inparameter" element="tns:emptyMethod">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="mod3_intf2_testMethod">
+    <wsdl:part name="inparameter" element="tns:mod3_intf2_testMethod">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testMethodResponse">
+    <wsdl:part name="outparameter" element="tns:testMethodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="method2Response">
+    <wsdl:part name="outparameter" element="tns:method2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="method2">
+    <wsdl:part name="inparameter" element="tns:method2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="emptyMethodResponse">
+    <wsdl:part name="outparameter" element="tns:emptyMethodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="mod3_intf2_testMethodResponse">
+    <wsdl:part name="outparameter" element="tns:mod3_intf2_testMethodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="methodResponse">
+    <wsdl:part name="outparameter" element="tns:methodResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="method">
+    <wsdl:part name="inparameter" element="tns:method">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="mod2.test2">
+    <wsdl:operation name="testMethod">
+      <wsdl:input name="testMethodRequest" message="tns:testMethod">
+    </wsdl:input>
+      <wsdl:output name="testMethodResponse" message="tns:testMethodResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="mod2.test">
+  </wsdl:portType>
+  <wsdl:portType name="mod3.intf">
+    <wsdl:operation name="emptyMethod">
+      <wsdl:input name="emptyMethodRequest" message="tns:emptyMethod">
+    </wsdl:input>
+      <wsdl:output name="emptyMethodResponse" message="tns:emptyMethodResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="mod.int">
+    <wsdl:operation name="method">
+      <wsdl:input name="methodRequest" message="tns:method">
+    </wsdl:input>
+      <wsdl:output name="methodResponse" message="tns:methodResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="mod3.intf2">
+    <wsdl:operation name="mod3_intf2_testMethod">
+      <wsdl:input name="mod3_intf2_testMethodRequest" message="tns:mod3_intf2_testMethod">
+    </wsdl:input>
+      <wsdl:output name="mod3_intf2_testMethodResponse" message="tns:mod3_intf2_testMethodResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="mod.int2">
+    <wsdl:operation name="method2">
+      <wsdl:input name="method2Request" message="tns:method2">
+    </wsdl:input>
+      <wsdl:output name="method2Response" message="tns:method2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="mod2.testCORBABinding" type="tns:mod2.test">
+    <corba:binding repositoryID="IDL:mod2/test:1.0" />
+  </wsdl:binding>
+  <wsdl:binding name="mod3.intfCORBABinding" type="tns:mod3.intf">
+    <corba:binding repositoryID="IDL:mod3/intf:1.0" />
+    <wsdl:operation name="emptyMethod">
+      <corba:operation name="emptyMethod" />
+      <wsdl:input name="emptyMethodRequest">
+      </wsdl:input>
+      <wsdl:output name="emptyMethodResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="mod.int2CORBABinding" type="tns:mod.int2">
+    <corba:binding repositoryID="IDL:mod/int2:1.0" />
+    <wsdl:operation name="method2">
+      <corba:operation name="method2">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface/typemap" mode="in" name="inint" idltype="mod.int" />
+      </corba:operation>
+      <wsdl:input name="method2Request">
+      </wsdl:input>
+      <wsdl:output name="method2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="mod2.test2CORBABinding" type="tns:mod2.test2">
+    <corba:binding repositoryID="IDL:mod2/test2:1.0" />
+    <wsdl:operation name="testMethod">
+      <corba:operation name="testMethod">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface/typemap" mode="in" name="intest" idltype="mod2.test" />
+      </corba:operation>
+      <wsdl:input name="testMethodRequest">
+      </wsdl:input>
+      <wsdl:output name="testMethodResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="mod3.intf2CORBABinding" type="tns:mod3.intf2">
+    <corba:binding repositoryID="IDL:mod3/intf2:1.0" />
+    <wsdl:operation name="mod3_intf2_testMethod">
+      <corba:operation name="testMethod">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ForwardInterface/typemap" mode="in" name="inparam" idltype="mod3.intf" />
+      </corba:operation>
+      <wsdl:input name="mod3_intf2_testMethodRequest">
+      </wsdl:input>
+      <wsdl:output name="mod3_intf2_testMethodResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="mod.intCORBABinding" type="tns:mod.int">
+    <corba:binding repositoryID="IDL:mod/int:1.0" />
+    <wsdl:operation name="method">
+      <corba:operation name="method" />
+      <wsdl:input name="methodRequest">
+      </wsdl:input>
+      <wsdl:output name="methodResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="mod3.intf2CORBAService">
+    <wsdl:port name="mod3.intf2CORBAPort" binding="tns:mod3.intf2CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="mod2.test2CORBAService">
+    <wsdl:port name="mod2.test2CORBAPort" binding="tns:mod2.test2CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="mod2.testCORBAService">
+    <wsdl:port name="mod2.testCORBAPort" binding="tns:mod2.testCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="mod.intCORBAService">
+    <wsdl:port name="mod.intCORBAPort" binding="tns:mod.intCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="mod.int2CORBAService">
+    <wsdl:port name="mod.int2CORBAPort" binding="tns:mod.int2CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="mod3.intfCORBAService">
+    <wsdl:port name="mod3.intfCORBAPort" binding="tns:mod3.intfCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

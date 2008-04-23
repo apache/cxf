@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://apache.org/xml_http_bare" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xformat="http://cxf.apache.org/bindings/xmlformat" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/xml_http_bare" name="XMLOverHttp">
+	<wsdl:types>
+		<schema targetNamespace="http://apache.org/xml_http_bare" xmlns="http://www.w3.org/2001/XMLSchema">
+			<element name="sayHiRequest" type="string"/>
+			<element name="sayHiResponse" type="string"/>
+		</schema>
+	</wsdl:types>
+	<message name="sayHiRequest">
+		<part name="sayHiRequest" element="tns:sayHiRequest"/>
+	</message>
+	<message name="sayHiResponse">
+		<part name="sayHiResponse" element="tns:sayHiResponse"/>
+	</message>
+	<portType name="GreetingPortType">
+		<operation name="sayHello">
+			<input name="sayHelloRequest" message="tns:sayHiRequest"/>
+			<output name="sayHelloResponse" message="tns:sayHiResponse"/>
+		</operation>
+	</portType>
+	<binding name="GreetingPortTypeXMLBinding" type="tns:GreetingPortType">
+		<xformat:binding/>
+		<operation name="sayHello">
+			<input/>
+			<output/>
+		</operation>
+	</binding>
+	<service name="XMLoverHTTP">
+	<port binding="tns:GreetingPortTypeXMLBinding" name="XMLPort">
+	<http:address location="http://localhost:0/some_url"/>
+	</port>
+	</service>
+</wsdl:definitions>

@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/inheritance" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/inheritance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/inheritance/typemap">
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance" binding="org.apache.IpTestCORBABinding" repositoryID="IDL:org/apache/IpTest:1.0" type="ns4:EndpointReferenceType" name="org.apache.IpTest" />
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance" binding="org.apache.yoko.IpInterfaceCORBABinding" repositoryID="IDL:org/apache/yoko/IpInterface:1.0" type="ns4:EndpointReferenceType" name="org.apache.yoko.IpInterface" />
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/inheritance" xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="test">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setTest">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="test" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setTestResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="org.apache.IpTestRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="setCallback">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="appInterface" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setCallbackResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="org.apache.yoko.IpInterfaceRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="setTestCallback">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="test" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setTestCallbackResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testInterface1">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testInterface1Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testInterface2">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testInterface2Response">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="setTestCallback">
+    <wsdl:part name="inparameter" element="tns:setTestCallback">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setCallbackResponse">
+    <wsdl:part name="outparameter" element="tns:setCallbackResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setCallback">
+    <wsdl:part name="inparameter" element="tns:setCallback">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testInterface2">
+    <wsdl:part name="inparameter" element="tns:testInterface2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="test">
+    <wsdl:part name="inparameter" element="tns:test">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testInterface2Response">
+    <wsdl:part name="outparameter" element="tns:testInterface2Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setTest">
+    <wsdl:part name="inparameter" element="tns:setTest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testResponse">
+    <wsdl:part name="outparameter" element="tns:testResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testInterface1Response">
+    <wsdl:part name="outparameter" element="tns:testInterface1Response">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setTestCallbackResponse">
+    <wsdl:part name="outparameter" element="tns:setTestCallbackResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testInterface1">
+    <wsdl:part name="inparameter" element="tns:testInterface1">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setTestResponse">
+    <wsdl:part name="outparameter" element="tns:setTestResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="org.apache.yoko.IpInterface">
+    <wsdl:operation name="setTest">
+      <wsdl:input name="setTestRequest" message="tns:setTest">
+    </wsdl:input>
+      <wsdl:output name="setTestResponse" message="tns:setTestResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="org.apache.IpTest">
+    <wsdl:operation name="test">
+      <wsdl:input name="testRequest" message="tns:test">
+    </wsdl:input>
+      <wsdl:output name="testResponse" message="tns:testResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="X.Interface3">
+    <wsdl:operation name="testInterface1">
+      <wsdl:input name="testInterface1Request" message="tns:testInterface1">
+    </wsdl:input>
+      <wsdl:output name="testInterface1Response" message="tns:testInterface1Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="A.B.C.E.Interface2">
+    <wsdl:operation name="testInterface1">
+      <wsdl:input name="testInterface1Request" message="tns:testInterface1">
+    </wsdl:input>
+      <wsdl:output name="testInterface1Response" message="tns:testInterface1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testInterface2">
+      <wsdl:input name="testInterface2Request" message="tns:testInterface2">
+    </wsdl:input>
+      <wsdl:output name="testInterface2Response" message="tns:testInterface2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="rootInterface">
+  </wsdl:portType>
+  <wsdl:portType name="A.B.C.E.Interface4">
+    <wsdl:operation name="testInterface1">
+      <wsdl:input name="testInterface1Request" message="tns:testInterface1">
+    </wsdl:input>
+      <wsdl:output name="testInterface1Response" message="tns:testInterface1Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testInterface2">
+      <wsdl:input name="testInterface2Request" message="tns:testInterface2">
+    </wsdl:input>
+      <wsdl:output name="testInterface2Response" message="tns:testInterface2Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="A.B.C.D.Interface1">
+    <wsdl:operation name="testInterface1">
+      <wsdl:input name="testInterface1Request" message="tns:testInterface1">
+    </wsdl:input>
+      <wsdl:output name="testInterface1Response" message="tns:testInterface1Response">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="org.apache.yoko.IpService">
+    <wsdl:operation name="setTest">
+      <wsdl:input name="setTestRequest" message="tns:setTest">
+    </wsdl:input>
+      <wsdl:output name="setTestResponse" message="tns:setTestResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="test">
+      <wsdl:input name="testRequest" message="tns:test">
+    </wsdl:input>
+      <wsdl:output name="testResponse" message="tns:testResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setCallback">
+      <wsdl:input name="setCallbackRequest" message="tns:setCallback">
+    </wsdl:input>
+      <wsdl:output name="setCallbackResponse" message="tns:setCallbackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setTestCallback">
+      <wsdl:input name="setTestCallbackRequest" message="tns:setTestCallback">
+    </wsdl:input>
+      <wsdl:output name="setTestCallbackResponse" message="tns:setTestCallbackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="A.B.C.E.Interface4CORBABinding" type="tns:A.B.C.E.Interface4">
+    <corba:binding repositoryID="IDL:A/B/C/E/Interface4:1.0" bases="IDL:A/B/C/E/Interface2:1.0" />
+    <wsdl:operation name="testInterface1">
+      <corba:operation name="testInterface1" />
+      <wsdl:input name="testInterface1Request">
+      </wsdl:input>
+      <wsdl:output name="testInterface1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testInterface2">
+      <corba:operation name="testInterface2" />
+      <wsdl:input name="testInterface2Request">
+      </wsdl:input>
+      <wsdl:output name="testInterface2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="org.apache.IpTestCORBABinding" type="tns:org.apache.IpTest">
+    <corba:binding repositoryID="IDL:org/apache/IpTest:1.0" />
+    <wsdl:operation name="test">
+      <corba:operation name="test" />
+      <wsdl:input name="testRequest">
+      </wsdl:input>
+      <wsdl:output name="testResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="org.apache.yoko.IpInterfaceCORBABinding" type="tns:org.apache.yoko.IpInterface">
+    <corba:binding repositoryID="IDL:org/apache/yoko/IpInterface:1.0" />
+    <wsdl:operation name="setTest">
+      <corba:operation name="setTest">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance/typemap" mode="in" name="test" idltype="org.apache.IpTest" />
+      </corba:operation>
+      <wsdl:input name="setTestRequest">
+      </wsdl:input>
+      <wsdl:output name="setTestResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="A.B.C.E.Interface2CORBABinding" type="tns:A.B.C.E.Interface2">
+    <corba:binding repositoryID="IDL:A/B/C/E/Interface2:1.0" bases="IDL:A/B/C/D/Interface1:1.0" />
+    <wsdl:operation name="testInterface1">
+      <corba:operation name="testInterface1" />
+      <wsdl:input name="testInterface1Request">
+      </wsdl:input>
+      <wsdl:output name="testInterface1Response">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testInterface2">
+      <corba:operation name="testInterface2" />
+      <wsdl:input name="testInterface2Request">
+      </wsdl:input>
+      <wsdl:output name="testInterface2Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="org.apache.yoko.IpServiceCORBABinding" type="tns:org.apache.yoko.IpService">
+    <corba:binding repositoryID="IDL:org/apache/yoko/IpService:1.0" bases="IDL:org/apache/yoko/IpInterface:1.0 IDL:org/apache/IpTest:1.0 IDL:rootInterface:1.0" />
+    <wsdl:operation name="setTest">
+      <corba:operation name="setTest">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance/typemap" mode="in" name="test" idltype="org.apache.IpTest" />
+      </corba:operation>
+      <wsdl:input name="setTestRequest">
+      </wsdl:input>
+      <wsdl:output name="setTestResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="test">
+      <corba:operation name="test" />
+      <wsdl:input name="testRequest">
+      </wsdl:input>
+      <wsdl:output name="testResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setCallback">
+      <corba:operation name="setCallback">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance/typemap" mode="in" name="appInterface" idltype="org.apache.yoko.IpInterface" />
+      </corba:operation>
+      <wsdl:input name="setCallbackRequest">
+      </wsdl:input>
+      <wsdl:output name="setCallbackResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setTestCallback">
+      <corba:operation name="setTestCallback">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/inheritance/typemap" mode="in" name="test" idltype="org.apache.IpTest" />
+      </corba:operation>
+      <wsdl:input name="setTestCallbackRequest">
+      </wsdl:input>
+      <wsdl:output name="setTestCallbackResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="rootInterfaceCORBABinding" type="tns:rootInterface">
+    <corba:binding repositoryID="IDL:rootInterface:1.0" />
+  </wsdl:binding>
+  <wsdl:binding name="A.B.C.D.Interface1CORBABinding" type="tns:A.B.C.D.Interface1">
+    <corba:binding repositoryID="IDL:A/B/C/D/Interface1:1.0" />
+    <wsdl:operation name="testInterface1">
+      <corba:operation name="testInterface1" />
+      <wsdl:input name="testInterface1Request">
+      </wsdl:input>
+      <wsdl:output name="testInterface1Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="X.Interface3CORBABinding" type="tns:X.Interface3">
+    <corba:binding repositoryID="IDL:X/Interface3:1.0" bases="IDL:A/B/C/D/Interface1:1.0" />
+    <wsdl:operation name="testInterface1">
+      <corba:operation name="testInterface1" />
+      <wsdl:input name="testInterface1Request">
+      </wsdl:input>
+      <wsdl:output name="testInterface1Response">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="A.B.C.E.Interface4CORBAService">
+    <wsdl:port name="A.B.C.E.Interface4CORBAPort" binding="tns:A.B.C.E.Interface4CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="org.apache.yoko.IpServiceCORBAService">
+    <wsdl:port name="org.apache.yoko.IpServiceCORBAPort" binding="tns:org.apache.yoko.IpServiceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="org.apache.yoko.IpInterfaceCORBAService">
+    <wsdl:port name="org.apache.yoko.IpInterfaceCORBAPort" binding="tns:org.apache.yoko.IpInterfaceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="org.apache.IpTestCORBAService">
+    <wsdl:port name="org.apache.IpTestCORBAPort" binding="tns:org.apache.IpTestCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="X.Interface3CORBAService">
+    <wsdl:port name="X.Interface3CORBAPort" binding="tns:X.Interface3CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="rootInterfaceCORBAService">
+    <wsdl:port name="rootInterfaceCORBAPort" binding="tns:rootInterfaceCORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="A.B.C.E.Interface2CORBAService">
+    <wsdl:port name="A.B.C.E.Interface2CORBAPort" binding="tns:A.B.C.E.Interface2CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="A.B.C.D.Interface1CORBAService">
+    <wsdl:port name="A.B.C.D.Interface1CORBAPort" binding="tns:A.B.C.D.Interface1CORBABinding">
+      <corba:address location="IOR:" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+                                                                                                                                                             
+  http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                             
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<definitions targetNamespace="http://apache.org/locator2" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:ls="http://apache.org/locator2" 
+    xmlns:query="http://apache.org/locator2/query" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://apache.org/locator2/types" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <types>
+       
+ <xs:schema attributeFormDefault="unqualified" blockDefault="#all" 
+            elementFormDefault="qualified" finalDefault="" 
+            targetNamespace="http://www.w3.org/2005/08/addressing" 
+            xmlns:tns="http://www.w3.org/2005/08/addressing">
+            <xs:element name="EndpointReference" type="tns:EndpointReferenceType"/>
+            <xs:complexType mixed="false" name="EndpointReferenceType">
+                <xs:sequence>
+                    <xs:element name="Address" type="tns:AttributedURIType"/>
+                    <xs:element minOccurs="0" name="ReferenceParameters" 
+                        type="tns:ReferenceParametersType"/>
+                    <xs:element minOccurs="0" ref="tns:Metadata"/>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" 
+                        processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+            </xs:complexType>
+            <xs:complexType mixed="false" name="ReferenceParametersType">
+                <xs:sequence>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" 
+                        processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+            </xs:complexType>
+            <xs:element name="Metadata" type="tns:MetadataType"/>
+            <xs:complexType mixed="false" name="MetadataType">
+                <xs:sequence>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" 
+                        processContents="lax"/>
+                </xs:sequence>
+                <!--
+    Until anyAttribute is supported, explicitly include the
+             wsdlLocation attribute definition.
+
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+-->
+                <xs:attribute name="wsdlLocation" type="xs:string" use="optional"/>
+            </xs:complexType>
+            <xs:element name="MessageID" type="tns:AttributedURIType"/>
+            <xs:element name="RelatesTo" type="tns:RelatesToType"/>
+            <xs:complexType mixed="false" name="RelatesToType">
+                <xs:simpleContent>
+                    <xs:extension base="xs:anyURI">
+                        <xs:attribute name="RelationshipType" 
+                            type="tns:RelationshipTypeOpenEnum" use="optional"/>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:extension>
+                </xs:simpleContent>
+            </xs:complexType>
+            <xs:simpleType name="RelationshipTypeOpenEnum">
+                <xs:union memberTypes="tns:RelationshipType xs:anyURI"/>
+            </xs:simpleType>
+            <xs:simpleType name="RelationshipType">
+                <xs:restriction base="xs:anyURI">
+                    <xs:enumeration value="http://www.w3.org/2005/08/addressing/reply"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ReplyTo" type="tns:EndpointReferenceType"/>
+            <xs:element name="From" type="tns:EndpointReferenceType"/>
+            <xs:element name="FaultTo" type="tns:EndpointReferenceType"/>
+            <xs:element name="To" type="tns:AttributedURIType"/>
+            <xs:element name="Action" type="tns:AttributedURIType"/>
+            <xs:complexType mixed="false" name="AttributedURIType">
+                <xs:simpleContent>
+                    <xs:extension base="xs:anyURI">
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:extension>
+                </xs:simpleContent>
+            </xs:complexType>
+            <xs:attribute name="IsReferenceParameter" type="xs:boolean"/>
+            <xs:simpleType name="FaultCodesOpenEnumType">
+                <xs:union memberTypes="tns:FaultCodesType xs:QName"/>
+            </xs:simpleType>
+            <xs:simpleType name="FaultCodesType">
+                <xs:restriction base="xs:QName">
+                    <xs:enumeration value="tns:InvalidAddressingHeader"/>
+                    <xs:enumeration value="tns:InvalidAddress"/>
+                    <xs:enumeration value="tns:InvalidEPR"/>
+                    <xs:enumeration value="tns:InvalidCardinality"/>
+                    <xs:enumeration value="tns:MissingAddressInEPR"/>
+                    <xs:enumeration value="tns:DuplicateMessageID"/>
+                    <xs:enumeration value="tns:ActionMismatch"/>
+                    <xs:enumeration value="tns:MessageAddressingHeaderRequired"/>
+                    <xs:enumeration value="tns:DestinationUnreachable"/>
+                    <xs:enumeration value="tns:ActionNotSupported"/>
+                    <xs:enumeration value="tns:EndpointUnavailable"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="RetryAfter" type="tns:AttributedUnsignedLongType"/>
+            <xs:complexType mixed="false" name="AttributedUnsignedLongType">
+                <xs:simpleContent>
+                    <xs:extension base="xs:unsignedLong">
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:extension>
+                </xs:simpleContent>
+            </xs:complexType>
+            <xs:element name="ProblemHeaderQName" type="tns:AttributedQNameType"/>
+            <xs:complexType mixed="false" name="AttributedQNameType">
+                <xs:simpleContent>
+                    <xs:extension base="xs:QName">
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:extension>
+                </xs:simpleContent>
+            </xs:complexType>
+            <xs:element name="ProblemHeader" type="tns:AttributedAnyType"/>
+            <xs:complexType mixed="false" name="AttributedAnyType">
+                <xs:sequence>
+                    <xs:any maxOccurs="1" minOccurs="1" namespace="##any" 
+                        processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+            </xs:complexType>
+            <xs:element name="ProblemIRI" type="tns:AttributedURIType"/>
+            <xs:element name="ProblemAction" type="tns:ProblemActionType"/>
+            <xs:complexType mixed="false" name="ProblemActionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" ref="tns:Action"/>
+                    <xs:element minOccurs="0" name="SoapAction" type="xs:anyURI"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified" 
+            targetNamespace="http://apache.org/locator2/query" 
+            xmlns:tns="http://apache.org/locator2/query"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	    jaxb:version="2.0">
+	    <xs:annotation>
+		<xs:appinfo>
+		    <jaxb:globalBindings mapSimpleTypeDef="true" choiceContentProperty="true">
+		        <jaxb:serializable/>
+		    </jaxb:globalBindings>
+		</xs:appinfo>
+	    </xs:annotation>
+            <xs:simpleType name="FieldEnumeratedType">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="GROUP"/>
+                    <xs:enumeration value="SERVICE"/>
+                    <xs:enumeration value="PORTNAME"/>
+                    <xs:enumeration value="INTERFACE"/>
+                    <xs:enumeration value="BINDING"/>
+                    <xs:enumeration value="EXTENSOR"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="FilterFieldType">
+                <xs:union memberTypes="tns:FieldEnumeratedType xs:string"/>
+            </xs:simpleType>
+            <xs:complexType name="FilterType">
+                <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                        <xs:attribute name="field" type="tns:FilterFieldType" 
+                            use="required"/>
+                    </xs:extension>
+                </xs:simpleContent>
+            </xs:complexType>
+            <xs:complexType name="QuerySelectType">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="filter" 
+                        type="tns:FilterType"/>
+                    <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="select" type="tns:QuerySelectType"/>
+        </xs:schema>
+        <xs:schema targetNamespace="http://apache.org/locator2/extensions">
+            <xs:element name="group" type="xs:string"/>
+        </xs:schema>
+        <xs:schema targetNamespace="http://apache.org/locator2/types">
+            <xs:import namespace="http://www.w3.org/2005/08/addressing"/>
+            <xs:import namespace="http://apache.org/locator2/query"/>
+            <xs:complexType name="EmptyMessage">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="EndpointIdentity">
+                <xs:annotation>
+                    <xs:documentation>Extensible endpoint identity type.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="node_id" type="xs:string"/>
+                    <xs:element name="service_qname" type="xs:QName"/>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" 
+                        processContents="lax"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="registerPeerManager">
+                <xs:annotation>
+                    <xs:documentation>Input message element for &quot;registerPeerManager&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="peer_manager" type="wsa:EndpointReferenceType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="registerPeerManagerResponse">
+                <xs:annotation>
+                    <xs:documentation>Output message element for &quot;registerPeerManager&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="peer_manager_reference" 
+                            type="wsa:EndpointReferenceType"/>
+                        <xs:element name="node_id" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deregisterPeerManager">
+                <xs:annotation>
+                    <xs:documentation>Input message element for &quot;deregisterPeerManager&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="node_id" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deregisterPeerManagerResponse" type="tns:EmptyMessage"/>
+            <xs:element name="registerEndpoint">
+                <xs:annotation>
+                    <xs:documentation>Input message element for &quot;registerEndpoint&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="endpoint_id" type="tns:EndpointIdentity"/>
+                        <xs:element name="endpoint_reference" 
+                            type="wsa:EndpointReferenceType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="registerEndpointResponse" type="tns:EmptyMessage"/>
+            <xs:element name="deregisterEndpoint">
+                <xs:annotation>
+                    <xs:documentation>Input message element for &quot;deregisterEndpoint&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="endpoint_id" type="tns:EndpointIdentity"/>
+                        <xs:element name="endpoint_reference" 
+                            type="wsa:EndpointReferenceType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deregisterEndpointResponse" type="tns:EmptyMessage"/>
+            <xs:element name="lookupEndpoint">
+                <xs:annotation>
+                    <xs:documentation>Input message element for &quot;lookupEndpoint&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="service_qname" type="xs:QName"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="lookupEndpointResponse">
+                <xs:annotation>
+                    <xs:documentation>Output message element for &quot;lookupEndpoint&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="service_endpoint" 
+                            type="wsa:EndpointReferenceType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listEndpoints" type="tns:EmptyMessage"/>
+            <xs:element name="listEndpointsResponse">
+                <xs:annotation>
+                    <xs:documentation>Output message element for &quot;listEndpoints&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="endpoint">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="endpoint_id" 
+                                        type="tns:EndpointIdentity"/>
+                                    <xs:element name="endpoint_reference" 
+                                        type="wsa:EndpointReferenceType"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="queryEndpoints">
+                <xs:annotation>
+                    <xs:documentation>Input message element for &quot;queryEndpoints&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element ref="query:select"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="queryEndpointsResponse">
+                <xs:annotation>
+                    <xs:documentation>Output message element for &quot;queryEndpoints&quot; operation.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="endpoint">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="endpoint_id" 
+                                        type="tns:EndpointIdentity"/>
+                                    <xs:element name="endpoint_reference" 
+                                        type="wsa:EndpointReferenceType"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="EndpointNotExistFaultException">
+                <xs:annotation>
+                    <xs:documentation>Fault exception when no endpoint available.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="error" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="EndpointNotExistFault" 
+                type="tns:EndpointNotExistFaultException"/>
+        </xs:schema>
+    </types>
+    <message name="registerPeerManagerInput">
+        <part element="tns:registerPeerManager" name="parameters"/>
+    </message>
+    <message name="registerPeerManagerOutput">
+        <part element="tns:registerPeerManagerResponse" name="parameters"/>
+    </message>
+    <message name="deregisterPeerManagerInput">
+        <part element="tns:deregisterPeerManager" name="parameters"/>
+    </message>
+    <message name="deregisterPeerManagerOutput">
+        <part element="tns:deregisterPeerManagerResponse" name="parameters"/>
+    </message>
+    <message name="registerEndpointInput">
+        <part element="tns:registerEndpoint" name="parameters"/>
+    </message>
+    <message name="registerEndpointOutput">
+        <part element="tns:registerEndpointResponse" name="parameters"/>
+    </message>
+    <message name="deregisterEndpointInput">
+        <part element="tns:deregisterEndpoint" name="parameters"/>
+    </message>
+    <message name="deregisterEndpointOutput">
+        <part element="tns:deregisterEndpointResponse" name="parameters"/>
+    </message>
+    <message name="lookupEndpointInput">
+        <part element="tns:lookupEndpoint" name="parameters"/>
+    </message>
+    <message name="lookupEndpointOutput">
+        <part element="tns:lookupEndpointResponse" name="parameters"/>
+    </message>
+    <message name="listEndpointInput">
+        <part element="tns:listEndpoints" name="parameters"/>
+    </message>
+    <message name="listEndpointOutput">
+        <part element="tns:listEndpointsResponse" name="parameters"/>
+    </message>
+    <message name="queryEndpointInput">
+        <part element="tns:queryEndpoints" name="parameters"/>
+    </message>
+    <message name="queryEndpointOutput">
+        <part element="tns:queryEndpointsResponse" name="parameters"/>
+    </message>
+    <message name="endpointNotExistFault">
+        <part element="tns:EndpointNotExistFault" name="parameters"/>
+    </message>
+    <portType name="LocatorService">
+        <operation name="registerPeerManager">
+            <xs:documentation>
+        Register a peer endpoint manager with the locator service. Once registered, 
+        the Locator associates the peer_id with the peer endpoint manager.
+      </xs:documentation>
+            <input message="ls:registerPeerManagerInput"/>
+            <output message="ls:registerPeerManagerOutput"/>
+        </operation>
+        <operation name="deregisterPeerManager">
+            <xs:documentation>
+        Deregister a peer endpoint manager with the locator service. Deregistering a
+        peer manager also deregisters all endpoints that were registered by it.
+      </xs:documentation>
+            <input message="ls:deregisterPeerManagerInput"/>
+            <output message="ls:deregisterPeerManagerOutput"/>
+        </operation>
+        <operation name="registerEndpoint">
+            <xs:documentation>
+        Register an endpoint to become available in the locator.  Once registered, an  
+        endpoint will be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints&quot; operations.
+      </xs:documentation>
+            <input message="ls:registerEndpointInput"/>
+            <output message="ls:registerEndpointOutput"/>
+        </operation>
+        <operation name="deregisterEndpoint">
+            <xs:documentation>
+        Deregister an endpoint from the locator. Once deregistered an endpoint will
+        no longer be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints operations.
+      </xs:documentation>
+            <input message="ls:deregisterEndpointInput"/>
+            <output message="ls:deregisterEndpointOutput"/>
+        </operation>
+        <operation name="lookupEndpoint">
+            <xs:documentation>Lookup an endpoint from the locator based on a QName.</xs:documentation>
+            <input message="ls:lookupEndpointInput"/>
+            <output message="ls:lookupEndpointOutput"/>
+            <fault message="ls:endpointNotExistFault" name="fault"/>
+        </operation>
+        <operation name="listEndpoints">
+            <xs:documentation>List all endpoints available in the locator.</xs:documentation>
+            <input message="ls:listEndpointInput"/>
+            <output message="ls:listEndpointOutput"/>
+        </operation>
+        <operation name="queryEndpoints">
+            <xs:documentation>List all endpoints available in the locator based on selection filters.</xs:documentation>
+            <input message="ls:queryEndpointInput"/>
+            <output message="ls:queryEndpointOutput"/>
+        </operation>
+    </portType>
+    <binding name="LocatorServiceBinding" type="ls:LocatorService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="registerPeerManager">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="deregisterPeerManager">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="registerEndpoint">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="deregisterEndpoint">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="lookupEndpoint">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="fault">
+                <soap:fault name="fault" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="listEndpoints">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="queryEndpoints">
+            <soap:operation/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="LocatorService">
+        <port binding="ls:LocatorServiceBinding" name="LocatorServicePort">
+            <soap:address location="http://localhost:6006/services/LocatorService"/>
+        </port>
+    </service>
+</definitions>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="l" targetNamespace="http://schemas.apache.org/idl/l.idl" xmlns:tns="http://schemas.apache.org/idl/l.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/l.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/l.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/l.idl/corba/typemap/">
+    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/l.idl" repositoryID="IDL:X/S:1.0" type="xsd1:X.S" name="X.S">
+      <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="str" idltype="ns1:X._1_S" />
+      <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="fx" idltype="ns1:X._2_S" />
+    </corba:struct>
+      <corba:anonstring bound="4" type="corba:string" name="X._1_S" />
+      <corba:anonfixed xmlns:xs="http://www.w3.org/2001/XMLSchema" scale="3" digits="5" type="xs:decimal" name="X._2_S" />
+      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/l.idl" repositoryID="IDL:X/op_a:1.0" type="xsd1:X.op_a" name="X.op_a">
+        <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="p1" idltype="ns1:X.S" />
+        <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="p2" idltype="ns1:X.S" />
+      </corba:struct>
+        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/l.idl" repositoryID="IDL:X/op_aResult:1.0" type="xsd1:X.op_aResult" name="X.op_aResult">
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="return" idltype="ns1:X.S" />
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="p2" idltype="ns1:X.S" />
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="p3" idltype="ns1:X.S" />
+        </corba:struct>
+        </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/l.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <simpleType name="X._1_S">
+                <restriction base="string">
+                    <maxLength value="4"/>
+                </restriction>
+            </simpleType>
+            <xsd:simpleType xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="X._2_S">
+		        <xsd:restriction base="xsd:decimal">
+				    <xsd:totalDigits value="5"/>
+   		            <xsd:fractionDigits value="3"/>
+		        </xsd:restriction>
+		    </xsd:simpleType>
+            <complexType name="X.S">
+                <sequence>
+                    <element name="str" type="xsd1:X._1_S"/>
+                    <element name="fx" type="xsd1:X._2_S"/>
+                </sequence>
+            </complexType>
+            <element name="X.op_a">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:X.S"/>
+                        <element name="p2" type="xsd1:X.S"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="X.op_aResult">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:X.S"/>
+                        <element name="p2" type="xsd1:X.S"/>
+                        <element name="p3" type="xsd1:X.S"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+  </types>
+  <message name="X.op_a">
+    <part name="parameters" element="xsd1:X.op_a"/>
+  </message>
+  <message name="X.op_aResponse">
+    <part name="parameters" element="xsd1:X.op_aResult"/>
+  </message>
+  <portType name="X">
+    <operation name="op_a">
+      <input name="op_a" message="tns:X.op_a"/>
+      <output name="op_aResponse" message="tns:X.op_aResponse"/>
+    </operation>
+  </portType>
+  <binding name="XCORBABinding" type="tns:X">
+    <corba:binding repositoryID="IDL:X:1.0" />
+    <operation name="op_a">
+      <corba:operation name="op_a">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" mode="in" name="p1" idltype="ns1:X.S" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" mode="out" name="p3" idltype="ns1:X.S" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" mode="inout" name="p2" idltype="ns1:X.S" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/l.idl/corba/typemap/" name="return" idltype="ns1:X.S" />
+      </corba:operation>
+      <input name="op_a">
+      </input>
+      <output name="op_aResponse">
+      </output>
+    </operation>
+  </binding>
+</definitions>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="qualified" elementFormDefault="qualified"
+	targetNamespace="http://cxf.apache.org/xmlbeans">
+
+    <!--
+        Yes, this is a very obtuse type, the point is to have inner types
+        without names - this caused NPE's on WSDL generation at one point
+    -->
+    <xsd:element name="trouble">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="inner">
+                    <xsd:complexType>
+                        <xsd:all>
+                            <xsd:element name="wombat">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:enumeration value="joe"/>
+                                        <xsd:enumeration value="bob"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:all>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="request">
+		<xsd:complexType>
+			<xsd:all>
+				<xsd:element maxOccurs="1" minOccurs="1"
+					name="sessionId" type="xsd:string" />
+			</xsd:all>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="response">
+		<xsd:complexType>
+			<xsd:all>
+				<xsd:element maxOccurs="1" minOccurs="1" name="form"
+					type="xsd:anyType" />
+			</xsd:all>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

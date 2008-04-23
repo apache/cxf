@@ -1,0 +1,10 @@
+
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext"><!-- 2 -->
+	<sec:SecurityToken>
+		<sec:TokenType>sec:X509v3</sec:TokenType>
+	</sec:SecurityToken>
+	<sec:SecurityHeader wsp:Optional="true" MustPrepend="true" MustManifestEncryption="true"/>
+	<sec:Integrity wsp:Optional="false">
+		<sec:MessageParts Dialect="http://schemas.xmlsoap.org/ws/2002/12/wsse#soap">wsp:Body()</sec:MessageParts>
+	</sec:Integrity>
+</wsp:Policy>

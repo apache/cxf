@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+    
+<xs:schema targetNamespace="http://cxf.apache.org/ws/rm/manager" 
+           xmlns:tns="http://cxf.apache.org/ws/rm/manager"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" 
+           xmlns:beans="http://www.springframework.org/schema/beans" 
+           xmlns:cxf-beans="http://cxf.apache.org/configuration/beans" 
+           elementFormDefault="qualified" 
+           attributeFormDefault="unqualified">
+  
+  <xs:annotation>
+    <xs:documentation>
+      This schema defines features and beans to configure the CXF Reliable Messaging components.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:include schemaLocation="http://cxf.apache.org/schemas/configuration/wsrm-manager-types.xsd"/>
+  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+  <xs:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
+  <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"/>
+
+  <xs:element name="reliableMessaging">
+    <xs:annotation>
+      <xs:documentation>
+        This feature enables and controls the use of WS-Reliable Messaging.
+        It ensures that the reliable messaging interceptors are added to the interceptor chains,
+        and allows to configure behaviour of the reliable messaging infrastructure
+        that goes beyond what can be described by the attributes in the RMAssertion type.
+        Note that addition of the addressing interceptors is not part of this feature. It should
+        therefore always be used in conjunction with the addressing feature.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group ref="tns:rmElements"/>
+      <xs:attribute name="id" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="rmManager">   
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="beans:identifiedType">
+          <xs:group ref="tns:rmElements"/>
+          <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:group name="rmElements">
+    <xs:sequence>
+      <xs:element ref="wsrmp:RMAssertion" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+              The RMAssertion to be used. 
+              The parameters of this RMAssertion element supercede those specified 
+              in policy attachments. 
+          </xs:documentation>          
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="tns:deliveryAssurance" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+              The delivery assurance to be used by the reliable messaging manager. 
+          </xs:documentation>          
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="tns:sourcePolicy" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+              The source policy to be used by the reliable messaging manager.
+          </xs:documentation>          
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="tns:destinationPolicy" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+              The destination policy to be used by the reliable messaging manager.
+          </xs:documentation>          
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="store" type="xs:anyType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+              The store to use when persisting messages.
+              The child element of this element must be a bean whose bean class implements 
+              org.apache.cxf.ws.rm.persistence.RMStore, or a reference to such a bean.
+              By default, messages are only persisted in memory, and thus delivery cannot be
+              guaranteed in the presence of application crashes.
+          </xs:documentation>          
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="beans:property" minOccurs="0" maxOccurs="unbounded">
+         <xs:annotation>
+          <xs:documentation>
+              Deprecated.
+          </xs:documentation>          
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="jdbcStore">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="beans:identifiedType">
+          <xs:attributeGroup ref="cxf-beans:beanAttributes"/>        
+          <xs:attribute name="driverClassName" type="xs:string" default="org.apache.derby.jdbc.EmbeddedDriver">
+            <xs:annotation>
+              <xs:documentation>
+                  The JDBC driver class name.          
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="url" type="xs:string" default="jdbc:derby:rmdb;create=true">
+            <xs:annotation>
+              <xs:documentation>
+                  The connection URL.          
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+           <xs:attribute name="userName" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                  The username.          
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+           <xs:attribute name="password" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                  The password.          
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

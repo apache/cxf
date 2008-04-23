@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="Calculator" targetNamespace="http://docwrapped.classnoanno.fortest.tools.cxf.apache.org/" xmlns:tns="http://docwrapped.classnoanno.fortest.tools.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://docwrapped.classnoanno.fortest.tools.cxf.apache.org/" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://docwrapped.classnoanno.fortest.tools.cxf.apache.org/">
+<xsd:element name="AddException" type="tns:AddException"/>
+<xsd:complexType name="AddException">
+<xsd:sequence/>
+</xsd:complexType>
+<xsd:element name="add" type="tns:add"/>
+<xsd:complexType name="add">
+<xsd:sequence>
+<xsd:element name="a" type="xsd:int"/>
+<xsd:element name="b" type="xsd:int"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="addResponse" type="tns:addResponse"/>
+<xsd:complexType name="addResponse">
+<xsd:sequence>
+<xsd:element name="return" type="xsd:int"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="add">
+    <wsdl:part name="parameters" element="tns:add">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="addResponse">
+    <wsdl:part name="parameters" element="tns:addResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AddException">
+    <wsdl:part name="AddException" element="tns:AddException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CalculatorPortType">
+    <wsdl:operation name="add">
+      <wsdl:input name="add" message="tns:add">
+    </wsdl:input>
+      <wsdl:output name="addResponse" message="tns:addResponse">
+    </wsdl:output>
+      <wsdl:fault name="AddException" message="tns:AddException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CalculatorSoapBinding" type="tns:CalculatorPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="add">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="add">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="addResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="AddException">
+        <soap:fault name="AddException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Calculator">
+    <wsdl:port name="CalculatorPort" binding="tns:CalculatorSoapBinding">
+      <soap:address location="http://localhost:9090/CalculatorPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

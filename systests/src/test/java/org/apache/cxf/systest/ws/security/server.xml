@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans 
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:test="http://apache.org/hello_world_soap_http"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://cxf.apache.org/core                                      http://cxf.apache.org/schemas/core.xsd
+        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
+    ">
+    
+    <!-- -->
+    <!-- Enable logging at all endpoints -->
+    <!-- -->
+    <cxf:bus>
+        <cxf:features>
+            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+        </cxf:features>
+    </cxf:bus>
+
+    <!-- -->
+    <!-- UsernameToken endpoint definition -->
+    <!-- This endpoint is configired to -->
+    <!-- -->
+    <jaxws:endpoint
+        id="UsernameTokenEndpoint"
+        implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
+        address="http://localhost:9000/GreeterService/UsernameTokenPort"
+        serviceName="test:GreeterService"
+        endpointName="test:UsernameTokenPort"
+        >
+        <jaxws:inInterceptors>
+            <ref bean="UsernameToken_Request"/>
+            <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+    <bean 
+        id="UsernameToken_Request"
+        class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
+        >
+        <constructor-arg>
+            <map>
+                <entry key="action" value="UsernameToken"/> 
+                <!-- <entry key="passwordType" value="PasswordDigest"/> -->
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/> 
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- -->
+    <!-- -->
+    <!-- -->
+    <jaxws:endpoint 
+        id="TimestampSignEncryptEndpoint"
+        implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
+        address="http://localhost:9000/GreeterService/TimestampSignEncryptPort"
+        serviceName="test:GreeterService"
+        endpointName="test:TimestampSignEncryptPort"
+        >
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
+            <ref bean="TimestampSignEncrypt_Response"/>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <ref bean="TimestampSignEncrypt_Request"/>
+            <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+    <bean 
+        id="TimestampSignEncrypt_Request"
+        class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
+        >
+        <constructor-arg>
+            <map>
+                <!-- Use this action order for local clients -->
+                <entry key="action" value="Timestamp Signature Encrypt"/>
+                <!-- Use this action spec for WCF clients 
+                <entry key="action" value="Signature Encrypt Timestamp"/>
+                -->
+                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
+                <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+    <bean 
+        id="TimestampSignEncrypt_Response"
+        class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor"
+        >
+        <constructor-arg>
+            <map>
+                <entry key="action" value="Timestamp Signature Encrypt"/>
+                <entry key="user" value="bob"/>
+                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
+                <entry key="encryptionPropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
+                <entry key="encryptionUser" value="Alice"/>
+                <entry key="signatureKeyIdentifier" value="DirectReference"/>
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/>
+                <entry key="signatureParts" value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
+                <!-- -->
+                <!-- Recommendation: signatures should be encrypted -->
+                <!-- -->
+                <entry key="encryptionParts" value="{Element}{http://www.w3.org/2000/09/xmldsig#}Signature;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
+                <!-- <entry key="encryptionKeyTransportAlgorithm" value="RSA15"/> -->
+                <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    
+</beans>

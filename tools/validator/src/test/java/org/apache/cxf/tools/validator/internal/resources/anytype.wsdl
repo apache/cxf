@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="BaseDataTypesRpcLitService" targetNamespace="http://tempuri.org/" 
+		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+		  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		  xmlns:tns="http://tempuri.org/">
+
+    <wsdl:message name="IBaseDataTypesRpcLit_RetObject_InputMessage">
+	<wsdl:part name="inObject" type="xsd:anyType" /> 
+    </wsdl:message>
+    <wsdl:message name="IBaseDataTypesRpcLit_RetObject_OutputMessage">
+	<wsdl:part name="RetObjectResult" type="xsd:anyType" /> 
+    </wsdl:message>
+
+    <wsdl:portType name="IBaseDataTypesRpcLit">
+	<wsdl:operation name="RetObject">
+	    <wsdl:input message="tns:IBaseDataTypesRpcLit_RetObject_InputMessage" /> 
+	    <wsdl:output message="tns:IBaseDataTypesRpcLit_RetObject_OutputMessage" /> 
+	</wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="BasicHttpBinding_IBaseDataTypesRpcLit" type="tns:IBaseDataTypesRpcLit">
+	<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" /> 
+
+	<wsdl:operation name="RetObject">
+	    <soap:operation soapAction="http://tempuri.org/IBaseDataTypesRpcLit/RetObject" style="rpc" /> 
+	    <wsdl:input>
+		<soap:body use="literal" namespace="http://tempuri.org/" /> 
+	    </wsdl:input>
+	    <wsdl:output>
+		<soap:body use="literal" namespace="http://tempuri.org/" /> 
+	    </wsdl:output>
+	</wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="BaseDataTypesRpcLitService">
+	<wsdl:port name="BasicHttpBinding_IBaseDataTypesRpcLit" binding="tns:BasicHttpBinding_IBaseDataTypesRpcLit">
+	    <soap:address location="http://131.107.72.15/SoapWsdl_BaseDataTypes_XmlFormatter_Service_Indigo/BaseDataTypesRpcLit.svc"/>
+	</wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,119 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
+struct Type5SequenceStruct {
+    long varInt;
+    string varString;
+};
+struct Type5 {
+    float varFloat;
+    Type5SequenceStruct Type5SequenceStruct_f;
+};
+struct Type4AllStruct {
+    string varStringExt;
+    float varFloatExt;
+};
+struct Type4 {
+    any anyType_f;
+    string AttrString;
+    Type4AllStruct Type4AllStruct_f;
+};
+struct base {
+    string attr1;
+    long attr2;
+    long e1;
+    string e2;
+};
+union long_nil switch(boolean) {
+    case TRUE:
+        long value;
+};
+union attrib2Type_nil switch(boolean) {
+    case TRUE:
+        string<2>  value;
+};
+struct Type6 {
+    short _simpleTypeValue;
+    long_nil attrib1;
+    attrib2Type_nil attrib2;
+};
+union sub2ChoiceType switch(long) {
+    case 0:
+        double e4;
+    case 1:
+        double e6;
+};
+struct sub2 {
+    base base_f;
+    sub2ChoiceType sub2ChoiceType_f;
+};
+struct Type2SequenceStruct {
+    float varFloat;
+};
+struct SimpleStruct {
+    float varFloat;
+    long varInt;
+    string varString;
+};
+struct Type2 {
+    SimpleStruct SimpleStruct_f;
+    string attrString1;
+    Type2SequenceStruct Type2SequenceStruct_f;
+    string attrString2;
+};
+struct sub3SequenceStruct {
+    boolean e5;
+};
+struct sub3 {
+    sub2 sub2_f;
+    sub3SequenceStruct sub3SequenceStruct_f;
+};
+struct Type3 {
+    SimpleStruct SimpleStruct_f;
+    string attrString;
+};
+struct Type1SequenceStruct {
+    long varString;
+    float varFloat;
+};
+struct Type1 {
+    SimpleStruct SimpleStruct_f;
+    string attrString;
+    Type1SequenceStruct Type1SequenceStruct_f;
+};
+struct sub1SequenceStruct {
+    float e3;
+};
+struct sub1 {
+    base base_f;
+    sub1SequenceStruct sub1SequenceStruct_f;
+};
+interface TypeInheritancePortType {
+    ::base
+    echoObject(
+        in ::base x
+    );
+    ::sub2
+    echoObject2(
+        in ::sub1 x
+    );
+    ::sub2
+    echoObject3(
+        in ::sub3 x
+    );
+};

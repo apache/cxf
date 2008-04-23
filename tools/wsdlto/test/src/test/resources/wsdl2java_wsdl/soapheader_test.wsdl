@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/header_test" xmlns:x1="http://apache.org/header_test/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/header_test" name="TestHeaderWSDL">
+	<wsdl:types>
+		<schema targetNamespace="http://apache.org/header_test/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/header_test/types" elementFormDefault="qualified">
+			<element name="testHeader1">
+				<complexType/>
+			</element>
+			<element name="testHeader1Response">
+				<complexType>
+					<sequence>
+						<element name="responseType" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader2">
+				<complexType>
+					<sequence>
+						<element name="requestType" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader2Response">
+				<complexType>
+					<sequence>
+						<element name="responseType" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader3">
+				<complexType>
+					<sequence>
+						<element name="requestType" nillable="true" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader3Response">
+				<complexType>
+					<sequence>
+						<element name="responseType" nillable="true" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader4">
+				<complexType>
+					<sequence>
+						<element name="requestType" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader4Response">
+				<complexType/>
+			</element>
+			<element name="testHeaderMessage">
+				<complexType>
+					<sequence>
+						<element name="requestType" nillable="true" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="testHeader5">
+				<complexType>
+					<sequence>
+						<element name="requestType" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="testHeader1Request">
+		<wsdl:part name="in" element="x1:testHeader1"/>
+		<wsdl:part name="inHeader" element="x1:testHeader1"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader1Response">
+		<wsdl:part name="out" element="x1:testHeader1Response"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader2Request">
+		<wsdl:part name="in" element="x1:testHeader2"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader2Response">
+		<wsdl:part name="out" element="x1:testHeader2Response"/>
+		<wsdl:part name="outHeader" element="x1:testHeader2Response"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader3Request">
+		<wsdl:part name="in" element="x1:testHeader3"/>
+		<wsdl:part name="inoutHeader" element="x1:testHeader3"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader3Response">
+		<wsdl:part name="out" element="x1:testHeader3Response"/>
+		<wsdl:part name="inoutHeader" element="x1:testHeader3"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader4Request">
+		<wsdl:part name="in" element="x1:testHeader4"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader4Response">
+		<wsdl:part name="out" element="x1:testHeader4Response"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader5Request">
+		<wsdl:part name="in" element="x1:testHeader5"/>
+	</wsdl:message>
+	<wsdl:message name="testHeader5Response">
+    	<wsdl:part name="outHeader" element="x1:testHeader5"/>
+	</wsdl:message>
+	<wsdl:message name="testHeaderMessage">
+		<wsdl:part name="inoutHeader" element="x1:testHeaderMessage"/>
+	</wsdl:message>
+	<wsdl:portType name="TestHeader">
+		<wsdl:operation name="testHeader1">
+			<wsdl:input name="testHeader1Request" message="tns:testHeader1Request"/>
+			<wsdl:output name="testHeader1Response" message="tns:testHeader1Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader2">
+			<wsdl:input name="testHeader2Request" message="tns:testHeader2Request"/>
+			<wsdl:output name="testHeader2Response" message="tns:testHeader2Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader3">
+			<wsdl:input name="testHeader3Request" message="tns:testHeader3Request"/>
+			<wsdl:output name="testHeader3Response" message="tns:testHeader3Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader4">
+			<wsdl:input name="testHeader4Request" message="tns:testHeader4Request"/>
+			<wsdl:output name="testHeader4Response" message="tns:testHeader4Response"/>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader5">
+			<wsdl:input name="testHeader5Request" message="tns:testHeader5Request"/>
+			<wsdl:output name="testHeader5Response" message="tns:testHeader5Response"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="TestHeader_SOAPBinding" type="tns:TestHeader">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="testHeader1">
+			<soap:operation style="document"/>
+			<wsdl:input>
+				<soap:body parts="in" use="literal"/>
+				<soap:header message="tns:testHeader1Request" part="inHeader" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader2">
+			<soap:operation style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="out" use="literal"/>
+				<soap:header message="tns:testHeader2Response" part="outHeader" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader3">
+			<soap:operation style="document"/>
+			<wsdl:input>
+				<soap:body parts="in" use="literal"/>
+				<soap:header message="tns:testHeader3Request" part="inoutHeader" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="out" use="literal"/>
+				<soap:header message="tns:testHeader3Response" part="inoutHeader" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader4">
+			<soap:operation style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+				<soap:header message="tns:testHeaderMessage" part="inoutHeader" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+				<soap:header message="tns:testHeaderMessage" part="inoutHeader" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="testHeader5">
+			<soap:operation style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="" use="literal"/>
+				<soap:header message="tns:testHeader5Response" part="outHeader" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="SOAPHeaderService">
+		<wsdl:port name="SoapHeaderPort" binding="tns:TestHeader_SOAPBinding">
+			<soap:address location="http://localhost:9100/SoapHeaderContext/SoapHeaderPort"/>
+			<http-conf:client/>
+			<http-conf:server/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

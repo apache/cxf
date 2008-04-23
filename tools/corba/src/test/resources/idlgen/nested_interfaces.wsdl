@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions name="nested_interfaces" targetNamespace="http://schemas.apache.org/idl/nested_interfaces.idl" xmlns:tns="http://schemas.apache.org/idl/nested_interfaces.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_interfaces.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/">
+    <corba:anonstring bound="14" type="corba:string" name="C.C1.aString" />
+    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:A/A1/AA1:1.0" type="xsd1:A.A1.AA1" name="A.A1.AA1">
+      <corba:member name="s" idltype="corba:string" />
+      <corba:member name="f" idltype="corba:float" />
+    </corba:struct>
+      <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:B/B1/BB1:1.0" type="xsd1:B.B1.BB1" name="B.B1.BB1">
+        <corba:member name="t" idltype="corba:short" />
+        <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="r" idltype="ns1:A.A1.AA1" />
+      </corba:struct>
+        <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:C/C1/CC1:1.0" type="xsd1:C.C1.CC1" name="C.C1.CC1">
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="aString_f" idltype="ns1:C.C1.aString" />
+          <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="b_f" idltype="ns1:B.B1.BB1" />
+        </corba:struct>
+          <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:B/B1/op_BB1Result:1.0" type="xsd1:B.B1.op_BB1Result" name="B.B1.op_BB1Result">
+            <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="return" idltype="ns1:B.B1.BB1" />
+            <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p2" idltype="ns1:B.B1.BB1" />
+          </corba:struct>
+            <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:B/B1/op_BB1:1.0" type="xsd1:B.B1.op_BB1" name="B.B1.op_BB1">
+              <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p1" idltype="ns1:A.A1.AA1" />
+            </corba:struct>
+              <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:A/A1/op_AA1:1.0" type="xsd1:A.A1.op_AA1" name="A.A1.op_AA1">
+                <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p1" idltype="ns1:A.A1.AA1" />
+                <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p2" idltype="ns1:A.A1.AA1" />
+              </corba:struct>
+                <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:C/C1/op_CC1:1.0" type="xsd1:C.C1.op_CC1" name="C.C1.op_CC1">
+                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p1" idltype="ns1:C.C1.CC1" />
+                  <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p2" idltype="ns1:B.B1.BB1" />
+                </corba:struct>
+                  <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:A/A1/op_AA1Result:1.0" type="xsd1:A.A1.op_AA1Result" name="A.A1.op_AA1Result">
+                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="return" idltype="ns1:A.A1.AA1" />
+                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p2" idltype="ns1:A.A1.AA1" />
+                    <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p3" idltype="ns1:A.A1.AA1" />
+                  </corba:struct>
+                    <corba:struct xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" repositoryID="IDL:C/C1/op_CC1Result:1.0" type="xsd1:C.C1.op_CC1Result" name="C.C1.op_CC1Result">
+                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="return" idltype="ns1:C.C1.CC1" />
+                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p2" idltype="ns1:B.B1.BB1" />
+                      <corba:member xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="p3" idltype="ns1:A.A1.AA1" />
+                    </corba:struct>
+                    </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.apache.org/idltypes/nested_interfaces.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <complexType name="A.A1.AA1">
+                <sequence>
+                    <element name="s" type="string"/>
+                    <element name="f" type="float"/>
+                </sequence>
+            </complexType>
+            <complexType name="B.B1.BB1">
+                <sequence>
+                    <element name="t" type="short"/>
+                    <element name="r" type="xsd1:A.A1.AA1"/>
+                </sequence>
+            </complexType>
+            <simpleType name="C.C1.aString">
+                <restriction base="string">
+                    <maxLength value="14"/>
+                </restriction>
+            </simpleType>
+            <complexType name="C.C1.CC1">
+                <sequence>
+                    <element name="aString_f" type="xsd1:C.C1.aString"/>
+                    <element name="b_f" type="xsd1:B.B1.BB1"/>
+                </sequence>
+            </complexType>
+            <element name="A.A1.op_AA1">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:A.A1.AA1"/>
+                        <element name="p2" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="A.A1.op_AA1Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:A.A1.AA1"/>
+                        <element name="p2" type="xsd1:A.A1.AA1"/>
+                        <element name="p3" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="B.B1.op_BB1">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="B.B1.op_BB1Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:B.B1.BB1"/>
+                        <element name="p2" type="xsd1:B.B1.BB1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="C.C1.op_CC1">
+                <complexType>
+                    <sequence>
+                        <element name="p1" type="xsd1:C.C1.CC1"/>
+                        <element name="p2" type="xsd1:B.B1.BB1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="C.C1.op_CC1Result">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="xsd1:C.C1.CC1"/>
+                        <element name="p2" type="xsd1:B.B1.BB1"/>
+                        <element name="p3" type="xsd1:A.A1.AA1"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+  </types>
+  <message name="B.B1.op_BB1Response">
+    <part name="parameters" element="xsd1:B.B1.op_BB1Result"/>
+  </message>
+  <message name="A.A1.op_AA1">
+    <part name="parameters" element="xsd1:A.A1.op_AA1"/>
+  </message>
+  <message name="C.C1.op_CC1Response">
+    <part name="parameters" element="xsd1:C.C1.op_CC1Result"/>
+  </message>
+  <message name="B.B1.op_BB1">
+    <part name="parameters" element="xsd1:B.B1.op_BB1"/>
+  </message>
+  <message name="C.C1.op_CC1">
+    <part name="parameters" element="xsd1:C.C1.op_CC1"/>
+  </message>
+  <message name="A.A1.op_AA1Response">
+    <part name="parameters" element="xsd1:A.A1.op_AA1Result"/>
+  </message>
+  <portType name="C.C1">
+    <operation name="op_CC1">
+      <input name="op_CC1" message="tns:C.C1.op_CC1"/>
+      <output name="op_CC1Response" message="tns:C.C1.op_CC1Response"/>
+    </operation>
+  </portType>
+  <portType name="B.B1">
+    <operation name="op_BB1">
+      <input name="op_BB1" message="tns:B.B1.op_BB1"/>
+      <output name="op_BB1Response" message="tns:B.B1.op_BB1Response"/>
+    </operation>
+  </portType>
+  <portType name="A.A1">
+    <operation name="op_AA1">
+      <input name="op_AA1" message="tns:A.A1.op_AA1"/>
+      <output name="op_AA1Response" message="tns:A.A1.op_AA1Response"/>
+    </operation>
+  </portType>
+  <binding name="C.C1CORBABinding" type="tns:C.C1">
+    <corba:binding repositoryID="IDL:C/C1:1.0" />
+    <operation name="op_CC1">
+      <corba:operation name="op_CC1">
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" mode="in" name="p1" idltype="ns1:C.C1.CC1" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" mode="out" name="p3" idltype="ns1:A.A1.AA1" />
+        <corba:param xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" mode="inout" name="p2" idltype="ns1:B.B1.BB1" />
+        <corba:return xmlns:ns1="http://schemas.apache.org/idl/nested_interfaces.idl/corba/typemap/" name="return" idltype="ns1:C.C1.CC1" />
+      </corba:operation>
+      <input name="op_CC1">
+      </input>
+      <output name="op_CC1Response">
+      </output>
+    </operation>
+  </binding>
+</definitions>

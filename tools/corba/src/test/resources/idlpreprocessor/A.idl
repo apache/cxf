@@ -1,0 +1,16 @@
+#ifndef __A_IDL__
+
+#define __A_IDL__
+
+#include "A.idl"
+
+#else
+
+module a
+{
+  interface A {
+    const boolean tt = TRUE;
+  };
+};
+
+#endif

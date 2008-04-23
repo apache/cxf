@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<definitions
+ targetNamespace="http://schemas.apache.org/tests" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:corba="http://cxf.apache.org/bindings/corba" 
+    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tns="http://schemas.apache.org/tests" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd1="http://schemas.apache.org/tests">
+ 
+  <corba:typeMapping 
+      targetNamespace="http://schemas.apache.org/tests/corba/typemap/">
+  </corba:typeMapping>
+  <types>
+    <schema targetNamespace="http://schemas.iona.com/idltypes/integertypes.idl"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element name="BasePortType.echoInteger.input" type="xsd:integer"/>
+      <xsd:element name="BasePortType.echoInteger.return" type="xsd:integer"/>
+      <xsd:element name="BasePortType.echoNonNegativeInteger.input" type="xsd:nonNegativeInteger"/>
+      <xsd:element name="BasePortType.echoNonNegativeInteger.return" type="xsd:nonNegativeInteger"/>
+      <xsd:element name="BasePortType.echoPositiveInteger.input" type="xsd:positiveInteger"/>
+      <xsd:element name="BasePortType.echoPositiveInteger.return" type="xsd:positiveInteger"/>
+      <xsd:element name="BasePortType.echoNonPositiveInteger.input" type="xsd:nonPositiveInteger"/>
+      <xsd:element name="BasePortType.echoNonPositiveInteger.return" type="xsd:nonPositiveInteger"/>
+      <xsd:element name="BasePortType.echoNegativeInteger.input" type="xsd:negativeInteger"/>
+      <xsd:element name="BasePortType.echoNegativeInteger.return" type="xsd:negativeInteger"/>
+    </schema>
+  </types>
+  <message name="BasePortType.echoInteger">
+    <part name="inputInteger" element="xsd1:BasePortType.echoInteger.input"/>
+  </message>
+  <message name="BasePortType.echoIntegerResponse">
+    <part name="return" element="xsd1:BasePortType.echoInteger.return"/>
+  </message>
+  <message name="BasePortType.echoNonNegativeInteger">
+    <part name="inputNonNegativeInteger" element="xsd1:BasePortType.echoNonNegativeInteger.input"/>
+  </message>
+  <message name="BasePortType.echoNonNegativeIntegerResponse">
+    <part name="return" element="xsd1:BasePortType.echoNonNegativeInteger.return"/>
+  </message>
+  <message name="BasePortType.echoPositiveInteger">
+    <part name="inputPositiveInteger" element="xsd1:BasePortType.echoPositiveInteger.input"/>
+  </message>
+  <message name="BasePortType.echoPositiveIntegerResponse">
+    <part name="return" element="xsd1:BasePortType.echoPositiveInteger.return"/>
+  </message>
+  <message name="BasePortType.echoNonPositiveInteger">
+    <part name="inputNonPositiveInteger" element="xsd1:BasePortType.echoNonPositiveInteger.input"/>
+  </message>
+  <message name="BasePortType.echoNonPositiveIntegerResponse">
+    <part name="return" element="xsd1:BasePortType.echoNonPositiveInteger.return"/>
+  </message>
+  <message name="BasePortType.echoNegativeInteger">
+    <part name="inputNegativeInteger" element="xsd1:BasePortType.echoNegativeInteger.input"/>
+  </message>
+  <message name="BasePortType.echoNegativeIntegerResponse">
+    <part name="return" element="xsd1:BasePortType.echoNegativeInteger.return"/>
+  </message>
+  <portType name="BasePortType">
+    <operation name="echoInteger">
+      <input message="tns:BasePortType.echoInteger" name="echoInteger"/>
+      <output message="tns:BasePortType.echoIntegerResponse" name="echoIntegerResponse"/>
+    </operation>
+    <operation name="echoNonNegativeInteger">
+      <input message="tns:BasePortType.echoNonNegativeInteger" name="echoNonNegativeInteger"/>
+      <output message="tns:BasePortType.echoNonNegativeIntegerResponse" name="echoNonNegativeIntegerResponse"/>
+    </operation>
+    <operation name="echoPositiveInteger">
+      <input message="tns:BasePortType.echoPositiveInteger" name="echoPositiveInteger"/>
+      <output message="tns:BasePortType.echoPositiveIntegerResponse" name="echoPositiveIntegerResponse"/>
+    </operation>
+    <operation name="echoNonPositiveInteger">
+      <input message="tns:BasePortType.echoNonPositiveInteger" name="echoNonPositiveInteger"/>
+      <output message="tns:BasePortType.echoNonPositiveIntegerResponse" name="echoNonPositiveIntegerResponse"/>
+    </operation>
+    <operation name="echoNegativeInteger">
+      <input message="tns:BasePortType.echoNegativeInteger" name="echoNegativeInteger"/>
+      <output message="tns:BasePortType.echoNegativeIntegerResponse" name="echoNegativeIntegerResponse"/>
+    </operation>
+  </portType>
+  <binding name="BasePortTypeCORBABinding" type="tns:BasePortType">
+    <corba:binding repositoryID="IDL:BasePortType:1.0"/>
+    <operation name="echoInteger">
+      <corba:operation name="echoInteger">
+        <corba:param name="inputInteger" mode="in" idltype="corba:longlong"/>
+        <corba:return name="return" idltype="corba:longlong"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoNonNegativeInteger">
+      <corba:operation name="echoNonNegativeInteger">
+        <corba:param name="inputNonNegativeInteger" mode="in" idltype="corba:ulonglong"/>
+        <corba:return name="return" idltype="corba:ulonglong"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoPositiveInteger">
+      <corba:operation name="echoPositiveInteger">
+        <corba:param name="inputPositiveInteger" mode="in" idltype="corba:ulonglong"/>
+        <corba:return name="return" idltype="corba:ulonglong"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoNonPositiveInteger">
+      <corba:operation name="echoNonPositiveInteger">
+        <corba:param name="inputNonPositiveInteger" mode="in" idltype="corba:longlong"/>
+        <corba:return name="return" idltype="corba:longlong"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+    <operation name="echoNegativeInteger">
+      <corba:operation name="echoNegativeInteger">
+        <corba:param name="inputNegativeInteger" mode="in" idltype="corba:longlong"/>
+        <corba:return name="return" idltype="corba:longlong"/>
+      </corba:operation>
+      <input/>
+      <output/>
+    </operation>
+  </binding>
+  <service name="BasePortTypeCORBAService">
+    <port name="BasePortTypeCORBAPort" binding="tns:BasePortTypeCORBABinding">
+      <corba:address location="..."/>
+    </port>
+  </service> 
+</definitions>

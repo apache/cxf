@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements. See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership. The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License. You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied. See the License for the
+	specific language governing permissions and limitations
+	under the License.
+-->
+<wsdl:definitions name="HelloWorld"
+	targetNamespace="uri:cxf.apache.org:jstest:any"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="uri:cxf.apache.org:jstest:any"
+	xmlns:x1="uri:cxf.apache.org:jstest:types:any"
+	xmlns:alts="uri:cxf.apache.org:jstest:types:any:alts"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+	    <schema targetNamespace="uri:cxf.apache.org:jstest:types:any:alts"
+	    		xmlns="http://www.w3.org/2001/XMLSchema"
+			          xmlns:tns="uri:cxf.apache.org:jstest:types:any:alts"
+			    elementFormDefault="qualified">
+			    
+			<simpleType name="MyStringType">
+				<restriction base="string">
+					<maxLength value="30" />
+				</restriction>
+			</simpleType>
+
+			<element name="restrictedStringAlternative"
+				type="tns:MyStringType" />
+
+			<element name="alternative1">
+				<complexType>
+					<sequence>
+						<element name="chalk" type="string" />
+					</sequence>
+				</complexType>
+			</element>
+
+			<element name="alternative2">
+				<complexType>
+					<sequence>
+						<element name="cheese" type="int" />
+					</sequence>
+				</complexType>
+			</element>
+
+	    </schema>
+		<schema targetNamespace="uri:cxf.apache.org:jstest:types:any"
+			xmlns="http://www.w3.org/2001/XMLSchema"
+			xmlns:tns="uri:cxf.apache.org:jstest:types:any"
+			elementFormDefault="qualified">
+
+			<element name="acceptAny1">
+				<complexType>
+					<sequence>
+						<element name='before' type='string' />
+						<any minOccurs='1' namespace='##other' />
+						<element name='after' type='string' />
+					</sequence>
+				</complexType>
+			</element>
+
+			<element name="acceptAnyN">
+				<complexType>
+					<sequence>
+						<element name='before' type='string' />
+						<any minOccurs='1' maxOccurs='10'  namespace='##other'/>
+						<element name='after' type='string' />
+					</sequence>
+				</complexType>
+			</element>
+
+			<element name="acceptAnyOptional">
+				<complexType>
+					<sequence>
+						<element name='before' type='string' />
+						<any minOccurs='0' maxOccurs='1'  namespace='##other' />
+						<element name='after' type='string' />
+					</sequence>
+				</complexType>
+			</element>
+
+			<element name='returnAny1'>
+				<complexType />
+			</element>
+
+			<element name='returnAnyN'>
+				<complexType />
+			</element>
+
+			<element name='returnAnyOptional'>
+				<complexType />
+			</element>
+
+		</schema>
+
+	</wsdl:types>
+
+	<wsdl:message name="acceptAny1">
+		<wsdl:part name="in" element="x1:acceptAny1" />
+	</wsdl:message>
+
+	<wsdl:message name="acceptAnyN">
+		<wsdl:part name="in" element="x1:acceptAnyN" />
+	</wsdl:message>
+
+	<wsdl:message name="acceptAnyOptional">
+		<wsdl:part name="in" element="x1:acceptAnyOptional" />
+	</wsdl:message>
+
+	<wsdl:message name="returnAny1">
+		<wsdl:part name="in" element="x1:returnAny1" />
+	</wsdl:message>
+
+	<wsdl:message name="returnAny1Response">
+		<wsdl:part name="out" element="x1:acceptAny1" />
+	</wsdl:message>
+
+	<wsdl:message name="returnAnyN">
+		<wsdl:part name="in" element="x1:returnAnyN" />
+	</wsdl:message>
+
+	<wsdl:message name="returnAnyNResponse">
+		<wsdl:part name="out" element="x1:acceptAnyN" />
+	</wsdl:message>
+
+	<wsdl:message name="returnAnyOptional">
+		<wsdl:part name="in" element="x1:returnAnyOptional" />
+	</wsdl:message>
+
+	<wsdl:message name="returnAnyOptionalResponse">
+		<wsdl:part name="out" element="x1:acceptAnyOptional" />
+	</wsdl:message>
+	
+	<!--  dummy message to get the alts package into the JAXB universe. -->
+	<!--  there has to be a better way to do this. -->
+	
+	<wsdl:message name="dummyAlts">
+		<wsdl:part name="in" element="alts:alternative1"/>
+	</wsdl:message>
+
+	<wsdl:portType name="AcceptAny">
+		<wsdl:operation name="acceptAny1">
+			<wsdl:input name="acceptAny1" message="tns:acceptAny1" />
+		</wsdl:operation>
+
+		<wsdl:operation name="acceptAnyN">
+			<wsdl:input name="acceptAnyN" message="tns:acceptAnyN" />
+		</wsdl:operation>
+
+		<wsdl:operation name="acceptAnyOptional">
+			<wsdl:input name="acceptAnyOptional"
+				message="tns:acceptAnyOptional" />
+		</wsdl:operation>
+
+		<wsdl:operation name="returnAny1">
+			<wsdl:input name="returnAny1" message="tns:returnAny1" />
+			<wsdl:output name="returnAny1Response"
+				message="tns:returnAny1Response" />
+		</wsdl:operation>
+
+		<wsdl:operation name="returnAnyN">
+			<wsdl:input name="returnAnyN" message="tns:returnAnyN" />
+			<wsdl:output name="returnAnyNResponse"
+				message="tns:returnAnyNResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="returnAnyOptional">
+			<wsdl:input name="returnAnyOptional"
+				message="tns:returnAnyOptional" />
+			<wsdl:output name="returnAnyOptionalResponse"
+				message="tns:returnAnyOptionalResponse" />
+		</wsdl:operation>
+		
+		<!--  dummy -->
+	    <wsdl:operation name="dummyAlts">
+	    	<wsdl:input name="dummyAlts" message="tns:dummyAlts"/>
+	    </wsdl:operation>
+
+	</wsdl:portType>
+	<wsdl:binding name="AcceptAny" type="tns:AcceptAny">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="acceptAny1">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="acceptAnyN">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="acceptAnyOptional">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+
+		<wsdl:operation name="returnAny1">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="returnAnyN">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="returnAnyOptional">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="dummyAlts">
+			<soap:operation style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+		</wsdl:operation>
+
+	</wsdl:binding>
+	<wsdl:service name="AcceptAnyService">
+		<wsdl:port binding="tns:AcceptAny" name="AcceptAny">
+			<soap:address location="http://localhost:9000/anyTests" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
+

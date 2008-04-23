@@ -1,0 +1,53 @@
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */ 
+ 
+module  mod {
+
+     module int  {
+          interface str {
+             typedef string myString;
+             typedef wstring myWString;
+             typedef string<10> myString10;
+             typedef wstring<10> myWString10;
+
+         };
+
+     };
+
+     interface bar {
+
+        mod::int::str::myString op1(in mod::int::str::myString in1,
+                                    out mod::int::str::myString out1,
+                                    inout mod::int::str::myString inout1);
+
+         mod::int::str::myWString op2(in mod::int::str::myWString in1,
+                                      out mod::int::str::myWString out1,
+                                      inout mod::int::str::myWString inout1);
+
+         mod::int::str::myString10 op3(in mod::int::str::myString10 in1,
+                                       out mod::int::str::myString10 out1,
+                                       inout mod::int::str::myString10 inout1);
+
+         mod::int::str::myWString10 op4(in mod::int::str::myWString10 in1,
+                                        out mod::int::str::myWString10 out1,
+                                        inout mod::int::str::myWString10 inout1);
+
+     };
+
+};

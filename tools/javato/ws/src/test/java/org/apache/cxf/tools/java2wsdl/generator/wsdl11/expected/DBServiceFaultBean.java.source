@@ -1,0 +1,30 @@
+
+package org.apache.cxf.tools.fortest.cxf523.jaxws;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+/**
+ * 
+ */
+
+@XmlRootElement(namespace = "http://cxf523.fortest.tools.cxf.apache.org/", name = "DBServiceFault")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(namespace = "http://cxf523.fortest.tools.cxf.apache.org/", name = "DBServiceFault")
+
+public class DBServiceFaultBean {
+
+    private java.lang.String message;
+
+    public java.lang.String getMessage ()     {
+	           return this.message;
+        }
+
+    public void setMessage (   java.lang.String newMessage  )     {
+	           this.message = newMessage;
+        }
+
+}
+

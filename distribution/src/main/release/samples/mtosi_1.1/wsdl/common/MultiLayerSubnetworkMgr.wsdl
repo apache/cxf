@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TMF854 Version 1.0 - Copyright TeleManagement Forum 2005 -->
+<wsdl:definitions name="TMF854-MultiLayerSubnetworkMgrInterfaces" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="tmf854.v1.ws" xmlns:tmf854XSD="tmf854.v1" xmlns:tmf854WS="tmf854.v1.ws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <!-- ======= Import Type Definitions ============= -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="tmf854.v1.ws">
+      <xsd:import namespace="tmf854.v1" schemaLocation="../../xsd/interfaces/MultiLayerSubnetworkMgr.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <!-- ======= Import Definitions ============= -->
+  <wsdl:import location="Exceptions.wsdl" namespace="tmf854.v1.ws"/>
+  <!-- ======= Definition of getAllEdgePointNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllEdgePointNames">
+    <wsdl:documentation>
+    The getAllEdgePointNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEdgePointNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllEdgePointNamesResponse">
+    <wsdl:documentation>
+    The getAllEdgePointNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllEdgePoints Request/Response Messages ========= -->
+  <wsdl:message name="getAllEdgePoints">
+    <wsdl:documentation>
+    The getAllEdgePoints request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEdgePoints"/>
+  </wsdl:message>
+  <wsdl:message name="getAllEdgePointsResponse">
+    <wsdl:documentation>
+    The getAllEdgePoints response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllEdgePointsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllFixedSubnetworkConnectionNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllFixedSubnetworkConnectionNames">
+    <wsdl:documentation>
+    The getAllFixedSubnetworkConnectionNamesrequest message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFixedSubnetworkConnectionNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllFixedSubnetworkConnectionNamesResponse">
+    <wsdl:documentation>
+    The getAllFixedSubnetworkConnectionNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllFixedSubnetworkConnections Request/Response Messages ========= -->
+  <wsdl:message name="getAllFixedSubnetworkConnections">
+    <wsdl:documentation>
+    The getAllFixedSubnetworkConnections request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFixedSubnetworkConnections"/>
+  </wsdl:message>
+  <wsdl:message name="getAllFixedSubnetworkConnectionsResponse">
+    <wsdl:documentation>
+    The getAllFixedSubnetworkConnections response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllFixedSubnetworkConnectionsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllManagedElementNamesWrtMLSN Request/Response Messages ========= -->
+  <wsdl:message name="getAllManagedElementNamesWrtMLSN">
+    <wsdl:documentation>
+    The getAllManagedElementNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllManagedElementNamesWrtMLSN"/>
+  </wsdl:message>
+  <wsdl:message name="getAllManagedElementNamesWrtMLSNResponse">
+    <wsdl:documentation>
+    The getAllManagedElementNamesWrtMLSN response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- =========== Definition of getAllManagedElementsWrtMLSN Request/Response Messages ========= -->
+  <wsdl:message name="getAllManagedElementsWrtMLSN">
+    <wsdl:documentation>
+    The getAllManagedElements request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllManagedElementsWrtMLSN"/>
+  </wsdl:message>
+  <wsdl:message name="getAllManagedElementsWrtMLSNResponse">
+    <wsdl:documentation>
+    The getAllManagedElements response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllManagedElementsWrtMLSNResponse"/>
+  </wsdl:message>
+  <!-- =========== Definition of getAllSubnetworkConnectionNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllSubnetworkConnectionNames">
+    <wsdl:documentation>
+    The getAllSubnetworkConnectionNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSubnetworkConnectionNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSubnetworkConnectionNamesResponse">
+    <wsdl:documentation>
+    The getAllSubnetworkConnectionNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- =========== Definition of getAllSubnetworkConnectionNamesWithTP Request/Response Messages ========= -->
+  <wsdl:message name="getAllSubnetworkConnectionNamesWithTP">
+    <wsdl:documentation>
+    The getAllSubnetworkConnectionNamesWithTP request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSubnetworkConnectionNamesWithTP"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSubnetworkConnectionNamesWithTPResponse">
+    <wsdl:documentation>
+    The getAllSubnetworkConnectionNamesWithTP response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllSubnetworkConnections Request/Response Messages ========= -->
+  <wsdl:message name="getAllSubnetworkConnections">
+    <wsdl:documentation>
+    The getAllSubnetworkConnections request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSubnetworkConnections"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSubnetworkConnectionsResponse">
+    <wsdl:documentation>
+    The getAllSubnetworkConnections response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSubnetworkConnectionsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllSubnetworkConnectionsWithTP Request/Response Messages ========= -->
+  <wsdl:message name="getAllSubnetworkConnectionsWithTP">
+    <wsdl:documentation>
+    The getAllSubnetworkConnectionsWithTP request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSubnetworkConnectionsWithTP"/>
+  </wsdl:message>
+  <wsdl:message name="getAllSubnetworkConnectionsWithTPResponse">
+    <wsdl:documentation>
+    The getAllSubnetworkConnectionsWithTP response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllSubnetworkConnectionsWithTPResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllTopologicalLinkNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllTopologicalLinkNames">
+    <wsdl:documentation>
+    The getAllTopologicalLinkNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTopologicalLinkNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllTopologicalLinkNamesResponse">
+    <wsdl:documentation>
+    The getAllTopologicalLinkNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllTopologicalLinks Request/Response Messages ========= -->
+  <wsdl:message name="getAllTopologicalLinks">
+    <wsdl:documentation>
+    The getAllTopologicalLinks request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTopologicalLinks"/>
+  </wsdl:message>
+  <wsdl:message name="getAllTopologicalLinksResponse">
+    <wsdl:documentation>
+    The getAllTopologicalLinks response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTopologicalLinksResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllTPPoolNames Request/Response Messages ========= -->
+  <wsdl:message name="getAllTPPoolNames">
+    <wsdl:documentation>
+    The getAllTPPoolNames request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTPPoolNames"/>
+  </wsdl:message>
+  <wsdl:message name="getAllTPPoolNamesResponse">
+    <wsdl:documentation>
+    The getAllTPPoolNames response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAllTPPools Request/Response Messages ========= -->
+  <wsdl:message name="getAllTPPools">
+    <wsdl:documentation>
+    The getAllTPPools request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTPPools"/>
+  </wsdl:message>
+  <wsdl:message name="getAllTPPoolsResponse">
+    <wsdl:documentation>
+    The getAllTPPools response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllTPPoolsResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getAssociatedTP Request/Response Messages ========= -->
+  <wsdl:message name="getAssociatedTP">
+    <wsdl:documentation>
+    The getAssociatedTP request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAssociatedTP"/>
+  </wsdl:message>
+  <wsdl:message name="getAssociatedTPResponse">
+    <wsdl:documentation>
+    The getAssociatedTP response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAssociatedTPResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getMultiLayerSubnetwork Request/Response Messages ========= -->
+  <wsdl:message name="getMultiLayerSubnetwork">
+    <wsdl:documentation>
+    The getMultiLayerSubnetwork request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getMultiLayerSubnetwork"/>
+  </wsdl:message>
+  <wsdl:message name="getMultiLayerSubnetworkResponse">
+    <wsdl:documentation>
+    The getMultiLayerSubnetwork response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getMultiLayerSubnetworkResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getRoute Request/Response Messages ========= -->
+  <wsdl:message name="getRoute">
+    <wsdl:documentation>
+    The getRoute request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getRoute"/>
+  </wsdl:message>
+  <wsdl:message name="getRouteResponse">
+    <wsdl:documentation>
+    The getRoute response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getRouteResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getRouteAndTopologicalLinks Request/Response Messages ========= -->
+  <wsdl:message name="getRouteAndTopologicalLinks">
+    <wsdl:documentation>
+    The getRouteAndTopologicalLinks request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getRouteAndTopologicalLinks"/>
+  </wsdl:message>
+  <wsdl:message name="getRouteAndTopologicalLinksResponse">
+    <wsdl:documentation>
+    The getRouteAndTopologicalLinks response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getRouteAndTopologicalLinksResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getSNC Request/Response Messages ========= -->
+  <wsdl:message name="getSNC">
+    <wsdl:documentation>
+    The getSNC request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSNC"/>
+  </wsdl:message>
+  <wsdl:message name="getSNCResponse">
+    <wsdl:documentation>
+    The getSNC response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSNCResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getSNCsByUserLabel Request/Response Messages ========= -->
+  <wsdl:message name="getSNCsByUserLabel">
+    <wsdl:documentation>
+    The getSNCsByUserLabel request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSNCsByUserLabel"/>
+  </wsdl:message>
+  <wsdl:message name="getSNCsByUserLabelResponse">
+    <wsdl:documentation>
+    The getSNCsByUserLabel response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getSNCsByUserLabelResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getTopologicalLink Request/Response Messages ========= -->
+  <wsdl:message name="getTopologicalLink">
+    <wsdl:documentation>
+    The getTopologicalLink request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTopologicalLink"/>
+  </wsdl:message>
+  <wsdl:message name="getTopologicalLinkResponse">
+    <wsdl:documentation>
+    The getTopologicalLink response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTopologicalLinkResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getTPGroupingRelationships Request/Response Messages ========= -->
+  <wsdl:message name="getTPGroupingRelationships">
+    <wsdl:documentation>
+    The getTPGroupingRelationships request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTPGroupingRelationships"/>
+  </wsdl:message>
+  <wsdl:message name="getTPGroupingRelationshipsResponse">
+    <wsdl:documentation>
+    The getTPGroupingRelationships response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getAllObjectNamesResponse"/>
+  </wsdl:message>
+  <!-- ======= Definition of getTPPool Request/Response Messages ========= -->
+  <wsdl:message name="getTPPool">
+    <wsdl:documentation>
+    The getTPPool request message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTPPool"/>
+  </wsdl:message>
+  <wsdl:message name="getTPPoolResponse">
+    <wsdl:documentation>
+    The getTPPool response message.
+    </wsdl:documentation>
+    <wsdl:part name="mtosiHeader" element="tmf854XSD:header"/>
+    <wsdl:part name="mtosiBody" element="tmf854XSD:getTPPoolResponse"/>
+  </wsdl:message>
+  <!-- ======= Port Type Definitions ====================== -->
+  <!-- ======= MultiLayerSubnetworkMgr Port Type  ===================== -->
+  <wsdl:portType name="MultiLayerSubnetworkMgr">
+    <wsdl:documentation>
+The MTOSI MultiLayerSubnetworkMgr porttype
+    </wsdl:documentation>
+    <wsdl:operation name="getAllEdgePointNames">
+      <wsdl:documentation>
+        This is the getAllEdgePointNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllEdgePointNames"/>
+      <wsdl:output message="tmf854WS:getAllEdgePointNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllEdgePoints">
+      <wsdl:documentation>
+        This is the getAllEdgePoints request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllEdgePoints"/>
+      <wsdl:output message="tmf854WS:getAllEdgePointsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllFixedSubnetworkConnectionNames">
+      <wsdl:documentation>
+        This is the getAllFixedSubnetworkConnectionNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllFixedSubnetworkConnectionNames"/>
+      <wsdl:output message="tmf854WS:getAllFixedSubnetworkConnectionNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllFixedSubnetworkConnections">
+      <wsdl:documentation>
+        This is the getAllFixedSubnetworkConnections request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllFixedSubnetworkConnections"/>
+      <wsdl:output message="tmf854WS:getAllFixedSubnetworkConnectionsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllManagedElementNamesWrtMLSN">
+      <wsdl:documentation>
+        This is the getAllManagedElementNamesWrtMLSN request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllManagedElementNamesWrtMLSN"/>
+      <wsdl:output message="tmf854WS:getAllManagedElementNamesWrtMLSNResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllManagedElementsWrtMLSN">
+      <wsdl:documentation>
+        This is the getAllManagedElementsWrtMLSN request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllManagedElementsWrtMLSN"/>
+      <wsdl:output message="tmf854WS:getAllManagedElementsWrtMLSNResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSubnetworkConnectionNames">
+      <wsdl:documentation>
+        This is the getAllSubnetworkConnectionNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSubnetworkConnectionNames"/>
+      <wsdl:output message="tmf854WS:getAllSubnetworkConnectionNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSubnetworkConnectionNamesWithTP">
+      <wsdl:documentation>
+        This is the getAllSubnetworkConnectionNamesWithTP request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSubnetworkConnectionNamesWithTP"/>
+      <wsdl:output message="tmf854WS:getAllSubnetworkConnectionNamesWithTPResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSubnetworkConnections">
+      <wsdl:documentation>
+        This is the getAllSubnetworkConnections request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSubnetworkConnections"/>
+      <wsdl:output message="tmf854WS:getAllSubnetworkConnectionsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllSubnetworkConnectionsWithTP">
+      <wsdl:documentation>
+        This is the getAllSubnetworkConnectionsWithTP request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllSubnetworkConnectionsWithTP"/>
+      <wsdl:output message="tmf854WS:getAllSubnetworkConnectionsWithTPResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTopologicalLinkNames">
+      <wsdl:documentation>
+        This is the getAllTopologicalLinkNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllTopologicalLinkNames"/>
+      <wsdl:output message="tmf854WS:getAllTopologicalLinkNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTopologicalLinks">
+      <wsdl:documentation>
+        This is the getAllTopologicalLinks request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllTopologicalLinks"/>
+      <wsdl:output message="tmf854WS:getAllTopologicalLinksResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTPPoolNames">
+      <wsdl:documentation>
+        This is the getAllTPPoolNames request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllTPPoolNames"/>
+      <wsdl:output message="tmf854WS:getAllTPPoolNamesResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAllTPPools">
+      <wsdl:documentation>
+        This is the getAllTPPools request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAllTPPools"/>
+      <wsdl:output message="tmf854WS:getAllTPPoolsResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAssociatedTP">
+      <wsdl:documentation>
+        This is the getAssociatedTP request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getAssociatedTP"/>
+      <wsdl:output message="tmf854WS:getAssociatedTPResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getMultiLayerSubnetwork">
+      <wsdl:documentation>
+        This is the getMultiLayerSubnetwork request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getMultiLayerSubnetwork"/>
+      <wsdl:output message="tmf854WS:getMultiLayerSubnetworkResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getRoute">
+      <wsdl:documentation>
+        This is the getRoute request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getRoute"/>
+      <wsdl:output message="tmf854WS:getRouteResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getRouteAndTopologicalLinks">
+      <wsdl:documentation>
+        This is the getRouteAndTopologicalLinks request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getRouteAndTopologicalLinks"/>
+      <wsdl:output message="tmf854WS:getRouteAndTopologicalLinksResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSNC">
+      <wsdl:documentation>
+        This is the getSNC request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getSNC"/>
+      <wsdl:output message="tmf854WS:getSNCResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSNCsByUserLabel">
+      <wsdl:documentation>
+        This is the getSNCsByUserLabel request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getSNCsByUserLabel"/>
+      <wsdl:output message="tmf854WS:getSNCsByUserLabelResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getTopologicalLink">
+      <wsdl:documentation>
+        This is the getTopologicalLink request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getTopologicalLink"/>
+      <wsdl:output message="tmf854WS:getTopologicalLinkResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getTPGroupingRelationships">
+      <wsdl:documentation>
+        This is the getTPGroupingRelationships request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getTPGroupingRelationships"/>
+      <wsdl:output message="tmf854WS:getTPGroupingRelationships"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+    <wsdl:operation name="getTPPool">
+      <wsdl:documentation>
+        This is the getTPPool request/response operation
+      </wsdl:documentation>
+      <wsdl:input message="tmf854WS:getTPPool"/>
+      <wsdl:output message="tmf854WS:getTPPoolResponse"/>
+      <wsdl:fault name="ProcessingFailureException" message="tmf854WS:ProcessingFailureException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>
