@@ -21,14 +21,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
+        <version>2.1</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-http-basic</artifactId>
     <name>Apache CXF Archetype - cxf-http-basic</name>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>2.1</version>
     <url>http://cxf.apache.org</url>
     <properties>
         <maven.test.skip>true</maven.test.skip>
