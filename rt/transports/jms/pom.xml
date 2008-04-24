@@ -23,7 +23,7 @@
     <packaging>jar</packaging>
     <version>2.1.1-SNAPSHOT</version>
     <name>Apache CXF Runtime JMS Transport</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
@@ -91,48 +91,40 @@
             <artifactId>activemq-core</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 
     <build>
-	<plugins>
-	    <plugin>
-		<groupId>org.apache.cxf</groupId>
-		<artifactId>cxf-common-xsd</artifactId>
-		<version>${project.version}</version>
-		<executions>
-		    <execution>
-			<id>generate-sources</id>
-			<phase>generate-sources</phase>
-			<configuration>
-			    <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-			    <xsdOptions>
-  			      <xsdOption>
-    			        <xsd>${basedir}/src/main/resources/schemas/wsdl/jms.xsd</xsd>
-    			        <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms.xjb</bindingFile>
-                                <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
-    			        <deleteDirs>
-      			          <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
-    			        </deleteDirs>
-  			      </xsdOption>
-			    </xsdOptions>
-			</configuration>
-			<goals>
-			    <goal>xsdtojava</goal>
-			</goals>
-		    </execution>
-		</executions>
-	    </plugin>
-	</plugins>
-    </build>    
-
-    <repositories>
-        <repository>
-            <id>apache.incubating.releases</id>
-            <name>Apache Incubating Release Distribution Repository</name>
-            <url>http://people.apache.org/repo/m2-incubating-repository</url>
-        </repository>
-    </repositories>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-common-xsd</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/jms.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/transports/jms</connection>

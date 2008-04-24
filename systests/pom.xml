@@ -29,7 +29,7 @@
     <artifactId>cxf-systests</artifactId>
     <name>Apache CXF System Tests</name>
     <version>2.1.1-SNAPSHOT</version>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/systests</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/systests</developerConnection>

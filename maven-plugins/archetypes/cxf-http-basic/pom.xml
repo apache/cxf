@@ -29,7 +29,7 @@
     <artifactId>cxf-http-basic</artifactId>
     <name>Apache CXF Archetype - cxf-http-basic</name>
     <version>2.1.1-SNAPSHOT</version>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
     <properties>
         <maven.test.skip>true</maven.test.skip>
         <eclipse.skip>true</eclipse.skip>

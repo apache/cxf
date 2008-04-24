@@ -26,7 +26,7 @@
     <packaging>jar</packaging>
     <version>2.1-SNAPSHOT</version>
     <name>Apache CXF XML to FastInfoset Maven2 Plugin Test</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
 
 
     <parent>

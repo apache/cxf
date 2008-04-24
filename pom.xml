@@ -23,7 +23,7 @@
     <artifactId>cxf</artifactId>
     <version>2.1.1-SNAPSHOT</version>
     <name>Apache CXF</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
 
     <packaging>pom</packaging>
 
@@ -66,38 +66,38 @@
     <mailingLists>
         <mailingList>
             <name>Apache CXF User List</name>
-            <subscribe>cxf-user-subscribe@incubator.apache.org</subscribe>
-            <unsubscribe>cxf-user-unsubscribe@incubator.apache.org</unsubscribe>
-            <post>cxf-user@incubator.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/incubator-cxf-user</archive>
+            <subscribe>users-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>users-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>users@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-users</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Developer List</name>
-            <subscribe>cxf-dev-subscribe@incubator.apache.org</subscribe>
-            <unsubscribe>cxf-dev-unsubscribe@incubator.apache.org</unsubscribe>
-            <post>cxf-dev@incubator.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/incubator-cxf-dev</archive>
+            <subscribe>dev-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>dev@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-dev</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Commits List</name>
-            <subscribe>cxf-commits-subscribe@incubator.apache.org</subscribe>
-            <unsubscribe>cxf-commits-unsubscribe@incubator.apache.org</unsubscribe>
-            <post>cxf-commits@incubator.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/incubator-cxf-commits</archive>
+            <subscribe>commits-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>commits@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-commits</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Issues List</name>
-            <subscribe>cxf-issues-subscribe@incubator.apache.org</subscribe>
-            <unsubscribe>cxf-issues-unsubscribe@incubator.apache.org</unsubscribe>
-            <post>cxf-issues@incubator.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/incubator-cxf-issues</archive>
+            <subscribe>issues-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>issues-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>issues@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-issues</archive>
         </mailingList>
         <mailingList>
             <name>Apache CXF Build Notifications List</name>
-            <subscribe>cxf-notifications-subscribe@incubator.apache.org</subscribe>
-            <unsubscribe>cxf-notifications-unsubscribe@incubator.apache.org</unsubscribe>
-            <post>cxf-notifications@incubator.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/incubator-cxf-notifications</archive>
+            <subscribe>notifications-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>notifications-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>notifications@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-notifications</archive>
         </mailingList>
     </mailingLists>
     <ciManagement>
@@ -107,7 +107,7 @@
             <notifier>
                 <type>mail</type>
                 <configuration>
-                    <address>cxf-notifications@incubator.apache.org</address>
+                    <address>notifications@cxf.apache.org</address>
                 </configuration>
             </notifier>
         </notifiers>

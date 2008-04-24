@@ -21,7 +21,7 @@
     <artifactId>cxf-rt-bindings-xml</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime XML Binding</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>

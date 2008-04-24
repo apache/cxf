@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <version>2.1.1-SNAPSHOT</version>
     <name>Apache CXF Command Line Tools WSDLTo</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>

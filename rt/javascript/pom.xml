@@ -3,7 +3,7 @@
     <artifactId>cxf-rt-javascript</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime JavaScript Client Generator</name>
-    <url>http://cwiki.apache.org/confluence/display/CXF/Index</url>
+    <url>http://cxf.apache.org/</url>
 
 
     <parent>

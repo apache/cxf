@@ -23,7 +23,7 @@
     <packaging>maven-plugin</packaging>
     <version>2.1.1-SNAPSHOT</version>
     <name>Apache CXF Common XSD2Java Plugins</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
 
 
     <parent>

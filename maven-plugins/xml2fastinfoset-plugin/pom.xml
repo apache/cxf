@@ -24,7 +24,7 @@
     <packaging>maven-plugin</packaging>
     <version>2.1.1-SNAPSHOT</version>
     <name>Apache CXF XML to FastInfoset Maven2 Plugin</name>
-    <url>http://cwiki.apache.org/CXF</url>
+    <url>http://cxf.apache.org</url>
     <prerequisites>
         <maven>2.0</maven>
     </prerequisites>

@@ -22,7 +22,7 @@
     <artifactId>cxf-rt-databinding-aegis</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime Aegis Databinding</name>
-    <url>http://cwiki.apache.org/confluence/display/CXF/Index</url>
+    <url>http://cxf.apache.org/</url>
 
 
     <parent>
