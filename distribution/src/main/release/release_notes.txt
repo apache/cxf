@@ -1,8 +1,8 @@
-Apache CXF 2.1 Beta 1 Release Notes
+Apache CXF 2.1 Release Notes
 
 1. Overview
 
-Apache CXF 2.1 (Beta 1) delivers the second major version of 
+Apache CXF 2.1 delivers the second major version of 
 the Celtix project (http://celtix.objectweb.org) and the XFire project
 (http://xfire.codehaus.org) merge.  This release is a major update from 
 the 2.0.x series.   The major new addition is JAX-WS 2.1 support.  However, there
