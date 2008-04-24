@@ -18,4 +18,4 @@
 #    under the License.
 #
 #
-http\://cxf.apache.org/schema/bindings/object.xsd=org/apache/cxf/binding/soap/spring/object.xsd
+http\://cxf.apache.org/schemas/bindings/object.xsd=schemas/bindings/object.xsd
