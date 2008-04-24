@@ -78,6 +78,7 @@
                 <exclude>**/var/journal</exclude>
                 <exclude>**/build.out*</exclude>
                 <exclude>STATUS</exclude>
+                <exclude>KEYS</exclude>
             </excludes>
         </fileSet>
     </fileSets>
