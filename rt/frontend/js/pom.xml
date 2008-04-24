@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-frontend-js</artifactId>
     <packaging>jar</packaging>
-    <version>2.1</version>
+    <version>2.1.1-SNAPSHOT</version>
     <name>Apache CXF Runtime JavaScript Frontend</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1</version>
+        <version>2.1.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -75,8 +75,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/tags/cxf-2.1/rt/frontend/js</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/tags/cxf-2.1/rt/frontend/js</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/frontend/js</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/frontend/js</developerConnection>
     </scm>
 
 </project>
