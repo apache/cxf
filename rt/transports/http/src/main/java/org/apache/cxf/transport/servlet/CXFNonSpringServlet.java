@@ -28,7 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.resource.ResourceManager;
 
 public class CXFNonSpringServlet extends AbstractCXFServlet {
-    
+
     public static Logger getLogger() {
         return LogUtils.getL7dLogger(CXFNonSpringServlet.class);
     }
@@ -36,11 +36,11 @@ public class CXFNonSpringServlet extends AbstractCXFServlet {
     @Override
     public void loadBus(ServletConfig servletConfig) throws ServletException {
         loadBusNoConfig(servletConfig);
-        //TODO do we need to privde the SUN's endpoint discription file supporting        
+        // You could add the endpoint publish codes here
     }
-    
+
     private void loadBusNoConfig(ServletConfig servletConfig) throws ServletException {
-        
+
         if (bus == null) {
             LOG.info("LOAD_BUS_WITHOUT_APPLICATION_CONTEXT");
             bus = BusFactory.newInstance().createBus();
@@ -48,11 +48,11 @@ public class CXFNonSpringServlet extends AbstractCXFServlet {
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
         resourceManager.addResourceResolver(new ServletContextResourceResolver(
                                                servletConfig.getServletContext()));
-                        
+
         replaceDestinationFactory();
         // Set up the ServletController
         controller = createServletController(servletConfig);
-        
+
     }
 
 }

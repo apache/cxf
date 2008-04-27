@@ -42,24 +42,24 @@ public class JMSTransportFactory extends AbstractTransportFactory
     static {
         URI_PREFIXES.add("jms://");
     }
-    
+
     private Bus bus;
-    
-    @Resource
+
+    @Resource(name = "bus")
     public void setBus(Bus b) {
         bus = b;
     }
-    
+
     public Bus getBus() {
         return bus;
     }
-        
-    public Conduit getConduit(EndpointInfo targetInfo) throws IOException {        
+
+    public Conduit getConduit(EndpointInfo targetInfo) throws IOException {
         return getConduit(targetInfo, targetInfo.getTarget());
     }
 
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target) throws IOException {
-        JMSConduit conduit = 
+        JMSConduit conduit =
             target == null ? new JMSConduit(bus, endpointInfo) : new JMSConduit(bus, endpointInfo, target);
         return conduit;
     }

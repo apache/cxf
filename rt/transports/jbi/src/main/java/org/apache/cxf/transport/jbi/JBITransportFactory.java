@@ -46,33 +46,33 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class JBITransportFactory extends AbstractTransportFactory implements ConduitInitiator,
     DestinationFactory {
-    
+
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/jbi";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(JBITransportFactory.class);
 
 
     private DeliveryChannel deliveryChannel;
     private Bus bus;
     private final Map<String, JBIDestination> destinationMap =  new HashMap<String, JBIDestination>();
-    
+
 
     private Collection<String> activationNamespaces;
-    
-    @Resource
+
+    @Resource(name = "bus")
     public void setBus(Bus b) {
         bus = b;
     }
-    
+
     public Bus getBus() {
         return bus;
     }
-    
+
     public Set<String> getUriPrefixes() {
         return Collections.singleton("jbi");
     }
 
-    @Resource
+
     public void setActivationNamespaces(Collection<String> ans) {
         activationNamespaces = ans;
     }
@@ -97,9 +97,9 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
         }
     }
 
-    
 
-    
+
+
     public DeliveryChannel getDeliveryChannel() {
         return deliveryChannel;
     }
@@ -124,8 +124,8 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
     }
 
     public Destination getDestination(EndpointInfo ei) throws IOException {
-        JBIDestination destination = new JBIDestination(ei, 
-                                         JBIDispatcherUtil.getInstance(this, getDeliveryChannel()), 
+        JBIDestination destination = new JBIDestination(ei,
+                                         JBIDispatcherUtil.getInstance(this, getDeliveryChannel()),
                                          getDeliveryChannel());
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
@@ -139,10 +139,10 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
         }
         return destination;
     }
-    
+
     public void putDestination(String epName, JBIDestination destination) throws JBIException {
         if (destinationMap.containsKey(epName)) {
-            throw new JBIException("JBIDestination for Endpoint " 
+            throw new JBIException("JBIDestination for Endpoint "
                                    + epName + " already be created");
         } else {
             destinationMap.put(epName, destination);
@@ -152,9 +152,9 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
     public JBIDestination getDestination(String epName) {
         return destinationMap.get(epName);
     }
-    
+
     public void removeDestination(String epName) {
         destinationMap.remove(epName);
     }
-    
+
 }
