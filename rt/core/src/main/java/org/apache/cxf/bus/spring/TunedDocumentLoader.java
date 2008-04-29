@@ -85,6 +85,7 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         }
 
         try {
+            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true); 
             nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", 
                                            true);
         } catch (Exception e) {
