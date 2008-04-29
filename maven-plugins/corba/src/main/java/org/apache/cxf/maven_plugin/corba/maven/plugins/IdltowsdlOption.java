@@ -21,7 +21,7 @@ package org.apache.cxf.maven_plugin.corba.maven.plugins;
 
 import java.util.List;
 
-public class IDLToWSDLOption {
+public class IdltowsdlOption {
 
     String idl;
     List<String> extraargs;

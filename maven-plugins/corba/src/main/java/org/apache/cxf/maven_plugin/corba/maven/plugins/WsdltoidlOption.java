@@ -21,7 +21,7 @@ package org.apache.cxf.maven_plugin.corba.maven.plugins;
 
 import java.util.List;
 
-public class WSDLToIDLOption {
+public class WsdltoidlOption {
 
     String wsdl;
     boolean corbabinding;

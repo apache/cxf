@@ -44,7 +44,7 @@ public class IDLToWSDLPlugin extends AbstractMojo {
     /**
      * @parameter
      */
-    IDLToWSDLOption idltowsdlOptions[];
+    IdltowsdlOption idltowsdlOptions[];
 
 
     public void execute() throws MojoExecutionException {
