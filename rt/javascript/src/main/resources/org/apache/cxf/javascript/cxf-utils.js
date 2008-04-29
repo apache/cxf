@@ -18,8 +18,7 @@
 // This code is structured on to require a 'new' of an object of type
 // CxfApacheOrgUtil.
 // Alternative, it could be made 'static', but this allowed us to use this same
-// object
-// to carry some state.
+// object to carry some state.
 var org_apache_cxf_XSI_namespace_uri = "http://www.w3.org/2001/XMLSchema-instance";
 var org_apache_cxf_XSD_namespace_uri = "http://www.w3.org/2001/XMLSchema";
 
@@ -27,14 +26,16 @@ function cxf_apache_org_util_null_trace(message) {
 }
 
 function CxfApacheOrgUtil() {
-	this.ELEMENT_NODE = 1;
-
+	// Set up tracing if there is a trace object.
 	if ("function" == typeof(org_apache_cxf_trace)) {
 		this.trace = org_apache_cxf_trace.trace;
 	} else {
 		this.trace = cxf_apache_org_util_null_trace;
 	}
 }
+
+// define a constant for the DOM node type for an element.
+CxfApacheOrgUtil.prototype.ELEMENT_NODE = 1;
 
 // compensate for Microsoft's weakness here.
 function org_apache_cxf_getNodeLocalName(node) {
@@ -64,6 +65,7 @@ function org_apache_cxf_getNamespaceURI(elementNode, namespacePrefix) {
 	return namespaceURI;
 }
 
+// Search through the attributes of one node to find a namespace prefix definition.
 function org_apache_cxf_findNamespace(elementNode, namespacePrefix) {
 	var attributes = elementNode.attributes;
 	if ((attributes != null) && (attributes.length > 0)) {
@@ -85,6 +87,7 @@ function org_apache_cxf_findNamespace(elementNode, namespacePrefix) {
 	}
 }
 
+// Get namespace for a node.
 function org_apache_cxf_get_node_namespaceURI(elementNode) {
 	var prefix = org_apache_cxf_getPrefix(elementNode.nodeName);
 	return org_apache_cxf_getNamespaceURI(elementNode, prefix);
@@ -92,6 +95,9 @@ function org_apache_cxf_get_node_namespaceURI(elementNode) {
 
 CxfApacheOrgUtil.prototype.getElementNamespaceURI = org_apache_cxf_get_node_namespaceURI;
 
+// Supprt functions for xsd:any start here.
+
+// Object that can test an element against an 'any' specification.
 function org_apache_cxf_any_ns_matcher(style, tns, nslist, nextLocalPart) {
 	this.style = style;
 	this.tns = tns;
@@ -178,6 +184,7 @@ function org_apache_cxf_escapeXmlEntities(val) {
 
 CxfApacheOrgUtil.prototype.escapeXmlEntities = org_apache_cxf_escapeXmlEntities;
 
+// Is an element xsi:nil? Note, in IE this requires the use of the prefix 'xsi', literally.
 function org_apache_cxf_isElementNil(node) {
 	if (node == null)
 		throw "null node passed to isElementNil";
@@ -239,7 +246,7 @@ function org_apache_cxf_isNodeNamedNS(node, namespaceURI, localName) {
 CxfApacheOrgUtil.prototype.isNodeNamedNS = org_apache_cxf_isNodeNamedNS;
 
 // Firefox splits large text regions into multiple Text objects (4096 chars in
-// each).
+// each). Glue it back together.
 function org_apache_cxf_getNodeText(node) {
 	var r = "";
 	for (var x = 0;x < node.childNodes.length; x++) {
@@ -460,12 +467,9 @@ function org_apache_cxf_base64_decode64UTF8(input) {
 	return plaintext;
 }
 
-// var placeholder = '<xop:Include
-// xmlns:xop="http://www.w3.org/2004/08/xop/include" '
-// + 'href="cid:' + uuid + '" />';
-// var mtomObject = 'Content-Type: text/plain; charset="utf-8";\r\nContent-ID:
-// <'
-// + uuid + '>\r\n\r\n' + value + '\r\n';
+// MTOM deserialization.
+// This assumes that the only content type it will be asked to deal with is text/plain;charset=utf-8.
+// This only handles cid: xop URNs.
 
 var org_apache_cxf_XOP_NS = 'http://www.w3.org/2004/08/xop/include';
 
@@ -505,10 +509,10 @@ function org_apache_cxf_deserialize_MTOM_or_base64(element) {
 }
 
 CxfApacheOrgUtil.prototype.deserializeBase64orMom = org_apache_cxf_deserialize_MTOM_or_base64;
+
 /*
  * Client object sends requests and calls back with responses.
  */
-
 function CxfApacheOrgClient(utils) {
 	utils.trace("Client constructor");
 	this.utils = utils;
@@ -656,7 +660,8 @@ function org_apache_cxf_client_request(url, requestXML, method, sync, headers) {
 		this.req.setRequestHeader("Content-Type", ctHeader);
 
 	} else {
-		this.req.setRequestHeader("Content-Type", "application/xml");
+	// for now, assume SOAP 1.1. 1.2 calls for application/xml. 
+		this.req.setRequestHeader("Content-Type", "text/xml");
 	}
 
 	if (headers) { // must be array indexed by header field.
@@ -943,7 +948,7 @@ function org_apache_cxf_get_xsi_type(elementNode) {
 	}
 }
 
-// return the an object if we can deserialize an object, otherwise return the
+// Return an object if we can deserialize an object, otherwise return the
 // element itself.
 function org_apache_cxf_deserialize_anyType(cxfjsutils, element) {
 	var type = org_apache_cxf_get_xsi_type(element);

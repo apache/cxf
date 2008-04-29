@@ -89,7 +89,7 @@ function compliantTest(url, beanArg)
 
 function compliantNoArgsTest(url)
 {
-	org_apache_cxf_trace.trace("Enter compliantArgsTest.");
+	org_apache_cxf_trace.trace("Enter compliantNoArgsTest.");
 	resetGlobals();
 	globalNotifier = new org_apache_cxf_notifier();
 	
@@ -102,6 +102,21 @@ function compliantNoArgsTest(url)
     // Return the notifier as a convenience to the Java code.
 	return globalNotifier;
 }
+
+// a test of depending on the URL taken from the service model.
+function portObjectTest()
+{
+	org_apache_cxf_trace.trace("Enter portObjectTest.");
+	resetGlobals();
+	globalNotifier = new org_apache_cxf_notifier();
+	
+	var intf = 
+	   new org_apache_cxf_javascript_fortest_SimpleDocLitBare_org_apache_cxf_javascript_fortest_SimpleDocLitBareImplPort();
+    intf.compliantNoArgs(test1SuccessCallback, test1ErrorCallback); 
+    // Return the notifier as a convenience to the Java code.
+	return globalNotifier;
+}
+
 
 function actionMethodTest(url, param)
 {

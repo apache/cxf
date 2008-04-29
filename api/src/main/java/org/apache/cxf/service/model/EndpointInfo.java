@@ -24,6 +24,9 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
+/**
+ * The EndpointInfo contains the information for a web service 'port' inside of a service.
+ */
 public class EndpointInfo extends AbstractDescriptionElement implements NamedItem {
     String transportId;
     ServiceInfo service;

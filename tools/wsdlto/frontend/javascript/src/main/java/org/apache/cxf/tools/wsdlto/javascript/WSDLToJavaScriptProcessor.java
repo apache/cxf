@@ -73,7 +73,9 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
                 writer.append(allThatJavascript);
             }
 
-            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, prefixManager,
+            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, 
+                                                                                   null,
+                                                                                   prefixManager,
                                                                                    nameManager);
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();

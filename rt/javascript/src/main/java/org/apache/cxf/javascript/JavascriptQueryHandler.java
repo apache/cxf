@@ -137,6 +137,7 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
                 }
 
                 ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
+                                                                                       endpoint.getAddress(),
                                                                                        prefixManager,
                                                                                        nameManager);
                 serviceBuilder.walk();

@@ -238,6 +238,35 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
             }
         });
     }
+    
+    private Void portObjectCaller(Context context) {
+        LOG.info("About to call portObjectTest " + getAddress());
+        Notifier notifier = 
+            testUtilities.rhinoCallConvert("portObjectTest", Notifier.class);
+
+        boolean notified = notifier.waitForJavascript(1000 * 10);
+        assertTrue(notified);
+        Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
+        assertNull(errorStatus);
+        String errorText = testUtilities.rhinoEvaluateConvert("globalErrorStatusText", String.class);
+        assertNull(errorText);
+
+        //This method returns a String
+        Scriptable response = (Scriptable)testUtilities.rhinoEvaluate("globalResponseObject");
+        String item = testUtilities.rhinoCallMethodConvert(String.class, response, "getStringItem");
+        assertEquals("horsefeathers", item);
+        return null;
+    }
+    
+    @Test
+    public void callPortObject() {
+        LOG.info("about to call portObject");
+        testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
+            public Void run(Context context) {
+                return portObjectCaller(context);
+            }
+        });
+    }
 
     public static Scriptable testBean1ToJS(JavascriptTestUtilities testUtilities,
                                            Context context, 

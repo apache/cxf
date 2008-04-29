@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.service;
 
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -47,7 +49,9 @@ import org.apache.cxf.service.model.UnwrappedOperationInfo;
  * 3.9) end the unwrapped operation.
  * 4) end the operation.
  * 5) end the interface.
- * 6) end the service info.
+ * 6) For each endpoint (= port) begin and end the EndpointInfo
+ * 7) For each binding (= BindingInfo) begin and end the BindingInfo.
+ * 8) end the service info.
  * </pre>
  * Unwrapped operations <i>share messages</i> with their corresponding wrapped messages,
  * so beware of processing the same messages twice as if unique.
@@ -73,6 +77,14 @@ public class ServiceModelVisitor {
         }
         
         end(serviceInfo.getInterface());
+        for (EndpointInfo endpointInfo : serviceInfo.getEndpoints()) {
+            begin(endpointInfo);
+            end(endpointInfo);
+        }
+        for (BindingInfo bindingInfo : serviceInfo.getBindings()) {
+            begin(bindingInfo);
+            end(bindingInfo);
+        }
         end(serviceInfo);
     }
 
@@ -147,5 +159,13 @@ public class ServiceModelVisitor {
     public void end(MessagePartInfo part) {
     }
     public void end(FaultInfo fault) {
+    }
+    public void begin(EndpointInfo endpointInfo) {
+    }
+    public void end(EndpointInfo endpointInfo) {
+    }
+    private void begin(BindingInfo bindingInfo) {
+    }
+    private void end(BindingInfo bindingInfo) {
     }
 }

@@ -46,6 +46,7 @@ import org.apache.cxf.javascript.UnsupportedConstruct;
 import org.apache.cxf.javascript.XmlSchemaUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -66,6 +67,9 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
+/**
+ * Class to construct the JavaScript corresponding to a service.
+ */
 public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getL7dLogger(ServiceJavascriptBuilder.class);
 
@@ -79,6 +83,8 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     private Set<MessageInfo> inputMessagesWithNameConflicts;
     private Set<MessageInfo> outputMessagesWithNameConflicts;
     private SchemaCollection xmlSchemaCollection;
+    // When generating from a tool or ?js, we know the endpoint addr and can build it into the javascript.
+    private String endpointAddress;
     
     private boolean isWrapped;
     // facts about the wrapper when there is one.
@@ -110,9 +116,19 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     private boolean nonVoidOutput;
     private boolean isRPC;
 
-    public ServiceJavascriptBuilder(ServiceInfo serviceInfo, NamespacePrefixAccumulator prefixAccumulator,
+    /**
+     * Construct builder object.
+     * @param serviceInfo CXF service model description of the service.
+     * @param endpointAddress http:// URL for the service, or null if not known.
+     * @param prefixAccumulator object that keeps track of prefixes through an entire WSDL.
+     * @param nameManager object that generates names for JavaScript objects.
+     */
+    public ServiceJavascriptBuilder(ServiceInfo serviceInfo,
+                                    String endpointAddress,
+                                    NamespacePrefixAccumulator prefixAccumulator,
                                     NameManager nameManager) {
         super(serviceInfo);
+        this.endpointAddress = endpointAddress;
         code = new StringBuilder();
         utils = new JavascriptUtils(code);
         this.nameManager = nameManager;
@@ -144,7 +160,11 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         utils.appendLine("this.jsutils = new CxfApacheOrgUtil();");
         utils.appendLine("this.jsutils.interfaceObject = this;");
         utils.appendLine("this.synchronous = false;");
-        utils.appendLine("this.url = null;");
+        if (endpointAddress != null) {
+            utils.appendLine("this.url = '" + endpointAddress + "';");
+        } else {
+            utils.appendLine("this.url = null;");
+        }
         utils.appendLine("this.client = null;");
         utils.appendLine("this.response = null;");
         // the callback functions for a pending operation are stored in these.
@@ -925,6 +945,17 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             conflicts.add(msg);
         }
         nameMap.put(msg.getName().getLocalPart(), msg);
+    }
+
+    @Override
+    public void begin(EndpointInfo endpointInfo) {
+        String address = endpointInfo.getAddress();
+        String portClassName = currentInterfaceClassName + "_" 
+            + nameManager.getJavascriptName(endpointInfo.getName());
+        code.append("function " + portClassName + " () {\n");
+        code.append("  this.url = '" + address + "';\n");
+        code.append("}\n");
+        code.append(portClassName + ".prototype = new " + currentInterfaceClassName + ";\n");
     }
 
 

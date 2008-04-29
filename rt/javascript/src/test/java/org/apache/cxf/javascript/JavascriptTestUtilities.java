@@ -363,7 +363,9 @@ public class JavascriptTestUtilities extends TestUtilities {
             readStringIntoRhino(allThatJavascript, schema.toString() + ".js");
         }
 
-        ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, prefixManager,
+        ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, 
+                                                                               null,
+                                                                               prefixManager,
                                                                                nameManager);
         serviceBuilder.walk();
         String serviceJavascript = serviceBuilder.getCode();
