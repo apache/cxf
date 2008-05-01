@@ -364,7 +364,9 @@ public final class ProcessorUtil {
             Map<String, Element> maps = CastUtils.cast((Map<?, ?>)context.get(ToolConstants.SCHEMA_MAP));
             if (maps != null) {
                 for (Element ele : maps.values()) {
-                    schema.read(ele);
+                    synchronized (ele.getOwnerDocument()) {
+                        schema.read(ele);
+                    }
                 }
                 elementByName = schema.getElementByQName(partElement);
             }

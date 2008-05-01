@@ -76,10 +76,13 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         this.namespaceUri = nsUri;
     }
 
-    public Element getElement() {
+    public synchronized Element getElement() {
         if (element == null && getSchema() != null) {
             CachedOutputStream cout = new CachedOutputStream();
-            getSchema().write(cout);
+            XmlSchema sch = getSchema();
+            synchronized (sch) {
+                getSchema().write(cout);
+            }
             Document sdoc = null;
             try {
                 sdoc = XMLUtils.parse(cout.getInputStream());

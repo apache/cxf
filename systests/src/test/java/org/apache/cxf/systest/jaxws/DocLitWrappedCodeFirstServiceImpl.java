@@ -19,7 +19,9 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.annotation.Resource;
@@ -29,6 +31,7 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
 import org.apache.cxf.systest.jaxws.types.Bar;
 import org.apache.cxf.systest.jaxws.types.BarImpl;
 
@@ -132,6 +135,10 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         Foo b = new Foo();
         b.setName("b");
         return Arrays.asList(a, b);
+    }
+    
+    public Set<Foo> getFooSet() {
+        return new LinkedHashSet<Foo>(listObjectOutput());
     }
 
     public List<Foo[]> listObjectArrayOutput() {

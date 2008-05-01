@@ -129,6 +129,15 @@ public final class ContextPropertiesMapping {
             context.put(MessageContext.HTTP_RESPONSE_HEADERS, responseHeaders);
         }  
         mapContext(context, cxf2jaxwsMap);
+        
+        Collection<Attachment> attachments 
+            = CastUtils.cast((Collection<?>)context.get(Message.ATTACHMENTS));
+        Map<String, DataHandler> dataHandlers = getDHMap(attachments);
+        context.put(MessageContext.INBOUND_MESSAGE_ATTACHMENTS, dataHandlers);
+        Map<String, Scope> scopes = CastUtils.cast((Map<?, ?>)context.get(WrappedMessageContext.SCOPES));
+        if (scopes != null) {
+            scopes.put(MessageContext.INBOUND_MESSAGE_ATTACHMENTS, Scope.APPLICATION);
+        }
     }
     
     private static void mapJaxws2Cxf(Map<String, Object> context) {
@@ -229,13 +238,9 @@ public final class ContextPropertiesMapping {
         }
 
     }
-    
-    private static void addMessageAttachments(WrappedMessageContext ctx,
-                                              Message message,
-                                              String propertyName) {
-        Map<String, DataHandler> dataHandlers = null;
 
-        Collection<Attachment> attachments = message.getAttachments();
+    private static Map<String, DataHandler> getDHMap(Collection<Attachment> attachments) {
+        Map<String, DataHandler> dataHandlers = null;
         if (attachments != null) {
             if (attachments instanceof LazyAttachmentCollection) {
                 dataHandlers = ((LazyAttachmentCollection)attachments).createDataHandlerMap();
@@ -247,7 +252,14 @@ public final class ContextPropertiesMapping {
                 }
             }
         }
+        return dataHandlers;
+    }
+    private static void addMessageAttachments(WrappedMessageContext ctx,
+                                              Message message,
+                                              String propertyName) {
 
+        Collection<Attachment> attachments = message.getAttachments();
+        Map<String, DataHandler> dataHandlers = getDHMap(attachments);
         ctx.put(propertyName, 
                 dataHandlers == null ? new LinkedHashMap<String, DataHandler>()
                                      : dataHandlers,

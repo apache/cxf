@@ -20,7 +20,7 @@ package org.apache.cxf.jaxws.interceptors;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
@@ -248,7 +248,7 @@ final class WrapperHelperCompiler extends ASMHelper {
             Class<?> tp = getMethods[x].getReturnType();
             mv.visitVarInsn(Opcodes.ALOAD, 2);            
             
-            if (Collection.class.isAssignableFrom(tp)) {
+            if (List.class.isAssignableFrom(tp)) {
                 doCollection(mv, x);
             } else { 
                 if (JAXBElement.class.isAssignableFrom(tp)) {

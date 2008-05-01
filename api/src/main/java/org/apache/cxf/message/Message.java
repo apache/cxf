@@ -57,6 +57,7 @@ public interface Message extends StringMap {
     String ENCODING = Message.class.getName() + ".ENCODING";
     String FIXED_PARAMETER_ORDER = Message.class.getName() + "FIXED_PARAMETER_ORDER";
     String MAINTAIN_SESSION = Message.class.getName() + ".MAINTAIN_SESSION";
+    String ATTACHMENTS = Message.class.getName() + ".ATTACHMENTS";
 
     String WSDL_DESCRIPTION = "javax.xml.ws.wsdl.description";
     String WSDL_SERVICE = "javax.xml.ws.wsdl.service";

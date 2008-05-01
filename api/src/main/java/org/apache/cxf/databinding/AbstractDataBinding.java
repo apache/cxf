@@ -89,8 +89,11 @@ public abstract class AbstractDataBinding implements DataBinding {
         }
         SchemaInfo schema = new SchemaInfo(serviceInfo, ns);
         schema.setSystemId(systemId);
-        XmlSchema xmlSchema = col.read(d, systemId, null);
-        schema.setSchema(xmlSchema);
+        XmlSchema xmlSchema;
+        synchronized (d) {
+            xmlSchema = col.read(d, systemId, null);
+            schema.setSchema(xmlSchema);
+        }
         serviceInfo.addSchema(schema);
         return xmlSchema;
     }

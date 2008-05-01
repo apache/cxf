@@ -84,43 +84,44 @@ public final class ValidatorUtil {
         if (document == null) {
             return schemaList;
         }
-        // URL might need encoding for special characters.
-        baseURI = URLEncoder.encode(baseURI, "utf-8");
-        SchemaCollection schemaCol = new SchemaCollection();
-        schemaCol.setBaseUri(baseURI);
-        NodeList nodes = document.getElementsByTagNameNS(
-            WSDLConstants.NS_SCHEMA_XSD, "schema");
-        for (int x = 0; x < nodes.getLength(); x++) {
-            Node schemaNode = nodes.item(x);
-            Element schemaEl = (Element) schemaNode;
-            String tns = schemaEl.getAttribute("targetNamespace");
-            try {
-                schemaCol.read(schemaEl, tns);
-            } catch (RuntimeException ex) {
-                LOG.log(Level.WARNING, "SCHEMA_READ_FAIL", tns);
-                //
-                // Couldn't find schema... check if it's relative to wsdl.
-                // XXX - Using setBaseUri() on the XmlSchemaCollection,
-                // only seems to work for the first imported xsd... so pass
-                // in the baseURI here.
-                //
+        synchronized (document) {
+            // URL might need encoding for special characters.
+            baseURI = URLEncoder.encode(baseURI, "utf-8");
+            SchemaCollection schemaCol = new SchemaCollection();
+            schemaCol.setBaseUri(baseURI);
+            NodeList nodes = document.getElementsByTagNameNS(
+                WSDLConstants.NS_SCHEMA_XSD, "schema");
+            for (int x = 0; x < nodes.getLength(); x++) {
+                Node schemaNode = nodes.item(x);
+                Element schemaEl = (Element) schemaNode;
+                String tns = schemaEl.getAttribute("targetNamespace");
                 try {
-                    schemaCol.read(schemaEl, baseURI);
-                } catch (RuntimeException ex2) {
-                    LOG.log(Level.WARNING, "SCHEMA_READ_FAIL", baseURI);
-                    continue;
+                    schemaCol.read(schemaEl, tns);
+                } catch (RuntimeException ex) {
+                    LOG.log(Level.WARNING, "SCHEMA_READ_FAIL", tns);
+                    //
+                    // Couldn't find schema... check if it's relative to wsdl.
+                    // XXX - Using setBaseUri() on the XmlSchemaCollection,
+                    // only seems to work for the first imported xsd... so pass
+                    // in the baseURI here.
+                    //
+                    try {
+                        schemaCol.read(schemaEl, baseURI);
+                    } catch (RuntimeException ex2) {
+                        LOG.log(Level.WARNING, "SCHEMA_READ_FAIL", baseURI);
+                        continue;
+                    }
                 }
             }
-        }
-        schemaList.add(schemaCol);
-        
-        // Now add schemas from imported wsdl files.
-        Map<String, Document> wsdlImports = getImportedWsdlMap(
-            document, baseURI);
-        for (Document wsdlImport : wsdlImports.values()) {
-            schemaList.addAll(getSchemaList(wsdlImport, baseURI));
-        }
-        
+            schemaList.add(schemaCol);
+            
+            // Now add schemas from imported wsdl files.
+            Map<String, Document> wsdlImports = getImportedWsdlMap(
+                document, baseURI);
+            for (Document wsdlImport : wsdlImports.values()) {
+                schemaList.addAll(getSchemaList(wsdlImport, baseURI));
+            }
+        }        
         return schemaList;
     }
     

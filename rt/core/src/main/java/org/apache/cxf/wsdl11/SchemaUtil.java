@@ -93,27 +93,29 @@ public final class SchemaUtil {
                     }
                 }
                 if (schemaElem != null) {
-                    for (Object prefix : def.getNamespaces().keySet()) {
-                        String ns = (String)def.getNamespaces().get(prefix);
-                        if (!"".equals(prefix) && !schemaElem.hasAttribute("xmlns:" + prefix)) {
-                            schemaElem.setAttributeNS(javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
-                                                      "xmlns:" + prefix, ns);
+                    synchronized (schemaElem.getOwnerDocument()) {
+                        for (Object prefix : def.getNamespaces().keySet()) {
+                            String ns = (String)def.getNamespaces().get(prefix);
+                            if (!"".equals(prefix) && !schemaElem.hasAttribute("xmlns:" + prefix)) {
+                                schemaElem.setAttributeNS(javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+                                                          "xmlns:" + prefix, ns);
+                            }
                         }
+                        String systemId = def.getDocumentBaseURI() + "#types" + schemaCount;
+    
+                        schemaCol.setBaseUri(def.getDocumentBaseURI());
+                        CatalogXmlSchemaURIResolver schemaResolver =
+                            new CatalogXmlSchemaURIResolver(OASISCatalogManager.getCatalogManager(bus));
+                        schemaCol.setSchemaResolver(schemaResolver);
+                        
+                        XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
+                        SchemaInfo schemaInfo = new SchemaInfo(serviceInfo, xmlSchema.getTargetNamespace());
+                        schemaInfo.setElement(schemaElem);
+                        schemaInfo.setSchema(xmlSchema);
+                        schemaInfo.setSystemId(systemId);
+                        serviceInfo.addSchema(schemaInfo);
+                        schemaCount++;
                     }
-                    String systemId = def.getDocumentBaseURI() + "#types" + schemaCount;
-
-                    schemaCol.setBaseUri(def.getDocumentBaseURI());
-                    CatalogXmlSchemaURIResolver schemaResolver =
-                        new CatalogXmlSchemaURIResolver(OASISCatalogManager.getCatalogManager(bus));
-                    schemaCol.setSchemaResolver(schemaResolver);
-                    
-                    XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
-                    SchemaInfo schemaInfo = new SchemaInfo(serviceInfo, xmlSchema.getTargetNamespace());
-                    schemaInfo.setElement(schemaElem);
-                    schemaInfo.setSchema(xmlSchema);
-                    schemaInfo.setSystemId(systemId);
-                    serviceInfo.addSchema(schemaInfo);
-                    schemaCount++;
                 }
             }
         }

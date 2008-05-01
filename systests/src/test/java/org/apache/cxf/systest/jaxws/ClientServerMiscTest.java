@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
@@ -263,6 +264,9 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
+        Set<Foo> fooSet = port.getFooSet();
+        assertEquals(2, fooSet.size());
+        
         assertEquals(24, port.echoIntDifferentWrapperName(24));
         
         String echoMsg = port.echo("Hello");

@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.jws.WebMethod;
@@ -124,5 +125,6 @@ public interface DocLitWrappedCodeFirstService {
         }
     }
     
+    Set<Foo> getFooSet();
 
 }

@@ -50,7 +50,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 
@@ -530,11 +529,11 @@ public final class StaxUtils {
             }
         }
 
-        NodeList nodes = e.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node n = nodes.item(i);
-            writeNode(n, writer, repairing);
-        }
+        Node nd = e.getFirstChild();
+        while (nd != null) {
+            writeNode(nd, writer, repairing);
+            nd = nd.getNextSibling();
+        }       
 
         if (endElement) {
             writer.writeEndElement();
@@ -545,10 +544,10 @@ public final class StaxUtils {
         throws XMLStreamException {
         if (n instanceof Element) {
             writeElement((Element)n, writer, repairing);
-        } else if (n instanceof Text) {
-            writer.writeCharacters(((Text)n).getNodeValue());
         } else if (n instanceof CDATASection) {
             writer.writeCData(((CDATASection)n).getData());
+        } else if (n instanceof Text) {
+            writer.writeCharacters(((Text)n).getNodeValue());
         } else if (n instanceof Comment) {
             writer.writeComment(((Comment)n).getData());
         } else if (n instanceof EntityReference) {

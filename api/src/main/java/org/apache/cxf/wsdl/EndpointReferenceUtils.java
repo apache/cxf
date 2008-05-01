@@ -564,14 +564,11 @@ public final class EndpointReferenceUtils {
         return null;
     }
     
-    public static Schema getSchema(ServiceInfo serviceInfo) {
-        if (serviceInfo == null) {
-            return null;
-        }
+    
+    private static Schema createSchema(ServiceInfo serviceInfo) {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
-        if (schema == null && !serviceInfo.hasProperty(Schema.class.getName())) {
-            SchemaFactory factory = SchemaFactory.newInstance(
-                XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        if (schema == null) {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             List<Source> schemaSources = new ArrayList<Source>();
             for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
                 Source source = new DOMSource(schemaInfo.getElement());
@@ -594,7 +591,20 @@ public final class EndpointReferenceUtils {
                     LOG.log(Level.WARNING, "Schema for: " + schemaInfo.getNamespaceURI() + "\n" + s);
                 }
             }
-            serviceInfo.setProperty(Schema.class.getName(), schema);            
+            serviceInfo.setProperty(Schema.class.getName(), schema);
+        }
+        return schema;
+    }
+    
+    public static Schema getSchema(ServiceInfo serviceInfo) {
+        if (serviceInfo == null) {
+            return null;
+        }
+        Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
+        if (schema == null && !serviceInfo.hasProperty(Schema.class.getName())) {
+            synchronized (serviceInfo) {
+                return createSchema(serviceInfo);
+            }
         }
         return schema;
     }
