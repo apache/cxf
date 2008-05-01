@@ -33,191 +33,123 @@ public class WSDLValidationTest extends ToolTestBase {
     }
 
     @Test
-    public void testValidateUniqueBody() {
-        try {
-
-            String[] args = new String[] {"-verbose", getLocation("/validator_wsdl/doc_lit_bare.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue("Non Unique Body Parts Error should be discovered: " + getStdErr(),
-                       getStdErr().indexOf("Non unique body part") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void testValidateUniqueBody() throws Exception {
+        String[] args = new String[] {"-verbose", getLocation("/validator_wsdl/doc_lit_bare.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue("Non Unique Body Parts Error should be discovered: " + getStdErr(),
+                   getStdErr().indexOf("Non unique body part") > -1);
     }
 
     @Test
-    public void testValidateMixedStyle() {
-        try {
-
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/hello_world_mixed_style.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue("Mixed style. Error should have been discovered: " + getStdErr(),
-                       getStdErr().indexOf("Mixed style, invalid WSDL") > -1);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void testValidateMixedStyle() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_mixed_style.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue("Mixed style. Error should have been discovered: " + getStdErr(),
+                   getStdErr().indexOf("Mixed style, invalid WSDL") > -1);
     }
 
     @Test
-    public void testValidateTypeElement() {
-        try {
-
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/hello_world_doc_lit_type.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue("Must refer to type element error should have been discovered: " + getStdErr(),
-                       getStdErr().indexOf("using the element attribute") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void testValidateTypeElement() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_doc_lit_type.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue("Must refer to type element error should have been discovered: " + getStdErr(),
+                   getStdErr().indexOf("using the element attribute") > -1);
     }
 
     @Test
-    public void testValidateAttribute() {
-        try {
-
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/hello_world_error_attribute.wsdl")};
-            WSDLValidator.main(args);
-            String expected = "WSDLException (at /wsdl:definitions/wsdl:message[1]/wsdl:part): "
-                + "faultCode=INVALID_WSDL: Encountered illegal extension attribute 'test'. "
-                + "Extension attributes must be in a namespace other than WSDL's";
-            assertTrue("Attribute error should be discovered: " + getStdErr(),
-                       getStdErr().indexOf(expected) > -1);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void testValidateAttribute() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_error_attribute.wsdl")};
+        WSDLValidator.main(args);
+        String expected = "WSDLException (at /wsdl:definitions/wsdl:message[1]/wsdl:part): "
+            + "faultCode=INVALID_WSDL: Encountered illegal extension attribute 'test'. "
+            + "Extension attributes must be in a namespace other than WSDL's";
+        assertTrue("Attribute error should be discovered: " + getStdErr(),
+                   getStdErr().indexOf(expected) > -1);
     }
 
     @Test
     public void testValidateReferenceError() throws Exception {
-
-        try {
-
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/hello_world_error_reference.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdErr().indexOf("[147,3]") != -1);
-            assertTrue(getStdErr().indexOf("Caused by {http://apache.org/hello_world_soap_http}"
-                                           + "[binding:Greeter_SOAPBinding1] not exist.") != -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }        
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_error_reference.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("[147,3]") != -1);
+        assertTrue(getStdErr().indexOf("Caused by {http://apache.org/hello_world_soap_http}"
+                                       + "[binding:Greeter_SOAPBinding1] not exist.") != -1);
     }
 
     @Test
     public void testBug305872() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/bug305872/http.xsd")};
-            WSDLValidator.main(args);
-            String expected = "Expected element '{http://schemas.xmlsoap.org/wsdl/}definitions'.";
-            assertTrue("Tools should check if this file is a wsdl file: " + getStdErr(),
-                       getStdErr().indexOf(expected) > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/bug305872/http.xsd")};
+        WSDLValidator.main(args);
+        String expected = "Expected element '{http://schemas.xmlsoap.org/wsdl/}definitions'.";
+        assertTrue("Tools should check if this file is a wsdl file: " + getStdErr(),
+                   getStdErr().indexOf(expected) > -1);
     }
 
     @Test
     public void testImportWsdlValidation() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/hello_world_import.wsdl")};
-            WSDLValidator.main(args);
-            
-            assertTrue("Is not valid wsdl!: " + getStdOut(),
-                       getStdOut().indexOf("Passed Validation") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_import.wsdl")};
+        WSDLValidator.main(args);
+        
+        assertTrue("Is not valid wsdl!: " + getStdOut(),
+                   getStdOut().indexOf("Passed Validation") > -1);
     }
 
     @Test
     public void testImportSchemaValidation() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/hello_world_schema_import.wsdl")};
-            WSDLValidator.main(args);
-            
-            assertTrue("Is not valid wsdl: " + getStdOut(),
-                       getStdOut().indexOf("Passed Validation") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_schema_import.wsdl")};
+        WSDLValidator.main(args);
+        
+        assertTrue("Is not valid wsdl: " + getStdOut(),
+                   getStdOut().indexOf("Passed Validation") > -1);
     }
 
     @Test
     public void testWSIBP2210() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/soapheader.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2210") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/soapheader.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2210") > -1);
     }
 
     @Test
     public void testWSIBPR2726() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/jms_test.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2726") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/jms_test.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2726") > -1);
     }
 
     @Test
     public void testWSIBPR2205() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/jms_test2.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2205") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/jms_test2.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2205") > -1);
     }
 
     @Test
     public void testWSIBPR2203() throws Exception {
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/header_rpc_lit.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdOut().indexOf("Passed Validation : Valid WSDL") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("No exception expected here, header_rpc_lit is a valid wsdl");
-        }
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/header_rpc_lit.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdOut().indexOf("Passed Validation : Valid WSDL") > -1);
 
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/header_rpc_lit_2203_in.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdErr().indexOf("soapbind:body element(s), only to wsdl:part element(s)") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        args = new String[] {"-verbose",
+                             getLocation("/validator_wsdl/header_rpc_lit_2203_in.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("soapbind:body element(s), only to wsdl:part element(s)") > -1);
 
-        try {
-            String[] args = new String[] {"-verbose",
-                                          getLocation("/validator_wsdl/header_rpc_lit_2203_out.wsdl")};
-            WSDLValidator.main(args);
-            assertTrue(getStdErr().indexOf("soapbind:body element(s), only to wsdl:part element(s)") > -1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        args = new String[] {"-verbose",
+                             getLocation("/validator_wsdl/header_rpc_lit_2203_out.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("soapbind:body element(s), only to wsdl:part element(s)") > -1);
     }
 
     @Test
