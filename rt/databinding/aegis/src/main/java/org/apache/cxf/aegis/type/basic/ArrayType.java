@@ -266,8 +266,10 @@ public class ArrayType extends Type {
         } else {
             type.writeObject(value, cwriter, context);
         }
-
-        cwriter.close();
+        
+        if (type.isWriteOuter()) {
+            cwriter.close();
+        }
     }
 
     @Override
