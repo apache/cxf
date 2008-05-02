@@ -20,7 +20,6 @@
 package org.apache.cxf.common.xmlschema;
 
 import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.Method;
 
 import javax.xml.namespace.QName;
@@ -204,19 +203,14 @@ public class SchemaCollection {
     }
 
     /**
-     * This is a really ugly trick to get around a bug or oversight in XmlSchema, which is that
-     * there is no way to programmatically construct an XmlSchema instance that ends up cataloged
-     * in a collection. If there is a fix to WSCOMMONS-272, this can go away.
+     * Once upon a time, XmlSchema had a bug in the constructor used in this function. So this wrapper was
+     * created to hold a workaround.
      * @param namespaceURI TNS for new schema.
      * @return new schema
      */
 
     public XmlSchema newXmlSchemaInCollection(String namespaceURI) {
-        StringBuffer tinyXmlSchemaDocument = new StringBuffer();
-        tinyXmlSchemaDocument.append("<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' ");
-        tinyXmlSchemaDocument.append("targetNamespace='" + namespaceURI + "'/>");
-        StringReader reader = new StringReader(tinyXmlSchemaDocument.toString());
-        return schemaCollection.read(reader, new ValidationEventHandler() { });
+        return new XmlSchema(namespaceURI, schemaCollection);
     }
     
     /**
