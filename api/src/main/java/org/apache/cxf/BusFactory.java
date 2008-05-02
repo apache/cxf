@@ -195,6 +195,21 @@ public abstract class BusFactory {
             } else {
                 is = classLoader.getResourceAsStream(serviceId);        
             }
+            if (is == null) {
+                serviceId = "META-INF/cxf/" + BusFactory.BUS_FACTORY_PROPERTY_NAME;
+            
+                if (classLoader == null) {
+                    classLoader = Thread.currentThread().getContextClassLoader();
+                }
+            
+                if (classLoader == null) {
+                    is = ClassLoader.getSystemResourceAsStream(serviceId);
+                } else {
+                    is = classLoader.getResourceAsStream(serviceId);        
+                }
+            }
+            
+            
             if (is != null) {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 busFactoryClass = rd.readLine();
@@ -228,3 +243,4 @@ public abstract class BusFactory {
     }
     
 }
+ 
