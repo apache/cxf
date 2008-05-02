@@ -123,7 +123,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                    requestContentType,
                                                                    acceptContentTypes));
         }
-        LOG.info("Found operation: " + ori.getMethod().getName());
+        LOG.fine("Found operation: " + ori.getMethod().getName());
         
         message.getExchange().put(OperationResourceInfo.class, ori);
         message.put(RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));

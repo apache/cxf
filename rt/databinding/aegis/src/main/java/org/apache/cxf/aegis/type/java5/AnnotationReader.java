@@ -295,7 +295,7 @@ public class AnnotationReader {
         return null;
     }
 
-    private static Object getAnnotationValue(String name,
+    Object getAnnotationValue(String name,
             Method method,
             int index,
             Object ignoredValue,
