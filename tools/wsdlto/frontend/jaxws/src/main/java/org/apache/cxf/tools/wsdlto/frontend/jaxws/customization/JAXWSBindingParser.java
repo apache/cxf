@@ -62,8 +62,8 @@ public class JAXWSBindingParser {
     }
 
     void parseElement(JAXWSBinding jaxwsBinding, Element element) {
-        NodeList children = element.getChildNodes();
-        if (children != null && children.getLength() == 0) {
+        Node child = element.getFirstChild();
+        if (child == null) {
             // global binding
             if (isAsyncElement(element)) {
                 jaxwsBinding.setEnableAsyncMapping(getNodeValue(element));
@@ -78,33 +78,20 @@ public class JAXWSBindingParser {
             if (isWrapperStyle(element)) {
                 jaxwsBinding.setEnableWrapperStyle(getNodeValue(element));
             }
-        }
-
-        if (children != null && children.getLength() > 0) {
+        } else {
             // other binding
-            for (int i = 0; i < children.getLength(); i++) {
-                Node child = children.item(i);
-
+            while (child != null) {
                 if (isAsyncElement(child)) {
                     jaxwsBinding.setEnableAsyncMapping(getNodeValue(child));
-                }
-                if (isMIMEElement(child)) {
+                } else if (isMIMEElement(child)) {
                     jaxwsBinding.setEnableMime(getNodeValue(child));
-                }
-
-                if (isWrapperStyle(child)) {
+                } else if (isWrapperStyle(child)) {
                     jaxwsBinding.setEnableWrapperStyle(getNodeValue(child));
-                }
-
-                if (isPackageElement(child)) {
+                } else if (isPackageElement(child)) {
                     jaxwsBinding.setPackage(getPackageName(child));
-                }
-
-                if (isJAXWSMethodElement(child)) {
+                } else if (isJAXWSMethodElement(child)) {
                     jaxwsBinding.setMethodName(getMethodName(child));
-                }
-
-                if (isJAXWSParameterElement(child)) {
+                } else if (isJAXWSParameterElement(child)) {
                     Element childElement = (Element)child;
                     String partPath = "//" +  childElement.getAttribute("part");
                     Node node = queryXPathNode(element.getOwnerDocument().getDocumentElement(), partPath);
@@ -121,9 +108,7 @@ public class JAXWSBindingParser {
                     String elementName = childElement.getAttribute("childElementName");
                     JAXWSParameter jpara = new JAXWSParameter(messageName, elementName, name);
                     jaxwsBinding.setJaxwsPara(jpara);
-                }
-
-                if (isJAXWSClass(child)) {
+                } else if (isJAXWSClass(child)) {
                     Element childElement = (Element)child;
                     String clzName = childElement.getAttribute("name");
                     String javadoc = "";
@@ -136,6 +121,7 @@ public class JAXWSBindingParser {
                     JAXWSClass jaxwsClass = new JAXWSClass(clzName, javadoc);
                     jaxwsBinding.setJaxwsClass(jaxwsClass);
                 }
+                child = child.getNextSibling();
             }
         }
 

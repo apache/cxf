@@ -364,7 +364,10 @@ public final class DynamicClientFactory {
         throws URISyntaxException, IOException {
         
         JarFile jar = new JarFile(file);
-        Attributes attr = jar.getManifest().getMainAttributes();
+        Attributes attr = null;
+        if (jar.getManifest() != null) {
+            attr = jar.getManifest().getMainAttributes();
+        }
         if (attr != null) {
             String cp = attr.getValue("Class-Path");
             while (cp != null) {
