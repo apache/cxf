@@ -83,8 +83,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/core</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/core</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/core</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/core</developerConnection>
     </scm>
 
 </project>

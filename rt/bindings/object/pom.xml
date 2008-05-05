@@ -76,8 +76,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/bindings/object</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/rt/bindings/object</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/bindings/object</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/bindings/object</developerConnection>
     </scm>
 
 </project>

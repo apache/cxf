@@ -247,8 +247,8 @@
     </profiles>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/api</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/api</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/api</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/api</developerConnection>
     </scm>
 
 </project>

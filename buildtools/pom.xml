@@ -116,8 +116,8 @@
     </build-->
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/buildtools</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/buildtools</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/buildtools</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/buildtools</developerConnection>
     </scm>
 
 </project>

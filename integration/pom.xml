@@ -38,8 +38,8 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/integration</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/integration</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/integration</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/integration</developerConnection>
     </scm>
 
 </project>

@@ -40,8 +40,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/common</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/common</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common</developerConnection>
     </scm>
 
 </project>

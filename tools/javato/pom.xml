@@ -36,7 +36,7 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/tools/javato</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/tools/javato</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/tools/javato</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/tools/javato</developerConnection>
     </scm>
 </project>

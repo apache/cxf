@@ -86,7 +86,7 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/integration/jbi</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/integration/jbi</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/integration/jbi</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/integration/jbi</developerConnection>
     </scm>
 </project>

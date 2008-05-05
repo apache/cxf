@@ -31,8 +31,8 @@
     <version>2.1.1-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/systests</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/systests</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/systests</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/systests</developerConnection>
     </scm>
     <build>
         <plugins>

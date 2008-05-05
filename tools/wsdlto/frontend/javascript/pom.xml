@@ -77,8 +77,8 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/tools/wsdlto/frontend/javascript</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/tools/wsdlto/frontend/javascript</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/tools/wsdlto/frontend/javascript</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/tools/wsdlto/frontend/javascript</developerConnection>
     </scm>
 
 

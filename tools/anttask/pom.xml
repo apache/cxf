@@ -84,8 +84,8 @@
     </build>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/cxf/trunk/tools/anttask</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/cxf/trunk/tools/anttask</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/tools/anttask</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/tools/anttask</developerConnection>
     </scm>
 
 </project>
