@@ -57,7 +57,7 @@ public class JBIDestinationTest extends AbstractJBITest {
         channel.send(messageExchange);
         EasyMock.replay(channel);
         
-        JBIDestinationOutputStream jbiOS = new JBIDestinationOutputStream(message, channel);
+        JBIDestinationOutputStream jbiOS = new JBIDestinationOutputStream(message, null, channel);
         
         //Create array of more than what is in threshold in CachedOutputStream, 
         //though the threshold in CachedOutputStream should be made protected 

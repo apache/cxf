@@ -118,7 +118,7 @@ public class JBIDestination extends AbstractDestination {
             DeliveryChannel dc = channel;
             message.put(MessageExchange.class, inMessage.get(MessageExchange.class));
             message.setContent(OutputStream.class,
-                               new JBIDestinationOutputStream(inMessage, dc));
+                               new JBIDestinationOutputStream(inMessage, message, dc));
         }        
 
         protected Logger getLogger() {

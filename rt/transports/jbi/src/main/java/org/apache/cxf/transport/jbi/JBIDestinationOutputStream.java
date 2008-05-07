@@ -43,12 +43,15 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JBIDestinationOutputStream.class);
     private Message inMessage;
+    private Message outMessage;
     private DeliveryChannel channel;
     
     public JBIDestinationOutputStream(Message m, 
+                               Message outM,
                                DeliveryChannel dc) {
         super();
         inMessage = m;
+        outMessage = outM;
         channel = dc;
     }
     
@@ -97,8 +100,8 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                 } else {
                     NormalizedMessage msg = xchng.createMessage();
                     //copy attachments
-                    if (inMessage.getAttachments() != null) {
-                        for (Attachment att : inMessage.getAttachments()) {
+                    if (outMessage != null && outMessage.getAttachments() != null) {
+                        for (Attachment att : outMessage.getAttachments()) {
                             msg.addAttachment(att.getId(), att
                                     .getDataHandler());
                         }
