@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
 public class JBIDestinationOutputStream extends CachedOutputStream {
@@ -95,6 +96,13 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                     }
                 } else {
                     NormalizedMessage msg = xchng.createMessage();
+                    //copy attachments
+                    if (inMessage.getAttachments() != null) {
+                        for (Attachment att : inMessage.getAttachments()) {
+                            msg.addAttachment(att.getId(), att
+                                    .getDataHandler());
+                        }
+                    }
                     msg.setContent(new DOMSource(doc));
                     xchng.setMessage(msg, "out");
                     
