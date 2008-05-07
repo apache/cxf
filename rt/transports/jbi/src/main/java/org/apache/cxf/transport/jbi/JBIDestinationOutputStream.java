@@ -21,6 +21,7 @@ package org.apache.cxf.transport.jbi;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,6 +107,12 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                                     .getDataHandler());
                         }
                     }
+                    //copy properties
+                    Set<String> keys = inMessage.keySet();
+                    for (String key : keys) {
+                        msg.setProperty(key, inMessage.get(key));
+                    }
+                    //copy contents
                     msg.setContent(new DOMSource(doc));
                     xchng.setMessage(msg, "out");
                     

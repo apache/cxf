@@ -21,6 +21,7 @@ package org.apache.cxf.transport.jbi;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -132,9 +133,16 @@ public final class JBIDispatcherUtil {
         getLogger().fine("dispatch method: " + opName);
                 
         NormalizedMessage nm = exchange.getMessage("in");
+        
         try {
 
             MessageImpl inMessage = new MessageImpl();
+            Set normalizedMessageProps = nm.getPropertyNames();
+            for (Object name : normalizedMessageProps) {
+                inMessage.put((String)name, nm.getProperty((String)name));
+                
+            }
+                        
             inMessage.put(MessageExchange.class, exchange);
             
             
