@@ -516,7 +516,15 @@ public final class StaxUtils {
                         declareNamespace = false;
                     }
                 } else {
-                    writer.writeAttribute(attrPrefix, attr.getNamespaceURI(), name, attr.getNodeValue());
+                    String attns = attr.getNamespaceURI();
+                    String value = attr.getNodeValue();
+                    if (attns == null || attns.length() == 0) {
+                        writer.writeAttribute(name, value);
+                    } else if (attrPrefix == null || attrPrefix.length() == 0) {
+                        writer.writeAttribute(attns, name, value);
+                    } else {
+                        writer.writeAttribute(attrPrefix, attns, name, value);
+                    }                    
                 }
             }
         }
