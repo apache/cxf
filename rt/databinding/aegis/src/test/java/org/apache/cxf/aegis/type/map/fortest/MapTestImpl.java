@@ -61,4 +61,11 @@ public class MapTestImpl implements MapTest {
     public void takeMapNs2(ObjectWithAMapNs2 map) {
     }
 
+    @SuppressWarnings("unchecked")
+    public Map getRawMapStringToInteger() {
+        Map r = new HashMap();
+        r.put("key", new Integer(12));
+        return r;
+    }
+
 }

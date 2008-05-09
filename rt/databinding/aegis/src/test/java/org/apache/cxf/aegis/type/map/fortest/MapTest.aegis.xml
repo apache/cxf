@@ -20,10 +20,13 @@
 <mappings>
 	<mapping>
 		<method name="getMapStringToLong">
-			<return-type valueType='java.lang.Integer' typeName="mstl"  />
+			<return-type typeName="mstl"  />
+		</method>
+		<method name="getRawMapStringToInteger">
+		  <return-type valueType="java.lang.Integer"/>
 		</method>
 		<method name="getMapLongToString">
-			<return-type typeName="mslt" />
+			<return-type typeName="mlts" />
 		</method>
 	</mapping>
 </mappings>
