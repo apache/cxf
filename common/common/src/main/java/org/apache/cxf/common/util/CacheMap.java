@@ -37,7 +37,9 @@ import java.util.WeakHashMap;
  * may reference the data keep the data in the cache.
  *
  * <b>
- * Note that this implementation is not synchronized.
+ * Note that this implementation is not synchronized. Not even a little. 
+ * 'Read-only' operations can trigger internal modifications. If you share this 
+ * class between threads, you must protect every operation.
  * </b>
  */
 public class CacheMap<K, V> implements Map<K, V> {
