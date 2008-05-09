@@ -37,6 +37,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -69,6 +70,7 @@ public class MapsTest extends AbstractAegisTest {
         clientInterface = (MapTest)proxyFac.create(); 
     }
     
+    @Ignore
     @Test
     public void testMapWsdl() throws WSDLException {
         @SuppressWarnings("unused")
