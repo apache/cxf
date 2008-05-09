@@ -411,6 +411,8 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <minmemory>128m</minmemory>
+                            <maxmemory>512m</maxmemory>
                             <header>Apache CXF API</header>
                             <footer>Apache CXF API</footer>
                             <sourcepath>${project.build.directory}/sources</sourcepath>
