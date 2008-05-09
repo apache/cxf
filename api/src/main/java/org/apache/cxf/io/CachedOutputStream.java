@@ -267,7 +267,7 @@ public class CachedOutputStream extends OutputStream {
             int x = fin.read(bytes);
             while (x != -1) {
                 if ((count + x) > limit) {
-                    x = count - limit;
+                    x = limit - count;
                 }
                 out.append(new String(bytes, 0, x));
                 count += x;
