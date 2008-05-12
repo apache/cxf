@@ -41,7 +41,7 @@ import org.apache.cxf.common.util.StringUtils;
  * application must provide an object that extends {@link AbstractDelegatingLogger}, and advertise that class
  * via one of the following mechanisms:
  * <ul>
- * <li>Create a file, in the classpath, named META-INF/cxf/org.apache.cxf.logger. 
+ * <li>Create a file, in the classpath, named META-INF/cxf/org.apache.cxf.Logger. 
  * This file should contain the fully-qualified name
  * of the class, with no comments, on a single line.</li>
  * <li>Call {@link #setLoggerClass(Class)} with a Class<?> reference to the logger class.</li>
