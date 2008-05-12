@@ -32,6 +32,7 @@ public class XNode {
     private QName name;
     private String attributeName;
     private String attributeValue;
+    private boolean isDefaultAttributeValue;
     private XNode parentNode;
 
     private XNode failurePoint;
@@ -77,7 +78,14 @@ public class XNode {
     public void setAttributeValue(final String newAttributeValue) {
         this.attributeValue = newAttributeValue;
     }
-
+    
+    public void setDefaultAttributeValue(boolean b) {
+        this.isDefaultAttributeValue = b;
+    }
+    public boolean isDefaultAttributeValue() {
+        return this.isDefaultAttributeValue;
+    }
+    
     public XNode getParentNode() {
         return parentNode;
     }
@@ -118,11 +126,18 @@ public class XNode {
         sb.append(":");
         sb.append(name.getLocalPart());
         if (!StringUtils.isEmpty(attributeName) && !StringUtils.isEmpty(attributeValue)) {
-            sb.append("[@");
+            sb.append("[");
+            if (isDefaultAttributeValue) {
+                sb.append("not(@");
+                sb.append(attributeName);
+                sb.append(") or ");
+            }
+            sb.append("@");
             sb.append(attributeName);
             sb.append("='");
             sb.append(attributeValue);
-            sb.append("']");
+            sb.append("'");
+            sb.append("]");
         }
         return sb.toString();
     }

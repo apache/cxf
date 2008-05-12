@@ -329,6 +329,10 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         XInput oNode = new XInput();
         oNode.setName(name);
         oNode.setParentNode(opVNode);
+        
+        if (name != null && name.equals(opVNode.getAttributeValue() + "Request")) {
+            oNode.setDefaultAttributeValue(true);
+        }
         return oNode;
     }
 
@@ -336,6 +340,9 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         XOutput oNode = new XOutput();
         oNode.setName(name);
         oNode.setParentNode(opVNode);
+        if (name != null && name.equals(opVNode.getAttributeValue() + "Response")) {
+            oNode.setDefaultAttributeValue(true);
+        }
         return oNode;
     }
 

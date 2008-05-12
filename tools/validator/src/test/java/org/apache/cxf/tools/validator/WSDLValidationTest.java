@@ -31,6 +31,14 @@ public class WSDLValidationTest extends ToolTestBase {
     public void setUp() {
         super.setUp();
     }
+    
+    @Test
+    public void testValidateDefaultOpMessageNames() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/defaultOpMessageNames.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(this.getStdOut().contains("Valid WSDL"));
+    }
 
     @Test
     public void testValidateUniqueBody() throws Exception {

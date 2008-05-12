@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="defaults.wsdl" 
+
+   targetNamespace="http://www.iona.com/artix/defaults" 
+
+   xmlns="http://schemas.xmlsoap.org/wsdl/" 
+
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+
+   xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" 
+
+   xmlns:tns="http://www.iona.com/artix/defaults" 
+
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+   <types>
+
+       <xsd:schema targetNamespace="http://www.iona.com/artix/defaults"
+
+
+           xmlns="http://www.iona.com/artix/defaults" 
+
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+           <xsd:complexType name="TestType">
+
+               <xsd:sequence>
+
+                   <xsd:element maxOccurs="1" minOccurs="1" name="msg"
+type="xsd:string"/>
+
+                   <xsd:element maxOccurs="1" minOccurs="1" name="num"
+type="xsd:int"/>
+
+               </xsd:sequence>
+
+           </xsd:complexType>
+
+           <xsd:element name="Test" type="TestType"/>
+
+       </xsd:schema>
+
+   </types>
+
+
+
+   <message name="TestMessage">
+
+       <part element="tns:Test" name="params"/>
+
+   </message>
+
+
+
+   <portType name="TestPortType">
+
+       <operation name="Test">
+
+           <input message="tns:TestMessage"/>
+
+           <output message="tns:TestMessage"/>
+
+       </operation>
+
+   </portType>
+
+
+
+   <binding name="TestPortTypeDefaults" type="tns:TestPortType">
+
+       <soap:binding style="document"
+transport="http://schemas.xmlsoap.org/soap/http"/>
+
+       <operation name="Test">
+
+           <soap:operation soapAction="" style="document"/>
+
+
+
+           <input name="TestRequest">
+
+               <soap:body use="literal"/>
+
+           </input>
+
+
+
+           <output name="TestResponse">
+
+               <soap:body use="literal"/>
+
+           </output>
+
+
+
+       </operation>
+
+   </binding>
+
+
+
+   <service name="TestService">
+
+       <port binding="tns:TestPortTypeDefaults" name="TestPort">
+
+           <soap:address location="http://localhost:9100/TestService"/>
+
+       </port>
+
+   </service>
+
+
+
+</definitions>
+
