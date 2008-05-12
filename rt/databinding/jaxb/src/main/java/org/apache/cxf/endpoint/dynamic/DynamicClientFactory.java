@@ -61,7 +61,6 @@ import com.sun.tools.xjc.api.XJC;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
@@ -404,20 +403,22 @@ public final class DynamicClientFactory {
                 URL[] urls = ((URLClassLoader)tcl).getURLs();
                 for (URL url : urls) {
                     if (url.getProtocol().startsWith("file")) {
-                        try {
-                            File file = new File(url.toURI().getPath());
-                            if (file.exists()) {
-                                classPath.append(file.getAbsolutePath())
-                                    .append(System
-                                            .getProperty("path.separator"));                                
-                            }
-                               
-                            if (file.getName().endsWith(".jar")) {
-                                addClasspathFromManifest(classPath, file);
-                            }
-                        } catch (URISyntaxException e) {
-                            throw new UncheckedException(e);
-                        }
+                        File file; 
+                        try { 
+                            file = new File(url.toURI().getPath()); 
+                        } catch (URISyntaxException urise) { 
+                            file = new File(url.getPath()); 
+                        } 
+
+                        if (file.exists()) { 
+                            classPath.append(file.getAbsolutePath()) 
+                                .append(System 
+                                        .getProperty("path.separator")); 
+
+                            if (file.getName().endsWith(".jar")) { 
+                                addClasspathFromManifest(classPath, file); 
+                            }                         
+                        }     
                     }
                 }
             }
