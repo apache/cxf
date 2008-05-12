@@ -64,19 +64,22 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
         return name;
     }
     
-    private boolean nameEquals(String a, String b) {
+    private boolean nameEquals(String a, String b, String def) {
         if (a == null) {
             // in case of input/output itself is empty
             return true;
         } else {
+            if (b == null) {
+                b = def;
+            }
             return "".equals(a) ? "".equals(b) : a.equals(b);
         }
     }
     public BindingOperationInfo buildOperation(QName opName, String inName, String outName) {
         for (OperationInfo op : getInterface().getOperations()) {
             if (opName.equals(op.getName())
-                && nameEquals(inName, op.getInputName())
-                && nameEquals(outName, op.getOutputName())) {
+                && nameEquals(inName, op.getInputName(), op.getName().getLocalPart() + "Request")
+                && nameEquals(outName, op.getOutputName(), op.getName().getLocalPart() + "Response")) {
                 
                 return new BindingOperationInfo(this, op);
             }
