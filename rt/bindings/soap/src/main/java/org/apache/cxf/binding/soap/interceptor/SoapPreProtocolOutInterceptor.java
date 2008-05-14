@@ -27,6 +27,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import static org.apache.cxf.message.Message.MIME_HEADERS;
@@ -71,6 +72,8 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
             soapVersion = Soap11.getInstance();
             message.setVersion(soapVersion);
         }
+        
+        message.put(Message.CONTENT_TYPE, soapVersion.getContentType());
     }
     
     /**

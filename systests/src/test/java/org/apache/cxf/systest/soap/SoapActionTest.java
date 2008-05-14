@@ -19,54 +19,70 @@
 
 package org.apache.cxf.systest.soap;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.hello_world_soap_action.Greeter;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SoapActionTest extends AbstractCXFTest {
+public class SoapActionTest extends Assert {
+    static Bus bus;
+    static String add11 = "http://localhost:9036/test11";
+    static String add12 = "http://localhost:9036/test12";
 
 
-    @Test
-    public void testEndpoint() throws Exception {
-        String add = "http://localhost:9036/test";
+    @BeforeClass
+    public static void createServers() throws Exception {
+        bus = BusFactory.getDefaultBus();
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new SoapActionGreeterImpl());
-        sf.setAddress(add);
-        sf.setBus(getBus());
+        sf.setAddress(add11);
+        sf.setBus(bus);
         sf.create();
-
-        JaxWsProxyFactoryBean pf = new JaxWsProxyFactoryBean();
-        pf.setServiceClass(Greeter.class);
-        pf.setAddress(add);
-        pf.setBus(getBus());
-        Greeter greeter = (Greeter) pf.create();
         
-        assertEquals("sayHi", greeter.sayHi("test"));
-        assertEquals("sayHi2", greeter.sayHi2("test"));
-        
-    }
-    
-    @Test
-    public void testSoap12Endpoint() throws Exception {
-        String add = "http://localhost:9036/test";
-        JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
+        sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new SoapActionGreeterImpl());
-        sf.setAddress(add);
-        sf.setBus(getBus());
+        sf.setAddress(add12);
+        sf.setBus(bus);
         SoapBindingConfiguration config = new SoapBindingConfiguration();
         config.setVersion(Soap12.getInstance());
         sf.setBindingConfig(config);
         sf.create();
+    }
+    @AfterClass
+    public static void shutdown() throws Exception {
+        bus.shutdown(true);
+    }
+    
+
+    @Test
+    public void testEndpoint() throws Exception {
+        JaxWsProxyFactoryBean pf = new JaxWsProxyFactoryBean();
+        pf.setServiceClass(Greeter.class);
+        pf.setAddress(add11);
+        pf.setBus(bus);
+        Greeter greeter = (Greeter) pf.create();
+        
+        assertEquals("sayHi", greeter.sayHi("test"));
+        assertEquals("sayHi2", greeter.sayHi2("test"));        
+    }
+    
+    @Test
+    public void testSoap12Endpoint() throws Exception {
 
         JaxWsProxyFactoryBean pf = new JaxWsProxyFactoryBean();
         pf.setServiceClass(Greeter.class);
-        pf.setAddress(add);
+        pf.setAddress(add12);
+        SoapBindingConfiguration config = new SoapBindingConfiguration();
+        config.setVersion(Soap12.getInstance());
         pf.setBindingConfig(config);
-        pf.setBus(getBus());
+        pf.setBus(bus);
         
         Greeter greeter = (Greeter) pf.create();
         
