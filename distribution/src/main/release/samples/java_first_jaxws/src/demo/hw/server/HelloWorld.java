@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+// START SNIPPET: service
+
 @WebService
 public interface HelloWorld {
 
