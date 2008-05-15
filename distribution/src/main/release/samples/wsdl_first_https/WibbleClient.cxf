@@ -36,7 +36,7 @@
            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
-    <http:tlsClientParameters>
+    <http:tlsClientParameters disableCNCheck="true">
       <sec:trustManagers>
           <sec:keyStore type="JKS" password="password"
                file="certs/truststore.jks"/>
@@ -58,8 +58,5 @@
       </sec:cipherSuitesFilter>
     </http:tlsClientParameters>
    </http:conduit>
-  
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-    </bean> 
+</beans> 
 
-</beans>

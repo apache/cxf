@@ -40,7 +40,7 @@
   <http:destination name="{http://apache.org/hello_world_soap_http}GreeterPort.http-destination"> 
   </http:destination>
 
-  <httpj:engine-factory bus="cxf">
+  <httpj:engine-factory>
    <httpj:engine port="9001">
     <httpj:tlsServerParameters>
       <sec:keyManagers keyPassword="password">
@@ -66,7 +66,4 @@
     </httpj:tlsServerParameters>
    </httpj:engine>
   </httpj:engine-factory>
-  
-  <!-- We need a bean named "cxf" -->
-  <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
 </beans>
