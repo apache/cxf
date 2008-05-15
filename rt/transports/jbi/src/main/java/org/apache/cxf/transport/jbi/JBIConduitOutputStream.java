@@ -131,6 +131,9 @@ public class JBIConduitOutputStream extends CachedOutputStream {
                     if (outMsg != null) {
                         content = outMsg.getContent();
                     } else {
+                        if (((InOut)xchng).getFault() == null) {
+                            throw xchng.getError();
+                        }
                         content = ((InOut)xchng).getFault().getContent();
                     }
                     Message inMessage = new MessageImpl();
