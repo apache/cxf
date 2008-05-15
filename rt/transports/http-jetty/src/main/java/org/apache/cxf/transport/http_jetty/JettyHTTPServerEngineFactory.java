@@ -198,7 +198,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         } 
         // checking the protocol    
         if (!protocol.equals(ref.getProtocol())) {
-            throw new IOException("Protocol mismatch: "
+            throw new IOException("Protocol mismatch for port " + port + ": "
                         + "engine's protocol is " + ref.getProtocol()
                         + ", the url protocol is " + protocol);
         }
