@@ -32,6 +32,8 @@ public class JavaInterface implements JavaAnnotatable {
     private String packageName;
     private String namespace;
     private String location;
+    private String packageJavaDoc;
+    private String classJavaDoc;
     private JavaModel model;
     private SOAPBinding.Style soapStyle;
     private SOAPBinding.Use soapUse;
@@ -166,6 +168,22 @@ public class JavaInterface implements JavaAnnotatable {
 
     public void setNamespace(String ns) {
         this.namespace = ns;
+    }
+    
+    public void setPackageJavaDoc(String doc) {
+        packageJavaDoc = doc;
+    }
+    
+    public String getPackageJavaDoc() {   
+        return (packageJavaDoc != null) ? packageJavaDoc : "";
+    }
+    
+    public void setClassJavaDoc(String doc) {
+        classJavaDoc = doc;
+    }
+    
+    public String getClassJavaDoc() {   
+        return (classJavaDoc != null) ? classJavaDoc : "";
     }
 
     public void addAnnotation(JAnnotation annotation) {

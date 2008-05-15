@@ -65,12 +65,19 @@ public class PortTypeProcessor extends AbstractProcessor {
         } else if (jaxwsBinding != null && jaxwsBinding.getPackage() != null) {
             intf.setPackageName(jaxwsBinding.getPackage());
         }
+        
+        if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
+            intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
+        } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
+            intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
+        }
 
         String name = intf.getName();
         if (infBinding != null
             && infBinding.getJaxwsClass() != null
             && infBinding.getJaxwsClass().getClassName() != null) {
             name = infBinding.getJaxwsClass().getClassName();
+            intf.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
         }
         intf.setName(name);
 
@@ -104,12 +111,20 @@ public class PortTypeProcessor extends AbstractProcessor {
         } else if (jaxwsBinding != null && jaxwsBinding.getPackage() != null) {
             intf.setPackageName(jaxwsBinding.getPackage());
         }
+        
+        if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
+            intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
+        } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
+            intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
+        }
+
 
         String name = intf.getName();
         if (infBinding != null
             && infBinding.getJaxwsClass() != null
             && infBinding.getJaxwsClass().getClassName() != null) {
             name = infBinding.getJaxwsClass().getClassName();
+            intf.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
         }
         intf.setName(name);
 

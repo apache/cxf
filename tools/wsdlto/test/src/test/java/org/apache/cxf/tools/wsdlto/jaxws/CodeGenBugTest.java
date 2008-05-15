@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
+
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebFault;
@@ -75,10 +77,10 @@ public class CodeGenBugTest extends ProcessorTestBase {
     @After
     public void tearDown() {
         super.tearDown();
-        processor = null;
+        //processor = null;
         env = null;
     }
-
+    
     @Test
     public void testBug305729() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug305729/hello_world.wsdl"));
@@ -514,9 +516,18 @@ public class CodeGenBugTest extends ProcessorTestBase {
 
         WSDLToJava.main(args);
 
-        assertFileEquals(getClass().getResource("expected/expected_hello_mime").getFile(),
-                         output.getCanonicalPath() 
-                         + "/org/apache/cxf/w2j/hello_world_mime/Hello.java");
+        String str1 = "SOAPBinding.ParameterStyle.BARE";
+        String str2 = "javax.xml.ws.Holder";
+        String str3 = "org.apache.cxf.mime.Address";
+        String str4 = "http://cxf.apache.org/w2j/hello_world_mime/types";
+                
+        String file = getStringFromFile(new File(output.getCanonicalPath() 
+                                        + "/org/apache/cxf/w2j/hello_world_mime/Hello.java"));
+        
+        assertTrue(file.contains(str1));
+        assertTrue(file.contains(str2));
+        assertTrue(file.contains(str3));
+        assertTrue(file.contains(str4));
     }
 
     @Test
@@ -920,6 +931,29 @@ public class CodeGenBugTest extends ProcessorTestBase {
         assertNotNull("Customized SEI class is not found", clz);
         Method customizedMethod = clz.getMethod("myGreetMe", new Class[] {String.class});
         assertNotNull("Customized method 'myGreetMe' in MyGreeter.class is not found", customizedMethod);
+    }
+    
+    
+    @Test
+    public void testJaxwsBindingJavaDoc() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_BINDING, getLocation("/wsdl2java_wsdl/cxf1152/jaxws1.xml"));
+        processor.setContext(env);
+        processor.execute();
+
+        List<String> results1 = FileUtils.readLines(new File(output.getCanonicalPath(), 
+            "org/mypkg/MyGreeter.java"));
+                
+        assertTrue(results1.contains(" * this is package javadoc"));
+        assertTrue(results1.contains("  * this is class javadoc"));
+        assertTrue(results1.contains(" * this is method javadoc"));
+        
+        List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(), 
+            "org/mypkg/SoapService.java")); 
+        
+        assertTrue(results2.contains(" * this is package javadoc"));
+        assertTrue(results2.contains(" * this is class javadoc"));
+        
     }
     
     @Test

@@ -37,6 +37,7 @@ public class JavaMethod implements JavaAnnotatable {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaMethod.class);
     private String name;
     private String operationName;
+    private String javaDoc;
     private JavaReturn javaReturn;
     private OperationType style;
     private String soapAction;
@@ -351,5 +352,13 @@ public class JavaMethod implements JavaAnnotatable {
 
     public final void setAsync(final boolean newAsync) {
         this.async = newAsync;
+    }
+    
+    public void setJavaDoc(String doc) {
+        javaDoc = doc;
+    }
+    
+    public String getJavaDoc() {
+        return (javaDoc != null) ? javaDoc : "";
     }
 }

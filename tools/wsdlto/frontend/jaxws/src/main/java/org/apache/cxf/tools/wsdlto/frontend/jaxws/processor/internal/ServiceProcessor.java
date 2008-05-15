@@ -142,8 +142,10 @@ public class ServiceProcessor extends AbstractProcessor {
 
             if (serviceBinding.getJaxwsClass() != null
                 && serviceBinding.getJaxwsClass().getClassName() != null) {
-                name = serviceBinding.getJaxwsClass().getClassName();
+                name = serviceBinding.getJaxwsClass().getClassName();  
+                sclz.setClassJavaDoc(serviceBinding.getJaxwsClass().getComments());          
             }
+            sclz.setPackageJavaDoc(serviceBinding.getPackageJavaDoc());
         }
         if (serviceBinding2 != null) {
             if (serviceBinding2.getPackage() != null) {
@@ -163,10 +165,14 @@ public class ServiceProcessor extends AbstractProcessor {
             }
             if (serviceBinding2.getJaxwsClass() != null
                 && serviceBinding2.getJaxwsClass().getClassName() != null) {
-                name = serviceBinding2.getJaxwsClass().getClassName();
+                name = serviceBinding2.getJaxwsClass().getClassName();                
+                sclz.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
+            }
+            if (!serviceBinding2.getPackageJavaDoc().equals("")) {
+                sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
             }
         }
-
+        
         sclz.setServiceName(service.getName().getLocalPart());
         sclz.setNamespace(namespace);
 
@@ -195,6 +201,8 @@ public class ServiceProcessor extends AbstractProcessor {
             JavaPort javaport = processPort(model, port);
             sclz.addPort(javaport);
         }
+        
+        sclz.setClassJavaDoc(jaxwsBinding.getClassJavaDoc());
         model.addServiceClass(name, sclz);
     }
 
@@ -220,6 +228,7 @@ public class ServiceProcessor extends AbstractProcessor {
             if (infBinding.getJaxwsClass() != null
                 && !StringUtils.isEmpty(infBinding.getJaxwsClass().getClassName())) {
                 jport.setPortType(infBinding.getJaxwsClass().getClassName());
+                jaxwsBinding.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
             }
 
             if (!infBinding.isEnableAsyncMapping()) {
@@ -231,6 +240,10 @@ public class ServiceProcessor extends AbstractProcessor {
 
             if (infBinding.getPackage() != null) {
                 jaxwsBinding.setPackage(infBinding.getPackage());
+            }
+            
+            if (!infBinding.getPackageJavaDoc().equals("")) {
+                jaxwsBinding.setPackageJavaDoc(infBinding.getPackageJavaDoc());
             }
         }
 

@@ -15,6 +15,10 @@
 ## specific language governing permissions and limitations
 ## under the License.
 
+/*
+ * $intf.packageJavaDoc
+ */
+
 package $intf.PackageName;
 
 #foreach ($import in $intf.Imports)
@@ -27,6 +31,11 @@ import ${import};
  * Generated source version: $version
  * 
  */
+ 
+ /*
+  * $intf.classJavaDoc
+  */
+
 
 #foreach ($annotation in $intf.Annotations)
 $annotation
@@ -34,6 +43,10 @@ $annotation
 
 public interface $intf.Name {
 #foreach ($method in $intf.Methods)
+
+/*
+ * ${method.JavaDoc}
+ */
 
 #foreach ($annotation in $method.Annotations)
     $annotation

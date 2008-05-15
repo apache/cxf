@@ -20,7 +20,9 @@
 <jaxws:bindings wsdlLocation="../hello_world.wsdl" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
 
     <jaxws:bindings node="wsdl:definitions">
-        <jaxws:package name="org.mypkg"/>
+        <jaxws:package name="org.mypkg">
+            <jaxws:javadoc>this is package javadoc</jaxws:javadoc>
+        </jaxws:package>
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='http://cxf.apache.org/w2j/hello_world_soap_http/types']" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -30,12 +32,16 @@
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:portType[@name='Greeter']">
-        <jaxws:class name="MyGreeter"/>
+        <jaxws:class name="MyGreeter">
+           <jaxws:javadoc>this is class javadoc</jaxws:javadoc>
+        </jaxws:class>
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:portType[@name='Greeter']/wsdl:operation[@name='greetMe']">
         <!-- rename the generated java method name-->
-        <jaxws:method name="myGreetMe"/>        
+        <jaxws:method name="myGreetMe"> 
+            <jaxws:javadoc>this is method javadoc</jaxws:javadoc>
+        </jaxws:method>       
     </jaxws:bindings>
 
 </jaxws:bindings>

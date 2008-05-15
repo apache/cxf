@@ -43,6 +43,12 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     private String packageName;
 
     private String methodName;
+    
+    private String methodJavaDoc;
+    
+    private String packageJavaDoc;
+    
+    private String classJavaDoc;
 
     private JAXWSParameter jaxwsPara;
 
@@ -135,5 +141,29 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
 
     public String getMethodName() {
         return this.methodName;
+    }
+    
+    public void setMethodJavaDoc(String doc) {
+        methodJavaDoc = doc;
+    }
+    
+    public String getMethodJavaDoc() {   
+        return (methodJavaDoc != null) ? methodJavaDoc : "";
+    }
+    
+    public void setPackageJavaDoc(String doc) {
+        packageJavaDoc = doc;
+    }
+    
+    public String getPackageJavaDoc() {   
+        return (packageJavaDoc != null) ? packageJavaDoc : "";
+    }
+    
+    public void setClassJavaDoc(String doc) {
+        classJavaDoc = doc;
+    }
+    
+    public String getClassJavaDoc() {   
+        return (classJavaDoc != null) ? classJavaDoc : "";
     }
 }

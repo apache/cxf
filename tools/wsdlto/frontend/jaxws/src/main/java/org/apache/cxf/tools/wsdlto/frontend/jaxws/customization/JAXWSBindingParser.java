@@ -89,8 +89,17 @@ public class JAXWSBindingParser {
                     jaxwsBinding.setEnableWrapperStyle(getNodeValue(child));
                 } else if (isPackageElement(child)) {
                     jaxwsBinding.setPackage(getPackageName(child));
+                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    if (docChild != null && this.isJAXWSClassDoc(docChild)) {
+                        jaxwsBinding.setPackageJavaDoc(DOMUtils.getContent(docChild));
+                    }
                 } else if (isJAXWSMethodElement(child)) {
                     jaxwsBinding.setMethodName(getMethodName(child));
+                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+
+                    if (docChild != null && this.isJAXWSClassDoc(docChild)) {
+                        jaxwsBinding.setMethodJavaDoc(DOMUtils.getContent(docChild));
+                    }
                 } else if (isJAXWSParameterElement(child)) {
                     Element childElement = (Element)child;
                     String partPath = "//" +  childElement.getAttribute("part");
@@ -136,6 +145,7 @@ public class JAXWSBindingParser {
         Element ele = (Element)node;
         return ele.getAttribute("name");
     }
+
 
     private boolean isPackageElement(Node node) {
         if (ToolConstants.NS_JAXWS_BINDINGS.equals(node.getNamespaceURI())

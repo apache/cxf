@@ -27,6 +27,8 @@ public class JavaServiceClass extends JavaClass {
     private final List<JavaPort> ports = new ArrayList<JavaPort>();
   
     private String serviceName;
+    private String classJavaDoc;
+    private String packageJavaDoc;
     
     public JavaServiceClass(JavaModel model) {
         super(model);
@@ -48,5 +50,20 @@ public class JavaServiceClass extends JavaClass {
         return serviceName;
     }
     
+    public void setPackageJavaDoc(String doc) {
+        packageJavaDoc = doc;
+    }
+    
+    public String getPackageJavaDoc() {   
+        return (packageJavaDoc != null) ? packageJavaDoc : "";
+    }
+    
+    public void setClassJavaDoc(String doc) {
+        classJavaDoc = doc;
+    }
+    
+    public String getClassJavaDoc() {   
+        return (classJavaDoc != null) ? classJavaDoc : "";
+    } 
 
 }
