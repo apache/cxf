@@ -951,8 +951,18 @@ public class CodeGenBugTest extends ProcessorTestBase {
         List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(), 
             "org/mypkg/SoapService.java")); 
         
-        assertTrue(results2.contains(" * this is package javadoc"));
-        assertTrue(results2.contains(" * this is class javadoc"));
+        boolean match1 = false;
+        boolean match2 = false;
+        for (String str : results2) {
+            if (str.contains("package javadoc")) {
+                match1 = true;
+            }
+            if (str.contains("class javadoc")) {
+                match2 = true;
+            }
+        }
+        assertTrue(match1);
+        assertTrue(match2);
         
     }
     
