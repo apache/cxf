@@ -915,7 +915,7 @@ public class CodeGenBugTest extends ProcessorTestBase {
             assertTrue(e.getMessage().indexOf("Summary:  Failures: 5, Warnings: 0") != -1);
         }
     }
-  /*  
+  
     @Test
     public void testTwoJaxwsBindingFile() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
@@ -932,7 +932,7 @@ public class CodeGenBugTest extends ProcessorTestBase {
         Method customizedMethod = clz.getMethod("myGreetMe", new Class[] {String.class});
         assertNotNull("Customized method 'myGreetMe' in MyGreeter.class is not found", customizedMethod);
     }
-    */
+
     
     
     @Test
@@ -948,8 +948,6 @@ public class CodeGenBugTest extends ProcessorTestBase {
         assertTrue(results1.contains(" * this is package javadoc"));
         assertTrue(results1.contains("  * this is class javadoc"));
         assertTrue(results1.contains(" * this is method javadoc"));
-        
-        System.out.println(output.getCanonicalPath());
         
         List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(), 
             "org/mypkg/SOAPService.java")); 
