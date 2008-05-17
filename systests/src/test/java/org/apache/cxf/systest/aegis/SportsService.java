@@ -24,9 +24,13 @@ import java.util.Collection;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.aegis.services.AttributeBean;
+
 @WebService(targetNamespace = "http://cxf.apache.org/systest/aegis/sports")
 public interface SportsService {
     Collection<Team> getTeams() throws WebServiceException;
     
     String testForMinOccurs0(String a, Integer b, String c);
+    AttributeBean getAttributeBean();
 }
+

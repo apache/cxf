@@ -25,6 +25,8 @@ import java.util.List;
 
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.aegis.services.AttributeBean;
+
 /**
  * 
  */
@@ -39,6 +41,10 @@ public class SportsServiceImpl implements SportsService {
     
     public String testForMinOccurs0(String a, Integer b, String c) {
         return a + b + c;
+    }
+
+    public AttributeBean getAttributeBean() {
+        return new AttributeBean();
     }
 
 }

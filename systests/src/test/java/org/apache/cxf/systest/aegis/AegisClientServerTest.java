@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.aegis;
 
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -31,12 +32,15 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.authservice.AuthService;
 import org.apache.cxf.authservice.Authenticate;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisClientServerTest extends AbstractBusClientServerTestBase {
@@ -150,5 +154,16 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         //CXF-1251
         String s = service.testForMinOccurs0("A", null, "b");
         assertEquals("Anullb", s);        
+    }
+    
+    @Ignore
+    @Test
+    public void testDynamicClient() throws Exception {
+        DynamicClientFactory dcf = DynamicClientFactory.newInstance();
+        Client client = dcf.createClient("http://localhost:9002/jaxwsAndAegisSports?wsdl");
+        Object r = client.invoke("getAttributeBean", (Object[]) null);
+        Method getAddrPlainString = r.getClass().getMethod("getAttrPlainString");
+        String s = (String)getAddrPlainString.invoke(r);
+        assertEquals("attrPlain", s);
     }
 }
