@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
 import org.apache.cxf.ws.rm.Identifier;
@@ -589,7 +590,7 @@ public class RMTxStoreTest extends Assert {
                 assertNull(msg.getTo());
             }
             byte[] actual = msg.getContent();
-            assertEquals(new String("Message " + mn.longValue()), new String(actual));
+            assertEquals(new String("Message " + mn.longValue()), IOUtils.newStringFromBytes(actual));
         }
     }
     

@@ -29,6 +29,7 @@ import javax.xml.transform.Source;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.swa.SwAServiceInterface;
 import org.apache.cxf.swa.types.DataStruct;
 import org.apache.cxf.swa.types.OutputResponseAll;
@@ -47,7 +48,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             bis = data.value.getDataRef().getDataSource().getInputStream();
             byte b[] = new byte[6];
             bis.read(b, 0, 6);
-            String string = new String(b);
+            String string = IOUtils.newStringFromBytes(b);
             
             ByteArrayDataSource source = 
                 new ByteArrayDataSource(("test" + string).getBytes(), "application/octet-stream");
@@ -64,7 +65,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             bis = data.value.getDataSource().getInputStream();
             byte b[] = new byte[6];
             bis.read(b, 0, 6);
-            String string = new String(b);
+            String string = IOUtils.newStringFromBytes(b);
             
             ByteArrayDataSource source = 
                 new ByteArrayDataSource(("test" + string).getBytes(), "application/octet-stream");
@@ -82,7 +83,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             bis = data.value.getDataSource().getInputStream();
             byte b[] = new byte[6];
             bis.read(b, 0, 6);
-            String string = new String(b);
+            String string = IOUtils.newStringFromBytes(b);
             
             ByteArrayDataSource source = 
                 new ByteArrayDataSource(("test" + string).getBytes(), "application/octet-stream");

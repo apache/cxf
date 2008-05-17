@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -128,7 +129,7 @@ public class PlugInClassLoaderTest extends Assert {
         byte[] bytes = new byte[10];
         configStream.read(bytes, 0, bytes.length);
 
-        String result = new String(bytes);
+        String result = IOUtils.newStringFromBytes(bytes);
         LOG.fine("dummy.txt contents: " + result);
         assertEquals("unexpected dummy.txt contents.", "blah,blah.", result);
     }
@@ -150,7 +151,7 @@ public class PlugInClassLoaderTest extends Assert {
         byte[] bytes = new byte[21];
         configStream.read(bytes, 0, bytes.length);
     
-        String result = new String(bytes);
+        String result = IOUtils.newStringFromBytes(bytes);
         LOG.fine("dummy.txt contents: " + result);
         assertTrue("unexpected dummy.txt contents:"  + result, result.indexOf("Manifest-Version: 1.0") != -1);
     }

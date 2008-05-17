@@ -48,6 +48,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -440,7 +441,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
                     if (getLogger().isLoggable(Level.FINE)) {
                         getLogger().log(Level.FINE, "The response message is ["
                                         + (replyObj instanceof String 
-                                           ? (String)replyObj : new String((byte[])replyObj))
+                                           ? (String)replyObj 
+                                               : IOUtils.newStringFromBytes((byte[])replyObj))
                                     + "]");
                     }
 

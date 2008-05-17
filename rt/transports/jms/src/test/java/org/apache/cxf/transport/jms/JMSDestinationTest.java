@@ -25,6 +25,7 @@ import java.io.InputStream;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -230,7 +231,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
             assertFalse("Read the Destination recieved Message error ", false);
             ex.printStackTrace();
         }
-        String reponse = new String(bytes);
+        String reponse = IOUtils.newStringFromBytes(bytes);
         assertEquals("The reponse date should be equals", reponse, "HelloWorld");
     }
     

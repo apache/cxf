@@ -108,7 +108,7 @@ public class AttachmentDeserializer {
             stream = new PushbackInputStream(message.getContent(InputStream.class),
                     boundary.length * 2);
             if (!readTillFirstBoundary(stream, boundary)) {
-                throw new IOException("Couldn't find MIME boundary: " + new String(boundary));
+                throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
 
             try {
@@ -135,7 +135,7 @@ public class AttachmentDeserializer {
         PushbackInputStream in = new PushbackInputStream(is, 4096);
         byte buf[] = new byte[2048];
         int i = in.read(buf);
-        String msg = new String(buf, 0, i);
+        String msg = IOUtils.newStringFromBytes(buf, 0, i);
         in.unread(buf, 0, i);
         
         // Reset the input stream since we'll need it again later

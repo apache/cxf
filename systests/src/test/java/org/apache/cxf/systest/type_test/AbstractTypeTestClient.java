@@ -31,6 +31,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.type_test.doc.TypeTestPortType;
 import org.apache.type_test.rpc.SOAPService;
@@ -1961,8 +1962,8 @@ public abstract class AbstractTypeTestClient
     }
 
     protected boolean equals(byte[] x, byte[] y) {
-        String xx = new String(x);
-        String yy = new String(y);
+        String xx = IOUtils.newStringFromBytes(x);
+        String yy = IOUtils.newStringFromBytes(y);
         return xx.equals(yy);
     }
 

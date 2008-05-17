@@ -22,6 +22,7 @@ package org.apache.cxf.resource;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public class URIResolverTest extends Assert {
             is2.close();
             
         }       
-        assertEquals(new String(barray), new String(barray2));
+        assertEquals(IOUtils.newStringFromBytes(barray), IOUtils.newStringFromBytes(barray2));
     }
 
     @Test

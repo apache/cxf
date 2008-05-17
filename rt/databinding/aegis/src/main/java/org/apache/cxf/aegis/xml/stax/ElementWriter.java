@@ -40,13 +40,11 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     private XMLStreamWriter writer;
 
     private String namespace;
-
     private String name;
-
     private String prefix;
 
     /**
-     * Create a LiteralWriter but without writing an element name.
+     * Create an ElementWriter but without writing an element name.
      * 
      * @param writer
      */
@@ -96,7 +94,7 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     private void writeStartElement() throws XMLStreamException {
         if (!StringUtils.isEmpty(namespace)) {
             boolean declare = false;
-
+            // Did the user declare a prefix?
             String decPrefix = writer.getNamespaceContext().getPrefix(namespace);
 
             // If the user didn't specify a prefix, create one

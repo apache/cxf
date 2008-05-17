@@ -22,6 +22,7 @@ package org.apache.cxf.common.util;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -91,7 +92,7 @@ public class Base64UtilityTest extends Assert {
     public void testEncodeDecodeString() throws Exception {
         String in = "QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
         byte bytes[] = Base64Utility.decode(in);
-        assertEquals("Aladdin:open sesame", new String(bytes));
+        assertEquals("Aladdin:open sesame", IOUtils.newStringFromBytes(bytes));
         String encoded = Base64Utility.encode(bytes);
         assertEquals(in, encoded);
     }
@@ -105,7 +106,7 @@ public class Base64UtilityTest extends Assert {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ByteArrayOutputStream bout2 = new ByteArrayOutputStream();
         Base64Utility.encodeChunk(bytes, 0, bytes.length, bout);
-        String encodedString = new String(bout.toByteArray());
+        String encodedString = IOUtils.newStringFromBytes(bout.toByteArray());
         Base64Utility.decode(encodedString.toCharArray(),
                              0,
                              encodedString.length(),
@@ -118,7 +119,7 @@ public class Base64UtilityTest extends Assert {
         bout2.reset();
         Base64Utility.decode(in, bout);
         bytes = bout.toByteArray();
-        assertEquals("Aladdin:open sesame", new String(bytes));
+        assertEquals("Aladdin:open sesame", IOUtils.newStringFromBytes(bytes));
         StringWriter writer = new StringWriter();
         Base64Utility.encode(bytes, 0, bytes.length, writer);
         assertEquals(in, writer.toString());

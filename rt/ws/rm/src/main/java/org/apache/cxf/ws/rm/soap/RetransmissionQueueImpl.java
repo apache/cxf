@@ -336,7 +336,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 }
             } else {
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Using saved output stream: " + new String(content));
+                    LOG.fine("Using saved output stream: " + IOUtils.newStringFromBytes(content));
                 }
             }
             ByteArrayInputStream bis = new ByteArrayInputStream(content);

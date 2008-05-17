@@ -23,6 +23,8 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.helpers.IOUtils;
+
 @WebService(targetNamespace = "urn:TypesService")
 public class TypesService {
 
@@ -70,6 +72,6 @@ public class TypesService {
     @WebMethod 
     public String testBase64Binary(byte i[],  @WebParam(mode = WebParam.Mode.OUT) Holder<byte[]> i2) {
         i2.value = i;
-        return "In:" + new String(i);
+        return "In:" + IOUtils.newStringFromBytes(i);
     }
 }

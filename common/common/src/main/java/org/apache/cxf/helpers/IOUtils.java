@@ -25,14 +25,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 
 public final class IOUtils {
-
+    public static final Charset UTF8_CHARSET = Charset.forName("utf-8");
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     private IOUtils() {
 
+    }
+    
+    /**
+     * Use this function instead of new String(byte[]) to avoid surprises from non-standard default encodings.
+     * @param bytes
+     * @return
+     */
+    public static String newStringFromBytes(byte[] bytes) {
+        try {
+            return new String(bytes, UTF8_CHARSET.name());
+        } catch (UnsupportedEncodingException e) {
+            throw 
+                new RuntimeException("Impossible failure: Charset.forName(\"utf-8\") returns invalid name.");
+
+        }
+    }
+
+    /**
+     * Use this function instead of new String(byte[], int, int) 
+     * to avoid surprises from non-standard default encodings.
+     * @param bytes
+     * @param start
+     * @param length
+     * @return
+     */
+    public static String newStringFromBytes(byte[] bytes, int start, int length) {
+        try {
+            return new String(bytes, start, length, UTF8_CHARSET.name());
+        } catch (UnsupportedEncodingException e) {
+            throw 
+                new RuntimeException("Impossible failure: Charset.forName(\"utf-8\") returns invalid name.");
+
+        }
     }
 
     public static int copy(final InputStream input, final OutputStream output)
@@ -107,7 +142,7 @@ public final class IOUtils {
         int n = 0;
         n = input.read(buffer);
         while (-1 != n) {
-            buf.append(new String(buffer, 0, n));
+            buf.append(newStringFromBytes(buffer, 0, n));
             n = input.read(buffer);
         }
         input.close();

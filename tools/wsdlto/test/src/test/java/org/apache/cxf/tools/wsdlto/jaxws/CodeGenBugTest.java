@@ -33,6 +33,7 @@ import javax.xml.ws.WebServiceClient;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.AnnotationUtil;
@@ -200,7 +201,7 @@ public class CodeGenBugTest extends ProcessorTestBase {
         BufferedInputStream filebuffer = new BufferedInputStream(fileinput);
         byte[] buffer = new byte[(int)file.length()];
         filebuffer.read(buffer);
-        String content = new String(buffer);
+        String content = IOUtils.newStringFromBytes(buffer);
         assertTrue("wsdl location should be url style in build.xml", content.indexOf("param1=\"file:") > -1);
 
     }

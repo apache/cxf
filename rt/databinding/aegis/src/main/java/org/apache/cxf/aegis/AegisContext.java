@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -54,15 +55,11 @@ import org.apache.cxf.common.util.SOAPConstants;
  * The application can control some parameters of the type creators by creating a TypeCreationOptions
  * object and setting properties. The application can add custom mappings to the type mapping, or 
  * even use its own classes for the TypeMapping or TypeCreator objects.
- * 
- * At the level of the data binding, the 'root elements' are defined by the WSDL message parts.
- * Additional classes that participate are termed 'override' classes.
- * 
+ *
  * Aegis, unlike JAXB, has no concept of a 'root element'. So, an application that 
  * uses Aegis without a web service has to either depend on xsi:type (at least for 
  * root elements) or have its own mapping from elements to classes, and pass the 
  * resulting Class objects to the readers.
- * 
  * At this level, the application must specify the initial set of classes to make 
  * make use of untyped collections or .aegis.xml files.
  * 
@@ -71,7 +68,10 @@ import org.apache.cxf.common.util.SOAPConstants;
  * particular item read. Specifically, if the application just leaves it to Aegis to
  * map an element tagged with an xsi:type to a class, Aegis can't know that some arbitrary class in
  * some arbitrary package is mapped to a particular schema type by QName in a
- * mapping XML file. 
+ * mapping XML file.
+ * 
+ * At the level of the CXF data binding, the 'root elements' are defined by the WSDL message parts.
+ * Additional classes that participate are termed 'override' classes.
  * 
  */
 public class AegisContext {
@@ -89,7 +89,9 @@ public class AegisContext {
     private boolean mtomEnabled;
     private boolean mtomUseXmime;
     // this URI goes into the type map.
-    private String mappingNamespaceURI; 
+    private String mappingNamespaceURI;
+    private XmlNsForm elementForm = XmlNsForm.QUALIFIED;
+    private XmlNsForm attributeForm = XmlNsForm.QUALIFIED;
     
     /**
      * Construct a context.
@@ -410,6 +412,38 @@ public class AegisContext {
 
     public void setMappingNamespaceURI(String mappingNamespaceURI) {
         this.mappingNamespaceURI = mappingNamespaceURI;
+    }
+
+    /**
+     * The form of elements. 
+     * @return Returns the elementForm.
+     */
+    public XmlNsForm getElementForm() {
+        return elementForm;
+    }
+
+    /**
+     * The form of elements.
+     * @param elementForm The elementForm to set.
+     */
+    public void setElementForm(XmlNsForm elementForm) {
+        this.elementForm = elementForm;
+    }
+
+    /**
+     * The form of attributes. 
+     * @return Returns the attributeForm.
+     */
+    public XmlNsForm getAttributeForm() {
+        return attributeForm;
+    }
+
+    /**
+     * The form for attributes.
+     * @param attributeForm The attributeForm to set.
+     */
+    public void setAttributeForm(XmlNsForm attributeForm) {
+        this.attributeForm = attributeForm;
     }
 
 }

@@ -22,6 +22,7 @@ package org.apache.cxf.javascript;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.MtoMImpl;
@@ -75,7 +76,7 @@ public class MtoMTest extends JavascriptRhinoTest {
         InputStream dis = implementor.getLastDHBean().getNotXml10().getInputStream();
         byte[] bytes = new byte[2048];
         int byteCount = dis.read(bytes, 0, 2048);
-        String stuff = new String(bytes, 0, byteCount);
+        String stuff = IOUtils.newStringFromBytes(bytes, 0, byteCount);
         assertEquals("<html>\u0027</html>", stuff);
         return null;
     }

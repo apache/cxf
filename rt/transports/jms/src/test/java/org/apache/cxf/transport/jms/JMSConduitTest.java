@@ -29,6 +29,7 @@ import javax.jms.BytesMessage;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.junit.BeforeClass;
@@ -117,7 +118,7 @@ public class JMSConduitTest extends AbstractJMSTester {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        String reponse = new String(bytes);
+        String reponse = IOUtils.newStringFromBytes(bytes);
         assertEquals("The reponse date should be equals", reponse, "HelloWorld");
                 
         JMSMessageHeadersType inHeader =

@@ -256,7 +256,7 @@ public class CachedOutputStream extends OutputStream {
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
                 byte bytes[] = ((ByteArrayOutputStream)currentStream).toByteArray();
-                out.append(new String(bytes, 0, limit));
+                out.append(IOUtils.newStringFromBytes(bytes, 0, limit));
             } else {
                 throw new IOException("Unknown format of currentStream");
             }
@@ -269,7 +269,7 @@ public class CachedOutputStream extends OutputStream {
                 if ((count + x) > limit) {
                     x = limit - count;
                 }
-                out.append(new String(bytes, 0, x));
+                out.append(IOUtils.newStringFromBytes(bytes, 0, x));
                 count += x;
                 
                 if (count >= limit) {
@@ -295,7 +295,7 @@ public class CachedOutputStream extends OutputStream {
             byte bytes[] = new byte[1024];
             int x = fin.read(bytes);
             while (x != -1) {
-                out.append(new String(bytes, 0, x));
+                out.append(IOUtils.newStringFromBytes(bytes, 0, x));
                 x = fin.read(bytes);
             }
             fin.close();

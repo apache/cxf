@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -60,7 +61,7 @@ public class PushBack401 extends AbstractPhaseInterceptor {
     private String[] extractUserPass(String token) {
         try {
             byte[] userpass = Base64Utility.decode(token);
-            String up = new String(userpass);
+            String up = IOUtils.newStringFromBytes(userpass);
             String user = up.substring(0, up.indexOf(':'));
             String pass = up.substring(up.indexOf(':') + 1);
             return new String[] {user, pass};
