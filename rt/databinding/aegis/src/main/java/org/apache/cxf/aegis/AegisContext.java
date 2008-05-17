@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -90,9 +89,6 @@ public class AegisContext {
     private boolean mtomUseXmime;
     // this URI goes into the type map.
     private String mappingNamespaceURI;
-    private XmlNsForm elementForm = XmlNsForm.QUALIFIED;
-    private XmlNsForm attributeForm = XmlNsForm.QUALIFIED;
-    
     /**
      * Construct a context.
      */
@@ -132,7 +128,6 @@ public class AegisContext {
      * @param mappingNamespaceURI URI to select mappings based on the encoding.
      */
     public void initialize() {
-        // The use of the XSD URI in the mapping is, MAGIC. 
         // allow spring config of an alternative mapping.
         if (configuration == null) {
             configuration = new TypeCreationOptions();
@@ -140,6 +135,7 @@ public class AegisContext {
         if (typeMapping == null) {
             boolean defaultNillable = configuration.isDefaultNillable();
             TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, mtomUseXmime);
+            // The use of the XSD URI in the mapping is, MAGIC. 
             if (mappingNamespaceURI == null) {
                 mappingNamespaceURI = SOAPConstants.XSD;
             }
@@ -413,37 +409,4 @@ public class AegisContext {
     public void setMappingNamespaceURI(String mappingNamespaceURI) {
         this.mappingNamespaceURI = mappingNamespaceURI;
     }
-
-    /**
-     * The form of elements. 
-     * @return Returns the elementForm.
-     */
-    public XmlNsForm getElementForm() {
-        return elementForm;
-    }
-
-    /**
-     * The form of elements.
-     * @param elementForm The elementForm to set.
-     */
-    public void setElementForm(XmlNsForm elementForm) {
-        this.elementForm = elementForm;
-    }
-
-    /**
-     * The form of attributes. 
-     * @return Returns the attributeForm.
-     */
-    public XmlNsForm getAttributeForm() {
-        return attributeForm;
-    }
-
-    /**
-     * The form for attributes.
-     * @param attributeForm The attributeForm to set.
-     */
-    public void setAttributeForm(XmlNsForm attributeForm) {
-        this.attributeForm = attributeForm;
-    }
-
 }

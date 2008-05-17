@@ -203,7 +203,8 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         AnnotatedTypeInfo typeInfo = new AnnotatedTypeInfo(
                 getTypeMapping(),
                 info.getTypeClass(),
-                typeName.getNamespaceURI());
+                typeName.getNamespaceURI(),
+                getConfiguration());
 
         typeInfo.setExtensibleElements(annotationReader.isExtensibleElements(
                 info.getTypeClass(),

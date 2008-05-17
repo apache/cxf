@@ -37,6 +37,8 @@ public class TypeCreationOptions {
     private boolean defaultExtensibleAttributes;
     private boolean defaultNillable = true;
     private int defaultMinOccurs;
+    private boolean qualifyElements = true;
+    private boolean qualifyAttributes;
 
     public TypeCreationOptions() {
         super();
@@ -88,6 +90,32 @@ public class TypeCreationOptions {
 
     public void setDefaultNillable(boolean defaultNillable) {
         this.defaultNillable = defaultNillable;
+    }
+
+    /** * @return Returns the qualifyElements.
+     */
+    public boolean isQualifyElements() {
+        return qualifyElements;
+    }
+
+    /**
+     * @param qualifyElements The qualifyElements to set.
+     */
+    public void setQualifyElements(boolean qualifyElements) {
+        this.qualifyElements = qualifyElements;
+    }
+
+    /** * @return Returns the qualifyAttributes.
+     */
+    public boolean isQualifyAttributes() {
+        return qualifyAttributes;
+    }
+
+    /**
+     * @param qualifyAttributes The qualifyAttributes to set.
+     */
+    public void setQualifyAttributes(boolean qualifyAttributes) {
+        this.qualifyAttributes = qualifyAttributes;
     }
 
 }

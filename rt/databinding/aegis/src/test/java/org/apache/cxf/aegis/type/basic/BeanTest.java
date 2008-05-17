@@ -40,7 +40,6 @@ import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.DOMOutputter;
 import org.junit.Test;
 
 public class BeanTest extends AbstractAegisTest {
@@ -59,6 +58,7 @@ public class BeanTest extends AbstractAegisTest {
         mapping = context.getTypeMapping();
     }
 
+    @Test
     public void testBean() throws Exception {
         BeanType type = new BeanType();
         type.setTypeClass(SimpleBean.class);
@@ -97,18 +97,6 @@ public class BeanTest extends AbstractAegisTest {
 
         assertValid("/b:root/b:bleh[text()='bleh']", element);
         assertValid("/b:root/b:howdy[text()='howdy']", element);
-    }
-
-    private void assertValid(String xpath, Element element) throws Exception {
-        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
-        
-        assertValid(xpath, doc);
-    }
-
-    private void assertInvalid(String xpath, Element element) throws Exception {
-        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
-        
-        assertInvalid(xpath, doc);
     }
     
     @Test

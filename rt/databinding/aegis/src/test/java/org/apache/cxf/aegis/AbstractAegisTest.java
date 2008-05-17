@@ -54,6 +54,8 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
+import org.jdom.Element;
+import org.jdom.output.DOMOutputter;
 import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {
@@ -211,6 +213,23 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         }
         return null;
         
+    }
+    
+    protected void assertXPathEquals(String xpath, String value, Element element) throws Exception {
+        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
+        assertXPathEquals(xpath, value, doc);
+    }
+    
+    protected void assertValid(String xpath, Element element) throws Exception {
+        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
+        
+        assertValid(xpath, doc);
+    }
+
+    protected void assertInvalid(String xpath, Element element) throws Exception {
+        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
+        
+        assertInvalid(xpath, doc);
     }
     
     protected Document getWSDLDocument(String string) throws WSDLException {

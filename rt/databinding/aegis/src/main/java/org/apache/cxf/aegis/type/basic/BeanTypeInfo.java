@@ -39,30 +39,20 @@ import org.apache.cxf.aegis.type.TypeMapping;
 
 public class BeanTypeInfo {
     private Map<QName, QName> mappedName2typeName = new HashMap<QName, QName>();
-
     private Map<QName, String> mappedName2pdName = new HashMap<QName, String>();
-
     private Map<QName, Type> mappedName2type = new HashMap<QName, Type>();
-
     private Class<?> beanClass;
-
     private List<QName> attributes = new ArrayList<QName>();
-
     private List<QName> elements = new ArrayList<QName>();
-
     private PropertyDescriptor[] descriptors;
-
     private TypeMapping typeMapping;
-
     private volatile boolean initialized;
-
     private String defaultNamespace;
-
     private int minOccurs;
-
     private boolean nillable = true;
-
     private boolean isExtension;
+    private boolean qualifyAttributes;
+    private boolean qualifyElements = true;
 
     /**
      * extensibleElements means adding xs:any to WSDL Complex Type Definition
@@ -138,9 +128,9 @@ public class BeanTypeInfo {
         String name = pd.getName();
 
         if (isAttribute(pd)) {
-            mapAttribute(name, createMappedName(pd));
+            mapAttribute(name, createMappedName(pd, qualifyAttributes));
         } else if (isElement(pd)) {
-            mapElement(name, createMappedName(pd));
+            mapElement(name, createMappedName(pd, qualifyElements));
         }
     }
 
@@ -245,8 +235,12 @@ public class BeanTypeInfo {
      * @param desc
      * @return
      */
-    protected QName createMappedName(PropertyDescriptor desc) {
-        return new QName(getDefaultNamespace(), desc.getName());
+    protected QName createMappedName(PropertyDescriptor desc, boolean qualified) {
+        if (qualified) {
+            return new QName(getDefaultNamespace(), desc.getName());
+        } else {
+            return new QName(null, desc.getName());
+        }
     }
 
     public void mapAttribute(String property, QName mappedName) {
@@ -431,6 +425,32 @@ public class BeanTypeInfo {
 
     public boolean isExtension() {
         return isExtension;
+    }
+
+    /** * @return Returns the qualifyAttributes.
+     */
+    public boolean isQualifyAttributes() {
+        return qualifyAttributes;
+    }
+
+    /**
+     * @param qualifyAttributes The qualifyAttributes to set.
+     */
+    public void setQualifyAttributes(boolean qualifyAttributes) {
+        this.qualifyAttributes = qualifyAttributes;
+    }
+
+    /** * @return Returns the qualifyElements.
+     */
+    public boolean isQualifyElements() {
+        return qualifyElements;
+    }
+
+    /**
+     * @param qualifyElements The qualifyElements to set.
+     */
+    public void setQualifyElements(boolean qualifyElements) {
+        this.qualifyElements = qualifyElements;
     }
 
 }

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.util.NamespaceHelper;
@@ -30,13 +31,17 @@ import org.apache.cxf.aegis.util.NamespaceHelper;
 public class AnnotatedTypeInfo extends BeanTypeInfo {
     private final AnnotationReader annotationReader;
 
-    public AnnotatedTypeInfo(TypeMapping tm, Class typeClass, String ns) {
-        this(tm, typeClass, ns, new AnnotationReader());
+    public AnnotatedTypeInfo(TypeMapping tm, Class typeClass, 
+                             String ns, TypeCreationOptions typeCreationOptions) {
+        this(tm, typeClass, ns, new AnnotationReader(), typeCreationOptions);
     }
 
-    public AnnotatedTypeInfo(TypeMapping tm, Class typeClass, String ns, AnnotationReader annotationReader) {
+    public AnnotatedTypeInfo(TypeMapping tm, Class typeClass, String ns, AnnotationReader annotationReader,
+                             TypeCreationOptions typeCreationOptions) {
         super(typeClass, ns);
         this.annotationReader = annotationReader;
+        setQualifyAttributes(typeCreationOptions.isQualifyAttributes());
+        setQualifyElements(typeCreationOptions.isQualifyElements());
         setTypeMapping(tm);
         initialize();
     }
@@ -49,12 +54,15 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
         if (annotationReader.isIgnored(pd.getReadMethod())) {
             return; 
         }
+        
+        String explicitNamespace = annotationReader.getNamespace(pd.getReadMethod());
+        boolean mustQualify = null != explicitNamespace && !"".equals(explicitNamespace);
 
         String name = pd.getName();
         if (isAttribute(pd)) {
-            mapAttribute(name, createMappedName(pd));
+            mapAttribute(name, createMappedName(pd, mustQualify || isQualifyAttributes()));
         } else if (isElement(pd)) {
-            mapElement(name, createMappedName(pd));
+            mapElement(name, createMappedName(pd, mustQualify || isQualifyElements()));
         }
     }
 
@@ -75,8 +83,13 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
     }
 
     @Override
-    protected QName createMappedName(PropertyDescriptor desc) {
-        return createQName(desc);
+    protected QName createMappedName(PropertyDescriptor desc, boolean qualify) {
+        QName name = createQName(desc);
+        if (!qualify) {
+            return new QName(null, name.getLocalPart());
+        } else {
+            return name;
+        }
     }
 
     protected QName createQName(PropertyDescriptor desc) {

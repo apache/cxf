@@ -529,7 +529,7 @@ public class BeanType extends Type {
     }
 
     private String getNameWithPrefix(Element root, String nameNS, String localName) {
-        if (!nameNS.equals(getSchemaType().getNamespaceURI())) {
+        if (!"".equals(nameNS) && !nameNS.equals(getSchemaType().getNamespaceURI())) {
             Element rootElement = (Element)root.getParent();
             String prefix = null;
             if (rootElement != null) { // can happen with doc/lit/bare

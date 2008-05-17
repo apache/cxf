@@ -72,15 +72,31 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
             LOG.debug("Found mapping for property " + pd.getName());
 
             style = e.getAttributeValue("style");
-            mappedName = NamespaceHelper.createQName(e, e.getAttributeValue("mappedName"),
-                                                     getDefaultNamespace());
         }
 
         if (style == null) {
             style = "element";
         }
+        
+        boolean element = "element".equals(style);
+        boolean qualify;
+        if (element) {
+            qualify = isQualifyElements();
+        } else {
+            qualify = isQualifyAttributes();
+        }
+        String namespace = null;
+        if (qualify) {
+            namespace = getDefaultNamespace();
+        }
+        
+        if (e != null) {
+            mappedName = NamespaceHelper.createQName(e, e.getAttributeValue("mappedName"),
+                                                     namespace);
+        }
+
         if (mappedName == null) {
-            mappedName = createMappedName(pd);
+            mappedName = createMappedName(pd, qualify);
         }
 
         if (e != null) {

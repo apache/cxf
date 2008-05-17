@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.XMLTypeCreator;
 import org.apache.cxf.aegis.type.basic.BeanType;
@@ -60,7 +61,8 @@ public class XFireTypeTest extends AbstractAegisTest {
 
     @Test
     public void testType() {
-        AnnotatedTypeInfo info = new AnnotatedTypeInfo(tm, XFireBean1.class, "urn:foo");
+        AnnotatedTypeInfo info = new AnnotatedTypeInfo(tm, XFireBean1.class, "urn:foo",
+                                                       new TypeCreationOptions());
 
         Iterator elements = info.getElements();
         assertTrue(elements.hasNext());
@@ -171,7 +173,8 @@ public class XFireTypeTest extends AbstractAegisTest {
 
     @Test
     public void testGetSetRequired() throws Exception {
-        BeanType type = new BeanType(new AnnotatedTypeInfo(tm, BadBean.class, "urn:foo"));
+        BeanType type = new BeanType(new AnnotatedTypeInfo(tm, BadBean.class, "urn:foo",
+                                                           new TypeCreationOptions()));
         type.setSchemaType(new QName("urn:foo", "BadBean"));
 
         assertFalse(type.getTypeInfo().getElements().hasNext());
