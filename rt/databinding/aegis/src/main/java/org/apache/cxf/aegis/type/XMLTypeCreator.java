@@ -359,7 +359,9 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             } else {
                 btinfo.setExtensibleAttributes(getConfiguration().isDefaultExtensibleAttributes());
             }
-
+            
+            btinfo.setQualifyAttributes(this.getConfiguration().isQualifyAttributes());
+            btinfo.setQualifyElements(this.getConfiguration().isQualifyElements());
             BeanType type = new BeanType(btinfo);
 
             if (name == null) {

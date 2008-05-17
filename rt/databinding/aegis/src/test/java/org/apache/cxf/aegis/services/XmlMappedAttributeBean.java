@@ -19,32 +19,17 @@
 
 package org.apache.cxf.aegis.services;
 
-import javax.xml.bind.annotation.XmlAttribute;
-
 /**
  * Test class for attribute forms.
  */
-public class AttributeBean {
-    private String attrPlainString = "attrPlain";
-    private String attrExplicitString = "attrExplicit";
+public class XmlMappedAttributeBean {
+    private String attrXmlString = "attrXml";
 
-    @XmlAttribute
-    public String getAttrPlainString() {
-        return attrPlainString;
+    public String getAttrXmlString() {
+        return attrXmlString;
     }
 
-    public void setAttrPlainString(String plainString) {
-        this.attrPlainString = plainString;
+    public void setAttrXmlString(String attrXmlString) {
+        this.attrXmlString = attrXmlString;
     }
-
-    @XmlAttribute (namespace = "urn:xyzzy")
-    public String getAttrExplicitString() {
-        return attrExplicitString;
-    }
-
-    public void setAttrExplicitString(String attrExplicitString) {
-        this.attrExplicitString = attrExplicitString;
-    }
-    
-
 }
