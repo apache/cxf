@@ -19,7 +19,6 @@
 
 package org.apache.cxf.aegis;
 
-import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
@@ -42,10 +41,6 @@ public class AegisElementDataWriter extends AbstractAegisIoImpl
     public void write(Object obj, QName elementName, boolean optional, Element output, Type aegisType)
         throws Exception {
         W3CDOMStreamWriter swriter = new W3CDOMStreamWriter(output);
-        QName elementNameToWrite = elementName;
-        if (aegisContext.getElementForm() == XmlNsForm.UNQUALIFIED) {
-            elementNameToWrite = new QName(elementName.getLocalPart());
-        }
-        writer.write(obj, elementNameToWrite, optional, swriter, aegisType);
+        writer.write(obj, elementName, optional, swriter, aegisType);
     }
 }
