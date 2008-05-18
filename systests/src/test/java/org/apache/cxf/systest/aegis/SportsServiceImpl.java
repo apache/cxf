@@ -25,8 +25,6 @@ import java.util.List;
 
 import javax.xml.ws.WebServiceException;
 
-import org.apache.cxf.aegis.services.AttributeBean;
-
 /**
  * 
  */

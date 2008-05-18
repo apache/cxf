@@ -19,16 +19,32 @@
 
 package org.apache.cxf.systest.aegis;
 
-import java.util.Collection;
+import javax.xml.bind.annotation.XmlAttribute;
 
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceException;
+/**
+ * Test class for attribute forms.
+ */
+public class AttributeBean {
+    private String attrPlainString = "attrPlain";
+    private String attrExplicitString = "attrExplicit";
 
-@WebService(targetNamespace = "http://cxf.apache.org/systest/aegis/sports")
-public interface SportsService {
-    Collection<Team> getTeams() throws WebServiceException;
+    @XmlAttribute
+    public String getAttrPlainString() {
+        return attrPlainString;
+    }
+
+    public void setAttrPlainString(String plainString) {
+        this.attrPlainString = plainString;
+    }
+
+    @XmlAttribute (namespace = "urn:xyzzy")
+    public String getAttrExplicitString() {
+        return attrExplicitString;
+    }
+
+    public void setAttrExplicitString(String attrExplicitString) {
+        this.attrExplicitString = attrExplicitString;
+    }
     
-    String testForMinOccurs0(String a, Integer b, String c);
-    AttributeBean getAttributeBean();
-}
 
+}
