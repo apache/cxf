@@ -180,9 +180,10 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 paramClass = (Class)type.getActualTypeArguments()[index];
             } else if (type.getActualTypeArguments()[index] instanceof WildcardType) {
                 WildcardType wildcardType = (WildcardType)type.getActualTypeArguments()[index];
-
-                if (wildcardType.getUpperBounds()[index] instanceof Class) {
-                    paramClass = (Class)wildcardType.getUpperBounds()[index];
+                // we really aren't prepared to deal with multiple upper bounds,
+                // so we just look at the first one.
+                if (wildcardType.getUpperBounds()[0] instanceof Class) {
+                    paramClass = (Class)wildcardType.getUpperBounds()[0];
                 }
             } else if (type.getActualTypeArguments()[index] instanceof ParameterizedType) {
                 ParameterizedType ptype = (ParameterizedType)type.getActualTypeArguments()[index];

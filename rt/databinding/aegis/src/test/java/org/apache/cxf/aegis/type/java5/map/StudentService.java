@@ -32,6 +32,8 @@ public interface StudentService {
     Student findStudent(Long id);
 
     Map<Long, Student> getStudentsMap();
+    
+    Map<String, ?> getWildcardMap();
 
     List<Student> getStudents(Map<String, String> filters);
 

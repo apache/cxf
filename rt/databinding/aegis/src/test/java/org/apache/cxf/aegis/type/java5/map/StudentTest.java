@@ -69,6 +69,8 @@ public class StudentTest extends AbstractAegisTest {
         assertNotNull(one);
         assertEquals("Student1", one.getName());
         
+        Map<String, ?> wildMap = clientInterface.getWildcardMap();
+        assertEquals("valuestring", wildMap.get("keystring"));
     }
 
     @Test 

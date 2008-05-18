@@ -63,4 +63,10 @@ public class StudentServiceImpl implements StudentService {
         return studentMap;
     }
 
+    public Map<String, ?> getWildcardMap() {
+        Map<String, String> m = new HashMap<String, String>();
+        m.put("keystring", "valuestring");
+        return m;
+    }
+
 }
