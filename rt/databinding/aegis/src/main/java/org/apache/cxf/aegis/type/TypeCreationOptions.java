@@ -92,30 +92,39 @@ public class TypeCreationOptions {
         this.defaultNillable = defaultNillable;
     }
 
-    /** * @return Returns the qualifyElements.
+    /** 
+     * Whether or not elements are qualified absent any annotations
+     * or mapping files. 
+     * True by default.
+     * @return 
      */
     public boolean isQualifyElements() {
         return qualifyElements;
     }
 
     /**
-     * @param qualifyElements The qualifyElements to set.
+     * Turn on of off element qualification.
+     * @param qualifyElements 
      */
     public void setQualifyElements(boolean qualifyElements) {
         this.qualifyElements = qualifyElements;
     }
 
-    /** * @return Returns the qualifyAttributes.
+    /**
+     * Whether or not attributes are qualified absent any annotations
+     * or mapping files.
+     * False by default. 
+     * @return 
      */
     public boolean isQualifyAttributes() {
         return qualifyAttributes;
     }
 
     /**
-     * @param qualifyAttributes The qualifyAttributes to set.
+     * Turn on or off attribute qualification. 
+     * @param qualifyAttributes 
      */
     public void setQualifyAttributes(boolean qualifyAttributes) {
         this.qualifyAttributes = qualifyAttributes;
     }
-
 }
