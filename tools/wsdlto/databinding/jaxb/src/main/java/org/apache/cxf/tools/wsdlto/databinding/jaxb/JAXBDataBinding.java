@@ -362,10 +362,12 @@ public class JAXBDataBinding implements DataBindingProfile {
         Mapping mapping = rawJaxbModelGenCode.get(wrapperElement);
         if (mapping != null) {
             List<? extends Property> propList = mapping.getWrapperStyleDrilldown();
-            for (Property pro : propList) {
-                if (pro.elementName().getNamespaceURI().equals(item.getNamespaceURI())
-                    && pro.elementName().getLocalPart().equals(item.getLocalPart())) {
-                    return pro.type().fullName();
+            if (propList != null) {
+                for (Property pro : propList) {
+                    if (pro.elementName().getNamespaceURI().equals(item.getNamespaceURI())
+                        && pro.elementName().getLocalPart().equals(item.getLocalPart())) {
+                        return pro.type().fullName();
+                    }
                 }
             }
         }
