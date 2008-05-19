@@ -309,6 +309,7 @@ public class JettyHTTPServerEngine
                 } catch (Exception ex) {
                     //ignore - probably wasn't fully started anyway
                 }
+                server = null;
                 throw new Fault(new Message("START_UP_SERVER_FAILED_MSG", LOG, e.getMessage()), e);
             }
         }        

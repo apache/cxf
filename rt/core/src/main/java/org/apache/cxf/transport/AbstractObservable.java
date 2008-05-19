@@ -44,7 +44,12 @@ public abstract class AbstractObservable implements Observable {
             if (observer != null) {
                 getLogger().fine("registering incoming observer: " + observer);
                 if (old == null) {
-                    activate();
+                    try {
+                        activate();
+                    } catch (RuntimeException ex) {
+                        incomingObserver = null;
+                        throw ex;
+                    }
                 }
             } else {
                 if (old != null) {

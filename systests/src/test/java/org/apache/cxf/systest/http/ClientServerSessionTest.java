@@ -22,6 +22,8 @@ package org.apache.cxf.systest.http;
 import java.lang.reflect.UndeclaredThrowableException;
 
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
@@ -92,6 +94,26 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
+    }
+    
+    @Test
+    public void testPublishOnBusyPort() {
+        GreeterSessionImpl implementor = new GreeterSessionImpl();
+        String address = "http://localhost:9020/SoapContext/GreeterPort";
+        try {
+            Endpoint.publish(address, implementor);
+            fail("Should have failed to publish as the port is busy");
+        } catch (WebServiceException ex) {
+            //ignore
+        }
+        try {
+            //CXF-1589
+            Endpoint.publish(address, implementor);
+            fail("Should have failed to publish as the port is busy");
+        } catch (WebServiceException ex) {
+            //ignore
+        }
+        
     }
     
 }

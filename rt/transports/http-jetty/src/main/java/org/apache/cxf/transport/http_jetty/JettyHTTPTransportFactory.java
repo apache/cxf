@@ -21,8 +21,8 @@ package org.apache.cxf.transport.http_jetty;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -39,7 +39,7 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
 
     private Map<String, JettyHTTPDestination> destinations = 
-        new HashMap<String, JettyHTTPDestination>();
+        new ConcurrentHashMap<String, JettyHTTPDestination>();
     
     public JettyHTTPTransportFactory() {
         super();
@@ -98,7 +98,7 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
         throws IOException {
         
         String addr = endpointInfo.getAddress();
-        JettyHTTPDestination destination = destinations.get(addr);
+        JettyHTTPDestination destination = addr == null ? null : destinations.get(addr);
         if (destination == null) {
             destination = createDestination(endpointInfo);
         }
@@ -110,8 +110,8 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
         EndpointInfo endpointInfo
     ) throws IOException {
         
-        JettyHTTPDestination destination = 
-            destinations.get(endpointInfo.getAddress());
+        String addr = endpointInfo.getAddress();
+        JettyHTTPDestination destination = addr == null ? null : destinations.get(addr);
         if (destination == null) {
             destination = 
                 new JettyHTTPDestination(getBus(), this, endpointInfo);
