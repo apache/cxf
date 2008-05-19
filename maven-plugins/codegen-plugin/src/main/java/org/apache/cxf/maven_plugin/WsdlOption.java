@@ -89,4 +89,14 @@ public class WsdlOption {
         WsdlOption t = (WsdlOption) obj;
         return t.getWsdl().equals(getWsdl());
     }
+    
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("WSDL: ").append(wsdl).append('\n');
+        builder.append("OutputDir: ").append(outputDir).append('\n');
+        builder.append("Extraargs: ").append(extraargs).append('\n');
+        builder.append("Packagenames: ").append(packagenames).append('\n');
+        builder.append('\n');
+        return builder.toString();
+    }
 }
