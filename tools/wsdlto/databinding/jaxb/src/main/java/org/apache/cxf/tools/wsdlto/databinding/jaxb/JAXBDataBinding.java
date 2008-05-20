@@ -93,6 +93,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     private S2JJAXBModel rawJaxbModelGenCode;
     private ToolContext context;
     private DefaultValueProvider defaultValues;
+    private boolean initialized;
     
     static {
         DEFAULT_TYPE_MAP.add("boolean");
@@ -123,10 +124,8 @@ public class JAXBDataBinding implements DataBindingProfile {
     }    
 
 
-    @SuppressWarnings("unchecked")
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
-
         
         SchemaCompilerImpl schemaCompiler = (SchemaCompilerImpl)XJC.createSchemaCompiler();
         ClassCollector classCollector = context.get(ClassCollector.class);
@@ -138,10 +137,9 @@ public class JAXBDataBinding implements DataBindingProfile {
         schemaCompiler.setErrorListener(listener);
         // Collection<SchemaInfo> schemas = serviceInfo.getSchemas();
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
-        Map<String, Element> schemaLists = (Map<String, Element>)context.get(ToolConstants.SCHEMA_MAP);
+        Map<String, Element> schemaLists = CastUtils.cast((Map<?, ?>)context.get(ToolConstants.SCHEMA_MAP));
 
-        Set<String> keys = schemaLists.keySet();
-        for (String key : keys) {
+        for (String key : schemaLists.keySet()) {
             Element ele = schemaLists.get(key);
             this.removeImportElement(ele);
             String tns = ele.getAttribute("targetNamespace");
@@ -160,8 +158,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
 
                        
-        Map<String, String> nsPkgMap = context.getNamespacePackageMap();
-        for (String ns : nsPkgMap.keySet()) {
+        for (String ns : context.getNamespacePackageMap().keySet()) {
             File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
             try {
                 InputSource ins = new InputSource(file.toURI().toString());
@@ -244,6 +241,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
             }
         }
+        initialized = true;
     }
 
     private String getPluginUsageString(Options opts) {
@@ -305,7 +303,9 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     public void generate(ToolContext c) throws ToolException {
-        initialize(c);
+        if (!initialized) {
+            initialize(c);
+        }
         if (rawJaxbModelGenCode == null) {
             return;
         }

@@ -259,8 +259,9 @@ public class CodeGenTest extends ProcessorTestBase {
         for (Method m : meths) {
             if ("login".equals(m.getName())) {
                 assertEquals(String.class, m.getReturnType());
-                assertEquals(2, m.getParameterTypes().length);
+                assertEquals(3, m.getParameterTypes().length);
                 assertEquals(Holder.class, m.getParameterTypes()[1]);
+                assertEquals(Holder.class, m.getParameterTypes()[2]);
             }
         }
     }

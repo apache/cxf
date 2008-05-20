@@ -23,6 +23,15 @@ under the License.
 		<bindings scd="wsa:EndpointReference">
 			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference" />
 		</bindings>
+		<bindings scd="wsa:ReplyTo">
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference" />
+		</bindings>
+		<bindings scd="wsa:FaultTo">
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference" />
+		</bindings>
+		<bindings scd="wsa:From">
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference" />
+		</bindings>
 		<bindings scd="~wsa:EndpointReferenceType">
 			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference" />
 		</bindings>

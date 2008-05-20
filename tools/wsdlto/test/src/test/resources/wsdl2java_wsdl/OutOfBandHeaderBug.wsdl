@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://cxf.apache.org/bugs/oobh" xmlns:intf="http://cxf.apache.org/bugs/oobh" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://cxf.apache.org/bugs/oobh" xmlns:intf="http://cxf.apache.org/bugs/oobh" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
+xmlns:wsa="http://www.w3.org/2005/08/addressing"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <wsdl:types>
 
         <schema targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://www.w3.org/2001/XMLSchema">
+            <import namespace="http://www.w3.org/2005/08/addressing"
+				schemaLocation="classpath:/schemas/wsdl/ws-addr.xsd" />
+
             <!--  type defined for soap header  -->
             <complexType name="SessionHeader">
                 <sequence>
@@ -25,6 +30,9 @@
     <wsdl:message name="SessionHeader">
         <wsdl:part name="SessionHeader" element="impl:SessionHeader"/>
     </wsdl:message>
+    <wsdl:message name="WSAHeader">
+        <wsdl:part name="WSAHeader" element="wsa:ReplyTo"/>
+    </wsdl:message>
     <wsdl:message name="LoginRequest">
         <wsdl:part name="param" element="impl:Login"/>
     </wsdl:message>
@@ -46,6 +54,7 @@
                 <wsdlsoap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
+                <wsdlsoap:header message="impl:WSAHeader" part="WSAHeader" use="literal"/>
                 <wsdlsoap:header message="impl:SessionHeader" part="SessionHeader" use="literal"/>
                 <wsdlsoap:body use="literal"/>
             </wsdl:output>

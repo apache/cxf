@@ -146,6 +146,22 @@ public final class ProcessorUtil {
         } else {
             name = dataBinding.getType(part.getTypeQName(), false);
         }
+        if (name == null) {
+            String namespace = resolvePartNamespace(part);
+            if ("http://www.w3.org/2005/08/addressing".equals(namespace)) {
+                //The ws-addressing stuff isn't mapped in jaxb as jax-ws specifies they 
+                //need to be mapped differently
+                String pn = part.getConcreteName().getLocalPart();
+                if ("EndpointReference".equals(pn)
+                    || "ReplyTo".equals(pn)
+                    || "From".equals(pn)
+                    || "FaultTo".equals(pn)) {
+                
+                    name = "javax.xml.ws.wsaddressing.W3CEndpointReference";
+                }
+            }
+            
+        }
         return name;       
     }
 
