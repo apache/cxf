@@ -350,7 +350,8 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     protected Class<?> getBeanClass(Class<?> exClass) {
         try {
             if (java.rmi.ServerException.class.isAssignableFrom(exClass)
-                || java.rmi.RemoteException.class.isAssignableFrom(exClass)) {
+                || java.rmi.RemoteException.class.isAssignableFrom(exClass)
+                || "javax.xml.ws".equals(exClass.getPackage().getName())) {
                 return null;
             }
 

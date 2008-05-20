@@ -40,7 +40,6 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisClientServerTest extends AbstractBusClientServerTestBase {
@@ -156,12 +155,11 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Anullb", s);        
     }
     
-    @Ignore
     @Test
     public void testDynamicClient() throws Exception {
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient("http://localhost:9002/jaxwsAndAegisSports?wsdl");
-        Object r = client.invoke("getAttributeBean", (Object[]) null);
+        Object r = client.invoke("getAttributeBean")[0];
         Method getAddrPlainString = r.getClass().getMethod("getAttrPlainString");
         String s = (String)getAddrPlainString.invoke(r);
         assertEquals("attrPlain", s);

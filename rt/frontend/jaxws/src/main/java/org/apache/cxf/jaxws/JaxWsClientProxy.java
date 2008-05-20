@@ -31,6 +31,7 @@ import java.util.concurrent.FutureTask;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
@@ -190,31 +191,11 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 exception.initCause(ex);
                 throw exception;
             } else if (getBinding() instanceof SOAPBinding) {
-                SOAPFault soapFault = ((SOAPBinding)getBinding()).getSOAPFactory().createFault();
+                SOAPFault soapFault = createSoapFault(ex);
+                if (soapFault == null) {
+                    throw new WebServiceException(ex);
+                }
                 
-                if (ex instanceof SoapFault) {
-                    soapFault.setFaultString(((SoapFault)ex).getReason());
-                    soapFault.setFaultCode(((SoapFault)ex).getFaultCode());
-                    soapFault.setFaultActor(((SoapFault)ex).getRole());
-
-                    Node nd = soapFault.getOwnerDocument().importNode(((SoapFault)ex).getOrCreateDetail(),
-                                                                      true);
-                    nd = nd.getFirstChild();
-                    soapFault.addDetail();
-                    while (nd != null) {
-                        Node next = nd.getNextSibling();
-                        soapFault.getDetail().appendChild(nd);
-                        nd = next;
-                    }
- 
-                } else {
-                    soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
-                    String msg = ex.getMessage();
-                    if (msg != null) {
-                        soapFault.setFaultString(msg);
-                    }
-                }      
-  
                 SOAPFaultException  exception = new SOAPFaultException(soapFault);
                 exception.initCause(ex);
                 throw exception;                
@@ -241,6 +222,47 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
 
     }
     
+    private SOAPFault createSoapFault(Exception ex) throws SOAPException {
+        SOAPFault soapFault;
+        try {
+            soapFault = ((SOAPBinding)getBinding()).getSOAPFactory().createFault();
+        } catch (Throwable t) {
+            //probably an old version of saaj or something that is not allowing createFault 
+            //method to work.  Try the saaj 1.2 method of doing this.
+            try {
+                soapFault = ((SOAPBinding)getBinding()).getMessageFactory().createMessage()
+                    .getSOAPBody().addFault();
+            } catch (Throwable t2) {
+                //still didn't work, we'll just throw what we have
+                return null;
+            }                        
+        }
+        
+        if (ex instanceof SoapFault) {
+            soapFault.setFaultString(((SoapFault)ex).getReason());
+            soapFault.setFaultCode(((SoapFault)ex).getFaultCode());
+            soapFault.setFaultActor(((SoapFault)ex).getRole());
+
+            Node nd = soapFault.getOwnerDocument().importNode(((SoapFault)ex).getOrCreateDetail(),
+                                                              true);
+            nd = nd.getFirstChild();
+            soapFault.addDetail();
+            while (nd != null) {
+                Node next = nd.getNextSibling();
+                soapFault.getDetail().appendChild(nd);
+                nd = next;
+            }
+
+        } else {
+            soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
+            String msg = ex.getMessage();
+            if (msg != null) {
+                soapFault.setFaultString(msg);
+            }
+        }      
+        return soapFault;
+    }
+
     private boolean addressChanged(String address) {
         return !(address == null
                  || getClient().getEndpoint().getEndpointInfo() == null

@@ -680,6 +680,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         for (int i = 0; i < types.length; i++) {
             Class exClass = types[i];
             Class beanClass = getBeanClass(exClass);
+            if (beanClass == null) {
+                continue;
+            }
 
             QName name = getFaultName(o.getInterface(), o, exClass, beanClass);
 

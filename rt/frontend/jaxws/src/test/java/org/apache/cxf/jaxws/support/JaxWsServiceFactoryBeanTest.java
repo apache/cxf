@@ -24,10 +24,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.jws.WebService;
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Binding;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPBinding;
@@ -254,4 +257,28 @@ public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
         assertTrue(binding instanceof SOAPBinding);
         assertTrue(((SOAPBinding)binding).isMTOMEnabled());
     }   
+    
+    @Test
+    public void testWebSeviceException() throws Exception {
+        ReflectionServiceFactoryBean bean = new JaxWsServiceFactoryBean();
+        Bus bus = getBus();
+        bean.setBus(bus);
+        bean.setServiceClass(WebServiceExceptionTestImpl.class);
+        Service service = bean.create();
+        ServiceInfo si = service.getServiceInfos().get(0);
+        ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus, si);
+        Definition def = builder.build();
+        
+        Document wsdl = WSDLFactory.newInstance().newWSDLWriter().getDocument(def);
+        
+        assertInvalid("/wsdl:definitions/wsdl:message[@name='WebServiceException']", wsdl);
+    }
+    
+    @WebService
+    public static class WebServiceExceptionTestImpl {
+        public int echoInt(int i) throws WebServiceException {
+            return i;
+        }
+        
+    }
 }
