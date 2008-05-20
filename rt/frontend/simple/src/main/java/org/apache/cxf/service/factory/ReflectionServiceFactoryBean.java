@@ -672,6 +672,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (paraAnnos != null && part != null) {
             part.setProperty(PARAM_ANNOTATION, paraAnnos);
         }
+        
         return true;
     }    
     private void setFaultClassInfo(OperationInfo o, Method selected) {
@@ -1491,6 +1492,36 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             part.setProperty(RAW_CLASS, rawClass);
         }
         part.setTypeClass(rawClass);
+        
+        if (part.getMessageInfo().getOperation().isUnwrapped()
+            && Boolean.TRUE.equals(part.getProperty(HEADER))) {
+            //header from the unwrapped operation, make sure the type is set for the 
+            //approriate header in the wrapped operation
+            OperationInfo o = ((UnwrappedOperationInfo)part.getMessageInfo().getOperation())
+                .getWrappedOperation();
+            
+            if (Boolean.TRUE.equals(part.getProperty(ReflectionServiceFactoryBean.MODE_OUT))
+                || Boolean.TRUE.equals(part.getProperty(ReflectionServiceFactoryBean.MODE_INOUT))) {
+                MessagePartInfo mpi = o.getOutput().getMessagePart(part.getName());
+                if (mpi != null) {
+                    mpi.setTypeClass(rawClass);
+                    mpi.setProperty(GENERIC_TYPE, type);
+                    if (Collection.class.isAssignableFrom(rawClass)) {
+                        mpi.setProperty(RAW_CLASS, type);
+                    }
+                }
+            }
+            if (!Boolean.TRUE.equals(part.getProperty(ReflectionServiceFactoryBean.MODE_OUT))) {
+                MessagePartInfo mpi = o.getInput().getMessagePart(part.getName());
+                if (mpi != null) {
+                    mpi.setTypeClass(rawClass);
+                    mpi.setProperty(GENERIC_TYPE, type);
+                    if (Collection.class.isAssignableFrom(rawClass)) {
+                        mpi.setProperty(RAW_CLASS, type);
+                    }
+                }
+            }
+        }      
     }
 
 
