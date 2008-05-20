@@ -401,6 +401,9 @@ public final class DynamicClientFactory {
         do {
             if (tcl instanceof URLClassLoader) {
                 URL[] urls = ((URLClassLoader)tcl).getURLs();
+                if (urls == null) {
+                    urls = new URL[0];
+                }
                 for (URL url : urls) {
                     if (url.getProtocol().startsWith("file")) {
                         File file; 
