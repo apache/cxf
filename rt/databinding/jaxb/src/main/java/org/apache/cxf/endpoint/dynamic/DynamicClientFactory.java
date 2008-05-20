@@ -175,9 +175,7 @@ public final class DynamicClientFactory {
 
         for (Iterator<JPackage> packages = codeModel.packages(); packages.hasNext();) {
             JPackage jpackage = packages.next();
-            String name = jpackage.name();
-            if ("org.w3._2001.xmlschema".equals(name)
-                || !jpackage.classes().hasNext()) {
+            if (!isValidPackage(jpackage)) {
                 continue;
             }
             if (firstnt) {
@@ -260,6 +258,27 @@ public final class DynamicClientFactory {
         // delete the classes files
         FileUtils.removeDir(classes);
         return client;
+    }
+
+    private boolean isValidPackage(JPackage jpackage) {
+        if (jpackage == null) {
+            return false;
+        }
+        String name = jpackage.name();
+        if ("org.w3._2001.xmlschema".equals(name)
+            || "java.lang".equals(name)
+            || "java.io".equals(name)
+            || "generated".equals(name)) {
+            return false;
+        }
+        Iterator<JDefinedClass> i = jpackage.classes();
+        while (i.hasNext()) {
+            JDefinedClass current = i.next();
+            if ("ObjectFactory".equals(current.name())) { 
+                return true;
+            }
+        }
+        return false;
     }
 
     private void outputDebug(JCodeModel codeModel) {
