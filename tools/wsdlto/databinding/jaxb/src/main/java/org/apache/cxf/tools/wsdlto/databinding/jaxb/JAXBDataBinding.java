@@ -129,7 +129,11 @@ public class JAXBDataBinding implements DataBindingProfile {
         
         SchemaCompilerImpl schemaCompiler = (SchemaCompilerImpl)XJC.createSchemaCompiler();
         ClassCollector classCollector = context.get(ClassCollector.class);
-        ClassNameAllocatorImpl allocator = new ClassNameAllocatorImpl(classCollector);
+        
+        
+        ClassNameAllocatorImpl allocator 
+            = new ClassNameAllocatorImpl(classCollector,
+                                         c.optionSet(ToolConstants.CFG_AUTORESOLVE));
 
         schemaCompiler.setClassNameAllocator(allocator);
            

@@ -159,6 +159,14 @@ Examples:
                 </annotation>
                 <switch>all</switch>
             </option>
+            
+            <option id="autoNameResolution" maxOccurs="1">
+                <annotation>
+                    If there are conflicts in the generated classnames, try to auto-generate new
+                    classnames instead of forcing the use of binding customizations.
+                </annotation>
+                <switch>autoNameResolution</switch>
+            </option>
 
 	        <option id="defaultValues" maxOccurs="1">
                 <annotation>

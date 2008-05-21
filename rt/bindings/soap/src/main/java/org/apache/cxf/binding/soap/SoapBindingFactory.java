@@ -403,7 +403,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             if (def != null && schemas != null) {
                 javax.wsdl.Message msg = def.getMessage(header.getMessage());
                 if (msg != null) {
-                    addOutOfBandParts(bop, msg, schemas, isInput);
+                    addOutOfBandParts(bop, msg, schemas, isInput, header.getPart());
                     serviceInfo.refresh();
                 } else {
                     throw new RuntimeException("Header message not defined in service model.");
@@ -413,7 +413,8 @@ public class SoapBindingFactory extends AbstractBindingFactory {
     }
 
     private void addOutOfBandParts(final BindingOperationInfo bop, final javax.wsdl.Message msg,
-                                   final SchemaCollection schemas, boolean isInput) {
+                                   final SchemaCollection schemas, boolean isInput,
+                                   final String partName) {
         MessageInfo minfo = null;
         MessageInfo.Type type;
 
@@ -446,7 +447,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         if (minfo == null) {
             minfo = new MessageInfo(null, type, msg.getQName());
         }
-        buildMessage(minfo, msg, schemas, nextId);
+        buildMessage(minfo, msg, schemas, nextId, partName);
 
         // for wrapped style
         OperationInfo unwrapped = bop.getOperationInfo().getUnwrappedOperation();
@@ -485,29 +486,35 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         if (minfo == null) {
             minfo = new MessageInfo(unwrapped, type, msg.getQName());
         }
-        buildMessage(minfo, msg, schemas, nextId);
+        buildMessage(minfo, msg, schemas, nextId, partName);
     }
 
     private void buildMessage(MessageInfo minfo,
                               javax.wsdl.Message msg,
                               SchemaCollection schemas,
-                              int nextId) {
+                              int nextId,
+                              String partNameFilter) {
         for (Part part : cast(msg.getParts().values(), Part.class)) {
-            MessagePartInfo pi = minfo.addMessagePart(new QName(minfo.getName().getNamespaceURI(), part
-                                                                .getName()));
-            if (part.getTypeName() != null) {
-                pi.setTypeQName(part.getTypeName());
-                pi.setElement(false);
-                pi.setXmlSchema(schemas.getTypeByQName(part.getTypeName()));
-            } else {
-                pi.setElementQName(part.getElementName());
-                pi.setElement(true);
-                pi.setXmlSchema(schemas.getElementByQName(part.getElementName()));
+            
+            if (StringUtils.isEmpty(partNameFilter)
+                || part.getName().equals(partNameFilter)) {
+            
+                MessagePartInfo pi = minfo.addMessagePart(new QName(minfo.getName().getNamespaceURI(), part
+                                                                    .getName()));
+                if (part.getTypeName() != null) {
+                    pi.setTypeQName(part.getTypeName());
+                    pi.setElement(false);
+                    pi.setXmlSchema(schemas.getTypeByQName(part.getTypeName()));
+                } else {
+                    pi.setElementQName(part.getElementName());
+                    pi.setElement(true);
+                    pi.setXmlSchema(schemas.getElementByQName(part.getElementName()));
+                }
+                pi.setProperty(OUT_OF_BAND_HEADER, Boolean.TRUE);
+                pi.setProperty(HEADER, Boolean.TRUE);
+                pi.setIndex(nextId);
+                nextId++;
             }
-            pi.setProperty(OUT_OF_BAND_HEADER, Boolean.TRUE);
-            pi.setProperty(HEADER, Boolean.TRUE);
-            pi.setIndex(nextId);
-            nextId++;
         }
     }
 

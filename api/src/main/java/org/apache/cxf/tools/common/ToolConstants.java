@@ -44,6 +44,7 @@ public final class ToolConstants {
     public static final String CFG_VERBOSE = "verbose";
     public static final String CFG_PORT = "port";
     public static final String CFG_BINDING = "binding";
+    public static final String CFG_AUTORESOLVE = "autoNameResolution";
     public static final String CFG_WEBSERVICE = "webservice";
     public static final String CFG_SERVER = "server";
     public static final String CFG_CLIENT = "client";

@@ -20,15 +20,17 @@
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 
 import com.sun.tools.xjc.api.ClassNameAllocator;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.util.ClassCollector;
 
 public class ClassNameAllocatorImpl implements ClassNameAllocator {
     private static final String TYPE_SUFFIX = "_Type";
     private ClassCollector collector;
+    private boolean autoResolveConflicts;
 
-    public ClassNameAllocatorImpl(ClassCollector classCollector) {
+    public ClassNameAllocatorImpl(ClassCollector classCollector, boolean autoResolve) {
         collector = classCollector;
-
+        autoResolveConflicts = autoResolve;
     }
 
     private boolean isNameCollision(String packageName, String className) {
@@ -41,7 +43,24 @@ public class ClassNameAllocatorImpl implements ClassNameAllocator {
             fullClzName = className + TYPE_SUFFIX;
         }
 
-        collector.addTypesClassName(packageName, className, packageName + "." + fullClzName);
+        String fullPckClass = packageName + "." + fullClzName;
+        
+        if (autoResolveConflicts) {
+            String t2 = collector.getTypesFullClassName(packageName, className);
+            int cnt = 1;
+            while (!StringUtils.isEmpty(t2)) {
+                
+                cnt++;
+                t2 = collector.getTypesFullClassName(packageName, className + cnt);
+            }
+            if (cnt != 1) {
+                className = className + cnt;
+                fullClzName = fullClzName + cnt;
+                fullPckClass = packageName + "." + fullClzName;
+            }
+        }
+        collector.addTypesClassName(packageName, className, fullPckClass);
+        
         return fullClzName;
     }
    
