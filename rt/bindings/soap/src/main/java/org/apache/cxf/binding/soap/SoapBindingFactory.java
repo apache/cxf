@@ -632,7 +632,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                             bmsg.getMessageParts().remove(mpi);
                         } else if (SOAPBindingUtil.isSOAPBody(content)) {
                             SoapBody sb = SOAPBindingUtil.getSoapBody(content);
-                            if (sb.getParts().size() == 1) {
+                            if (sb.getParts() != null && sb.getParts().size() == 1) {
                                 partName = (String) sb.getParts().get(0);
                             }
 
