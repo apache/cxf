@@ -2074,6 +2074,9 @@ public abstract class AbstractTypeTestClient
                 assertTrue("testStringList(): Incorrect value for out param", yOrig.equals(z.value));
                 assertTrue("testStringList(): Incorrect return value", x.equals(ret));
             }
+            if (testDocLiteral) {
+                ret = docClient.testStringList(null, y, z);
+            }
         } else {
             String[] x = {"I", "am", "SimpleList"};
             String[] yOrig = {"Does", "SimpleList", "Work"};

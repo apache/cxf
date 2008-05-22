@@ -301,7 +301,7 @@ final class WrapperHelperCompiler extends ASMHelper {
         // List newA = (List)lst.get(99);
         // if (aVal == null) {
         // obj.setA(newA);
-        // } else {
+        // } else if (newA != null) {
         // aVal.addAll(newA);
         // }
         
@@ -341,6 +341,8 @@ final class WrapperHelperCompiler extends ASMHelper {
         Label jumpOverLabel = new Label();
         mv.visitJumpInsn(Opcodes.GOTO, jumpOverLabel);
         mv.visitLabel(nonNullLabel);
+        mv.visitVarInsn(Opcodes.ALOAD, 4);
+        mv.visitJumpInsn(Opcodes.IFNULL, jumpOverLabel);
         mv.visitVarInsn(Opcodes.ALOAD, 3);
         mv.visitVarInsn(Opcodes.ALOAD, 4);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE,
