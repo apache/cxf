@@ -17,7 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<!-- START SNIPPET: beans -->
 <!--beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:simple="http://cxf.apache.org/simple"
@@ -90,7 +89,6 @@ http://cxf.apache.org/schemas/jaxws.xsd">
     </jaxws:serviceBean>
    </jaxws:server>  
    
-     
   <jaxws:server address="/jaxwsAndAegisSports"
     serviceClass="org.apache.cxf.systest.aegis.SportsService">
     <jaxws:dataBinding>
@@ -101,4 +99,3 @@ http://cxf.apache.org/schemas/jaxws.xsd">
     </jaxws:serviceBean>
   </jaxws:server>
 </beans>
-<!-- END SNIPPET: beans -->

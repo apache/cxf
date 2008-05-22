@@ -23,15 +23,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.ws.WebServiceException;
-
 /**
  * 
  */
 public class SportsServiceImpl implements SportsService {
 
     /** {@inheritDoc}*/
-    public Collection<Team> getTeams() throws WebServiceException {
+    public Collection<Team> getTeams() {
         List<Team> teams = new ArrayList<Team>();
         teams.add(new Team("Patriots", "New England"));
         return teams;

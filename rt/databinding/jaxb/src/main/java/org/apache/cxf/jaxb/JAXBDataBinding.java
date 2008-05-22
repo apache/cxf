@@ -378,7 +378,8 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         return extraClass;
     }
 
-    private List<DOMResult> generateJaxbSchemas() throws IOException {
+    // default access for tests.
+    List<DOMResult> generateJaxbSchemas() throws IOException {
         final List<DOMResult> results = new ArrayList<DOMResult>();
 
         context.generateSchema(new SchemaOutputResolver() {

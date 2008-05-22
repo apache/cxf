@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxb.fortest;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(namespace = "uri:ultima:thule")
@@ -31,5 +32,31 @@ public class QualifiedBean {
 
     public void setAriadne(String ariadne) {
         this.ariadne = ariadne;
+    }
+    
+    @XmlAttribute
+    public String getDefaultAttribute() {
+        return "default";
+    }
+    
+    public void setDefaultAttribute(String val) {
+        //
+    }
+    
+    
+    @XmlAttribute(namespace = "")
+    public String getEmptyNamespaceAttribute() {
+        return "empty";
+    }
+    
+    public void setEmptyNamespaceAttribute() {
+    }
+
+    @XmlAttribute(namespace = "urn:xyzzy")
+    public String getExplicitNamespaceAttribute() {
+        return "explicit";
+    }
+    
+    public void setExplicitNamespaceAttribute() {
     }
 }
