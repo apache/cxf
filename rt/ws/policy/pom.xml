@@ -32,9 +32,9 @@
 
     <dependencies>
         
-    <dependency>
-        <groupId>javax.xml.ws</groupId>
-        <artifactId>jaxws-api</artifactId>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxws_2.1_spec</artifactId>
 	</dependency>
 	<dependency>
 	    <groupId>org.apache.geronimo.specs</groupId>

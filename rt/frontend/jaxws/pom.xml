@@ -56,8 +56,8 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxws_2.1_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>asm</groupId>

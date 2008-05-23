@@ -333,7 +333,7 @@ public class ServerLauncher {
         }
         cmd.add("-ea");
         
-        cmd.add("-Djavax.xml.ws.spi.Provider=org.apache.cxf.bus.jaxws.spi.ProviderImpl");
+        cmd.add("-Djavax.xml.ws.spi.Provider=org.apache.cxf.jaxws.spi.ProviderImpl");
         String portClose = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
         if (portClose != null) {
             cmd.add("-Dorg.apache.cxf.transports.http_jetty.DontClosePort=" + portClose);
