@@ -126,9 +126,11 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         DocumentBuilderFactory factory = super.createDocumentBuilderFactory(validationMode, namespaceAware);
         try {
             factory.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", false);
-        } catch (ParserConfigurationException pce) {
-            // blank
+        } catch (Exception e) {
+            // we can get all kinds of exceptions from this
+            // due to old copies of Xerces and whatnot.
         }
+        
         return factory;
     }
     
