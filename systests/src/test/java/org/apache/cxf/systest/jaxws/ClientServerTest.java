@@ -115,6 +115,20 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Client client = dynamicClientFactory.createClient(wsdlUrl);
         assertNotNull(client);
     }
+    
+    @Test
+    public void testJaxWsDynamicClient() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/others/dynamic_client_base64.wsdl");
+        assertNotNull(wsdl);
+        String wsdlUrl = null;
+        wsdlUrl = wsdl.toURI().toString();
+        CXFBusFactory busFactory = new CXFBusFactory(); 
+        Bus bus = busFactory.createBus();
+        org.apache.cxf.jaxws.endpoint.dynamic.DynamicClientFactory dynamicClientFactory = 
+            org.apache.cxf.jaxws.endpoint.dynamic.DynamicClientFactory.newInstance(bus);
+        Client client = dynamicClientFactory.createClient(wsdlUrl);
+        assertNotNull(client);
+    }
         
     @Test
     public void testBasicConnection() throws Exception {
