@@ -65,6 +65,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.endpoint.EndpointImplFactory;
+import org.apache.cxf.endpoint.SimpleEndpointImplFactory;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.resource.URIResolver;
@@ -76,7 +78,7 @@ import org.apache.cxf.service.model.ServiceInfo;
  * 
  *
  */
-public final class DynamicClientFactory {
+public class DynamicClientFactory {
 
     private static final Logger LOG = LogUtils.getL7dLogger(DynamicClientFactory.class);
 
@@ -88,8 +90,12 @@ public final class DynamicClientFactory {
     
     private Map<String, Object> jaxbContextProperties;
     
-    private DynamicClientFactory(Bus bus) {
+    protected DynamicClientFactory(Bus bus) {
         this.bus = bus;
+    }
+    
+    protected EndpointImplFactory getEndpointImplFactory() {
+        return SimpleEndpointImplFactory.getSingleton();
     }
 
     public void setTemporaryDirectory(String dir) {
@@ -156,7 +162,8 @@ public final class DynamicClientFactory {
         }
         URL u = composeUrl(wsdlUrl);
         LOG.log(Level.FINE, "Creating client from URL " + u.toString());
-        ClientImpl client = new ClientImpl(bus, u, service, port);
+        ClientImpl client = new ClientImpl(bus, u, service, port,
+                                           getEndpointImplFactory());
 
         Service svc = client.getEndpoint().getService();
         //all SI's should have the same schemas

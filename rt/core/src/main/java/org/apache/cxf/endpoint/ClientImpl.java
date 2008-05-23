@@ -94,14 +94,34 @@ public class ClientImpl
     }
 
     public ClientImpl(URL wsdlUrl) {
-        this(BusFactory.getThreadDefaultBus(), wsdlUrl, null, null);
+        this(BusFactory.getThreadDefaultBus(), wsdlUrl, null, null, SimpleEndpointImplFactory.getSingleton());
     }
     
     public ClientImpl(URL wsdlUrl, QName port) {
-        this(BusFactory.getThreadDefaultBus(), wsdlUrl, null, port);
+        this(BusFactory.getThreadDefaultBus(), wsdlUrl, null, port, SimpleEndpointImplFactory.getSingleton());
     }
 
+    /**
+     * Create a Client that uses the default EndpointImpl.
+     * @param bus
+     * @param wsdlUrl
+     * @param service
+     * @param port
+     */
     public ClientImpl(Bus bus, URL wsdlUrl, QName service, QName port) {
+        this(bus, wsdlUrl, service, port, SimpleEndpointImplFactory.getSingleton());
+    }
+
+    /**
+     * Create a Client that uses a specific EndpointImpl.
+     * @param bus
+     * @param wsdlUrl
+     * @param service
+     * @param port
+     * @param endpointImplFactory
+     */
+    public ClientImpl(Bus bus, URL wsdlUrl, QName service, 
+                      QName port, EndpointImplFactory endpointImplFactory) {
         this.bus = bus;
         
         WSDLServiceFactory sf = (service == null)
