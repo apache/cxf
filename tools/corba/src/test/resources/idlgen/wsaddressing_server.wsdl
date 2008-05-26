@@ -17,14 +17,26 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions name="c/epr.idl" targetNamespace="http://schemas.apache.org/idl/c/epr.idl" xmlns:tns="http://schemas.apache.org/idl/c/epr.idl" xmlns:corbatm="http://schemas.apache.org/typemap/corba/c/epr.idl" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/idl/c/epr.idl/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:addressing="http://www.w3.org/2005/08/addressing" xmlns:xsd1="http://schemas.apache.org/idltypes/c/epr.idl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+addressing
+<definitions name="c/epr.idl" 
+             targetNamespace="http://schemas.apache.org/idl/c/epr.idl" 
+             xmlns:tns="http://schemas.apache.org/idl/c/epr.idl" 
+             xmlns:corbatm="http://schemas.apache.org/typemap/corba/c/epr.idl" 
+             xmlns:corba="http://cxf.apache.org/bindings/corba" 
+             xmlns:ns1="http://schemas.apache.org/idl/c/epr.idl/corba/typemap/" 
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+             xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+             xmlns:addressing="http://www.w3.org/2005/08/addressing" 
+             xmlns:xsd1="http://schemas.apache.org/idltypes/c/epr.idl" 
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
   <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/c/epr.idl/corba/typemap/">
     <corba:object xmlns:addressing="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="addressing:EndpointReferenceType" name="CORBA.Object" />
   </corba:typeMapping>
   <types>
     <schema targetNamespace="http://schemas.apache.org/idltypes/c/epr.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-     <xsd:import xmlns:xsd="http://www.w3.org/2001/XMLSchema" namespace="http://www.w3.org/2005/08/addressing" schemaLocation="./src/test/resources/wsdl/wsaddressing.xsd"/>
+     <xsd:import xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                 namespace="http://www.w3.org/2005/08/addressing" 
+                 schemaLocation="./src/test/resources/wsdl/wsaddressing.xsd"/>
     </schema>
   </types>
   <message name="TestServer.registerResponse">

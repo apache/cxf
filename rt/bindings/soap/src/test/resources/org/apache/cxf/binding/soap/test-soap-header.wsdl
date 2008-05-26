@@ -37,6 +37,9 @@
 					</sequence>
 				</complexType>
 			</element>
+			<element name="inHeaderResponse">
+			 <complexType/>
+			</element>
 		</schema>
 		
 		<schema targetNamespace="http://mycompany.example.com/employees"

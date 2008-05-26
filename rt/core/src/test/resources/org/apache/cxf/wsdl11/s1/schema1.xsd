@@ -23,6 +23,26 @@
 
   <xs:import namespace="http://apache.org/hello_world_soap_http/types/s3" schemaLocation="./s3/schema3.xsd"/>
 
+  <xs:element name="sayHi">
+    <xs:complexType/>
+  </xs:element>
+  
+  <xs:element name="sayHiResponse">
+    <xs:complexType/>
+  </xs:element>
+
+  <xs:element name="greetMe">
+    <xs:complexType/>
+  </xs:element>
+
+  <xs:element name="greetMeResponse">
+    <xs:complexType/>
+  </xs:element>
+
+  <xs:element name="greetMeOneWay">
+    <xs:complexType/>
+  </xs:element>
+  
   <xs:element name="pingMe">
     <xs:complexType/>
   </xs:element>

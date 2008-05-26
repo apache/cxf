@@ -25,8 +25,7 @@
     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
     xmlns:tns="http://schemas.apache.org/tests" 
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/tests">
- 
+    xmlns:stringtypes="http://schemas.apache.org/idltypes/stringtypes.idl">
   <corba:typeMapping 
       targetNamespace="http://schemas.apache.org/tests/corba/typemap/">
   </corba:typeMapping>
@@ -53,52 +52,52 @@
     </schema>
   </types>
   <message name="BasePortType.echoNormalizedString">
-    <part name="inputNormalizedString" element="xsd1:BasePortType.echoNormalizedString.input"/>
+    <part name="inputNormalizedString" element="stringtypes:BasePortType.echoNormalizedString.input"/>
   </message>
   <message name="BasePortType.echoNormalizedStringResponse">
-    <part name="return" element="xsd1:BasePortType.echoNormalizedString.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoNormalizedString.return"/>
   </message>
   <message name="BasePortType.echoToken">
-    <part name="inputToken" element="xsd1:BasePortType.echoToken.input"/>
+    <part name="inputToken" element="stringtypes:BasePortType.echoToken.input"/>
   </message>
   <message name="BasePortType.echoTokenResponse">
-    <part name="return" element="xsd1:BasePortType.echoToken.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoToken.return"/>
   </message>
   <message name="BasePortType.echoLanguage">
-    <part name="inputLanguage" element="xsd1:BasePortType.echoLanguage.input"/>
+    <part name="inputLanguage" element="stringtypes:BasePortType.echoLanguage.input"/>
   </message>
   <message name="BasePortType.echoLanguageResponse">
-    <part name="return" element="xsd1:BasePortType.echoLanguage.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoLanguage.return"/>
   </message>
   <message name="BasePortType.echoNMTOKEN">
-    <part name="inputNMTOKEN" element="xsd1:BasePortType.echoNMTOKEN.input"/>
+    <part name="inputNMTOKEN" element="stringtypes:BasePortType.echoNMTOKEN.input"/>
   </message>
   <message name="BasePortType.echoNMTOKENResponse">
-    <part name="return" element="xsd1:BasePortType.echoNMTOKEN.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoNMTOKEN.return"/>
   </message>
   <message name="BasePortType.echoName">
-    <part name="inputName" element="xsd1:BasePortType.echoName.input"/>
+    <part name="inputName" element="stringtypes:BasePortType.echoName.input"/>
   </message>
   <message name="BasePortType.echoNameResponse">
-    <part name="return" element="xsd1:BasePortType.echoName.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoName.return"/>
   </message>
   <message name="BasePortType.echoNCName">
-    <part name="inputNCName" element="xsd1:BasePortType.echoNCName.input"/>
+    <part name="inputNCName" element="stringtypes:BasePortType.echoNCName.input"/>
   </message>
   <message name="BasePortType.echoNCNameResponse">
-    <part name="return" element="xsd1:BasePortType.echoNCName.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoNCName.return"/>
   </message>
   <message name="BasePortType.echoID">
-    <part name="inputID" element="xsd1:BasePortType.echoID.input"/>
+    <part name="inputID" element="stringtypes:BasePortType.echoID.input"/>
   </message>
   <message name="BasePortType.echoIDResponse">
-    <part name="return" element="xsd1:BasePortType.echoID.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoID.return"/>
   </message>
   <message name="BasePortType.echoAnyURI">
-    <part name="inputAnyURI" element="xsd1:BasePortType.echoAnyURI.input"/>
+    <part name="inputAnyURI" element="stringtypes:BasePortType.echoAnyURI.input"/>
   </message>
   <message name="BasePortType.echoAnyURIResponse">
-    <part name="return" element="xsd1:BasePortType.echoAnyURI.return"/>
+    <part name="return" element="stringtypes:BasePortType.echoAnyURI.return"/>
   </message>
   <portType name="BasePortType">
     <operation name="echoNormalizedString">

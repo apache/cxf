@@ -33,7 +33,7 @@
      xmlns="http://www.w3.org/2001/XMLSchema"
      xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
      <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
-      <xsd:element name="xsd1:TestServer.register.cb" type="addressing:EndpointReferenceType"/>
+      <xsd:element name="TestServer.register.cb" type="addressing:EndpointReferenceType"/>
     </schema>
   </types>
   <message name="TestServer.register">

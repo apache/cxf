@@ -31,7 +31,7 @@
       targetNamespace="http://schemas.apache.org/tests/corba/typemap/">
   </corba:typeMapping>
   <types>
-    <schema targetNamespace="http://schemas.iona.com/idltypes/integertypes.idl"
+    <schema targetNamespace="http://schemas.apache.org/tests"
      xmlns="http://www.w3.org/2001/XMLSchema"
      xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
       <xsd:element name="BasePortType.echoInteger.input" type="xsd:integer"/>

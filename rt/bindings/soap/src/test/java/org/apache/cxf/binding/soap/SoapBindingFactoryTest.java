@@ -90,7 +90,7 @@ public class SoapBindingFactoryTest extends Assert {
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
         ServiceInfo serviceInfo = builder
-            .buildServices(d, new QName("urn:cxf:no_body_parts/wsdl", 
+            .buildServices(d, new QName("urn:org:apache:cxf:no_body_parts/wsdl", 
                                         "NoBodyParts"))
             .get(0);
 
@@ -103,8 +103,8 @@ public class SoapBindingFactoryTest extends Assert {
         assertTrue(WSDLConstants.NS_SOAP11_HTTP_TRANSPORT.equalsIgnoreCase(sbi.getTransportURI()));
         assertTrue(sbi.getSoapVersion() instanceof Soap11);
 
-        BindingOperationInfo boi = sbi.getOperation(new QName("urn:cxf:no_body_parts/wsdl",
-                                                              "convertMime"));
+        BindingOperationInfo boi = sbi.getOperation(new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+                                                              "operation1"));
 
         assertNotNull(boi);
         SoapOperationInfo sboi = boi.getExtensor(SoapOperationInfo.class);

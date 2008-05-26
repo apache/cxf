@@ -550,9 +550,8 @@ public class WSDLServiceBuilder {
         XmlSchemaElement outputEl = null;
 
         // RULE No.2:
-        // The input message part refers to a global element decalration whose
-        // localname
-        // is equal to the operation name
+        // The input message part refers to a global element declaration whose
+        // local name is equal to the operation name.
         MessagePartInfo inputPart = inputMessage.getMessagePartByIndex(0);
         if (!inputPart.isElement()) {
             passedRule = false;
@@ -720,8 +719,17 @@ public class WSDLServiceBuilder {
                 pi.setXmlSchema(schemas.getTypeByQName(part.getTypeName()));
             } else {
                 pi.setElementQName(part.getElementName());
+                XmlSchemaElement schemaElement = schemas.getElementByQName(part.getElementName());
+                if (null == schemaElement) {
+                    org.apache.cxf.common.i18n.Message errorMessage = 
+                        new org.apache.cxf.common.i18n.Message("WSDL4J_BAD_ELEMENT_PART",
+                                                               LOG,
+                                                               part.getName(),
+                                                               part.getElementName());
+                    throw new WSDLRuntimeException(errorMessage);
+                }
                 pi.setElement(true);
-                pi.setXmlSchema(schemas.getElementByQName(part.getElementName()));
+                pi.setXmlSchema(schemaElement);
             }
         }
     }
