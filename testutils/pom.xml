@@ -166,13 +166,13 @@
                    <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
                 </configuration>
                 <executions>
-                    <execution>
+                    <!-- execution>
                         <id>validate</id>
                         <phase>validate</phase>
                         <goals>
                           <goal>wsdlvalidator</goal>
                         </goals>
-                    </execution>
+                    </execution -->
                   </executions>
             </plugin>
             <plugin>

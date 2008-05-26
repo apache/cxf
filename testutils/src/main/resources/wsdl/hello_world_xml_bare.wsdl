@@ -101,11 +101,11 @@ under the License.
         </wsdl:operation>
         <wsdl:operation name="testTriPart" parameterOrder="in1 in3 in2">
             <wsdl:input message="tns:triPartRequest" name="triPartRequest"/>
-            <wsdl:output message="tns:multiParamPartResponse" name="multiParamPartResponse"/>
+            <wsdl:output message="tns:multiParamPartResponse" name="triPartResponse"/>
         </wsdl:operation>
         <wsdl:operation name="testTriPartNoOrder">
-            <wsdl:input message="tns:triPartRequest" name="triPartRequest"/>
-            <wsdl:output message="tns:multiParamPartResponse" name="multiParamPartResponse"/>
+            <wsdl:input message="tns:triPartRequest" name="triPartNoOrderRequest"/>
+            <wsdl:output message="tns:multiParamPartResponse" name="tryPartNoOrderPartResponse"/>
         </wsdl:operation>
     </wsdl:portType>
 

@@ -21,12 +21,13 @@ package org.apache.cxf.maven_plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.tools.common.toolspec.ToolRunner;
+import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.validator.WSDLValidator;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -145,12 +146,22 @@ public class WSDLValidatorMojo extends AbstractMojo {
             try {
                 list.add(file.getCanonicalPath());
                 String[] pargs = list.toArray(new String[list.size()]);
-                ToolRunner.runTool(WSDLValidator.class, WSDLValidator.class
-                                   .getResourceAsStream("wsdlvalidator.xml"), false, pargs);
+                
+                InputStream toolspecStream = WSDLValidator.class
+                    .getResourceAsStream("wsdlvalidator.xml");
+                ToolSpec spec = new ToolSpec(toolspecStream, false);
+                toolspecStream.close();
+                WSDLValidator validator = new WSDLValidator(spec);
+                validator.setArguments(pargs);
+                boolean ok = validator.executeForMaven();
+                if (!ok) {
+                    throw new MojoExecutionException("WSDL failed validation: " + file.getName());
+                }
+
                 doneFile.createNewFile();
             } catch (Throwable e) {
-                getLog().debug(e);
-                throw new MojoExecutionException(e.getMessage(), e);
+                throw new MojoExecutionException(file.getName() + ": " 
+                                                 + e.getMessage(), e);
             }
         }
     }

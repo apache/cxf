@@ -88,7 +88,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
             }
             return XMLUtils.parse(new InputSource(URIParserUtil.getAbsoluteURI(nw)));
         } catch (FileNotFoundException fe) {
-            LOG.log(Level.WARNING, "Can not find the wsdl " + wsdl + "to validate");
+            LOG.log(Level.WARNING, "Cannot find the wsdl " + wsdl + "to validate");
             return null;
         } catch (Exception e) {
             throw new ToolException(e);

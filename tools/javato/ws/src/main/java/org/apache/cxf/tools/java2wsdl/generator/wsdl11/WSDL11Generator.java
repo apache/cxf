@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
+import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
@@ -58,8 +60,9 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
         File outputdir = createOutputDir(file);
         Definition def = null;
         try {
-            OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+            Writer os = FileWriterUtil.getWriter(file);
             WSDLWriter wsdlWriter = WSDLFactory.newInstance().newWSDLWriter();
+
             ServiceWSDLBuilder builder = new ServiceWSDLBuilder(getBus(), getServiceModel());
             builder.setUseSchemaImports(this.allowImports());
 
@@ -90,7 +93,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
 
             for (Map.Entry<String, SchemaInfo> imp : imports.entrySet()) {
                 File impfile = new File(file.getParentFile(), imp.getKey());
-                os = new BufferedOutputStream(new FileOutputStream(impfile));
+                os = FileWriterUtil.getWriter(impfile);
                 imp.getValue().getSchema().write(os);
                 os.close();
             }

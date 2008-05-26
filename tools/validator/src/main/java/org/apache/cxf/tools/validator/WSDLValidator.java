@@ -48,6 +48,21 @@ public class WSDLValidator extends AbstractCXFToolContainer {
         set.add(ToolConstants.CFG_SCHEMA_URL);
         return set;
     }
+    
+    public boolean executeForMaven() {
+        super.execute(false);
+        ToolContext env = getContext();
+        env.setParameters(getParametersMap(getArrayKeys()));
+        if (isVerboseOn()) {
+            env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
+        }
+        env.put(ToolConstants.CFG_VALIDATE_WSDL, Boolean.TRUE);
+        env.put(ToolConstants.CFG_CMD_ARG, getArgument());
+
+      
+        WSDL11Validator wsdlValidator = new WSDL11Validator(null, env, getBus());
+        return wsdlValidator.isValid();
+    }
 
     public void execute(boolean exitOnFinish) {
         try {
