@@ -34,6 +34,7 @@
     <modules>
         <module>codegen-plugin</module>
         <module>java2ws-plugin</module>
+        <module>wsdl-validator-plugin</module>
         <module>corba</module>
         <module>archetypes</module>
         <module>eclipse-plugin-generator</module>
