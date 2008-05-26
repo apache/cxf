@@ -72,6 +72,54 @@ public class SoapBindingFactoryTest extends Assert {
         bfm.registerBindingFactory(ns, bindingFactory);
         return bfm;
     }
+    
+    @Test
+    public void testNoBodyParts() throws Exception {
+        Definition d = createDefinition("/wsdl/no_body_parts.wsdl");
+        Bus bus = getMockBus();
+
+        BindingFactoryManager bfm = getBindingFactoryManager(WSDLConstants.NS_SOAP11, bus);
+
+        bus.getExtension(BindingFactoryManager.class);
+        expectLastCall().andReturn(bfm).anyTimes();
+        
+        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
+        expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
+        
+        control.replay();
+
+        WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
+        ServiceInfo serviceInfo = builder
+            .buildServices(d, new QName("urn:cxf:no_body_parts/wsdl", 
+                                        "NoBodyParts"))
+            .get(0);
+
+        BindingInfo bi = serviceInfo.getBindings().iterator().next();
+
+        assertTrue(bi instanceof SoapBindingInfo);
+
+        SoapBindingInfo sbi = (SoapBindingInfo)bi;
+        assertEquals("document", sbi.getStyle());
+        assertTrue(WSDLConstants.NS_SOAP11_HTTP_TRANSPORT.equalsIgnoreCase(sbi.getTransportURI()));
+        assertTrue(sbi.getSoapVersion() instanceof Soap11);
+
+        BindingOperationInfo boi = sbi.getOperation(new QName("urn:cxf:no_body_parts/wsdl",
+                                                              "convertMime"));
+
+        assertNotNull(boi);
+        SoapOperationInfo sboi = boi.getExtensor(SoapOperationInfo.class);
+        assertNotNull(sboi);
+        assertNull(sboi.getStyle());
+        assertEquals("", sboi.getAction());
+
+        BindingMessageInfo input = boi.getInput();
+        SoapBodyInfo bodyInfo = input.getExtensor(SoapBodyInfo.class);
+        assertNull(bodyInfo.getUse());
+
+        List<MessagePartInfo> parts = bodyInfo.getParts();
+        assertNotNull(parts);
+        assertEquals(0, parts.size());
+    }
 
     @Test
     public void testFactory() throws Exception {        

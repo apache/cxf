@@ -146,6 +146,13 @@ public class WSDLServiceBuilder {
 
     private List<ServiceInfo> buildServices(Definition d, QName name, DescriptionInfo description) {
         Service service = d.getService(name);
+        if (service == null) {
+            org.apache.cxf.common.i18n.Message msg = 
+                new org.apache.cxf.common.i18n.Message("MISSING_SERVICE",
+                                                       LOG,
+                                                       name);
+            throw new WSDLRuntimeException(msg);
+        }
         return buildServices(d, service, description);
     }
 
@@ -356,8 +363,12 @@ public class WSDLServiceBuilder {
                 }
             }
             if (ns == null) {
-                throw new RuntimeException("Can non find the destination factory, check the port "
-                                           + " //wsdl:port[@name='" + port.getName() + "']");
+                
+                org.apache.cxf.common.i18n.Message msg = new 
+                    org.apache.cxf.common.i18n.Message("MISSING_DESTINATION_FACTORY",
+                                                       LOG,
+                                                       port.getName());
+                throw new WSDLRuntimeException(msg);
             }
             try {
                 factory = bus.getExtension(DestinationFactoryManager.class).getDestinationFactory(ns);

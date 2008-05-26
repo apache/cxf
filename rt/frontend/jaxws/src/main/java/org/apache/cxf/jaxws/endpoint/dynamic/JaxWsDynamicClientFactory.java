@@ -22,14 +22,23 @@ package org.apache.cxf.jaxws.endpoint.dynamic;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.EndpointImplFactory;
+import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImplFactory;
 
 /**
- * This class creates dynamic clients with JAX-WS endpoints.
- */
-public class DynamicClientFactory extends org.apache.cxf.endpoint.dynamic.DynamicClientFactory {
+ * This class reads a WSDL and creates a dynamic client from it with JAX-WS
+ * functionality.
+ * This provides support for attachments and other useful things that 
+ * come with JAX-WS.
+ * 
+ * Use {@link #newInstance} to obtain an instance, and then
+ * {@link #createClient(String)} (or other overloads) to create a client.
+ * 
+ * This factory uses the JAXB data binding. 
+ **/
+public class JaxWsDynamicClientFactory extends DynamicClientFactory {
 
-    protected DynamicClientFactory(Bus bus) {
+    protected JaxWsDynamicClientFactory(Bus bus) {
         super(bus);
     }
 
@@ -45,8 +54,8 @@ public class DynamicClientFactory extends org.apache.cxf.endpoint.dynamic.Dynami
      *            instance
      * @return the new instance
      */
-    public static DynamicClientFactory newInstance(Bus b) {
-        return new DynamicClientFactory(b);
+    public static JaxWsDynamicClientFactory newInstance(Bus b) {
+        return new JaxWsDynamicClientFactory(b);
     }
 
     /**
@@ -55,8 +64,8 @@ public class DynamicClientFactory extends org.apache.cxf.endpoint.dynamic.Dynami
      * @return the new instance
      * @see CXFBusFactory#getDefaultBus()
      */
-    public static DynamicClientFactory newInstance() {
+    public static JaxWsDynamicClientFactory newInstance() {
         Bus bus = CXFBusFactory.getThreadDefaultBus();
-        return new DynamicClientFactory(bus);
+        return new JaxWsDynamicClientFactory(bus);
     }
 }

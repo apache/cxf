@@ -124,8 +124,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         wsdlUrl = wsdl.toURI().toString();
         CXFBusFactory busFactory = new CXFBusFactory(); 
         Bus bus = busFactory.createBus();
-        org.apache.cxf.jaxws.endpoint.dynamic.DynamicClientFactory dynamicClientFactory = 
-            org.apache.cxf.jaxws.endpoint.dynamic.DynamicClientFactory.newInstance(bus);
+        org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory dynamicClientFactory = 
+            org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory.newInstance(bus);
         Client client = dynamicClientFactory.createClient(wsdlUrl);
         assertNotNull(client);
     }

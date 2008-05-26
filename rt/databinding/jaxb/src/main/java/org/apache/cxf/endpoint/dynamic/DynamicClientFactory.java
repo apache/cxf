@@ -75,8 +75,17 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 /**
+ * This class reads a WSDL and creates a dynamic client from it.
  * 
+ * Use {@link #newInstance} to obtain an instance, and then
+ * {@link #createClient(String)} (or other overloads) to create a client.
+ * 
+ * It uses the JAXB data binding. It does not set up complex interceptors for 
+ * features such as attachments. 
+ * See {@link org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory}
+ * for an alternative that sets up JAX-WS endpoints.
  *
+ * This class may be subclassed to allow for other endpoints or behaviors.
  */
 public class DynamicClientFactory {
 

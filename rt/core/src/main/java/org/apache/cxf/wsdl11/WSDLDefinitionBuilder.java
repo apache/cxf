@@ -153,7 +153,7 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
                                       LOG,
                                       wsdlURL,
                                       we.getMessage());
-            throw new RuntimeException(msg.toString(), we);
+            throw new WSDLRuntimeException(msg, we);
         }
     }
 
