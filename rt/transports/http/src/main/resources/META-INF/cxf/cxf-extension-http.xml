@@ -27,6 +27,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	  id="org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder"/>
     <bean class="org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder"
 	  id="org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder"/>
+    <bean class="org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider"
+          id="org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider"/>
+ 
     
     
     <bean class="org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory"
