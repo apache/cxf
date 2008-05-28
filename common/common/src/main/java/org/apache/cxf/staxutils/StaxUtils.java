@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.io.Writer;
 //import java.util.HashMap;
 //import java.util.Map;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.NamespaceContext;
@@ -38,6 +39,12 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.DTD;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartDocument;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -873,6 +880,115 @@ public final class StaxUtils {
             LOG.info(XMLUtils.toString(StaxUtils.read(reader), 4));
         } catch (XMLStreamException e) {
             LOG.severe(e.getMessage());
+        }
+    }
+    
+    
+    private static void writeStartElementEvent(XMLEvent event, XMLStreamWriter writer) 
+        throws XMLStreamException {
+        StartElement start = event.asStartElement();
+        QName name = start.getName();
+        String nsURI = name.getNamespaceURI();
+        String localName = name.getLocalPart();
+        String prefix = name.getPrefix();
+        
+        if (prefix != null) {
+            writer.writeStartElement(prefix, localName, nsURI);
+        } else if (nsURI != null) {
+            writer.writeStartElement(localName, nsURI);
+        } else {
+            writer.writeStartElement(localName);
+        }
+        Iterator it = start.getNamespaces();
+        while (it != null && it.hasNext()) {
+            writeEvent((XMLEvent)it.next(), writer);
+        }
+        
+        it = start.getAttributes();
+        while (it != null && it.hasNext()) {
+            writeAttributeEvent((Attribute)it.next(), writer);            
+        }
+    }
+    private static void writeAttributeEvent(XMLEvent event, XMLStreamWriter writer) 
+        throws XMLStreamException {
+        
+        Attribute attr = (Attribute)event;
+        QName name = attr.getName();
+        String nsURI = name.getNamespaceURI();
+        String localName = name.getLocalPart();
+        String prefix = name.getPrefix();
+        String value = attr.getValue();
+
+        if (prefix != null) {
+            writer.writeAttribute(prefix, nsURI, localName, value);
+        } else if (nsURI != null) {
+            writer.writeAttribute(nsURI, localName, value);
+        } else {
+            writer.writeAttribute(localName, value);
+        }
+    }
+
+    public static void writeEvent(XMLEvent event, XMLStreamWriter writer)
+        throws XMLStreamException {
+
+        switch (event.getEventType()) {
+        case XMLEvent.START_ELEMENT:
+            writeStartElementEvent(event, writer);
+            break;
+        case XMLEvent.END_ELEMENT:
+            writer.writeEndElement();
+            break;
+        case XMLEvent.ATTRIBUTE: 
+            writeAttributeEvent(event, writer);
+            break;
+        case XMLEvent.ENTITY_REFERENCE:
+            writer.writeEntityRef(((javax.xml.stream.events.EntityReference)event).getName());
+            break;
+        case XMLEvent.DTD:
+            writer.writeDTD(((DTD)event).getDocumentTypeDeclaration());
+            break;
+        case XMLEvent.PROCESSING_INSTRUCTION:
+            if (((javax.xml.stream.events.ProcessingInstruction)event).getData() != null) {
+                writer.writeProcessingInstruction(
+                    ((javax.xml.stream.events.ProcessingInstruction)event).getTarget(), 
+                    ((javax.xml.stream.events.ProcessingInstruction)event).getData());
+            } else {
+                writer.writeProcessingInstruction(
+                    ((javax.xml.stream.events.ProcessingInstruction)event).getTarget());
+            }
+            break;
+        case XMLEvent.NAMESPACE:
+            if (((Namespace)event).isDefaultNamespaceDeclaration()) {
+                writer.writeDefaultNamespace(((Namespace)event).getNamespaceURI());
+            } else {
+                writer.writeNamespace(((Namespace)event).getPrefix(),
+                                      ((Namespace)event).getNamespaceURI());
+            }
+            break;
+        case XMLEvent.COMMENT:
+            writer.writeComment(((javax.xml.stream.events.Comment)event).getText());
+            break;
+        case XMLEvent.CHARACTERS:
+        case XMLEvent.SPACE:
+            writer.writeCharacters(event.asCharacters().getData());
+            break;
+        case XMLEvent.CDATA:
+            writer.writeCData(event.asCharacters().getData());
+            break;
+        case XMLEvent.START_DOCUMENT:
+            if (((StartDocument)event).encodingSet()) {
+                writer.writeStartDocument(((StartDocument)event).getCharacterEncodingScheme(),
+                                          ((StartDocument)event).getVersion());
+
+            } else {
+                writer.writeStartDocument(((StartDocument)event).getVersion());
+            }
+            break;
+        case XMLEvent.END_DOCUMENT:
+            writer.writeEndDocument();
+            break;
+        default:
+            //shouldn't get here
         }
     }
 }

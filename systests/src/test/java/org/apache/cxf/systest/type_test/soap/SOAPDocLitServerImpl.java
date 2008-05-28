@@ -21,6 +21,7 @@ package org.apache.cxf.systest.type_test.soap;
 
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.Holder;
 
 
 import org.apache.cxf.BusFactory;
@@ -28,6 +29,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.type_test.TypeTestImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.type_test.doc.TypeTestPortType;
+import org.apache.type_test.types1.FixedArray;
 
 public class SOAPDocLitServerImpl extends AbstractBusTestServerBase {
     
@@ -58,6 +60,22 @@ public class SOAPDocLitServerImpl extends AbstractBusTestServerBase {
                 endpointInterface = "org.apache.type_test.doc.TypeTestPortType",
                 targetNamespace = "http://apache.org/type_test/doc",
                 wsdlLocation = "testutils/type_test/type_test_doclit_soap.wsdl")
-    class SOAPTypeTestImpl extends TypeTestImpl implements TypeTestPortType {
+    public class SOAPTypeTestImpl extends TypeTestImpl implements TypeTestPortType {
+        
+        //override so we can test some bad validation things
+        public FixedArray testFixedArray(
+                                         FixedArray x,
+                                         Holder<FixedArray> y,
+                                         Holder<FixedArray> z) {
+            z.value = new FixedArray();
+            z.value.getItem().addAll(y.value.getItem());
+            y.value = new FixedArray();
+            y.value.getItem().addAll(x.getItem());
+            if (x.getItem().get(0) == 24) {
+                y.value.getItem().add(0);
+                z.value.getItem().remove(0);
+            }
+            return x;
+        }
     }
 }

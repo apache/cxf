@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 
 import org.apache.cxf.databinding.DataWriter;
@@ -40,6 +41,8 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.CachingXmlEventWriter;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -64,8 +67,23 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
                               BindingOperationInfo operation, MessageContentsList objs, 
                               List<MessagePartInfo> parts) {
         OutputStream out = message.getContent(OutputStream.class);
-        XMLStreamWriter xmlWriter = message.getContent(XMLStreamWriter.class);
+        XMLStreamWriter origXmlWriter = message.getContent(XMLStreamWriter.class);
         Service service = exchange.get(Service.class);
+        XMLStreamWriter xmlWriter = origXmlWriter;
+        CachingXmlEventWriter cache = null;
+        
+        if (shouldValidate(message) && !isRequestor(message)) {
+            //need to cache the events in case validation fails
+            cache = new CachingXmlEventWriter();
+            try {
+                cache.setNamespaceContext(origXmlWriter.getNamespaceContext());
+            } catch (XMLStreamException e) {
+                //ignorable, will just get extra namespace decls
+            }
+            xmlWriter = cache;
+            out = null;
+        }
+        
         if (out != null 
             && writeToOutputStream(message, operation.getBinding(), service)
             && !MessageUtils.isTrue(message.getContextualProperty(DISABLE_OUTPUTSTREAM_OPTIMIZATION))) {
@@ -96,10 +114,22 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
                 }
             }
         }
+        if (cache != null) {
+            try {
+                for (XMLEvent event : cache.getEvents()) {
+                    StaxUtils.writeEvent(event, origXmlWriter);
+                }
+            } catch (XMLStreamException e) {
+                throw new Fault(e);
+            }
+        }
     }
     
     
-    
+    protected boolean shouldValidate(Message m) {
+        Object en = m.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        return Boolean.TRUE.equals(en) || "true".equals(en);
+    }
     
     protected boolean writeToOutputStream(Message m, BindingInfo info, Service s) {
         /**
@@ -137,8 +167,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
     }
 
     private void setSchemaOutMessage(Service service, Message message, DataWriter<?> writer) {
-        Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        if (Boolean.TRUE.equals(en) || "true".equals(en)) {
+        if (shouldValidate(message)) {
             Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0));
             writer.setSchema(schema);
         }

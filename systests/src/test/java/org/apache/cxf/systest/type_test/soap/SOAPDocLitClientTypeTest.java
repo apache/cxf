@@ -18,14 +18,17 @@
  */
 package org.apache.cxf.systest.type_test.soap;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
+import org.apache.type_test.types1.FixedArray;
 import org.apache.type_test.types2.StructWithAnyArrayLax;
 import org.apache.type_test.types2.StructWithAnyStrict;
 import org.junit.BeforeClass;
@@ -44,6 +47,24 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
         initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
     }
 
+    @Test
+    public void testValidationFailureOnServerOut() throws Exception {
+        FixedArray x = new FixedArray();
+        FixedArray yOrig = new FixedArray();
+        
+        x.getItem().addAll(Arrays.asList(24, 42, 2008));
+        yOrig.getItem().addAll(Arrays.asList(24, 0, 1));
+
+        Holder<FixedArray> y = new Holder<FixedArray>(yOrig);
+        Holder<FixedArray> z = new Holder<FixedArray>();
+        try {
+            docClient.testFixedArray(x, y, z);
+            fail("should have thrown exception");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage(), ex.getMessage().contains("Marshalling"));
+        }
+    }
+    
     @Test
     public void testStructWithAnyStrict() throws Exception {
         SOAPFactory factory = SOAPFactory.newInstance();
