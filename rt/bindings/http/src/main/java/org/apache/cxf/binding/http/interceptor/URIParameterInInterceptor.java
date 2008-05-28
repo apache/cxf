@@ -88,7 +88,7 @@ public class URIParameterInInterceptor extends AbstractPhaseInterceptor<Message>
         MessagePartInfo part = parts.get(0);
 
         List<Param> params = null;
-        if ("application/x-www-form-urlencoded.".equals(contentType)) {
+        if ("application/x-www-form-urlencoded".equals(contentType)) {
             params = IriDecoderHelper.decode(path, location, message.getContent(InputStream.class));
         } else if ("application/xml".equals(contentType)) {
             params = IriDecoderHelper.decodeIri(path, location);
