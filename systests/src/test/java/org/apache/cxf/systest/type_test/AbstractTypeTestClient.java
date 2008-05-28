@@ -30,6 +30,7 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -2075,7 +2076,11 @@ public abstract class AbstractTypeTestClient
                 assertTrue("testStringList(): Incorrect return value", x.equals(ret));
             }
             if (testDocLiteral) {
-                ret = docClient.testStringList(null, y, z);
+                try {
+                    ret = docClient.testStringList(null, y, z);
+                } catch (SOAPFaultException ex) {
+                    assertTrue(ex.getMessage(), ex.getMessage().contains("Unmarshalling"));
+                }
             }
         } else {
             String[] x = {"I", "am", "SimpleList"};
