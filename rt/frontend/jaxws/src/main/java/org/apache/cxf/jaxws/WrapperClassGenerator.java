@@ -49,6 +49,7 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -228,12 +229,16 @@ public final class WrapperClassGenerator extends ASMHelper {
         cw.visit(Opcodes.V1_5, Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE, classFileName, null,
                  "java/lang/Object", null);
         
-        
+        boolean q = qualified;
+        SchemaInfo si = interfaceInfo.getService().getSchema(ns);
+        if (si != null) {
+            q = si.isElementFormQualified();
+        }
         AnnotationVisitor av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlSchema;", true);
         av0.visit("namespace", ns);
         av0.visitEnum("elementFormDefault",
                       getClassCode(XmlNsForm.class),
-                      qualified ? "QUALIFIED" : "UNQUALIFIED");
+                      q ? "QUALIFIED" : "UNQUALIFIED");
         av0.visitEnd();
         cw.visitEnd();
 
