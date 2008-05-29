@@ -31,14 +31,17 @@ import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.no_body_parts.NoBodyPartsImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.junit.Test;
 
 public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
@@ -174,5 +177,27 @@ public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
         assertNotNull(sop);
         assertEquals("", sop.getAction());
         assertEquals("document", sop.getStyle());
+    }
+    
+    @org.junit.Ignore
+    @Test
+    public void testDocLiteralPartWithType() throws Exception {
+        serviceFactory = new ReflectionServiceFactoryBean();
+        serviceFactory.setBus(getBus());
+        serviceFactory.setServiceClass(NoBodyPartsImpl.class);
+        Service service = serviceFactory.create();
+        ServiceInfo serviceInfo = 
+            service.getServiceInfos().get(0);
+        QName qname = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+                                "operation1");
+        MessageInfo mi = serviceInfo.getMessage(qname);
+        qname = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+            "mimeAttachment");
+        MessagePartInfo mpi = mi.getMessagePart(qname);
+        QName elementQName = mpi.getElementQName();
+        XmlSchemaElement element = 
+            serviceInfo.getXmlSchemaCollection().getElementByQName(elementQName);
+        assertNotNull(element);
+
     }
 }
