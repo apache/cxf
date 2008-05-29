@@ -1,0 +1,61 @@
+set( $void = $params.required( "serverUrl" , "https?://.+", "the base URL where jira is available, no trailing slash" ) )
+#set( $void = $params.required( "projectId" , "[0-9]+", "the numeric id the project" ) )
+#set( $void = $params.required( "projectName" , ".+", "the display name the project" ) )
+#if ( $email == "true" )
+#set( $void = $params.required( "to" , ".+", "the email 'To' address" ) )
+#set( $void = $params.required( "from" , ".+", "the email 'From' address" ) )
+#end
+#set( $void = $params.validate() )
+##
+#set( $url = "${serverUrl}/secure/IssueNavigator.jspa?view=rss&&pid=${projectId}&status=1&tempMax=200&reset=true&decorator=none" )
+#set( $jirarss = $rss.fetch( $url ) )
+#set( $issues = $jirarss.fillAttachments() )
+#set( $void = $date.format("yyyy-MM-dd") )
+##
+#if ( $email == "true" )
+TO: $to
+FROM: $from
+SUBJECT: Issues with Attachments: week of $date
+ 
+#end
+##
+#foreach( $issue in $issues )
+#set( $issue.attributes.totalAttachments = $issue.attachments.size() )
+#end
+#set( $issues = $issues.greater("@totalAttachments", 0).sort("created") )
+ 
+$projectName - $date.as("EEEE, MMMM d, yyyy")
+ 
+  $issues.size() Issues with Attachments
+ 
+  (sorted oldest to newest)
+ 
+#if ( $issues.size() < 11 )
+#foreach( $issue in $issues )
+    [$issue.key] $issue.summary
+      - Created: $date.format($issue.created)
+      - Type: $issue.type
+      - Fix Versions: $issue.fixVersions
+      - Reporter: $issue.reporter
+      - Attachments: $issue.attachments
+      - $issue.link
+ 
+#end
+#elseif ( $issues.size() < 30 )
+#foreach( $issue in $issues )
+    [$issue.key] $issue.summary
+      ($date.format($issue.created) - $issue.type - $issue.reporter)
+      $issue.link
+ 
+#end
+#elseif ( $issues.size() < 50 )
+#foreach( $issue in $issues )
+  $date.format($issue.created) [$issue.key] $issue.summary
+  $issue.link
+ 
+#end
+#else
+#foreach( $issue in $issues )
+  $date.format($issue.created) - $issue.link
+#end
+#end
