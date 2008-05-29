@@ -1,4 +1,4 @@
-set( $void = $params.required( "serverUrl" , "https?://.+", "the base URL where jira is available, no trailing slash" ) )
+#set( $void = $params.required( "serverUrl" , "https?://.+", "the base URL where jira is available, no trailing slash" ) )
 #set( $void = $params.required( "projectId" , "[0-9]+", "the numeric id the project" ) )
 #set( $void = $params.required( "projectName" , ".+", "the display name the project" ) )
 #if ( $email == "true" )
@@ -7,7 +7,7 @@ set( $void = $params.required( "serverUrl" , "https?://.+", "the base URL where 
 #end
 #set( $void = $params.validate() )
 ##
-#set( $url = "${serverUrl}/secure/IssueNavigator.jspa?view=rss&&pid=${projectId}&status=1&tempMax=200&reset=true&decorator=none" )
+#set( $url = "${serverUrl}/secure/IssueNavigator.jspa?view=rss&&pid=${projectId}&status=1&tempMax=500&reset=true&decorator=none&updated%3Aprevious=-4w" )
 #set( $jirarss = $rss.fetch( $url ) )
 #set( $issues = $jirarss.fillAttachments() )
 #set( $void = $date.format("yyyy-MM-dd") )
@@ -34,9 +34,11 @@ $projectName - $date.as("EEEE, MMMM d, yyyy")
 #foreach( $issue in $issues )
     [$issue.key] $issue.summary
       - Created: $date.format($issue.created)
+      - Updated: $date.format($issue.updated)
       - Type: $issue.type
       - Fix Versions: $issue.fixVersions
       - Reporter: $issue.reporter
+      - Assigned: $issue.assignee
       - Attachments: $issue.attachments
       - $issue.link
  
