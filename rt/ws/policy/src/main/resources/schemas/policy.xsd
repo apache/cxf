@@ -61,6 +61,7 @@
       </xsd:sequence>
       <xsd:attribute name="ignoreUnknownAssertions" type="xsd:boolean" default="false"/>
       <xsd:attribute name="namespace" type="xsd:string"/>
+      <xsd:attribute name="id" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
   
