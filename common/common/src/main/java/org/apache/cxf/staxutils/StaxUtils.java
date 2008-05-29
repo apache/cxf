@@ -182,6 +182,20 @@ public final class StaxUtils {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
     }
+    public static boolean toNextTag(XMLStreamReader reader) {
+        try {
+            // advance to first tag.
+            int x = reader.getEventType();
+            while (x != XMLStreamReader.START_ELEMENT
+                && x != XMLStreamReader.END_ELEMENT
+                && reader.hasNext()) {
+                x = reader.next();
+            }
+        } catch (XMLStreamException e) {
+            throw new RuntimeException("Couldn't parse stream.", e);
+        }
+        return true;
+    }
 
     public static boolean toNextTag(DepthXMLStreamReader reader, QName endTag) {
         try {
