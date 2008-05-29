@@ -593,9 +593,6 @@ public class WSDLToIDLGenerationTest extends Assert {
         }
     }
 
-    // The ws-addr import in this wsdl fails. Ignored until cataloged
-    // or otherwise dealt with --bimargulies.
-    @org.junit.Ignore
     @Test
     public void testWsaddressingServerIdlgen() throws Exception {
         

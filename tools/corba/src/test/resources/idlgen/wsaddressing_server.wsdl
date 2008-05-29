@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-addressing
+
 <definitions name="c/epr.idl" 
              targetNamespace="http://schemas.apache.org/idl/c/epr.idl" 
              xmlns:tns="http://schemas.apache.org/idl/c/epr.idl" 
@@ -34,15 +34,14 @@ addressing
   </corba:typeMapping>
   <types>
     <schema targetNamespace="http://schemas.apache.org/idltypes/c/epr.idl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-     <xsd:import xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-                 namespace="http://www.w3.org/2005/08/addressing" 
-                 schemaLocation="./src/test/resources/wsdl/wsaddressing.xsd"/>
+     <import namespace="http://www.w3.org/2005/08/addressing" 
+             schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
     </schema>
   </types>
   <message name="TestServer.registerResponse">
   </message>
   <message name="TestServer.register">
-    <part name="cb" element="addressing:EndpointReferenceType"/>
+    <part name="cb" element="addressing:EndpointReference"/>
   </message>
   <portType name="TestServer">
     <operation name="register">

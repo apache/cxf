@@ -13,7 +13,7 @@
 		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 			attributeFormDefault="unqualified" elementFormDefault="qualified"
 			targetNamespace="http://factory_pattern.cxf.apache.org/">
-			<xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="wsaddressing.xsd"/>	
+			<xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>	
 			<xsd:element name="create">
 				<xsd:complexType>
 					<xsd:sequence>

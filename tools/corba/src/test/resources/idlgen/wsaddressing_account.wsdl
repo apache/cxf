@@ -26,7 +26,7 @@
   <types>
     <schema elementFormDefault="qualified" targetNamespace="http://www.apache.org/bus/demos/bank" xmlns="http://www.w3.org/2001/XMLSchema">
             
-            <import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="./src/test/resources/wsdl/wsaddressing.xsd"/>
+            <import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
             <complexType name="AccountNames">
                 <sequence>
                     <element maxOccurs="unbounded" minOccurs="0" name="name" type="xsd:string"/>
