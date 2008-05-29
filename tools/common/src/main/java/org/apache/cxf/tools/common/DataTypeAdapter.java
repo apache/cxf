@@ -20,26 +20,23 @@ package org.apache.cxf.tools.common;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.Fault;
-
 public final class DataTypeAdapter {
-    private static final Logger LOG = LogUtils.getL7dLogger(DataTypeAdapter.class);
 
     private DataTypeAdapter() {
     }
 
     public static Date parseDate(String s) {
+        if (s == null) {
+            return null;
+        }
         return DatatypeConverter.parseDate(s).getTime();
     }
     public static String printDate(Date dt) {
         if (dt == null) {
-            throw new Fault(new Message("NULL_PASSED_FOR_DATE", LOG));
+            return null;
         }
         Calendar c = Calendar.getInstance();
         c.setTime(dt);
@@ -47,11 +44,14 @@ public final class DataTypeAdapter {
     }
 
     public static Date parseTime(String s) {
+        if (s == null) {
+            return null;
+        }
         return DatatypeConverter.parseTime(s).getTime();
     }
     public static String printTime(Date dt) {
         if (dt == null) {
-            throw new Fault(new Message("NULL_PASSED_FOR_DATE", LOG));
+            return null;
         }
         Calendar c = Calendar.getInstance();
         c.setTime(dt);
@@ -59,11 +59,14 @@ public final class DataTypeAdapter {
     }
 
     public static Date parseDateTime(String s) {
+        if (s == null) {
+            return null;
+        }
         return DatatypeConverter.parseDateTime(s).getTime();
     }
     public static String printDateTime(Date dt) {
         if (dt == null) {
-            throw new Fault(new Message("NULL_PASSED_FOR_DATE", LOG));
+            return null;
         }
         Calendar c = Calendar.getInstance();
         c.setTime(dt);
