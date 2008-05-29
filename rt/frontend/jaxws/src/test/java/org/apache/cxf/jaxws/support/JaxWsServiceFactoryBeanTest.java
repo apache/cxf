@@ -239,8 +239,6 @@ public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
         
         assertValid("/wsdl:definitions/wsdl:message[@name='echoChar']" 
                     + "/wsdl:part[@name = 'y'][@element='ns1:charEl_y']" , wsdl);
-
-        
     }
     
     @Test

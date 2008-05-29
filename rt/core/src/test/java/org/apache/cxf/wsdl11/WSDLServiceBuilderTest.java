@@ -67,7 +67,6 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class WSDLServiceBuilderTest extends Assert {
@@ -77,6 +76,7 @@ public class WSDLServiceBuilderTest extends Assert {
     private static final String BARE_WSDL_PATH = "hello_world_bare.wsdl";
     private static final String IMPORT_WSDL_PATH = "hello_world_schema_import.wsdl";
     private static final String MULTIPORT_WSDL_PATH = "hello_world_multiporttype.wsdl";
+    private static final String NO_BODY_PARTS_WSDL_PATH = "no_body_parts.wsdl";
     
     private static final String EXTENSION_NAMESPACE = "http://cxf.apache.org/extension/ns";
     private static final QName EXTENSION_ATTR_BOOLEAN = new QName(EXTENSION_NAMESPACE, "booleanAttr");
@@ -98,8 +98,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
     private DestinationFactoryManager destinationFactoryManager;
 
-    @Before
-    public void setUp() throws Exception {
+    public void setUpBasic() throws Exception {
         setUpWSDL(WSDL_PATH, 0);
     }
 
@@ -160,6 +159,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
     @Test
     public void testServiceInfo() throws Exception {
+        setUpBasic();
         assertEquals("SOAPService", serviceInfo.getName().getLocalPart());
         assertEquals("http://apache.org/hello_world_soap_http", serviceInfo.getName().getNamespaceURI());
         assertEquals("http://apache.org/hello_world_soap_http", serviceInfo.getTargetNamespace());
@@ -177,12 +177,14 @@ public class WSDLServiceBuilderTest extends Assert {
 
     @Test
     public void testInterfaceInfo() throws Exception {
+        setUpBasic();
         assertEquals("Greeter", serviceInfo.getInterface().getName().getLocalPart());
         control.verify();
     }
 
     @Test
     public void testOperationInfo() throws Exception {
+        setUpBasic();
         QName name = new QName(serviceInfo.getName().getNamespaceURI(), "sayHi");
         assertEquals(4, serviceInfo.getInterface().getOperations().size());
         OperationInfo sayHi = serviceInfo.getInterface().getOperation(
@@ -262,6 +264,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
     @Test
     public void testBindingInfo() throws Exception {
+        setUpBasic();
         BindingInfo bindingInfo = null;
         assertEquals(1, serviceInfo.getBindings().size());
         bindingInfo = serviceInfo.getBindings().iterator().next();
@@ -274,6 +277,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
     @Test
     public void testBindingOperationInfo() throws Exception {
+        setUpBasic();
         BindingInfo bindingInfo = null;
         bindingInfo = serviceInfo.getBindings().iterator().next();
         Collection<BindingOperationInfo> bindingOperationInfos = bindingInfo.getOperations();
@@ -305,6 +309,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
     @Test
     public void testBindingMessageInfo() throws Exception {
+        setUpBasic();
         BindingInfo bindingInfo = null;
         bindingInfo = serviceInfo.getBindings().iterator().next();
 
@@ -362,7 +367,8 @@ public class WSDLServiceBuilderTest extends Assert {
     }
 
     @Test
-    public void testSchema() {
+    public void testSchema() throws Exception {
+        setUpBasic();
         SchemaCollection schemas = serviceInfo.getXmlSchemaCollection();
         assertNotNull(schemas);
         assertEquals(1, serviceInfo.getSchemas().size());
@@ -376,6 +382,22 @@ public class WSDLServiceBuilderTest extends Assert {
         Schema schema = EndpointReferenceUtils.getSchema(serviceInfo);
         assertNotNull(schema);
         control.verify();
+    }
+    
+    @Test
+    public void testNoBodyParts() throws Exception {
+        setUpWSDL(NO_BODY_PARTS_WSDL_PATH, 0);
+        QName messageName = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+                                      "operation1Request");
+        MessageInfo mi = serviceInfo.getMessage(messageName);
+        QName partName = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+                                   "mimeAttachment");
+        MessagePartInfo pi = mi.getMessagePart(partName);
+        QName typeName = 
+            new QName("http://www.w3.org/2001/XMLSchema",
+                      "base64Binary");
+        assertEquals(typeName, pi.getTypeQName());
+        assertNull(pi.getElementQName());
     }
 
     @Test

@@ -71,6 +71,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -405,6 +406,33 @@ public class ServiceWSDLBuilder {
     }
 
     protected void buildService(ServiceInfo serviceInfo) {
+        
+        Map<QName, MessageInfo> messages = serviceInfo.getMessages();
+        for (Map.Entry<QName, MessageInfo> mie : messages.entrySet()) {
+            Message message = definition.createMessage();
+            message.setUndefined(false);
+            message.setQName(mie.getKey());
+            for (MessagePartInfo mpi : mie.getValue().getMessageParts()) {
+                Part part = definition.createPart();
+                boolean elemental = mpi.isElement();
+                // RFSB will turn on isElement bogusly.
+                if (elemental 
+                    && null == serviceInfo.getXmlSchemaCollection().
+                        getElementByQName(mpi.getElementQName())) {
+                    elemental = false;
+                }
+                if (elemental) {
+                    part.setElementName(mpi.getElementQName());
+                } else {
+                    part.setTypeName(mpi.getTypeQName());
+                }
+                part.setName(mpi.getName().getLocalPart());
+                message.addPart(part);
+            }
+            
+            definition.addMessage(message);
+        }
+        
         Service serv = definition.createService();
         serv.setQName(serviceInfo.getName());
         addNamespace(serviceInfo.getName().getNamespaceURI());

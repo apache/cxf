@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" 
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+             xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+             xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+             xmlns:tns="urn:org:apache:cxf:no_body_parts/wsdl"
+             xmlns:types="urn:org:apache:cxf:no_body_parts/types"
+             targetNamespace="urn:org:apache:cxf:no_body_parts/wsdl"
+             name="no_body_parts">
+<types>
+<xsd:schema xmlns:tns="http://ws-i.org/profiles/basic/1.1/xsd" 
+            elementFormDefault="qualified" 
+            targetNamespace="http://ws-i.org/profiles/basic/1.1/xsd"> 
+	<xsd:simpleType name="swaRef"> 
+		<xsd:restriction base="xsd:anyURI"/> 
+	</xsd:simpleType> 
+</xsd:schema>
+
+<xsd:schema xmlns:tns="urn:org:apache:cxf:no_body_parts/types" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+            xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" 
+            elementFormDefault="qualified" 
+            targetNamespace="urn:org:apache:cxf:no_body_parts/types">
+
+    <xsd:element name="operation1">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="targetType" type="xsd:string" nillable="true"/>
+                <xsd:element name="optionString" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>            
+    </xsd:element>
+    <xsd:element name="operation1Response"> 
+        <xsd:complexType>
+            <xsd:sequence>    
+                <xsd:element name="status" type="xsd:string" nillable="true"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+</xsd:schema>
+</types>
+
+<message name="operation1Request">
+    <part name="parameters" element="types:operation1"/>
+    <part name="mimeAttachment" type="xsd:base64Binary"/>
+</message>
+<message name="operation1Response">
+    <part name="result" element="types:operation1Response"/>
+    <part name="mimeAttachment" type="xsd:base64Binary"/>
+</message>
+
+<portType name="NoBodyPartsSEI">
+    <operation name="operation1">
+        <input message="tns:operation1Request"/>
+        <output message="tns:operation1Response"/>
+    </operation>    
+</portType>
+
+<binding name="NoBodyPartsSEIBinding" type="tns:NoBodyPartsSEI">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" 
+                  style="document"/>
+    <operation name="operation1">
+        <soap:operation soapAction=""/>
+        <input>
+            <mime:multipartRelated>
+                <mime:part>
+                    <soap:body use="literal"/>
+                </mime:part>
+                <mime:part>
+                    <mime:content part="mimeAttachment" type="application/octet-stream"/>
+                </mime:part>
+            </mime:multipartRelated>
+        </input>
+        <output>
+            <mime:multipartRelated> 
+                <mime:part>
+                    <soap:body use="literal"/>
+                </mime:part>
+                <mime:part>
+                    <mime:content part="mimeAttachment" type="application/octet-stream"/>
+                </mime:part>
+            </mime:multipartRelated>        
+        </output>        
+    </operation>
+</binding>
+
+<service name="NoBodyParts">
+    <port name="NoBodyPartsPort" binding="tns:NoBodyPartsSEIBinding">
+      <soap:address location="http://localhost/NoBodyParts" />
+    </port>
+</service>
+
+</definitions>
+

@@ -29,6 +29,7 @@ import javax.wsdl.Input;
 import javax.wsdl.Message;
 import javax.wsdl.Operation;
 import javax.wsdl.Output;
+import javax.wsdl.Part;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
@@ -53,14 +54,14 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ServiceWSDLBuilderTest extends Assert {
 
     private static final Logger LOG = LogUtils.getLogger(ServiceWSDLBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";
-    
+    private static final String NO_BODY_PARTS_WSDL_PATH = "no_body_parts.wsdl";
+
     private Definition def;
     private Definition newDef;
     private Service service;
@@ -74,10 +75,8 @@ public class ServiceWSDLBuilderTest extends Assert {
     private DestinationFactoryManager destinationFactoryManager;
     private DestinationFactory destinationFactory;
     
-    @Before
-    public void setUp() throws Exception {
-  
-        String wsdlUrl = getClass().getResource(WSDL_PATH).toString();
+    private void setupWSDL(String wsdlPath) throws Exception {
+        String wsdlUrl = getClass().getResource(wsdlPath).toString();
         LOG.info("the path of wsdl file is " + wsdlUrl);
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
@@ -122,8 +121,19 @@ public class ServiceWSDLBuilderTest extends Assert {
         newDef = null;
     }
     
+    @Test
+    public void testNoBodyParts() throws Exception {
+        setupWSDL(NO_BODY_PARTS_WSDL_PATH);
+        QName messageName = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+            "operation1Request");
+        Message message = newDef.getMessage(messageName);
+        Part part = message.getPart("mimeAttachment");
+        assertNotNull(part.getTypeName());
+    }
+    
     @Test    
     public void testDefinition() throws Exception {
+        setupWSDL(WSDL_PATH);
         assertEquals(newDef.getTargetNamespace(), "http://apache.org/hello_world_soap_http");
         Service serv = newDef.getService(new QName("http://apache.org/hello_world_soap_http",
                                                    "SOAPService"));
@@ -133,6 +143,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testPortType() throws Exception {
+        setupWSDL(WSDL_PATH);
         assertEquals(1, newDef.getPortTypes().size());
         PortType portType = (PortType)newDef.getPortTypes().values().iterator().next();
         assertNotNull(portType);
@@ -142,6 +153,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testSayHiOperation() throws Exception {
+        setupWSDL(WSDL_PATH);
         PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
             "Greeter"));
         Collection<Operation> operations =  
@@ -176,6 +188,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testGreetMeOperation() throws Exception {
+        setupWSDL(WSDL_PATH);
         PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
             "Greeter"));
         Operation greetMe = portType.getOperation("greetMe", "greetMeRequest", "greetMeResponse");
@@ -205,6 +218,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testGreetMeOneWayOperation() throws Exception {
+        setupWSDL(WSDL_PATH);
         PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
             "Greeter"));
         Operation greetMeOneWay = portType.getOperation("greetMeOneWay", "greetMeOneWayRequest", null);
@@ -226,6 +240,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testPingMeOperation() throws Exception {
+        setupWSDL(WSDL_PATH);
         PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
             "Greeter"));
         Operation pingMe = portType.getOperation("pingMe", "pingMeRequest", "pingMeResponse");
@@ -264,6 +279,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testBinding() throws Exception {
+        setupWSDL(WSDL_PATH);
         assertEquals(newDef.getBindings().size(), 1);
         Binding binding = newDef.getBinding(new QName(newDef.getTargetNamespace(), "Greeter_SOAPBinding"));
         assertNotNull(binding);
@@ -272,6 +288,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     
     @Test
     public void testSchemas() throws Exception {
+        setupWSDL(WSDL_PATH);
         Types types = newDef.getTypes();
         assertNotNull(types);
         Collection<ExtensibilityElement> schemas = 

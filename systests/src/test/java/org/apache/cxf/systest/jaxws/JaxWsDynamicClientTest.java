@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
+import org.apache.cxf.no_body_parts.types.Operation1;
 import org.apache.cxf.no_body_parts.types.Operation1Response;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
@@ -48,24 +49,27 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         for (int i = 0; i < messageDigest.length; i++) {
             hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
         }
-        return messageDigest.toString();
+        return hexString.toString();
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(ServerNoBodyParts.class));
+                   launchServer(ServerNoBodyParts.class, true));
     }
     
-    @org.junit.Ignore // until we sort out the wsdl4j problem.
+    //@org.junit.Ignore // until we sort out the wsdl4j problem.
     @Test
     public void testInvocation() throws Exception {
         JaxWsDynamicClientFactory dcf = 
             JaxWsDynamicClientFactory.newInstance();
         Client client = dcf.createClient("http://localhost:9020/NoBodyParts/NoBodyPartsService?wsdl");
         byte[] bucketOfBytes = 
-            IOUtils.readBytesFromStream(getClass().getResourceAsStream("wsdl/no_body_parts.wsdl"));
-        Object[] rparts = client.invoke("operation1", bucketOfBytes);
+            IOUtils.readBytesFromStream(getClass().getResourceAsStream("/wsdl/no_body_parts.wsdl"));
+        Operation1 parameters = new Operation1();
+        parameters.setOptionString("opt-ion");
+        parameters.setTargetType("tar-get");
+        Object[] rparts = client.invoke("operation1", parameters, bucketOfBytes);
         Operation1Response r = (Operation1Response)rparts[0];
         assertEquals(md5(bucketOfBytes), r.getStatus());
     }

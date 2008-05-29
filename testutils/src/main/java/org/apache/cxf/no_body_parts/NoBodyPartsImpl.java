@@ -46,7 +46,7 @@ public class NoBodyPartsImpl implements NoBodyPartsSEI {
         for (int i = 0; i < messageDigest.length; i++) {
             hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
         }
-        return messageDigest.toString();
+        return hexString.toString();
     }
 
     /** {@inheritDoc} */
