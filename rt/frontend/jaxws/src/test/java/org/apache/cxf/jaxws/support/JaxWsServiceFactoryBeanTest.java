@@ -42,20 +42,46 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.mtom_xop.TestMtomImpl;
+import org.apache.cxf.no_body_parts.NoBodyPartsImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.hello_world_soap_http.GreeterImpl;
+import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.junit.Test;
 
 public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
+    
+    @org.junit.Ignore
+    @Test
+    public void testDocLiteralPartWithType() throws Exception {
+        ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
+        serviceFactory.setBus(getBus());
+        serviceFactory.setServiceClass(NoBodyPartsImpl.class);
+        Service service = serviceFactory.create();
+        ServiceInfo serviceInfo = 
+            service.getServiceInfos().get(0);
+        QName qname = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+                                "operation1");
+        MessageInfo mi = serviceInfo.getMessage(qname);
+        qname = new QName("urn:org:apache:cxf:no_body_parts/wsdl",
+            "mimeAttachment");
+        MessagePartInfo mpi = mi.getMessagePart(qname);
+        QName elementQName = mpi.getElementQName();
+        XmlSchemaElement element = 
+            serviceInfo.getXmlSchemaCollection().getElementByQName(elementQName);
+        assertNotNull(element);
+
+    }
+
 
     @Test
     public void testEndpoint() throws Exception {
