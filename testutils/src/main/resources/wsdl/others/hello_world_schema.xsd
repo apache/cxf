@@ -24,7 +24,7 @@
             elementFormDefault="qualified">
 
     <import namespace="http://apache.org/hello_world/types2" 
-        schemaLocation="testutils/hello_world_schema2.xsd"/>
+        schemaLocation="hello_world_schema2.xsd"/>
 
 
     <element name="sayHi">

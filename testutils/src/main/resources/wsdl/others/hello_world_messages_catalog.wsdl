@@ -29,7 +29,7 @@
         <schema targetNamespace="http://apache.org/hello_world/types/schema" 
             xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
             <xsd:import namespace="http://apache.org/hello_world/types" 
-                schemaLocation="testutils/hello_world_schema.xsd"/>
+                schemaLocation="hello_world_schema.xsd"/>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">

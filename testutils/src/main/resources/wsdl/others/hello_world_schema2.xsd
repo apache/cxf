@@ -20,7 +20,11 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
     targetNamespace="http://apache.org/hello_world/types2"
             elementFormDefault="qualified">
-    <element name="sayHi2">
-        <complexType/>
-    </element>
+
+    <xsd:import namespace="http://apache.org/hello_world/types"
+        schemaLocation="hello_world_schema.xsd"/>
+
+    <xsd:element name="sayHi2">
+        <xsd:complexType/>
+    </xsd:element>
 </xsd:schema>

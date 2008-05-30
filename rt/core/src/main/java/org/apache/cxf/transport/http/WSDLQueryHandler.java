@@ -265,13 +265,15 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         //check to see if it's already in a URL format.  If so, leave it.
                         new URL(start);
                     } catch (MalformedURLException e) {
-                        done.put(start, imp.getDefinition());
-                        updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
+                        if (done.put(start, imp.getDefinition()) == null) {
+                            updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
+                        }
                     }
                 } else {
-                    done.put(start, imp.getDefinition());
-                    done.put(resolvedSchemaLocation, imp.getDefinition());
-                    updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
+                    if (done.put(start, imp.getDefinition()) == null) {
+                        done.put(resolvedSchemaLocation, imp.getDefinition());
+                        updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
+                    }
                 }
             }
         }      
@@ -340,13 +342,15 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                             //check to see if it's already in a URL format.  If so, leave it.
                             new URL(start);
                         } catch (MalformedURLException e) {
-                            doneSchemas.put(start, imp);
-                            updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                            if (doneSchemas.put(start, imp) == null) {
+                                updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                            }
                         }
                     } else {
-                        doneSchemas.put(start, imp);
-                        doneSchemas.put(resolvedSchemaLocation, imp);
-                        updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                        if (doneSchemas.put(start, imp) == null) {
+                            doneSchemas.put(resolvedSchemaLocation, imp);
+                            updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                        }
                     }
                 }
             }
@@ -363,8 +367,9 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                             //check to see if it's aleady in a URL format.  If so, leave it.
                             new URL(start);
                         } catch (MalformedURLException e) {
-                            doneSchemas.put(start, included);
-                            updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                            if (doneSchemas.put(start, included) == null) {
+                                updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                            }
                         }
                     }
                 } else if (!doneSchemas.containsKey(start) 

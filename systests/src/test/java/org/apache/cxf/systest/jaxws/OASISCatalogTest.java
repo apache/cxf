@@ -59,19 +59,21 @@ public class OASISCatalogTest extends Assert {
         Endpoint ep = Endpoint.publish(null, new GreeterImpl());
         try {
             URL url = new URL("http://localhost:9000/SoapContext/SoapPort?"
-                              + "xsd=testutils/hello_world_schema2.xsd");
+                              + "xsd=hello_world_schema2.xsd");
             assertNotNull(url.getContent());
+            String result = IOUtils.toString((InputStream)url.getContent());
+            assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
             
             
             url = new URL("http://localhost:9000/SoapContext/SoapPort"
-                          + "?xsd=testutils/hello_world_schema.xsd");
-            String result = IOUtils.toString((InputStream)url.getContent());
-            assertTrue(result.contains("xsd=testutils/hello_world_schema2.xsd"));
+                          + "?xsd=hello_world_schema.xsd");
+            result = IOUtils.toString((InputStream)url.getContent());
+            assertTrue(result, result.contains("xsd=hello_world_schema2.xsd"));
 
             url = new URL("http://localhost:9000/SoapContext/SoapPort"
                           + "?wsdl=testutils/others/hello_world_messages_catalog.wsdl");
             result = IOUtils.toString((InputStream)url.getContent());
-            assertTrue(result.contains("xsd=testutils/hello_world_schema.xsd"));
+            assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
 
         } finally {
             ep.stop();
