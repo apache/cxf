@@ -180,8 +180,7 @@ public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
         assertEquals("document", sop.getStyle());
     }
     
-    @org.junit.Ignore
-    @Test
+    @Test(expected = ServiceConstructionException.class)
     public void testDocLiteralPartWithType() throws Exception {
         serviceFactory = new ReflectionServiceFactoryBean();
         serviceFactory.setBus(getBus());

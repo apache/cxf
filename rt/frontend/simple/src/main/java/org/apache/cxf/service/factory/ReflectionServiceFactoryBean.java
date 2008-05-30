@@ -990,6 +990,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 mpi.setConcreteName(qname);
                 continue;
             } else {
+                if (null == mpi.getTypeQName()) {
+                    throw new ServiceConstructionException(new Message("UNMAPPABLE_PORT_TYPE", LOG,
+                                                                       method.getDeclaringClass().getName(),
+                                                                       method.getName(),
+                                                                       mpi.getName()));
+                }
                 el.setSchemaTypeName(mpi.getTypeQName());
                 mpi.setXmlSchema(el);
                 mpi.setConcreteName(qname);
