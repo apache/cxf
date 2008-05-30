@@ -60,7 +60,6 @@ import org.junit.Test;
 
 public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
     
-    @org.junit.Ignore
     @Test
     public void testDocLiteralPartWithType() throws Exception {
         ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
@@ -79,7 +78,6 @@ public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
         XmlSchemaElement element = 
             serviceInfo.getXmlSchemaCollection().getElementByQName(elementQName);
         assertNotNull(element);
-
     }
 
 
