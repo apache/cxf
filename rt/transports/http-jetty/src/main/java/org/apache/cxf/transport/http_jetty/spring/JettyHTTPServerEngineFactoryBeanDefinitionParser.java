@@ -33,6 +33,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 
@@ -73,9 +74,7 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
             
             
             if (StringUtils.isEmpty(bus)) {
-                if (ctx.getRegistry().containsBeanDefinition("cxf")) {
-                    bean.addPropertyReference("bus", "cxf");
-                }
+                addBusWiringAttribute(bean, BusWiringType.PROPERTY);
             } else {
                 bean.addPropertyReference("bus", bus);
             }

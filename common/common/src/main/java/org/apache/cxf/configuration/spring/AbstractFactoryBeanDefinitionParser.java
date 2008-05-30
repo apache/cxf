@@ -62,8 +62,8 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             } 
         }
         
-        if (!setBus && ctx.getRegistry().containsBeanDefinition("cxf")) {
-            wireBus(factoryBean, "cxf");
+        if (!setBus) {
+            addBusWiringAttribute(factoryBean, BusWiringType.PROPERTY);
         }
         
         NodeList children = element.getChildNodes();

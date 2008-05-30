@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.policy.RMAssertion;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -50,8 +51,8 @@ public class RMManagerBeanDefinitionParser extends AbstractBeanDefinitionParser 
         ctx.getDelegate().parsePropertyElements(element, bean.getBeanDefinition());
         
         String bus = element.getAttribute("bus");
-        if (bus == null || "".equals(bus) && ctx.getRegistry().containsBeanDefinition("cxf")) {
-            bean.addPropertyReference("bus", "cxf");
+        if (bus == null || "".equals(bus)) {
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY);
         } else {
             bean.addPropertyReference("bus", bus);
         }

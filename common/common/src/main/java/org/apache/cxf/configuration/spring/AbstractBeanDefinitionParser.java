@@ -20,6 +20,7 @@ package org.apache.cxf.configuration.spring;
 
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -33,6 +34,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.helpers.DOMUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -46,14 +48,19 @@ import org.springframework.util.StringUtils;
 
 public abstract class AbstractBeanDefinitionParser 
     extends org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser {
+    public static final String WIRE_BUS_ATTRIBUTE = AbstractBeanDefinitionParser.class.getName() + ".wireBus";
+
     private static Map<String, JAXBContext> packageContextCache = new CacheMap<String, JAXBContext>(); 
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);
+    
     private Class beanClass;
     
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         boolean setBus = parseAttributes(element, ctx, bean);        
-        if (!setBus && ctx.getRegistry().containsBeanDefinition("cxf") && hasBusProperty()) {
-            wireBus(bean, "cxf");
+        if (!setBus && hasBusProperty()) {
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY);
         }
         parseChildElements(element, ctx, bean);
     }
@@ -219,8 +226,9 @@ public abstract class AbstractBeanDefinitionParser
         return first;
     }
 
-    protected void wireBus(BeanDefinitionBuilder bean, String busId) {
-        bean.addPropertyReference("bus", busId);
+    protected void addBusWiringAttribute(BeanDefinitionBuilder bean, BusWiringType type) {
+        LOG.fine("Adding " + WIRE_BUS_ATTRIBUTE + " attribute " + type + " to bean " + bean);
+        bean.getRawBeanDefinition().setAttribute(WIRE_BUS_ATTRIBUTE, type);
     }
     
     protected void mapElementToJaxbProperty(Element parent, 

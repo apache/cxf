@@ -30,6 +30,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
@@ -114,7 +115,12 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             throw new RuntimeException("Could not process configuration.", e);
         }
         
-        bean.addPropertyValue("bus", busValue.getValue());        
+        // if the containing bean is having the bus wired up by the post processor then we should too
+        if (ctx.getContainingBeanDefinition().getAttribute(WIRE_BUS_ATTRIBUTE) == BusWiringType.PROPERTY) {
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY);
+        } else {
+            bean.addPropertyValue("bus", busValue.getValue());
+        }
         
         bean.setLazyInit(false);
         

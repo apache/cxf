@@ -29,10 +29,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -61,13 +61,9 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         NamedNodeMap atts = element.getAttributes();
         String bus = element.getAttribute("bus");
         if (StringUtils.isEmpty(bus)) {
-            if (ctx.getRegistry().containsBeanDefinition(Bus.DEFAULT_BUS_ID)) {
-                bean.addConstructorArgReference(Bus.DEFAULT_BUS_ID);
-            }
+            addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
         } else {
-            if (ctx.getRegistry().containsBeanDefinition(bus)) {
-                bean.addConstructorArgReference(bus);
-            }
+            bean.addConstructorArgReference(bus);
         }
         for (int i = 0; i < atts.getLength(); i++) {
             Attr node = (Attr) atts.item(i);
