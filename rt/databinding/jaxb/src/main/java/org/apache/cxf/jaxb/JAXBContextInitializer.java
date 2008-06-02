@@ -82,7 +82,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
             if (inf != null
                 && inf.getMessagePart(0).getTypeClass() != null) {
-                //if the wrapper has a type class, we don't need t do anything
+                //if the wrapper has a type class, we don't need to do anything
                 //as everything would have been discovered when walking the
                 //wrapper type (unless it's a header which wouldn't be in the wrapper)
                 return;

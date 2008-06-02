@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.javascript.BasicNameManager;
 import org.apache.cxf.javascript.JavascriptQueryHandler;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
@@ -48,12 +50,23 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
         super.process();
 
         ServiceInfo serviceInfo = context.get(ServiceInfo.class);
-
         File jsFile = getOutputFile(serviceInfo.getName().getLocalPart() + ".js");
 
         BasicNameManager nameManager = BasicNameManager.newNameManager(serviceInfo, null);
         NamespacePrefixAccumulator prefixManager = new NamespacePrefixAccumulator(serviceInfo
-            .getXmlSchemaCollection());
+                                                                                  .getXmlSchemaCollection());
+        
+        Map<String, String> nsPrefixMap = 
+            CastUtils.cast(
+                           context.get(ToolConstants.CFG_JSPREFIXMAP, Map.class),
+                           String.class, String.class);
+
+        if (nsPrefixMap != null) {
+            for (Map.Entry<String, String> prefixEntry : nsPrefixMap.entrySet()) {
+                prefixManager.collect(prefixEntry.getValue(), prefixEntry.getKey());
+            }
+        }
+        
         Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(jsFile);

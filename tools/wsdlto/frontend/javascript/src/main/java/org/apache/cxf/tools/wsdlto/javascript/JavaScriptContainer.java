@@ -83,7 +83,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     public void execute() throws ToolException {
         buildToolContext();
         validate(context);
-
+        
         WSDLConstants.WSDLVersion version = getWSDLVersion();
 
         String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);

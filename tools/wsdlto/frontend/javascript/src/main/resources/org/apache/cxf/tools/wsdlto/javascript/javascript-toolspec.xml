@@ -25,7 +25,7 @@
 
     <annotation>
 Examples:
-        wsdl2java -client HelloWorld.wsdl
+        wsdl2js HelloWorld.wsdl
     </annotation>
 
     <usage>
@@ -70,12 +70,6 @@ Examples:
                 <associatedArgument placement="afterSpace">
                     <annotation>output-directory</annotation>
                 </associatedArgument>
-            </option>
-
-            <option id="client" maxOccurs="1">
-                <annotation>
-                    Generates the client code.</annotation>
-                <switch>client</switch>
             </option>
 
             <option id="validate" maxOccurs="1">
