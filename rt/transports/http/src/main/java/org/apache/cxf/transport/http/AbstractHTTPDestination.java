@@ -172,6 +172,13 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         Exchange ex = message.getExchange();
         return ex == null ? false : ex.isOneWay();
     }
+    
+    /**
+     * @return the associated conduit initiator
+     */
+    protected ConduitInitiator getConduitInitiator() {
+        return conduitInitiator;
+    }
 
     /**
      * Copy the request headers into the message.

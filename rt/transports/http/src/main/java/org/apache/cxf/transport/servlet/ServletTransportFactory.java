@@ -92,7 +92,7 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
         ServletDestination d = getDestinationForPath(endpointInfo.getAddress());
         if (d == null) { 
             String path = getTrimmedPath(endpointInfo.getAddress());
-            d = new ServletDestination(getBus(), null, endpointInfo, this, path);
+            d = new ServletDestination(getBus(), this, endpointInfo, this, path);
             destinations.put(path, d);
         }
         return d;

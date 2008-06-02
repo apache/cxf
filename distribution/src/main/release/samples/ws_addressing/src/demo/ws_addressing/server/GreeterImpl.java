@@ -27,7 +27,8 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.types.FaultDetail;
 
-@WebService(name = "Greeter",
+@WebService(name = "SoapPort",
+            portName = "SoapPort",
             serviceName = "SOAPService", 
             targetNamespace = "http://apache.org/hello_world_soap_http", 
             wsdlLocation = "file:./wsdl/hello_world_addr.wsdl")

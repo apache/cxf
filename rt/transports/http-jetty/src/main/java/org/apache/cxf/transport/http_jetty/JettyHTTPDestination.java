@@ -37,7 +37,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transports.http.QueryHandler;
@@ -160,12 +159,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     }   
      
 
-    /**
-     * @return the associated conduit initiator
-     */
-    protected ConduitInitiator getConduitInitiator() {
-        return conduitInitiator;
-    }
     
     protected String getBasePathForFullAddress(String addr) {
         try {

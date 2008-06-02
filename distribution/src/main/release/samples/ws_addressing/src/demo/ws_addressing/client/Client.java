@@ -21,6 +21,7 @@ package demo.ws_addressing.client;
 
 import java.io.File;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URL;
 import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -55,9 +56,16 @@ public final class Client {
             System.exit(1); 
         }
         
-        try { 
-            File wsdl = new File(args[0]);
-            SOAPService service = new SOAPService(wsdl.toURL(), SERVICE_NAME);
+        try {
+            URL wsdlURL; 
+            File wsdlFile = new File(args[0]);
+            if (wsdlFile.exists()) {
+                wsdlURL = wsdlFile.toURL();
+            } else {
+                wsdlURL = new URL(args[0]);
+            }
+
+            SOAPService service = new SOAPService(wsdlURL, SERVICE_NAME);
             Greeter port = service.getSoapPort();
 
             implicitPropagation(port);

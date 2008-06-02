@@ -39,4 +39,20 @@
         <echo level="info" message="Generating code using wsdl2java..."/>
         <wsdl2java file="hello_world_addr.wsdl"/>
     </target>
+
+
+    <property name="cxf.war.file.name" value="helloworld_wsaddr"/>
+    <target name="war" depends="build">
+        <cxfwar wsdl="hello_world_addr.wsdl" filename="${cxf.war.file.name}.war"/>
+    </target>
+
+    <target name="client-servlet" description="run demo client hitting servlet" depends="build">
+        <property name="param" value=""/>
+        <cxfrun classname="demo.ws_addressing.client.Client" 
+            jvmarg1="-Dcxf.config.file=client.xml"
+            param1="${base.url}/helloworld_wsaddr/services/hello_world?wsdl" 
+            param2="${op}" param3="${param}"/>
+    </target>
+
+
 </project>
