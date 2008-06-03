@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.configuration.spring;
 
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -27,6 +28,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -37,6 +39,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -243,13 +246,13 @@ public abstract class AbstractBeanDefinitionParser
                                             QName name,
                                             String propertyName, 
                                             Class<?> c) {
-        Node data = null;
+        Element data = null;
         NodeList nl = parent.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node n = nl.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(n.getLocalName())
                 && name.getNamespaceURI().equals(n.getNamespaceURI())) {
-                data = n;
+                data = (Element)n;
                 break;
             }
         }
@@ -259,7 +262,6 @@ public abstract class AbstractBeanDefinitionParser
         }
 
         JAXBContext context = null;
-        Object obj = null;
         try {
             String pkg = getJaxbPackage();
             if (null != c && c.getPackage() != null) {
@@ -270,24 +272,37 @@ public abstract class AbstractBeanDefinitionParser
                 context = JAXBContext.newInstance(pkg, getClass().getClassLoader());
                 packageContextCache.put(pkg, context);
             }
-            Unmarshaller u = context.createUnmarshaller();
-            if (c != null) {
-                obj = u.unmarshal(data, c);
-            } else {
-                obj = u.unmarshal(data);
-            }
-
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)obj;
-                obj = el.getValue();
-
+            try {
+                StringWriter writer = new StringWriter();
+                XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
+                StaxUtils.copy(data, xmlWriter);
+                xmlWriter.flush();
+    
+                BeanDefinitionBuilder jaxbbean 
+                    = BeanDefinitionBuilder.rootBeanDefinition(JAXBBeanFactory.class);
+                jaxbbean.getRawBeanDefinition().setFactoryMethodName("createJAXBBean");
+                jaxbbean.addConstructorArg(context);
+                jaxbbean.addConstructorArg(writer.toString());
+                jaxbbean.addConstructorArg(c);
+                bean.addPropertyValue(propertyName, jaxbbean.getBeanDefinition());
+            } catch (Exception ex) {
+                Unmarshaller u = context.createUnmarshaller();
+                Object obj;
+                if (c != null) {
+                    obj = u.unmarshal(data, c);
+                } else {
+                    obj = u.unmarshal(data);
+                }
+                if (obj instanceof JAXBElement<?>) {
+                    JAXBElement<?> el = (JAXBElement<?>)obj;
+                    obj = el.getValue();
+                }
+                if (obj != null) {
+                    bean.addPropertyValue(propertyName, obj);
+                }
             }
         } catch (JAXBException e) {
             throw new RuntimeException("Could not parse configuration.", e);
-        }
-
-        if (obj != null) {
-            bean.addPropertyValue(propertyName, obj);
         }
     }
 

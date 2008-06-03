@@ -32,6 +32,8 @@ import org.junit.Test;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
+@org.junit.Ignore("Not valid as the parser shouldn't be generating the beans themselves, thats the" 
+                  + "job of the factory later on.  Need to update this test to do that.")
 public class BeanDefinitionParsersTest extends Assert {
     @Test
     public void testDest()throws Exception {
