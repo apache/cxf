@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
@@ -44,6 +44,8 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
@@ -61,6 +63,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
     public static final String TIMESTAMP_RESULT = "wss4j.timestamp.result";
     public static final String SIGNATURE_RESULT = "wss4j.signature.result";
+    public static final String PROCESSOR_MAP = "wss4j.processor.map";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JInInterceptor.class);
     private static final Logger TIME_LOG = LogUtils.getL7dLogger(WSS4JInInterceptor.class,
@@ -68,6 +71,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                                                                  WSS4JInInterceptor.class.getName()
                                                                      + "-Time");
     private SAAJInInterceptor saajIn = new SAAJInInterceptor();
+
+    /**
+     *
+     */
+    private WSSecurityEngine secEngineOverride;
     
     public WSS4JInInterceptor() {
         super();
@@ -76,9 +84,15 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         getAfter().add(SAAJInInterceptor.class.getName());
     }
 
+    @SuppressWarnings("unchecked")
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
         setProperties(properties);
+        final Map<QName, String> map = 
+            (Map<QName, String>) properties.get(PROCESSOR_MAP);
+        if (map != null) {
+            secEngineOverride = createSecurityEngine(map);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -128,15 +142,20 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
              * they may be used for encryption too.
              */
             doReceiverAction(doAction, reqData);
-
+            
             Vector wsResult = null;
             if (doTimeLog) {
                 t1 = System.currentTimeMillis();
             }
 
             try {
-                wsResult = secEngine.processSecurityHeader(doc.getSOAPPart(), actor, cbHandler, reqData
-                    .getSigCrypto(), reqData.getDecCrypto());
+                wsResult = getSecurityEngine().processSecurityHeader(
+                    doc.getSOAPPart(), 
+                    actor, 
+                    cbHandler, 
+                    reqData.getSigCrypto(), 
+                    reqData.getDecCrypto()
+                );
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new SoapFault(new Message("SECURITY_FAILED", LOG), ex, version.getSender());
@@ -158,13 +177,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
                 checkSignatureConfirmation(reqData, wsResult);
             }
-            
-            //
-            // Now remove the Signature Confirmation results. This is needed to work around the
-            // wsResult.size() != actions.size() comparison below. The real issue is to fix the
-            // broken checkReceiverResults method in WSS4J.
-            //
-            removeSignatureConfirmationResults(wsResult);
 
             /*
              * Now we can check the certificate used to sign the message. In the
@@ -214,11 +226,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             /*
              * now check the security actions: do they match, in right order?
-             *
-             * Added size comparison to work around
-             * https://issues.apache.org/jira/browse/WSS-70
              */
-            if (wsResult.size() != actions.size() || !checkReceiverResults(wsResult, actions)) {
+            if (!checkReceiverResults(wsResult, actions)) {
                 LOG.warning("Security processing failed (actions mismatch)");
                 throw new SoapFault(new Message("ACTION_MISMATCH", LOG), version.getSender());
 
@@ -304,18 +313,52 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return cbHandler;
     }
     
-    private void removeSignatureConfirmationResults(List<Object> wsResult) {
-        //
-        // Now remove the Signature Confirmation results. This is needed to work around the
-        // wsResult.size() != actions.size() comparison below. The real issue is to fix the
-        // broken checkReceiverResults method in WSS4J.
-        //
-        for (int i = 0; i < wsResult.size(); i++) {
-            Integer action = (Integer)((WSSecurityEngineResult)wsResult.get(i))
-                .get(WSSecurityEngineResult.TAG_ACTION);
-            if (action != null && action.intValue() == WSConstants.SC) {
-                wsResult.remove(i);
-            }
+    /**
+     * @return      the WSSecurityEngine in use by this interceptor.
+     *              This engine is defined to be the secEngineOverride
+     *              instance, if defined in this class (and supplied through
+     *              construction); otherwise, it is taken to be the default
+     *              WSSecEngine instance (currently defined in the WSHandler
+     *              base class).
+     *
+     * TODO the WSHandler base class defines secEngine to be static, which
+     * is really bad, because the engine has mutable state on it.
+     */
+    private WSSecurityEngine
+    getSecurityEngine() {
+        if (secEngineOverride != null) {
+            return secEngineOverride;
         }
+        return secEngine;
+    }
+
+    /**
+     * @return      a freshly minted WSSecurityEngine instance, using the
+     *              (non-null) processor map, to be used to initialize the
+     *              WSSecurityEngine instance.
+     *
+     * TODO The WSS4J APIs leave something to be desired here, but hopefully
+     * we'll clean all this up in WSS4J-2.0
+     */
+    private WSSecurityEngine
+    createSecurityEngine(
+        final Map<QName, String> map
+    ) {
+        assert map != null;
+        final WSSConfig config = WSSConfig.getNewInstance();
+        for (Map.Entry<QName, String> entry : map.entrySet()) {
+            final QName key = entry.getKey();
+            String val = entry.getValue();
+            if (val != null) {
+                val = val.trim();
+                if ("null".equals(val) || val.length() == 0) {
+                    val = null;
+                }
+            }
+            config.setProcessor(key, val);
+        }
+        final WSSecurityEngine ret = new WSSecurityEngine();
+        ret.setWssConfig(config);
+        return ret;
     }
 }

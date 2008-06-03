@@ -87,23 +87,6 @@
   </supplement>
   <supplement>
     <project>
-      <groupId>org.apache.ws.security</groupId>
-      <artifactId>wss4j</artifactId>
-      <name>Apache WSS4J</name>
-      <organization>
-        <name>The Apache Software Foundation</name>
-        <url>http://www.apache.org/</url>
-      </organization>
-      <licenses>
-        <license>
-          <name>The Apache Software License, Version 2.0</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-      </licenses>
-    </project>
-  </supplement>
-  <supplement>
-    <project>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
       <name>Java Architecture for XML Binding (JAXB API)</name>
@@ -162,12 +145,29 @@
   </supplement>
   <supplement>
     <project>
-      <groupId>xml-security</groupId>
+      <groupId>org.apache.santuario</groupId>
       <artifactId>xmlsec</artifactId>
       <name>XML Security</name>
       <organization>
         <name>The Apache Software Foundation</name>
         <url>http://www.apache.org</url>
+      </organization>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+    <supplement>
+    <project>
+      <groupId>opensaml</groupId>
+      <artifactId>opensaml</artifactId>
+      <name>OpenSAML</name>
+      <organization>
+        <name>Internet2</name>
+        <url>http://www.opensaml.org</url>
       </organization>
       <licenses>
         <license>
