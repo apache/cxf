@@ -291,6 +291,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             serverFactory.setFeatures(getFeatures());
             serverFactory.setInvoker(invoker);
             serverFactory.setSchemaLocations(schemaLocations);
+            if (serverFactory.getProperties() != null) {
+                serverFactory.getProperties().putAll(properties);
+            } else {
+                serverFactory.setProperties(properties);
+            }
             
             // Be careful not to override any serverfactory settings as a user might
             // have supplied their own.

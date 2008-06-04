@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxb;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
 import org.w3c.dom.Document;
 
@@ -54,6 +55,19 @@ public class TestServiceTest extends AbstractDependencyInjectionSpringContextTes
 
         assertEquals(expected, widgetFromService);
     }
+
+    @Test
+    public void testExtraSubClassWithJaxbFromEndpoint() throws Throwable {
+        Widget expected = new ExtendedWidget(42, "blah", "blah", true, true);
+        
+        ((BindingProvider)testClient).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                 "http://localhost:7081/service/TestEndpoint");
+        Widget widgetFromService = testClient.getWidgetById((long)42);
+
+        assertEquals(expected, widgetFromService);
+    }
+
     
     @Test
     public void testSchema() throws Exception {

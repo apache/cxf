@@ -55,6 +55,24 @@ under the License.
 		
 	</jaxws:server>
 	
+	<!-- Endpoint -->
+	<jaxws:endpoint id="testEndpoint" 
+		implementor="org.apache.cxf.systest.jaxb.service.TestServiceImpl" 
+		address="http://localhost:7081/service/TestEndpoint">
+	
+		<jaxws:properties>
+			<entry key="jaxb.additionalContextClasses">
+				<bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
+					<property name="classNames">
+						<list>
+							<value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
+						</list>
+					</property>
+				</bean>
+			</entry>
+		</jaxws:properties>
+	</jaxws:endpoint>
+	
 	
 	<!-- Client Proxy -->
 	<jaxws:client id="testClient" address="http://localhost:7081/service/TestService" serviceClass="org.apache.cxf.systest.jaxb.service.TestService">
