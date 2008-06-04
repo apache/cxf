@@ -39,7 +39,7 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
     // is likely to include a Jetty or something else that we can't get rid of.
     private static GenericApplicationContext applicationContext;
     private DefaultResourceLoader resourceLoader;
-
+    private Class<?> configContextClass = AbstractCXFSpringTest.class;
     /**
      * Load up all the beans from the XML files returned by the getConfigLocations method.
      * @throws Exception 
@@ -53,7 +53,7 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
             return;
         }
         applicationContext = new GenericApplicationContext();
-        resourceLoader = new DefaultResourceLoader(getClass().getClassLoader());
+        resourceLoader = new DefaultResourceLoader(configContextClass.getClassLoader());
         for (String beanDefinitionPath : getConfigLocations()) {
             XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
             Resource resource = resourceLoader.getResource(beanDefinitionPath);
@@ -110,5 +110,9 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
      */
     protected <T> T getBean(Class<T> type, String beanName) {
         return type.cast(applicationContext.getBean(beanName));
+    }
+
+    protected void setConfigContextClass(Class<?> configContextClass) {
+        this.configContextClass = configContextClass;
     }
 }

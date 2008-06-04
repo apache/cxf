@@ -282,6 +282,7 @@ public class AegisDatabinding
             if (overrideTypes != null) {
                 aegisContext.setRootClassNames(overrideTypes);
             }
+            
             if (configuration != null) {
                 aegisContext.setTypeCreationOptions(configuration);
             }

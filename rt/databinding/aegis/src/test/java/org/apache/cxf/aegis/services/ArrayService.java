@@ -18,11 +18,17 @@
  */
 package org.apache.cxf.aegis.services;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
 /**
  * An array service for testing.
+ * There are some JAX-WS annotations for tests with JAX-WS.
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
+@WebService(targetNamespace = "urn:org.apache.cxf.aegis",
+            serviceName = "arrayService")
 public class ArrayService {
     
     private org.jdom.Element[] jdomArray;
@@ -30,12 +36,17 @@ public class ArrayService {
     private String beforeValue;
     private String afterValue;
     
+    @WebMethod
     public SimpleBean[] getBeanArray() {
         SimpleBean bean = new SimpleBean();
         bean.setBleh("bleh");
         bean.setHowdy("howdy");
 
         return new SimpleBean[] {bean};
+    }
+    
+    @WebMethod
+    public void takeOneSimpleBean(SimpleBean sb) {
     }
     
     public void resetValues() {
@@ -45,30 +56,36 @@ public class ArrayService {
         w3cArray = null;
     }
 
+    @WebMethod
     public String[] getStringArray() {
         return new String[] {"bleh", "bleh"};
     }
 
+    @WebMethod
     public boolean submitStringArray(String[] array) {
         return true;
     }
 
+    @WebMethod
     public boolean submitBeanArray(SimpleBean[] array) {
         return true;
     }
     
+    @WebMethod
     public void submitJDOMArray(String before, org.jdom.Element[] anything, String after) {
         beforeValue = before;
         jdomArray = anything;
         afterValue = after;
     }
 
+    @WebMethod
     public void submitW3CArray(String before, org.w3c.dom.Document[] anything, String after) {
         beforeValue = before;
         w3cArray = anything;
         afterValue = after;
     }
 
+    @WebMethod
     public org.jdom.Element[] getJdomArray() {
         return jdomArray;
     }

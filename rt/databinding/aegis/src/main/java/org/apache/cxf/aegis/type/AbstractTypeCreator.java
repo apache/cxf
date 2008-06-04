@@ -184,11 +184,14 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
         if (info.getMinOccurs() != -1) {
             type.setMinOccurs(info.getMinOccurs());
+        } else {
+            type.setMinOccurs(typeConfiguration.getDefaultMinOccurs());
         }
+        
         if (info.getMaxOccurs() != -1) {
             type.setMaxOccurs(info.getMaxOccurs());
         }
-
+        
         type.setFlat(info.isFlat());
 
         return type;
@@ -398,15 +401,10 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
         Object keyType;
         Object valueType;
-        
         QName mappedName;
-
         QName typeName;
-
         Class type;
-
         String description;
-
         long minOccurs = -1;
         long maxOccurs = -1;
         boolean flat;
@@ -515,5 +513,6 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         public void setValueType(Object valueType) {
             this.valueType = valueType;
         }
+
     }
 }
