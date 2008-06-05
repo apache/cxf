@@ -33,6 +33,7 @@ import org.apache.ws.commons.schema.ValidationEventHandler;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.extensions.ExtensionRegistry;
 import org.apache.ws.commons.schema.resolver.URIResolver;
@@ -93,7 +94,27 @@ public class SchemaCollection {
     }
 
     public XmlSchemaType getTypeByQName(QName schemaTypeName) {
-        return schemaCollection.getTypeByQName(schemaTypeName);
+        XmlSchemaType xst = schemaCollection.getTypeByQName(schemaTypeName);
+        
+        //HACKY workaround for WSCOMMONS-355
+        if (xst == null 
+            && "http://www.w3.org/2001/XMLSchema".equals(schemaTypeName.getNamespaceURI())) {
+            XmlSchema sch = getSchemaByTargetNamespace(schemaTypeName.getNamespaceURI());
+            
+            if ("anySimpleType".equals(schemaTypeName.getLocalPart())) {
+                XmlSchemaSimpleType type = new XmlSchemaSimpleType(sch);
+                type.setName(schemaTypeName.getLocalPart());
+                sch.addType(type);
+                xst = type;
+            } else if ("anyType".equals(schemaTypeName.getLocalPart())) {
+                XmlSchemaType type = new XmlSchemaType(sch);
+                type.setName(schemaTypeName.getLocalPart());
+                sch.addType(type);
+                xst = type;
+            }
+        }
+        
+        return xst;
     }
 
     public XmlSchema[] getXmlSchema(String systemId) {
