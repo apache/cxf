@@ -60,6 +60,13 @@
             <artifactId>cxf-tools-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-tools-wsdlto-core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
 
         <dependency>

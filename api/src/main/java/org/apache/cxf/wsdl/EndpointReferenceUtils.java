@@ -19,10 +19,13 @@
 
 package org.apache.cxf.wsdl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,7 +63,6 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
@@ -101,14 +103,14 @@ public final class EndpointReferenceUtils {
      * the code in here.
      */
     private static final class SchemaLSResourceResolver implements LSResourceResolver {
-        private final ServiceInfo si;
+        private final Map<String, DOMSource> schemas;
         private final ExtendedURIResolver resolver = new ExtendedURIResolver();
-        private SchemaLSResourceResolver(ServiceInfo serviceInfo) {
-            this.si = serviceInfo;
+        
+        private SchemaLSResourceResolver(Map<String, DOMSource> schemas) {
+            this.schemas = schemas;
         }
         
-        private Reader getSchemaAsStream(Element schemaElement) {
-            DOMSource source = new DOMSource(schemaElement);
+        private Reader getSchemaAsStream(DOMSource source) {
             StringWriter writer = new StringWriter();
             StreamResult result = new StreamResult(writer);
             try {
@@ -121,35 +123,37 @@ public final class EndpointReferenceUtils {
 
         public LSInput resolveResource(String type, String namespaceURI, String publicId,
                                        String systemId, String baseURI) {
-            for (SchemaInfo schemaInfo : si.getSchemas()) {
-                XmlSchema sch = schemaInfo.getSchema();
-                if (namespaceURI.equals(sch.getTargetNamespace())) {
+
+            String newId = systemId;
+            if (baseURI != null) {
+                try {
+                    URI uri = new URI(baseURI);
+                    uri = uri.resolve(systemId);
+                    newId = uri.toString();
+                } catch (URISyntaxException e) {
+                    //ignore
+                }
+            }
+            if (schemas.containsKey(newId + ":" + namespaceURI)) {
+                DOMSource ds = schemas.remove(newId + ":" + namespaceURI);
+                LSInputImpl impl = new LSInputImpl();
+                impl.setSystemId(newId);
+                impl.setBaseURI(newId);
+                impl.setCharacterStream(getSchemaAsStream(ds));
+                return impl;
+            }
+            
+            for (Map.Entry<String, DOMSource> ent : schemas.entrySet()) {
+                if (ent.getKey().endsWith(namespaceURI)) {
+                    schemas.remove(ent.getKey());
                     LSInputImpl impl = new LSInputImpl();
-                    Element schemaAsDom = schemaInfo.getElement();
-                    if (schemaAsDom != null) {
-                        impl.setCharacterStream(getSchemaAsStream(schemaAsDom));
-                        return impl;
-                    }
-                    // otherwise, go ahead and assume it's out there somewhere.
-                    // this needs catalog support, does it not?
-                    InputStream ins = null;
-                    try {
-                        URL url = new URL(sch.getSourceURI());
-                        ins = url.openStream();
-                    } catch (Exception e) {
-                        //ignore, we'll just use what we have.  (though
-                        //bugs in XmlSchema could make this less useful)
-                    }
-                    
-                    if (ins == null) {
-                        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
-                        sch.write(out);
-                        ins = out.createInputStream();
-                    }
-                    impl.setByteStream(ins);
+                    impl.setSystemId(newId);
+                    impl.setBaseURI(newId);
+                    impl.setCharacterStream(getSchemaAsStream(ent.getValue()));
                     return impl;
                 }
             }
+                
             //REVIST - we need to get catalogs in here somehow  :-(
             if (systemId == null) {
                 systemId = publicId;
@@ -569,7 +573,7 @@ public final class EndpointReferenceUtils {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Map<String, Source> schemaSourcesMap = new LinkedHashMap<String, Source>();
+            Map<String, DOMSource> schemaSourcesMap = new LinkedHashMap<String, DOMSource>();
             for (SchemaInfo si : serviceInfo.getSchemas()) {
                 Element el = si.getElement();
                 String baseURI = el.getBaseURI();
@@ -580,36 +584,43 @@ public final class EndpointReferenceUtils {
                 schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
             }
 
-            for (XmlSchema sch : serviceInfo.getXmlSchemaCollection().getXmlSchemas()) {
-                if (sch.getSourceURI() != null
-                    && !schemaSourcesMap.containsKey(sch.getSourceURI() + ":" 
-                                                     + sch.getTargetNamespace())) { 
-                    
-                    InputStream ins = null;
-                    try {
-                        URL url = new URL(sch.getSourceURI());
-                        ins = url.openStream();
-                    } catch (Exception e) {
-                        //ignore, we'll just use what we have.  (though
-                        //bugs in XmlSchema could make this less useful)
-                    }
-                    
-                    if (ins == null) {
-                        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
-                        sch.write(out);
-                        ins = out.createInputStream();
-                    }
-                    StreamSource ss = new StreamSource(ins, sch.getSourceURI());
-                    schemaSourcesMap.put(sch.getSourceURI() + ":" 
-                                         + sch.getTargetNamespace(), ss);
-                }
-            } 
-
             try {
-                factory.setResourceResolver(new SchemaLSResourceResolver(serviceInfo));
+                for (XmlSchema sch : serviceInfo.getXmlSchemaCollection().getXmlSchemas()) {
+                    if (sch.getSourceURI() != null
+                        && !schemaSourcesMap.containsKey(sch.getSourceURI() + ":" 
+                                                         + sch.getTargetNamespace())) { 
+                        
+                        InputStream ins = null;
+                        try {
+                            URL url = new URL(sch.getSourceURI());
+                            ins = url.openStream();
+                        } catch (Exception e) {
+                            //ignore, we'll just use what we have.  (though
+                            //bugs in XmlSchema could make this less useful)
+                        }
+                        
+                        if (ins == null) {
+                            LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
+                            sch.write(out);
+                            ins = out.createInputStream();
+                        }
+                        Document doc = XMLUtils.parse(ins);
+                        try {
+                            ins.close();
+                        } catch (IOException ex) {
+                            //ignore
+                        }
+                        
+                        DOMSource ss = new DOMSource(doc, sch.getSourceURI());
+                        schemaSourcesMap.put(sch.getSourceURI() + ":" 
+                                             + sch.getTargetNamespace(), ss);
+                    }
+                } 
+
+                factory.setResourceResolver(new SchemaLSResourceResolver(schemaSourcesMap));
                 schema = factory.newSchema(schemaSourcesMap.values()
                                            .toArray(new Source[schemaSourcesMap.size()]));
-            } catch (SAXException ex) {
+            } catch (Exception ex) {
                 // Something not right with the schema from the wsdl.
                 LOG.log(Level.WARNING, "SAXException for newSchema() on ", ex);
                 for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
