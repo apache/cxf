@@ -113,7 +113,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return HEADERS;
     }
 
-    public Map getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 

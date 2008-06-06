@@ -108,7 +108,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
         SoapVersion version = msg.getVersion();
         if (doDebug) {
-            LOG.fine("WSS4JInSecurityHandler: enter invoke()");
+            LOG.fine("WSS4JInInterceptor: enter handleMessage()");
         }
 
         long t0 = 0;
@@ -148,18 +148,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 t1 = System.currentTimeMillis();
             }
 
-            try {
-                wsResult = getSecurityEngine().processSecurityHeader(
-                    doc.getSOAPPart(), 
-                    actor, 
-                    cbHandler, 
-                    reqData.getSigCrypto(), 
-                    reqData.getDecCrypto()
-                );
-            } catch (WSSecurityException ex) {
-                LOG.log(Level.WARNING, "", ex);
-                throw new SoapFault(new Message("SECURITY_FAILED", LOG), ex, version.getSender());
-            }
+            wsResult = getSecurityEngine().processSecurityHeader(
+                doc.getSOAPPart(), 
+                actor, 
+                cbHandler, 
+                reqData.getSigCrypto(), 
+                reqData.getDecCrypto()
+            );
 
             if (doTimeLog) {
                 t2 = System.currentTimeMillis();
@@ -170,7 +165,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     return;
                 } else {
                     LOG.warning("Request does not contain required Security header");
-                    throw new SoapFault(new Message("NO_SECURITY", LOG), version.getSender());
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
                 }
             }
 
@@ -197,7 +192,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
                 if (returnCert != null && !verifyTrust(returnCert, reqData)) {
                     LOG.warning("The certificate used for the signature is not trusted");
-                    throw new SoapFault(new Message("UNTRUSTED_CERT", LOG), version.getSender());
+                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
                 msg.put(SIGNATURE_RESULT, actionResult);
             }
@@ -219,7 +214,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
                 if (timestamp != null && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
                     LOG.warning("The timestamp could not be validated");
-                    throw new SoapFault(new Message("INVALID_TIMESTAMP", LOG), version.getSender());
+                    throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED);
                 }
                 msg.put(TIMESTAMP_RESULT, actionResult);
             }
@@ -229,8 +224,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
              */
             if (!checkReceiverResults(wsResult, actions)) {
                 LOG.warning("Security processing failed (actions mismatch)");
-                throw new SoapFault(new Message("ACTION_MISMATCH", LOG), version.getSender());
-
+                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
             }
 
             doResults(msg, actor, doc, wsResult);
@@ -244,12 +238,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
 
             if (doDebug) {
-                LOG.fine("WSS4JInHandler: exit invoke()");
+                LOG.fine("WSS4JInInterceptor: exit handleMessage()");
             }
 
         } catch (WSSecurityException e) {
             LOG.log(Level.WARNING, "", e);
-            throw new SoapFault(new Message("WSSECURITY_EX", LOG), e, version.getSender());
+            SoapFault fault = createSoapFault(version, e);
+            throw fault;
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
         } catch (SOAPException e) {
@@ -361,4 +356,31 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         ret.setWssConfig(config);
         return ret;
     }
+    
+    
+    /**
+     * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
+     * 1.1 specification, chapter 12 "Error Handling".
+     * 
+     * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
+     * specified in the WSSecurityException (if it exists).
+     * 
+     * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
+     * as the fault code from the WSSecurityException.
+     */
+    private SoapFault 
+    createSoapFault(SoapVersion version, WSSecurityException e) {
+        SoapFault fault;
+        javax.xml.namespace.QName faultCode = e.getFaultCode();
+        if (version.getVersion() == 1.1 && faultCode != null) {
+            fault = new SoapFault(e.getMessage(), e, faultCode);
+        } else {
+            fault = new SoapFault(e.getMessage(), e, version.getSender());
+            if (version.getVersion() != 1.1 && faultCode != null) {
+                fault.setSubCode(faultCode);
+            }
+        }
+        return fault;
+    }
+    
 }
