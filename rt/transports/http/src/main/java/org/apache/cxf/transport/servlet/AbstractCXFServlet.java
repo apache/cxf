@@ -65,6 +65,10 @@ public abstract class AbstractCXFServlet extends HttpServlet {
         if (forcedBaseAddress != null) {
             newController.setForcedBaseAddress(forcedBaseAddress);
         }
+        String serviceListStyleSheet = servletConfig.getInitParameter("service-list-stylesheet");
+        if (serviceListStyleSheet != null) {
+            newController.setServiceListStyleSheet(serviceListStyleSheet);
+        }
         return newController;
     }
     

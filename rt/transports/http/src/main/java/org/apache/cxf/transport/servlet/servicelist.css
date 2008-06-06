@@ -1,0 +1,30 @@
+@CHARSET "ISO-8859-1";
+.heading {
+	font-size: large;
+}
+.field {
+	font-weight: bold;
+}
+.value {
+	font-weight: normal;
+}
+.porttypename {
+	font-weight: bold;
+}
+UL {
+	margin-top: 0;
+}
+LI {
+	font-weight: normal;
+}
+TABLE {
+	border: solid;
+	border-collapse: collapse;
+	border-width: 2px;
+}
+TD {
+	border: solid;
+	border-width: 1px;
+	vertical-align: text-top;
+	padding: 5px;
+}

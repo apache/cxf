@@ -20,6 +20,7 @@ package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Level;
@@ -32,7 +33,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.xmlsoap.schemas.wsdl.http.AddressType;
@@ -47,6 +50,7 @@ public class ServletController {
     private boolean isHideServiceList;
     private boolean disableAddressUpdates;
     private String forcedBaseAddress;
+    private String serviceListStyleSheet;
  
     public ServletController(ServletTransportFactory df, AbstractCXFServlet servlet) {
         this.transport = df;
@@ -61,6 +65,9 @@ public class ServletController {
     }
     public void setForcedBaseAddress(String s) {
         forcedBaseAddress = s;
+    }
+    public void setServiceListStyleSheet(String serviceListStyleSheet) {
+        this.serviceListStyleSheet = serviceListStyleSheet;
     }
     
     private synchronized void updateDests(HttpServletRequest request) {
@@ -169,20 +176,66 @@ public class ServletController {
     
     private void generateServiceList(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
+        
+        if (request.getParameter("stylesheet") != null) {
+            URL url = this.getClass().getResource("servicelist.css");
+            if (url != null) {
+                IOUtils.copy(url.openStream(), response.getOutputStream());
+            }
+            return;
+        }
+        
         Collection<ServletDestination> destinations = transport.getDestinations();
         response.setContentType("text/html");        
-        response.getWriter().write("<html><body>");
+        response.setCharacterEncoding("UTF-8");
+        
+        response.getWriter().write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" " 
+                + "\"http://www.w3.org/TR/html4/loose.dtd\">");
+        response.getWriter().write("<HTML><HEAD>");
+        if (serviceListStyleSheet != null) {
+            response.getWriter().write(
+                    "<LINK type=\"text/css\" rel=\"stylesheet\" href=\"" 
+                    + request.getContextPath() + "/" + serviceListStyleSheet + "\">");
+        } else {
+            response.getWriter().write(
+                                       "<LINK type=\"text/css\" rel=\"stylesheet\" href=\"" 
+                                       + request.getRequestURI() + "/?stylesheet=1\">");            
+        }
+        response.getWriter().write("<meta http-equiv=content-type content=\"text/html; charset=UTF-8\">");
+        response.getWriter().write("<title>CXF - Service list</title>");
+        response.getWriter().write("</head><body>");
         if (!isHideServiceList) {
             if (destinations.size() > 0) {  
+                response.getWriter().write("<span class=\"heading\">Available services:</span><br/>");
+                response.getWriter().write("<table " + (serviceListStyleSheet == null
+                        ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
                 for (ServletDestination sd : destinations) {
                     if (null != sd.getEndpointInfo().getName()) {
+                        response.getWriter().write("<tr><td>");
+                        response.getWriter().write("<span class=\"porttypename\">"
+                                + sd.getEndpointInfo().getInterface().getName().getLocalPart()
+                                + "</span>");
+                        response.getWriter().write("<ul>");
+                        for (OperationInfo oi : sd.getEndpointInfo().getInterface().getOperations()) {
+                            response.getWriter().write("<li>" + oi.getName().getLocalPart() + "</li>");
+                        }
+                        response.getWriter().write("</ul>");
+                        response.getWriter().write("</td><td>");
                         String address = sd.getEndpointInfo().getAddress();
-                        response.getWriter().write("<p> <a href=\"" + address + "?wsdl\">");
-                        response.getWriter().write(sd.getEndpointInfo().getName() + "</a> </p>");
+                        response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
+                                + "<span class=\"value\">" + address + "</span>");
+                        response.getWriter().write("<br/><span class=\"field\">Wsdl:</span> "
+                                + "<a href=\"" + address + "?wsdl\">"
+                                + sd.getEndpointInfo().getService().getName() + "</a>");
+                        response.getWriter().write("<br/><span class=\"field\">Target namespace:</span> "
+                                + "<span class=\"value\">" 
+                                + sd.getEndpointInfo().getService().getTargetNamespace() + "</span>");
+                        response.getWriter().write("</td></tr>");
                     }    
                 }
+                response.getWriter().write("</table>");
             } else {
-                response.getWriter().write("No service was found.");
+                response.getWriter().write("<span class=\"heading\">No service was found.</span>");
             }
         }    
         response.getWriter().write("</body></html>");
