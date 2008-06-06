@@ -103,7 +103,9 @@ public class SoapFaultFactory implements BindingFaultFactory {
         Document doc = factory.newDocumentBuilder().newDocument();
         Element elem = null;
         
-        JAXBContext ctx = JAXBContext.newInstance(WS_RM_PACKAGE);
+        JAXBContext ctx = JAXBContext.newInstance(
+            WS_RM_PACKAGE,
+            SequenceAcknowledgement.class.getClassLoader());
         Marshaller m = ctx.createMarshaller();
         if (RMConstants.getInvalidAcknowledgmentFaultCode().equals(fault.getSubCode())) {
             SequenceAcknowledgement ack = (SequenceAcknowledgement)detail;

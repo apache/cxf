@@ -384,7 +384,10 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      */
     private static synchronized JAXBContext getJAXBContext() throws JAXBException {
         if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(WS_RM_PACKAGE);
+            jaxbContext =
+                JAXBContext.newInstance(
+                    WS_RM_PACKAGE,
+                    SequenceAcknowledgement.class.getClassLoader());
         }
         return jaxbContext;
     }

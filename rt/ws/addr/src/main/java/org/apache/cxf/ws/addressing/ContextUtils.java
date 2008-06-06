@@ -589,7 +589,10 @@ public final class ContextUtils {
     public static JAXBContext getJAXBContext() throws JAXBException {
         synchronized (ContextUtils.class) {
             if (jaxbContext == null) {
-                jaxbContext = JAXBContext.newInstance(WSA_OBJECT_FACTORY.getClass());
+                jaxbContext =
+                    JAXBContext.newInstance(
+                        WSA_OBJECT_FACTORY.getClass().getPackage().getName(),
+                        WSA_OBJECT_FACTORY.getClass().getClassLoader());
             }
         }
         return jaxbContext;

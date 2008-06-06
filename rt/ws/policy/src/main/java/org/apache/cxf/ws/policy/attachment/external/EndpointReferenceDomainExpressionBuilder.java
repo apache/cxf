@@ -89,7 +89,8 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
         }
         
         try {
-            JAXBContext context = JAXBContext.newInstance(EndpointReferenceType.class.getPackage().getName());
+            Class clz = EndpointReferenceType.class;
+            JAXBContext context = JAXBContext.newInstance(clz.getPackage().getName(), clz.getClassLoader());
             unmarshaller = context.createUnmarshaller();
         } catch (JAXBException ex) {
             throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILDER_INIT_EXC", BUNDLE, 
