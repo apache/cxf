@@ -109,8 +109,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
 
             String url = (String)env.get(ToolConstants.CFG_WSDLURL);
             String location = (String)env.get(ToolConstants.CFG_WSDLLOCATION);
-            if (location == null 
-                || "".equals(location)) {
+            if (location == null) {
                 location = url;
             }
             

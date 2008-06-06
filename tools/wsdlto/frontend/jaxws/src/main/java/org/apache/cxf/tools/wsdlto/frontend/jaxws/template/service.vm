@@ -43,7 +43,11 @@ import ${import};
  * $service.classJavaDoc
  */
 
-@WebServiceClient(name = "${service.ServiceName}", targetNamespace = "$service.Namespace", wsdlLocation = "$wsdlLocation")
+@WebServiceClient(name = "${service.ServiceName}", 
+#if ($wsdlLocation != "")
+                  wsdlLocation = "$wsdlLocation",
+#end
+                  targetNamespace = "$service.Namespace") 
 #foreach ($annotation in $service.Annotations)
 $annotation
 #end
@@ -55,6 +59,7 @@ public class ${service.Name} extends Service {
     public final static QName $port.Name = new QName("$service.Namespace", "$port.PortName");
 #end
     static {
+#if ($wsdlLocation != "")
         URL url = null;
         try {
             url = new URL("$wsdlLocation");
@@ -63,6 +68,9 @@ public class ${service.Name} extends Service {
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;
+#else
+        WSDL_LOCATION = null;
+#end
     }
 
     public ${service.Name}(URL wsdlLocation) {

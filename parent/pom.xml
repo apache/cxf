@@ -385,6 +385,10 @@
                 <version>1.6.2</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>xerces</groupId>
                         <artifactId>xercesImpl</artifactId>
                     </exclusion>
