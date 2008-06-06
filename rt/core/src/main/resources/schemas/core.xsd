@@ -46,6 +46,7 @@
     <xsd:complexType>
       <xsd:sequence />
       <xsd:attribute name="limit" type="xsd:int" use="optional" default="102400"/>
+      <xsd:attribute name="id" type="xsd:string" use="optional"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="fastinfoset">
