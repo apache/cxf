@@ -414,13 +414,13 @@ public class ClientImpl
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + i1);
         }
-        List<Interceptor> i2 = endpoint.getInInterceptors();
+        List<Interceptor> i2 = getInInterceptors();
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Interceptors contributed by client: " + i2);
+        }
+        List<Interceptor> i3 = endpoint.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + i2);
-        }
-        List<Interceptor> i3 = getInInterceptors();
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Interceptors contributed by client: " + i3);
         }
         List<Interceptor> i4 = endpoint.getBinding().getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
@@ -500,6 +500,7 @@ public class ClientImpl
                 
         exchange.put(MessageObserver.class, this);
         exchange.put(Retryable.class, this);
+        exchange.put(Client.class, this);
         exchange.put(Bus.class, bus);
 
         if (endpoint != null && boi != null) {
@@ -537,13 +538,13 @@ public class ClientImpl
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + i1);
         }
-        List<Interceptor> i2 = endpoint.getOutInterceptors();
+        List<Interceptor> i2 = getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Interceptors contributed by endpoint: " + i2);
+            LOG.fine("Interceptors contributed by client: " + i2);
         }
-        List<Interceptor> i3 = getOutInterceptors();
+        List<Interceptor> i3 = endpoint.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Interceptors contributed by client: " + i3);
+            LOG.fine("Interceptors contributed by endpoint: " + i3);
         }
         List<Interceptor> i4 = endpoint.getBinding().getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {

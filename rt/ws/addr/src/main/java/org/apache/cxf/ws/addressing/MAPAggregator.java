@@ -50,6 +50,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.UnwrappedOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
@@ -507,6 +508,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             return null;
         }
         OperationInfo op = bop.getOperationInfo();
+        if (op.isUnwrapped()) {
+            op = ((UnwrappedOperationInfo)op).getWrappedOperation();
+        }
         
         String actionUri = (String) message.get(SoapBindingConstants.SOAP_ACTION);
         if (actionUri != null) {

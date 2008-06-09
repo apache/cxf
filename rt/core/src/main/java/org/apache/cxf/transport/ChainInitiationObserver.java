@@ -66,9 +66,9 @@ public class ChainInitiationObserver implements MessageObserver {
             // setup chain
             PhaseInterceptorChain chain = chainCache.get(bus.getExtension(PhaseManager.class).getInPhases(),
                                                          bus.getInInterceptors(),
+                                                         endpoint.getService().getInInterceptors(),
                                                          endpoint.getInInterceptors(),
-                                                         getBinding().getInInterceptors(),
-                                                         endpoint.getService().getInInterceptors());
+                                                         getBinding().getInInterceptors());
             
             
             message.setInterceptorChain(chain);

@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 import java.util.SortedSet;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.phase.Phase;
@@ -35,11 +36,15 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
 
     protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
         Endpoint e = ex.get(Endpoint.class);
+        Client c = ex.get(Client.class);
         
+        chain.add(getBus().getInFaultInterceptors());
+        if (c != null) {
+            chain.add(c.getInFaultInterceptors());
+        }
+        chain.add(e.getService().getInFaultInterceptors());
         chain.add(e.getInFaultInterceptors());
         chain.add(e.getBinding().getInFaultInterceptors());
-        chain.add(e.getService().getInFaultInterceptors());
-        chain.add(getBus().getInFaultInterceptors());
     }
     
     protected SortedSet<Phase> getPhases() {

@@ -133,17 +133,17 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         
         Endpoint ep = ex.get(Endpoint.class);
         
-        List<Interceptor> i1 = ep.getOutInterceptors();
+        List<Interceptor> i1 = bus.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Interceptors contributed by endpoint: " + i1);
+            LOG.fine("Interceptors contributed by bus: " + i1);
         }
         List<Interceptor> i2 = ep.getService().getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by service: " + i2);
         }
-        List<Interceptor> i3 = bus.getOutInterceptors();
+        List<Interceptor> i3 = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Interceptors contributed by bus: " + i3);
+            LOG.fine("Interceptors contributed by endpoint: " + i3);
         }
         List<Interceptor> i4 = null;
         PhaseInterceptorChain chain;
