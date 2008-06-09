@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -136,10 +137,36 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             usingDefault = true;
         }
         for (String cfgFile : cfgFiles) {
-            ClassPathResource cpr = new ClassPathResource(cfgFile);
-            if (cpr.exists()) {
-                resources.add(cpr);
+            boolean found = false;
+            Resource cpr = new ClassPathResource(cfgFile);
+            if (!cpr.exists()) {
+                try {
+                    //see if it's a URL
+                    URL url = new URL(cfgFile);
+                    cpr = new UrlResource(url);
+                    if (cpr.exists()) {
+                        resources.add(cpr);
+                        found = true;
+                    }
+                } catch (MalformedURLException e) {
+                    //ignore
+                }
+                if (!found) {
+                    //try loading it our way
+                    URL url = ClassLoaderUtils.getResource(cfgFile, this.getClass());
+                    if (url != null) {
+                        cpr = new UrlResource(url);
+                        if (cpr.exists()) {
+                            resources.add(cpr);
+                            found = true;
+                        }
+                    }
+                }
             } else {
+                resources.add(cpr);
+                found = true;
+            }
+            if (!found) {
                 if (!usingDefault) {
                     LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_NOT_FOUND_MSG", cfgFile);
                 } else {

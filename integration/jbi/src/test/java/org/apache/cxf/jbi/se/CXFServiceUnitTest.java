@@ -31,7 +31,6 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.jbi.JBITransportFactory;
 import org.easymock.classextension.EasyMock;
@@ -46,8 +45,6 @@ public class CXFServiceUnitTest extends Assert {
     private static final String ROOT_PATH =
         "/service-assemblies/cxf-demo-service-assembly/version_1/sus/"
             + "CXFServiceEngine/JBIDemoSE_AProvider";
-    private static final String CXF_CONFIG =
-        "/components/CXFServiceEngine/version_1/META-INF/cxf-config.xml";
     private CXFServiceUnit csu;
     private CXFServiceUnitManager csuManager;
     private ComponentContext ctx = EasyMock.createMock(ComponentContext.class);
@@ -61,8 +58,6 @@ public class CXFServiceUnitTest extends Assert {
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         absCsuPath = getClass().getResource(ROOT_PATH).toURI().getPath();
         
-        System.setProperty(Configurer.USER_CFG_FILE_PROPERTY_NAME,
-            getClass().getResource(CXF_CONFIG).toString());
         bus = new SpringBusFactory().createBus();
               
         ComponentClassLoader componentClassLoader =

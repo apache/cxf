@@ -29,7 +29,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.Configurer;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -40,8 +39,6 @@ public class CXFServiceUnitManagerTest extends Assert {
     
     private static final Logger LOG = LogUtils.getL7dLogger(CXFServiceUnitManagerTest.class);
 
-    private static final String CXF_CONFIG = 
-        "/components/CXFServiceEngine/version_1/META-INF/cxf-config.xml";
     private CXFServiceUnitManager csuManager;
     private ComponentContext ctx = EasyMock.createMock(ComponentContext.class);
     private Bus bus;    
@@ -50,8 +47,6 @@ public class CXFServiceUnitManagerTest extends Assert {
     public void setUp() throws Exception {
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         
-        System.setProperty(Configurer.USER_CFG_FILE_PROPERTY_NAME, 
-            getClass().getResource(CXF_CONFIG).toString());
         bus = new SpringBusFactory().createBus();
         ComponentClassLoader componentClassLoader = 
             new ComponentClassLoader(new URL[0], getClass().getClassLoader());

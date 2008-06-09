@@ -67,7 +67,7 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder {
      */
     @SuppressWarnings("unchecked")
     public JaxbAssertionBuilder(String className, QName qn) throws JAXBException, ClassNotFoundException {
-        this(ClassLoaderUtils.loadClass(className, JaxbAssertionBuilder.class), qn);
+        this((Class<T>)ClassLoaderUtils.loadClass(className, JaxbAssertionBuilder.class), qn);
     }
     
     /**
