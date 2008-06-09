@@ -147,6 +147,7 @@ public abstract class BusFactory {
      * default search algorithm.
      * @return a new BusFactory to be used to create Bus objects
      */
+    @SuppressWarnings("unchecked")
     public static BusFactory newInstance(String className) {
         BusFactory instance = null;
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
