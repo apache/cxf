@@ -19,6 +19,8 @@
 
 package org.apache.cxf.wsdl11;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -77,9 +79,17 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     public WSDLServiceFactory(Bus b, String url, QName sn) {
         setBus(b);
         try {
+            try {
+                wsdlUrl = new URL(url);
+            } catch (MalformedURLException e) {
+                wsdlUrl = new File(url).toURL();
+            }
             // use wsdl manager to parse wsdl or get cached definition
-            definition = getBus().getExtension(WSDLManager.class).getDefinition(url);
+            WSDLManager wsdlManager = getBus().getExtension(WSDLManager.class);
+            definition = wsdlManager.getDefinition(wsdlUrl);
         } catch (WSDLException ex) {
+            throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
+        } catch (MalformedURLException ex) {
             throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
         }
         
