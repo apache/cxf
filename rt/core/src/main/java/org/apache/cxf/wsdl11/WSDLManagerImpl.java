@@ -20,6 +20,7 @@
 package org.apache.cxf.wsdl11;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +75,17 @@ public class WSDLManagerImpl implements WSDLManager {
     final ExtensionRegistry registry;
     final WSDLFactory factory;
     final Map<Object, Definition> definitionsMap;
-    final Map<Definition, ServiceSchemaInfo> schemaCacheMap; 
+    
+    /**
+     * The schemaCacheMap is used as a cache of SchemaInfo against the WSDLDefinitions.
+     * Note that the value is a WeakReference of ServiceSchemaInfo - Here the ServiceSchemaInfo in turn holds
+     * the key WSDL Definition. Since the value always strongly refers to the key, we make the value also
+     * weak - so that whenever their is no external strong reference to the key, the entry will qualify for
+     * removal from the map.
+     * https://issues.apache.org/jira/browse/CXF-1621
+     *
+     */
+    final Map<Definition, WeakReference<ServiceSchemaInfo>> schemaCacheMap;
     private boolean disableSchemaCache;
     
     private Bus bus;
@@ -99,7 +110,7 @@ public class WSDLManagerImpl implements WSDLManager {
             throw new BusException(e);
         }
         definitionsMap = new CacheMap<Object, Definition>();
-        schemaCacheMap = new CacheMap<Definition, ServiceSchemaInfo>();
+        schemaCacheMap = new CacheMap<Definition, WeakReference<ServiceSchemaInfo>>();
 
         registerInitialExtensions();
     }
@@ -203,11 +214,7 @@ public class WSDLManagerImpl implements WSDLManager {
         ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
                                                                                 catLocator,
                                                                                 bus);
-        Definition def = reader.readWSDL(wsdlLocator);
-        synchronized (definitionsMap) {
-            definitionsMap.put(url, def);
-        }
-        return def;
+        return reader.readWSDL(wsdlLocator);
     }
 
     private void registerInitialExtensions() throws BusException {
@@ -244,15 +251,18 @@ public class WSDLManagerImpl implements WSDLManager {
             return null;
         }
         synchronized (schemaCacheMap) {
-            return schemaCacheMap.get(wsdl);
+            WeakReference<ServiceSchemaInfo> weakReference = schemaCacheMap.get(wsdl);
+            if (weakReference != null) {
+                return weakReference.get();
+            }
         }
-        
+        return null;
     }
 
     public void putSchemasForDefinition(Definition wsdl, ServiceSchemaInfo schemas) {
         if (!disableSchemaCache) {
             synchronized (schemaCacheMap) {
-                schemaCacheMap.put(wsdl, schemas);
+                schemaCacheMap.put(wsdl, new WeakReference<ServiceSchemaInfo>(schemas));
             }
         }
         
