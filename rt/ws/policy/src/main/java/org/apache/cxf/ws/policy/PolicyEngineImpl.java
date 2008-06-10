@@ -546,6 +546,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
     public void stopServer(Server server) {
         EndpointInfo ei = server.getEndpoint().getEndpointInfo();
         serverEndpointInfo.remove(ei);
+        clientEndpointInfo.remove(ei);
 
         /**
          * While cleaning up the entries of requestInfo's, responseInfo's and faultInfo's map, we create
