@@ -28,11 +28,12 @@ import javax.wsdl.Service;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.bindings.xformat.XMLFormatBinding;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
-import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.WSDLToXML;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +45,7 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
     public void setUp() throws Exception {
         super.setUp();
         env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        env.put(Bus.class, BusFactory.getDefaultBus());
     }
 
     @Test
@@ -59,70 +61,66 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
 
 
-        try {
-            processor.parseWSDL(outputFile.getAbsolutePath());
-            Binding binding = processor.getWSDLDefinition().getBinding(
-                                                                       new QName(processor
-                                                                           .getWSDLDefinition()
-                                                                           .getTargetNamespace(),
-                                                                                 "Greeter_XMLBinding"));
-            if (binding == null) {
-                fail("Element wsdl:binding Greeter_XMLBinding Missed!");
+        processor.parseWSDL(outputFile.getAbsolutePath());
+        Binding binding = processor.getWSDLDefinition().getBinding(
+                                                                   new QName(processor
+                                                                       .getWSDLDefinition()
+                                                                       .getTargetNamespace(),
+                                                                             "Greeter_XMLBinding"));
+        if (binding == null) {
+            fail("Element wsdl:binding Greeter_XMLBinding Missed!");
+        }
+        Iterator it = binding.getExtensibilityElements().iterator();
+        boolean found = false;
+        while (it.hasNext()) {
+            Object obj = it.next();
+            if (obj instanceof XMLFormatBinding) {
+                found = true;
+                break;
             }
-            Iterator it = binding.getExtensibilityElements().iterator();
-            boolean found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
-                if (obj instanceof XMLFormatBinding) {
+        }
+        if (!found) {
+            fail("Element <xformat:binding/> Missed!");
+        }
+        BindingOperation bo = binding.getBindingOperation("sayHi", null, null);
+        if (bo == null) {
+            fail("Element <wsdl:operation name=\"sayHi\"> Missed!");
+        }
+        it = bo.getBindingInput().getExtensibilityElements().iterator();
+        found = false;
+        while (it.hasNext()) {
+            Object obj = it.next();
+            if (obj instanceof XMLBindingMessageFormat
+                && ((XMLBindingMessageFormat)obj).getRootNode().getLocalPart().equals("sayHi")) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            fail("Element <xformat:body rootNode=\"tns:sayHi\" /> Missed!");
+        }
+        Service service = processor.getWSDLDefinition().getService(
+                                                                   new QName(processor
+                                                                       .getWSDLDefinition()
+                                                                       .getTargetNamespace(),
+                                                                             "Greeter_XMLService"));
+        if (service == null) {
+            fail("Element wsdl:service Greeter_XMLService Missed!");
+        }
+        it = service.getPort("Greeter_XMLPort").getExtensibilityElements().iterator();
+        found = false;
+        while (it.hasNext()) {
+            Object obj = it.next();
+            if (obj instanceof HTTPAddress) {
+                HTTPAddress xmlHttpAddress = (HTTPAddress)obj;
+                if (xmlHttpAddress.getLocationURI() != null) {
                     found = true;
                     break;
                 }
             }
-            if (!found) {
-                fail("Element <xformat:binding/> Missed!");
-            }
-            BindingOperation bo = binding.getBindingOperation("sayHi", null, null);
-            if (bo == null) {
-                fail("Element <wsdl:operation name=\"sayHi\"> Missed!");
-            }
-            it = bo.getBindingInput().getExtensibilityElements().iterator();
-            found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
-                if (obj instanceof XMLBindingMessageFormat
-                    && ((XMLBindingMessageFormat)obj).getRootNode().getLocalPart().equals("sayHi")) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                fail("Element <xformat:body rootNode=\"tns:sayHi\" /> Missed!");
-            }
-            Service service = processor.getWSDLDefinition().getService(
-                                                                       new QName(processor
-                                                                           .getWSDLDefinition()
-                                                                           .getTargetNamespace(),
-                                                                                 "Greeter_XMLService"));
-            if (service == null) {
-                fail("Element wsdl:service Greeter_XMLService Missed!");
-            }
-            it = service.getPort("Greeter_XMLPort").getExtensibilityElements().iterator();
-            found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
-                if (obj instanceof HTTPAddress) {
-                    HTTPAddress xmlHttpAddress = (HTTPAddress)obj;
-                    if (xmlHttpAddress.getLocationURI() != null) {
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found) {
-                fail("Element http:address of service port Missed!");
-            }
-        } catch (ToolException e) {
-            fail("Exception Encountered when parsing wsdl, error: " + e.getMessage());
+        }
+        if (!found) {
+            fail("Element http:address of service port Missed!");
         }
     }
 }

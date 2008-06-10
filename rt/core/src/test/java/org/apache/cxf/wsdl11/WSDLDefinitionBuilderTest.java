@@ -30,6 +30,7 @@ import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.BusFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,7 +41,7 @@ public class WSDLDefinitionBuilderTest extends Assert {
         String qname = "http://apache.org/hello_world_soap_http";
         String wsdlUrl = getClass().getResource("hello_world.wsdl").toString();
         
-        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder();
+        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(BusFactory.getDefaultBus());
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
         
@@ -61,7 +62,7 @@ public class WSDLDefinitionBuilderTest extends Assert {
     public void testBuildImportedWSDL() throws Exception {
         String wsdlUrl = getClass().getResource("hello_world_services.wsdl").toString();
         
-        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder();
+        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(BusFactory.getDefaultBus());
         Definition def = builder.build(wsdlUrl);
 
         assertNotNull(def);

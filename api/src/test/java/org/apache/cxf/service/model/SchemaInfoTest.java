@@ -29,7 +29,7 @@ public class SchemaInfoTest extends Assert {
     
     @Before
     public void setUp() throws Exception {
-        schemaInfo = new SchemaInfo(null, "http://apache.org/hello_world_soap_http/types");
+        schemaInfo = new SchemaInfo("http://apache.org/hello_world_soap_http/types");
     }
   
     @Test

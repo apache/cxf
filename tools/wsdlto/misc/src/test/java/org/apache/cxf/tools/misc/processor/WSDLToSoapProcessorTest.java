@@ -34,6 +34,8 @@ import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
@@ -54,6 +56,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
     public void setUp() throws Exception {
         super.setUp();
         env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        env.put(Bus.class, BusFactory.getDefaultBus());
     }
 
     @Test

@@ -28,7 +28,6 @@ import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
@@ -154,10 +153,6 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
     }
 
     private void setAddrElement() throws ToolException {
-        ExtensionRegistry extReg = this.wsdlReader.getExtensionRegistry();
-        if (extReg == null) {
-            extReg = wsdlFactory.newPopulatedExtensionRegistry();
-        }
         String transport = (String)env.get(ToolConstants.CFG_TRANSPORT);
         Address address = AddressFactory.getInstance().getAddresser(transport);
 

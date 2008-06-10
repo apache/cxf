@@ -21,19 +21,17 @@ package org.apache.cxf.tools.misc.processor;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.wsdl.Definition;
-import javax.wsdl.extensions.schema.Schema;
+import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 
 import org.xml.sax.SAXParseException;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.Processor;
@@ -44,6 +42,7 @@ import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.validator.internal.WSDL11Validator;
 import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
 public class AbstractWSDLToProcessor implements Processor, com.sun.tools.xjc.api.ErrorListener {
@@ -53,14 +52,14 @@ public class AbstractWSDLToProcessor implements Processor, com.sun.tools.xjc.api
     protected Definition wsdlDefinition;
     protected ToolContext env;
     protected WSDLFactory wsdlFactory;
-    protected WSDLReader wsdlReader;
+    protected ExtensionRegistry extReg;
 
 
     protected ClassCollector classColletor;
-    List<Schema> schemaList = new ArrayList<Schema>();
-    
-    private final Map<String, WSDLExtensibilityPlugin> wsdlPlugins
+    private Map<String, WSDLExtensibilityPlugin> wsdlPlugins
         = new HashMap<String, WSDLExtensibilityPlugin>();
+    
+
 
     protected Writer getOutputWriter(String newNameExt) throws ToolException {
         Writer writer = null;
@@ -109,16 +108,22 @@ public class AbstractWSDLToProcessor implements Processor, com.sun.tools.xjc.api
 
 
     protected void parseWSDL(String wsdlURL) throws ToolException {
-        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(true);
+        Bus bus = env.get(Bus.class);
+        if (bus == null) {
+            bus = BusFactory.getDefaultBus();
+            env.put(Bus.class, bus);
+        }
+        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(bus);
         wsdlDefinition = builder.build(wsdlURL);
-
-        wsdlReader = builder.getWSDLReader();
-        wsdlFactory = builder.getWSDLFactory();
+        WSDLManager mgr = bus.getExtension(WSDLManager.class);
+        mgr.removeDefinition(wsdlDefinition);
         
-        wsdlPlugins.putAll(builder.getWSDLPlugins());
-        LOG.log(Level.INFO, "FOUND_WSDL_PLUGINS", wsdlPlugins.keySet());
+        wsdlFactory = mgr.getWSDLFactory();
+        extReg = mgr.getExtensionRegistry();
+        wsdlPlugins = builder.getWSDLPlugins();
     }
 
+    
     public WSDLExtensibilityPlugin getWSDLPlugin(final String key, final Class clz) {
         StringBuffer sb = new StringBuffer();
         sb.append(key);
@@ -130,6 +135,7 @@ public class AbstractWSDLToProcessor implements Processor, com.sun.tools.xjc.api
         }
         return plugin;
     }
+    
 
     protected void init() throws ToolException {
 

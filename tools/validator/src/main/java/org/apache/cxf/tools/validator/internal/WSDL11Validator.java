@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -64,7 +65,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
     }
 
     public WSDL11Validator(final Definition definition, final ToolContext pe) {
-        this(definition, pe, null);
+        this(definition, pe, BusFactory.getDefaultBus());
     }
 
     public WSDL11Validator(final Definition definition, final ToolContext pe, final Bus b) {

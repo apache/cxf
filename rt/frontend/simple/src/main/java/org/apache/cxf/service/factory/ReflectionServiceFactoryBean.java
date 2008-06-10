@@ -1214,7 +1214,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
         }
 
-        SchemaInfo schemaInfo = new SchemaInfo(serviceInfo, namespaceURI);
+        SchemaInfo schemaInfo = new SchemaInfo(namespaceURI);
         SchemaCollection col = serviceInfo.getXmlSchemaCollection();
         XmlSchema schema = col.getSchemaByTargetNamespace(namespaceURI);
 

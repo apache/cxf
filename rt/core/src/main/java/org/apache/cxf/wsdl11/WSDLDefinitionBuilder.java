@@ -28,93 +28,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.extensions.mime.MIMEPart;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import com.ibm.wsdl.extensions.soap.SOAPHeaderImpl;
-import com.ibm.wsdl.extensions.soap.SOAPHeaderSerializer;
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
-import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.cxf.wsdl.WSDLBuilder;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
+import org.apache.cxf.wsdl.WSDLManager;
 
 public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
-
     protected static final Logger LOG = LogUtils.getL7dLogger(WSDLDefinitionBuilder.class);
-    private static final String EXTENSIONS_RESOURCE = "META-INF/extensions.xml";
     private static final String WSDL_PLUGIN_RESOURCE = "META-INF/wsdl.plugin.xml";
 
-    protected WSDLReader wsdlReader;
     protected Definition wsdlDefinition;
-    final WSDLFactory wsdlFactory;
-    final ExtensionRegistry registry;
     private List<Definition> importedDefinitions = new ArrayList<Definition>();
+
 
     private final Map<String, WSDLExtensibilityPlugin> wsdlPlugins
         = new HashMap<String, WSDLExtensibilityPlugin>();
-
     private Bus bus;
 
     public WSDLDefinitionBuilder(Bus b) {
-        this();
         this.bus = b;
-    }
-
-    public WSDLDefinitionBuilder() {
-        try {
-            wsdlFactory = WSDLFactory.newInstance();
-            registry = wsdlFactory.newPopulatedExtensionRegistry();
-            QName header11 = new QName(WSDLConstants.NS_SOAP11, "header");
-            QName header12 = new QName(WSDLConstants.NS_SOAP12, "header");
-            registry.registerDeserializer(MIMEPart.class,
-                                          header11,
-                                          new SOAPHeaderSerializer());
-            registry.registerSerializer(MIMEPart.class,
-                                        header11,
-                                        new SOAPHeaderSerializer());
-            registry.mapExtensionTypes(MIMEPart.class, header11, SOAPHeaderImpl.class);
-            registry.registerDeserializer(MIMEPart.class,
-                                          header12,
-                                          new SOAPHeaderSerializer());
-            registry.registerSerializer(MIMEPart.class,
-                                        header12,
-                                        new SOAPHeaderSerializer());
-            registry.mapExtensionTypes(MIMEPart.class, header12, SOAPHeaderImpl.class);
-            
-
-            registerInitialExtensions();
-            wsdlReader = wsdlFactory.newWSDLReader();
-            wsdlReader.setExtensionRegistry(registry);
-            
-            // TODO enable the verbose if in verbose mode.
-            wsdlReader.setFeature("javax.wsdl.verbose", false);
-            wsdlReader.setFeature("javax.wsdl.importDocuments", true);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public WSDLDefinitionBuilder(boolean requirePlugins) {
-        this();
-        if (requirePlugins) {
-            registerWSDLExtensibilityPlugins();
-        }
     }
 
     public void setBus(Bus b) {
@@ -129,12 +73,9 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
     @SuppressWarnings("unchecked")
     protected void parseWSDL(String wsdlURL) {
         try {
-
-            wsdlReader.setExtensionRegistry(registry);
-
-            WSDLLocatorImpl wsdlLocator = new WSDLLocatorImpl(wsdlURL);
-            wsdlLocator.setCatalogResolver(OASISCatalogManager.getCatalogManager(bus).getCatalog());
-            wsdlDefinition = wsdlReader.readWSDL(wsdlLocator);
+            WSDLManager mgr = bus.getExtension(WSDLManager.class);
+            registerWSDLExtensibilityPlugins(mgr.getExtensionRegistry());
+            wsdlDefinition = mgr.getDefinition(wsdlURL);
 
             parseImports(wsdlDefinition);
 
@@ -181,50 +122,12 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
         return importedDefinitions;
     }
 
-    private void registerInitialExtensions() throws BusException {
-        Properties initialExtensions = null;
-        try {
-            initialExtensions = PropertiesLoaderUtils.loadAllProperties(EXTENSIONS_RESOURCE, Thread
-                            .currentThread().getContextClassLoader());
-        } catch (IOException ex) {
-            throw new BusException(ex);
-        }
-
-        for (Iterator it = initialExtensions.keySet().iterator(); it.hasNext();) {
-            StringTokenizer st = new StringTokenizer(initialExtensions.getProperty((String) it.next()), "=");
-            String parentType = st.nextToken();
-            String elementType = st.nextToken();
-            try {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Registering extension: " + elementType + " for parent: " + parentType);
-                }
-                JAXBExtensionHelper.addExtensions(registry, parentType, elementType, 
-                                                  Thread.currentThread().getContextClassLoader());
-            } catch (ClassNotFoundException ex) {
-                LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
-            } catch (JAXBException ex) {
-                LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
-            }
-        }
-    }
-
-    public ExtensionRegistry getExtenstionRegistry() {
-        return registry;
-    }
-
-    public WSDLFactory getWSDLFactory() {
-        return wsdlFactory;
-    }
-
-    public WSDLReader getWSDLReader() {
-        return wsdlReader;
-    }
 
     public Map<String, WSDLExtensibilityPlugin> getWSDLPlugins() {
         return wsdlPlugins;
     }
 
-    private void registerWSDLExtensibilityPlugins() {
+    private void registerWSDLExtensibilityPlugins(ExtensionRegistry registry) {
         Properties initialExtensions = null;
         try {
             initialExtensions = PropertiesLoaderUtils.loadAllProperties(WSDL_PLUGIN_RESOURCE, Thread
@@ -242,7 +145,8 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
                 }
 
                 WSDLExtensibilityPlugin plugin
-                    = (WSDLExtensibilityPlugin)Class.forName(pluginClz).newInstance();
+                    = (WSDLExtensibilityPlugin)ClassLoaderUtils.loadClass(pluginClz, getClass()).
+                        newInstance();
                 plugin.setExtensionRegistry(registry);
                 wsdlPlugins.put(key, plugin);
             } catch (Exception ex) {

@@ -37,7 +37,6 @@ import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
@@ -52,8 +51,6 @@ import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
 public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
 
     private static final String NEW_FILE_NAME_MODIFIER = "-xmlbinding";
-
-    private ExtensionRegistry extReg;
 
     private Map services;
     private Service service;
@@ -78,7 +75,6 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
             Message msg = new Message("SERVICE_PORT_EXIST", LOG);
             throw new ToolException(msg);
         }
-        extReg = this.wsdlReader.getExtensionRegistry();
         doAppendBinding();
         doAppendService();
         writeToWSDL();
@@ -262,11 +258,6 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
     }
 
     private void setAddrElement() throws ToolException {
-        extReg = this.wsdlReader.getExtensionRegistry();
-        if (extReg == null) {
-            extReg = wsdlFactory.newPopulatedExtensionRegistry();
-        }
-
         Address address = AddressFactory.getInstance().getAddresser("xml");
 
         for (String key : address.getNamespaces(env).keySet()) {

@@ -49,6 +49,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -68,6 +69,7 @@ import org.apache.cxf.tools.validator.internal.model.XPort;
 import org.apache.cxf.tools.validator.internal.model.XPortType;
 import org.apache.cxf.tools.validator.internal.model.XService;
 import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaType;
@@ -98,17 +100,17 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     public WSDLRefValidator(final String wsdl, final Document doc) {
-        this(wsdl, doc, null);
+        this(wsdl, doc, BusFactory.getDefaultBus());
     }
 
     public WSDLRefValidator(final String wsdl, final Document doc, final Bus b) {
-        WSDLDefinitionBuilder wsdlBuilder = new WSDLDefinitionBuilder();
-        if (b != null) {
-            wsdlBuilder.setBus(b);
-        }
+        WSDLDefinitionBuilder wsdlBuilder = new WSDLDefinitionBuilder(b);
 
         try {
             this.definition = wsdlBuilder.build(wsdl);
+            WSDLManager mgr = b.getExtension(WSDLManager.class);
+            mgr.removeDefinition(this.definition);
+
             if (wsdlBuilder.getImportedDefinitions().size() > 0) {
                 importedDefinitions = new ArrayList<Definition>();
                 importedDefinitions.addAll(wsdlBuilder.getImportedDefinitions());

@@ -29,6 +29,7 @@ import javax.wsdl.Service;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
@@ -52,6 +53,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         String wsdlUrl = getClass().getResource("resources/hello_world_xml_bare.wsdl").toString();
 
         JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
+        builder.setBus(BusFactory.getDefaultBus());
         builder.setContext(env);
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
@@ -90,6 +92,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         String wsdlUrl = getClass().getResource("resources/jms_test.wsdl").toString();
 
         JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
+        builder.setBus(BusFactory.getDefaultBus());
         builder.setContext(env);
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);

@@ -28,6 +28,7 @@ import javax.wsdl.PortType;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
@@ -49,6 +50,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         env.put(ToolConstants.CFG_BINDING, getClass().getResource("resources/binding2.xml").toString());
         JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
         builder.setContext(env);
+        builder.setBus(BusFactory.getDefaultBus());
         builder.build();
         builder.customize();
 
@@ -95,6 +97,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         env.put(ToolConstants.CFG_BINDING, getClass().getResource("resources/binding3.xml").toString());
         JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
         builder.setContext(env);
+        builder.setBus(BusFactory.getDefaultBus());
         builder.build();
         builder.customize();
 
@@ -147,6 +150,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
 
         JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
         builder.setContext(env);
+        builder.setBus(BusFactory.getDefaultBus());
         builder.build();
 
         // this call will fail before CXF-556
@@ -161,6 +165,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
 
         JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
         builder.setContext(env);
+        builder.setBus(BusFactory.getDefaultBus());
         builder.build();
 
         Definition def = builder.getWSDLModel();

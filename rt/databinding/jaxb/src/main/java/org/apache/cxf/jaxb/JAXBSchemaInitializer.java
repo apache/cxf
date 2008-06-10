@@ -254,7 +254,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             return;
         }
         
-        schemaInfo = new SchemaInfo(serviceInfo, qn.getNamespaceURI(), qualifiedSchemas, false);
+        schemaInfo = new SchemaInfo(qn.getNamespaceURI(), qualifiedSchemas, false);
         
         el = createXsElement(part, typeName, schemaInfo);
 
@@ -403,7 +403,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             schema.setNamespaceContext(nsMap);
 
             
-            schemaInfo = new SchemaInfo(serviceInfo, part.getElementQName().getNamespaceURI());
+            schemaInfo = new SchemaInfo(part.getElementQName().getNamespaceURI());
             schemaInfo.setSchema(schema);
             serviceInfo.addSchema(schemaInfo);
         } else {

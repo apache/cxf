@@ -56,6 +56,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.CustomizationPar
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
 public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
@@ -63,8 +64,6 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
     protected static final Logger LOG = LogUtils.getL7dLogger(JAXWSDefinitionBuilder.class);
     protected CustomizationParser cusParser;
 
-    private WSDLDefinitionBuilder builder;
-    private WSDLReader wsdlReader;
     private Definition wsdlDefinition;
 
     private List<InputSource> jaxbBindings;
@@ -72,11 +71,6 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
     private Map<String, String> cataLogResolvedMap = new HashMap<String, String>();
 
     public JAXWSDefinitionBuilder() {
-        builder = new WSDLDefinitionBuilder();
-        ExtensionRegistry registry = builder.getExtenstionRegistry();
-        registerJaxwsExtension(registry);
-        wsdlReader = builder.getWSDLReader();
-        wsdlReader.setExtensionRegistry(registry);
     }
 
     public Definition build() {
@@ -85,8 +79,12 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
     }
 
     public Definition build(String wsdlURL) {
-        this.builder.setBus(this.bus);
+        WSDLManager mgr = bus.getExtension(WSDLManager.class);
+        registerJaxwsExtension(mgr.getExtensionRegistry());
+        
+        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(this.bus);
         wsdlDefinition = builder.build(wsdlURL);
+        mgr.removeDefinition(wsdlDefinition);
         context.put(Bus.class, bus);
         context.put(ToolConstants.IMPORTED_DEFINITION, builder.getImportedDefinitions());
         checkSupported(wsdlDefinition);
@@ -175,7 +173,13 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         String wsdlUrl = URIParserUtil.getAbsoluteURI((String)context.get(ToolConstants.CFG_WSDLURL));
         CustomizedWSDLLocator wsdlLocator = new CustomizedWSDLLocator(wsdlUrl, eleMap);
         wsdlLocator.setCatalogResolver(OASISCatalogManager.getCatalogManager(bus).getCatalog());
-        Definition def = wsdlReader.readWSDL(wsdlLocator);
+        
+        WSDLManager mgr = bus.getExtension(WSDLManager.class);
+        WSDLReader reader = mgr.getWSDLFactory().newWSDLReader();
+        reader.setFeature("javax.wsdl.verbose", false);
+        reader.setExtensionRegistry(mgr.getExtensionRegistry());       
+
+        Definition def = reader.readWSDL(wsdlLocator);
         cataLogResolvedMap.putAll(wsdlLocator.getResolvedMap());
         return def;
 
@@ -189,15 +193,12 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
 
         return this.wsdlDefinition;
     }
-    public WSDLReader getWSDLReader() {
-        return wsdlReader;
-    }
+
 
 
     public boolean validate(final Definition def) throws ToolException {
         return new WSDL11Validator(def, context, bus).isValid();
     }
-    
     
     public Map<String, String> getCataLogResolvedMap() {
         return this.cataLogResolvedMap;

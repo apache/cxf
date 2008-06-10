@@ -109,7 +109,7 @@ public final class SchemaUtil {
                         schemaCol.setSchemaResolver(schemaResolver);
                         
                         XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
-                        SchemaInfo schemaInfo = new SchemaInfo(serviceInfo, xmlSchema.getTargetNamespace());
+                        SchemaInfo schemaInfo = new SchemaInfo(xmlSchema.getTargetNamespace());
                         schemaInfo.setElement(schemaElem);
                         schemaInfo.setSchema(xmlSchema);
                         schemaInfo.setSystemId(systemId);

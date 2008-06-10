@@ -37,7 +37,6 @@ import javax.wsdl.Output;
 import javax.wsdl.Part;
 import javax.wsdl.PortType;
 import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
@@ -56,8 +55,6 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
 
     private static final String NEW_FILE_NAME_MODIFIER = "-soapbinding";
 
-    private ExtensionRegistry extReg;
-
     private Map portTypes;
     private PortType portType;
     private Binding binding;
@@ -65,7 +62,6 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
     public void process() throws ToolException {
         init();
         validate();
-        extReg = this.wsdlReader.getExtensionRegistry();
         doAppendBinding();
     }
 

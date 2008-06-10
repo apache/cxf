@@ -34,7 +34,6 @@ import org.apache.ws.commons.schema.XmlSchemaForm;
 
 public final class SchemaInfo extends AbstractPropertiesHolder {
   
-    ServiceInfo serviceInfo;
     String namespaceUri;
     Element element;
     boolean isElementQualified;
@@ -42,12 +41,11 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     XmlSchema schema;
     String systemId;
     
-    public SchemaInfo(ServiceInfo serviceInfo, String namespaceUri) {
-        this(serviceInfo, namespaceUri, false, false);
+    public SchemaInfo(String namespaceUri) {
+        this(namespaceUri, false, false);
     }
-    public SchemaInfo(ServiceInfo serviceInfo, String namespaceUri,
+    public SchemaInfo(String namespaceUri,
                       boolean qElement, boolean qAttribute) {
-        this.serviceInfo = serviceInfo;
         this.namespaceUri = namespaceUri;
         this.isElementQualified = qElement;
         this.isAttributeQualified = qAttribute;
@@ -64,10 +62,6 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         return buffer.toString();
     }
     
-    public ServiceInfo getServiceInfo() {
-        return serviceInfo;
-    }
-
     public String getNamespaceURI() {
         return namespaceUri;
     }

@@ -35,7 +35,9 @@ public class WSDL11ValidatorTest extends Assert {
         try {
             assertFalse(validator.isValid());
         } catch (Exception e) {
-            assertTrue(e.getMessage().indexOf("Caused by {http://apache.org/hello_world/messages}"
+            e.printStackTrace();
+            assertTrue(e.getMessage(), e.getMessage()
+                           .indexOf("Caused by {http://apache.org/hello_world/messages}"
                                               + "[portType:GreeterA][operation:sayHi] not exist.") != -1);
         }
     }
