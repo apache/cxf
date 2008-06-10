@@ -154,7 +154,7 @@ public class WSDLManagerImpl implements WSDLManager {
      * 
      * @see org.apache.cxf.wsdl.WSDLManager#getDefinition(java.net.URL)
      */
-    public Definition getDefinition(URL url) throws WSDLException {
+    public Definition getDefinition(URL url) throws WSDLException { 
         synchronized (definitionsMap) {
             if (definitionsMap.containsKey(url)) {
                 return definitionsMap.get(url);
@@ -214,7 +214,11 @@ public class WSDLManagerImpl implements WSDLManager {
         ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
                                                                                 catLocator,
                                                                                 bus);
-        return reader.readWSDL(wsdlLocator);
+        Definition def = reader.readWSDL(wsdlLocator);
+        synchronized (definitionsMap) {
+            definitionsMap.put(url, def);
+        }
+        return def;
     }
 
     private void registerInitialExtensions() throws BusException {
