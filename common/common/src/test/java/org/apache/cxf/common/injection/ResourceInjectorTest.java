@@ -47,6 +47,7 @@ import org.junit.Test;
 public class ResourceInjectorTest extends Assert {
     private static final String RESOURCE_ONE = "resource one";
     private static final String RESOURCE_TWO = "resource two";
+    private static final String RESOURCE_THREE = "resource three";
     
     private ResourceInjector injector; 
         
@@ -61,6 +62,8 @@ public class ResourceInjectorTest extends Assert {
         EasyMock.expectLastCall().andReturn(RESOURCE_ONE);
         resMgr.resolveResource("resource2", String.class, resolvers);
         EasyMock.expectLastCall().andReturn(RESOURCE_TWO);
+        resMgr.resolveResource("resource3", CharSequence.class, resolvers);
+        EasyMock.expectLastCall().andReturn(RESOURCE_THREE);
         EasyMock.replay(resMgr);
         
         injector = new ResourceInjector(resMgr); 
@@ -145,7 +148,9 @@ public class ResourceInjectorTest extends Assert {
 
         assertNotNull(target.getResource2()); 
         assertEquals(RESOURCE_TWO, target.getResource2());
-         
+        
+        assertNotNull(target.getResource3());
+        assertEquals(RESOURCE_THREE, target.getResource3());
     }
     
     private Target getProxyObject() {
@@ -168,6 +173,7 @@ public class ResourceInjectorTest extends Assert {
 interface Target {
     String getResource1(); 
     String getResource2(); 
+    CharSequence getResource3();
 }
 
 class CallInterceptor implements MethodInterceptor {
@@ -189,6 +195,9 @@ class FieldTarget implements Target {
 
     @Resource(name = "resource2")
     private String resource2foo;
+    
+    @Resource(name = "resource3")
+    private CharSequence resource3foo;
 
     public String getResource1() { 
         return resource1; 
@@ -197,9 +206,13 @@ class FieldTarget implements Target {
     public String getResource2() { 
         return resource2foo;
     } 
+    
+    public CharSequence getResource3() {
+        return resource3foo;
+    }
 
     public String toString() { 
-        return "[" + resource1 + ":" + resource2foo + "]";
+        return "[" + resource1 + ":" + resource2foo + ":" + resource3foo + "]";
     }
 
 }
@@ -214,6 +227,7 @@ class SubSetterTarget extends SetterTarget {
 interface ISetterTarget extends Target {    
     void setResource1(final String argResource1);    
     void setResource2(final String argResource2);
+    void setResource3(final CharSequence argResource3);
 }
 
 class ProxyClass implements InvocationHandler {
@@ -231,6 +245,9 @@ class ProxyClass implements InvocationHandler {
                 types = new Class[args.length];
                 for (int i = 0; i < args.length; i++) {
                     types[i] = args[i].getClass();
+                    if ("setResource3".equals(m.getName()) && types[i].equals(String.class)) {
+                        types[i] = CharSequence.class;
+                    }
                 }
             }    
             Method target = obj.getClass().getMethod(m.getName(), types);
@@ -249,6 +266,7 @@ class SetterTarget implements Target {
 
     private String resource1;
     private String resource2;
+    private CharSequence resource3;
     private boolean injectionCompletePublic; 
     private boolean injectionCompletePrivate; 
     private boolean preDestroy; 
@@ -270,6 +288,15 @@ class SetterTarget implements Target {
     @Resource(name = "resource2")
     public void setResource2(final String argResource2) {
         this.resource2 = argResource2;
+    }
+    
+    public final CharSequence getResource3() {
+        return this.resource3;
+    }
+    
+    @Resource(name = "resource3")
+    public void setResource3(final CharSequence argResource3) {
+        this.resource3 = argResource3;
     }
 
     @PostConstruct
@@ -310,9 +337,12 @@ class SetterTarget implements Target {
     }
 }
 
+//CHECKSTYLE:OFF
 @Resource(name = "resource1")
 class ClassTarget implements Target {
 
+    @Resource(name = "resource3") 
+    public CharSequence resource3foo;
     @Resource(name = "resource2") 
     public String resource2foo; 
     private String res1; 
@@ -328,16 +358,22 @@ class ClassTarget implements Target {
     public final String getResource2() {
         return resource2foo;
     }
+    
+    public final CharSequence getResource3() {
+        return resource3foo;
+    }
 }
 
 
 
 @Resources({@Resource(name = "resource1"), 
-            @Resource(name = "resource2") })
+            @Resource(name = "resource2"),
+            @Resource(name = "resource3") })
 class ResourcesContainerTarget implements Target {
 
     private String res1; 
     private String resource2; 
+    private CharSequence resource3;
 
     public final void setResource1(String res) { 
         res1 = res; 
@@ -349,5 +385,9 @@ class ResourcesContainerTarget implements Target {
 
     public final String getResource2() {
         return resource2;
+    }
+    
+    public final CharSequence getResource3() {
+        return resource3;
     }
 }

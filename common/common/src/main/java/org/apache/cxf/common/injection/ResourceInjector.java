@@ -244,8 +244,10 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             if (method.getDeclaringClass().isAssignableFrom(getTarget().getClass())) {
                 method.invoke(getTarget(), resource);
             } else { // deal with the proxy setter method
-                Method targetMethod = getTarget().getClass().
-                getMethod(method.getName(), new Class[]{resource.getClass()});
+                Method targetMethod = findMethod(getTarget().getClass(), 
+                                                 method.getName(),
+                                                 resource);                
+
                 targetMethod.invoke(getTarget(), resource);
             }
         } catch (IllegalAccessException e) { 
@@ -259,6 +261,22 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         } 
     } 
 
+
+    private Method findMethod(Class<? extends Object> class1, String name, Object resource)
+        throws SecurityException, NoSuchMethodException {
+        try {
+            return class1.getMethod(name, new Class[]{resource.getClass()});
+        } catch (NoSuchMethodException e) {
+            for (Method m : class1.getMethods()) {
+                if (m.getName().equals(name)
+                    && m.getParameterTypes().length == 1
+                    && m.getParameterTypes()[0].isInstance(resource)) {
+                    return m;
+                }
+            }
+            throw e;
+        }
+    }
 
     private String getResourceName(Resource res, Method method) { 
         assert method != null; 
