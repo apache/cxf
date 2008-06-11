@@ -361,8 +361,23 @@
                                     <resource>META-INF/extensions.xml</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/cxf/extensions.xml</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/bus-extensions.xml</resource>
                                 </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/cxf/bus-extensions.xml</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/service.validator.xml</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/wsdl.plugin.xml</resource>
+                                </transformer>                     
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/tools.service.validator.xml</resource>
+                                </transformer>                                           
                                 <transformer implementation="org.apache.cxf.maven.PluginTransformer">
                                     <resource>META-INF/tools-plugin.xml</resource>
                                 </transformer>

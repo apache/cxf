@@ -42,7 +42,8 @@ public class ExtensionManagerImpl implements ExtensionManager {
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";
-    public static final String BUS_EXTENSION_RESOURCE = "META-INF/bus-extensions.xml";
+    public static final String BUS_EXTENSION_RESOURCE_COMPAT = "META-INF/bus-extensions.xml";
+    public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.xml";
     
     private final ClassLoader loader;
     private ResourceManager resourceManager;
@@ -53,11 +54,18 @@ public class ExtensionManagerImpl implements ExtensionManager {
 
     public ExtensionManagerImpl(ClassLoader cl, Map<Class, Object> initialExtensions, 
                                 ResourceManager rm) {
-        this(BUS_EXTENSION_RESOURCE, cl, initialExtensions, rm);
+        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_COMPAT}, cl, initialExtensions, rm);
     }
-    
-    public ExtensionManagerImpl(String resource, ClassLoader cl, Map<Class, Object> initialExtensions, 
-        ResourceManager rm) {
+    public ExtensionManagerImpl(String resource, 
+                                ClassLoader cl, 
+                                Map<Class, Object> initialExtensions, 
+                                ResourceManager rm) {
+        this(new String[] {resource}, cl, initialExtensions, rm);
+    }    
+    public ExtensionManagerImpl(String resources[], 
+                                ClassLoader cl, 
+                                Map<Class, Object> initialExtensions, 
+                                ResourceManager rm) {
 
         loader = cl;
         activated = initialExtensions;
@@ -71,7 +79,9 @@ public class ExtensionManagerImpl implements ExtensionManager {
         deferred = new ConcurrentHashMap<String, Collection<Extension>>();
 
         try {
-            load(resource);
+            for (String resource : resources) {
+                load(resource);
+            }
         } catch (IOException ex) {
             throw new ExtensionException(ex);
         }

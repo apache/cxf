@@ -54,8 +54,6 @@ public class ExtensionManagerBus extends CXFBusImpl {
     private static final String BUS_ID_PROPERTY_NAME = "org.apache.cxf.bus.id";
     
     
-    private static final String BUS_EXTENSION_RESOURCE = "META-INF/bus-extensions.xml";
-
     public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties) {
         super(e);
 
@@ -85,7 +83,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         extensions.put(ResourceManager.class, resourceManager);
 
-        ExtensionManagerImpl em = new ExtensionManagerImpl(BUS_EXTENSION_RESOURCE, 
+        ExtensionManagerImpl em = new ExtensionManagerImpl(
                                  Thread.currentThread().getContextClassLoader(),
                                  extensions,
                                  resourceManager);

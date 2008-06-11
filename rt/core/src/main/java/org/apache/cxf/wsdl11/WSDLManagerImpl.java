@@ -69,7 +69,8 @@ public class WSDLManagerImpl implements WSDLManager {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLManagerImpl.class);
 
-    private static final String EXTENSIONS_RESOURCE = "META-INF/extensions.xml";
+    private static final String EXTENSIONS_RESOURCE = "META-INF/cxf/extensions.xml";
+    private static final String EXTENSIONS_RESOURCE_COMPAT = "META-INF/extensions.xml";
 
     final ExtensionRegistry registry;
     final WSDLFactory factory;
@@ -216,9 +217,13 @@ public class WSDLManagerImpl implements WSDLManager {
     }
 
     private void registerInitialExtensions() throws BusException {
+        registerInitialExtensions(EXTENSIONS_RESOURCE_COMPAT);
+        registerInitialExtensions(EXTENSIONS_RESOURCE);
+    }
+    private void registerInitialExtensions(String resource) throws BusException {
         Properties initialExtensions = null;
         try {
-            initialExtensions = PropertiesLoaderUtils.loadAllProperties(EXTENSIONS_RESOURCE, 
+            initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
                                                                         Thread.currentThread()
                                                                               .getContextClassLoader());
         } catch (IOException ex) {
