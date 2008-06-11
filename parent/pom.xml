@@ -1146,7 +1146,7 @@
         <profile>
             <id>spring2.5</id>
             <properties>
-                <spring.version>2.5.3</spring.version>
+                <spring.version>2.5.4</spring.version>
                 <spring.mock>spring-test</spring.mock>
             </properties>
         </profile>
