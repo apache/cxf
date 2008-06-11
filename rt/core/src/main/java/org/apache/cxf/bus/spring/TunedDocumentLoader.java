@@ -44,6 +44,7 @@ import org.xml.sax.XMLReader;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.springframework.beans.factory.xml.DefaultDocumentLoader;
@@ -75,7 +76,8 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         transformerFactory = TransformerFactory.newInstance();
         
         try {
-            Class<?> cls = Class.forName("com.ctc.wstx.sax.WstxSAXParserFactory");
+            Class<?> cls = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
+                                                      TunedDocumentLoader.class);
             saxParserFactory = (SAXParserFactory)cls.newInstance();
             nsasaxParserFactory = (SAXParserFactory)cls.newInstance();
         } catch (Throwable e) {
