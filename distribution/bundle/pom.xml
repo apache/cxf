@@ -275,8 +275,7 @@
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${pom.version}</Specification-Version>
                         <DynamicImport-Package>
-                            com.ctc.wstx.*,
-                            com.ctc.wstx.sax.*
+                            com.ctc.wstx.*
                         </DynamicImport-Package>
                         <Import-Package>
                             antlr*;resolution:=optional,
