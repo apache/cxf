@@ -133,7 +133,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/http.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/wsdl/wsdl.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <dependencies>
                                         <dependency>${basedir}/target/schemas/schemas/wsdl/wsdl.xsd</dependency>
                                     </dependencies>
@@ -143,16 +143,16 @@
                                     <packagename>org.apache.cxf.ws.addressing</packagename>
                                 </xsdOption>
                                 <xsdOption>
-                                    <xsd>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
-                                    <packagename>org.apache.cxf.ws.addressing.wsdl</packagename>
-                                </xsdOption>
-                                <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/addressing.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/wsdl/addressing.xjb</bindingFile>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/configuration/security.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/configuration/security.xjb</bindingFile>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
+                                    <bindingFile>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
@@ -170,7 +170,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/schemas/wsdl/test-conf.xsd</xsd>
                                     <bindingFile>${basedir}/src/test/resources/schemas/wsdl/test-conf.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/test/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>

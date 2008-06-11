@@ -158,7 +158,7 @@ public class XSDToJavaMojo extends AbstractMojo {
             while (it.hasNext()) {
                 list.add(it.next().toString());
             }
-        }           
+        }          
         list.add("-quiet");
         list.add("-d");
         list.add(outputDir);

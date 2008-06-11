@@ -18,8 +18,8 @@
   under the License.
 --
 
-SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" "oasis-200401-wss-wssecurity-secext-1.0.xsd"
-SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" "oasis-200401-wss-wssecurity-utility-1.0.xsd"
-SYSTEM "http://www.w3.org/2001/xml.xsd" "xml.xsd"
-SYSTEM "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" "xmldsig-core-schema.xsd"
-PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "XMLSchema.dtd"
+SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" "../../../src/main/resources/schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" "../../../src/main/resources/schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+SYSTEM "http://www.w3.org/2001/xml.xsd" "../../../src/main/resources/schemas/xml.xsd"
+SYSTEM "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" "../../../src/main/resources/schemas/xmldsig-core-schema.xsd"
+PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "../../../src/main/resources/schemas/XMLSchema.dtd"

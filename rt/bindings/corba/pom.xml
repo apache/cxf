@@ -89,7 +89,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/corba-binding.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/corba-binding.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>

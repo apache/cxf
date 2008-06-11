@@ -139,7 +139,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/wsrm.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/wsrm.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/ws/addressing</deleteDir>
                                     </deleteDirs>
@@ -147,7 +147,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/wsrm-manager-types.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/configuration/wsrm-policy.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <extension>true</extension>
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>

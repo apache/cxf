@@ -107,7 +107,7 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/http-jetty.xsd</xsd>
-                                    <catalog>${basedir}/src/main/resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/configuration/security</deleteDir>

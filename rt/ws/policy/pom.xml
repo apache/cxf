@@ -103,7 +103,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/ws-policy-200409.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/ws-policy-200409.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/oasis_open</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
@@ -112,7 +112,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/ws-policy-200607.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/ws-policy-200607.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/oasis_open</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
