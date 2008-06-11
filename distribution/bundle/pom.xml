@@ -370,9 +370,6 @@
                                     <resource>META-INF/cxf/bus-extensions.xml</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
-                                    <resource>META-INF/service.validator.xml</resource>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/wsdl.plugin.xml</resource>
                                 </transformer>                     
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
