@@ -509,7 +509,7 @@ public final class JAXRSUtils {
 
         String result = null;
         List<String> results = values.get(parameterName);
-        if (values != null && values.size() > 0) {
+        if (results != null && results.size() > 0) {
             result = results.get(results.size() - 1);
         }
         if (result != null) {
