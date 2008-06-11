@@ -149,10 +149,17 @@ public abstract class BusFactory {
      */
     public static BusFactory newInstance(String className) {
         BusFactory instance = null;
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (className == null) {
-            className = getBusFactoryClass(classLoader);
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            className = getBusFactoryClass(loader);
+            if (className == null && loader != BusFactory.class.getClassLoader()) {
+                className = getBusFactoryClass(BusFactory.class.getClassLoader()); 
+            }
         }
+        if (className == null) {
+            className = BusFactory.DEFAULT_BUS_FACTORY;
+        }
+        
         Class<? extends BusFactory> busFactoryClass;
         try {
             busFactoryClass = 
@@ -230,10 +237,8 @@ public abstract class BusFactory {
                     return busFactoryClass;
                 }
             }
-
-            // otherwise use default  
-            busFactoryClass = BusFactory.DEFAULT_BUS_FACTORY;
             return busFactoryClass;
+
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "FAILED_TO_DETERMINE_BUS_FACTORY_EXC", ex);
         } 

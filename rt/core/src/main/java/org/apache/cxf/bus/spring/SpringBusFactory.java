@@ -64,6 +64,7 @@ public class SpringBusFactory extends BusFactory {
     public Bus createBus(String cfgFile) {
         return createBus(cfgFile, defaultBusNotExists());
     }
+    
     public Bus createBus(String cfgFiles[]) {
         return createBus(cfgFiles, defaultBusNotExists());
     }
@@ -71,7 +72,6 @@ public class SpringBusFactory extends BusFactory {
     private Bus finishCreatingBus(BusApplicationContext bac) {
         final Bus bus = (Bus)bac.getBean(Bus.DEFAULT_BUS_ID);
 
-        //bus.setExtension(new ConfigurerImpl(bac), Configurer.class);
         bus.setExtension(bac, BusApplicationContext.class);
 
         possiblySetDefaultBus(bus);
@@ -88,12 +88,32 @@ public class SpringBusFactory extends BusFactory {
         }
         return createBus(new String[] {cfgFile}, includeDefaults);
     }    
+    
     public Bus createBus(String cfgFiles[], boolean includeDefaults) {
         try {      
-            return finishCreatingBus(new BusApplicationContext(cfgFiles, includeDefaults, context));
+            return finishCreatingBus(createApplicationContext(cfgFiles, includeDefaults));
         } catch (BeansException ex) {
             LogUtils.log(LOG, Level.WARNING, "APP_CONTEXT_CREATION_FAILED_MSG", ex, (Object[])null);
             throw new RuntimeException(ex);
+        }
+    }
+    
+    private BusApplicationContext createApplicationContext(String cfgFiles[], boolean includeDefaults) {
+        try {      
+            return new BusApplicationContext(cfgFiles, includeDefaults, context);
+        } catch (BeansException ex) {
+            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+            if (contextLoader != BusApplicationContext.class.getClassLoader()) {
+                Thread.currentThread().setContextClassLoader(
+                    BusApplicationContext.class.getClassLoader());
+                try {
+                    return new BusApplicationContext(cfgFiles, includeDefaults, context);        
+                } finally {
+                    Thread.currentThread().setContextClassLoader(contextLoader);
+                }
+            } else {
+                throw ex;
+            }
         }
     }
     
@@ -110,6 +130,7 @@ public class SpringBusFactory extends BusFactory {
         }
         return createBus(new URL[] {url}, includeDefaults);
     }
+    
     public Bus createBus(URL[] urls, boolean includeDefaults) {
         try {      
             return finishCreatingBus(new BusApplicationContext(urls, includeDefaults, context));
