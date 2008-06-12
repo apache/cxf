@@ -173,13 +173,17 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         }
         String name = el.getTextContent().trim();
         if ("##SOAP11_HTTP".equals(name)) {
-            name = "http://schemas.xmlsoap.org/wsdl/soap/http";
+            return "http://schemas.xmlsoap.org/wsdl/soap/http".contains(id)
+                || "http://schemas.xmlsoap.org/soap/".contains(id);
         } else if ("##SOAP11_HTTP_MTOM".equals(name)) {
-            name = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true";
+            return "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true".contains(id)
+                || "http://schemas.xmlsoap.org/soap/?mtom=true".contains(id);
         } else if ("##SOAP12_HTTP".equals(name)) {
-            name = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
+            return "http://www.w3.org/2003/05/soap/bindings/HTTP/".contains(id)
+                || "http://schemas.xmlsoap.org/wsdl/soap12/".contains(id);
         } else if ("##SOAP12_HTTP_MTOM".equals(name)) {
-            name = "http://www.w3.org/2003/05/soap/bindings/HTTP/?mtom=true";
+            return "http://www.w3.org/2003/05/soap/bindings/HTTP/?mtom=true".contains(id)
+                || "http://schemas.xmlsoap.org/wsdl/soap12/?mtom=true".contains(id);
         } else if ("##XML_HTTP".equals(name)) {
             name = "http://www.w3.org/2004/08/wsdl/http";
         }

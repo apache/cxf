@@ -288,7 +288,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         }
         
         try {
-            if ("http://schemas.xmlsoap.org/soap/".equals(binding)) {
+            if (binding.contains("/soap")) {
                 if (bindingConfig == null) {
                     bindingConfig = new SoapBindingConfiguration();
                 }

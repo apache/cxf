@@ -67,6 +67,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         super.setUpBus();
         
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
+        bindingFactory.setBus(bus);
 
         bus.getExtension(BindingFactoryManager.class)
             .registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bindingFactory);
