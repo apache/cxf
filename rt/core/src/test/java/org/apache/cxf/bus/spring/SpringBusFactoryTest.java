@@ -30,6 +30,7 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -49,11 +50,17 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SpringBusFactoryTest extends Assert {
 
+    @After
+    public void tearDown() {
+        BusFactory.setDefaultBus(null);
+    }
+    
     @Test
     public void testDefault() {
         Bus bus = new SpringBusFactory().createBus();

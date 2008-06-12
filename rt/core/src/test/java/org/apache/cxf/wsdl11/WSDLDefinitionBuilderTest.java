@@ -32,10 +32,16 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSDLDefinitionBuilderTest extends Assert {
-
+    @BeforeClass
+    public static void ensureNewBus() {
+        BusFactory.setDefaultBus(null);
+    }
+    
+    
     @Test
     public void testBuildSimpleWSDL() throws Exception {
         String qname = "http://apache.org/hello_world_soap_http";
