@@ -86,38 +86,6 @@
 
     </dependencies>
 
-    <!--build>
-	<plugins>
-	    <plugin>
-		<groupId>org.apache.cxf</groupId>
-		<artifactId>cxf-common-xsd</artifactId>
-		<version>${project.version}</version>
-		<executions>
-		    <execution>
-			<id>generate-sources</id>
-			<phase>generate-sources</phase>
-			<configuration>
-			    <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-			    <xsdOptions>
-				<xsdOption>
-				    <xsd>${basedir}/src/main/resources/schemas/ws-addr-wsdl.xsd</xsd>
-				    <bindingFile>${basedir}/src/main/resources/schemas/ws-addr-wsdl.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
-				    <deleteDirs>
-					<deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
-				    </deleteDirs>
-				</xsdOption>
-			    </xsdOptions>
-			</configuration>
-			<goals>
-			    <goal>xsdtojava</goal>
-			</goals>
-		    </execution>
-		</executions>
-	    </plugin>
-	</plugins>
-    </build-->
-
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/ws/addr</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/ws/addr</developerConnection>
