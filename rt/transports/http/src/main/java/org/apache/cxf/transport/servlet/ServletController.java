@@ -21,7 +21,10 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -185,7 +188,6 @@ public class ServletController {
             return;
         }
         
-        Collection<ServletDestination> destinations = transport.getDestinations();
         response.setContentType("text/html");        
         response.setCharacterEncoding("UTF-8");
         
@@ -205,6 +207,16 @@ public class ServletController {
         response.getWriter().write("<title>CXF - Service list</title>");
         response.getWriter().write("</head><body>");
         if (!isHideServiceList) {
+            List<ServletDestination> destinations 
+                = new LinkedList<ServletDestination>(transport.getDestinations());
+            Collections.sort(destinations, new Comparator<ServletDestination>() {
+                public int compare(ServletDestination o1, ServletDestination o2) {
+                    return o1.getEndpointInfo().getInterface().getName()
+                         .getLocalPart().compareTo(o2.getEndpointInfo()
+                                                       .getInterface().getName().getLocalPart());
+                }
+            });
+                
             if (destinations.size() > 0) {  
                 response.getWriter().write("<span class=\"heading\">Available services:</span><br/>");
                 response.getWriter().write("<table " + (serviceListStyleSheet == null
