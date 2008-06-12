@@ -230,6 +230,11 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                             qh.writeResponse(requestURL, pathInfo, endpointInfo, resp.getOutputStream());
                         } catch (Exception ex) {
                             LOG.log(Level.WARNING, "writeResponse failed: ", ex);
+                            try {
+                                resp.sendError(500, ex.getMessage());
+                            } catch (IOException ioe) {
+                                //ignore
+                            }
                         }
                         endpointInfo.setAddress(oldAddress);
                         resp.getOutputStream().flush();                     

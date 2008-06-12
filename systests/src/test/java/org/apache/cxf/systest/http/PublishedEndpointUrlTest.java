@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.http;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,6 +57,11 @@ public class PublishedEndpointUrlTest extends Assert {
 
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
         wsdlReader.setFeature("javax.wsdl.verbose", false);
+        
+        URL url = new URL(svrFactory.getAddress() + "?wsdl=1");
+        HttpURLConnection connect = (HttpURLConnection)url.openConnection();
+        assertEquals(500, connect.getResponseCode());
+        
         Definition wsdl = wsdlReader.readWSDL(svrFactory.getAddress() + "?wsdl");
         assertNotNull(wsdl);
         

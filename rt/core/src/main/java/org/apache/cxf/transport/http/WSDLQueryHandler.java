@@ -145,7 +145,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     String wsdl2 = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
                                                        wsdl,
                                                        base);
-                    def = mp.get(wsdl2);
+                    if (wsdl2 != null) {
+                        def = mp.get(wsdl2);
+                    }
+                }
+                if (def == null) {
+                    throw new WSDLQueryException(new Message("WSDL_NOT_FOUND", LOG, wsdl), null);
                 }
                 
                 synchronized (def) {
@@ -168,7 +173,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     String xsd2 = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
                                                        xsd,
                                                        base);
-                    si = smp.get(xsd2);
+                    if (xsd2 != null) { 
+                        si = smp.get(xsd2);
+                    }
+                }
+                if (si == null) {
+                    throw new WSDLQueryException(new Message("SCHEMA_NOT_FOUND", LOG, wsdl), null);
                 }
                 
                 String uri = si.getReferencedSchema().getDocumentBaseURI();
@@ -185,37 +195,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 doc = XMLUtils.getParser().parse(src);
             }
             
-            NodeList nl = doc.getDocumentElement()
-                .getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema",
-                                        "import");
-            for (int x = 0; x < nl.getLength(); x++) {
-                Element el = (Element)nl.item(x);
-                String sl = el.getAttribute("schemaLocation");
-                if (smp.containsKey(sl)) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl);
-                }
-            }
-            nl = doc.getDocumentElement()
-                .getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema",
-                                        "include");
-            for (int x = 0; x < nl.getLength(); x++) {
-                Element el = (Element)nl.item(x);
-                String sl = el.getAttribute("schemaLocation");
-                if (smp.containsKey(sl)) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl);
-                }
-            }
-            nl = doc.getDocumentElement()
-                .getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/",
-                                    "import");
-            for (int x = 0; x < nl.getLength(); x++) {
-                Element el = (Element)nl.item(x);
-                String sl = el.getAttribute("location");
-                if (mp.containsKey(sl)) {
-                    el.setAttribute("location", base + "?wsdl=" + sl);
-                }
-            }
-            doc.setXmlStandalone(true);
+            updateDoc(doc, base, mp, smp);
             String enc = doc.getXmlEncoding();
             if (enc == null) {
                 enc = "utf-8";
@@ -225,11 +205,49 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                                                                      enc);
             StaxUtils.writeNode(doc, writer, true);
             writer.flush();
+        } catch (WSDLQueryException wex) {
+            throw wex;
         } catch (Exception wex) {
             throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
                                                      LOG,
                                                      baseUri), wex);
         }
+    }
+    
+    private void updateDoc(Document doc, String base,
+                           Map<String, Definition> mp,
+                           Map<String, SchemaReference> smp) {
+        NodeList nl = doc.getDocumentElement()
+            .getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema",
+                                    "import");
+        for (int x = 0; x < nl.getLength(); x++) {
+            Element el = (Element)nl.item(x);
+            String sl = el.getAttribute("schemaLocation");
+            if (smp.containsKey(sl)) {
+                el.setAttribute("schemaLocation", base + "?xsd=" + sl);
+            }
+        }
+        nl = doc.getDocumentElement()
+            .getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema",
+                                    "include");
+        for (int x = 0; x < nl.getLength(); x++) {
+            Element el = (Element)nl.item(x);
+            String sl = el.getAttribute("schemaLocation");
+            if (smp.containsKey(sl)) {
+                el.setAttribute("schemaLocation", base + "?xsd=" + sl);
+            }
+        }
+        nl = doc.getDocumentElement()
+            .getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/",
+                                "import");
+        for (int x = 0; x < nl.getLength(); x++) {
+            Element el = (Element)nl.item(x);
+            String sl = el.getAttribute("location");
+            if (mp.containsKey(sl)) {
+                el.setAttribute("location", base + "?wsdl=" + sl);
+            }
+        }
+        doc.setXmlStandalone(true);
     }
 
     static String resolveWithCatalogs(OASISCatalogManager catalogs, String start, String base) {
