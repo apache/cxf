@@ -184,13 +184,11 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-                            <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
+                            <sourceRoot>target/generated/src/main/java</sourceRoot>
+                            <wsdlRoot>src/main/resources/wsdl</wsdlRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>
-                                        ${basedir}/target/generated/src/main/resources/wsdl/type_test/type_test_xml.wsdl
-                                    </wsdl>
+                                    <wsdl>target/generated/src/main/resources/wsdl/type_test/type_test_xml.wsdl</wsdl>
                                     <dependencies>
                                         <dependency>
                                             ${basedir}/target/generated/src/main/resources/wsdl/type_test/type_test_xml_inc.wsdl
@@ -207,9 +205,7 @@
                                     </dependencies>
                                 </wsdlOption>
                                 <wsdlOption>
-                                    <wsdl>
-                                        ${basedir}/target/generated/src/main/resources/wsdl/type_test/type_test_doclit_soap.wsdl
-                                    </wsdl>
+                                    <wsdl>target/generated/src/main/resources/wsdl/type_test/type_test_doclit_soap.wsdl</wsdl>
                                     <dependencies>
                                         <dependency>
                                             ${basedir}/target/generated/src/main/resources/wsdl/type_test/type_test_doclit.wsdl
@@ -226,9 +222,7 @@
                                     </dependencies>
                                 </wsdlOption>
                                 <wsdlOption>
-                                    <wsdl>
-                                        ${basedir}/target/generated/src/main/resources/wsdl/type_test/type_test_rpclit_soap.wsdl
-                                    </wsdl>
+                                    <wsdl>target/generated/src/main/resources/wsdl/type_test/type_test_rpclit_soap.wsdl</wsdl>
                                     <dependencies>
                                         <dependency>
                                             ${basedir}/target/generated/src/main/resources/wsdl/type_test/type_test_rpclit.wsdl
