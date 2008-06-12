@@ -21,6 +21,7 @@ package org.apache.cxf.maven_plugin;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -111,7 +112,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
      */
     String excludes[];
                     
-
     private List<WsdlOption> getWsdlOptionsFromDir(final File root,
                                                    final File output)
         throws MojoExecutionException {
@@ -262,14 +262,39 @@ public class WSDL2JavaMojo extends AbstractMojo {
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
         
-        File file = new File(wsdlOption.getWsdl());
+        
+        String wsdlLocation = wsdlOption.getWsdl();
+        URI basedir = project.getBasedir().toURI();
+        URI wsdlURI = basedir.resolve(wsdlLocation);
+        
+        String doneFileName = wsdlURI.toString();
+        if (doneFileName.startsWith(basedir.toString())) {
+            doneFileName = doneFileName.substring(basedir.toString().length());
+        }
+        
+        doneFileName = doneFileName.replace('?', '_')
+            .replace('&', '_').replace('/', '_').replace('\\', '_');
+        
         // If URL to WSDL, replace ? and & since they're invalid chars for file names
         File doneFile =
-            new File(markerDirectory, "." + file.getName().replace('?', '_').replace('&', '_') + ".DONE");
+            new File(markerDirectory, "." + doneFileName + ".DONE");
+        
+        long timestamp = 0;
+        if ("file".equals(wsdlURI.getScheme())) {
+            timestamp = new File(wsdlURI).lastModified();
+        } else {
+            try {
+                timestamp = wsdlURI.toURL().openConnection().getDate();
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        
+        
         boolean doWork = cgtimestamp > doneFile.lastModified();
         if (!doneFile.exists()) {
             doWork = true;
-        } else if (file.lastModified() > doneFile.lastModified()) {
+        } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
         } else if (isDefServiceName(wsdlOption)) {
             doWork = true;
@@ -306,7 +331,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                     list.add(it.next().toString());
                 }
             }
-            list.add(wsdlOption.getWsdl());
+            list.add(wsdlURI.toString());
 
             getLog().debug("Calling wsdl2java with args: " + list);
             try {

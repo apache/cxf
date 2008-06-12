@@ -20,6 +20,7 @@
 package org.apache.cxf.maven_plugin;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -59,11 +60,20 @@ public class XSDToJavaMojo extends AbstractMojo {
      */
     XsdOption xsdOptions[];
     
+    /**
+     * Directory in which the "DONE" markers are saved that 
+     * @parameter expression="${cxf.markerDirectory}" 
+     *            default-value="${project.build.directory}/cxf-xsd-plugin-markers"
+     */
+    File markerDirectory;
+    
+    
     public void execute() throws MojoExecutionException {
         String outputDir = testSourceRoot == null ? sourceRoot : testSourceRoot;
         File outputDirFile = new File(outputDir);
         outputDirFile.mkdirs();
-        
+        markerDirectory.mkdirs();
+
         long timestamp = CodegenUtils.getCodegenTimestamp();
         boolean result = true;
         
@@ -74,12 +84,37 @@ public class XSDToJavaMojo extends AbstractMojo {
         for (int x = 0; x < xsdOptions.length; x++) {
             String[] args = getArguments(xsdOptions[x], outputDir);
             
-            File file = new File(xsdOptions[x].getXsd());
-            File doneFile = new File(outputDirFile, "." + file.getName() + ".DONE");
+            String xsdLocation = xsdOptions[x].getXsd();
+            URI basedir = project.getBasedir().toURI();
+            URI xsdURI = basedir.resolve(xsdLocation);
+            
+            String doneFileName = xsdURI.toString();
+            if (doneFileName.startsWith(basedir.toString())) {
+                doneFileName = doneFileName.substring(basedir.toString().length());
+            }
+            
+            doneFileName = doneFileName.replace('?', '_')
+                .replace('&', '_').replace('/', '_').replace('\\', '_');
+            
+            // If URL to WSDL, replace ? and & since they're invalid chars for file names
+            File doneFile =
+                new File(markerDirectory, "." + doneFileName + ".DONE");
+            
+            long srctimestamp = 0;
+            if ("file".equals(xsdURI.getScheme())) {
+                srctimestamp = new File(xsdURI).lastModified();
+            } else {
+                try {
+                    srctimestamp = xsdURI.toURL().openConnection().getDate();
+                } catch (Exception e) {
+                    //ignore
+                }
+            }
+            
             boolean doWork = timestamp > doneFile.lastModified();
             if (!doneFile.exists()) {
                 doWork = true;
-            } else if (file.lastModified() > doneFile.lastModified()) {
+            } else if (srctimestamp > doneFile.lastModified()) {
                 doWork = true;
             } else {
                 File files[] = xsdOptions[x].getDependencies();
