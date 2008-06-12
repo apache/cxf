@@ -308,8 +308,6 @@
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
                             org.xmlsoap.schemas*;version=${pom.version};-split-package:=merge-first,
                             org.codehaus.xfire.aegis.type.java5.*,
-                            org.xmlsoap.schemas.wsdl.http.*,
-                            org.w3._2006._05.addressing.wsdl.*,
                             '=META-INF.cxf'
                         </Export-Package>
                         <_failok>true</_failok>

@@ -27,4 +27,7 @@
             <jaxb:package name="org.apache.cxf.ws.addressing.wsdl"/>
         </jaxb:schemaBindings>
     </jaxb:bindings>
+    <jaxb:bindings schemaLocation="ws-addr-wsdl.xsd" node="/xs:schema/xs:element[@name='UsingAddressing']">
+      <jaxb:class ref="org.apache.cxf.ws.addressing.wsdl.UsingAddressingImpl"/>
+    </jaxb:bindings>
 </jaxb:bindings>

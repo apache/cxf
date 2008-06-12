@@ -23,6 +23,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
@@ -36,12 +38,16 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.StringUtils;
 
 
 /**
@@ -50,6 +56,8 @@ import org.apache.cxf.common.util.PackageUtils;
  *
  */
 public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeserializer {
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
+
     JAXBContext context;
     final Class<? extends TExtensibilityElementImpl> typeClass;
       
@@ -71,7 +79,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                      Class<? extends TExtensibilityElementImpl> cls) throws JAXBException {
         
         JAXBExtensionHelper helper = new JAXBExtensionHelper(cls);
-        
+        boolean found = false;
         try {
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
                                                    true, cls.getClassLoader());
@@ -85,15 +93,44 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                         QName elementType = new QName(elementDecl.namespace(), elementDecl.name());
                         registry.registerDeserializer(parentType, elementType, helper); 
                         registry.registerSerializer(parentType, elementType, helper);                         
-                        registry.mapExtensionTypes(parentType, elementType, cls);                        
+                        registry.mapExtensionTypes(parentType, elementType, cls);
+                        found = true;
                     }                    
                 }
             }        
             
         } catch (ClassNotFoundException ex) {
-            // TODO
-            ex.printStackTrace();            
+            //ignore
         }        
+        if (!found) {
+            //not in object factory or no object factory, try other annotations
+            XmlRootElement elAnnot = cls.getAnnotation(XmlRootElement.class);
+            if (elAnnot != null) {
+                String name = elAnnot.name();
+                String ns = elAnnot.namespace();
+                if (StringUtils.isEmpty(ns)
+                    || "##default".equals(ns)) {
+                    XmlSchema schema = cls.getPackage().getAnnotation(XmlSchema.class);
+                    if (schema != null) {
+                        ns = schema.namespace();
+                    }
+                }
+                if (!StringUtils.isEmpty(ns) && !StringUtils.isEmpty(name)) {
+                    QName elementType = new QName(ns, name);
+                    registry.registerDeserializer(parentType, elementType, helper); 
+                    registry.registerSerializer(parentType, elementType, helper);                         
+                    registry.mapExtensionTypes(parentType, elementType, cls);
+                    
+                    helper.getJAXBContext();
+                    found = true;
+                }
+            }
+        }
+        
+        if (!found) {
+            LOG.log(Level.WARNING, "EXTENSION_NOT_REGISTERED", 
+                    new Object[] {cls.getName(), parentType.getName()});
+        }
     }
 
     protected JAXBContext getJAXBContext() {

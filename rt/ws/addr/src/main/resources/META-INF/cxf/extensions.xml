@@ -20,5 +20,5 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
     <!-- WS-A -->
-    <entry key="org.apache.cxf.ws.addressing-1">javax.wsdl.Binding=org.w3._2006._05.addressing.wsdl.UsingAddressing</entry>
+    <entry key="org.apache.cxf.ws.addressing-1">javax.wsdl.Binding=org.apache.cxf.ws.addressing.wsdl.UsingAddressing</entry>
 </properties>

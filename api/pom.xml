@@ -153,6 +153,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
+                                    <extension>true</extension>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>

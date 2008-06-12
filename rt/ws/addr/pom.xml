@@ -86,7 +86,7 @@
 
     </dependencies>
 
-    <build>
+    <!--build>
 	<plugins>
 	    <plugin>
 		<groupId>org.apache.cxf</groupId>
@@ -116,7 +116,7 @@
 		</executions>
 	    </plugin>
 	</plugins>
-    </build>
+    </build-->
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/ws/addr</connection>

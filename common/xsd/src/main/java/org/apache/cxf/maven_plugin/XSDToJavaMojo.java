@@ -58,7 +58,6 @@ public class XSDToJavaMojo extends AbstractMojo {
      * @parameter
      */
     XsdOption xsdOptions[];
-
     
     public void execute() throws MojoExecutionException {
         String outputDir = testSourceRoot == null ? sourceRoot : testSourceRoot;
@@ -159,7 +158,11 @@ public class XSDToJavaMojo extends AbstractMojo {
                 list.add(it.next().toString());
             }
         }          
-        list.add("-quiet");
+        if (getLog().isDebugEnabled()) {
+            list.add("-verbose");            
+        } else { 
+            list.add("-quiet");
+        }
         list.add("-d");
         list.add(outputDir);
         list.add(option.getXsd());
