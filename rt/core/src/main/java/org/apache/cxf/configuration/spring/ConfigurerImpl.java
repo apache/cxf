@@ -22,6 +22,8 @@ package org.apache.cxf.configuration.spring;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,7 +46,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
 
-    private ApplicationContext appContext;
+    private Set<ApplicationContext> appContexts;
     private final Map<String, String> wildCardBeanDefinitions = new HashMap<String, String>();
     
     public ConfigurerImpl() {
@@ -56,24 +58,26 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     }
         
     private void initWildcardDefinitionMap() {
-        if (null != appContext) {
-            for (String n : appContext.getBeanDefinitionNames()) {
-                if (isWildcardBeanName(n)) {
-                    AutowireCapableBeanFactory bf = appContext.getAutowireCapableBeanFactory();
-                    BeanDefinitionRegistry bdr = (BeanDefinitionRegistry) bf;
-                    BeanDefinition bd = bdr.getBeanDefinition(n);
-                    String className = bd.getBeanClassName();
-                    if (null != className) {
-                        if (!wildCardBeanDefinitions.containsKey(className)) {
-                            wildCardBeanDefinitions.put(className, n);
+        if (null != appContexts) {
+            for (ApplicationContext appContext : appContexts) {
+                for (String n : appContext.getBeanDefinitionNames()) {
+                    if (isWildcardBeanName(n)) {
+                        AutowireCapableBeanFactory bf = appContext.getAutowireCapableBeanFactory();
+                        BeanDefinitionRegistry bdr = (BeanDefinitionRegistry) bf;
+                        BeanDefinition bd = bdr.getBeanDefinition(n);
+                        String className = bd.getBeanClassName();
+                        if (null != className) {
+                            if (!wildCardBeanDefinitions.containsKey(className)) {
+                                wildCardBeanDefinitions.put(className, n);
+                            } else {
+                                LogUtils.log(LOG, Level.WARNING, "ONE_WILDCARD_BEAN_ID_PER_CLASS_MSG", 
+                                             new String[]{wildCardBeanDefinitions.get(className),
+                                                          className,
+                                                          n});   
+                            }
                         } else {
-                            LogUtils.log(LOG, Level.WARNING, "ONE_WILDCARD_BEAN_ID_PER_CLASS_MSG", 
-                                         new String[]{wildCardBeanDefinitions.get(className),
-                                                      className,
-                                                      n});   
+                            LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n); 
                         }
-                    } else {
-                        LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n); 
                     }
                 }
             }
@@ -84,9 +88,9 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         configureBean(null, beanInstance);
     }
     
-    public void configureBean(String bn, Object beanInstance) {
+    public synchronized void configureBean(String bn, Object beanInstance) {
 
-        if (null == appContext) {
+        if (null == appContexts) {
             return;
         }
         
@@ -109,6 +113,12 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                 return null;
             }
         });
+        
+        for (ApplicationContext appContext : appContexts) {
+            if (appContext.containsBean(bn)) {
+                this.setBeanFactory(appContext.getAutowireCapableBeanFactory());
+            }
+        }
         
         try {
             super.configureBean(beanInstance);
@@ -177,9 +187,15 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     }
     
     public final void setApplicationContext(ApplicationContext ac) {
-        appContext = ac;
-        setBeanFactory(appContext.getAutowireCapableBeanFactory());
-        initWildcardDefinitionMap();
+        appContexts = new CopyOnWriteArraySet<ApplicationContext>();
+        addApplicationContext(ac);
+        setBeanFactory(ac.getAutowireCapableBeanFactory());
+    }
+    public final void addApplicationContext(ApplicationContext ac) {
+        if (!appContexts.contains(ac)) {
+            appContexts.add(ac);
+            initWildcardDefinitionMap();
+        }
     }
 
     public Class<?> getRegistrationType() {

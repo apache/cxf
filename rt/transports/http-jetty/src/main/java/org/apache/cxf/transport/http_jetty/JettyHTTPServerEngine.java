@@ -120,7 +120,7 @@ public class JettyHTTPServerEngine
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.
      */
-    JettyHTTPServerEngine(
+    public JettyHTTPServerEngine(
         JettyHTTPServerEngineFactory fac, 
         Bus bus,
         int port) {
@@ -146,6 +146,10 @@ public class JettyHTTPServerEngine
     @Resource(name = "bus")
     public void setBus(Bus b) {
         bus = b;
+    }
+    
+    public Bus getBus() {
+        return bus;
     }
     
     

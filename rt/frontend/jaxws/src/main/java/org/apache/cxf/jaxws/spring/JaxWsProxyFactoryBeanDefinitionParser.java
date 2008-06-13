@@ -18,14 +18,22 @@
  */
 package org.apache.cxf.jaxws.spring;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.spring.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBeanDefinitionParser {
 
     @Override
     protected Class getFactoryClass() {
-        return JaxWsProxyFactoryBean.class;
+        return JAXWSSpringClientProxyFactoryBean.class;
     }
 
     @Override
@@ -33,4 +41,23 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
         return ".jaxws-client";
     }
 
+    
+    public static class JAXWSSpringClientProxyFactoryBean extends JaxWsProxyFactoryBean
+        implements ApplicationContextAware {
+
+        public JAXWSSpringClientProxyFactoryBean() {
+            super();
+        }
+        public JAXWSSpringClientProxyFactoryBean(ClientFactoryBean fact) {
+            super(fact);
+        }
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
+        }
+    }
 }

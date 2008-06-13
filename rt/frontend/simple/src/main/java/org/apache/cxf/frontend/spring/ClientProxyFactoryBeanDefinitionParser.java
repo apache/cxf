@@ -25,10 +25,17 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
+import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class ClientProxyFactoryBeanDefinitionParser 
     extends AbstractFactoryBeanDefinitionParser {
@@ -40,7 +47,7 @@ public class ClientProxyFactoryBeanDefinitionParser
 
     @Override
     protected Class getFactoryClass() {
-        return ClientProxyFactoryBean.class;
+        return SpringClientProxyFactoryBean.class;
     }
 
     @Override
@@ -77,6 +84,25 @@ public class ClientProxyFactoryBeanDefinitionParser
             bean.addPropertyValue(name, list);
         } else {
             setFirstChildAsProperty(e, ctx, bean, name);
+        }
+    }
+    
+    public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
+        implements ApplicationContextAware {
+
+        public SpringClientProxyFactoryBean() {
+            super();
+        }
+        public SpringClientProxyFactoryBean(ClientFactoryBean fact) {
+            super(fact);
+        }
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
         }
     }
 }

@@ -27,6 +27,7 @@ import javax.xml.ws.handler.Handler;
 
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.interceptor.Interceptor;
@@ -52,6 +53,9 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     
     public JaxWsProxyFactoryBean() {
         super(new JaxWsClientFactoryBean());
+    }
+    public JaxWsProxyFactoryBean(ClientFactoryBean fact) {
+        super(fact);
     }
 
     public void setHandlers(List<Handler> h) {

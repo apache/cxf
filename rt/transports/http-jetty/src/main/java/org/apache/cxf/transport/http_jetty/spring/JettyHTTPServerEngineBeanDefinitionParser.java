@@ -26,20 +26,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
+import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersType;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -193,5 +200,30 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
     protected Class getBeanClass(Element arg0) {
         return JettyHTTPServerEngine.class;
     }
+    
+    public static class SpringJettyHTTPServerEngine extends JettyHTTPServerEngine
+        implements ApplicationContextAware {
+        
+        public SpringJettyHTTPServerEngine(
+            JettyHTTPServerEngineFactory fac, 
+            Bus bus,
+            int port) {
+            super(fac, bus, port);
+        }
+        
+        public SpringJettyHTTPServerEngine() {
+            super();
+        }
+        
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
+        }
+    }
+        
 
 }

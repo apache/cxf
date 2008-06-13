@@ -158,7 +158,7 @@ public class SpringBeansTest extends Assert {
         boolean found = false;
         String[] names = ctx.getBeanNamesForType(EndpointImpl.class);
         for (String n : names) {
-            if (n.startsWith(EndpointImpl.class.getName())) { 
+            if (n.startsWith(EndpointImpl.class.getPackage().getName())) { 
                 found = true;
             }
         }

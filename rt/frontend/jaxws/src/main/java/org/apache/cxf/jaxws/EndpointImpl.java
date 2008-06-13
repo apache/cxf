@@ -135,6 +135,13 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         this(bus, implementor, (String) null);
     }
     
+    public void setBus(Bus b) {
+        bus = b;
+    }
+    public Bus getBus() {
+        return bus;
+    }
+    
     public Binding getBinding() {
         return ((JaxWsEndpointImpl) getEndpoint()).getJaxwsBinding();
     }

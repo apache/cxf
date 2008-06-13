@@ -18,10 +18,17 @@
  */
 package org.apache.cxf.jaxws.spring;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
 import org.apache.cxf.frontend.spring.ServerFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
@@ -32,5 +39,24 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
         ServerFactoryBeanDefinitionParser parser = new ServerFactoryBeanDefinitionParser();
         parser.setBeanClass(JaxWsServerFactoryBean.class);
         registerBeanDefinitionParser("server", parser);        
+    }
+    
+    public static class SpringServerFactoryBean extends JaxWsServerFactoryBean
+        implements ApplicationContextAware {
+    
+        public SpringServerFactoryBean() {
+            super();
+        }
+        public SpringServerFactoryBean(JaxWsServiceFactoryBean fact) {
+            super(fact);
+        }
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
+        }
     }
 }

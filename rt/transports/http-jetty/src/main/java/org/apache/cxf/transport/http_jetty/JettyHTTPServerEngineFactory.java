@@ -92,6 +92,10 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         this.bus = bus;
     }
     
+    public Bus getBus() {
+        return bus;
+    }
+    
     
     @PostConstruct
     public void registerWithBus() {

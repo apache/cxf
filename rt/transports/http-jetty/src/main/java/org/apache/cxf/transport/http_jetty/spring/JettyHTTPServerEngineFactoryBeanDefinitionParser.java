@@ -29,6 +29,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
@@ -42,9 +45,12 @@ import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIde
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersType;
 
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         extends AbstractBeanDefinitionParser {
@@ -159,7 +165,24 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
 
     @Override
     protected Class getBeanClass(Element arg0) {
-        return JettyHTTPServerEngineFactory.class;
+        return SpringJettyHTTPServerEngineFactory.class;
+    }
+    
+    public static class SpringJettyHTTPServerEngineFactory extends JettyHTTPServerEngineFactory 
+        implements ApplicationContextAware {
+
+        public SpringJettyHTTPServerEngineFactory() {
+            super();
+        }
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+                registerWithBus();
+            }
+        }
     }
 
 }

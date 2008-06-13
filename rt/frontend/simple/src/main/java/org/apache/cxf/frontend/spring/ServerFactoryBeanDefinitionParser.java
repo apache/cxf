@@ -25,14 +25,21 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 
 public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
@@ -40,7 +47,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
 
     public ServerFactoryBeanDefinitionParser() {
         super();
-        setBeanClass(ServerFactoryBean.class);
+        setBeanClass(SpringServerFactoryBean.class);
     }
     
     @Override
@@ -103,4 +110,22 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         return true;
     }
 
+    public static class SpringServerFactoryBean extends ServerFactoryBean
+        implements ApplicationContextAware {
+
+        public SpringServerFactoryBean() {
+            super();
+        }
+        public SpringServerFactoryBean(ReflectionServiceFactoryBean fact) {
+            super(fact);
+        }
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
+        }
+    }
 }

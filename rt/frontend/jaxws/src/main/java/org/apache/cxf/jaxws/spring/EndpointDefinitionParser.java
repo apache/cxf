@@ -29,16 +29,22 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 
 public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
@@ -47,7 +53,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
 
     public EndpointDefinitionParser() {
         super();
-        setBeanClass(EndpointImpl.class);
+        setBeanClass(SpringEndpointImpl.class);
     }
 
     @Override
@@ -144,10 +150,31 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         throws BeanDefinitionStoreException {
         String id = super.resolveId(elem, definition, ctx);
         if (StringUtils.isEmpty(id)) {
-            id = getBeanClass().getName() + "--" + definition.hashCode();
+            id = EndpointImpl.class.getName() + "--" + definition.hashCode();
         }
         
         return id;
+    }
+    
+    
+    public static class SpringEndpointImpl extends EndpointImpl
+        implements ApplicationContextAware {
+    
+        public SpringEndpointImpl(Object implementor) {
+            super((Bus)null, implementor);
+        }
+        public SpringEndpointImpl(Bus bus, Object implementor) {
+            super(bus, implementor);
+        }
+        
+        
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
+        }
     }
 
 }
