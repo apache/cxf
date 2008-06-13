@@ -250,6 +250,25 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <!-- work around opensaml not being in central -->  
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <id>apache-ws-snapshots2</id>
+            <name>Apache ws.zones - 2</name>
+            <url>http://ws.zones.apache.org/repository2/</url>
+        </repository>
+    </repositories>
+
+
+
     <build>
         <resources>
             <resource>
