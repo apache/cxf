@@ -84,16 +84,16 @@ public class LocalDestination extends AbstractDestination {
                         protected void onFirstWrite() throws IOException {
                             final PipedInputStream stream = new PipedInputStream();
                             wrappedStream = new PipedOutputStream(stream);
-    
+
+                            final MessageImpl m = new MessageImpl();
+                            localDestinationFactory.copy(message, m);
+                            m.setContent(InputStream.class, stream);
+
                             final Runnable receiver = new Runnable() {
-                                public void run() {
-                                    MessageImpl m = new MessageImpl();
-                                    localDestinationFactory.copy(message, m);
-                                    
+                                public void run() {                                    
                                     if (exchange != null) {
                                         exchange.setInMessage(m);
                                     }
-                                    m.setContent(InputStream.class, stream);
                                     conduit.getMessageObserver().onMessage(m);
                                 }
                             };

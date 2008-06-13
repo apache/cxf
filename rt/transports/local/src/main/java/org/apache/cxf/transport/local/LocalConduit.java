@@ -117,14 +117,15 @@ public class LocalConduit extends AbstractConduit {
                     final PipedInputStream stream = new PipedInputStream();
                     wrappedStream = new PipedOutputStream(stream);
 
+                    final MessageImpl inMsg = new MessageImpl();
+                    transportFactory.copy(message, inMsg); 
+
+                    inMsg.setContent(InputStream.class, stream);
+                    inMsg.setDestination(destination);
+                    inMsg.put(IN_CONDUIT, conduit);
+
                     final Runnable receiver = new Runnable() {
-                        public void run() {
-                            MessageImpl inMsg = new MessageImpl();
-                            transportFactory.copy(message, inMsg); 
-                            inMsg.setContent(InputStream.class, stream);
-                            inMsg.setDestination(destination);
-                            inMsg.put(IN_CONDUIT, conduit);
-                            
+                        public void run() {                            
                             ExchangeImpl ex = new ExchangeImpl();
                             ex.setInMessage(inMsg);
                             ex.put(IN_EXCHANGE, exchange);
