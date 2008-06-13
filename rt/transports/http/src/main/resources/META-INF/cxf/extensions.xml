@@ -21,5 +21,5 @@
 <properties>
     <entry key="org.apache.cxf.transports.http-1">javax.wsdl.Port=org.apache.cxf.transports.http.configuration.HTTPClientPolicy</entry>
     <entry key="org.apache.cxf.transports.http-2">javax.wsdl.Port=org.apache.cxf.transports.http.configuration.HTTPServerPolicy</entry>
-    <entry key="org.apache.cxf.transports.http-3">javax.wsdl.Port=org.xmlsoap.schemas.wsdl.http.AddressType</entry>
+    <entry key="org.apache.cxf.transports.http-3">javax.wsdl.Port=org.apache.cxf.wsdl.http.AddressType</entry>
 </properties>

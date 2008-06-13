@@ -48,8 +48,8 @@ import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
-import org.xmlsoap.schemas.wsdl.http.AddressType;
 
 
 /**

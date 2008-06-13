@@ -41,7 +41,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.xmlsoap.schemas.wsdl.http.AddressType;
+import org.apache.cxf.wsdl.http.AddressType;
 
 public class ServletController {
     

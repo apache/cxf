@@ -132,7 +132,7 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/http.xsd</xsd>
-                                    <bindingFile>${basedir}/target/schemas/schemas/wsdl/wsdl.xjb</bindingFile>
+                                    <bindingFile>${basedir}/target/schemas/schemas/wsdl/http.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <dependencies>
                                         <dependency>${basedir}/target/schemas/schemas/wsdl/wsdl.xsd</dependency>

@@ -31,9 +31,9 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlsoap.schemas.wsdl.http.AddressType;
 
 public class LocalTransportFactoryTest extends Assert {
     @Test
