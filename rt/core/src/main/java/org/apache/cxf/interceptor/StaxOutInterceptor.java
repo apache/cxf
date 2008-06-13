@@ -41,6 +41,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static final String OUTPUT_STREAM_HOLDER = StaxOutInterceptor.class.getName() + ".outputstream";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
@@ -66,6 +67,8 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             writer = getXMLOutputFactory(message).createXMLStreamWriter(os, encoding);
             if (Boolean.TRUE.equals(message.getContextualProperty(FORCE_START_DOCUMENT))) {
                 writer.writeStartDocument(encoding, "1.0");
+                message.removeContent(OutputStream.class);
+                message.put(OUTPUT_STREAM_HOLDER, os);
             }
         } catch (XMLStreamException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("STREAM_CREATE_EXC", BUNDLE), e);
@@ -74,6 +77,14 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
         // Add a final interceptor to write end elements
         message.getInterceptorChain().add(ending);
+    }
+    @Override
+    public void handleFault(Message message) {
+        super.handleFault(message);
+        OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
+        if (os != null) {
+            message.setContent(OutputStream.class, os);
+        }
     }
 
     private String getEncoding(Message message) {
@@ -145,6 +156,10 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 if (xtw != null) {
                     xtw.writeEndDocument();
                     xtw.close();
+                }
+                OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
+                if (os != null) {
+                    message.setContent(OutputStream.class, os);
                 }
             } catch (XMLStreamException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);

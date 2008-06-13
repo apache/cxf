@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.staxutils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import org.w3c.dom.Document;
 
 /**
  * Abstract logic for creating XMLStreamReader from DOM documents. Its works
@@ -71,6 +74,15 @@ public abstract class AbstractDOMStreamReader implements XMLStreamReader {
         public ElementFrame(Object element, ElementFrame parent) {
             this.element = element;
             this.parent = parent;
+        }
+        public ElementFrame(Document doc) {
+            this.element = doc;
+            parent = null;
+            started = true;
+            attributes = Collections.emptyList();
+            prefixes = Collections.emptyList();
+            uris = Collections.emptyList();
+            allAttributes = Collections.emptyList();
         }
         
         public Object getElement() {

@@ -84,8 +84,10 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             String a = "application/fastinfoset";
             if (!accepts.isEmpty()) {
                 a += ", " + accepts.get(0);
+                accepts.set(0, a);
+            } else {
+                accepts.add(a);
             }
-            accepts.set(0, a);
         }
             
         if (force 

@@ -334,6 +334,12 @@ public final class StaxUtils {
             case XMLStreamConstants.CHARACTERS:
                 writer.writeCharacters(reader.getText());
                 break;
+            case XMLStreamConstants.COMMENT:
+                writer.writeComment(reader.getText());
+                break;
+            case XMLStreamConstants.CDATA:
+                writer.writeCData(reader.getText());
+                break;
             case XMLStreamConstants.START_DOCUMENT:
             case XMLStreamConstants.END_DOCUMENT:
             case XMLStreamConstants.ATTRIBUTE:

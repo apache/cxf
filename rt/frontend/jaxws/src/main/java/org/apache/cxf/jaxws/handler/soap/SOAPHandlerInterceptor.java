@@ -283,8 +283,10 @@ public class SOAPHandlerInterceptor extends
     }
 
     public void handleFault(SoapMessage message) {
-    }
-    
+        if (getInvoker(message).isOutbound()) {
+            SAAJ_OUT.handleFault(message);
+        }
+    }    
     protected QName getOpQName(Exchange ex, Object data) {
         SOAPMessageContextImpl sm = (SOAPMessageContextImpl)data;
         try {

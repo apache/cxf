@@ -130,7 +130,9 @@ public class SOAPHandlerInterceptorTest extends Assert {
         // This is to set direction to outbound
         expect(exchange.getOutMessage()).andReturn(message).anyTimes();
         CachedStream originalEmptyOs = new CachedStream();
-        message.setContent(OutputStream.class, originalEmptyOs);
+        
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(originalEmptyOs);
+        message.setContent(XMLStreamWriter.class, writer);
 
         InterceptorChain chain = new PhaseInterceptorChain((new PhaseManagerImpl()).getOutPhases());
         //Interceptors after SOAPHandlerInterceptor DOMXMLStreamWriter to write
@@ -154,6 +156,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
             }
 
         });
+        
         chain.add(new SOAPHandlerInterceptor(binding));
         message.setInterceptorChain(chain);
         control.replay();
@@ -162,12 +165,8 @@ public class SOAPHandlerInterceptorTest extends Assert {
         
         control.verify();
 
-        // Verify outputStream
-        CachedStream expectedOs = prepareOutputStreamFromResource("resources/greetMeRpcLitRespChanged.xml");
-
-        assertTrue("The content of outputStream should remain unchanged", compareInputStream(expectedOs
-            .getInputStream(), originalEmptyOs.getInputStream()));
-
+        writer.flush();
+        
         // Verify SOAPMessage
         SOAPMessage resultedMessage = message.getContent(SOAPMessage.class);
         assertNotNull(resultedMessage);
@@ -469,18 +468,6 @@ public class SOAPHandlerInterceptorTest extends Assert {
         assertTrue(understood.isEmpty());
     }
 
-    private boolean compareInputStream(InputStream os1, InputStream os2) throws Exception {
-        if (os1.available() != os2.available()) {
-            return false;
-        }
-        for (int i = 0; i < os1.available(); i++) {
-            if (os1.read() != os2.read()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private XMLStreamReader preparemXMLStreamReader(String resouceName) throws Exception {
         InputStream is = this.getClass().getResourceAsStream(resouceName);
         XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(is);
@@ -546,18 +533,6 @@ public class SOAPHandlerInterceptorTest extends Assert {
         return soapMessage;
     }
 
-    private CachedStream prepareOutputStreamFromResource(String resouceName) throws Exception {
-        SOAPMessage soapMessage = prepareSOAPMessage(resouceName);
-        CachedStream os = new CachedStream();
-        soapMessage.writeTo(os);
-        return os;
-    }
-/*
-    private CachedStream prepareOutputStreamFromSOAPMessage(SOAPMessage soapMessage) throws Exception {
-        CachedStream os = new CachedStream();
-        soapMessage.writeTo(os);
-        return os;
-    }*/
 
     private class CachedStream extends CachedOutputStream {
         protected void doFlush() throws IOException {

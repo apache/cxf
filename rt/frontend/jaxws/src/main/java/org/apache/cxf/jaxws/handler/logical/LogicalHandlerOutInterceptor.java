@@ -48,7 +48,8 @@ import org.apache.cxf.transport.MessageObserver;
 public class LogicalHandlerOutInterceptor<T extends Message> 
     extends AbstractJAXWSHandlerInterceptor<T> {
     
-    public static final String ORIGINAL_WRITER = "original_writer";
+    public static final String ORIGINAL_WRITER 
+        = LogicalHandlerOutInterceptor.class.getName() + ".original_writer";
     private LogicalHandlerOutEndingInterceptor<T> ending;
     
     public LogicalHandlerOutInterceptor(Binding binding) {
@@ -78,7 +79,14 @@ public class LogicalHandlerOutInterceptor<T extends Message>
             throw new Fault(e);
         }
     }
-    
+    @Override
+    public void handleFault(T message) {
+        super.handleFault(message);
+        XMLStreamWriter os = (XMLStreamWriter)message.get(ORIGINAL_WRITER);
+        if (os != null) {
+            message.setContent(XMLStreamWriter.class, os);
+        }
+    }
     
     private class LogicalHandlerOutEndingInterceptor<X extends Message> 
         extends AbstractJAXWSHandlerInterceptor<X> {

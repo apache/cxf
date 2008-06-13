@@ -78,6 +78,9 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         
         mc.getInterceptorChain().add(ending);
     }    
+    public void handleFault(SoapMessage message) {
+        saajOut.handleFault(message);
+    } 
     
     public final WSS4JOutInterceptorInternal createEndingInterceptor() {
         return new WSS4JOutInterceptorInternal();

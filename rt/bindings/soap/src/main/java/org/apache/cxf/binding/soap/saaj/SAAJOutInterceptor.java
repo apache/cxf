@@ -21,8 +21,6 @@ package org.apache.cxf.binding.soap.saaj;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ResourceBundle;
 
 import javax.xml.soap.MessageFactory;
@@ -43,6 +41,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 
@@ -55,7 +54,10 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  * SOAPMessage.
  */
 public class SAAJOutInterceptor extends AbstractSoapInterceptor {
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJOutInterceptor.class);
+    private static final String ORIGINAL_XML_WRITER 
+        = SAAJOutInterceptor.class.getName() + ".original.xml.writer";
 
     public SAAJOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
@@ -75,10 +77,15 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 SOAPMessage soapMessage = factory.createMessage();
 
                 SOAPPart soapPart = soapMessage.getSOAPPart();
+                
+                XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
+                message.put(ORIGINAL_XML_WRITER, origWriter);
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter(soapPart);
                 // Replace stax writer with DomStreamWriter
                 message.setContent(XMLStreamWriter.class, writer);
                 message.setContent(SOAPMessage.class, soapMessage);
+                
+                
             } catch (SOAPException e) {
                 throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, version.getSender());
             }
@@ -86,6 +93,9 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
             //as the SOAPMessage already has everything in place, we do not need XMLStreamWriter to write
             //anything for us, so we just set XMLStreamWriter's output to a dummy output stream.         
             try {
+                XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
+                message.put(ORIGINAL_XML_WRITER, origWriter);
+                
                 XMLStreamWriter dummyWriter = StaxUtils.getXMLOutputFactory()
                     .createXMLStreamWriter(new ByteArrayOutputStream());
                 message.setContent(XMLStreamWriter.class, dummyWriter);
@@ -97,6 +107,15 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
         // Add a final interceptor to write the message
         message.getInterceptorChain().add(new SAAJOutEndingInterceptor());
     }
+    @Override
+    public void handleFault(SoapMessage message) {
+        super.handleFault(message);
+        XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
+        if (writer != null) {
+            message.setContent(XMLStreamWriter.class, writer);
+        }
+    }
+
     
     public class SAAJOutEndingInterceptor extends AbstractSoapInterceptor {
         public SAAJOutEndingInterceptor() {
@@ -107,23 +126,19 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
             SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
  
             if (soapMessage != null) {
-                
-                OutputStream os = message.getContent(OutputStream.class);
+                XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
                 try {
-                    setMessageContent(message, soapMessage);
-                    soapMessage.writeTo(os);
-                    os.flush();
-                } catch (IOException e) {
+                    StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
+                    writer.flush();
+                    message.setContent(XMLStreamWriter.class, writer);
+                } catch (XMLStreamException e) {
                     throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
-                        .getSender());
-                } catch (SOAPException e) {
-                    throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
-                        .getSender());
+                                        .getSender());
                 }
             }
         }
 
-        private void setMessageContent(SoapMessage message, SOAPMessage soapMessage) 
+        protected void setMessageContent(SoapMessage message, SOAPMessage soapMessage) 
             throws SOAPException {
             
             if (soapMessage.getAttachments().hasNext()) {

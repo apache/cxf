@@ -54,6 +54,10 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
                 
         this.document = element.getOwnerDocument();
     }
+    public W3CDOMStreamReader(Document doc) {
+        super(new ElementFrame(doc));
+        this.document = doc;
+    }
 
     /**
      * Get the document associated with this stream.
@@ -70,7 +74,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
      */
     @Override
     protected final void newFrame(ElementFrame frame) {
-        Element element = getCurrentElement();
+        Node element = getCurrentNode();
         frame.uris = new ArrayList<String>();
         frame.prefixes = new ArrayList<String>();
         frame.attributes = new ArrayList<Object>();
@@ -78,8 +82,9 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
         if (context == null) {
             context = new W3CNamespaceContext();
         }
-
-        context.setElement(element);
+        if (element instanceof Element) {
+            context.setElement((Element)element);
+        }
 
         NamedNodeMap nodes = element.getAttributes();
 
@@ -122,37 +127,44 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
         super.endElement();
     }
 
+    public final Node getCurrentNode() {
+        return (Node)getCurrentFrame().element;
+    }
     public final Element getCurrentElement() {
         return (Element)getCurrentFrame().element;
     }
 
     @Override
     protected ElementFrame getChildFrame(int currentChild) {
-        return new ElementFrame(getCurrentElement().getChildNodes().item(currentChild), getCurrentFrame());
+        return new ElementFrame(getCurrentNode().getChildNodes().item(currentChild), getCurrentFrame());
     }
 
     @Override
     protected int getChildCount() {
-        return getCurrentElement().getChildNodes().getLength();
+        return getCurrentNode().getChildNodes().getLength();
     }
 
     @Override
     protected int moveToChild(int currentChild) {
-        this.content = getCurrentElement().getChildNodes().item(currentChild);
-
-        if (content instanceof Text) {
-            return CHARACTERS;
-        } else if (content instanceof Element) {
+        content = getCurrentNode().getFirstChild();
+        while (currentChild > 0 && content != null) {
+            content = content.getNextSibling();
+            --currentChild;
+        }
+        
+        if (content instanceof Element) {
             return START_ELEMENT;
         } else if (content instanceof CDATASection) {
             return CDATA;
         } else if (content instanceof Comment) {
+            return COMMENT;
+        } else if (content instanceof Text) {
             return CHARACTERS;
         } else if (content instanceof EntityReference) {
             return ENTITY_REFERENCE;
         }
 
-        throw new IllegalStateException();
+        throw new IllegalStateException("Found type: " + content.getClass().getName());
     }
 
     @Override
@@ -283,7 +295,10 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
     }
 
     public String getText() {
-        return DOMUtils.getRawContent(getCurrentElement());
+        if (content instanceof Text) {
+            return ((Text)content).getData();
+        }
+        return DOMUtils.getRawContent(getCurrentNode());
     }
 
     public char[] getTextCharacters() {
@@ -303,7 +318,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
     }
 
     public QName getName() {
-        Element el = getCurrentElement();
+        Node el = getCurrentNode();
 
         String prefix = getPrefix();
         String ln = getLocalName();
@@ -316,17 +331,17 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
     }
 
     public String getLocalName() {
-        String ln = getCurrentElement().getLocalName();
+        String ln = getCurrentNode().getLocalName();
         if (ln == null) {
-            ln = getCurrentElement().getNodeName();
+            ln = getCurrentNode().getNodeName();
         }
         return ln;
     }
 
     public String getNamespaceURI() {
-        String ln = getCurrentElement().getLocalName();
+        String ln = getCurrentNode().getLocalName();
         if (ln == null) {
-            ln = getCurrentElement().getNodeName();
+            ln = getCurrentNode().getNodeName();
             if (ln.indexOf(":") == -1) {
                 ln = getNamespaceURI("");
             } else {
@@ -334,11 +349,11 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
             }
             return ln;
         }
-        return getCurrentElement().getNamespaceURI();
+        return getCurrentNode().getNamespaceURI();
     }
 
     public String getPrefix() {
-        String prefix = getCurrentElement().getPrefix();
+        String prefix = getCurrentNode().getPrefix();
         if (prefix == null) {
             prefix = "";
         }
