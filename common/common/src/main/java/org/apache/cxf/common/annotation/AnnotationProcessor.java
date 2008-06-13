@@ -20,12 +20,9 @@
 package org.apache.cxf.common.annotation;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
@@ -41,23 +38,6 @@ import org.apache.cxf.common.logging.LogUtils;
 public  class AnnotationProcessor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationProcessor.class); 
-    
-    private static Method visitClassMethod; 
-    private static Method visitFieldMethod; 
-    private static Method visitMethodMethod; 
-    
-    static { 
-        try {
-            visitClassMethod = AnnotationVisitor.class.getMethod("visitClass", Class.class, Annotation.class);
-            visitFieldMethod = AnnotationVisitor.class.getMethod("visitField", Field.class, Annotation.class);
-            visitMethodMethod = AnnotationVisitor.class.getMethod("visitMethod", 
-                                                                  Method.class, Annotation.class);
-            
-        } catch (NoSuchMethodException e) {
-            // ignore
-        }
-        
-    } 
     
     private final Object target; 
     private List<Class<? extends Annotation>> annotationTypes; 
@@ -100,14 +80,28 @@ public  class AnnotationProcessor {
         if (targetClass.getSuperclass() != null) {
             processMethods(visitor, targetClass.getSuperclass());
         }
-        visitAnnotatedElement(targetClass.getDeclaredMethods(), visitor, visitMethodMethod); 
+        for (Method element : targetClass.getDeclaredMethods()) {
+            for (Class<? extends Annotation> clz : annotationTypes) {
+                Annotation ann = element.getAnnotation(clz); 
+                if (ann != null) {
+                    visitor.visitMethod(element, ann);
+                }
+            }
+        }
     }
     
     private void processFields(AnnotationVisitor visitor, Class<? extends Object> targetClass) { 
         if (targetClass.getSuperclass() != null) {
             processFields(visitor, targetClass.getSuperclass());
         }
-        visitAnnotatedElement(targetClass.getDeclaredFields(), visitor, visitFieldMethod); 
+        for (Field element : targetClass.getDeclaredFields()) {
+            for (Class<? extends Annotation> clz : annotationTypes) {
+                Annotation ann = element.getAnnotation(clz); 
+                if (ann != null) {
+                    visitor.visitField(element, ann);
+                }
+            }
+        }
     } 
     
     
@@ -115,28 +109,11 @@ public  class AnnotationProcessor {
         if (targetClass.getSuperclass() != null) {
             processClass(visitor, targetClass.getSuperclass());
         }
-        Class<?>[] classes = {targetClass}; 
-        visitAnnotatedElement(classes, visitor, visitClassMethod);
-    }
-    
-    private <U extends AnnotatedElement> void visitAnnotatedElement(U[] elements, 
-                                                                    AnnotationVisitor visitor,
-                                                                    Method visitorMethod) {
-        
-        for (U element : elements) {
-            for (Class<? extends Annotation> clz : annotationTypes) {
-                Annotation ann = element.getAnnotation(clz); 
-                if (ann != null) {
-                    try {                        
-                        visitorMethod.invoke(visitor, element, ann);
-                    } catch (IllegalAccessException e) {
-                        // ignore, we're invoking methods of a public interface
-                    } catch (InvocationTargetException e) {
-                        Throwable cause = e.getCause() == null ? e : e.getCause();
-                        LogUtils.log(LOG, Level.SEVERE, "VISITOR_RAISED_EXCEPTION", cause, visitor, element);
-                    }
-                }
+        for (Class<? extends Annotation> clz : annotationTypes) {
+            Annotation ann = targetClass.getAnnotation(clz); 
+            if (ann != null) {
+                visitor.visitClass(targetClass, ann);
             }
         }
-    }
+    }    
 }

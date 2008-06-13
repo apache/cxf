@@ -85,6 +85,7 @@ public class AnnotationProcessorTest extends Assert {
         Method expectedMethod3 = AnnotatedGreeterImpl.class.getDeclaredMethod("greetMe", String.class); 
         Method expectedMethod4 = 
             AnnotatedGreeterImpl.class.getDeclaredMethod("setContext", WebServiceContext.class); 
+        Method expectedMethod5 = AnnotatedGreeterImpl.class.getDeclaredMethod("greetMeOneWay", String.class);
 
         expectedAnnotations.add(WebMethod.class);
         expectedAnnotations.add(Resource.class); 
@@ -100,6 +101,8 @@ public class AnnotationProcessorTest extends Assert {
                            (Annotation)EasyMock.isA(WebMethod.class));
         visitor.visitMethod(EasyMock.eq(expectedMethod4), 
                            (Annotation)EasyMock.isA(Resource.class));
+        visitor.visitMethod(EasyMock.eq(expectedMethod5), 
+                            (Annotation)EasyMock.isA(WebMethod.class));
         runProcessor(visitor);
     }
 
