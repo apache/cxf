@@ -85,8 +85,14 @@ public class XSDToJavaMojo extends AbstractMojo {
             String[] args = getArguments(xsdOptions[x], outputDir);
             
             String xsdLocation = xsdOptions[x].getXsd();
+            File xsdFile = new File(xsdLocation);
             URI basedir = project.getBasedir().toURI();
-            URI xsdURI = basedir.resolve(xsdLocation);
+            URI xsdURI;
+            if (xsdFile.exists()) {
+                xsdURI = xsdFile.toURI();
+            } else {
+                xsdURI = basedir.resolve(xsdLocation);
+            }
             
             String doneFileName = xsdURI.toString();
             if (doneFileName.startsWith(basedir.toString())) {

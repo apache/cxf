@@ -264,8 +264,14 @@ public class WSDL2JavaMojo extends AbstractMojo {
         
         
         String wsdlLocation = wsdlOption.getWsdl();
+        File wsdlFile = new File(wsdlLocation);
         URI basedir = project.getBasedir().toURI();
-        URI wsdlURI = basedir.resolve(wsdlLocation);
+        URI wsdlURI;
+        if (wsdlFile.exists()) {
+            wsdlURI = wsdlFile.toURI();
+        } else {
+            wsdlURI = basedir.resolve(wsdlLocation);
+        }
         
         String doneFileName = wsdlURI.toString();
         if (doneFileName.startsWith(basedir.toString())) {
