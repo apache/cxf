@@ -484,8 +484,16 @@ public class HTTPConduit
         
         //TODO using Message context to decided HTTP send properties 
              
-        connection.setConnectTimeout((int)clientSidePolicy.getConnectionTimeout());
-        connection.setReadTimeout((int)clientSidePolicy.getReceiveTimeout());
+        long timeout = clientSidePolicy.getConnectionTimeout();
+        if (timeout > Integer.MAX_VALUE) {
+            timeout = Integer.MAX_VALUE;
+        }
+        connection.setConnectTimeout((int)timeout);
+        timeout = clientSidePolicy.getReceiveTimeout();
+        if (timeout > Integer.MAX_VALUE) {
+            timeout = Integer.MAX_VALUE;
+        }
+        connection.setReadTimeout((int)timeout);
         connection.setUseCaches(false);
         // We implement redirects in this conduit. We do not
         // rely on the underlying URLConnection implementation
