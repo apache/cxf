@@ -21,9 +21,13 @@ package org.apache.cxf.binding.soap.saaj;
 
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 
+import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeader;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
@@ -32,13 +36,16 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 
+import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
@@ -126,33 +133,40 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
             SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
  
             if (soapMessage != null) {
+                if (soapMessage.countAttachments() > 0) {
+                    if (message.getAttachments() == null) {
+                        message.setAttachments(new ArrayList<Attachment>(soapMessage
+                                .countAttachments()));
+                    }
+                    Iterator<AttachmentPart> it = CastUtils.cast(soapMessage.getAttachments());
+                    while (it.hasNext()) {
+                        AttachmentPart part = it.next();
+                        AttachmentImpl att = new AttachmentImpl(part.getContentId());
+                        try {
+                            att.setDataHandler(part.getDataHandler());
+                        } catch (SOAPException e) {
+                            throw new Fault(e);
+                        }
+                        Iterator<MimeHeader> it2 = CastUtils.cast(part.getAllMimeHeaders());
+                        while (it2.hasNext()) {
+                            MimeHeader header = it2.next();
+                            att.setHeader(header.getName(), header.getValue());
+                        }
+                        message.getAttachments().add(att);
+                    }
+                }
+                
                 XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
                 try {
                     StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
                     writer.flush();
                     message.setContent(XMLStreamWriter.class, writer);
+
                 } catch (XMLStreamException e) {
                     throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
                                         .getSender());
                 }
             }
-        }
-
-        protected void setMessageContent(SoapMessage message, SOAPMessage soapMessage) 
-            throws SOAPException {
-            
-            if (soapMessage.getAttachments().hasNext()) {
-                StringBuffer sb = new StringBuffer();
-                for (String str : soapMessage.getMimeHeaders().getHeader("Content-Type")) {
-                    sb.append(str);
-                }
-                String contentType = sb.toString();
-                if (contentType != null && contentType.length() > 0) {
-                    message.put(org.apache.cxf.message.Message.CONTENT_TYPE, contentType);
-                }
-                    
-            }
-            
         }
 
     }
