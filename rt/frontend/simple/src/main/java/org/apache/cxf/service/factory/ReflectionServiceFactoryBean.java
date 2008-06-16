@@ -53,6 +53,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -320,6 +321,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
         ServiceInfo serviceInfo = new ServiceInfo();
         SchemaCollection col = serviceInfo.getXmlSchemaCollection();
+        col.getXmlSchemaCollection().setSchemaResolver(new CatalogXmlSchemaURIResolver(this.getBus()));
         col.getExtReg().registerSerializer(MimeAttribute.class, new MimeSerializer());
 
         ServiceImpl service = new ServiceImpl(serviceInfo);

@@ -98,8 +98,9 @@ public class IdlPreprocessorReaderTest extends TestCase {
         final String location = "B.idl"; 
         // uses <> notation for include
         final URL orig = findTestResource(location);
-        final File dir = new File(orig.getPath().substring(0, 
-                orig.getPath().indexOf(location)));
+        final File origFile = new File(orig.toURI());
+        final File dir = new File(origFile.getAbsolutePath()
+                                  .substring(0, origFile.getAbsolutePath().indexOf(location)));
         final DefaultIncludeResolver includeResolver = new DefaultIncludeResolver(dir);
         final DefineState defineState = new DefineState(new HashMap<String, String>());
         

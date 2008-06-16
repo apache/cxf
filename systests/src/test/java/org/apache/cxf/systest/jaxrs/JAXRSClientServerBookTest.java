@@ -177,8 +177,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:9080/bookstore/books";
 
-        String inputFile = getClass().getResource("resources/add_book.txt").getFile();         
-        File input =  new File(inputFile);
+        File input = new File(getClass().getResource("resources/add_book.txt").toURI());         
         PostMethod post = new PostMethod(endpointAddress);
         post.setRequestHeader("Content-Type", "application/xml");
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
@@ -202,8 +201,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testUpdateBook() throws Exception {
         String endpointAddress = "http://localhost:9080/bookstore/books";
 
-        String inputFile = getClass().getResource("resources/update_book.txt").getFile();
-        File input = new File(inputFile);
+        File input = new File(getClass().getResource("resources/update_book.txt").toURI());
         PutMethod put = new PutMethod(endpointAddress);
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         put.setRequestEntity(entity);
@@ -231,8 +229,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
 
         // Roll back changes:
-        String inputFile1 = getClass().getResource("resources/expected_get_book123.txt").getFile();
-        File input1 = new File(inputFile1);
+        File input1 = new File(getClass().getResource("resources/expected_get_book123.txt").toURI());
         PutMethod put1 = new PutMethod(endpointAddress);
         RequestEntity entity1 = new FileRequestEntity(input1, "text/xml; charset=ISO-8859-1");
         put1.setRequestEntity(entity1);
@@ -252,8 +249,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testUpdateBookWithDom() throws Exception {
         String endpointAddress = "http://localhost:9080/bookstore/bookswithdom";
 
-        String inputFile = getClass().getResource("resources/update_book.txt").getFile();
-        File input = new File(inputFile);
+        File input = new File(getClass().getResource("resources/update_book.txt").toURI());
         PutMethod put = new PutMethod(endpointAddress);
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         put.setRequestEntity(entity);
@@ -278,8 +274,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testUpdateBookWithJSON() throws Exception {
         String endpointAddress = "http://localhost:9080/bookstore/bookswithjson";
 
-        String inputFile = getClass().getResource("resources/update_book_json.txt").getFile();
-        File input = new File(inputFile);
+        File input = new File(getClass().getResource("resources/update_book_json.txt").toURI());
         PutMethod put = new PutMethod(endpointAddress);
         RequestEntity entity = new FileRequestEntity(input, "application/json; charset=ISO-8859-1");
         put.setRequestEntity(entity);
@@ -307,8 +302,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
 
         // Roll back changes:
-        String inputFile1 = getClass().getResource("resources/expected_get_book123.txt").getFile();
-        File input1 = new File(inputFile1);
+        File input1 = new File(getClass().getResource("resources/expected_get_book123.txt").toURI());
         PutMethod put1 = new PutMethod(endpointAddress);
         RequestEntity entity1 = new FileRequestEntity(input1, "text/xml; charset=ISO-8859-1");
         put1.setRequestEntity(entity1);
@@ -329,8 +323,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:9080/bookstore/books";
 
-        String inputFile = getClass().getResource("resources/update_book_not_exist.txt").getFile();         
-        File input =  new File(inputFile);
+        File input = new File(getClass().getResource("resources/update_book_not_exist.txt").toURI());         
         PutMethod post = new PutMethod(endpointAddress);
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         post.setRequestEntity(entity);

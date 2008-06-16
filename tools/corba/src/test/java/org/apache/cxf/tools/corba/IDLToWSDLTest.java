@@ -167,10 +167,10 @@ public class IDLToWSDLTest extends ToolTestBase {
     
     // test "-s base64Binary" and "-s hexBinary" options
     public void doTestSequenceOctetMappingOption(String encoding) throws Exception {
-        File input = new File(getClass().getResource("/idl/sequence_octet.idl").getFile());
+        File input = new File(getClass().getResource("/idl/sequence_octet.idl").toURI());
         File actual = new File(output, "sequence_octet.wsdl");
         File expected = new File(getClass().getResource("/idl/expected_" 
-                                                        + encoding + "_sequence_octet.wsdl").getFile());
+                                                        + encoding + "_sequence_octet.wsdl").toURI());
         
         String[] args = new String[] {"-s", encoding,
                                       "-o", output.toString(),
@@ -200,10 +200,10 @@ public class IDLToWSDLTest extends ToolTestBase {
     
     // test "-x <schema-namespace>" 
     public void testSchemaNamespace() throws Exception {
-        File input = new File(getClass().getResource("/idl/HelloWorld.idl").getFile());
+        File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
         File actual = new File(output, "HelloWorld.wsdl");
         File expected = 
-            new File(getClass().getResource("/idl/expected_HelloWorld_schema_namespace.wsdl").getFile());
+            new File(getClass().getResource("/idl/expected_HelloWorld_schema_namespace.wsdl").toURI());
         
         String[] args = new String[] {"-x", "http://cxf.apache.org/foobar/schema",
                                       "-o", output.toString(),
@@ -216,10 +216,10 @@ public class IDLToWSDLTest extends ToolTestBase {
     
     // test "-f <corba-address-file>"
     public void testCorbaAddressFile() throws Exception {
-        File input = new File(getClass().getResource("/idl/HelloWorld.idl").getFile());
+        File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
         File actual = new File(output, "HelloWorld.wsdl");
         File expected = 
-            new File(getClass().getResource("/idl/expected_HelloWorld_corba_address_file.wsdl").getFile());
+            new File(getClass().getResource("/idl/expected_HelloWorld_corba_address_file.wsdl").toURI());
         
         // create temporary file containing ior
         File addressFile = new File(output, "HelloWorld.idl");
@@ -247,10 +247,10 @@ public class IDLToWSDLTest extends ToolTestBase {
 
     // test "-t <corba-type-map target-namespace>"
     public void testCorbaTypeMapTargetNamespace() throws Exception {
-        File input = new File(getClass().getResource("/idl/sequence_octet.idl").getFile());
+        File input = new File(getClass().getResource("/idl/sequence_octet.idl").toURI());
         File actual = new File(output, "sequence_octet.wsdl");
         File expected = 
-            new File(getClass().getResource("/idl/expected_sequence_octet_corba_typemap_tns.wsdl").getFile());
+            new File(getClass().getResource("/idl/expected_sequence_octet_corba_typemap_tns.wsdl").toURI());
         
         String[] args = new String[] {"-t", "http://cxf.apache.org/foobar/typemap",
                                       "-o", output.toString(),
@@ -263,9 +263,9 @@ public class IDLToWSDLTest extends ToolTestBase {
 
     // test "-b Treat bounded strings as unbounded."
     public void testTreatBoundedStringsAsUnbounded() throws Exception {
-        File input = new File(getClass().getResource("/idl/String.idl").getFile());
+        File input = new File(getClass().getResource("/idl/String.idl").toURI());
         File actual = new File(output, "String.wsdl");
-        File expected = new File(getClass().getResource("/idl/expected_String_unbounded.wsdl").getFile());
+        File expected = new File(getClass().getResource("/idl/expected_String_unbounded.wsdl").toURI());
         
         String[] args = new String[] {"-b",
                                       "-o", output.toString(),
@@ -278,9 +278,9 @@ public class IDLToWSDLTest extends ToolTestBase {
     
     //  test "-b Treat bounded strings as unbounded."
     public void testTreatBoundedAnonStringsAsUnbounded() throws Exception {
-        File input = new File(getClass().getResource("/idl/Anonstring.idl").getFile());
+        File input = new File(getClass().getResource("/idl/Anonstring.idl").toURI());
         File actual = new File(output, "Anonstring.wsdl");
-        File expected = new File(getClass().getResource("/idl/expected_Anonstring_unbounded.wsdl").getFile());
+        File expected = new File(getClass().getResource("/idl/expected_Anonstring_unbounded.wsdl").toURI());
         
         String[] args = new String[] {"-b",
                                       "-o", output.toString(),
@@ -292,9 +292,9 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     public void testExceptionsWithSchemasInDifferentNS() throws Exception {
-        File input = new File(getClass().getResource("/idl/Exception.idl").getFile());
+        File input = new File(getClass().getResource("/idl/Exception.idl").toURI());
         File actual = new File(output, "Exception.wsdl");
-        File expected = new File(getClass().getResource("/idl/expected_Exception_DiffNS.wsdl").getFile());
+        File expected = new File(getClass().getResource("/idl/expected_Exception_DiffNS.wsdl").toURI());
         
         String[] args = new String[] {"-x", "http://cxf.apache.org/bindings/corba/idl/Exception/types",
                                       "-o", output.toString(),
@@ -306,10 +306,10 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     public void testOutputWSDLFileName() throws Exception {
-        File input = new File(getClass().getResource("/idl/HelloWorld.idl").getFile());
+        File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
         File actual = new File(output, "ArtixHelloWorld.wsdl");
         File expected = 
-            new File(getClass().getResource("/idl/expected_HelloWorld.wsdl").getFile());
+            new File(getClass().getResource("/idl/expected_HelloWorld.wsdl").toURI());
         
         String[] args = new String[] {"-ow", "ArtixHelloWorld.wsdl",
                                       "-o", output.toString(),

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -79,7 +80,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         //httpurlconnection.setRequestProperty("Content-Length",   String.valueOf(is.available()));   
 
         OutputStream outputstream = httpUrlConnection.getOutputStream();
-        String inputFile = getClass().getResource("resources/singleValPostBody.txt").getFile();         
+        File inputFile = new File(getClass().getResource("resources/singleValPostBody.txt").toURI());         
          
         byte[] tmp = new byte[4096];
         int i = 0;

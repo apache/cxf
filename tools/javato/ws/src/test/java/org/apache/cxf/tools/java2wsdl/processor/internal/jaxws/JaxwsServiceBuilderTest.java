@@ -21,6 +21,7 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URI;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
@@ -80,8 +81,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass()
-            .getResource("expected/expected_doc_lit_wrapped_with_wrapperclass.wsdl").getFile();
+        URI expectedFile = this.getClass()
+            .getResource("expected/expected_doc_lit_wrapped_with_wrapperclass.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
 
@@ -96,8 +97,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass()
-            .getResource("expected/expected_doc_lit_wrapped_no_wrapperclass.wsdl").getFile();
+        URI expectedFile = this.getClass()
+            .getResource("expected/expected_doc_lit_wrapped_no_wrapperclass.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
     
@@ -113,8 +114,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass().getResource("expected/expected_hello_world_doc_lit.wsdl")
-            .getFile();
+        URI expectedFile = this.getClass().getResource("expected/expected_hello_world_doc_lit.wsdl")
+            .toURI();
         assertWsdlEquals(new File(expectedFile), output);
         //assertFileEquals(expectedFile, output.getAbsolutePath());
     }
@@ -130,8 +131,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass().getResource("expected/expected_doc_lit_wrapped_localName.wsdl")
-            .getFile();
+        URI expectedFile = this.getClass().getResource("expected/expected_doc_lit_wrapped_localName.wsdl")
+            .toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
 
@@ -146,8 +147,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass()
-            .getResource("expected/expected_doc_lit_wrapped_no_webparam.wsdl").getFile();
+        URI expectedFile = this.getClass()
+            .getResource("expected/expected_doc_lit_wrapped_no_webparam.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
     
@@ -162,7 +163,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass().getResource("expected/expected_holder.wsdl").getFile();
+        URI expectedFile = this.getClass().getResource("expected/expected_holder.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
     
@@ -176,8 +177,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass().getResource("expected/expected_hello_world_async.wsdl")
-            .getFile();
+        URI expectedFile = this.getClass().getResource("expected/expected_hello_world_async.wsdl")
+            .toURI();
 
         assertWsdlEquals(new File(expectedFile), output);
     }
@@ -194,7 +195,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(file);
         assertTrue(output.exists());
 
-        String expectedFile = this.getClass().getResource("expected/expected_rpc_lit.wsdl").getFile();
+        URI expectedFile = this.getClass().getResource("expected/expected_rpc_lit.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), file);
     }
 
@@ -252,7 +253,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(file);
         assertTrue(file.exists());
 
-        String expectedFile = this.getClass().getResource("expected/soap_header.wsdl").getFile();
+        URI expectedFile = this.getClass().getResource("expected/soap_header.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), file);
     }
 
@@ -291,8 +292,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
 
         String s = IOUtils.toString(new FileInputStream(output));
         assertTrue(s.indexOf("EchoPort") != -1);
-        String expectedFile = this.getClass()
-            .getResource("expected/expected_rpclist_no_sei.wsdl").getFile();
+        URI expectedFile = this.getClass()
+            .getResource("expected/expected_rpclist_no_sei.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
 

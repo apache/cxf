@@ -166,8 +166,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:9080/json/books"; 
 
-        String inputFile = getClass().getResource("resources/add_book_json.txt").getFile();         
-        File input =  new File(inputFile);
+        File input = new File(getClass().getResource("resources/add_book_json.txt").toURI());         
         PostMethod post = new PostMethod(endpointAddress);
         RequestEntity entity = new FileRequestEntity(input, "text/plain; charset=ISO-8859-1");
         post.setRequestEntity(entity);

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URI;
 
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
 import org.junit.After;
@@ -727,8 +728,8 @@ public class WSDLToIDLGenerationTest extends Assert {
     public void testCorbaRecursiveStructs() throws Exception {
         
         try {
-            String fileName = getClass().getResource("/idlgen/recursivestruct.wsdl").toString();
-            idlgen.setWsdlFile(fileName);
+            URI fileName = getClass().getResource("/idlgen/recursivestruct.wsdl").toURI();
+            idlgen.setWsdlFile(new File(fileName).getAbsolutePath());
             
             idlgen.setBindingName("TestInterfaceCORBABinding");
             idlgen.setOutputFile("recursivestruct.idl");            
@@ -749,8 +750,8 @@ public class WSDLToIDLGenerationTest extends Assert {
     public void testCoraRecursiveUnion() throws Exception {
         
         try {
-            String fileName = getClass().getResource("/idlgen/recursiveunion.wsdl").toString();
-            idlgen.setWsdlFile(fileName);
+            URI fileName = getClass().getResource("/idlgen/recursiveunion.wsdl").toURI();
+            idlgen.setWsdlFile(new File(fileName).getAbsolutePath());
             
             idlgen.setBindingName("TestInterfaceCORBABinding");
             idlgen.setOutputFile("recursiveunion.idl");            

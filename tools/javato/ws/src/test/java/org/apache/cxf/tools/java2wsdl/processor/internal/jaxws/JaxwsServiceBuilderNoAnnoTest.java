@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.io.File;
+import java.net.URI;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -54,7 +55,7 @@ public class JaxwsServiceBuilderNoAnnoTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = getClass().getResource("expected/stock_noanno_bare.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/stock_noanno_bare.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
 
@@ -69,7 +70,7 @@ public class JaxwsServiceBuilderNoAnnoTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = getClass().getResource("expected/stock_noanno_wrapped.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/stock_noanno_wrapped.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
 
@@ -88,7 +89,7 @@ public class JaxwsServiceBuilderNoAnnoTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String expectedFile = getClass().getResource("expected/stock_noanno_rpc.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/stock_noanno_rpc.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), output);
     }
 

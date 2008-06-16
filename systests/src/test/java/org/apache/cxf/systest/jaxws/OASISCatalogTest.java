@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxws;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
@@ -114,15 +115,19 @@ public class OASISCatalogTest extends Assert {
         }
 
         // update catalog dynamically now
-        URL jaxwscatalog = 
-            getClass().getResource("/META-INF/jax-ws-catalog.xml");
+        Enumeration<URL> jaxwscatalog = 
+            getClass().getClassLoader().getResources("META-INF/jax-ws-catalog.xml");
         assertNotNull(jaxwscatalog);
 
-        catalog.loadCatalog(jaxwscatalog);
+        while (jaxwscatalog.hasMoreElements()) {
+            URL url = jaxwscatalog.nextElement();
+            catalog.loadCatalog(url);
+        }
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         Greeter greeter = service.getPort(portName, Greeter.class);
         assertNotNull(greeter);
+        bus.shutdown(true);
     }
 
     @Test

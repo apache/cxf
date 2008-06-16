@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.corba.processors;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -675,8 +676,8 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
     public void testSetCorbaAddressFile() throws Exception {
         
         try {
-            String fileName = getClass().getResource("/wsdl/datetime.wsdl").toString();
-            generator.setWsdlFile(fileName);
+            URI fileName = getClass().getResource("/wsdl/datetime.wsdl").toURI();
+            generator.setWsdlFile(new File(fileName).getAbsolutePath());
             generator.addInterfaceName("BasePortType");
 
             Definition model = generator.generateCORBABinding();                
@@ -689,7 +690,7 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             assertEquals("file:./Base.ref", address);            
             
             URL idl = getClass().getResource("/wsdl/addressfile.txt");
-            String filename = idl.getFile();
+            String filename = new File(idl.toURI()).getAbsolutePath();
             generator.setAddressFile(filename);
             model = generator.generateCORBABinding();
             service = model.getService(name);

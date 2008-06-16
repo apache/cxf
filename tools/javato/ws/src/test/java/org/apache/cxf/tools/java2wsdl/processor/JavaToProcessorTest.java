@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.java2wsdl.processor;
 
 import java.io.File;
+import java.net.URI;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
@@ -96,7 +97,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        String expectedFile = getClass().getResource("expected/calculator.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/calculator.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "calculator.wsdl"));
 
     }
@@ -125,7 +126,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        String expectedFile = getClass().getResource("expected/hello_soap12.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/hello_soap12.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "hello_soap12.wsdl"));
     }
 
@@ -192,7 +193,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        String expectedFile = getClass().getResource("expected/db.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/db.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "db.wsdl"));
     }
 
@@ -216,7 +217,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        String expectedFile = getClass().getResource("expected/my_hello_soap12.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/my_hello_soap12.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "my_hello_soap12.wsdl"));
     }
     @Test
@@ -311,7 +312,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "rpc-hello.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        String expectedFile = getClass().getResource("expected/rpc-hello-expected.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/rpc-hello-expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "rpc-hello.wsdl"));
 
     }
@@ -325,7 +326,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "xml-bare.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        String expectedFile = getClass().getResource("expected/xml-bare-expected.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/xml-bare-expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "/xml-bare.wsdl"));
 
     }
@@ -341,7 +342,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "fault.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
 
-        String expectedFile = getClass().getResource("expected/hello_world_fault_expected.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/hello_world_fault_expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "/fault.wsdl"));
     }
 
@@ -384,7 +385,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File bindingFile = new File(output, "echo_date.xjb");
         assertTrue(bindingFile.exists());
 
-        String expectedFile = getClass().getResource("expected/echo_date.xjb").getFile();
+        URI expectedFile = getClass().getResource("expected/echo_date.xjb").toURI();
         assertWsdlEquals(new File(expectedFile), bindingFile);
     }
 
@@ -400,7 +401,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File bindingFile = new File(output, "echo_calendar.xjb");
         assertTrue(bindingFile.exists());
 
-        String expectedFile = getClass().getResource("expected/echo_calendar.xjb").getFile();
+        URI expectedFile = getClass().getResource("expected/echo_calendar.xjb").toURI();
         assertWsdlEquals(new File(expectedFile), bindingFile);
     }
 
@@ -420,7 +421,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "list_test.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
 
-        String expectedFile = getClass().getResource("expected/list_expected.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/list_expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "/list_test.wsdl"));
 
     }
@@ -440,7 +441,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "send_image.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
         
-        String expectedFile = getClass().getResource("expected/expected_send_image.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/expected_send_image.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
 
@@ -458,7 +459,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "send_image2.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
         
-        String expectedFile = getClass().getResource("expected/expected_send_image2.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/expected_send_image2.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
 
@@ -475,7 +476,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "add_numbers.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        String expectedFile = getClass().getResource("expected/add_numbers_expected.wsdl").getFile();
+        URI expectedFile = getClass().getResource("expected/add_numbers_expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
 

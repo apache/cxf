@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.ws.commons.schema.XmlSchemaException;
@@ -37,6 +38,9 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
     private ExtendedURIResolver resolver;
     private Catalog catalogResolver;
 
+    public CatalogXmlSchemaURIResolver(Bus bus) {
+        this(OASISCatalogManager.getCatalogManager(bus));
+    }
     public CatalogXmlSchemaURIResolver(OASISCatalogManager catalogManager) {
         this.resolver = new ExtendedURIResolver();
         this.catalogResolver = catalogManager.getCatalog();

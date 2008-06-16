@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -76,7 +77,7 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         //httpurlconnection.setRequestProperty("Content-Length",   String.valueOf(is.available()));   
 
         OutputStream outputstream = httpUrlConnection.getOutputStream();
-        String inputFile = getClass().getResource("resources/add_book.txt").getFile();         
+        File inputFile = new File(getClass().getResource("resources/add_book.txt").toURI());         
          
         byte[] tmp = new byte[4096];
         int i = 0;

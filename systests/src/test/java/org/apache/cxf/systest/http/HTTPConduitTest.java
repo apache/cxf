@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.http;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -124,12 +125,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         try {
             //System.setProperty("javax.net.debug", "all");
             String keystore = 
-                Server.class.getResource("resources/Morpit.jks").getFile();
+                new File(Server.class.getResource("resources/Morpit.jks").toURI()).getAbsolutePath();
             //System.out.println("Keystore: " + keystore);
             KeyManager[] kmgrs = getKeyManagers(getKeyStore("JKS", keystore, "password"), "password");
             
             String truststore = 
-                Server.class.getResource("resources/Truststore.jks").getFile();
+                new File(Server.class.getResource("resources/Truststore.jks").toURI()).getAbsolutePath();
             //System.out.println("Truststore: " + truststore);
             TrustManager[] tmgrs = getTrustManagers(getKeyStore("JKS", truststore, "password"));
             
