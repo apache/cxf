@@ -57,6 +57,10 @@ classpath.  Specifically, reading an EndpointReference via
 EndpointReference.readFrom(Source) may not result in an EndpointReference that
 is completely usable as namespace declarations may be lost.
 
+The latest version of the WSS4J library that is used to implement WS-Security 
+requires the opensaml jar to be on the classpath.  This is different than previous
+versions that only required it if doing SAML assertions.  When upgrading
+to CXF 2.1.1, you will need to add the opensaml jar to your application.   
 
 3. Building the Samples
 
