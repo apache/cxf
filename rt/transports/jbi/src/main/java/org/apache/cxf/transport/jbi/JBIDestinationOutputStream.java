@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jbi.messaging.DeliveryChannel;
+import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.NormalizedMessage;
@@ -41,6 +42,8 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
 public class JBIDestinationOutputStream extends CachedOutputStream {
+
+    private static final String SEND_SYNC = "javax.jbi.messaging.sendSync";
 
     private static final Logger LOG = LogUtils.getL7dLogger(JBIDestinationOutputStream.class);
     private Message inMessage;
@@ -119,12 +122,17 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                 }
                 LOG.fine(new org.apache.cxf.common.i18n.Message(
                     "POST.DISPATCH", LOG).toString());
-                channel.send(xchng);
+                if (xchng.getStatus() == ExchangeStatus.ACTIVE
+                        && Boolean.TRUE.equals(xchng.getProperty(SEND_SYNC))) {
+                    channel.sendSync(xchng);
+                } else {
+                    channel.send(xchng);
+                }
             }
         } catch (Exception ex) { 
             LOG.log(Level.SEVERE, new org.apache.cxf.common.i18n.Message(
                 "ERROR.SEND.MESSAGE", LOG).toString(), ex);
         }
     }
-    
+
 }
