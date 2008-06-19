@@ -41,7 +41,7 @@ public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
     }
 
     @Override
-    protected String getStyle() {
+    public String getStyle() {
         SOAPBinding sb = getServiceClass().getAnnotation(SOAPBinding.class);
         if (sb != null) {
             if (sb.style().equals(Style.DOCUMENT)) {
@@ -72,6 +72,6 @@ public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
                 return "encoded";
             }
         }
-        return super.getStyle();
+        return super.getUse();
     }
 }

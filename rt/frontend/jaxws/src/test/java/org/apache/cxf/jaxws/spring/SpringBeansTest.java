@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxws.spring;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -27,6 +28,7 @@ import javax.xml.namespace.QName;
 
 import junit.framework.Assert;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexType;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
@@ -46,6 +48,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.service.Hello;
+import org.apache.cxf.transport.http.WSDLQueryHandler;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.After;
 import org.junit.Test;
@@ -217,16 +220,37 @@ public class SpringBeansTest extends Assert {
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/servers.xml"});
 
-        JaxWsServerFactoryBean bean = (JaxWsServerFactoryBean) ctx.getBean("simple");
+        JaxWsServerFactoryBean bean;
+        BindingConfiguration bc;
+        SoapBindingConfiguration sbc;
+        
+        bean = (JaxWsServerFactoryBean) ctx.getBean("inlineSoapBindingRPC");
+        assertNotNull(bean);
+        
+        bc = bean.getBindingConfig();
+        assertTrue(bc instanceof SoapBindingConfiguration);
+        sbc = (SoapBindingConfiguration) bc;
+        assertEquals("rpc", sbc.getStyle());
+
+        WSDLQueryHandler handler = new WSDLQueryHandler((Bus)ctx.getBean("cxf"));
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        handler.writeResponse("http://localhost/test?wsdl", "/test",
+                              bean.create().getEndpoint().getEndpointInfo(),
+                              bout);
+        String wsdl = bout.toString();
+        assertTrue(wsdl.contains("name=\"stringArray\""));
+        assertTrue(wsdl.contains("name=\"stringArray\""));
+        
+        bean = (JaxWsServerFactoryBean) ctx.getBean("simple");
         assertNotNull(bean);
 
         bean = (JaxWsServerFactoryBean) ctx.getBean("inlineSoapBinding");
         assertNotNull(bean);
         
-        BindingConfiguration bc = bean.getBindingConfig();
+        bc = bean.getBindingConfig();
         assertTrue(bc instanceof SoapBindingConfiguration);
-        SoapBindingConfiguration sbc = (SoapBindingConfiguration) bc;
-        assertTrue(sbc.getVersion() instanceof Soap12);
+        sbc = (SoapBindingConfiguration) bc;
+        assertTrue("Not soap version 1.2: " + sbc.getVersion(),  sbc.getVersion() instanceof Soap12);
         
         bean = (JaxWsServerFactoryBean) ctx.getBean("inlineDataBinding");
         
@@ -300,4 +324,5 @@ public class SpringBeansTest extends Assert {
         assertTrue("the soap configure should set isMtomEnabled to be true",
                    sbc.isMtomEnabled());
     }
+    
 }

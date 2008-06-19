@@ -38,7 +38,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
           </list>
       </property>
   </bean>
-  
+   
   <jaxws:server id="simple" serviceBean="#greeter" xmlns:test="urn:foo" xmlns="urn:foo"/>
 
   <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
@@ -106,6 +106,14 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     address="http://localhost:8080/test">
     <jaxws:binding>
       <soap:soapBinding mtomEnabled="true" version="1.2"/>
+    </jaxws:binding>
+  </jaxws:server>
+  
+  <jaxws:server id="inlineSoapBindingRPC" 
+    serviceClass="org.apache.cxf.jaxws.service.Hello"
+    address="http://localhost:8080/testrpc">
+    <jaxws:binding>
+      <soap:soapBinding style="rpc"/>
     </jaxws:binding>
   </jaxws:server>
   

@@ -86,7 +86,8 @@ public class JaxWsServiceConfigurationTest extends Assert {
         JaxWsServiceConfiguration jwsc = (JaxWsServiceConfiguration) bean.getServiceConfigurations().get(0);
         jwsc.setServiceFactory(bean);
 
-        assertEquals("document", jwsc.getStyle());
+        assertNull(jwsc.getStyle());
+        assertEquals("document", bean.getStyle());
         assertNull(jwsc.isWrapped());
     }
 

@@ -28,13 +28,18 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 public class SoapBindingConfiguration extends BindingConfiguration {
     private SoapVersion soapVersion = Soap11.getInstance();
-    private String style = "document";
+    private String style;
     private String use;
     private String transportURI = "http://schemas.xmlsoap.org/soap/http";
     private String defaultSoapAction = "";
     private boolean mtomEnabled;
     private QName bindingName;
     private String bindingNamePostfix = "SoapBinding";
+    
+    public SoapBindingConfiguration() {
+        
+    }
+    
 
     @Override
     public String getBindingId() {
@@ -63,11 +68,15 @@ public class SoapBindingConfiguration extends BindingConfiguration {
         this.transportURI = transportURI;
     }
 
-    protected String getStyle() {
-        return style;
+    public boolean isSetStyle() {
+        return style != null;
+    }
+    
+    public String getStyle() {
+        return style == null ? "document" : style;
     }
 
-    protected String getStyle(OperationInfo op) {
+    public String getStyle(OperationInfo op) {
         return getStyle();
     }
 

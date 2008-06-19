@@ -34,6 +34,7 @@ import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -58,8 +59,28 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         serviceClass = sbean.getServiceClass();
         serviceName = sbean.getServiceQName(false);
         endpointName = sbean.getEndpointName(false);
+        sbean.getServiceConfigurations().add(new SoapBindingServiceConfiguration());
     }
     protected AbstractWSDLBasedEndpointFactory() {
+    }
+
+    
+    private class SoapBindingServiceConfiguration extends AbstractServiceConfiguration {
+        public String getStyle() {
+            if (getBindingConfig() instanceof SoapBindingConfiguration
+                && ((SoapBindingConfiguration)getBindingConfig()).isSetStyle()) {
+                return ((SoapBindingConfiguration)getBindingConfig()).getStyle();
+            }
+            return null;
+        }
+        public Boolean isWrapped() {
+            if (getBindingConfig() instanceof SoapBindingConfiguration
+                && ((SoapBindingConfiguration)getBindingConfig()).isSetStyle()
+                && "rpc".equals(((SoapBindingConfiguration)getBindingConfig()).getStyle())) {
+                return Boolean.FALSE;
+            }
+            return null;
+        }
     }
     
     protected Endpoint createEndpoint() throws BusException, EndpointException {        
@@ -292,7 +313,8 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                 if (bindingConfig == null) {
                     bindingConfig = new SoapBindingConfiguration();
                 }
-                if (bindingConfig instanceof SoapBindingConfiguration) {
+                if (bindingConfig instanceof SoapBindingConfiguration
+                    && !((SoapBindingConfiguration)bindingConfig).isSetStyle()) {
                     ((SoapBindingConfiguration)bindingConfig).setStyle(serviceFactory.getStyle());
                 }
             }

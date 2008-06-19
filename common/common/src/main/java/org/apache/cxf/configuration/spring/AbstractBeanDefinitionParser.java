@@ -173,13 +173,7 @@ public abstract class AbstractBeanDefinitionParser
 
     protected void setFirstChildAsProperty(Element element, ParserContext ctx, 
                                          BeanDefinitionBuilder bean, String propertyName) {
-        String id = getAndRegisterFirstChild(element, ctx, bean, propertyName);
-        bean.addPropertyReference(propertyName, id);
-        
-    }
 
-    protected String getAndRegisterFirstChild(Element element, ParserContext ctx, 
-                                              BeanDefinitionBuilder bean, String propertyName) {
         Element first = getFirstChild(element);
         
         if (first == null) {
@@ -196,25 +190,22 @@ public abstract class AbstractBeanDefinitionParser
                 if (id == null) {
                     throw new IllegalStateException("<ref> elements must have a \"bean\" attribute!");
                 }
-                return id;
+                bean.addPropertyReference(propertyName, id);
+                return;
             } else if ("bean".equals(name)) {
                 BeanDefinitionHolder bdh = ctx.getDelegate().parseBeanDefinitionElement(first);
                 child = bdh.getBeanDefinition();
-                id = bdh.getBeanName();
+                bean.addPropertyValue(propertyName, child);
+                return;
             } else {
                 throw new UnsupportedOperationException("Elements with the name " + name  
                                                         + " are not currently "
                                                         + "supported as sub elements of " 
                                                         + element.getLocalName());
             }
-            
-        } else {
-            child = ctx.getDelegate().parseCustomElement(first, bean.getBeanDefinition());
-            id = child.toString();
         }
-       
-        ctx.getRegistry().registerBeanDefinition(id, child);
-        return id;
+        child = ctx.getDelegate().parseCustomElement(first, bean.getBeanDefinition());
+        bean.addPropertyValue(propertyName, child);
     }
 
     protected Element getFirstChild(Element element) {
