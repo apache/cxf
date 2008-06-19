@@ -28,8 +28,6 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 public class ColocFeature extends AbstractFeature {
-    private static final ColocOutInterceptor COLOC_OUT = new ColocOutInterceptor();
-    private static final ColocInInterceptor COLOC_IN = new ColocInInterceptor();
 
     @Override
     public void initialize(Client client, Bus bus) {
@@ -41,8 +39,7 @@ public class ColocFeature extends AbstractFeature {
     
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        COLOC_OUT.setBus(bus);
-        provider.getInInterceptors().add(COLOC_IN);
-        provider.getOutInterceptors().add(COLOC_OUT);
+        provider.getInInterceptors().add(new ColocInInterceptor());
+        provider.getOutInterceptors().add(new ColocOutInterceptor(bus));
     }
 }

@@ -59,6 +59,10 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public ColocOutInterceptor() {
         super(Phase.POST_LOGICAL);
     }
+    public ColocOutInterceptor(Bus b) {
+        super(Phase.POST_LOGICAL);
+        bus = b;
+    }
 
     public void setBus(Bus bus) {
         this.bus = bus; 
