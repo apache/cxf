@@ -594,11 +594,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
             setFaultClassInfo(o, method);
         }
-        try {
-            o.setProperty(METHOD_PARAM_ANNOTATIONS, method.getParameterAnnotations());
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        o.setProperty(METHOD_PARAM_ANNOTATIONS, method.getParameterAnnotations());
         o.setProperty(METHOD_ANNOTATIONS, method.getAnnotations());
         Class<?>[] paramTypes = method.getParameterTypes();
         Type[] genericTypes = method.getGenericParameterTypes();
