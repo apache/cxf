@@ -55,11 +55,11 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 public class HTTPConduitTest extends Assert {
     private Message inMessage;
     private IMocksControl control;
-    
+
     @Before
     public void setUp() throws Exception {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -77,9 +77,9 @@ public class HTTPConduitTest extends Assert {
         message.put(Message.PROTOCOL_HEADERS, headers);
         return message;
     }
-    
+
     /**
-     * This test class is a Basic Auth Supplier with a 
+     * This test class is a Basic Auth Supplier with a
      * preemptive UserPass.
      */
     class BasicAuthSupplier extends HttpBasicAuthSupplier {
@@ -104,14 +104,14 @@ public class HTTPConduitTest extends Assert {
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new HTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
-        
-        EndpointReferenceType target = 
+
+        EndpointReferenceType target =
             EndpointReferenceUtils.getEndpointReference(
                     "http://nowhere.com/bar/foo");
-        
+
         // Test call
         EndpointReferenceType ref = conduit.getTarget();
-        
+
         assertNotNull("unexpected null target", ref);
         assertEquals("unexpected target",
                      EndpointReferenceUtils.getAddress(ref),
@@ -126,7 +126,7 @@ public class HTTPConduitTest extends Assert {
                      conduit.getURL().getPath(),
                      "/bar/foo");
     }
-    
+
     /**
      * Verfies one of the tenents of our interface -- the Conduit sets up
      * an OutputStream on the message after a "prepare".
@@ -140,18 +140,45 @@ public class HTTPConduitTest extends Assert {
         conduit.finalizeConfig();
 
         Message message = getNewMessage();
-        
+
         // Test call
         conduit.prepare(message);
-        
-        assertNotNull("Conduit should always set output stream.", 
+
+        assertNotNull("Conduit should always set output stream.",
                         message.getContent(OutputStream.class));
+    }
+
+    @Test
+    public void testAuthPolicyFromEndpointInfo() throws Exception {
+        Bus bus = new CXFBusImpl();
+        EndpointInfo ei = new EndpointInfo();
+        AuthorizationPolicy ap = new AuthorizationPolicy();
+        ap.setPassword("password");
+        ap.setUserName("testUser");
+        ei.addExtensor(ap);
+        ei.setAddress("http://nowhere.com/bar/foo");
+        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        conduit.finalizeConfig();
+        Message message = getNewMessage();
+
+        // Test call
+        conduit.prepare(message);
+
+        Map<String, List<String>> headers =
+            CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+
+        assertNotNull("Authorization Header should exist",
+                headers.get("Authorization"));
+
+        assertEquals("Unexpected Authorization Token",
+                "Basic " + Base64Utility.encode("testUser:password".getBytes()),
+                headers.get("Authorization").get(0));
     }
 
     /**
      * This test verifies the precidence of Authorization Information.
      * Setting authorization information on the Message takes precidence
-     * over a Basic Auth Supplier with preemptive UserPass, and that 
+     * over a Basic Auth Supplier with preemptive UserPass, and that
      * followed by setting it directly on the Conduit.
      */
     @Test
@@ -161,58 +188,58 @@ public class HTTPConduitTest extends Assert {
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new HTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
-    
+
         conduit.getAuthorization().setUserName("Satan");
         conduit.getAuthorization().setPassword("hell");
         Message message = getNewMessage();
-        
+
         // Test call
         conduit.prepare(message);
-        
+
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        
+
         assertNotNull("Authorization Header should exist",
                 headers.get("Authorization"));
-        
-        assertEquals("Unexpected Authorization Token", 
+
+        assertEquals("Unexpected Authorization Token",
                 "Basic " + Base64Utility.encode("Satan:hell".getBytes()),
                 headers.get("Authorization").get(0));
-        
+
         // Setting a Basic Auth User Pass should override
         conduit.setBasicAuthSupplier(new BasicAuthSupplier());
         message = getNewMessage();
-        
+
         // Test Call
         conduit.prepare(message);
-        
+
         headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
-        assertEquals("Unexpected Authorization Token", 
+        assertEquals("Unexpected Authorization Token",
                 "Basic " + Base64Utility.encode("Gandalf:staff".getBytes()),
                 headers.get("Authorization").get(0));
-        
+
         // Setting authorization policy on the message should override all.
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Hello");
         authPolicy.setPassword("world");
         message = getNewMessage();
         message.put(AuthorizationPolicy.class, authPolicy);
-        
+
         conduit.prepare(message);
-        
+
         headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        
-        assertEquals("Unexpected Authorization Token", 
+
+        assertEquals("Unexpected Authorization Token",
                 "Basic " + Base64Utility.encode("Hello:world".getBytes()),
                 headers.get("Authorization").get(0));
     }
 
     public void testDecoupledEndpoint() throws Exception {
         control = EasyMock.createNiceControl();
-        
+
         Bus bus = new CXFBusImpl();
 
         URL decoupledURL = new URL("http://nowhere.com/response");
@@ -230,31 +257,31 @@ public class HTTPConduitTest extends Assert {
         EasyMock.expectLastCall().andReturn(destination);
         destination.setMessageObserver(
                 EasyMock.isA(HTTPConduit.InterposedMessageObserver.class));
-        
+
         control.replay();
-        
+
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new HTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
-        
+
         // Test call
         conduit.getClient().setDecoupledEndpoint(decoupledURL.toString());
-        
+
         assertNotNull("expected back channel", conduit.getBackChannel());
-        
+
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
                 inMessage = m;
             }
         };
-        
+
         // Test call
         conduit.setMessageObserver(observer);
 
         Message incoming = new MessageImpl();
         conduit.getDecoupledObserver().onMessage(incoming);
-       
+
         assertSame("expected pass thru onMessage() notification",
                    inMessage,
                    incoming);
@@ -287,5 +314,5 @@ public class HTTPConduitTest extends Assert {
             control = null;
         }
     }
-    
+
 }

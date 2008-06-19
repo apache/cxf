@@ -21,6 +21,7 @@ package org.apache.cxf.frontend;
 import java.util.Map;
 
 import org.apache.cxf.BusException;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -33,23 +34,23 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 
 public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
     private Client client;
-    
+
     public ClientFactoryBean() {
         this(new ReflectionServiceFactoryBean());
     }
-    public ClientFactoryBean(ReflectionServiceFactoryBean factory) { 
+    public ClientFactoryBean(ReflectionServiceFactoryBean factory) {
         super(factory);
     }
 
     public Client create() {
-        
+
         if (client != null) {
             return client;
         }
         applyExtraClass();
         try {
             Endpoint ep = createEndpoint();
-            
+            applyProperties(ep);
             createClient(ep);
             initializeAnnotationInterceptors(ep, getServiceClass());
         } catch (EndpointException e) {
@@ -72,7 +73,7 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
             }
         }
     }
-    
+
     protected void applyExtraClass() {
         DataBinding dataBinding = getServiceFactory().getDataBinding();
         if (dataBinding instanceof JAXBDataBinding) {
@@ -83,12 +84,22 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
             }
         }
     }
-    
+
+
+    protected void applyProperties(Endpoint ep) {
+        //Apply the AuthorizationPolicy to the endpointInfo
+        Map props = this.getProperties();
+        if (props != null && props.get(AuthorizationPolicy.class.getName()) != null) {
+            AuthorizationPolicy ap = (AuthorizationPolicy)props.get(AuthorizationPolicy.class.getName());
+            ep.getEndpointInfo().addExtensor(ap);
+        }
+    }
+
     public Client getClient() {
         return client;
     }
 
     public void setClient(Client client) {
         this.client = client;
-    }    
+    }
 }

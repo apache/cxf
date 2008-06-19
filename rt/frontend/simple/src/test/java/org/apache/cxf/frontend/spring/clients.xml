@@ -29,7 +29,7 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-xml.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
-  
+
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
       <property name="transportIds">
           <list>
@@ -40,11 +40,11 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
           </list>
       </property>
   </bean>
-  
+
   <bean id="saajIn" class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
   <bean id="saajOut" class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
-  
-  <simple:client id="client1" 
+
+  <simple:client id="client1"
     serviceClass="org.apache.cxf.service.factory.HelloService"
     address="http://localhost:9000/foo"
     serviceName="s:SOAPService"
@@ -64,13 +64,20 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
       <bean class="org.apache.cxf.endpoint.NullConduitSelector"/>
     </simple:conduitSelector>
   </simple:client>
-  
-   <simple:client id="client2" 
+
+   <simple:client id="client2"
     serviceClass="org.apache.cxf.service.factory.HelloService"
     address="http://localhost:9000/foo2"
     serviceName="s:XMLService"
     xmlns:s="http://apache.org/hello_world_soap_http"
-    endpointName="s:XMLPort"    
-    bindingId="http://cxf.apache.org/bindings/xformat">    
+    endpointName="s:XMLPort"
+    bindingId="http://cxf.apache.org/bindings/xformat">
    </simple:client>
+
+   <simple:client id="client3"
+      serviceClass="org.apache.cxf.service.factory.HelloService"
+      address="http://localhost:9000/foo2"
+      username="testUser"
+      password="password">
+    </simple:client>
 </beans>
