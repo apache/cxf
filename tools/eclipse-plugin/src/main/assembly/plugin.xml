@@ -28,28 +28,28 @@
     <fileSets>
         <fileSet>
             <directory>target/classes/</directory>
-            <outputDirectory>plugins/org.apache.cxf_${cxf.version}</outputDirectory>
+            <outputDirectory>plugins/org.apache.cxf_${pom.version}</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>target</directory>
-            <outputDirectory>plugins/org.apache.cxf_${cxf.version}/META-INF</outputDirectory>
+            <outputDirectory>plugins/org.apache.cxf_${pom.version}/META-INF</outputDirectory>
             <includes>
                 <include>MANIFEST.MF</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>target/maven-shared-archive-resources</directory>
-            <outputDirectory>plugins/org.apache.cxf_${cxf.version}/</outputDirectory>
+            <outputDirectory>plugins/org.apache.cxf_${pom.version}/</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>target/maven-shared-archive-resources/META-INF</directory>
-            <outputDirectory>plugins/org.apache.cxf_${cxf.version}/about_files</outputDirectory>
+            <outputDirectory>plugins/org.apache.cxf_${pom.version}/about_files</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
@@ -57,7 +57,7 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>plugins/org.apache.cxf_${cxf.version}/lib</outputDirectory>
+            <outputDirectory>plugins/org.apache.cxf_${pom.version}/lib</outputDirectory>
             <unpack>false</unpack>
             <scope>runtime</scope>
         </dependencySet>
