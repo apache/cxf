@@ -406,7 +406,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                     addOutOfBandParts(bop, msg, schemas, isInput, header.getPart());
                     serviceInfo.refresh();
                 } else {
-                    throw new RuntimeException("Header message not defined in service model.");
+                    throw new RuntimeException("Problem with WSDL: soap:header element is referring to an undefined wsdl:message element.");
                 }
             }
         }
