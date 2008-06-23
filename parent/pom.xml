@@ -44,8 +44,8 @@
         <saaj.impl.artifactId>saaj-impl</saaj.impl.artifactId>
 
         <jaxb.version>2.1</jaxb.version>
-        <jaxb.impl.version>2.1.6</jaxb.impl.version>
-        <jaxb.xjc.version>2.1.6</jaxb.xjc.version>
+        <jaxb.impl.version>2.1.7</jaxb.impl.version>
+        <jaxb.xjc.version>2.1.7</jaxb.xjc.version>
         <jetty.version>6.1.9</jetty.version>
         <saaj.version>1.3</saaj.version>
         <saaj.impl.version>1.3</saaj.impl.version>
@@ -175,6 +175,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.2</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf</groupId>

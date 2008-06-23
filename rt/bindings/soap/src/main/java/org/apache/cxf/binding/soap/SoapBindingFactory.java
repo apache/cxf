@@ -407,7 +407,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                     serviceInfo.refresh();
                 } else {
                     throw new RuntimeException("Problem with WSDL: soap:header element" 
-                       + " is referring to an undefined wsdl:message element.");
+                        + " is referring to an undefined wsdl:message element.");
                 }
             }
         }
