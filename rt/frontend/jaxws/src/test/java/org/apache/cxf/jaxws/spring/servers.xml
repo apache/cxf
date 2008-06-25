@@ -28,7 +28,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
-    
+
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
       <property name="transportIds">
           <list>
@@ -38,26 +38,26 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
           </list>
       </property>
   </bean>
-   
+
   <jaxws:server id="simple" serviceBean="#greeter" xmlns:test="urn:foo" xmlns="urn:foo"/>
 
   <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
 
-  <jaxws:server id="simpleWithAddress" 
+  <jaxws:server id="simpleWithAddress"
     serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"/>
-  
+
   <jaxws:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress">
     <jaxws:serviceBean>
       <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
     </jaxws:serviceBean>
   </jaxws:server>
-  
-  <jaxws:server id="inlineInvoker" 
+
+  <jaxws:server id="inlineInvoker"
     serviceClass="org.apache.hello_world_soap_http.GreeterImpl"
-    address="http://localhost:8080/simpleWithAddress" 
-    bus="cxf" 
+    address="http://localhost:8080/simpleWithAddress"
+    bus="cxf"
     endpointName="e:SoapPort_Test1"
-    serviceName="s:SOAPService_Test1"    
+    serviceName="s:SOAPService_Test1"
     xmlns:e="http://apache.org/hello_world_soap_http"
     xmlns:s="http://apache.org/hello_world_soap_http">
     <jaxws:invoker>
@@ -71,10 +71,10 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
       <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
     </jaxws:dataBinding>
   </jaxws:server>
- 
+
   <jaxws:server id="bookServer"
   	serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl"
-    address="http://localhost:8080/act" 
+    address="http://localhost:8080/act"
     bus="cxf">
     <jaxws:invoker>
       <bean class="org.apache.cxf.service.invoker.BeanInvoker">
@@ -97,35 +97,41 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
       </jaxws:dataBinding>
   </jaxws:server>
 
-   <jaxws:client id="bookClient" 
+   <jaxws:client id="bookClient"
     serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexType"
     address="http://localhost:8080/act"/>
 
-  <jaxws:server id="inlineSoapBinding" 
+  <jaxws:server id="inlineSoapBinding"
     serviceClass="org.apache.cxf.jaxws.service.Hello"
     address="http://localhost:8080/test">
     <jaxws:binding>
       <soap:soapBinding mtomEnabled="true" version="1.2"/>
     </jaxws:binding>
   </jaxws:server>
-  
-  <jaxws:server id="inlineSoapBindingRPC" 
+
+  <jaxws:server id="inlineWsdlLocation"
+    serviceClass="org.apache.cxf.jaxws.service.GreeterImplDoc"
+    address="http://localhost:8080/wsdl"
+    wsdlLocation="wsdl/hello_world_doc_lit.wsdl">
+  </jaxws:server>
+
+  <jaxws:server id="inlineSoapBindingRPC"
     serviceClass="org.apache.cxf.jaxws.service.Hello"
     address="http://localhost:8080/testrpc">
     <jaxws:binding>
       <soap:soapBinding style="rpc"/>
     </jaxws:binding>
   </jaxws:server>
-  
-  <jaxws:server id="inlineDataBinding" 
+
+  <jaxws:server id="inlineDataBinding"
     serviceClass="org.apache.cxf.jaxws.service.Hello"
     address="http://localhost:8080/test">
     <jaxws:dataBinding>
       <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
     </jaxws:dataBinding>
   </jaxws:server>
-  
+
   <!-- We should auto generate this id -->
   <jaxws:server serviceBean="#greeter"/>
-  
+
 </beans>

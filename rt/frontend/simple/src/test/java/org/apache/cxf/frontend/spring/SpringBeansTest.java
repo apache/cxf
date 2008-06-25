@@ -19,7 +19,6 @@
 package org.apache.cxf.frontend.spring;
 
 import java.util.List;
-
 import junit.framework.Assert;
 
 import org.apache.cxf.binding.BindingConfiguration;
@@ -42,6 +41,8 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+
+
 public class SpringBeansTest extends Assert {
 
     @Test
@@ -63,8 +64,6 @@ public class SpringBeansTest extends Assert {
         bean = (ServerFactoryBean) ctx.getBean("inlineSoapBinding");
         assertNotNull(bean);
 
-
-
         BindingConfiguration bc = bean.getBindingConfig();
         assertTrue(bc instanceof SoapBindingConfiguration);
         SoapBindingConfiguration sbc = (SoapBindingConfiguration) bc;
@@ -75,6 +74,9 @@ public class SpringBeansTest extends Assert {
                      bean.getBindingId(),
                      "http://cxf.apache.org/bindings/xformat");
 
+        bean = (ServerFactoryBean) ctx.getBean("simpleWithWSDL");
+        assertNotNull(bean);
+        assertEquals(bean.getWsdlLocation(), "org/apache/cxf/frontend/spring/simple.wsdl");
     }
 
     @Test

@@ -32,25 +32,25 @@ import org.springframework.context.ApplicationContextAware;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("client", new JaxWsProxyFactoryBeanDefinitionParser());        
+        registerBeanDefinitionParser("client", new JaxWsProxyFactoryBeanDefinitionParser());
         registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser());
         registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());
-        
+
         ServerFactoryBeanDefinitionParser parser = new ServerFactoryBeanDefinitionParser();
-        parser.setBeanClass(JaxWsServerFactoryBean.class);
-        registerBeanDefinitionParser("server", parser);        
+        parser.setBeanClass(SpringServerFactoryBean.class);
+        registerBeanDefinitionParser("server", parser);
     }
-    
+
     public static class SpringServerFactoryBean extends JaxWsServerFactoryBean
         implements ApplicationContextAware {
-    
+
         public SpringServerFactoryBean() {
             super();
         }
         public SpringServerFactoryBean(JaxWsServiceFactoryBean fact) {
             super(fact);
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();

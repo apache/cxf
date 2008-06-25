@@ -50,9 +50,9 @@ import org.apache.cxf.service.invoker.Invoker;
 
 
 /**
- * This class helps take a {@link org.apache.cxf.service.Service} and 
+ * This class helps take a {@link org.apache.cxf.service.Service} and
  * expose as a server side endpoint.
- * If there is no Service, it can create one for you using a 
+ * If there is no Service, it can create one for you using a
  * {@link ReflectionServiceFactoryBean}.
  * <p>
  * For most scenarios you'll want to just have the ServerFactoryBean handle everything
@@ -87,14 +87,14 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     private Object serviceBean;
     private List<String> schemaLocations;
     private Invoker invoker;
-    
+
     public ServerFactoryBean() {
-        this(new ReflectionServiceFactoryBean());       
+        this(new ReflectionServiceFactoryBean());
     }
     public ServerFactoryBean(ReflectionServiceFactoryBean sbean) {
         super(sbean);
     }
-    
+
     public String getBeanName() {
         return this.getClass().getName();
     }
@@ -110,21 +110,21 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             } else if (serviceBean != null) {
                 getServiceFactory().setInvoker(createInvoker());
             }
-            
+
             Endpoint ep = createEndpoint();
-            server = new ServerImpl(getBus(), 
-                                    ep, 
-                                    getDestinationFactory(), 
+            server = new ServerImpl(getBus(),
+                                    ep,
+                                    getDestinationFactory(),
                                     getBindingFactory());
-            
+
             if (invoker == null) {
                 if (serviceBean != null) {
                     ep.getService().setInvoker(createInvoker());
-                }    
+                }
             } else {
                 ep.getService().setInvoker(invoker);
             }
-            
+
             if (start) {
                 server.start();
             }
@@ -135,32 +135,32 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
         } catch (IOException e) {
             throw new ServiceConstructionException(e);
         }
-        
+
         if (serviceBean != null) {
             initializeAnnotationInterceptors(server.getEndpoint(),
                                              ClassHelper.getRealClass(getServiceBean()));
         } else if (getServiceClass() != null) {
             initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
         }
-        
-        
+
+
         applyFeatures();
         return server;
     }
 
-    
+
     @Override
     protected void initializeServiceFactory() {
         super.initializeServiceFactory();
-        
+
         DataBinding db = getServiceFactory().getDataBinding();
         if (db instanceof AbstractDataBinding && schemaLocations != null) {
             ResourceManager rr = getBus().getExtension(ResourceManager.class);
-            
+
             List<DOMSource> schemas = new ArrayList<DOMSource>();
             for (String l : schemaLocations) {
                 URL url = rr.resolveResource(l, URL.class);
-                
+
                 if (url == null) {
                     URIResolver res;
                     try {
@@ -168,13 +168,13 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                     } catch (IOException e) {
                         throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG), e);
                     }
-                    
+
                     if (!res.isResolved()) {
                         throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG));
                     }
                     url = res.getURL();
                 }
-                
+
                 Document d;
                 try {
                     d = DOMUtils.readXml(url.openStream());
@@ -184,7 +184,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                 }
                 schemas.add(new DOMSource(d, url.toString()));
             }
-            
+
             ((AbstractDataBinding)db).setSchemas(schemas);
         }
     }
@@ -207,8 +207,8 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             }
         }
     }
-      
-    
+
+
     protected Invoker createInvoker() {
         return new BeanInvoker(getServiceBean());
     }
@@ -233,10 +233,10 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
         this.start = start;
     }
 
-    public Object getServiceBean() {        
+    public Object getServiceBean() {
         return serviceBean;
     }
-    
+
     public Class<?> getServiceBeanClass() {
         if (serviceBean != null) {
             return ClassHelper.getRealClass(serviceBean);
@@ -248,7 +248,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     /**
      * Set the backing service bean. If this is set a BeanInvoker is created for
      * the provided bean.
-     * 
+     *
      * @return
      */
     public void setServiceBean(Object serviceBean) {
@@ -269,6 +269,14 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
     public void setInvoker(Invoker invoker) {
         this.invoker = invoker;
+    }
+
+    public void setWsdlLocation(String location) {
+        setWsdlURL(location);
+    }
+
+    public String getWsdlLocation() {
+        return getWsdlURL();
     }
 
 }

@@ -29,7 +29,7 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-xml.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
-    
+
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
       <property name="transportIds">
           <list>
@@ -40,25 +40,30 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
           </list>
       </property>
   </bean>
-  
+
   <simple:server id="simple" serviceBean="#greeter"/>
 
   <bean id="greeter" class="org.apache.cxf.service.factory.HelloServiceImpl"/>
 
-  <simple:server id="simpleWithAddress" 
+  <simple:server id="simpleWithAddress"
     serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"/>
-  
-  <simple:server id="simpleWithBindingId" 
+
+  <simple:server id="simpleWithWSDL"
+    serviceBean="#greeter"
+    wsdlLocation="org/apache/cxf/frontend/spring/simple.wsdl"
+    address="http://localhost:8080/simpleWithWSDL"/>
+
+  <simple:server id="simpleWithBindingId"
     serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"
     bindingId="http://cxf.apache.org/bindings/xformat"/>
-    
+
   <simple:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress">
     <simple:serviceBean>
       <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
     </simple:serviceBean>
   </simple:server>
-  
-  <simple:server id="inlineInvoker" 
+
+  <simple:server id="inlineInvoker"
     serviceClass="org.apache.cxf.service.factory.HelloServiceImpl"
     address="http://localhost:8080/simpleWithAddress">
     <simple:invoker>
@@ -68,13 +73,13 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
         </constructor-arg>
       </bean>
     </simple:invoker>
-    
+
   </simple:server>
-  
-  <simple:server id="inlineSoapBinding" 
+
+  <simple:server id="inlineSoapBinding"
     serviceClass="org.apache.cxf.service.factory.HelloService"
     serviceBean="#greeter"
-    address="http://localhost:8080/test"   
+    address="http://localhost:8080/test"
     serviceName="t:HelloService"
     xmlns:t="http://apache.org/hello_world_soap_http"
     endpointName="t:HelloPort"
