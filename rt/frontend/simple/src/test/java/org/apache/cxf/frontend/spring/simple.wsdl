@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="HelloServiceImpl" targetNamespace="http://factory.service.cxf.apache.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://factory.service.cxf.apache.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+	<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://factory.service.cxf.apache.org/" xmlns:tns="http://factory.service.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="echo" type="tns:echo" />
+    <xsd:complexType name="echo">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="text" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="echoResponse" type="tns:echoResponse" />
+    <xsd:complexType name="echoResponse">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="return" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="ping" type="tns:ping" />
+    <xsd:complexType name="ping">
+        <xsd:sequence />
+    </xsd:complexType>
+    <xsd:element name="pingResponse" type="tns:pingResponse" />
+    <xsd:complexType name="pingResponse">
+        <xsd:sequence />
+    </xsd:complexType>
+    <xsd:element name="sayHello" type="tns:sayHello" />
+    <xsd:complexType name="sayHello">
+        <xsd:sequence />
+    </xsd:complexType>
+    <xsd:element name="sayHelloResponse" type="tns:sayHelloResponse" />
+    <xsd:complexType name="sayHelloResponse">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="return" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="echoWithExchange" type="tns:echoWithExchange" />
+    <xsd:complexType name="echoWithExchange">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="text" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="echoWithExchangeResponse" type="tns:echoWithExchangeResponse" />
+    <xsd:complexType name="echoWithExchangeResponse">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="return" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="echoResponse">
+    <wsdl:part element="tns:echoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="pingResponse">
+    <wsdl:part element="tns:pingResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHello">
+    <wsdl:part element="tns:sayHello" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ping">
+    <wsdl:part element="tns:ping" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo">
+    <wsdl:part element="tns:echo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoWithExchange">
+    <wsdl:part element="tns:echoWithExchange" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoWithExchangeResponse">
+    <wsdl:part element="tns:echoWithExchangeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHelloResponse">
+    <wsdl:part element="tns:sayHelloResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HelloServiceImplPortType">
+    <wsdl:operation name="echo">
+      <wsdl:input message="tns:echo" name="echo">
+    </wsdl:input>
+      <wsdl:output message="tns:echoResponse" name="echoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:ping" name="ping">
+    </wsdl:input>
+      <wsdl:output message="tns:pingResponse" name="pingResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHello">
+      <wsdl:input message="tns:sayHello" name="sayHello">
+    </wsdl:input>
+      <wsdl:output message="tns:sayHelloResponse" name="sayHelloResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echoWithExchange">
+      <wsdl:input message="tns:echoWithExchange" name="echoWithExchange">
+    </wsdl:input>
+      <wsdl:output message="tns:echoWithExchangeResponse" name="echoWithExchangeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HelloServiceImplSoapBinding" type="tns:HelloServiceImplPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="echo">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="echo">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="echoResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="ping">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="pingResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHello">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="sayHello">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="sayHelloResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echoWithExchange">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="echoWithExchange">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="echoWithExchangeResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HelloServiceImpl">
+    <wsdl:port binding="tns:HelloServiceImplSoapBinding" name="HelloServiceImplPort">
+      <soap:address location="http://localhost:8080/simpleWithWSDL" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
