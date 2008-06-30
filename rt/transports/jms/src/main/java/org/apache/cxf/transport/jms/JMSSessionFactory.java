@@ -97,7 +97,6 @@ import org.apache.cxf.common.util.AbstractTwoStageCache;
  * reply-capable cache as necessary.
  * <p>
  *
- * @author Eoghan Glynn
  */
 public class JMSSessionFactory {
 
@@ -250,6 +249,12 @@ public class JMSSessionFactory {
                         if (null != theReplyDestination || null != replyDest) {
                             destination = null != replyDest ? (Queue) replyDest : (Queue)theReplyDestination;
                             
+                            selector = "JMSCorrelationID = '" + generateUniqueSelector(ret) + "'";
+                        }
+                        
+                        if (destination == null) {
+                            //neither replyDestination not replyDest are present.
+                            destination = session.createTemporaryQueue();
                             selector = "JMSCorrelationID = '" + generateUniqueSelector(ret) + "'";
                         }
                         

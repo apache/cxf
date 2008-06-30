@@ -40,7 +40,6 @@ import java.util.Queue;
  * the outer class is initialized).
  * <p>
  *
- * @author Eoghan Glynn
  */
 public abstract class AbstractTwoStageCache<E> {
     private Object mutex;

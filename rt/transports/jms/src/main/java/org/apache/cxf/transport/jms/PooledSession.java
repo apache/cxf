@@ -35,7 +35,6 @@ import javax.jms.TemporaryQueue;
  * though the intention is to genericize this to the pub-sub domain
  * also.
  *
- * @author Eoghan Glynn
  */
 public class PooledSession {
     private final Session theSession;

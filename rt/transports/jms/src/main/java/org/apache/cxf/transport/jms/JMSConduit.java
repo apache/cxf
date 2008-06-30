@@ -106,7 +106,7 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
                 isOneWay = ex.isOneWay();
             }    
             //get the pooledSession with response expected 
-            PooledSession pooledSession = base.sessionFactory.get(!isOneWay);            
+            PooledSession pooledSession = base.sessionFactory.get(!isOneWay);
             // put the PooledSession into the outMessage
             message.put(JMSConstants.JMS_POOLEDSESSION, pooledSession);
             

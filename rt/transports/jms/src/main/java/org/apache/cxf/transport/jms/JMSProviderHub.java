@@ -41,7 +41,6 @@ import javax.naming.NamingException;
  * static methods, but the intention is to support in future sharing
  * of JMS resources accross compatible ports.
  *
- * @author Eoghan Glynn
  */
 public final class JMSProviderHub {
 

@@ -100,11 +100,16 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
             for (int idx = 0; idx < 5; idx++) {
+
+                greeter.greetMeOneWay("test String");
+                
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
                 String exResponse = response1 + idx;
                 assertEquals(exResponse, greeting);
 
+
+                
                 String reply = greeter.sayHi();
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
