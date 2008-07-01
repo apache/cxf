@@ -41,7 +41,8 @@ public class FormEncodingReaderProviderTest extends Assert {
     @Test
     public void testReadFrom() throws Exception {
         InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
-        MultivaluedMap<String, String> mvMap = ferp.readFrom(Object.class, null, null, is);
+        MultivaluedMap<String, String> mvMap = 
+            ferp.readFrom(Object.class, null, null, null, null, is);
         assertEquals("Wrong entry for foo", "bar", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "far", mvMap.getFirst("boo"));
 
@@ -50,7 +51,8 @@ public class FormEncodingReaderProviderTest extends Assert {
     @Test
     public void testReadFromMultiples() throws Exception {
         InputStream is = getClass().getResourceAsStream("multiValPostBody.txt");
-        MultivaluedMap<String, String> mvMap = ferp.readFrom(Object.class, null, null, is);
+        MultivaluedMap<String, String> mvMap = 
+            ferp.readFrom(Object.class, null, null, null, null, is);
         List<String> vals = mvMap.get("foo");
 
         assertEquals("Wrong size for foo params", 2, vals.size());
@@ -63,7 +65,7 @@ public class FormEncodingReaderProviderTest extends Assert {
 
     @Test
     public void testReadable() {
-        assertTrue(ferp.isReadable(MultivaluedMap.class));
+        assertTrue(ferp.isReadable(MultivaluedMap.class, null, null));
     }
 
     @Test

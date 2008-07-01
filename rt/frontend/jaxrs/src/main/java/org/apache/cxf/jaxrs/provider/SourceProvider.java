@@ -22,6 +22,8 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,16 +46,17 @@ import org.w3c.dom.Document;
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Source.class.isAssignableFrom(type);
     }
     
-    public boolean isReadable(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Source.class.isAssignableFrom(type);
     }
     
-    public Object readFrom(Class<Object> source, MediaType media,
-                           MultivaluedMap<String, String> httpHeaders, InputStream is) throws IOException {
+    public Object readFrom(Class<Object> source, Type genericType, Annotation[] annotations, MediaType m,  
+        MultivaluedMap<String, String> headers, InputStream is) 
+        throws IOException {
         if (DOMSource.class.isAssignableFrom(source)) {
             Document doc = null;
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -76,8 +79,9 @@ public class SourceProvider implements
         throw new IOException("Unrecognized source");
     }
 
-    public void writeTo(Source source, MediaType media, MultivaluedMap<String, Object> httpHeaders,
-                        OutputStream os) throws IOException {
+    public void writeTo(Source source, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
+        throws IOException {
         StreamResult result = new StreamResult(os);
         TransformerFactory tf = TransformerFactory.newInstance();
         try {

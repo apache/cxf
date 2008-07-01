@@ -1,1 +1,1 @@
-<Book><id>124</id><name>CXF in Action - 2</name></Book>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Book><id>124</id><name>CXF in Action - 2</name></Book>

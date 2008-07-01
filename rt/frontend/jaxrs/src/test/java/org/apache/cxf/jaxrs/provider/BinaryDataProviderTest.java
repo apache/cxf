@@ -22,9 +22,15 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
@@ -37,19 +43,19 @@ public class BinaryDataProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         MessageBodyWriter<Object> p = new BinaryDataProvider();
-        assertTrue(p.isWriteable(byte[].class)
-                   && p.isWriteable(InputStream.class)
-                   && p.isWriteable(File.class)
-                   && !p.isWriteable(int[].class));
+        assertTrue(p.isWriteable(byte[].class, null, null)
+                   && p.isWriteable(InputStream.class, null, null)
+                   && p.isWriteable(File.class, null, null)
+                   && !p.isWriteable(int[].class, null, null));
     }
     
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new BinaryDataProvider();
-        assertTrue(p.isReadable(byte[].class)
-                   && p.isReadable(InputStream.class)
-                   && !p.isReadable(File.class)
-                   && !p.isReadable(int[].class));
+        assertTrue(p.isReadable(byte[].class, null, null)
+                   && p.isReadable(InputStream.class, null, null)
+                   && !p.isReadable(File.class, null, null)
+                   && !p.isReadable(int[].class, null, null));
     }
     
     @SuppressWarnings("unchecked")
@@ -57,13 +63,17 @@ public class BinaryDataProviderTest extends Assert {
     public void testReadFrom() throws Exception {
         MessageBodyReader p = new BinaryDataProvider();
         byte[] bytes = (byte[])p.readFrom(byte[].class, null, null, 
-                                          new ByteArrayInputStream("hi".getBytes()));
+                                          null, null, new ByteArrayInputStream("hi".getBytes()));
         assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
         
-        InputStream is = (InputStream)p.readFrom(InputStream.class, null, null, 
-                                          new ByteArrayInputStream("hi".getBytes()));
+        InputStream is = (InputStream)p.readFrom(InputStream.class, null, null, null, null, 
+            new ByteArrayInputStream("hi".getBytes()));
         bytes = IOUtils.readBytesFromStream(is);
         assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
+        
+        Reader r = (Reader)p.readFrom(Reader.class, null, null, 
+                       MediaType.valueOf("text/xml"), null, new ByteArrayInputStream("hi".getBytes()));
+        assertEquals(IOUtils.toString(r), "hi");
     }
     
     @SuppressWarnings("unchecked")
@@ -71,12 +81,30 @@ public class BinaryDataProviderTest extends Assert {
     public void testWriteTo() throws Exception {
         MessageBodyWriter p = new BinaryDataProvider();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        p.writeTo(new byte[]{'h', 'i'}, null, null, os);
+        p.writeTo(new byte[]{'h', 'i'}, null, null, null, null, null, os);
         assertTrue(Arrays.equals(new String("hi").getBytes(), os.toByteArray()));
         ByteArrayInputStream is = new ByteArrayInputStream("hi".getBytes());
         os = new ByteArrayOutputStream();
-        p.writeTo(is, null, null, os);
+        p.writeTo(is, null, null, null, null, null, os);
+        assertTrue(Arrays.equals(os.toByteArray(), new String("hi").getBytes()));
+        
+        Reader r = new StringReader("hi");
+        os = new ByteArrayOutputStream();
+        p.writeTo(r, null, null, null, MediaType.valueOf("text/xml"), null, os);
+        assertTrue(Arrays.equals(os.toByteArray(), new String("hi").getBytes()));
+        
+        os = new ByteArrayOutputStream();
+        p.writeTo(new StreamingOutputImpl(), null, null, null, 
+                  MediaType.valueOf("text/xml"), null, os);
         assertTrue(Arrays.equals(os.toByteArray(), new String("hi").getBytes()));
     }
 
+    
+    private static class StreamingOutputImpl implements StreamingOutput {
+
+        public void write(OutputStream output) throws IOException {
+            output.write("hi".getBytes());
+        }
+        
+    }
 }

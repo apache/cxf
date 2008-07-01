@@ -30,7 +30,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Response;
 
 @ProduceMime("text/plain")
-@Path("/bookstore/")
+@Path("/bookstore/{id}")
 public class BookStoreNoSubResource {
 
     public BookStoreNoSubResource() {

@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,18 +35,21 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.MetadataMap;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 @ConsumeMime("application/x-www-form-urlencoded")
 @Provider
 public final class FormEncodingReaderProvider implements MessageBodyReader<Object> {
 
-    public boolean isReadable(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, 
+                              Annotation[] annotations) {
         return type.isAssignableFrom(MultivaluedMap.class);
     }
 
-    public MultivaluedMap<String, String> readFrom(Class<Object> type, MediaType m,
-                                                   MultivaluedMap<String, String> headers, InputStream is) {
+    public MultivaluedMap<String, String> readFrom(
+        Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType type, 
+        MultivaluedMap<String, String> headers, InputStream is) 
+        throws IOException {
         try {
 
             String charset = "UTF-8";

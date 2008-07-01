@@ -23,6 +23,8 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -36,11 +38,11 @@ import org.apache.cxf.helpers.IOUtils;
 public final class StringProvider 
     implements MessageBodyWriter<String>, MessageBodyReader<String>  {
 
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type == String.class;
     }
     
-    public boolean isReadable(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type == String.class;
     }
     
@@ -48,8 +50,9 @@ public final class StringProvider
         return s.length();
     }
 
-    public String readFrom(Class<String> type, MediaType m, MultivaluedMap<String, String> headers,
-                           InputStream is) {
+    public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, MediaType m, 
+        MultivaluedMap<String, String> headers, InputStream is) 
+        throws IOException  {
         try {
             return IOUtils.toString(is);
         } catch (IOException e) {
@@ -58,7 +61,8 @@ public final class StringProvider
         return null;
     }
 
-    public void writeTo(String obj, MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
+    public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
         try {
             os.write(obj.getBytes());
         } catch (IOException e) {

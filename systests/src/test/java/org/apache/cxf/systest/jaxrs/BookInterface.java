@@ -21,14 +21,13 @@ package org.apache.cxf.systest.jaxrs;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
-
-import org.apache.cxf.customer.book.BookNotFoundFault;
 
 public interface BookInterface {
 
     @GET
     @Path("/thosebooks/{bookId}/")
     @ProduceMime("application/xml")
-    Book getThatBook(Long id) throws BookNotFoundFault;
+    Book getThatBook(@PathParam("bookId") Long id) throws BookNotFoundFault;
 }

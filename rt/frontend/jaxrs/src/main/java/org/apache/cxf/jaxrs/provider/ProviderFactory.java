@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,103 +30,220 @@ import java.util.List;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
-import org.apache.cxf.jaxrs.JAXRSUtils;
+import org.apache.cxf.jaxrs.ext.MappingsHandler;
+import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
 public final class ProviderFactory {
     
     private static final ProviderFactory PF = new ProviderFactory();
     
-    private List<MessageBodyReader> defaultMessageReaders = new ArrayList<MessageBodyReader>();
-    private List<MessageBodyWriter> defaultMessageWriters = new ArrayList<MessageBodyWriter>();
-    private List<MessageBodyReader> userMessageReaders = new ArrayList<MessageBodyReader>();
-    private List<MessageBodyWriter> userMessageWriters = new ArrayList<MessageBodyWriter>();
-    private List<SystemQueryHandler> queryHandlers = new ArrayList<SystemQueryHandler>();
+    private List<ProviderInfo<MessageBodyReader>> defaultMessageReaders = 
+        new ArrayList<ProviderInfo<MessageBodyReader>>();
+    private List<ProviderInfo<MessageBodyWriter>> defaultMessageWriters = 
+        new ArrayList<ProviderInfo<MessageBodyWriter>>();
+    private List<ProviderInfo<MessageBodyReader>> userMessageReaders = 
+        new ArrayList<ProviderInfo<MessageBodyReader>>();
+    private List<ProviderInfo<MessageBodyWriter>> userMessageWriters = 
+        new ArrayList<ProviderInfo<MessageBodyWriter>>();
+    private List<ProviderInfo<ContextResolver>> userContextResolvers = 
+        new ArrayList<ProviderInfo<ContextResolver>>();
+    private List<ProviderInfo<ExceptionMapper>> userExceptionMappers = 
+        new ArrayList<ProviderInfo<ExceptionMapper>>();
+    private List<ProviderInfo<RequestHandler>> requestHandlers = 
+        new ArrayList<ProviderInfo<RequestHandler>>();
+    private List<ProviderInfo<ResponseHandler>> responseHandlers = 
+        new ArrayList<ProviderInfo<ResponseHandler>>();
+    private RequestPreprocessor requestPreprocessor;
     
     private ProviderFactory() {
         // TODO : this needs to be done differently,
         // we need to use cxf-jaxrs-extensions
         setProviders(defaultMessageReaders,
                      defaultMessageWriters,
+                     userContextResolvers,
+                     requestHandlers,
+                     responseHandlers,
+                     userExceptionMappers,
+                     new JAXBElementProvider(),
                      new JSONProvider(),
                      new BinaryDataProvider(),
-                     new JAXBElementProvider(),
                      new StringProvider(),
                      new SourceProvider(),
-                     new AtomFeedProvider(),
-                     new AtomEntryProvider(),
-                     new FormEncodingReaderProvider());
-        
-        queryHandlers.add(new AcceptTypeQueryHandler());
+                     new FormEncodingReaderProvider(),
+                     new PrimitiveTextProvider(),
+                     new MappingsHandler());
     }
     
     public static ProviderFactory getInstance() {
         return PF;
     }
 
-    public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType, MediaType mediaType) {
+    @SuppressWarnings("unchecked")
+    public <T> ContextResolver<T> createContextResolver(Type contextType, Message m) {
+        for (ProviderInfo<ContextResolver> cr : userContextResolvers) {
+            Type[] types = cr.getProvider().getClass().getGenericInterfaces();
+            for (Type t : types) {
+                if (t instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)t;
+                    Type[] args = pt.getActualTypeArguments();
+                    for (int i = 0; i < args.length; i++) {
+                        if (contextType == args[i]) {
+                            
+                            InjectionUtils.injectContextFields(cr.getProvider(), cr, m);
+                            InjectionUtils.injectContextMethods(cr.getProvider(), cr, m);
+                            return cr.getProvider();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, Message m) {
+        for (ProviderInfo<ExceptionMapper> em : userExceptionMappers) {
+            Type[] types = em.getProvider().getClass().getGenericInterfaces();
+            for (Type t : types) {
+                if (t instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)t;
+                    Type[] args = pt.getActualTypeArguments();
+                    for (int i = 0; i < args.length; i++) {
+                        if (exceptionType.isAssignableFrom((Class<?>)args[i])) {
+                            InjectionUtils.injectContextFields(em.getProvider(), em, m);
+                            InjectionUtils.injectContextMethods(em.getProvider(), em, m);
+                            return em.getProvider();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType,
+                                                            Type parameterType,
+                                                            Annotation[] parameterAnnotations,
+                                                            MediaType mediaType,
+                                                            Message m) {
         // Try user provided providers
         MessageBodyReader<T> mr = chooseMessageReader(userMessageReaders, 
                                                       bodyType,
-                                                      mediaType);
+                                                      parameterType,
+                                                      parameterAnnotations,
+                                                      mediaType,
+                                                      m);
         
         //If none found try the default ones
         if (mr == null) {
             mr = chooseMessageReader(defaultMessageReaders,
                                      bodyType,
-                                     mediaType);
+                                     parameterType,
+                                     parameterAnnotations,
+                                     mediaType,
+                                     m);
         }     
         
         return mr;
     }
     
-    public SystemQueryHandler getQueryHandler(MultivaluedMap<String, String> query) {
+    
+    
+    public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
         
-        for (SystemQueryHandler h : queryHandlers) {
-            if (h.supports(query)) {
-                return h;
-            }
-        }
+        return Collections.unmodifiableList(requestHandlers);
+    }
+    
+    public List<ProviderInfo<ResponseHandler>> getResponseHandlers() {
         
-        return null;
+        return Collections.unmodifiableList(responseHandlers);
     }
 
-    public <T> MessageBodyWriter<T> createMessageBodyWriter(Class<T> bodyType, MediaType mediaType) {
+    public <T> MessageBodyWriter<T> createMessageBodyWriter(Class<T> bodyType,
+                                                            Type parameterType,
+                                                            Annotation[] parameterAnnotations,
+                                                            MediaType mediaType,
+                                                            Message m) {
         // Try user provided providers
         MessageBodyWriter<T> mw = chooseMessageWriter(userMessageWriters,
                                                       bodyType,
-                                                      mediaType);
+                                                      parameterType,
+                                                      parameterAnnotations,
+                                                      mediaType,
+                                                      m);
         
         //If none found try the default ones
         if (mw == null) {
             mw = chooseMessageWriter(defaultMessageWriters,
                                      bodyType,
-                                     mediaType);
+                                     parameterType,
+                                     parameterAnnotations,
+                                     mediaType,
+                                     m);
         }     
         
         return mw;
     }
     
        
-    private void setProviders(List<MessageBodyReader> readers, 
-                              List<MessageBodyWriter> writers, 
+    private void setProviders(List<ProviderInfo<MessageBodyReader>> readers, 
+                              List<ProviderInfo<MessageBodyWriter>> writers,
+                              List<ProviderInfo<ContextResolver>> resolvers,
+                              List<ProviderInfo<RequestHandler>> requestFilters,
+                              List<ProviderInfo<ResponseHandler>> responseFilters,
+                              List<ProviderInfo<ExceptionMapper>> excMappers,
                               Object... providers) {
         
         for (Object o : providers) {
             if (MessageBodyReader.class.isAssignableFrom(o.getClass())) {
-                readers.add((MessageBodyReader)o); 
+                readers.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)o)); 
             }
             
             if (MessageBodyWriter.class.isAssignableFrom(o.getClass())) {
-                writers.add((MessageBodyWriter)o); 
+                writers.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)o)); 
+            }
+            
+            if (ContextResolver.class.isAssignableFrom(o.getClass())) {
+                resolvers.add(new ProviderInfo<ContextResolver>((ContextResolver)o)); 
+            }
+            
+            if (RequestHandler.class.isAssignableFrom(o.getClass())) {
+                requestFilters.add(new ProviderInfo<RequestHandler>((RequestHandler)o)); 
+            }
+            
+            if (ResponseHandler.class.isAssignableFrom(o.getClass())) {
+                responseFilters.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o)); 
+            }
+            
+            if (ExceptionMapper.class.isAssignableFrom(o.getClass())) {
+                excMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
             }
         }
         
         sortReaders(readers);
         sortWriters(writers);
+        
+        injectContexts(readers, writers, resolvers, requestFilters, responseFilters, excMappers);
+    }
+    
+    void injectContexts(List<?> ... providerLists) {
+        for (List<?> list : providerLists) {
+            for (Object p : list) {
+                ProviderInfo pi = (ProviderInfo)p;
+                InjectionUtils.injectContextProxies(pi, pi.getProvider());
+            }
+        }
     }
     
     /*
@@ -133,11 +253,11 @@ public final class ProviderFactory {
      * provider that lists *. Quality parameter values are also used such that
      * x/y;q=1.0 < x/y;q=0.7.
      */    
-    private void sortReaders(List<MessageBodyReader> entityProviders) {
+    private void sortReaders(List<ProviderInfo<MessageBodyReader>> entityProviders) {
         Collections.sort(entityProviders, new MessageBodyReaderComparator());
     }
     
-    private void sortWriters(List<MessageBodyWriter> entityProviders) {
+    private void sortWriters(List<ProviderInfo<MessageBodyWriter>> entityProviders) {
         Collections.sort(entityProviders, new MessageBodyWriterComparator());
     }
     
@@ -153,23 +273,20 @@ public final class ProviderFactory {
      * @param requestedMimeType
      * @return
      */
+    @SuppressWarnings("unchecked")
     private <T> MessageBodyReader<T> chooseMessageReader(
-        List<MessageBodyReader> readers, Class<T> type, MediaType mediaType) {
-        for (MessageBodyReader<T> ep : readers) {
+                                 List<ProviderInfo<MessageBodyReader>> readers, 
+                                                         Class<T> type,
+                                                         Type genericType,
+                                                         Annotation[] annotations,
+                                                         MediaType mediaType,
+                                                         Message m) {
+        for (ProviderInfo<MessageBodyReader> ep : readers) {
             
-            if (!ep.isReadable(type)) {
-                continue;
-            }
-            
-            List<MediaType> supportedMediaTypes =
-                JAXRSUtils.getConsumeTypes(ep.getClass().getAnnotation(ConsumeMime.class));
-            
-            List<MediaType> availableMimeTypes = 
-                JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
-                                              supportedMediaTypes);
-
-            if (availableMimeTypes.size() != 0) {
-                return ep;
+            if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
+                InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+                InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                return ep.getProvider();
             }
         }     
         
@@ -177,6 +294,25 @@ public final class ProviderFactory {
         
     }
     
+    private <T> boolean matchesReaderCriterias(MessageBodyReader<T> ep,
+                                               Class<T> type,
+                                               Type genericType,
+                                               Annotation[] annotations,
+                                               MediaType mediaType) {
+        if (!ep.isReadable(type, genericType, annotations)) {
+            return false;
+        }
+        
+        List<MediaType> supportedMediaTypes =
+            JAXRSUtils.getConsumeTypes(ep.getClass().getAnnotation(ConsumeMime.class));
+        
+        List<MediaType> availableMimeTypes = 
+            JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
+                                          supportedMediaTypes);
+
+        return availableMimeTypes.size() != 0 ? true : false;
+        
+    }
         
     /**
      * Choose the first body writer provider that matches the requestedMimeType 
@@ -188,21 +324,19 @@ public final class ProviderFactory {
      * @param requestedMimeType
      * @return
      */
+    @SuppressWarnings("unchecked")
     private <T> MessageBodyWriter<T> chooseMessageWriter(
-        List<MessageBodyWriter> writers, Class<T> type, MediaType mediaType) {
-        for (MessageBodyWriter<T> ep : writers) {
-            if (!ep.isWriteable(type)) {
-                continue;
-            }
-            List<MediaType> supportedMediaTypes =
-                JAXRSUtils.getProduceTypes(ep.getClass().getAnnotation(ProduceMime.class));
-            
-            List<MediaType> availableMimeTypes = 
-                JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
-                                              supportedMediaTypes);
-
-            if (availableMimeTypes.size() != 0) {
-                return ep;
+                          List<ProviderInfo<MessageBodyWriter>> writers, 
+                                                         Class<T> type,
+                                                         Type genericType,
+                                                         Annotation[] annotations,
+                                                         MediaType mediaType,
+                                                         Message m) {
+        for (ProviderInfo<MessageBodyWriter> ep : writers) {
+            if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
+                InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+                InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                return ep.getProvider();
             }
         }     
         
@@ -210,57 +344,91 @@ public final class ProviderFactory {
         
     }
     
-    //TODO : also scan for the @Provider annotated implementations    
-    public boolean registerUserEntityProvider(Object o) {
-        setProviders(userMessageReaders, userMessageWriters, o);
-        return true;
+    private <T> boolean matchesWriterCriterias(MessageBodyWriter<T> ep,
+                                               Class<T> type,
+                                               Type genericType,
+                                               Annotation[] annotations,
+                                               MediaType mediaType) {
+        if (!ep.isWriteable(type, genericType, annotations)) {
+            return false;
+        }
+        
+        List<MediaType> supportedMediaTypes =
+            JAXRSUtils.getProduceTypes(ep.getClass().getAnnotation(ProduceMime.class));
+        
+        List<MediaType> availableMimeTypes = 
+            JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
+                                          supportedMediaTypes);
+
+        return availableMimeTypes.size() != 0 ? true : false;
+        
     }
     
-    public boolean deregisterUserEntityProvider(Object o) {
-        boolean result = false;
+    public boolean deregisterEntityProvide(Object o) {
+        
         if (o instanceof MessageBodyReader) {
-            result = userMessageReaders.remove(o);
+            return userMessageReaders.remove(o);
         }
-        return o instanceof MessageBodyReader 
-               ? result && userMessageWriters.remove(o) : result;
+        if (o instanceof MessageBodyWriter) {
+            return userMessageWriters.remove(o);
+        }
+        if (o instanceof ContextResolver) {
+            return userContextResolvers.remove(o);
+        }
+        if (o instanceof RequestHandler) {
+            return requestHandlers.remove(o);
+        }
+        
+        return false;
                                                
     }
     
-    public List<MessageBodyReader> getDefaultMessageReaders() {
-        return defaultMessageReaders;
+    List<ProviderInfo<MessageBodyReader>> getDefaultMessageReaders() {
+        return Collections.unmodifiableList(defaultMessageReaders);
     }
 
-    public List<MessageBodyWriter> getDefaultMessageWriters() {
-        return defaultMessageWriters;
+    List<ProviderInfo<MessageBodyWriter>> getDefaultMessageWriters() {
+        return Collections.unmodifiableList(defaultMessageWriters);
     }
     
-    public List<MessageBodyReader> getUserMessageReaders() {
-        return userMessageReaders;
+    List<ProviderInfo<MessageBodyReader>> getUserMessageReaders() {
+        return Collections.unmodifiableList(userMessageReaders);
     }
     
-    public List<MessageBodyWriter> getUserMessageWriters() {
-        return userMessageWriters;
+    List<ProviderInfo<MessageBodyWriter>> getUserMessageWriters() {
+        return Collections.unmodifiableList(userMessageWriters);
     }
     
-    public void clearUserMessageProviders() {
-        userMessageReaders.clear();
-        userMessageWriters.clear();
+    List<ProviderInfo<ContextResolver>> getUserContextResolvers() {
+        return Collections.unmodifiableList(userContextResolvers);
     }
-
+    
+     
+    public void registerUserProvider(Object provider) {
+        setUserProviders(Collections.singletonList(provider));    
+    }
     /**
      * Use for injection of entityProviders
      * @param entityProviders the entityProviders to set
      */
-    public void setUserEntityProviders(List<?> userProviders) {
+    public void setUserProviders(List<?> userProviders) {
         setProviders(userMessageReaders,
                      userMessageWriters,
+                     userContextResolvers,
+                     requestHandlers,
+                     responseHandlers,
+                     userExceptionMappers,
                      userProviders.toArray());
     }
 
     private static class MessageBodyReaderComparator 
-        implements Comparator<MessageBodyReader> {
+        implements Comparator<ProviderInfo<MessageBodyReader>> {
         
-        public int compare(MessageBodyReader e1, MessageBodyReader e2) {
+        public int compare(ProviderInfo<MessageBodyReader> p1, 
+                           ProviderInfo<MessageBodyReader> p2) {
+            MessageBodyReader e1 = p1.getProvider();
+            MessageBodyReader e2 = p2.getProvider();
+            
             ConsumeMime c = e1.getClass().getAnnotation(ConsumeMime.class);
             String[] mimeType1 = {"*/*"};
             if (c != null) {
@@ -289,9 +457,13 @@ public final class ProviderFactory {
     }
     
     private static class MessageBodyWriterComparator 
-        implements Comparator<MessageBodyWriter> {
+        implements Comparator<ProviderInfo<MessageBodyWriter>> {
         
-        public int compare(MessageBodyWriter e1, MessageBodyWriter e2) {
+        public int compare(ProviderInfo<MessageBodyWriter> p1, 
+                           ProviderInfo<MessageBodyWriter> p2) {
+            MessageBodyWriter e1 = p1.getProvider();
+            MessageBodyWriter e2 = p2.getProvider();
+            
             ProduceMime c = e1.getClass().getAnnotation(ProduceMime.class);
             String[] mimeType1 = {"*/*"};
             if (c != null) {
@@ -317,5 +489,42 @@ public final class ProviderFactory {
             
             return str1.compareTo(str2);
         }
+    }
+    
+    public void setRequestPreporcessor(RequestPreprocessor rp) {
+        this.requestPreprocessor = rp;
+    }
+    
+    public RequestPreprocessor getRequestPreprocessor() {
+        return requestPreprocessor;
+    }
+    
+    public void cleatThreadLocalProxies() {
+        clearProxies(defaultMessageReaders,
+                     defaultMessageWriters,
+                     userMessageReaders,
+                     userMessageWriters,
+                     userContextResolvers,
+                     requestHandlers,
+                     responseHandlers,
+                     userExceptionMappers);
+    }
+    
+    void clearProxies(List<?> ...lists) {
+        for (List<?> list : lists) {
+            for (Object p : list) {
+                ProviderInfo pi = (ProviderInfo)p;
+                pi.clearThreadLocalProxies();
+            }
+        }
+    }
+    
+    void clearProviders() {
+        userMessageReaders.clear();
+        userMessageWriters.clear();
+        userContextResolvers.clear();
+        userExceptionMappers.clear();
+        requestHandlers.clear();
+        responseHandlers.clear();
     }
 }

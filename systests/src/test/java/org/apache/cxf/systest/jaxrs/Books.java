@@ -19,26 +19,20 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Books")
 public class Books {
 
-    private Collection<Book> books;
+    @XmlElement
+    private Book b;
     
-    public Books() {
-        this.books = new ArrayList<Book>();
+    public Books(Book b) {
+        this.b = b;
     }
-    
-    public Books(Collection<Book> books) {
-        this.books = books;
+
+    public Book getBook() {
+        return b;
     }
-    
-    public Collection<Book> getBooks() {
-        return books;
-    }
-    
 }

@@ -22,6 +22,8 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
@@ -45,23 +47,16 @@ public class AtomEntryProvider
     private static final Abdera ATOM_ENGINE = new Abdera();
     private static final String JSON_TYPE = "application/json";
     
-    public Entry readFrom(Class<Entry> clazz, MediaType mt, 
-                          MultivaluedMap <String, String> headers, InputStream is)
-        throws IOException {
-        Document<Entry> doc = ATOM_ENGINE.getParser().parse(is);
-        return doc.getRoot();
+    public long getSize(Entry feed) {
+        return -1;
     }
 
-    public boolean isReadable(Class<?> type) {
-        return Entry.class.isAssignableFrom(type);
-    }
-    
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Entry.class.isAssignableFrom(type);
     }
 
-    public void writeTo(Entry entry, MediaType mt, 
-                        MultivaluedMap<String, Object> headers, OutputStream os)
+    public void writeTo(Entry entry, Class<?> clazz, Type type, Annotation[] a, 
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         if (JSON_TYPE.equals(mt.toString())) {
             Writer w = ATOM_ENGINE.getWriterFactory().getWriter("json");
@@ -69,9 +64,17 @@ public class AtomEntryProvider
         } else {
             entry.writeTo(os);
         }
+        
     }
- 
-    public long getSize(Entry entry) {
-        return -1;
+
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+        return Entry.class.isAssignableFrom(type);
+    }
+
+    public Entry readFrom(Class<Entry> clazz, Type t, Annotation[] a, MediaType mt, 
+                          MultivaluedMap<String, String> headers, InputStream is) 
+        throws IOException {
+        Document<Entry> doc = ATOM_ENGINE.getParser().parse(is);
+        return doc.getRoot();
     }
 }

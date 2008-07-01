@@ -26,18 +26,23 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class OperationResourceInfo {
     private URITemplate uriTemplate;
     private ClassResourceInfo classResourceInfo;
-    private Method method;
+    private Method methodToInvoke;
+    private Method annotatedMethod;
     private String httpMethod;
-   
+    private List<MediaType> produceMimes;
+    private List<MediaType> consumeMimes;
 
     public OperationResourceInfo(Method m, ClassResourceInfo cri) {
-        method = m;
+        methodToInvoke = m;
+        annotatedMethod = m;
         classResourceInfo = cri;
+        checkMediaTypes();
     }
 
     public URITemplate getURITemplate() {
@@ -56,12 +61,12 @@ public class OperationResourceInfo {
         classResourceInfo = c;
     }
 
-    public Method getMethod() {
-        return method;
+    public Method getMethodToInvoke() {
+        return methodToInvoke;
     }
 
-    public void setMethod(Method m) {
-        method = m;
+    public void setMethodToInvoke(Method m) {
+        methodToInvoke = m;
     }
 
     public String getHttpMethod() {
@@ -72,6 +77,15 @@ public class OperationResourceInfo {
         httpMethod = m;
     }
     
+    public void setAnnotatedMethod(Method m) {
+        annotatedMethod = m;
+        checkMediaTypes();
+    }
+    
+    public Method getAnnotatedMethod() {
+        return annotatedMethod;
+    }
+    
     public boolean isSubResourceLocator() {
         return httpMethod == null ? true : false;
     }
@@ -79,25 +93,31 @@ public class OperationResourceInfo {
     
     public List<MediaType> getProduceTypes() {
         
-        // this needs to be calculated on init
-        ProduceMime pm = 
-            (ProduceMime)JAXRSUtils.getMethodAnnotation(method, ProduceMime.class);
-        if (pm != null) {
-            return JAXRSUtils.getMediaTypes(pm.value());
-        }
-        
-        return JAXRSUtils.getProduceTypes(classResourceInfo.getProduceMime());
+        return produceMimes;
     }
     
     public List<MediaType> getConsumeTypes() {
         
-        // this needs to be calculated on init
-        ConsumeMime pm = 
-            (ConsumeMime)JAXRSUtils.getMethodAnnotation(method, ConsumeMime.class);
-        if (pm != null) {
-            return JAXRSUtils.getMediaTypes(pm.value());
+        return consumeMimes;
+    }
+    
+    private void checkMediaTypes() {
+        ConsumeMime cm = 
+            (ConsumeMime)AnnotationUtils.getMethodAnnotation(annotatedMethod, ConsumeMime.class);
+        if (cm != null) {
+            consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()));
+        } else if (classResourceInfo != null) {
+            consumeMimes = JAXRSUtils.sortMediaTypes(
+                               JAXRSUtils.getConsumeTypes(classResourceInfo.getConsumeMime()));
         }
         
-        return JAXRSUtils.getConsumeTypes(classResourceInfo.getConsumeMime());
+        ProduceMime pm = 
+            (ProduceMime)AnnotationUtils.getMethodAnnotation(annotatedMethod, ProduceMime.class);
+        if (pm != null) {
+            produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()));
+        } else if (classResourceInfo != null) {
+            produceMimes = JAXRSUtils.sortMediaTypes(
+                               JAXRSUtils.getProduceTypes(classResourceInfo.getProduceMime()));
+        }
     }
 }

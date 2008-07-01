@@ -41,7 +41,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -67,10 +67,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testNoMessageWriterFound() throws Exception {
         // TODO : more specific message is needed
-        String msg = ".No message body writer found for response class : GregorianCalendar.";
+        String msg1 = ".No message body writer found for response class : GregorianCalendar.";
+        String msg2 = ".No message body writer found for response class : Calendar.";
         
-        getAndCompare("http://localhost:9080/bookstore/timetable",
-                      msg,
+        getAndCompareStrings("http://localhost:9080/bookstore/timetable",
+                      msg1, msg2,
                       "*/*", 406);
     }
     
@@ -136,6 +137,39 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/query?bookId=123",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/defaultquery",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/123",
+                               "resources/expected_get_book123json.txt",
+                               "application/xml,application/json", 200);
+    }
+    
+    @Test
+    public void testGetBookElement() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/element",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBookAdapter() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/adapter",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBook123FromSub() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/interface/subresource",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+        
         getAndCompareAsStrings("http://localhost:9080/bookstore/books/123",
                                "resources/expected_get_book123json.txt",
                                "application/xml,application/json", 200);
@@ -153,7 +187,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetChapterChapter() throws Exception {
         
         getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse",
-                               "resources/expected_get_chapter1.txt",
+                               "resources/expected_get_chapter1_utf.txt",
                                "application/xml", 200);
     }
     
@@ -348,12 +382,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         InputStream in = connect.getInputStream();
         assertNotNull(in);           
 
-        InputStream expected123 = getClass().getResourceAsStream("resources/expected_get_cd.txt");
         InputStream expected124 = getClass().getResourceAsStream("resources/expected_get_cds124.txt");
         String result = getStringFromInputStream(in);
-        //System.out.println("---" + getStringFromInputStream(in));
-        
-        assertTrue(result.indexOf(getStringFromInputStream(expected123)) >= 0);
+        System.out.println("---" + result);
         assertTrue(result.indexOf(getStringFromInputStream(expected124)) >= 0);
     }
     
@@ -378,7 +409,29 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             // Release current connection to the connection pool once you are done
             get.releaseConnection();
         }  
-    }    
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Test
+    public void testGetPlainLong() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstore/booksplain"; 
+
+        PostMethod post = new PostMethod(endpointAddress);
+        post.addRequestHeader("Content-Type" , "text/plain");
+        post.addRequestHeader("Accept" , "text/plain");
+        post.setRequestBody("12345");
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(200, result);
+            assertEquals(post.getResponseBodyAsString(), "12345");
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }  
+    }
     
     @Test
     public void testGetCDsJSON() throws Exception {
@@ -494,6 +547,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                int expectedStatus) throws Exception {
         GetMethod get = new GetMethod(address);
         get.setRequestHeader("Accept", acceptType);
+        get.setRequestHeader("Accept-Language", "en,da;q=0.8");
         HttpClient httpClient = new HttpClient();
         try {
             int result = httpClient.executeMethod(get);
@@ -501,6 +555,25 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
             assertEquals("Expected value is wrong", 
                          expectedValue, jsonContent);
+        } finally {
+            get.releaseConnection();
+        }
+    }
+    
+    private void getAndCompareStrings(String address, 
+                               String expectedValue1,
+                               String expectedValue2,
+                               String acceptType,
+                               int expectedStatus) throws Exception {
+        GetMethod get = new GetMethod(address);
+        get.setRequestHeader("Accept", acceptType);
+        HttpClient httpClient = new HttpClient();
+        try {
+            int result = httpClient.executeMethod(get);
+            assertEquals(expectedStatus, result);
+            String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
+            assertTrue("Expected value is wrong", 
+                       expectedValue1.equals(jsonContent) || expectedValue2.equals(jsonContent));
         } finally {
             get.releaseConnection();
         }

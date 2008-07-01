@@ -20,46 +20,40 @@
 package org.apache.cxf.jaxrs.provider;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.stream.StreamSource;
 
 @Provider
-public final class JAXBElementProvider 
-    implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
-
-    static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
-
-    public boolean isWriteable(Class<?> type) {
-        return type.getAnnotation(XmlRootElement.class) != null;
-    }
+public final class JAXBElementProvider extends AbstractJAXBProvider  {
     
-    public boolean isReadable(Class<?> type) {
-        return type.getAnnotation(XmlRootElement.class) != null;
-    }
-
-    public long getSize(Object o) {
-        return -1;
-    }
     
-    public Object readFrom(Class<Object> type, MediaType m, MultivaluedMap<String, String> headers,
-                           InputStream is) {
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
+        MultivaluedMap<String, String> headers, InputStream is) 
+        throws IOException {
         try {
-            JAXBContext context = getJAXBContext(type);
+            Class<?> theType = getActualType(type, genericType);
+            JAXBContext context = getJAXBContext(theType, genericType);
+            
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            return unmarshaller.unmarshal(is);
+            if (JAXBElement.class.isAssignableFrom(type)) {
+                return unmarshaller.unmarshal(new StreamSource(is), theType);
+            } else {
+                return unmarshaller.unmarshal(is);
+            }
+            
         } catch (JAXBException e) {
             e.printStackTrace();         
         }
@@ -67,29 +61,25 @@ public final class JAXBElementProvider
         return null;
     }
 
-    public void writeTo(Object obj, MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
+    
+    public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
+        throws IOException {
         try {
-            JAXBContext context = getJAXBContext(obj.getClass());
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-            marshaller.marshal(obj, os);
+            Object actualObject = checkAdapter(obj, anns);
+            Class<?> actualClass = actualObject.getClass();
+            if (cls == genericType) {
+                genericType = actualClass;
+            }
+            Marshaller ms = createMarshaller(actualObject, actualClass, genericType, m);
+            ms.marshal(actualObject, os);
             
-            //TODO: support Calendar type
-            //}
         } catch (JAXBException e) {
             //TODO: better exception handling
             e.printStackTrace();
         }
     }
 
-    private JAXBContext getJAXBContext(Class type) throws JAXBException {
-        synchronized (jaxbContexts) {
-            JAXBContext context = jaxbContexts.get(type);
-            if (context == null) {
-                context = JAXBContext.newInstance(type);
-                jaxbContexts.put(type, context);
-            }
-            return context;
-        }
-    }
+    
+    
 }

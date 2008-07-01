@@ -46,7 +46,7 @@ public class AtomEntryProviderTest extends Assert {
     @Test
     public void testReadFrom() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomEntry.xml");
-        Entry simple = afd.readFrom(Entry.class, null, null, is);
+        Entry simple = afd.readFrom(Entry.class, null, null, null, null, is);
         assertEquals("Wrong entry title", 
                      "Atom-Powered Robots Run Amok", simple.getTitle());
         
@@ -55,13 +55,14 @@ public class AtomEntryProviderTest extends Assert {
     @Test
     public void testWriteTo() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomEntry.xml");
-        Entry simple = afd.readFrom(Entry.class, 
-                                    MediaType.parse("application/atom+xml;type=entry"), null, is);
+        Entry simple = afd.readFrom(Entry.class, null, 
+            null, MediaType.valueOf("application/atom+xml;type=entry"), null, is);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        afd.writeTo(simple, MediaType.parse("application/atom+xml;type=entry"), null, bos);
+        afd.writeTo(simple, null, null, null, 
+            MediaType.valueOf("application/atom+xml;type=entry"), null, bos);
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        Entry simpleCopy = afd.readFrom(Entry.class, 
-                                        MediaType.parse("application/atom+xml"), null, bis);
+        Entry simpleCopy = afd.readFrom(Entry.class, null, 
+            null, MediaType.valueOf("application/atom+xml"), null, bis);
         assertEquals("Wrong entry title", 
                      "Atom-Powered Robots Run Amok", simpleCopy.getTitle());
         assertEquals("Wrong entry title", 
@@ -70,16 +71,16 @@ public class AtomEntryProviderTest extends Assert {
     
     @Test
     public void testWriteable() {
-        assertTrue(afd.isWriteable(Entry.class));
-        assertTrue(afd.isWriteable(FOMEntry.class));
-        assertFalse(afd.isWriteable(Feed.class));
+        assertTrue(afd.isWriteable(Entry.class, null, null));
+        assertTrue(afd.isWriteable(FOMEntry.class, null, null));
+        assertFalse(afd.isWriteable(Feed.class, null, null));
     }
     
     @Test
     public void testReadable() {
-        assertTrue(afd.isReadable(Entry.class));
-        assertTrue(afd.isReadable(FOMEntry.class));
-        assertFalse(afd.isReadable(Feed.class));
+        assertTrue(afd.isReadable(Entry.class, null, null));
+        assertTrue(afd.isReadable(FOMEntry.class, null, null));
+        assertFalse(afd.isReadable(Feed.class, null, null));
     }
     
     @Test

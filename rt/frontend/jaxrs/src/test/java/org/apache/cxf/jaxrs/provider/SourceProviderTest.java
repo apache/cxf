@@ -38,17 +38,17 @@ public class SourceProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         SourceProvider p = new SourceProvider();
-        assertTrue(p.isWriteable(StreamSource.class)
-                   && p.isWriteable(DOMSource.class)
-                   && p.isWriteable(Source.class));
+        assertTrue(p.isWriteable(StreamSource.class, null, null)
+                   && p.isWriteable(DOMSource.class, null, null)
+                   && p.isWriteable(Source.class, null, null));
     }
     
     @Test
     public void testIsReadable() {
         SourceProvider p = new SourceProvider();
-        assertTrue(p.isReadable(StreamSource.class)
-                   && p.isReadable(DOMSource.class)
-                   && p.isReadable(Source.class));
+        assertTrue(p.isReadable(StreamSource.class, null, null)
+                   && p.isReadable(DOMSource.class, null, null)
+                   && p.isReadable(Source.class, null, null));
     }
 
     @Test
@@ -64,17 +64,17 @@ public class SourceProviderTest extends Assert {
         SourceProvider p = new SourceProvider();
         StreamSource s = new StreamSource(new ByteArrayInputStream("<test/>".getBytes()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        p.writeTo(s, null, null, os);
+        p.writeTo(s, null, null, null, null, null, os);
         assertTrue(os.toString().contains("<test/>"));
         os = new ByteArrayOutputStream();
-        p.writeTo(createDomSource(), null, null, os);
+        p.writeTo(createDomSource(), null, null, null, null, null, os);
         assertTrue(os.toString().contains("<test/>"));
     }
     
     @SuppressWarnings("unchecked")
     private <T> Object verifyRead(MessageBodyReader p, Class<T> type) throws Exception {
         return p.readFrom(type,
-                   null, null, 
+                   null, null, null, null,
                    new ByteArrayInputStream("<test/>".getBytes()));
     }
     

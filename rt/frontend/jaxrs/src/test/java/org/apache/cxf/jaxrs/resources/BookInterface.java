@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.resources;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 
 public interface BookInterface {
@@ -31,4 +32,7 @@ public interface BookInterface {
     @ProduceMime("text/bar2")
     @ConsumeMime("text/foo2")
     String getAuthor();
+    
+    @Path("/books/{bookId}/")
+    Book getBook(@PathParam("bookId") String id);
 }

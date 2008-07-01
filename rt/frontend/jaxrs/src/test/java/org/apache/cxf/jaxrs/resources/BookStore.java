@@ -33,10 +33,16 @@ public class BookStore extends BookSuperClass implements BookInterface {
     public BookStore() {
     }
 
-    @Path("/books/{bookId}/")
-    public Book getBook(@PathParam("bookId") String id) {
+    public Book getBook(String id) {
         return null;
     }
+    
+    @Override
+    public Book getNewBook(String id, Boolean isNew) {
+        return null;
+    }
+    
+    
 
     @POST
     @Path("/books")

@@ -19,32 +19,32 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.core.Context;
 
-import org.apache.cxf.jaxrs.JAXRSUtils;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
-public class ClassResourceInfo {
+public class ClassResourceInfo extends AbstractResourceInfo {
     
-    private boolean root;
-    private Class<?> resourceClass;
-    private Class<?> serviceClass;
     private URITemplate uriTemplate;
     private MethodDispatcher methodDispatcher;
     private ResourceProvider resourceProvider;
     private List<ClassResourceInfo> subClassResourceInfo = new ArrayList<ClassResourceInfo>();
-    private List<Field> httpContexts;
-    private List<Field> resources;
-
+   
+    private List<Field> paramFields;
+    private List<Method> paramMethods;
+    
     public ClassResourceInfo(Class<?> theResourceClass) {
         this(theResourceClass, false);
     }
@@ -58,23 +58,45 @@ public class ClassResourceInfo {
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, boolean theRoot) {
-        resourceClass = theResourceClass;
-        serviceClass = theServiceClass;
-        root = theRoot;
-        initHttpContexts();
-        initResources();
-    }
-
-    public boolean isRoot() {
-        return root;
+        super(theResourceClass, theServiceClass, theRoot);
+        if (theRoot) {
+            initParamFields();
+            initParamMethods();
+        }
     }
     
-    public Class<?> getResourceClass() {
-        return resourceClass;
+    private void initParamFields() {
+        if (getResourceClass() == null || !isRoot()) {
+            return;
+        }
+        
+        
+        for (Field f : getServiceClass().getDeclaredFields()) {
+            for (Annotation a : f.getAnnotations()) {
+                if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
+                    if (paramFields == null) {
+                        paramFields = new ArrayList<Field>();
+                    }
+                    paramFields.add(f);
+                }
+            }
+        }
     }
     
-    public Class<?> getServiceClass() {
-        return serviceClass;
+    private void initParamMethods() {
+        
+        for (Method m : getServiceClass().getMethods()) {
+        
+            if (!m.getName().startsWith("set") || m.getParameterTypes().length != 1) {
+                continue;
+            }
+            for (Annotation a : m.getAnnotations()) {
+                if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
+                    checkParamMethod(m, AnnotationUtils.getAnnotationValue(a));
+                    break;
+                }
+            }
+        }
     }
 
     public URITemplate getURITemplate() {
@@ -113,67 +135,50 @@ public class ClassResourceInfo {
         resourceProvider = rp;
     }
     
-    private void initHttpContexts() {
-        if (resourceClass == null || !root) {
-            return;
-        }
-        httpContexts = new ArrayList<Field>();
-        Field[] fields = getServiceClass().getDeclaredFields();
-        
-        for (Field f : fields) {
-            Context context = f.getAnnotation(Context.class);
-            if (context != null) {
-                httpContexts.add(f);               
-            }
-        }
-    }
-
-    private void initResources() {
-        if (resourceClass == null || !root) {
-            return;
-        }
-        resources = new ArrayList<Field>();
-        Field[] fields = getServiceClass().getDeclaredFields();
-        
-        for (Field f : fields) {
-            Resource resource = f.getAnnotation(Resource.class);
-            if (resource != null) {
-                resources.add(f);               
-            }
-        }
-    }
-
     public ProduceMime getProduceMime() {
-        return (ProduceMime)JAXRSUtils.getClassAnnotation(getServiceClass(), ProduceMime.class);
+        return (ProduceMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ProduceMime.class);
     }
     
     public ConsumeMime getConsumeMime() {
-        return (ConsumeMime)JAXRSUtils.getClassAnnotation(getServiceClass(), ConsumeMime.class);
+        return (ConsumeMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ConsumeMime.class);
+    }
+    
+    public boolean isEncodedEnabled() {
+        return AnnotationUtils.getClassAnnotation(getServiceClass(), 
+                                                  Encoded.class) != null;
     }
     
     public Path getPath() {
-        return (Path)JAXRSUtils.getClassAnnotation(getServiceClass(), Path.class);
+        return (Path)AnnotationUtils.getClassAnnotation(getServiceClass(), Path.class);
     }
     
-    public List<Field> getHttpContexts() {
-        List<Field> ret;
-        if (httpContexts != null) {
-            ret = Collections.unmodifiableList(httpContexts);
-        } else {
-            ret = Collections.emptyList();
+    private void addParamMethod(Method m) {
+        if (paramMethods == null) {
+            paramMethods = new ArrayList<Method>();
         }
-        return ret;
+        paramMethods.add(m);
     }
     
-    public List<Field> getResources() {
-        List<Field> ret;
-        if (resources != null) {
-            ret = Collections.unmodifiableList(resources);
-        } else {
-            ret = Collections.emptyList();
+    @SuppressWarnings("unchecked")
+    public List<Method> getParameterMethods() {
+        return paramMethods == null ? Collections.EMPTY_LIST 
+                                    : Collections.unmodifiableList(paramMethods);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Field> getParameterFields() {
+        return paramFields == null ? Collections.EMPTY_LIST 
+                                    : Collections.unmodifiableList(paramFields);
+    }
+    
+    private void checkParamMethod(Method m, String value) {
+        if (m.getName().equalsIgnoreCase("set" + value)) {
+            addParamMethod(m);
         }
-        return ret;
     }
     
-    
+    @Override
+    public boolean isSingleton() {
+        return resourceProvider instanceof SingletonResourceProvider;
+    }
 }

@@ -32,7 +32,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
@@ -48,6 +51,7 @@ import org.apache.cxf.customer.book.BookNotFoundFault;
 public class AtomBookStore {
 
     @Context private UriInfo uField;
+    private HttpHeaders headers;
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private Map<Long, CD> cds = new HashMap<Long, CD>();
     private long bookId = 123;
@@ -58,10 +62,23 @@ public class AtomBookStore {
         System.out.println("----books: " + books.size());
     }
     
+    @Context
+    public void setHttpHeaders(HttpHeaders theHeaders) {
+        headers = theHeaders;
+    }
+    
     @GET
     @Path("/books/feed")
-    @ProduceMime({"application/atom+xml", "application/json" })
+    @ProduceMime({"application/json", "application/atom+xml" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
+        
+        MediaType mt = headers.getMediaType();
+        if (!mt.equals(MediaType.valueOf(MediaType.MEDIA_TYPE_WILDCARD))
+            && !mt.equals(MediaType.APPLICATION_JSON_TYPE) 
+            && !mt.equals(MediaType.APPLICATION_ATOM_XML_TYPE)) {
+            throw new WebApplicationException();
+        }
+        
         Factory factory = Abdera.getNewFactory();
         Feed f = factory.newFeed();
         f.setBaseUri(uParam.getAbsolutePath().toString());

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -83,43 +84,47 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         assertTrue(template.match("/bookstore/books/123", values));     
         assertTrue(rootCri.hasSubResources());   
         MethodDispatcher md = rootCri.getMethodDispatcher();
-        assertEquals(6, md.getOperationResourceInfos().size());  
+        assertEquals(7, md.getOperationResourceInfos().size());  
         for (OperationResourceInfo ori : md.getOperationResourceInfos()) {
-            if ("getDescription".equals(ori.getMethod().getName())) {
+            if ("getDescription".equals(ori.getMethodToInvoke().getName())) {
                 assertEquals("GET", ori.getHttpMethod());
                 assertEquals("/path", ori.getURITemplate().getValue());
                 assertEquals("text/bar", ori.getProduceTypes().get(0).toString());
                 assertEquals("text/foo", ori.getConsumeTypes().get(0).toString());
                 assertFalse(ori.isSubResourceLocator());
-            } else if ("getAuthor".equals(ori.getMethod().getName())) {
+            } else if ("getAuthor".equals(ori.getMethodToInvoke().getName())) {
                 assertEquals("GET", ori.getHttpMethod());
                 assertEquals("/path2", ori.getURITemplate().getValue());
                 assertEquals("text/bar2", ori.getProduceTypes().get(0).toString());
                 assertEquals("text/foo2", ori.getConsumeTypes().get(0).toString());
                 assertFalse(ori.isSubResourceLocator());
-            } else if ("getBook".equals(ori.getMethod().getName())) {
+            } else if ("getBook".equals(ori.getMethodToInvoke().getName())) {
                 assertNull(ori.getHttpMethod());
                 assertNotNull(ori.getURITemplate());
                 assertTrue(ori.isSubResourceLocator());
-            } else if ("addBook".equals(ori.getMethod().getName())) {
+            }  else if ("getNewBook".equals(ori.getMethodToInvoke().getName())) {
+                assertNull(ori.getHttpMethod());
+                assertNotNull(ori.getURITemplate());
+                assertTrue(ori.isSubResourceLocator());
+            }  else if ("addBook".equals(ori.getMethodToInvoke().getName())) {
                 assertEquals("POST", ori.getHttpMethod());
                 assertNotNull(ori.getURITemplate());
                 assertFalse(ori.isSubResourceLocator());
-            } else if ("updateBook".equals(ori.getMethod().getName())) {
+            } else if ("updateBook".equals(ori.getMethodToInvoke().getName())) {
                 assertEquals("PUT", ori.getHttpMethod());
                 assertNotNull(ori.getURITemplate());
                 assertFalse(ori.isSubResourceLocator());
-            } else if ("deleteBook".equals(ori.getMethod().getName())) {
+            } else if ("deleteBook".equals(ori.getMethodToInvoke().getName())) {
                 assertEquals("DELETE", ori.getHttpMethod());
                 assertNotNull(ori.getURITemplate());
                 assertFalse(ori.isSubResourceLocator());
             } else {
-                fail("unexpected OperationResourceInfo" + ori.getMethod().getName());
+                fail("unexpected OperationResourceInfo" + ori.getMethodToInvoke().getName());
             }
         }
         
         // Verify sub-resource ClassResourceInfo: Book
-        assertEquals(1, rootCri.getSubClassResourceInfo().size());
+        assertEquals(2, rootCri.getSubClassResourceInfo().size());
         ClassResourceInfo subCri = rootCri.getSubClassResourceInfo().get(0);        
         assertNull(subCri.getURITemplate());
         assertEquals(org.apache.cxf.jaxrs.resources.Book.class, subCri.getResourceClass());
@@ -141,7 +146,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
                              String httpMethod, 
                              boolean isSubresource) {
         for (OperationResourceInfo ori : ops) {
-            if (opName.equals(ori.getMethod().getName())) {
+            if (opName.equals(ori.getMethodToInvoke().getName())) {
                 assertEquals(httpMethod, ori.getHttpMethod());
                 assertNotNull(ori.getURITemplate());
                 assertEquals(isSubresource, ori.isSubResourceLocator());

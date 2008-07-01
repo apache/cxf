@@ -51,9 +51,7 @@ public final class URITemplate {
 
     private final String template;
     private final String regexSuffix;
-    private final boolean endsWithSlash;
     private final List<String> templateVariables;
-    private final String templateRegex;
     private final Pattern templateRegexPattern;
 
     public URITemplate(String theTemplate) {
@@ -81,7 +79,7 @@ public final class URITemplate {
         templateVariables = Collections.unmodifiableList(names);
 
         int endPos = stringBuilder.length() - 1;
-        this.endsWithSlash = (endPos >= 0) ? stringBuilder.charAt(endPos) == '/' : false;
+        boolean endsWithSlash = (endPos >= 0) ? stringBuilder.charAt(endPos) == '/' : false;
         if (regexSuffix != null) {
             if (endsWithSlash) {
                 stringBuilder.deleteCharAt(endPos);
@@ -89,13 +87,15 @@ public final class URITemplate {
             stringBuilder.append(regexSuffix);
         }
 
-        templateRegex = stringBuilder.toString();
-        //System.out.println("----" + theTemplate + ": " + templateRegex);
-        templateRegexPattern = Pattern.compile(templateRegex);
+        templateRegexPattern = Pattern.compile(stringBuilder.toString());
     }
 
     public String getValue() {
         return template;
+    }
+    
+    public int getNumberOfGroups() {
+        return templateVariables.size();
     }
     
     private void copyURITemplateCharacters(String templateValue, int start, int end, StringBuilder b) {
@@ -144,7 +144,7 @@ public final class URITemplate {
                                              Path path) {
         
         if (path == null) {
-            return new URITemplate("/", URITemplate.UNLIMITED_REGEX_SUFFIX);
+            return new URITemplate("/", URITemplate.LIMITED_REGEX_SUFFIX);
         }
         
         String pathValue = path.value();

@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingConfiguration;
@@ -33,6 +34,7 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.service.Service;
@@ -63,6 +65,8 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     private JAXRSServiceFactoryBean serviceFactory;
     private List<Object> serviceBeans;
     private List<?> entityProviders;
+    private Map<Object, Object> languageMappings;
+    private Map<Object, Object> extensionMappings;
 
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -89,8 +93,11 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
                 ep.getService().setInvoker(invoker);
             }
             if (entityProviders != null) {
-                ProviderFactory.getInstance().setUserEntityProviders(entityProviders); 
+                ProviderFactory.getInstance().setUserProviders(entityProviders); 
             }
+            ProviderFactory.getInstance().setRequestPreporcessor(
+                new RequestPreprocessor(languageMappings, extensionMappings));
+            
             
             if (start) {
                 server.start();
@@ -216,6 +223,14 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
         return null;
     }
 
+    public void setLanguageMappings(Map<Object, Object> lMaps) {
+        languageMappings = lMaps;
+    }
+    
+    public void setExtensionMappings(Map<Object, Object> extMaps) {
+        extensionMappings = extMaps;
+    }
+    
     public JAXRSServiceFactoryBean getServiceFactory() {
         return serviceFactory;
     }
@@ -258,14 +273,14 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     /**
      * @return the entityProviders
      */
-    public List<?> getEntityProviders() {
+    public List<?> getProviders() {
         return entityProviders;
     }
 
     /**
      * @param entityProviders the entityProviders to set
      */
-    public void setEntityProviders(List<? extends Object> entityProviders) {
-        this.entityProviders = entityProviders;
+    public void setProviders(List<? extends Object> providers) {
+        this.entityProviders = providers;
     }
 }

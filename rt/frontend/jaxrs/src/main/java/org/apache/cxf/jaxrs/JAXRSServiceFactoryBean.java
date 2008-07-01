@@ -22,20 +22,28 @@ package org.apache.cxf.jaxrs;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Path;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
@@ -46,8 +54,8 @@ import org.apache.cxf.service.invoker.Invoker;
  */
 public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
-    //private static final Logger LOG = Logger.getLogger(JAXRSServiceFactoryBean.class.getName());
-    //private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSServiceFactoryBean.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServiceFactoryBean.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSServiceFactoryBean.class);
 
     protected List<ClassResourceInfo> classResourceInfos = 
         new ArrayList<ClassResourceInfo>();
@@ -106,12 +114,19 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return resourceClasses;
     }
 
+    public List<ClassResourceInfo> getClassResourceInfo() {
+        return Collections.unmodifiableList(classResourceInfos);
+    }
+    
     public void setResourceClasses(List<Class> classes) {
         for (Class resourceClass : classes) {
             ClassResourceInfo classResourceInfo = 
                 createClassResourceInfo(resourceClass, resourceClass, true);
-            classResourceInfos.add(classResourceInfo);
+            if (classResourceInfo != null) {
+                classResourceInfos.add(classResourceInfo);
+            }
         }
+        injectContexts();
     }
 
     public void setResourceClasses(Class... classes) {
@@ -126,12 +141,22 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
                                         ClassHelper.getRealClass(bean),
                                             true);
             classResourceInfos.add(classResourceInfo);
+            classResourceInfo.setResourceProvider(
+                               new SingletonResourceProvider(bean));
+        }
+    }
+    
+    private void injectContexts() {
+        for (ClassResourceInfo cri : classResourceInfos) {
+            if (cri.isSingleton()) {
+                InjectionUtils.injectContextProxies(cri, 
+                                                    cri.getResourceProvider().getInstance());
+            }
         }
     }
     
     public void setResourceProvider(Class c, ResourceProvider rp) {
         resourceProviders.put(c, rp);
-        updateClassResourceProviders();
     }
     
     protected void initializeServiceModel() {
@@ -149,7 +174,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
 
     private void updateClassResourceProviders() {
         for (ClassResourceInfo cri : classResourceInfos) {
-            //TODO: Using information from annotation to determine which lifecycle provider to use
+            if (cri.getResourceProvider() != null) {
+                continue;
+            }
+            
             ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
             if (rp != null) {
                 cri.setResourceProvider(rp);
@@ -159,6 +187,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
                 cri.setResourceProvider(rp);  
             }
         }
+        injectContexts();
     }
     
     protected ClassResourceInfo createClassResourceInfo(
@@ -172,52 +201,56 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         
         MethodDispatcher md = createOperation(cri);
         cri.setMethodDispatcher(md);
-        return cri;
+        return checkMethodDispatcher(cri) ? cri : null;
     }
 
     protected MethodDispatcher createOperation(ClassResourceInfo cri) {
         MethodDispatcher md = new MethodDispatcher();
         for (Method m : cri.getServiceClass().getMethods()) {
             
-                       
-            String httpMethod = JAXRSUtils.getHttpMethodValue(m);
-            Path path = (Path)JAXRSUtils.getMethodAnnotation(m, Path.class);
-            if (httpMethod != null && path != null) {
-                /*
-                 * Sub-resource method, URI template created by concatenating
-                 * the URI template of the resource class with the URI template
-                 * of the method
-                 */
-                OperationResourceInfo ori = new OperationResourceInfo(m, cri);
-                URITemplate t = 
-                    URITemplate.createTemplate(cri, path);
-                ori.setURITemplate(t);
-                ori.setHttpMethod(httpMethod);
-                md.bind(ori, m);
-            } else if (path != null) {
-                // sub-resource locator
-                OperationResourceInfo ori = new OperationResourceInfo(m, cri);
-                URITemplate t = 
-                    URITemplate.createTemplate(cri, path);
-                ori.setURITemplate(t);
-                md.bind(ori, m);     
-                Class subResourceClass = m.getReturnType();
-                ClassResourceInfo subCri = createClassResourceInfo(
-                     subResourceClass, subResourceClass, false);
-                cri.addSubClassResourceInfo(subCri);
-            } else if (httpMethod != null) {
-                OperationResourceInfo ori = new OperationResourceInfo(m, cri);
-                URITemplate t = 
-                    URITemplate.createTemplate(cri, null);
-                ori.setURITemplate(t);
-                ori.setHttpMethod(httpMethod);
-                md.bind(ori, m);
+            Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(m);
+            
+            String httpMethod = AnnotationUtils.getHttpMethodValue(annotatedMethod);
+            Path path = (Path)AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
+            
+            if (httpMethod != null || path != null) {
+                md.bind(createOperationInfo(m, annotatedMethod, cri, path, httpMethod), m);
+                if (httpMethod == null) {
+                    // subresource locator
+                    Class subResourceClass = m.getReturnType();
+                    ClassResourceInfo subCri = createClassResourceInfo(
+                         subResourceClass, subResourceClass, false);
+                    if (checkMethodDispatcher(subCri)) {
+                        cri.addSubClassResourceInfo(subCri);
+                    }
+                }
             }
         }
-
+        
         return md;
     }
     
+    private OperationResourceInfo createOperationInfo(Method m, Method annotatedMethod, 
+                                                      ClassResourceInfo cri, Path path, String httpMethod) {
+        OperationResourceInfo ori = new OperationResourceInfo(m, cri);
+        URITemplate t = 
+            URITemplate.createTemplate(cri, path);
+        ori.setURITemplate(t);
+        ori.setHttpMethod(httpMethod);
+        ori.setAnnotatedMethod(annotatedMethod);
+        return ori;
+    }
+    
+       
+    private boolean checkMethodDispatcher(ClassResourceInfo cr) {
+        if (cr.getMethodDispatcher().getOperationResourceInfos().isEmpty()) {
+            LOG.warning(new org.apache.cxf.common.i18n.Message("NO_RESOURCE_OP_EXC", 
+                                                               BUNDLE, 
+                                                               cr.getClass().getName()).toString());
+            return false;
+        }
+        return true;
+    }
     
     
     protected Invoker createInvoker() {

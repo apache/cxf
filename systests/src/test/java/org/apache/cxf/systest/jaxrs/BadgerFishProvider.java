@@ -22,11 +22,15 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -51,13 +55,16 @@ import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
 public final class BadgerFishProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
 
-    static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
-
-    public boolean isReadable(Class<?> type) {
+    
+    private static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
+    @Context
+    private HttpHeaders requestHeaders;  
+    
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
     
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
 
@@ -65,8 +72,8 @@ public final class BadgerFishProvider
         return -1;
     }
     
-    public Object readFrom(Class<Object> type, MediaType m, MultivaluedMap<String, String> headers,
-                           InputStream is) {
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, 
+                           MediaType m, MultivaluedMap<String, String> headers, InputStream is) {
         try {
             JAXBContext context = getJAXBContext(type);
             Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -85,14 +92,16 @@ public final class BadgerFishProvider
         return null;
     }
 
-    public void writeTo(Object obj, MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
+    public void writeTo(Object obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
         try {
+            if (!"badger-fish-language".equals(requestHeaders.getLanguage())) {
+                throw new RuntimeException();
+            }
+            
             JAXBContext context = getJAXBContext(obj.getClass());
             Marshaller marshaller = context.createMarshaller();
-            //marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-
-            // Set up the JSON StAX implementation
-            
+                        
             XMLOutputFactory factory = new BadgerFishXMLOutputFactory();
             XMLStreamWriter xsw = factory.createXMLStreamWriter(os);            
             marshaller.marshal(obj, xsw);

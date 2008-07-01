@@ -38,12 +38,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.PathParam;
-
-import org.apache.cxf.customer.book.BookNotFoundDetails;
-import org.apache.cxf.customer.book.BookNotFoundFault;
-
-
 public class BookStoreWithInterface extends BookStoreStorage implements BookInterface {
 
     public BookStoreWithInterface() {
@@ -54,7 +48,7 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
     }
     
     
-    public Book getThatBook(@PathParam("bookId") Long id) throws BookNotFoundFault {
+    public Book getThatBook(Long id) throws BookNotFoundFault {
         return doGetBook(id);
     }
     

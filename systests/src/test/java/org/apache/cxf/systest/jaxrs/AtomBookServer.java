@@ -19,22 +19,61 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import java.net.URISyntaxException;
+
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.handler.DefaultHandler;
+import org.mortbay.jetty.handler.HandlerCollection;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.webapp.WebAppContext;
     
 public class AtomBookServer extends AbstractBusTestServerBase {
 
+    private org.mortbay.jetty.Server server;
+    
     protected void run() {
-        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(AtomBookStore.class);
-        //default lifecycle is per-request, change it to singleton
-        sf.setResourceProvider(AtomBookStore.class, 
-                               new SingletonResourceProvider(new AtomBookStore()));
-        sf.setAddress("http://localhost:9080/");
+        System.out.println("Starting Server");
 
-        sf.create();        
+        server = new org.mortbay.jetty.Server();
+
+        SelectChannelConnector connector = new SelectChannelConnector();
+        connector.setPort(9080);
+        server.setConnectors(new Connector[] {connector});
+
+        WebAppContext webappcontext = new WebAppContext();
+        String contextPath = null;
+        try {
+            contextPath = getClass().getResource("/jaxrs_atom").toURI().getPath();
+        } catch (URISyntaxException e1) {
+            e1.printStackTrace();
+        }
+        webappcontext.setContextPath("/");
+
+        webappcontext.setWar(contextPath);
+
+        HandlerCollection handlers = new HandlerCollection();
+        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
+
+        server.setHandler(handlers);
+        try {
+            server.start();
+                       
+        } catch (Exception e) {
+            e.printStackTrace();
+        }     
+        
     }
+    
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if (server != null) {
+            server.stop();
+            server.destroy();
+            server = null;
+        }
+    }   
 
     public static void main(String[] args) {
         try {

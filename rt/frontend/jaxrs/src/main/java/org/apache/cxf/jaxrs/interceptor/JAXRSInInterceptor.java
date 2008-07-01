@@ -23,19 +23,24 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
-import org.apache.cxf.jaxrs.JAXRSUtils;
-import org.apache.cxf.jaxrs.MetadataMap;
+import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
+import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.provider.SystemQueryHandler;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -44,6 +49,7 @@ import org.apache.cxf.service.Service;
 public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final String RELATIVE_PATH = "relative.path";
+    public static final String ROOT_RESOURCE_CLASS = "root.resource.class";
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSInInterceptor.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
@@ -53,6 +59,28 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) {
+        
+        try {
+            processRequest(message);
+        } catch (RuntimeException ex) {
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex);
+            if (excResponse == null) {
+                ProviderFactory.getInstance().cleatThreadLocalProxies();
+                throw ex;
+            }
+            message.getExchange().put(Response.class, excResponse);
+        }
+        
+        
+    }
+    
+    private void processRequest(Message message) {
+        RequestPreprocessor rp = 
+            ProviderFactory.getInstance().getRequestPreprocessor();
+        if (rp != null) {
+            rp.preprocess(message, new UriInfoImpl(message, null));
+        }
+        
         String path = (String)message.get(Message.PATH_INFO);
         String address = (String)message.get(Message.BASE_PATH);
         String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -79,51 +107,62 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             path = path + "/";
         }
         
-        //TODO : make sure we do this parsing only once
-        MultivaluedMap<String, String> queries = 
-            JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), 
-                                            "&", true);
-        SystemQueryHandler sqh = ProviderFactory.getInstance().getQueryHandler(queries);
-        if (sqh != null) {
-            // TODO : if Response != null then make sure no invocations happen
-            // TODO : root resource class needs be selected earlier
-            sqh.handleQuery(message, null, queries);
-        }
         
-        String acceptContentTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-        if (acceptContentTypes == null) {
-            acceptContentTypes = "*/*";
-        }
-        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
-        
-        LOG.fine("Request path is: " + path);
-        LOG.fine("Request HTTP method is: " + httpMethod);
-        LOG.fine("Request contentType is: " + requestContentType);
-        LOG.fine("Accept contentType is: " + acceptContentTypes);
-        
-        //1. Matching target resource classes and method
+        //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)service).getClassResourceInfos();
 
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = JAXRSUtils.findTargetResourceClass(resources, 
-                                                                       path, 
-                                                                       httpMethod, 
-                                                                       values,
-                                                                       requestContentType, 
-                                                                       acceptContentTypes);
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values);
+        if (resource == null) {
+            org.apache.cxf.common.i18n.Message errorMsg = 
+                new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC", 
+                                                   BUNDLE, 
+                                                   path);
+            LOG.severe(errorMsg.toString());
+            throw new Fault(errorMsg);
+        }
+        
+        List<ProviderInfo<RequestHandler>> shs = 
+            ProviderFactory.getInstance().getRequestHandlers();
+        for (ProviderInfo<RequestHandler> sh : shs) {
+            Response response = sh.getProvider().handleRequest(message, resource);
+            if (response != null) {
+                message.getExchange().put(Response.class, response);
+                return;
+            }
+        }
+        
+        String acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+        if (acceptTypes == null) {
+            acceptTypes = "*/*";
+        }
+        
+        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+        message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
+        
+        LOG.fine("Request path is: " + path);
+        LOG.fine("Request HTTP method is: " + httpMethod);
+        LOG.fine("Request contentType is: " + requestContentType);
+        LOG.fine("Accept contentType is: " + acceptTypes);
+        
+        
+        OperationResourceInfo ori = 
+            JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                       httpMethod, values, requestContentType, acceptContentTypes);
 
         if (ori == null) {
-            String errorMessage = "No operation found for path: " + path + ", contentType: " 
-                + requestContentType + ", Accept contentType: " + acceptContentTypes;
-            LOG.severe(errorMessage);
-            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OP_EXC", 
-                                                                   BUNDLE, 
-                                                                   path,
-                                                                   requestContentType,
-                                                                   acceptContentTypes));
+            org.apache.cxf.common.i18n.Message errorMsg = 
+                new org.apache.cxf.common.i18n.Message("NO_OP_EXC", 
+                                                   BUNDLE, 
+                                                   path,
+                                                   requestContentType,
+                                                   acceptTypes);
+            LOG.severe(errorMsg.toString());
+            throw new Fault(errorMsg);
         }
-        LOG.fine("Found operation: " + ori.getMethod().getName());
+        LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         
         message.getExchange().put(OperationResourceInfo.class, ori);
         message.put(RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));

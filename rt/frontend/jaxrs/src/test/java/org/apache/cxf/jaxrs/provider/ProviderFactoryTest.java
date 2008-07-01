@@ -23,20 +23,27 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.JAXRSUtils;
+import org.apache.cxf.jaxrs.JAXBContextProvider;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,21 +53,21 @@ public class ProviderFactoryTest extends Assert {
     
     @Before
     public void setUp() {
-        ProviderFactory.getInstance().clearUserMessageProviders();
+        ProviderFactory.getInstance().clearProviders();
     }
     
     @Test
     public void testSortEntityProviders() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        pf.registerUserEntityProvider(new TestStringProvider());
-        pf.registerUserEntityProvider(new StringProvider());
+        pf.registerUserProvider(new TestStringProvider());
+        pf.registerUserProvider(new StringProvider());
         
-        List<MessageBodyReader> readers = pf.getUserMessageReaders();
+        List<ProviderInfo<MessageBodyReader>> readers = pf.getUserMessageReaders();
 
         assertTrue(indexOf(readers, TestStringProvider.class) 
                    < indexOf(readers, StringProvider.class));
         
-        List<MessageBodyWriter> writers = pf.getUserMessageWriters();
+        List<ProviderInfo<MessageBodyWriter>> writers = pf.getUserMessageWriters();
 
         assertTrue(indexOf(writers, TestStringProvider.class) 
                    < indexOf(writers, StringProvider.class));
@@ -79,7 +86,7 @@ public class ProviderFactoryTest extends Assert {
         verifyProvider(byte[].class, BinaryDataProvider.class, "*/*");
         verifyProvider(InputStream.class, BinaryDataProvider.class, "image/png");
         MessageBodyWriter writer = ProviderFactory.getInstance()
-            .createMessageBodyWriter(File.class, JAXRSUtils.ALL_TYPES);
+            .createMessageBodyWriter(File.class, null, null, JAXRSUtils.ALL_TYPES, null);
         assertTrue(BinaryDataProvider.class == writer.getClass());
     }
     
@@ -87,14 +94,14 @@ public class ProviderFactoryTest extends Assert {
                                 String errorMessage) 
         throws Exception {
         
-        MediaType mType = MediaType.parse(mediaType);
+        MediaType mType = MediaType.valueOf(mediaType);
         
         MessageBodyReader reader = ProviderFactory.getInstance()
-            .createMessageBodyReader(type, mType);
+            .createMessageBodyReader(type, null, null, mType, null);
         assertSame(errorMessage, provider, reader.getClass());
     
         MessageBodyWriter writer = ProviderFactory.getInstance()
-            .createMessageBodyWriter(type, mType);
+            .createMessageBodyWriter(type, null, null, mType, null);
         assertTrue(errorMessage, provider == writer.getClass());
     }
     
@@ -112,6 +119,9 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetAtomProvider() throws Exception {
+        ProviderFactory.getInstance().setUserProviders(
+             Arrays.asList(
+                  new Object[]{new AtomEntryProvider(), new AtomFeedProvider()}));
         verifyProvider(Entry.class, AtomEntryProvider.class, "application/atom+xml");
         verifyProvider(Feed.class, AtomFeedProvider.class, "application/atom+xml");
     }
@@ -119,7 +129,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testGetStringProviderUsingProviderDeclaration() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        pf.registerUserEntityProvider(new TestStringProvider());
+        pf.registerUserProvider(new TestStringProvider());
         verifyProvider(String.class, TestStringProvider.class, "text/html");
     }    
     
@@ -132,23 +142,35 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testRegisterCustomJSONEntityProvider() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        pf.registerUserEntityProvider(new CustomJSONProvider());
+        pf.registerUserProvider(new CustomJSONProvider());
         verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, CustomJSONProvider.class, 
                        "application/json", "User-registered provider was not returned first");
+    }
+    
+    
+    @Test
+    public void testRegisterCustomResolver() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new JAXBContextProvider());
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, null);
+        assertTrue("JAXBContext ContextProvider can not be found", 
+                   cr instanceof JAXBContextProvider);
+        
     }
     
     @Test
     public void testRegisterCustomEntityProvider() throws Exception {
         ProviderFactory pf = (ProviderFactory)ProviderFactory.getInstance();
-        pf.registerUserEntityProvider(new CustomWidgetProvider());
+        pf.registerUserProvider(new CustomWidgetProvider());
         
         verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class, 
                        "application/widget", "User-registered provider was not returned first");
     }
     
-    private int indexOf(List<? extends Object> providers, Class providerType) {
+    private int indexOf(List<? extends Object> providerInfos, Class providerType) {
         int index = 0;
-        for (Object p : providers) {
+        for (Object pi : providerInfos) {
+            Object p = ((ProviderInfo)pi).getProvider();
             if (p.getClass().isAssignableFrom(providerType)) {
                 break;
             }
@@ -162,11 +184,11 @@ public class ProviderFactoryTest extends Assert {
     private final class TestStringProvider 
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
-        public boolean isReadable(Class<?> type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
             return type == String.class;
         }
         
-        public boolean isWriteable(Class<?> type) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
             return type == String.class;
         }
         
@@ -174,8 +196,8 @@ public class ProviderFactoryTest extends Assert {
             return s.length();
         }
 
-        public String readFrom(Class<String> type, MediaType m, MultivaluedMap<String, String> headers,
-                               InputStream is) {
+        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, 
+                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {
             try {
                 return IOUtils.toString(is);
             } catch (IOException e) {
@@ -184,8 +206,8 @@ public class ProviderFactoryTest extends Assert {
             return null;
         }
 
-        public void writeTo(String obj, MediaType m, MultivaluedMap<String, Object> headers, 
-                            OutputStream os) {
+        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+            MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             try {
                 os.write(obj.getBytes());
             } catch (IOException e) {
@@ -200,11 +222,11 @@ public class ProviderFactoryTest extends Assert {
     private final class CustomJSONProvider 
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
-        public boolean isReadable(Class<?> type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public boolean isWriteable(Class<?> type) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
@@ -212,14 +234,14 @@ public class ProviderFactoryTest extends Assert {
             return s.length();
         }
 
-        public String readFrom(Class<String> type, MediaType m, MultivaluedMap<String, String> headers,
-                               InputStream is) {    
+        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, 
+                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {    
             //Dummy
             return null;
         }
 
-        public void writeTo(String obj, MediaType m, MultivaluedMap<String, Object> headers, 
-                            OutputStream os) {
+        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+            MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             //Dummy
         }
 
@@ -230,11 +252,11 @@ public class ProviderFactoryTest extends Assert {
     private final class CustomWidgetProvider
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
-        public boolean isReadable(Class<?> type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public boolean isWriteable(Class<?> type) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
@@ -243,16 +265,17 @@ public class ProviderFactoryTest extends Assert {
         }
 
 
-        public String readFrom(Class<String> type, MediaType m, MultivaluedMap<String, String> headers,
-                               InputStream is) {    
+        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, 
+                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {    
             //Dummy
             return null;
         }
 
-        public void writeTo(String obj, MediaType m, MultivaluedMap<String, Object> headers, 
-                            OutputStream os) {
+        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+            MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             //Dummy
         }
 
     }
+    
 }

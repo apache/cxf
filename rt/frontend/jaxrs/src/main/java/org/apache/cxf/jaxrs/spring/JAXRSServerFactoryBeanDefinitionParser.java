@@ -55,9 +55,11 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
 
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element el, String name) {
-        if ("properties".equals(name)) {
+        if ("properties".equals(name) 
+            || "extensionMappings".equals(name)
+            || "languageMappings".equals(name)) {
             Map map = ctx.getDelegate().parseMapElement(el, bean.getBeanDefinition());
-            bean.addPropertyValue("properties", map);
+            bean.addPropertyValue(name, map);
         } else if ("executor".equals(name)) {
             setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");
         } else if ("invoker".equals(name)) {
@@ -69,7 +71,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else if ("features".equals(name) || "schemaLocations".equals(name) 
-            || "entityProviders".equals(name) || "serviceBeans".equals(name)) {
+            || "providers".equals(name) || "serviceBeans".equals(name)) {
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else {

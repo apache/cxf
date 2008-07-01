@@ -23,8 +23,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 
 import javax.ws.rs.ConsumeMime;
@@ -48,17 +50,17 @@ import org.apache.xmlbeans.XmlObject;
 public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, MessageBodyWriter<XmlObject> {
 
     /** {@inheritDoc} */
-    public XmlObject readFrom(Class type, MediaType mediaType, MultivaluedMap httpHeaders,
-                           InputStream entityStream) throws IOException {
+    public XmlObject readFrom(Class<XmlObject> type, Type genericType, 
+                              Annotation[] annotations, MediaType m,  
+                     MultivaluedMap<String, String> headers, InputStream is) 
+        throws IOException {
 
-        XmlObject result = parseXmlBean(type, entityStream);
-
-        return result;
+        return parseXmlBean(type, is);
     }
 
     /** {@inheritDoc} */
-    public void writeTo(XmlObject t, MediaType mediaType, MultivaluedMap httpHeaders,
-                        OutputStream entityStream)
+    public void writeTo(XmlObject t, Class<?> cls, Type genericType, Annotation[] annotations,  
+                        MediaType m, MultivaluedMap<String, Object> headers, OutputStream entityStream)
         throws IOException {
 
         // May need to set some XMLOptions here
@@ -72,12 +74,12 @@ public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, Me
     }
 
     /** {@inheritDoc} */
-    public boolean isReadable(Class type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isXmlBean(type);
     }
 
     /** {@inheritDoc} */
-    public boolean isWriteable(Class type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isXmlBean(type);
     }
 

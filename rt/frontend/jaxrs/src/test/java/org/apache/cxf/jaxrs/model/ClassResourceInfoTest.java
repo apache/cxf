@@ -62,11 +62,11 @@ public class ClassResourceInfoTest extends Assert {
     @Test
     public void testGetHttpContexts() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
-        List<Field> fields = c.getHttpContexts();
+        List<Field> fields = c.getContextFields();
         assertEquals("Only root classes should check these fields", 0, fields.size());
         
         c = new ClassResourceInfo(TestClass.class, true);
-        fields = c.getHttpContexts();
+        fields = c.getContextFields();
         assertEquals("2 http context fields available", 2, fields.size());
         assertTrue("Wrong fields selected", 
                    (fields.get(0).getType() == UriInfo.class
@@ -78,10 +78,10 @@ public class ClassResourceInfoTest extends Assert {
     @Test
     public void testGetResources() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
-        List<Field> fields = c.getResources();
+        List<Field> fields = c.getResourceFields();
         assertEquals("Only root classes should check these fields", 0, fields.size());
         c = new ClassResourceInfo(TestClass.class, true);
-        fields = c.getResources();
+        fields = c.getResourceFields();
         
         Set<Class<?>> clses = new HashSet<Class<?>>(); 
         for (Field f : fields) {

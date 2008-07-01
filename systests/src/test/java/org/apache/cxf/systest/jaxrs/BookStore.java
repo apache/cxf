@@ -27,18 +27,22 @@ import java.util.Map;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.cxf.customer.book.BookNotFoundDetails;
-import org.apache.cxf.customer.book.BookNotFoundFault;
 import org.apache.cxf.helpers.XMLUtils;
 
 @Path("/bookstore/")
@@ -48,6 +52,10 @@ public class BookStore {
     private Map<Long, CD> cds = new HashMap<Long, CD>();
     private long bookId = 123;
     private long cdId = 123;
+    
+    private String currentBookId;
+    @PathParam("CDId")
+    private String currentCdId;
 
     public BookStore() {
         init();
@@ -57,9 +65,11 @@ public class BookStore {
     @GET
     @Path("webappexception")
     public Book throwException() {
+        
         Response response = Response.serverError().entity("This is a WebApplicationException").build();
         throw new WebApplicationException(response);
     }
+    
     
     @GET
     @Path("timetable")
@@ -74,17 +84,43 @@ public class BookStore {
     }
     
     @GET
-    @Path("/books")
-    public Books getBooks() {
-        return new Books(books.values());
+    @Path("/books/query")
+    public Book getBookQuery(@QueryParam("bookId") String id) throws BookNotFoundFault {
+        return doGetBook(id);
     }
     
+    @GET
+    @Path("/books/defaultquery")
+    public Book getDefaultBookQuery(@DefaultValue("123") @QueryParam("bookId") String id) 
+        throws BookNotFoundFault {
+        return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/books/element")
+    public JAXBElement<Book> getBookElement() throws Exception {
+        return new JAXBElement<Book>(new QName("", "Book"),
+                                     Book.class,
+                                     doGetBook("123"));
+    }
+    
+    @GET
+    @Path("/books/adapter")
+    @XmlJavaTypeAdapter(BookInfoAdapter.class)
+    public BookInfo getBookAdapter() throws Exception {
+        return new BookInfo(doGetBook("123"));
+    }
+    
+    @PathParam("bookId")
+    public void setBookId(String id) {
+        currentBookId = id;
+    }
     
     @GET
     @Path("/books/{bookId}/")
     @ProduceMime("application/json")
-    public Book getBookAsJSON(@PathParam("bookId") String id) throws BookNotFoundFault {
-        return doGetBook(id);
+    public Book getBookAsJSON() throws BookNotFoundFault {
+        return doGetBook(currentBookId);
     }
     
     private Book doGetBook(String id) throws BookNotFoundFault {
@@ -206,11 +242,19 @@ public class BookStore {
         return r;
     }
 
+    @POST
+    @Path("/booksplain")
+    @ConsumeMime("text/plain")
+    @ProduceMime("text/plain")
+    public Long echoBookId(long theBookId) {
+        return new Long(theBookId);
+    }
+    
     @GET
     @Path("/cd/{CDId}/")
-    public CD getCD(@PathParam("CDId") String id) {
-        System.out.println("----invoking getCD with cdId: " + id);
-        CD cd = cds.get(Long.parseLong(id));
+    public CD getCD() {
+        System.out.println("----invoking getCD with cdId: " + currentCdId);
+        CD cd = cds.get(Long.parseLong(currentCdId));
 
         return cd;
     }
@@ -233,7 +277,12 @@ public class BookStore {
         c.setCD(cds.values());
         return c;
     }
-
+    
+    @Path("/interface")
+    public BookSubresource getBookFromSubresource() {
+        return new BookSubresourceImpl();
+    }
+    
     final void init() {
         Book book = new Book();
         book.setId(bookId);
@@ -248,6 +297,39 @@ public class BookStore {
         cd1.setId(++cdId);
         cd1.setName("BICYCLE RACE");
         cds.put(cd1.getId(), cd1);
+    }
+    
+    private static class BookInfo {
+        private String name;
+        private long id;
+        
+        public BookInfo(Book b) {
+            this.name = b.getName();
+            this.id = b.getId();
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public long getId() {
+            return id;
+        }
+    }
+    
+    public static class BookInfoAdapter extends XmlAdapter<Book, BookInfo> {
+
+        @Override
+        public Book marshal(BookInfo v) throws Exception {
+            return new Book(v.getName(), v.getId());
+        }
+
+        @Override
+        public BookInfo unmarshal(Book v) throws Exception {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
     }
 }
 

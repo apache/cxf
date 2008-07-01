@@ -1,1 +1,1 @@
-<CDs><CD><id>123</id><name>BOHEMIAN RHAPSODY</name></CD><CD><id>124</id><name>BICYCLE RACE</name></CD></CDs>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><CDs><CD><id>123</id><name>BOHEMIAN RHAPSODY</name></CD><CD><id>124</id><name>BICYCLE RACE</name></CD></CDs>

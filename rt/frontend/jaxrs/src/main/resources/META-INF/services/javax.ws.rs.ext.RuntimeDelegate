@@ -1,1 +1,1 @@
-org.apache.cxf.jaxrs.provider.RuntimeDelegateImpl
+org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl

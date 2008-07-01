@@ -1,1 +1,24 @@
-{"contributors":[],"title":"Collection of Books","categories":[],"entries":[{"contributors":[],"title":"CXF in Action","content":{"value":"<Book><id>123<\/id><name>CXF in Action<\/name><\/Book>","type":"application/xml"},"categories":[],"authors":[],"id":"123","links":[]}],"authors":[{"name":"BookStore Management Company"}],"id":"http://www.books.com","links":[]}
+{
+ "id":"http://www.books.com",
+ "title":"Collection of Books",
+ "authors":[{
+   "name":"BookStore Management Company"
+  }
+ ],
+ "entries":[{
+   "id":"123",
+   "title":"CXF in Action",
+   "content":{
+    "attributes":{
+     "type":"application/xml"
+    },
+    "children":["<Book><id>123<\/id><name>CXF in Action<\/name><\/Book>"
+    ]
+   }
+  }
+ ],
+ "attributes":{
+  "xml:base":"/bookstore/books/feed"
+ }
+}
+

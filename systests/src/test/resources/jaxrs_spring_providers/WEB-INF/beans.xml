@@ -36,10 +36,14 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
             <ref bean="petstore"/>
             <ref bean="bookstore"/>
         </jaxrs:serviceBeans>
-        <jaxrs:entityProviders>
+        <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.BadgerFishProvider"/>
-        </jaxrs:entityProviders>
+            <ref bean="exceptionMapper"/>
+        </jaxrs:providers>
     </jaxrs:server>
     <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
     <bean id="petstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.PetStore"/>
+    <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
+        <property name="toHandle" value="true"/>
+    </bean>   
 </beans>

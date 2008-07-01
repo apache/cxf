@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.resources;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 
 
@@ -32,4 +33,8 @@ public abstract class BookSuperClass {
     @ProduceMime("text/bar")
     @ConsumeMime("text/foo")
     public abstract String getDescription();
+    
+    @Path("/books/{bookId}/{new}")
+    public abstract  Book getNewBook(@PathParam("bookId") String id,
+                                     @PathParam("new") Boolean isNew);
 }

@@ -1,1 +1,1 @@
-<ns1:XMLFault xmlns:ns1="http://cxf.apache.org/bindings/xformat"><ns1:faultstring xmlns:ns1="http://cxf.apache.org/bindings/xformat">org.apache.cxf.customer.book.BookNotFoundFault</ns1:faultstring></ns1:XMLFault>
+<ns1:XMLFault xmlns:ns1="http://cxf.apache.org/bindings/xformat"><ns1:faultstring xmlns:ns1="http://cxf.apache.org/bindings/xformat">org.apache.cxf.systest.jaxrs.BookNotFoundFault</ns1:faultstring></ns1:XMLFault>

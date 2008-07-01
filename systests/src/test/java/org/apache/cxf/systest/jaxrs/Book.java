@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.ProduceMime;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -37,6 +38,11 @@ public class Book {
     public Book() {
         init();
         System.out.println("----chapters: " + chapters.size());
+    }
+    
+    public Book(String name, long id) {
+        this.name = name;
+        this.id = id;
     }
     
     public void setName(String n) {
@@ -56,6 +62,7 @@ public class Book {
     
     @GET
     @Path("chapters/{chapterid}/")    
+    @ProduceMime("application/xml;charset=ISO-8859-1")
     public Chapter getChapter(@PathParam("chapterid")int chapterid) {
         System.out.println("----invoking getChapter with chapterid: " + chapterid);
 

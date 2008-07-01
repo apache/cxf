@@ -48,6 +48,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
+        connect.addRequestProperty("Content-Language", "badger-fish-language");
         InputStream in = connect.getInputStream();
         assertNotNull(in);           
 
@@ -56,6 +57,25 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
             .getResourceAsStream("resources/expected_get_book123badgerfish.txt");
 
         assertEquals("BadgerFish output not correct", 
+                     getStringFromInputStream(expected).trim(),
+                     getStringFromInputStream(in).trim());
+    }
+    
+    @Test
+    public void testGetBookNotFound() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/bookstore/books/12345"; 
+        URL url = new URL(endpointAddress);
+        URLConnection connect = url.openConnection();
+        connect.addRequestProperty("Accept", "application/json");
+        InputStream in = connect.getInputStream();
+        assertNotNull(in);           
+
+        InputStream expected = getClass()
+            .getResourceAsStream("resources/expected_get_book_notfound_mapped.txt");
+
+        assertEquals("Exception is not mapped correctly", 
                      getStringFromInputStream(expected).trim(),
                      getStringFromInputStream(in).trim());
     }

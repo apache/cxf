@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +53,11 @@ import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
 public final class XMLBeansJSONProvider extends XMLBeansElementProvider {
 
     /** {@inheritDoc} */
-    public XmlObject readFrom(Class type, MediaType m, MultivaluedMap headers, InputStream is) {
+    @Override
+    public XmlObject readFrom(Class<XmlObject> type, Type genericType, 
+                              Annotation[] annotations, MediaType m, 
+        MultivaluedMap<String, String> headers, InputStream is)
+        throws IOException {
         XmlObject result = null;
 
         try {
@@ -74,7 +80,9 @@ public final class XMLBeansJSONProvider extends XMLBeansElementProvider {
     }
 
     /** {@inheritDoc} */
-    public void writeTo(XmlObject obj, MediaType m, MultivaluedMap headers, OutputStream os) {
+    @Override
+    public void writeTo(XmlObject obj, Class<?> cls, Type genericType, Annotation[] annotations,  
+                        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
 
         try {
 

@@ -37,8 +37,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.codehaus.jettison.json.JSONObject;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AtomClientBookTest extends AbstractBusClientServerTestBase {
@@ -52,21 +52,17 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore("this test fails on different JDK's due to the"
-            + "maps abdera uses not being ordered so the"
-            + "strict string compares fail")
     public void testGetBooks() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/books/feed"; 
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals(endpointAddress, feed.getBaseUri().toString());
+        assertEquals("/bookstore/books/feed", feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
         
-        getAndCompareAsStrings("http://localhost:9080/bookstore/books/feed",
+        getAndCompareJson("http://localhost:9080/bookstore/books/feed",
                                "resources/expected_atom_books_json.txt",
                                "application/json");
         
-        // add new book
         Entry e = createBookEntry(256, "AtomBook");
         StringWriter w = new StringWriter();
         e.writeTo(w);
@@ -84,44 +80,46 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
             Document<Entry> entryDoc = abdera.getParser().parse(post.getResponseBodyAsStream());
             assertEquals(entryDoc.getRoot().toString(), e.toString());
         } finally {
-            // Release current connection to the connection pool once you are done
             post.releaseConnection();
         }         
         
-        Entry entry = getEntry(location, null);
+        Entry entry = getEntry("http://localhost:9080" + location, null);
         assertEquals(location, entry.getBaseUri().toString());
         assertEquals("AtomBook", entry.getTitle());
                 
-        // get existing book
+        
         
         endpointAddress =
             "http://localhost:9080/bookstore/books/subresources/123"; 
         entry = getEntry(endpointAddress, null);
         assertEquals("CXF in Action", entry.getTitle());
         
-        // now json
-        getAndCompareAsStrings("http://localhost:9080/bookstore/books/entries/123",
+        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123",
                                "resources/expected_atom_book_json.txt",
                                "application/json");
         
-        // do the same using a system query
-        getAndCompareAsStrings("http://localhost:9080/bookstore/books/entries/123?_contentType="
+        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123?_type="
                                + "application/json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
-//      do the same using a system query shortcut
-        getAndCompareAsStrings("http://localhost:9080/bookstore/books/entries/123?_contentType="
+        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123?_type="
                                + "json",
+                               "resources/expected_atom_book_json.txt",
+                               "*/*");
+        
+        // do the same using extension mappings
+        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123.json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
         
         
     }
     
-    private void getAndCompareAsStrings(String address, 
-                                        String resourcePath,
-                                        String type) throws Exception {
+    private void getAndCompareJson(String address, 
+                                   String resourcePath,
+                                   String type) throws Exception {
         GetMethod get = new GetMethod(address);
+        get.setRequestHeader("Content-Type", "*/*");
         get.setRequestHeader("Accept", type);
         HttpClient httpClient = new HttpClient();
         try {
@@ -129,7 +127,12 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
             String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
             String expected = getStringFromInputStream(
                   getClass().getResourceAsStream(resourcePath));
-            assertEquals("Atom entry should've been formatted as json", expected, jsonContent);
+            
+            JSONObject obj1 = new JSONObject(jsonContent);
+            JSONObject obj2 = new JSONObject(expected);
+            
+            assertEquals("Atom entry should've been formatted as json", 
+                         obj1.toString(), obj2.toString());
         } finally {
             get.releaseConnection();
         }
@@ -162,6 +165,7 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
     
     private Feed getFeed(String endpointAddress, String acceptType) throws Exception {
         GetMethod get = new GetMethod(endpointAddress);
+        get.setRequestHeader("Content-Type", "*/*");
         if (acceptType != null) {
             get.setRequestHeader("Accept", acceptType);
         }
@@ -177,6 +181,7 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
     
     private Entry getEntry(String endpointAddress, String acceptType) throws Exception {
         GetMethod get = new GetMethod(endpointAddress);
+        get.setRequestHeader("Content-Type", "*/*");
         if (acceptType != null) {
             get.setRequestHeader("Accept", acceptType);
         }
