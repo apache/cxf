@@ -180,7 +180,6 @@ public abstract class AbstractBeanDefinitionParser
             throw new IllegalStateException(propertyName + " property must have child elements!");
         }
         
-        // Seems odd that we have to do the registration, I wonder if there is a better way
         String id;
         BeanDefinition child;
         if (first.getNamespaceURI().equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI)) {
