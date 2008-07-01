@@ -52,7 +52,6 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @org.junit.Ignore
     public void testGetBooks() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/books/feed"; 
