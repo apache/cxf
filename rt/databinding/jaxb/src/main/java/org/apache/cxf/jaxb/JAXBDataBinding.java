@@ -41,7 +41,9 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
@@ -144,7 +146,10 @@ public final class JAXBDataBinding extends AbstractDataBinding {
 
     private Map<String, Object> contextProperties = Collections.emptyMap();
     private Map<String, Object> marshallerProperties = Collections.emptyMap();
-
+    private Map<String, Object> unmarshallerProperties = Collections.emptyMap();
+    private Unmarshaller.Listener unmarshallerListener;
+    private Marshaller.Listener marshallerListener;
+    
     private boolean qualifiedSchemas;
     private Service service;
 
@@ -174,7 +179,7 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         context = ctx;
     }
 
-    private NamespacePrefixMapper getNamespacePrefixMapper() {
+    public NamespacePrefixMapper getNamespacePrefixMapper() {
         Map<String, String> mappings = getDeclaredNamespaceMappings();
         if (mappings == null) {
             mappings = Collections.emptyMap();
@@ -197,38 +202,23 @@ public final class JAXBDataBinding extends AbstractDataBinding {
 
     @SuppressWarnings("unchecked")
     public <T> DataWriter<T> createWriter(Class<T> c) {
-        Map<String, Object> currentMarshallerProperties = new HashMap<String, Object>();
-        if (!marshallerProperties.containsKey("com.sun.xml.bind.namespacePrefixMapper")) {
-            currentMarshallerProperties.put("com.sun.xml.bind.namespacePrefixMapper",
-                                            getNamespacePrefixMapper());
-        }
-        currentMarshallerProperties.putAll(marshallerProperties);
 
         Integer mtomThresholdInt = new Integer(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
             DataWriterImpl<XMLStreamWriter> r 
-                = new DataWriterImpl<XMLStreamWriter>(
-                    context,
-                    currentMarshallerProperties,
-                    contextClasses);
+                = new DataWriterImpl<XMLStreamWriter>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == OutputStream.class) {
-            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(context,
-                                                                              currentMarshallerProperties,
-                                                                              contextClasses);
+            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == XMLEventWriter.class) {
-            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(
-                                                                                  context,
-                                                                                  currentMarshallerProperties,
-                                                                                  contextClasses);
+            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == Node.class) {
-            DataWriterImpl<Node> r = new DataWriterImpl<Node>(context, currentMarshallerProperties,
-                                                              contextClasses);
+            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         }
@@ -243,11 +233,11 @@ public final class JAXBDataBinding extends AbstractDataBinding {
     public <T> DataReader<T> createReader(Class<T> c) {
         DataReader<T> dr = null;
         if (c == XMLStreamReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(context, contextClasses);
+            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this);
         } else if (c == XMLEventReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(context, contextClasses);
+            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this);
         } else if (c == Node.class) {
-            dr = (DataReader<T>)new DataReaderImpl<Node>(context, contextClasses);
+            dr = (DataReader<T>)new DataReaderImpl<Node>(this);
         }
 
         return dr;
@@ -560,7 +550,11 @@ public final class JAXBDataBinding extends AbstractDataBinding {
             }
         }
     }
-
+    
+    public Set<Class<?>> getContextClasses() {
+        return Collections.unmodifiableSet(this.contextClasses);
+    }
+    
     // Now we can not add all the classes that Jaxb needed into JaxbContext,
     // especially when
     // an ObjectFactory is pointed to by an jaxb @XmlElementDecl annotation
@@ -636,6 +630,60 @@ public final class JAXBDataBinding extends AbstractDataBinding {
     }
     
     
+    /**
+     * Return a map of properties. These properties are set into the JAXB
+     * Unmarshaller (via Unmarshaller.setProperty(...) when the unmarshaller is
+     * created.
+     * 
+     * @return the map of JAXB unmarshaller properties.
+     */
+    public Map<String, Object> getUnmarshallerProperties() {
+        return unmarshallerProperties;
+    }
+
+    /**
+     * Set a map of JAXB unmarshaller properties. These properties are set into
+     * the JAXB Unmarshaller (via Unmarshaller.setProperty(...) when the unmarshaller
+     * is created.
+     * 
+     * @param unmarshallerProperties map of properties.
+     */
+    public void setUnmarshallerProperties(Map<String, Object> unmarshallerProperties) {
+        this.unmarshallerProperties = unmarshallerProperties;
+    }
+    
+    /**
+     * Returns the Unmarshaller.Listener that will be registered on the Unmarshallers
+     * @return
+     */
+    public Unmarshaller.Listener getUnmarshallerListener() {
+        return unmarshallerListener;
+    }
+
+    /**
+     * Sets the Unmarshaller.Listener that will be registered on the Unmarshallers
+     * @param unmarshallerListener
+     */
+    public void setUnmarshallerListener(Unmarshaller.Listener unmarshallerListener) {
+        this.unmarshallerListener = unmarshallerListener;
+    }
+    /**
+     * Returns the Marshaller.Listener that will be registered on the Marshallers
+     * @return
+     */
+    public Marshaller.Listener getMarshallerListener() {
+        return marshallerListener;
+    }
+
+    /**
+     * Sets the Marshaller.Listener that will be registered on the Marshallers
+     * @param marshallerListener
+     */
+    public void setMarshallerListener(Marshaller.Listener marshallerListener) {
+        this.marshallerListener = marshallerListener;
+    }
+
+    
     public static void clearCaches() {
         synchronized (JAXBCONTEXT_CACHE) {
             JAXBCONTEXT_CACHE.clear();
@@ -644,4 +692,5 @@ public final class JAXBDataBinding extends AbstractDataBinding {
             OBJECT_FACTORY_CACHE.clear();
         }
     }
+
 }

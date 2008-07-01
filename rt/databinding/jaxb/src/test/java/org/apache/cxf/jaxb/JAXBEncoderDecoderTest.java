@@ -25,13 +25,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -82,8 +80,6 @@ public class JAXBEncoderDecoderTest extends Assert {
     JAXBContext context;
     Schema schema;
     
-    private Map<String, Object> emptyMarshallerProperties = Collections.emptyMap();
-    
     @Before
     public void setUp() throws Exception {
         
@@ -119,7 +115,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
         Node node;
         try {
-            JAXBEncoderDecoder.marshall(context, null, null, part, elNode, emptyMarshallerProperties);
+            JAXBEncoderDecoder.marshall(context.createMarshaller(), null, part, elNode);
             fail("Should have thrown a Fault");
         } catch (Fault ex) {
             //expected - not a valid object
@@ -130,7 +126,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         QName elName = new QName(wrapperAnnotation.targetNamespace(),
                                  wrapperAnnotation.localName());
         part.setElementQName(elName);
-        JAXBEncoderDecoder.marshall(context, null, obj, part, elNode, emptyMarshallerProperties);
+        JAXBEncoderDecoder.marshall(context.createMarshaller(), obj, part, elNode);
         node = elNode.getLastChild();
         //The XML Tree Looks like
         //<GreetMe><requestType>Hello</requestType></GreetMe>
@@ -147,11 +143,12 @@ public class JAXBEncoderDecoderTest extends Assert {
         //stringStruct.setArg0("hello");
         stringStruct.setArg1("world");
         // Marshal without the schema should work.
-        JAXBEncoderDecoder.marshall(context, null, stringStruct, part,  elNode, emptyMarshallerProperties);
+        JAXBEncoderDecoder.marshall(context.createMarshaller(), stringStruct, part,  elNode);
         try {
+            Marshaller m = context.createMarshaller();
+            m.setSchema(schema);
             // Marshal with the schema should get an exception.
-            JAXBEncoderDecoder.marshall(context, schema, stringStruct, part,  elNode, 
-                                        emptyMarshallerProperties);
+            JAXBEncoderDecoder.marshall(m, stringStruct, part,  elNode);
             fail("Marshal with schema should have thrown a Fault");
         } catch (Fault ex) {
             //expected - not a valid object
@@ -174,7 +171,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         XMLOutputFactory opFactory = XMLOutputFactory.newInstance();
         opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
         XMLEventWriter writer = opFactory.createXMLEventWriter(stringWriter);
-        JAXBEncoderDecoder.marshall(context, null, testObject, part, writer, emptyMarshallerProperties);
+        JAXBEncoderDecoder.marshall(context.createMarshaller(), testObject, part, writer);
         writer.flush();
         writer.close();
         String xmlResult = stringWriter.toString();
@@ -185,7 +182,6 @@ public class JAXBEncoderDecoderTest extends Assert {
     
     @Test
     public void testCustomNamespaces() throws Exception {
-        Map<String, Object> marshallProps = new HashMap<String, Object>();
         NamespacePrefixMapper mapper = new NamespacePrefixMapper() {
 
             @Override
@@ -198,7 +194,6 @@ public class JAXBEncoderDecoderTest extends Assert {
                 return suggestion;
             } 
         };
-        marshallProps.put("com.sun.xml.bind.namespacePrefixMapper", mapper);
         ObjectWithQualifiedElementElement testObject = new ObjectWithQualifiedElementElement();
         testObject.setString1("twine");
         testObject.setString2("cord");
@@ -213,7 +208,10 @@ public class JAXBEncoderDecoderTest extends Assert {
         XMLOutputFactory opFactory = XMLOutputFactory.newInstance();
         opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
         XMLEventWriter writer = opFactory.createXMLEventWriter(stringWriter);
-        JAXBEncoderDecoder.marshall(context, null, testObject, part, writer, marshallProps);
+        Marshaller m = context.createMarshaller();
+        m.setProperty("com.sun.xml.bind.namespacePrefixMapper", mapper);
+        
+        JAXBEncoderDecoder.marshall(m, testObject, part, writer);
         writer.flush();
         writer.close();
         String xmlResult = stringWriter.toString();
@@ -239,7 +237,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
         //STARTDOCUMENT/ENDDOCUMENT is not required
         //writer.add(eFactory.createStartDocument("utf-8", "1.0"));        
-        JAXBEncoderDecoder.marshall(context, null, obj, part, writer, emptyMarshallerProperties);
+        JAXBEncoderDecoder.marshall(context.createMarshaller(), obj, part, writer);
         //writer.add(eFactory.createEndDocument());
         writer.flush();
         writer.close();
@@ -277,7 +275,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         //Remove START_DOCUMENT & START_ELEMENT pertaining to Envelope and Body Tags.
 
         part.setTypeClass(GreetMe.class);
-        Object val = JAXBEncoderDecoder.unmarshall(context, null, reader, part, null, true);
+        Object val = JAXBEncoderDecoder.unmarshall(context.createUnmarshaller(), reader, part, true);
         assertNotNull(val);
         assertTrue(val instanceof GreetMe);
         assertEquals("TestSOAPInputPMessage", 
@@ -297,8 +295,8 @@ public class JAXBEncoderDecoderTest extends Assert {
         Document doc = DOMUtils.createDocument();
         Element elNode = doc.createElementNS(elName.getNamespaceURI(), 
                                              elName.getLocalPart());
-        JAXBEncoderDecoder.marshall(context, null, 
-                                    new String("TestSOAPMessage"), part,  elNode, emptyMarshallerProperties);
+        JAXBEncoderDecoder.marshall(context.createMarshaller(), 
+                                    new String("TestSOAPMessage"), part,  elNode);
         
         assertNotNull(elNode.getChildNodes());
         assertEquals("TestSOAPMessage", elNode.getFirstChild().getFirstChild().getNodeValue());
@@ -324,8 +322,8 @@ public class JAXBEncoderDecoderTest extends Assert {
         elNode.appendChild(rtEl);
         rtEl.appendChild(doc.createTextNode("Hello Test"));
 
-        Object obj = JAXBEncoderDecoder.unmarshall(context, null,
-                         elNode, part, null, true);
+        Object obj = JAXBEncoderDecoder.unmarshall(context.createUnmarshaller(),
+                         elNode, part, true);
         assertNotNull(obj);
 
         //Add a Node and then test
@@ -335,7 +333,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         part.setTypeClass(String.class);
         Node n = null;
         try {
-            JAXBEncoderDecoder.unmarshall(context, null, n, part, null, true);
+            JAXBEncoderDecoder.unmarshall(context.createUnmarshaller(), n, part, true);
             fail("Should have received a Fault");
         } catch (Fault pe) {
             //Expected Exception
@@ -364,14 +362,16 @@ public class JAXBEncoderDecoderTest extends Assert {
         rtEl.appendChild(doc.createTextNode("World"));
         
         // Should unmarshal without problems when no schema used.
-        obj = JAXBEncoderDecoder.unmarshall(context, null, elNode, part, null, true);
+        obj = JAXBEncoderDecoder.unmarshall(context.createUnmarshaller(), elNode, part, true);
         assertNotNull(obj);
         assertEquals(StringStruct.class,  obj.getClass());
         assertEquals("World", ((StringStruct)obj).getArg1());
         
         try {
             // unmarshal with schema should raise exception.
-            obj = JAXBEncoderDecoder.unmarshall(context, schema, elNode, part, null, true);
+            Unmarshaller m = context.createUnmarshaller();
+            m.setSchema(schema);
+            obj = JAXBEncoderDecoder.unmarshall(m, elNode, part, true);
             fail("Should have thrown a Fault");
         } catch (Fault ex) {
             // expected - schema validation should fail.
@@ -390,7 +390,10 @@ public class JAXBEncoderDecoderTest extends Assert {
         elNode.appendChild(rtEl);
         rtEl.appendChild(doc.createTextNode("Hello Test"));
        
-        Object obj = JAXBEncoderDecoder.unmarshall(context, null, elNode);
+        Object obj = JAXBEncoderDecoder.unmarshall(context.createUnmarshaller(), 
+                                                   elNode,
+                                                   null,
+                                                   true);
         assertNotNull(obj);
         assertEquals(GreetMe.class,  obj.getClass());
         assertEquals("Hello Test", ((GreetMe)obj).getRequestType());
@@ -408,7 +411,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
         //STARTDOCUMENT/ENDDOCUMENT is not required
         //writer.add(eFactory.createStartDocument("utf-8", "1.0"));        
-        JAXBEncoderDecoder.marshall(context, null, obj, writer, emptyMarshallerProperties);
+        JAXBEncoderDecoder.marshall(context.createMarshaller(), obj, null, writer);
         //writer.add(eFactory.createEndDocument());
         writer.flush();
         writer.close();

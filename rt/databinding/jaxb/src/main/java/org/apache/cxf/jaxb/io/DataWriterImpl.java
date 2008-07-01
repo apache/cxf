@@ -20,16 +20,23 @@
 package org.apache.cxf.jaxb.io;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
+import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.namespace.QName;
 
 import com.sun.xml.bind.api.TypeReference;
 
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
@@ -37,24 +44,68 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
-    private Set<Class<?>> contextClasses;
-    private Map<String, Object> marshallerProperties = Collections.emptyMap();
+    private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
+
+    private JAXBDataBinding databinding;
     
-    public DataWriterImpl(JAXBContext ctx, Set<Class<?>> contextClasses) {
-        super(ctx);
-        this.contextClasses = contextClasses;
-    }
-    
-    public DataWriterImpl(JAXBContext ctx, 
-                          Map<String, Object> marshallerProperties,
-                          Set<Class<?>> contextClasses) {
-        super(ctx);
-        this.marshallerProperties = marshallerProperties;
-        this.contextClasses = contextClasses;
+    public DataWriterImpl(JAXBDataBinding binding) {
+        super(binding.getContext());
+        databinding = binding;
     }
     
     public void write(Object obj, T output) {
         write(obj, null, output);
+    }
+    
+    public Marshaller createMarshaller(Object elValue, MessagePartInfo part) {
+        Class<?> cls = null;
+        if (part != null) {
+            cls = part.getTypeClass();
+        }
+
+        if (cls == null) {
+            cls = null != elValue ? elValue.getClass() : null;
+        }
+
+        if (cls != null && cls.isArray() && elValue instanceof Collection) {
+            Collection<?> col = (Collection<?>)elValue;
+            elValue = col.toArray((Object[])Array.newInstance(cls.getComponentType(), col.size()));
+        }
+        Marshaller marshaller;
+        try {
+            
+            marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
+            marshaller.setListener(databinding.getMarshallerListener());
+            
+            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+                                   databinding.getNamespacePrefixMapper());
+            if (databinding.getMarshallerProperties() != null) {
+                for (Map.Entry<String, Object> propEntry 
+                    : databinding.getMarshallerProperties().entrySet()) {
+                    try {
+                        marshaller.setProperty(propEntry.getKey(), propEntry.getValue());
+                    } catch (PropertyException pe) {
+                        LOG.log(Level.INFO, "PropertyException setting Marshaller properties", pe);
+                    }
+                }
+            }
+            
+            marshaller.setSchema(schema);
+            marshaller.setAttachmentMarshaller(getAttachmentMarshaller());
+        } catch (JAXBException ex) {
+            if (ex instanceof javax.xml.bind.MarshalException) {
+                javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
+                Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
+                    .getMessage());
+                throw new Fault(faultMessage, ex);
+            } else {
+                throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
+            }
+        }
+        return marshaller;
     }
     
     public void write(Object obj, MessagePartInfo part, T output) {
@@ -70,27 +121,31 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 && part != null
                 && Boolean.TRUE.equals(part.getProperty(JAXBDataBinding.class.getName() 
                                                         + ".CUSTOM_EXCEPTION"))) {
-                JAXBEncoderDecoder.marshallException(getJAXBContext(), getSchema(), (Exception)obj,
-                                                     part, output, getAttachmentMarshaller(),
-                                                     marshallerProperties);                
+                JAXBEncoderDecoder.marshallException(createMarshaller(obj, part),
+                                                     (Exception)obj,
+                                                     part, 
+                                                     output);                
             } else {
                 Annotation[] anns = getJAXBAnnotation(part);
                 if (!honorJaxbAnnotation || anns.length == 0) {
-                    JAXBEncoderDecoder.marshall(getJAXBContext(), getSchema(), obj, part, output,
-                                                getAttachmentMarshaller(), marshallerProperties);
+                    JAXBEncoderDecoder.marshall(createMarshaller(obj, part), obj, part, output);
                 } else if (honorJaxbAnnotation && anns.length > 0) {
                     //RpcLit will use the JAXB Bridge to marshall part message when it is 
                     //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
                     //TODO:Cache the JAXBRIContext
                     QName qname = new QName(null, part.getConcreteName().getLocalPart());
                     TypeReference typeReference = new TypeReference(qname, part.getTypeClass(), anns);
-                    JAXBEncoderDecoder.marshalWithBridge(typeReference, contextClasses, obj, 
-                                                         output, getAttachmentMarshaller());
+                    
+                    JAXBEncoderDecoder.marshalWithBridge(typeReference, 
+                                                         databinding.getContextClasses(), 
+                                                         obj, 
+                                                         output, 
+                                                         getAttachmentMarshaller());
                 }
             }
         } else if (obj == null && needToRender(obj, part)) {
-            JAXBEncoderDecoder.marshallNullElement(getJAXBContext(), getSchema(), output, part,
-                                                   marshallerProperties);
+            JAXBEncoderDecoder.marshallNullElement(createMarshaller(obj, part),
+                                                   output, part);
         }
     }
 
@@ -101,15 +156,5 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         }
         return false;
     }
-
-    public Map<String, Object> getMarshallerProperties() {
-        return marshallerProperties;
-    }
-
-    public void setMarshallerProperties(Map<String, Object> marshallerProperties) {
-        this.marshallerProperties = marshallerProperties;
-    }
-    
-
     
 }

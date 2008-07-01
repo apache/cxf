@@ -242,6 +242,6 @@ public class JAXBDataBindingTest extends Assert {
         writer.write(bean, xmlWriter);
         xmlWriter.flush();
         String xml = stringWriter.toString();
-        assertTrue(xml.contains("greenland=\"uri:ultima:thule"));
+        assertTrue(xml, xml.contains("greenland=\"uri:ultima:thule"));
     }
 }

@@ -20,27 +20,68 @@
 package org.apache.cxf.jaxb.io;
 
 import java.lang.annotation.Annotation;
-import java.util.Set;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import com.sun.xml.bind.api.TypeReference;
 
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
-    Set<Class<?>> contextClasses;
-    public DataReaderImpl(JAXBContext ctx, Set<Class<?>> contextClasses) {
-        super(ctx);
-        this.contextClasses = contextClasses;
+    private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
+    JAXBDataBinding databinding;
+    
+    public DataReaderImpl(JAXBDataBinding binding) {
+        super(binding.getContext());
+        databinding = binding;
     }
 
     public Object read(T input) {
         return read(null, input);
+    }
+    
+    private Unmarshaller createUnmarshaller() {
+        try {
+            Unmarshaller um = null;
+            um = context.createUnmarshaller();
+            if (databinding.getUnmarshallerListener() != null) {
+                um.setListener(databinding.getUnmarshallerListener());
+            }
+            if (databinding.getUnmarshallerProperties() != null) {
+                for (Map.Entry<String, Object> propEntry 
+                    : databinding.getUnmarshallerProperties().entrySet()) {
+                    try {
+                        um.setProperty(propEntry.getKey(), propEntry.getValue());
+                    } catch (PropertyException pe) {
+                        LOG.log(Level.INFO, "PropertyException setting Marshaller properties", pe);
+                    }
+                }
+            }
+            um.setSchema(schema);
+            um.setAttachmentUnmarshaller(getAttachmentUnmarshaller());
+            return um;
+        } catch (JAXBException ex) {
+            if (ex instanceof javax.xml.bind.UnmarshalException) {
+                javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
+                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, unmarshalEx.getLinkedException()
+                    .getMessage()), ex);
+            } else {
+                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
+            }
+        }
     }
 
     public Object read(MessagePartInfo part, T reader) {
@@ -56,18 +97,19 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             QName qname = new QName(null, part.getConcreteName().getLocalPart());
             TypeReference typeReference = new TypeReference(qname, part.getTypeClass(), anns);
             return JAXBEncoderDecoder.unmarshalWithBridge(typeReference, 
-                                                          contextClasses,
+                                                          databinding.getContextClasses(),
                                                           reader,
                                                           getAttachmentUnmarshaller());
         }
         
-        return JAXBEncoderDecoder.unmarshall(getJAXBContext(), getSchema(), reader, part, 
-                                             getAttachmentUnmarshaller(), unwrapJAXBElement);
+        return JAXBEncoderDecoder.unmarshall(createUnmarshaller(), reader, part, 
+                                             unwrapJAXBElement);
     }
 
     public Object read(QName name, T input, Class type) {
-        return JAXBEncoderDecoder.unmarshall(getJAXBContext(), getSchema(), input, name, type, 
-                                             getAttachmentUnmarshaller(), unwrapJAXBElement);
+        return JAXBEncoderDecoder.unmarshall(createUnmarshaller(), input,
+                                             name, type, 
+                                             unwrapJAXBElement);
     }
 
 }
