@@ -19,6 +19,10 @@
 
 package org.apache.cxf.systest.ws.security;
 
+import java.security.Principal;
+
+import javax.xml.ws.WebServiceContext;
+
 
 @javax.jws.WebService(
     serviceName = "SOAPServiceWSSecurity", 
@@ -29,10 +33,31 @@ package org.apache.cxf.systest.ws.security;
 )
 public class GreeterImpl 
     extends org.apache.hello_world_soap_http.GreeterImpl {
+    
+    private static Principal user;
+    
+    public static Principal getUser() {
+        return user;
+    }
 
     public String greetMe(String me) {
+        WebServiceContext ctx = super.getContext();
+        Principal p = ctx.getUserPrincipal();
+        if (p != null) {
+            user = p;
+        }        
+        
         System.out.println("\n\n*** GreetMe called with: " + me + "***\n\n");
         return "Hello " + me;
+    }
+    
+    public String sayHi() {
+        WebServiceContext ctx = super.getContext();
+        Principal p = ctx.getUserPrincipal();
+        if (p != null) {
+            user = p;
+        }
+        return super.sayHi();
     }
     
 }

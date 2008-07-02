@@ -116,6 +116,10 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
         result = source2String(dispatcher.invoke(new StreamSource(is)));
         assertTrue(result.indexOf("Bonjour") != -1);
+        //make sure the principal was set
+        assertNotNull(GreeterImpl.getUser());
+        assertEquals("alice", GreeterImpl.getUser().getName());
+        
         //
         // Sending no security headers should result in a Fault
         //

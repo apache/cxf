@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,10 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -168,7 +171,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
                 }
             }
-
             if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
                 checkSignatureConfirmation(reqData, wsResult);
             }
@@ -282,6 +284,22 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             i++;
         }
         msg.setContent(XMLStreamReader.class, reader);
+        
+        for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
+            final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            if (p != null) {
+                SecurityContext c = new SecurityContext() {
+                    public Principal getUserPrincipal() {
+                        return p;
+                    }
+                    public boolean isUserInRole(String role) {
+                        return false;
+                    }
+                };
+                msg.put(SecurityContext.class, c);
+                break;
+            }
+        }
     }
 
     private String getAction(SoapMessage msg, SoapVersion version) {
