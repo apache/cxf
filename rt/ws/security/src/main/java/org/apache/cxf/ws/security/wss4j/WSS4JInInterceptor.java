@@ -66,6 +66,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
     public static final String TIMESTAMP_RESULT = "wss4j.timestamp.result";
     public static final String SIGNATURE_RESULT = "wss4j.signature.result";
+    public static final String PRINCIPAL_RESULT = "wss4j.principal.result";
     public static final String PROCESSOR_MAP = "wss4j.processor.map";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JInInterceptor.class);
@@ -87,18 +88,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         getAfter().add(SAAJInInterceptor.class.getName());
     }
 
-    @SuppressWarnings("unchecked")
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
         setProperties(properties);
-        final Map<QName, String> map = 
-            (Map<QName, String>) properties.get(PROCESSOR_MAP);
+        final Map<QName, String> map = CastUtils.cast(
+            (Map)properties.get(PROCESSOR_MAP));
         if (map != null) {
             secEngineOverride = createSecurityEngine(map);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void handleMessage(SoapMessage msg) throws Fault {
         SOAPMessage doc = msg.getContent(SOAPMessage.class);
         if (doc == null) {
@@ -257,14 +256,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
         throws SOAPException, XMLStreamException {
         /*
          * All ok up to this point. Now construct and setup the security result
          * structure. The service may fetch this and check it.
          */
-        List<Object> results = (Vector<Object>)msg.get(WSHandlerConstants.RECV_RESULTS);
+        List<Object> results = CastUtils.cast((List)msg.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
             results = new Vector<Object>();
             msg.put(WSHandlerConstants.RECV_RESULTS, results);
@@ -288,17 +286,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             if (p != null) {
-                SecurityContext c = new SecurityContext() {
-                    public Principal getUserPrincipal() {
-                        return p;
-                    }
-                    public boolean isUserInRole(String role) {
-                        return false;
-                    }
-                };
-                msg.put(SecurityContext.class, c);
-                break;
-            }
+                msg.put(PRINCIPAL_RESULT, p);                   
+                SecurityContext sc = msg.get(SecurityContext.class);
+                if (sc == null || sc.getUserPrincipal() == null) {
+                    SecurityContext c = new SecurityContext() {
+                        public Principal getUserPrincipal() {
+                            return p;
+                        }
+                        public boolean isUserInRole(String role) {
+                            return false;
+                        }
+                    };
+                    msg.put(SecurityContext.class, c);
+                    break;
+                }
+            }            
         }
     }
 
