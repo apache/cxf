@@ -78,7 +78,6 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
         setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
     }
     
-    @SuppressWarnings("unchecked")
     public Server create() {
         try {
             Endpoint ep = createEndpoint();

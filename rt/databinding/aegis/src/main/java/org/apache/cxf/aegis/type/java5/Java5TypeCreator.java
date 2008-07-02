@@ -193,7 +193,6 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         return paramClass;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Type createDefaultType(TypeClassInfo info) {
         QName typeName = info.getTypeName();
@@ -235,7 +234,6 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         return type;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public QName createQName(Class typeClass) {
         String name = annotationReader.getName(typeClass);

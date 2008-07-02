@@ -73,8 +73,6 @@ public class MapsTest extends AbstractAegisTest {
     @Ignore
     @Test
     public void testMapWsdl() throws WSDLException {
-        @SuppressWarnings("unused")
-        //Document wsdl = getWSDLDocument("MapTestService");
         Definition wsdlDef = getWSDLDefinition("MapTestService");
         StringWriter sink = new StringWriter();
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(wsdlDef, sink);

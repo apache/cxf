@@ -54,7 +54,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         super(Phase.MARSHAL);
     }
 
-    @SuppressWarnings("unchecked")
     public void handleMessage(Message message) {
         
         try {

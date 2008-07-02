@@ -124,7 +124,6 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
         return this;
     }
     
-    @SuppressWarnings("unchecked")
     public ResponseBuilder header(String name, Object value) {
         metadata.add(name, value.toString());
         return this;

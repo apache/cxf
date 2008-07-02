@@ -313,7 +313,6 @@ public class PhaseInterceptorChainTest extends Assert {
         return setUpPhaseInterceptor(phase, id, null, null);
     }
 
-    @SuppressWarnings("unchecked")
     AbstractPhaseInterceptor setUpPhaseInterceptor(final String phase, 
                                                    final String id,
                                                    Set<String> b,

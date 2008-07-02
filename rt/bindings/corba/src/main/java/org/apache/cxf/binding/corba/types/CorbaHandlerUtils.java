@@ -370,7 +370,8 @@ public final class CorbaHandlerUtils {
         if (schemaType instanceof XmlSchemaElement) {
             stype = ((XmlSchemaElement) schemaType).getSchemaType();
             if (stype == null) {
-                stype = CorbaUtils.getXmlSchemaType(serviceInfo, el.getRefName());
+                stype = CorbaUtils.getXmlSchemaType(serviceInfo, 
+                                                    ((XmlSchemaElement) schemaType).getRefName());
             }
         }
         

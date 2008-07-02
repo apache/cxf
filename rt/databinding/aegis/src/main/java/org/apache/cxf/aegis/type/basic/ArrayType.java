@@ -173,6 +173,9 @@ public class ArrayType extends Type {
         }
 
         Type type = getComponentType();
+        if (type == null) {
+            throw new DatabindingException("Couldn't find type for array.");
+        }
         if (XmlSchemaConstants.ANY_TYPE_QNAME.equals(type.getSchemaType())) {
             forceXsiWrite = true;
         }
@@ -186,9 +189,6 @@ public class ArrayType extends Type {
 
         String name = type.getSchemaType().getLocalPart();
 
-        if (type == null) {
-            throw new DatabindingException("Couldn't find type for " + type.getTypeClass() + ".");
-        }
 
         Class arrayType = type.getTypeClass();
 

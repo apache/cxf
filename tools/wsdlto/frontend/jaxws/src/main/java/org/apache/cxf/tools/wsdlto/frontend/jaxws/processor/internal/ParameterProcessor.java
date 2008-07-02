@@ -54,7 +54,6 @@ public class ParameterProcessor extends AbstractProcessor {
 
     private DataBindingProfile dataBinding;
 
-    @SuppressWarnings("unchecked")
     public ParameterProcessor(ToolContext penv) {
         super(penv);
         dataBinding = context.get(DataBindingProfile.class);

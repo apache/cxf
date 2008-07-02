@@ -49,7 +49,6 @@ public class XMLFormatValidator extends ServiceValidator {
         return checkXMLBindingFormat();
     }
 
-    @SuppressWarnings("unchecked")
     private boolean checkXMLBindingFormat() {
         Collection<BindingInfo> bindings = service.getBindings();
         if (bindings != null) {
@@ -63,7 +62,6 @@ public class XMLFormatValidator extends ServiceValidator {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     private boolean checkXMLFormat(BindingInfo binding) {
         Collection<BindingOperationInfo> bos = binding.getOperations();
         boolean result = true;

@@ -279,7 +279,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
      * @param startingAfterInterceptorID the id of the interceptor 
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     public synchronized boolean doInterceptStartingAfter(Message message,
                                                          String startingAfterInterceptorID) {
         updateIterator();
@@ -300,7 +299,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
      * @param startingAtInterceptorID the id of the interceptor 
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     public synchronized boolean doInterceptStartingAt(Message message,
                                                          String startingAtInterceptorID) {
         updateIterator();

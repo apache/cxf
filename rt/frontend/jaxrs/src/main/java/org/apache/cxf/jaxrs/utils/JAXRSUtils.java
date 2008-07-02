@@ -471,7 +471,6 @@ public final class JAXRSUtils {
         return value.length() > 0 ? InjectionUtils.handleParameter(value, pClass) : defaultValue;
     }
     
-    @SuppressWarnings("unchecked")
     public static Object createContextValue(Message m, Type genericType, Class<?> clazz) {
  
         Object o = null;
@@ -551,7 +550,6 @@ public final class JAXRSUtils {
     
     
     //TODO : multiple query string parsing, do it once
-    @SuppressWarnings("unchecked")
     private static Object readQueryString(QueryParam queryParam,
                                           Class<?> paramType,
                                           Type genericType,

@@ -220,7 +220,6 @@ public final class JAXBEncoderDecoder {
     }
     
 //  TODO: cache the JAXBRIContext
-    @SuppressWarnings("unchecked")
     public static Object unmarshalWithBridge(TypeReference ref,
                                              Set<Class<?>> ctxClasses,
                                              Object source,
@@ -304,7 +303,6 @@ public final class JAXBEncoderDecoder {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static Exception unmarshallException(Unmarshaller u, 
                                                 Object source,
                                                 MessagePartInfo part) {

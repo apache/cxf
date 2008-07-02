@@ -72,7 +72,6 @@ public class ResourceAdapterInternalException extends javax.resource.spi.Resourc
     }
 
 
-    @SuppressWarnings("deprecation")
     public Exception getLinkedException() {
         Exception linkedEx = null;
         if (getCause() instanceof Exception) {

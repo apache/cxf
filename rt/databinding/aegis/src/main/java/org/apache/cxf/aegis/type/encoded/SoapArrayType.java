@@ -284,7 +284,7 @@ public class SoapArrayType extends Type {
         // ComponentType
         Type type = getComponentType();
         if (type == null) {
-            throw new DatabindingException("Couldn't find type for " + type.getTypeClass() + ".");
+            throw new DatabindingException("Couldn't find component type for array.");
         }
 
         // Root component's schema type

@@ -276,7 +276,6 @@ public final class SOAPBindingUtil {
         return obj instanceof SOAPBinding || obj instanceof SOAP12Binding;
     }
 
-    @SuppressWarnings("unchecked")
     public static List<SoapFault> getBindingOperationSoapFaults(BindingOperation bop) {
         List<SoapFault> faults = new ArrayList<SoapFault>();
         Map bindingFaults = bop.getBindingFaults();

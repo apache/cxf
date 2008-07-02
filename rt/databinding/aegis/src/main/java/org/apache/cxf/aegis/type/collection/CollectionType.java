@@ -90,7 +90,7 @@ public class CollectionType extends ArrayType {
             Type type = getComponentType();
 
             if (type == null) {
-                throw new DatabindingException("Couldn't find type for " + type.getTypeClass() + ".");
+                throw new DatabindingException("Couldn't find component type for Collection.");
             }
 
             for (Iterator itr = list.iterator(); itr.hasNext();) {

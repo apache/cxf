@@ -956,7 +956,6 @@ public class CodeGenTest extends ProcessorTestBase {
         assertNotNull("method should be generated", method);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testSupportXMLBindingBare() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/xml_http_bare.wsdl"));

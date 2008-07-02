@@ -163,7 +163,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                                        contentType, 
                                                                        acceptContentType);
             
-            if (subCri == null) {
+            if (subOri == null) {
                 org.apache.cxf.common.i18n.Message errorM = 
                     new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_METHOD_FOUND",  
                                                            BUNDLE, 

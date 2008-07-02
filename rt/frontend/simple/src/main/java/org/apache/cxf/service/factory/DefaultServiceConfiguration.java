@@ -106,7 +106,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     private String getDefaultLocalName(OperationInfo op, Method method, int paramNumber, String prefix) {
         Class<?> impl = getServiceFactory().getServiceClass();
         // try to grab the implementation class so we can read the debug symbols from it
-        if (impl == null) {
+        if (impl != null) {
             try {
                 method = impl.getMethod(method.getName(), method.getParameterTypes());
             } catch (Exception e) {

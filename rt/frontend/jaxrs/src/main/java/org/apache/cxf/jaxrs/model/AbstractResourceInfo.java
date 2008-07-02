@@ -161,19 +161,16 @@ public abstract class AbstractResourceInfo {
         return ret;
     }
     
-    @SuppressWarnings("unchecked")
     public ThreadLocalProxy getContextFieldProxy(Field f) {
         return fieldProxyMap == null ? null
                : fieldProxyMap.get(f);
     }
     
-    @SuppressWarnings("unchecked")
     public ThreadLocalProxy getResourceFieldProxy(Field f) {
         return resourceProxyMap == null ? null
                : resourceProxyMap.get(f);
     }
     
-    @SuppressWarnings("unchecked")
     public ThreadLocalProxy getContextSetterProxy(Method m) {
         return setterProxyMap == null ? null : setterProxyMap.get(m);
     }
