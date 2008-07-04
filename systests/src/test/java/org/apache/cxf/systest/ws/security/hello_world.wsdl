@@ -26,6 +26,7 @@
     name="WSSecurity"
     >
 
+    <!-- Imported hello_world.wsdl is located in CXF's testutils module -->
     <wsdl:import 
         namespace="http://apache.org/hello_world_soap_http"
         location="wsdl/hello_world.wsdl"
