@@ -41,7 +41,8 @@ public class Option {
     }
 
     public void setExtraargs(List<String> ea) {
-        this.extraargs = ea;
+        this.extraargs.clear();
+        this.extraargs.addAll(ea);
     }
 
     public List<String> getPackagenames() {
