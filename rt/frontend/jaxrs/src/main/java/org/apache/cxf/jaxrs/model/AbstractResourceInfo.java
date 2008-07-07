@@ -188,7 +188,9 @@ public abstract class AbstractResourceInfo {
             return;
         }
         for (ThreadLocalProxy tlp : tlps.values()) {
-            tlp.remove();
+            if (tlp != null) {
+                tlp.remove();
+            }
         }
     }
 }

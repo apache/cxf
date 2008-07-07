@@ -39,6 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
@@ -284,7 +285,7 @@ public final class InjectionUtils {
             proxy = new ThreadLocalRequest();
         }  else if (MessageBodyWorkers.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalMessageBodyWorkers();
-        } else if (MessageBodyWorkers.class.isAssignableFrom(type)) {
+        } else if (HttpServletRequest.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletRequest();
         }
         return proxy;
