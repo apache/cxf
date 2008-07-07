@@ -40,7 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -1215,7 +1214,6 @@ public class HTTPConduit
      * Using this method will override any Authorization Policy set in 
      * configuration.
      */
-    @Resource
     public void setAuthorization(AuthorizationPolicy authorization) {
         this.authorizationPolicy = authorization;
     }
@@ -1236,7 +1234,6 @@ public class HTTPConduit
      * This method sets the Client Side Policy for this HTTPConduit. Using this
      * method will override any HTTPClientPolicy set in configuration.
      */
-    @Resource
     public void setClient(HTTPClientPolicy client) {
         this.clientSidePolicy = client;
     }
@@ -1254,7 +1251,6 @@ public class HTTPConduit
      * Using this method overrides any Authorization Policy for the proxy 
      * that is set in the configuration.
      */
-    @Resource
     public void setProxyAuthorization(
             ProxyAuthorizationPolicy proxyAuthorization
     ) {
@@ -1274,7 +1270,6 @@ public class HTTPConduit
      * Using this method overrides any TLS Client Parameters that is configured
      * for this HTTPConduit.
      */
-    @Resource
     public void setTlsClientParameters(TLSClientParameters params) {
         this.tlsClientParameters = params;
         if (this.tlsClientParameters != null) {
@@ -1312,7 +1307,6 @@ public class HTTPConduit
      * Using this method overrides any trust decider configured for this 
      * HTTPConduit.
      */
-    @Resource
     public void setTrustDecider(MessageTrustDecider decider) {
         this.trustDecider = decider;
     }
@@ -1331,7 +1325,6 @@ public class HTTPConduit
      * Using this method overrides any trust decider configured for this 
      * HTTPConduit.
      */
-    @Resource
     public void setBasicAuthSupplier(HttpBasicAuthSupplier supplier) {
         this.basicAuthSupplier = supplier;
     }

@@ -187,8 +187,6 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         if (resource != null) {
             invokeSetter(method, resource);
         } else {
-            resource = resolveResource(resourceName, clz);
-            
             LOG.log(Level.FINE, "RESOURCE_RESOLVE_FAILED", new Object[] {resourceName, clz});
         }
     }
