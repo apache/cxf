@@ -54,7 +54,10 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                           WSS4JOutInterceptor.class.getName() + "-Time");
     private WSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
+    private boolean mtomEnabled;
     
+    
+
     public WSS4JOutInterceptor() {
         super();
         setPhase(Phase.PRE_PROTOCOL);
@@ -67,10 +70,25 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         this();
         setProperties(props);
     }
+    
+    public boolean isAllowMTOM() {
+        return mtomEnabled;
+    }
+    /**
+     * Enable or disable mtom with WS-Security.   By default MTOM is disabled as
+     * attachments would not get encrypted or be part of the signature.
+     * @param mtomEnabled
+     */
+    public void setAllowMTOM(boolean allowMTOM) {
+        this.mtomEnabled = allowMTOM;
+    }
+
     public void handleMessage(SoapMessage mc) throws Fault {
         //must turn off mtom when using WS-Sec so binary is inlined so it can
         //be properly signed/encrypted/etc...
-        mc.put(org.apache.cxf.message.Message.MTOM_ENABLED, false);
+        if (!mtomEnabled) {
+            mc.put(org.apache.cxf.message.Message.MTOM_ENABLED, false);
+        }
         
         if (mc.getContent(SOAPMessage.class) == null) {
             saajOut.handleMessage(mc);
