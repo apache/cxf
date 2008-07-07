@@ -33,17 +33,21 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
+import org.apache.cxf.wsdl.http.AddressType;
 
 public class ServletTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
     
     private Map<String, ServletDestination> destinations = 
         new ConcurrentHashMap<String, ServletDestination>();
+    
+    private ServletController controller;
     
     public ServletTransportFactory(Bus b) {
         super.setBus(b);
@@ -61,6 +65,9 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     public ServletTransportFactory() {
     }
    
+    public void setServletController(ServletController c) {
+        controller = c;
+    }
 
     @Resource(name = "bus")
     public void setBus(Bus b) {
@@ -94,6 +101,19 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
             String path = getTrimmedPath(endpointInfo.getAddress());
             d = new ServletDestination(getBus(), this, endpointInfo, this, path);
             destinations.put(path, d);
+            
+            if (controller != null
+                && !StringUtils.isEmpty(controller.getLastBaseURL())) {
+                String ad = d.getEndpointInfo().getAddress();
+                if (ad.equals(path)
+                    || ad.equals(controller.getLastBaseURL() + path)) {
+                    d.getEndpointInfo().setAddress(controller.getLastBaseURL() + path);
+                    if (d.getEndpointInfo().getExtensor(AddressType.class) != null) {
+                        d.getEndpointInfo().getExtensor(AddressType.class)
+                            .setLocation(controller.getLastBaseURL() + path);
+                    }
+                }
+            }
         }
         return d;
     }

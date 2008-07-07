@@ -57,7 +57,8 @@ public class ServletController {
  
     public ServletController(ServletTransportFactory df, AbstractCXFServlet servlet) {
         this.transport = df;
-        this.cxfServlet = servlet;       
+        this.cxfServlet = servlet;
+        df.setServletController(this);
     }
     
     public void setHideServiceList(boolean generate) {
@@ -71,6 +72,10 @@ public class ServletController {
     }
     public void setServiceListStyleSheet(String serviceListStyleSheet) {
         this.serviceListStyleSheet = serviceListStyleSheet;
+    }
+    
+    String getLastBaseURL() {
+        return lastBase;
     }
     
     private synchronized void updateDests(HttpServletRequest request) {

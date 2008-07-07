@@ -251,12 +251,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             ServerImpl serv = getServer(addr);
             if (addr != null) {            
                 EndpointInfo endpointInfo = serv.getEndpoint().getEndpointInfo();
-                endpointInfo.setAddress(addr);
+                if (!endpointInfo.getAddress().contains(addr)) {
+                    endpointInfo.setAddress(addr);
+                }
                 if (publishedEndpointUrl != null) {
                     // TODO is there a good place to put this key-string as a constant?
                     endpointInfo.setProperty("publishedEndpointUrl", publishedEndpointUrl);
                 }
-                this.address = addr;
+                this.address = endpointInfo.getAddress();
             }
             serv.start();
         } catch (WebServiceException ex) {

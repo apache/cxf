@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.servlet;
 
+import javax.xml.ws.Endpoint;
+
 import org.w3c.dom.Document;
 
 import com.meterware.httpunit.PostMethodWebRequest;
@@ -128,6 +130,19 @@ public class SpringServletTest extends AbstractServletTest {
         assertValid("//wsdl:operation[@name='greetMe']", doc);
         assertValid("//wsdlsoap:address[@location='http://cxf.apache.org/Greeter']", doc);
         
+        Endpoint.publish("/services/Greeter3", new org.apache.hello_world_soap_http.GreeterImpl());
+        req = 
+            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter3?wsdl");
+        res = client.getResponse(req);    
+        assertEquals(200, res.getResponseCode());
+        assertEquals("text/xml", res.getContentType());
+        
+        doc = DOMUtils.readXml(res.getInputStream());
+        assertNotNull(doc);
+        
+        assertValid("//wsdl:operation[@name='greetMe']", doc);
+        assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/Greeter3']", doc);
+
     }
     
     @Test
