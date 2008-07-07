@@ -159,15 +159,27 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeComment(String value) throws XMLStreamException {
-        currentNode.appendChild(document.createComment(value));
+        if (currentNode == null) {
+            document.appendChild(document.createComment(value));
+        } else {
+            currentNode.appendChild(document.createComment(value));
+        }
     }
 
     public void writeProcessingInstruction(String target) throws XMLStreamException {
-        currentNode.appendChild(document.createProcessingInstruction(target, null));
+        if (currentNode == null) {
+            document.appendChild(document.createProcessingInstruction(target, null));
+        } else {
+            currentNode.appendChild(document.createProcessingInstruction(target, null));
+        }
     }
 
     public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
-        currentNode.appendChild(document.createProcessingInstruction(target, data));
+        if (currentNode == null) {
+            document.appendChild(document.createProcessingInstruction(target, data));
+        } else {
+            currentNode.appendChild(document.createProcessingInstruction(target, data));
+        }
     }
 
     public void writeCData(String data) throws XMLStreamException {
@@ -186,11 +198,11 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument(String version) throws XMLStreamException {
-        writeStartDocument();
+        document.setXmlVersion(version);
     }
 
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
-        writeStartDocument();
+        document.setXmlVersion(version);
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
