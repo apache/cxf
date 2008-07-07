@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.URLDataSource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
@@ -149,9 +148,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             
             // This code could probably be refactored out somewhere...
             if (o instanceof Source) {
-                
                 dh = new DataHandler(createDataSource((Source)o, ct));
-                
             } else if (o instanceof Image) {
                 // TODO: make this streamable. This is one of my pet
                 // peeves in JAXB RI as well, so if you fix this, submit the 
@@ -191,13 +188,14 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 } catch (IOException e) {
                     //ignore, use same dh
                 }
-            } else if (dh == null) {
+            } else if (o instanceof byte[]) {
+                if (ct == null) {
+                    ct = "application/octet-stream";
+                }
+                dh = new DataHandler(new ByteArrayDataSource((byte[])o, ct));                
+            } else {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED", 
                                                                        LOG, o.getClass()));
-            } else if (dh.getDataSource() instanceof URLDataSource) {
-                URLDataSource ds = (URLDataSource)dh.getDataSource();
-                dh = new DataHandler(ds.getURL()); 
-                ct = ds.getContentType();
             }
             
             AttachmentImpl att = new AttachmentImpl(id);
