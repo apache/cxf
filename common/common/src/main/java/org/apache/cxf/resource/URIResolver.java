@@ -64,10 +64,10 @@ public class URIResolver {
         this.calling = (calling != null) ? calling : getClass();
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
-        } else if (baseUriStr != null && baseUriStr.startsWith("jar:")) {
-            tryJar(baseUriStr, uriStr);
-        } else if (uriStr.startsWith("jar:")) {
-            tryJar(uriStr);
+        } else if (baseUriStr != null && (baseUriStr.startsWith("jar:") || baseUriStr.startsWith("zip:"))) {
+            tryArchive(baseUriStr, uriStr);
+        } else if (uriStr.startsWith("jar:") || uriStr.startsWith("zip:")) {
+            tryArchive(uriStr);
         } else {
             tryFileSystem(baseUriStr, uriStr);
         }
@@ -83,10 +83,10 @@ public class URIResolver {
 
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
-        } else if (baseUriStr != null && baseUriStr.startsWith("jar:")) {
-            tryJar(baseUriStr, uriStr);
-        } else if (uriStr.startsWith("jar:")) {
-            tryJar(uriStr);
+        } else if (baseUriStr != null && (baseUriStr.startsWith("jar:") || baseUriStr.startsWith("zip:"))) {
+            tryArchive(baseUriStr, uriStr);
+        } else if (uriStr.startsWith("jar:") || uriStr.startsWith("zip:")) {
+            tryArchive(uriStr);
         } else {
             tryFileSystem(baseUriStr, uriStr);
         }
@@ -193,18 +193,18 @@ public class URIResolver {
         }
     }
     
-    private void tryJar(String baseStr, String uriStr) throws IOException {
+    private void tryArchive(String baseStr, String uriStr) throws IOException {
         int i = baseStr.indexOf('!');
         if (i == -1) {
             tryFileSystem(baseStr, uriStr);
         }
 
-        String jarBase = baseStr.substring(0, i + 1);
-        String jarEntry = baseStr.substring(i + 1);
+        String archiveBase = baseStr.substring(0, i + 1);
+        String archiveEntry = baseStr.substring(i + 1);
         try {
-            URI u = new URI(jarEntry).resolve(uriStr);
+            URI u = new URI(archiveEntry).resolve(uriStr);
 
-            tryJar(jarBase + u.toString());
+            tryArchive(archiveBase + u.toString());
 
             if (is != null) {
                 if (u.isAbsolute()) {
@@ -219,7 +219,7 @@ public class URIResolver {
         tryFileSystem("", uriStr);
     }
     
-    private void tryJar(String uriStr) throws IOException {
+    private void tryArchive(String uriStr) throws IOException {
         int i = uriStr.indexOf('!');
         if (i == -1) {
             return;
@@ -252,7 +252,7 @@ public class URIResolver {
             } catch (URISyntaxException e) {
                 // processing the jar:file:/ type value
                 String urlStr = url.toString();
-                if (urlStr.startsWith("jar:")) {
+                if (urlStr.startsWith("jar:") || urlStr.startsWith("zip:")) {
                     int pos = urlStr.indexOf('!');
                     if (pos != -1) {
                         try {

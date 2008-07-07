@@ -57,10 +57,13 @@ public final class WsdlOptionLoader {
     }
     
     public List<WsdlOption> load(String wsdlRoot) throws MojoExecutionException {
-        return load(new File(wsdlRoot), new String[] {"*.wsdl"}, null);
+        return load(new File(wsdlRoot), new String[] {"*.wsdl"}, null, null);
     }
 
-    public List<WsdlOption> load(File wsdlBasedir, String includes[], String excludes[])
+    public List<WsdlOption> load(File wsdlBasedir,
+                                 String includes[],
+                                 String excludes[],
+                                 Option defaultOptions)
         throws MojoExecutionException {
         
         if (wsdlBasedir == null) {
@@ -68,10 +71,10 @@ public final class WsdlOptionLoader {
         }
 
         if (!wsdlBasedir.exists()) {
-            throw new MojoExecutionException(wsdlBasedir + " not exists");
+            throw new MojoExecutionException(wsdlBasedir + " does not exist");
         }
 
-        return findJobs(wsdlBasedir, getWsdlFiles(wsdlBasedir, includes, excludes));
+        return findJobs(wsdlBasedir, getWsdlFiles(wsdlBasedir, includes, excludes), defaultOptions);
     }
 
     private List<File> getWsdlFiles(File dir, String includes[], String excludes[])
@@ -106,7 +109,7 @@ public final class WsdlOptionLoader {
         return FileUtils.getFiles(dir, pattern);
     }
 
-    protected List<WsdlOption> findJobs(File dir, List<File> wsdlFiles) {
+    protected List<WsdlOption> findJobs(File dir, List<File> wsdlFiles, Option defaultOptions) {
         List<WsdlOption> jobs = new ArrayList<WsdlOption>();
 
         for (File wsdl : wsdlFiles) {
@@ -119,22 +122,16 @@ public final class WsdlOptionLoader {
             File options = getOptions(dir, wsdlName + WSDL_OPTIONS);
             List<File> bindings = getBindingFiles(dir, wsdlName + WSDL_BINDINGS);
 
-            jobs.add(generateWsdlOption(wsdl, bindings, options));
+            jobs.add(generateWsdlOption(wsdl, bindings, options, defaultOptions));
         }
         return jobs;
     }
 
     protected WsdlOption generateWsdlOption(final File wsdl, 
                                             final List<File> bindingFiles, 
-                                            final File options) {
+                                            final File options,
+                                            final Option defaultOptions) {
         WsdlOption wsdlOption = new WsdlOption();
-
-        if (bindingFiles != null) {
-            for (File binding : bindingFiles) {
-                wsdlOption.getExtraargs().add("-b");
-                wsdlOption.getExtraargs().add(binding.toString());
-            }
-        }
 
         if (options != null && options.exists()) {
             try {
@@ -145,8 +142,22 @@ public final class WsdlOptionLoader {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (defaultOptions != null) {
+            // no options specified use the defaults
+            wsdlOption.setPackagenames(defaultOptions.getPackagenames());
+            wsdlOption.setExtraargs(defaultOptions.getExtraargs());
+            wsdlOption.setOutputDir(defaultOptions.getOutputDir());
+            wsdlOption.setDeleteDirs(defaultOptions.getDeleteDirs());
+            wsdlOption.setDependencies(defaultOptions.getDependencies());
+            wsdlOption.setBindingFiles(defaultOptions.getBindingFiles());
         }
-        wsdlOption.setWsdl(wsdl.toString());
+        
+        if (bindingFiles != null) {
+            for (File binding : bindingFiles) {
+                wsdlOption.addBindingFile(binding);
+            }
+        }
+        wsdlOption.setWsdl(wsdl.toURI().toString());
         
         return wsdlOption;
     }

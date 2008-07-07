@@ -38,7 +38,6 @@ public class ExtendedURIResolver {
 
     public InputSource resolve(String curUri, String baseUri) {
         try {
-            lastestImportUri = curUri;
             currentResolver.resolve(baseUri, curUri, getClass());
             if (currentResolver.isResolved()) {
                 if (currentResolver.getURI() != null && currentResolver.getURI().isAbsolute()) {
@@ -60,6 +59,10 @@ public class ExtendedURIResolver {
             }
         } catch (IOException e) {
             // move on...
+        } finally {
+            lastestImportUri = curUri;
+            // the uri may have been updated since we were called
+            // so only store it away when everything else is done
         }
         return null;
         // return new InputSource(schemaLocation);

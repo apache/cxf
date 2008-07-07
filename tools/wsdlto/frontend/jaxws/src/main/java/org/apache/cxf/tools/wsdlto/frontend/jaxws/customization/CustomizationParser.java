@@ -452,7 +452,7 @@ public final class CustomizationParser {
             }
 
         } else {
-            Message msg = new Message("UNKNOWN_BINDING_FILE", LOG, bindingFile);
+            Message msg = new Message("UNKNOWN_BINDING_FILE", LOG, bindingFile, reader.getName());
             throw new ToolException(msg);
         }
     }

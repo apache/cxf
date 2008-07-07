@@ -19,34 +19,12 @@
 
 package org.apache.cxf.maven_plugin;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-public class WsdlOption {
+public class WsdlOption extends Option {
     String wsdl;
-    List<String> packagenames;
-    List<String> extraargs = new ArrayList<String>();
-    File outputDir;
-    File dependencies[];
-    File redundantDirs[];
-
-    public List<String> getExtraargs() {
-        return extraargs;
-    }
-
-    public void setExtraargs(List<String> ea) {
-        this.extraargs = ea;
-    }
-
-    public List<String> getPackagenames() {
-        return packagenames;
-    }
-
-    public void setPackagenames(List<String> pn) {
-        this.packagenames = pn;
-    }
-
+    String wsdlLocation;
+    boolean wsdlLocationSet;
+    
     public String getWsdl() {
         return wsdl;
     }
@@ -54,24 +32,17 @@ public class WsdlOption {
     public void setWsdl(String w) {
         wsdl = w;
     }
-    public void setDependencies(File files[]) {
-        dependencies = files;
+    
+    public void setWsdlLocation(String s) {
+        wsdlLocationSet = true;
+        wsdlLocation = s;
     }
-    public File[] getDependencies() {
-        return dependencies;
-    }    
-    public void setDeleteDirs(File files[]) {
-        redundantDirs = files;
-    }
-    public File[] getDeleteDirs() {
-        return redundantDirs;
+    public String getWsdlLocation() {
+        return wsdlLocation;
     }
     
-    public File getOutputDir() {
-        return outputDir;
-    }
-    public void setOutputDir(File f) {
-        outputDir = f;
+    public boolean isSetWsdlLocation() {
+        return wsdlLocationSet;
     }
     
     public int hashCode() {

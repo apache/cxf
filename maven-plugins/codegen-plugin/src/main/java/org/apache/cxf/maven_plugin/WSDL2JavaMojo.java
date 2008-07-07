@@ -70,6 +70,11 @@ public class WSDL2JavaMojo extends AbstractMojo {
      */
     MavenProject project;
 
+    /**
+     * Default options to be used when a wsdl has not had it's options explicitly specified.
+     * @parameter
+     */
+    Option defaultOptions;
 
     /**
      * @parameter
@@ -116,7 +121,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                                                    final File output)
         throws MojoExecutionException {
         List<WsdlOption> options = new ArrayList<WsdlOption>();
-        for (WsdlOption o : new WsdlOptionLoader().load(root, includes, excludes)) {
+        for (WsdlOption o : new WsdlOptionLoader().load(root, includes, excludes, defaultOptions)) {
             if (o.getOutputDir() == null) {
                 o.setOutputDir(output);
             }
@@ -326,16 +331,39 @@ public class WSDL2JavaMojo extends AbstractMojo {
                     list.add(it.next().toString());
                 }
             }
-            // -d specify the dir for generated source code
-            //list.add("-verbose");
+            if (getLog().isDebugEnabled()) {
+                list.add("-verbose");            
+            }
+            // -d specify the dir for generated source code            
             list.add("-d");
             list.add(outputDirFile.toString());
 
+            for (String binding : wsdlOption.getBindingFiles()) {
+                File bindingFile = new File(binding);
+                URI bindingURI;
+                if (bindingFile.exists()) {
+                    bindingURI = bindingFile.toURI();
+                } else {
+                    bindingURI = basedir.resolve(binding);
+                }
+                list.add("-b");
+                list.add(bindingURI.toString());
+            }
+            
             if (wsdlOption.getExtraargs() != null) {
                 Iterator it = wsdlOption.getExtraargs().iterator();
                 while (it.hasNext()) {
-                    list.add(it.next().toString());
+                    Object value = it.next();
+                    if (value == null) {
+                        value = ""; // Maven make empty tags into null
+                                    // instead of empty strings.
+                    }
+                    list.add(value.toString());
                 }
+            }
+            if (wsdlOption.isSetWsdlLocation()) {
+                list.add("-wsdlLocation");
+                list.add(wsdlOption.getWsdlLocation() == null ? "" : wsdlOption.getWsdlLocation());
             }
             list.add(wsdlURI.toString());
 
