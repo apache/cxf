@@ -216,6 +216,7 @@
                     <configuration>
                         <rulesets>
                             <ruleset>cxf-pmd-ruleset.xml</ruleset>
+                            <ruleset>cxf-pmd-custom.xml</ruleset>
                         </rulesets>
                         <targetJdk>1.5</targetJdk>
                         <linkXRef>false</linkXRef>

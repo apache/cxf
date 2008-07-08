@@ -80,6 +80,11 @@
             <version>1.0-alpha-15</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>pmd</groupId>
+            <artifactId>pmd</artifactId>
+            <version>4.2</version>
+        </dependency>
     </dependencies>
 
     <!--build>
