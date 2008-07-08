@@ -22,27 +22,12 @@ package org.apache.cxf.maven_plugin;
 
 public class WsdlOption extends Option {
     String wsdl;
-    String wsdlLocation;
-    boolean wsdlLocationSet;
-    
     public String getWsdl() {
         return wsdl;
     }
 
     public void setWsdl(String w) {
         wsdl = w;
-    }
-    
-    public void setWsdlLocation(String s) {
-        wsdlLocationSet = true;
-        wsdlLocation = s;
-    }
-    public String getWsdlLocation() {
-        return wsdlLocation;
-    }
-    
-    public boolean isSetWsdlLocation() {
-        return wsdlLocationSet;
     }
     
     public int hashCode() {

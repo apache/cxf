@@ -323,49 +323,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         if (doWork) {
             doneFile.delete();
 
-            List<String> list = new ArrayList<String>();
-            if (wsdlOption.getPackagenames() != null) {
-                Iterator it = wsdlOption.getPackagenames().iterator();
-                while (it.hasNext()) {
-                    list.add("-p");
-                    list.add(it.next().toString());
-                }
-            }
-            if (getLog().isDebugEnabled()) {
-                list.add("-verbose");            
-            }
-            // -d specify the dir for generated source code            
-            list.add("-d");
-            list.add(outputDirFile.toString());
-
-            for (String binding : wsdlOption.getBindingFiles()) {
-                File bindingFile = new File(binding);
-                URI bindingURI;
-                if (bindingFile.exists()) {
-                    bindingURI = bindingFile.toURI();
-                } else {
-                    bindingURI = basedir.resolve(binding);
-                }
-                list.add("-b");
-                list.add(bindingURI.toString());
-            }
-            
-            if (wsdlOption.getExtraargs() != null) {
-                Iterator it = wsdlOption.getExtraargs().iterator();
-                while (it.hasNext()) {
-                    Object value = it.next();
-                    if (value == null) {
-                        value = ""; // Maven make empty tags into null
-                                    // instead of empty strings.
-                    }
-                    list.add(value.toString());
-                }
-            }
-            if (wsdlOption.isSetWsdlLocation()) {
-                list.add("-wsdlLocation");
-                list.add(wsdlOption.getWsdlLocation() == null ? "" : wsdlOption.getWsdlLocation());
-            }
-            list.add(wsdlURI.toString());
+            List<String> list = generateCommandLine(wsdlOption, outputDirFile, basedir, wsdlURI);
 
             getLog().debug("Calling wsdl2java with args: " + list);
             try {
@@ -376,6 +334,100 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
         }
+    }
+
+    private List<String> generateCommandLine(WsdlOption wsdlOption, File outputDirFile, URI basedir,
+                                             URI wsdlURI) {
+        List<String> list = new ArrayList<String>();
+        if (wsdlOption.getPackagenames() != null) {
+            Iterator it = wsdlOption.getPackagenames().iterator();
+            while (it.hasNext()) {
+                list.add("-p");
+                list.add(it.next().toString());
+            }
+        }
+        if (wsdlOption.getNamespaceExcludes() != null) {
+            Iterator it = wsdlOption.getNamespaceExcludes().iterator();
+            while (it.hasNext()) {
+                list.add("-nexclude");
+                list.add(it.next().toString());
+            }
+        }
+        if (getLog().isDebugEnabled()) {
+            list.add("-verbose");            
+        }
+        // -d specify the dir for generated source code            
+        list.add("-d");
+        list.add(outputDirFile.toString());
+
+        for (String binding : wsdlOption.getBindingFiles()) {
+            File bindingFile = new File(binding);
+            URI bindingURI;
+            if (bindingFile.exists()) {
+                bindingURI = bindingFile.toURI();
+            } else {
+                bindingURI = basedir.resolve(binding);
+            }
+            list.add("-b");
+            list.add(bindingURI.toString());
+        }
+        if (wsdlOption.getFrontEnd() != null) {
+            list.add("-fe");
+            list.add(wsdlOption.getFrontEnd());
+        }
+        if (wsdlOption.getDataBinding() != null) {
+            list.add("-db");
+            list.add(wsdlOption.getDataBinding());
+        }
+        if (wsdlOption.getWsdlVersion() != null) {
+            list.add("-wv");
+            list.add(wsdlOption.getWsdlVersion());
+        }
+        if (wsdlOption.getCatalog() != null) {
+            list.add("-catalog");
+            list.add(wsdlOption.getCatalog());
+        }
+        if (wsdlOption.isExtendedSoapHeaders()) {
+            list.add("-exsh");
+        }
+        if (wsdlOption.isValidateWsdl()) {
+            list.add("-validate");
+        }
+        if (wsdlOption.getDefaultExcludesNamespace() != null) {
+            list.add("-dex");
+            list.add(wsdlOption.getDefaultExcludesNamespace().toString());
+        }
+        if (wsdlOption.getDefaultNamespacePackageMapping() != null) {
+            list.add("-dns");
+            list.add(wsdlOption.getDefaultNamespacePackageMapping().toString());
+        }
+        if (wsdlOption.getServiceName()  != null) {
+            list.add("-sn");
+            list.add(wsdlOption.getServiceName());
+        }
+        if (wsdlOption.isAutoNameResolution()) {
+            list.add("-autoNameResolution");
+        }
+        if (wsdlOption.isNoAddressBinding()) {
+            list.add("-noAddressBinding");
+        }
+        if (wsdlOption.getExtraargs() != null) {
+            Iterator it = wsdlOption.getExtraargs().iterator();
+            while (it.hasNext()) {
+                Object value = it.next();
+                if (value == null) {
+                    value = ""; // Maven makes empty tags into null
+                                // instead of empty strings.
+                }
+                list.add(value.toString());
+            }
+        }
+        if (wsdlOption.isSetWsdlLocation()) {
+            list.add("-wsdlLocation");
+            list.add(wsdlOption.getWsdlLocation() == null ? "" : wsdlOption.getWsdlLocation());
+        }
+        list.add(wsdlURI.toString());
+        return list;
     }
 
     private boolean deleteDir(File f) {

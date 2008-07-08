@@ -144,12 +144,7 @@ public final class WsdlOptionLoader {
             }
         } else if (defaultOptions != null) {
             // no options specified use the defaults
-            wsdlOption.setPackagenames(defaultOptions.getPackagenames());
-            wsdlOption.setExtraargs(defaultOptions.getExtraargs());
-            wsdlOption.setOutputDir(defaultOptions.getOutputDir());
-            wsdlOption.setDeleteDirs(defaultOptions.getDeleteDirs());
-            wsdlOption.setDependencies(defaultOptions.getDependencies());
-            wsdlOption.setBindingFiles(defaultOptions.getBindingFiles());
+            defaultOptions.copyOptions(wsdlOption);
         }
         
         if (bindingFiles != null) {
