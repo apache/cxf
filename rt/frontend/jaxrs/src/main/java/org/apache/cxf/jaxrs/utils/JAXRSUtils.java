@@ -179,6 +179,14 @@ public final class JAXRSUtils {
                 new Comparator<ClassResourceInfo>() {
 
                     public int compare(ClassResourceInfo cr1, ClassResourceInfo cr2) {
+                        
+                        String l1 = cr1.getURITemplate().getLiteralChars();
+                        String l2 = cr2.getURITemplate().getLiteralChars();
+                        if (!l1.equals(l2)) {
+                            // descending order 
+                            return l1.length() < l2.length() ? 1 : -1; 
+                        }
+                        
                         int g1 = cr1.getURITemplate().getNumberOfGroups();
                         int g2 = cr2.getURITemplate().getNumberOfGroups();
                         // descending order 

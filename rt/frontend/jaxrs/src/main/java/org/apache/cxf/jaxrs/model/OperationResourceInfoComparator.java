@@ -36,6 +36,13 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             return e1.getHttpMethod() != null ? -1 : 1;
         }
         
+        String l1 = e1.getURITemplate().getLiteralChars();
+        String l2 = e2.getURITemplate().getLiteralChars();
+        if (!l1.equals(l2)) {
+            // descending order 
+            return l1.length() < l2.length() ? 1 : -1; 
+        }
+                
         if (e1.getHttpMethod() == null && e2.getHttpMethod() == null) {
             // with two subresource locators, those with more capturing groups win
             int g1 = e1.getURITemplate().getNumberOfGroups();
@@ -58,14 +65,6 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                                                 mimeTypeP2.get(0));
         }
         
-        if (result == 0 && e1.getHttpMethod() != null && e2.getHttpMethod() != null) {
-            // we're comparing two resource methods with matching http methods and produce/consume types
-            int g1 = e1.getURITemplate().getNumberOfGroups();
-            int g2 = e2.getURITemplate().getNumberOfGroups();
-            // ascending order 
-            return g1 < g2 ? -1 : g1 > g2 ? 1 : 0;  
-        }
-
         return result;
     }
 

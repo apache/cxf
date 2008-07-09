@@ -40,28 +40,33 @@ public final class URITemplate {
     /**
      * The regular expression for matching URI templates and names.
      */
-    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{([\\w-\\._~]+?)\\}");
+    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{([a-zA-Z0-9][-\\w.]*)\\}");
 
     /**
      * A URI template is converted into a regular expression by substituting
      * (.*?) for each occurrence of {\([w- 14 \. ]+?\)} within the URL
      * template
      */
-    private static final String URITEMPLATE_VARIABLE_REGEX = "(.*?)";
+    private static final String PATH_VARIABLE_REGEX = "([^/]+?)";
+    private static final String PATH_UNLIMITED_VARIABLE_REGEX = "(.*?)";
 
     private final String template;
-    private final String regexSuffix;
+    private final boolean limited;
+    private final boolean encoded;
     private final List<String> templateVariables;
     private final Pattern templateRegexPattern;
+    private final String literals;
 
     public URITemplate(String theTemplate) {
-        this(theTemplate, null);
+        this(theTemplate, true, false);
     }
     
-    public URITemplate(String theTemplate, String theRegexSuffix) {
+    public URITemplate(String theTemplate, boolean limited, boolean encoded) {
         this.template = theTemplate;
-        this.regexSuffix = theRegexSuffix;
-
+        this.limited = limited;
+        this.encoded = encoded;
+        
+        StringBuilder literalChars = new StringBuilder();
         StringBuilder stringBuilder = new StringBuilder();
         List<String> names = new ArrayList<String>();
 
@@ -69,27 +74,45 @@ public final class URITemplate {
         Matcher matcher = TEMPLATE_NAMES_PATTERN.matcher(template);
         int i = 0;
         while (matcher.find()) {
+            literalChars.append(template.substring(i, matcher.start()));
             copyURITemplateCharacters(template, i, matcher.start(), stringBuilder);
-            stringBuilder.append(URITEMPLATE_VARIABLE_REGEX);
-            names.add(matcher.group(1));
             i = matcher.end();
+            if (!limited && i == template.length()) {
+                stringBuilder.append(PATH_UNLIMITED_VARIABLE_REGEX);
+            } else {
+                stringBuilder.append(PATH_VARIABLE_REGEX);
+            }
+            names.add(matcher.group(1));
         }
+        literalChars.append(template.substring(i, template.length()));
         copyURITemplateCharacters(template, i, template.length(), stringBuilder);
 
+        literals = literalChars.toString();
         templateVariables = Collections.unmodifiableList(names);
 
         int endPos = stringBuilder.length() - 1;
         boolean endsWithSlash = (endPos >= 0) ? stringBuilder.charAt(endPos) == '/' : false;
-        if (regexSuffix != null) {
-            if (endsWithSlash) {
-                stringBuilder.deleteCharAt(endPos);
-            }
-            stringBuilder.append(regexSuffix);
+        
+        if (endsWithSlash) {
+            stringBuilder.deleteCharAt(endPos);
         }
-
+        stringBuilder.append(limited ? LIMITED_REGEX_SUFFIX : UNLIMITED_REGEX_SUFFIX);
+        
         templateRegexPattern = Pattern.compile(stringBuilder.toString());
     }
 
+    public boolean isLimited() {
+        return limited;
+    }
+    
+    public boolean encode() {
+        return encoded;
+    }
+    
+    public String getLiteralChars() {
+        return literals;
+    }
+    
     public String getValue() {
         return template;
     }
@@ -132,10 +155,10 @@ public final class URITemplate {
         }
 
         // The right hand side value, might be used to further resolve sub-resources.
-        if (regexSuffix != null) {
-            String finalGroup = m.group(i);
-            templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup == null ? "/" : finalGroup);
-        }
+        
+        String finalGroup = m.group(i);
+        templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup == null ? "/" : finalGroup);
+        
 
         return true;
     }
@@ -144,7 +167,7 @@ public final class URITemplate {
                                              Path path) {
         
         if (path == null) {
-            return new URITemplate("/", URITemplate.LIMITED_REGEX_SUFFIX);
+            return new URITemplate("/");
         }
         
         String pathValue = path.value();
@@ -152,9 +175,6 @@ public final class URITemplate {
             pathValue = "/" + pathValue;
         }
         
-        String suffixPattern = (path.limited())
-            ? URITemplate.LIMITED_REGEX_SUFFIX : URITemplate.UNLIMITED_REGEX_SUFFIX;
-        
-        return new URITemplate(pathValue, suffixPattern);
+        return new URITemplate(pathValue, path.limited(), path.encode());
     }
 }

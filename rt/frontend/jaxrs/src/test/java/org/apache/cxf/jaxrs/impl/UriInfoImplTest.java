@@ -122,7 +122,7 @@ public class UriInfoImplTest extends Assert {
         
         // with suffix
         values.clear();
-        new URITemplate("/bar", URITemplate.UNLIMITED_REGEX_SUFFIX).match("/bar", values);
+        new URITemplate("/bar", false, false).match("/bar", values);
         
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
                                         values);
