@@ -24,8 +24,8 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 import org.apache.hello_world_soap_http.Greeter;
-import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.JSDemoService;
+import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.types.FaultDetail;
 
 public final class Client {
