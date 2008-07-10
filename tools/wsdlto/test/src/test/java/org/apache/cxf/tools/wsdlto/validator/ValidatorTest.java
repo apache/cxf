@@ -52,7 +52,8 @@ public class ValidatorTest extends ProcessorTestBase {
             fail("xml_format_root.wsdl is not a valid wsdl, should throws exception here");
         } catch (Exception e) {
             String expected = "Binding(Greeter_XMLBinding):BindingOperation" 
-                + "({http://apache.org/xml_http_bare}sayHi)-input: missing xml format body element";
+                + "({http://apache.org/xml_http_bare}sayHi)-input: empty value of rootNode attribute, "
+                + "the value should be {http://apache.org/xml_http_bare}sayHi";
             assertEquals(expected, e.getMessage().trim());
         }
     }

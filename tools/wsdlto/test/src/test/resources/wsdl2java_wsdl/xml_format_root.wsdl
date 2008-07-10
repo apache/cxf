@@ -61,7 +61,7 @@
     <xformat:binding/>
     <wsdl:operation name="sayHi">
       <wsdl:input name="sayHiRequest">
-	<!--xformat:body rootNode="tns:sayHi"/-->
+	<xformat:body/>
       </wsdl:input>
       <wsdl:output name="sayHiResponse">
       </wsdl:output>
