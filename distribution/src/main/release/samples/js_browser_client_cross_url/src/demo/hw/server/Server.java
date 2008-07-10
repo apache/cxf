@@ -19,15 +19,21 @@
 
 package demo.hw.server;
 
-import javax.xml.ws.Endpoint;
+
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 
 public class Server {
+	private GenericApplicationContext applicationContext;
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
-        Object implementor = new GreeterImpl();
-        String address = "http://localhost:9000/JSDemoService/JSDemoPort";
-        Endpoint.publish(address, implementor);
+        
+        applicationContext = new GenericApplicationContext();
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
+        reader.loadBeanDefinitions(new ClassPathResource("applicationContext.xml", this.getClass()));
+        applicationContext.refresh();
     }
 
     public static void main(String args[]) throws Exception {

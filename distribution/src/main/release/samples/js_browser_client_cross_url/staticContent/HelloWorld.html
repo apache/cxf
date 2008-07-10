@@ -20,26 +20,13 @@
 <head>
 <title>Hello World JavaScript Client Sample</title>
 <!-- Generate and retrieve a JavaScript client for the server. -->
-<!--
-<script type="text/javascript" src="/JSDemoService/JSDemoPort?js"></script>
--->
-<script type="text/javascript">
+<script type="text/javascript" src="http://localhost:9001/hello_world_9001?js"></script>
 <!-- To simulate loading from a URL that isn't on the same host
      we dynamically construct the script. Note that in the real world
      you could hardcode a script element. -->
+<script type="text/javascript">
 
-function loadjs(filename) {
- if (filetype=="js"){ //if filename is a external JavaScript file
-  var fileref=document.createElement('script')
-  fileref.setAttribute("type","text/javascript")
-  fileref.setAttribute("src", filename)
-}
-
-var jsurl = 'http://' + window.location.hostname + ':9000/JSDemoService/JSDemoPort?js';
-
-loadjs(jsurl);
-
-var Greeter = new apache_org_hello_world_soap_http_Greeter();
+var Greeter = null;
 
 var responseSpan;
 
@@ -61,6 +48,7 @@ function invokeSayHi()
 {
     responseSpan = document.getElementById('sayHiResponse');
     responseSpan.firstChild.nodeValue = " - pending - ";
+    Greeter = new apache_org_hello_world_soap_http_Greeter();
     Greeter.sayHi(sayHiResponse, sayHiError);
 }
 </script>
