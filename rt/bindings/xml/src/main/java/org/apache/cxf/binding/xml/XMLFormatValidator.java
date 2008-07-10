@@ -115,17 +115,8 @@ public class XMLFormatValidator extends ServiceValidator {
             Object ext = it.next();
             if (ext instanceof XMLBindingMessageFormat) {
                 XMLBindingMessageFormat xmlFormat = (XMLBindingMessageFormat)ext;
-                QName rootNodeName = bo.getName();
-                if (xmlFormat.getRootNode() != null) {
-                    if (xmlFormat.getRootNode().equals(rootNodeName)) {
-                        return true;
-                    } else {
-                        addErrorMessage(errorPath
-                                        + ": wrong value of rootNode attribute, the value should be "
-                                        + rootNodeName);
-                        return false;
-                    }
-                } else {                    
+                if (xmlFormat.getRootNode() == null) {
+                    QName rootNodeName = bo.getName();
                     addErrorMessage(errorPath
                                     + ": empty value of rootNode attribute, the value should be "
                                     + rootNodeName);
@@ -133,7 +124,6 @@ public class XMLFormatValidator extends ServiceValidator {
                 }
             }
         }
-        addErrorMessage(errorPath + ": missing xml format body element");
-        return false;
+        return true;
     }
 }
