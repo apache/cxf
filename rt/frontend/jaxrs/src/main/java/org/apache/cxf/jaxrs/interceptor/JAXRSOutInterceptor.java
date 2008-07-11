@@ -146,17 +146,17 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
             try {
+                
+                responseType = checkFinalContentType(responseType);
+                LOG.fine("Response content type is: " + responseType.toString());
+                message.put(Message.CONTENT_TYPE, responseType.toString());
+                
                 LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
                 writer.writeTo(responseObj, targetType, invoked.getGenericReturnType(), 
                                invoked.getAnnotations(), 
                                responseType, 
                                response.getMetadata(), 
                                out);
-                
-                responseType = checkFinalContentType(responseType);
-                LOG.fine("Response content type is: " + responseType.toString());
-                message.put(Message.CONTENT_TYPE, responseType.toString());
-                
                 
             } catch (IOException e) {
                 e.printStackTrace();
