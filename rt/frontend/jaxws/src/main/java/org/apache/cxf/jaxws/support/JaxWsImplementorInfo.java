@@ -223,12 +223,8 @@ public class JaxWsImplementorInfo {
     }
 
     private String getDefaultNamespace(Class clazz) {
-        Package pkg = clazz.getPackage();
-        if (pkg == null) {
-            return "http://unknown.namespace/";
-        } else {
-            return PackageUtils.getNamespace(pkg.getName());
-        }
+        String pkg = PackageUtils.getNamespace(PackageUtils.getPackageName(clazz));
+        return StringUtils.isEmpty(pkg) ? "http://unknown.namespace/" : pkg;
     }
         
     private String getWSInterfaceName(Class<?> implClz) {

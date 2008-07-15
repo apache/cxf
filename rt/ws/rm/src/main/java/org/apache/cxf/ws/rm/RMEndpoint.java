@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
@@ -247,7 +248,7 @@ public class RMEndpoint {
         try {
             JAXBContext ctx =
                 JAXBContext.newInstance(
-                    CreateSequenceType.class.getPackage().getName(),
+                    PackageUtils.getPackageName(CreateSequenceType.class),
                     CreateSequenceType.class.getClassLoader());
             dataBinding = new JAXBDataBinding(ctx);
         } catch (JAXBException e) {

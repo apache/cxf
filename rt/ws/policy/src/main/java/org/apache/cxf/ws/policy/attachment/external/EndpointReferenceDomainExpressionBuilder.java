@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.PolicyException;
 
@@ -90,7 +91,8 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
         
         try {
             Class clz = EndpointReferenceType.class;
-            JAXBContext context = JAXBContext.newInstance(clz.getPackage().getName(), clz.getClassLoader());
+            String pkg = PackageUtils.getPackageName(clz);
+            JAXBContext context = JAXBContext.newInstance(pkg, clz.getClassLoader());
             unmarshaller = context.createUnmarshaller();
         } catch (JAXBException ex) {
             throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILDER_INIT_EXC", BUNDLE, 

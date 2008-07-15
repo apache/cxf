@@ -41,6 +41,7 @@ import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
@@ -70,11 +71,8 @@ public final class WrapperClassGenerator extends ASMHelper {
     }
 
     private String getPackageName(Method method) {
-        Package pkg = method.getDeclaringClass().getPackage();
-        if (pkg == null) {
-            return ToolConstants.DEFAULT_PACKAGE_NAME;
-        }
-        return pkg.getName();
+        String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
+        return pkg.length() == 0 ? ToolConstants.DEFAULT_PACKAGE_NAME : pkg;
     }
 
     private Annotation[] getMethodParameterAnnotations(final MessagePartInfo mpi) {

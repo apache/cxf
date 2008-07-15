@@ -110,7 +110,10 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 String ns = elAnnot.namespace();
                 if (StringUtils.isEmpty(ns)
                     || "##default".equals(ns)) {
-                    XmlSchema schema = cls.getPackage().getAnnotation(XmlSchema.class);
+                    XmlSchema schema = null;
+                    if (cls.getPackage() != null) {
+                        schema = cls.getPackage().getAnnotation(XmlSchema.class);
+                    }
                     if (schema != null) {
                         ns = schema.namespace();
                     }

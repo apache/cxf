@@ -51,6 +51,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
@@ -488,8 +489,8 @@ public class ServiceImpl extends ServiceDelegate {
         }
 
         String tns = webService.targetNamespace();
-        if (tns.length() == 0 && seiClass.getPackage() != null) {
-            tns = URIParserUtil.getNamespace(seiClass.getPackage().getName());
+        if (tns.length() == 0) {
+            tns = URIParserUtil.getNamespace(PackageUtils.getPackageName(seiClass));
         }
 
         return new QName(tns, name);

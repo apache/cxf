@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.java2wsdl.generator;
 
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.wsdl.WSDLConstants;
 
@@ -34,7 +35,7 @@ public final class WSDLGeneratorFactory {
     }
 
     protected String getGeneratorClassName() {
-        String pkgName = getClass().getPackage().getName();
+        String pkgName = PackageUtils.getPackageName(getClass());
         return pkgName + "." + wsdlVersion.toString().toLowerCase() + "." + wsdlVersion + "Generator";
     }
 

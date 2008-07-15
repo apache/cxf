@@ -38,6 +38,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -254,8 +255,8 @@ public abstract class AbstractBeanDefinitionParser
         JAXBContext context = null;
         try {
             String pkg = getJaxbPackage();
-            if (null != c && c.getPackage() != null) {
-                pkg = c.getPackage().getName();
+            if (null != c) {
+                pkg = PackageUtils.getPackageName(c);
             }
             context = packageContextCache.get(pkg);
             if (context == null) {

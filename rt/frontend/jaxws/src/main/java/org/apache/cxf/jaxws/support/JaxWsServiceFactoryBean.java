@@ -53,6 +53,7 @@ import javax.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
@@ -351,7 +352,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         try {
             if (java.rmi.ServerException.class.isAssignableFrom(exClass)
                 || java.rmi.RemoteException.class.isAssignableFrom(exClass)
-                || "javax.xml.ws".equals(exClass.getPackage().getName())) {
+                || "javax.xml.ws".equals(PackageUtils.getPackageName(exClass))) {
                 return null;
             }
 

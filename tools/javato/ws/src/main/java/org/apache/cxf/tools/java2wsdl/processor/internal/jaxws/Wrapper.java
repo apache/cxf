@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -133,11 +134,8 @@ public class Wrapper {
     }
 
     protected String getPackageName(final Method m) {
-        Package pkg = m.getDeclaringClass().getPackage();
-        if (pkg == null) {
-            return ToolConstants.DEFAULT_PACKAGE_NAME;
-        }
-        return pkg.getName();
+        String pkg = PackageUtils.getPackageName(m.getDeclaringClass());
+        return pkg.length() == 0 ? ToolConstants.DEFAULT_PACKAGE_NAME : pkg;
     }
 
     public boolean isWrapperAbsent() {

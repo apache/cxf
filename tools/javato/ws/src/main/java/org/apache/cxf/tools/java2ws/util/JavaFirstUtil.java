@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -68,11 +69,8 @@ public final class JavaFirstUtil {
             jreturn.setStyle(Style.OUT);
             jm.setReturn(jreturn);
 
-            if (m.getDeclaringClass().getPackage() != null) {
-                javaInf.setPackageName(m.getDeclaringClass().getPackage().getName());
-            } else {
-                javaInf.setPackageName(ToolConstants.DEFAULT_PACKAGE_NAME);
-            }
+            String pkg = PackageUtils.getPackageName(m.getDeclaringClass());
+            javaInf.setPackageName(pkg.length() == 0 ? ToolConstants.DEFAULT_PACKAGE_NAME : pkg);
             javaInf.addMethod(jm);
             javaInf.setName(inf.getName().getLocalPart());
 

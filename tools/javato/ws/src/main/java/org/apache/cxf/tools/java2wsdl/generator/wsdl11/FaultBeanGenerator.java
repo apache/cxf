@@ -27,21 +27,22 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.wsdl.Fault;
 
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.FaultBean;
 
-
 public final class FaultBeanGenerator extends BeanGenerator {
 
     private String getSEIPackage(final Method method) {
-        Package pkg = method.getDeclaringClass().getPackage();
-        if (pkg == null) {
+        String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
+        if (pkg.length() == 0) {
             return ToolConstants.DEFAULT_PACKAGE_NAME;
+        } else {
+            return pkg;
         }
-        return pkg.getName();
     }
     
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {

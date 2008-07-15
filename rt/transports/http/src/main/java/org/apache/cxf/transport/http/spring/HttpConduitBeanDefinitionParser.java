@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -106,7 +107,7 @@ public class HttpConduitBeanDefinitionParser
         // the configured TLSClientParameters into the HTTPConduit.
         JAXBContext context = null;
         try {
-            context = JAXBContext.newInstance(TLSClientParametersType.class.getPackage().getName(), 
+            context = JAXBContext.newInstance(PackageUtils.getPackageName(TLSClientParametersType.class), 
                     getClass().getClassLoader());
             Unmarshaller u = context.createUnmarshaller();
             JAXBElement<TLSClientParametersType> jaxb = 
