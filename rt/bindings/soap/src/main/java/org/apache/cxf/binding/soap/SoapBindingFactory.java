@@ -500,8 +500,13 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             if (StringUtils.isEmpty(partNameFilter)
                 || part.getName().equals(partNameFilter)) {
             
-                MessagePartInfo pi = minfo.addMessagePart(new QName(minfo.getName().getNamespaceURI(), part
-                                                                    .getName()));
+                QName pqname = new QName(minfo.getName().getNamespaceURI(), part.getName());
+                MessagePartInfo pi = minfo.addOutOfBandMessagePart(pqname);
+                
+                if (!minfo.getName().equals(msg.getQName())) {
+                    pi.setMessageContainer(new MessageInfo(minfo.getOperation(), null, msg.getQName()));
+                }
+                
                 if (part.getTypeName() != null) {
                     pi.setTypeQName(part.getTypeName());
                     pi.setElement(false);
@@ -577,8 +582,19 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             for (SoapHeader header : headers) {
                 SoapHeaderInfo headerInfo = new SoapHeaderInfo();
                 headerInfo.setUse(header.getUse());
-                MessagePartInfo part = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), header
-                                .getPart()));
+                MessagePartInfo part = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), 
+                                                                    header.getPart()));
+                if (part != null && header.getMessage() != null
+                    && !part.getMessageInfo().getName().equals(header.getMessage())) {
+                    part = null;
+                    //out of band, let's find it
+                    for (MessagePartInfo mpi : msg.getOutOfBandParts()) {
+                        if (mpi.getName().getLocalPart().equals(header.getPart())
+                            && mpi.getMessageInfo().getName().equals(header.getMessage())) {
+                            part = mpi;
+                        }
+                    }
+                }
                 if (part != null) {
                     headerInfo.setPart(part);
                     messageParts.remove(part);
@@ -609,54 +625,9 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             List<MessagePartInfo> bodyParts = new ArrayList<MessagePartInfo>();
             for (Iterator itr = parts.iterator(); itr.hasNext();) {
                 Object part = itr.next();
-                String partName = null;
                 if (part instanceof MIMEPart) {
                     MIMEPart mpart = (MIMEPart) part;
-                    if (mpart.getExtensibilityElements().size() < 1) {
-                        throw new RuntimeException("MIMEPart should at least contain one element!");
-                    }
-                    for (Object content : mpart.getExtensibilityElements()) {
-                        if (content instanceof MIMEContent) {
-                            MIMEContent mc = (MIMEContent)content;
-                            partName = mc.getPart();
-
-                            if (attParts == null) {
-                                attParts = new LinkedList<MessagePartInfo>();
-                            }
-
-                            MessagePartInfo mpi =
-                                msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
-                                                             partName));
-                            mpi.setProperty(Message.CONTENT_TYPE, mc.getType());
-                            attParts.add(mpi);
-                            // Attachments shouldn't be part of the body message
-                            bmsg.getMessageParts().remove(mpi);
-                        } else if (SOAPBindingUtil.isSOAPBody(content)) {
-                            SoapBody sb = SOAPBindingUtil.getSoapBody(content);
-                            if (sb.getParts() != null && sb.getParts().size() == 1) {
-                                partName = (String) sb.getParts().get(0);
-                            }
-
-                            // We can have a list of empty part names here.
-                            if (partName != null) {
-                                addSoapBodyPart(msg, bodyParts, partName);
-                            }
-                        } else if (SOAPBindingUtil.isSOAPHeader(content)) {
-                            SoapHeader header = SOAPBindingUtil.getSoapHeader(content);
-
-                            SoapHeaderInfo headerInfo = new SoapHeaderInfo();
-                            headerInfo.setUse(header.getUse());
-                            MessagePartInfo mpi =
-                                msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), header
-                                            .getPart()));
-                            if (mpi != null) {
-                                headerInfo.setPart(mpi);
-                                messageParts.remove(part);
-                                bmsg.getMessageParts().remove(mpi);
-                                bmsg.addExtensor(headerInfo);
-                            }
-                        }
-                    }
+                    attParts = handleMimePart(mpart, attParts, msg, bmsg, bodyParts, messageParts);
                 } else {
                     addSoapBodyPart(msg, bodyParts, (String)part);
                 }
@@ -669,6 +640,75 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
         bmsg.addExtensor(bodyInfo);
     }
+    
+    private List<MessagePartInfo> handleMimePart(MIMEPart mpart, 
+                                                 List<MessagePartInfo> attParts,
+                                                 MessageInfo msg,
+                                                 BindingMessageInfo bmsg,
+                                                 List<MessagePartInfo> bodyParts,
+                                                 List<MessagePartInfo> messageParts) {
+        if (mpart.getExtensibilityElements().size() < 1) {
+            throw new RuntimeException("MIMEPart should at least contain one element!");
+        }
+        String partName = null;
+        for (Object content : mpart.getExtensibilityElements()) {
+            if (content instanceof MIMEContent) {
+                MIMEContent mc = (MIMEContent)content;
+                partName = mc.getPart();
+
+                if (attParts == null) {
+                    attParts = new LinkedList<MessagePartInfo>();
+                }
+
+                MessagePartInfo mpi =
+                    msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
+                                                 partName));
+                mpi.setProperty(Message.CONTENT_TYPE, mc.getType());
+                attParts.add(mpi);
+                // Attachments shouldn't be part of the body message
+                bmsg.getMessageParts().remove(mpi);
+            } else if (SOAPBindingUtil.isSOAPBody(content)) {
+                SoapBody sb = SOAPBindingUtil.getSoapBody(content);
+                if (sb.getParts() != null && sb.getParts().size() == 1) {
+                    partName = (String) sb.getParts().get(0);
+                }
+
+                // We can have a list of empty part names here.
+                if (partName != null) {
+                    addSoapBodyPart(msg, bodyParts, partName);
+                }
+            } else if (SOAPBindingUtil.isSOAPHeader(content)) {
+                SoapHeader header = SOAPBindingUtil.getSoapHeader(content);
+
+                SoapHeaderInfo headerInfo = new SoapHeaderInfo();
+                headerInfo.setUse(header.getUse());
+                MessagePartInfo mpi =
+                    msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), header
+                                .getPart()));
+                
+                if (mpi != null && header.getMessage() != null
+                    && !mpi.getMessageInfo().getName().equals(header.getMessage())) {
+                    mpi = null;
+                    //out of band, let's find it
+                    for (MessagePartInfo mpi2 : msg.getOutOfBandParts()) {
+                        if (mpi2.getName().getLocalPart().equals(header.getPart())
+                            && mpi2.getMessageInfo().getName().equals(header.getMessage())) {
+                            mpi = mpi2;
+                        }
+                    }
+                }
+
+                if (mpi != null) {
+                    headerInfo.setPart(mpi);
+                    messageParts.remove(mpart);
+                    bmsg.getMessageParts().remove(mpi);
+                    bmsg.addExtensor(headerInfo);
+                }
+            }
+        }
+        return attParts;
+    }
+    
     private void addSoapBodyPart(MessageInfo msg, List<MessagePartInfo> bodyParts, String partName) {
         MessagePartInfo mpi = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
                                                            partName));

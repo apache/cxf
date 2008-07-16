@@ -33,6 +33,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     private OperationInfo operation;
     private Map<QName, MessagePartInfo> messageParts 
         = new LinkedHashMap<QName, MessagePartInfo>(4);
+    private List<MessagePartInfo> outOfBandParts;
     
     /**
      * Initializes a new instance of the <code>MessagePartContainer</code>.
@@ -102,11 +103,22 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
             }
             i++;
         }
+        for (MessagePartInfo p : getOutOfBandParts()) {
+            if (part == p) {
+                return i;
+            }
+            i++;
+        }
         return -1;
     }
 
     public MessagePartInfo getMessagePartByIndex(int i) {
         for (MessagePartInfo p : messageParts.values()) {
+            if (p.getIndex() == i) {
+                return p;
+            }
+        }
+        for (MessagePartInfo p : getOutOfBandParts()) {
             if (p.getIndex() == i) {
                 return p;
             }
@@ -141,6 +153,12 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
                 }
             }
         }
+        for (MessagePartInfo mpi2 : getOutOfBandParts()) {
+            if (name.equals(mpi2.getName())
+                || name.equals(mpi2.getConcreteName())) {
+                return mpi2;
+            }
+        }
         return mpi;
     }
     
@@ -154,7 +172,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         if (n == -1) {
             return null;
         }
-        for (MessagePartInfo mpi : messageParts.values()) {
+        for (MessagePartInfo mpi : getMessageParts()) {
             if (n == 0) {
                 return mpi;
             }
@@ -163,17 +181,42 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         return null;
     }    
     
+    
+    public MessagePartInfo addOutOfBandMessagePart(QName name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Invalid name [" + name + "]");
+        }
+
+        MessagePartInfo part = new MessagePartInfo(name, this);
+        if (outOfBandParts == null) {
+            outOfBandParts = new ArrayList<MessagePartInfo>(1);
+        }
+        part.setIndex(messageParts.size() + outOfBandParts.size());
+        outOfBandParts.add(part);
+        return part;
+    }
+
+    
+    
     /**
      * Returns all message parts for this message.
      *
      * @return all message parts.
      */
     public List<MessagePartInfo> getMessageParts() {
-        return Collections.unmodifiableList(new ArrayList<MessagePartInfo>(messageParts.values()));
+        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>(messageParts.values());
+        parts.addAll(getOutOfBandParts());
+        return Collections.unmodifiableList(parts);
+    }
+    public List<MessagePartInfo> getOutOfBandParts() {
+        if (outOfBandParts == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(outOfBandParts);
     }
     
     public int size() {
-        return messageParts.size();
+        return messageParts.size() + getOutOfBandParts().size();
     }
     
 

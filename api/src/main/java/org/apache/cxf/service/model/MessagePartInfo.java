@@ -41,6 +41,10 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
         mInfo = info;
         pname = n;
     }
+    
+    public void setMessageContainer(AbstractMessageContainer info) {
+        mInfo = info;
+    }
 
     /**
      * @return Returns the name.

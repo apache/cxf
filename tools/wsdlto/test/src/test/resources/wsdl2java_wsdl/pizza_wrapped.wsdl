@@ -73,14 +73,14 @@ under the License.
     </wsdl:portType>
 
     <wsdl:message name="CallerIDHeader">
-      <wsdl:part name="callerID" element="types:CallerIDHeader"/>
+      <wsdl:part name="parameters" element="types:CallerIDHeader"/>
     </wsdl:message>
 
     <wsdl:message name="OrderPizzaRequest">
-      <wsdl:part name="body" element="types:OrderPizza"/>
+      <wsdl:part name="parameters" element="types:OrderPizza"/>
     </wsdl:message>
     <wsdl:message name="OrderPizzaResponse">
-      <wsdl:part name="body" element="types:OrderPizzaResponse"/>
+      <wsdl:part name="parameters" element="types:OrderPizzaResponse"/>
     </wsdl:message>
 
   <wsdl:binding name="PizzaPortBinding" type="tns:Pizza">
@@ -88,7 +88,7 @@ under the License.
     <wsdl:operation name="OrderPizza">
       <soap:operation soapAction=""/>
       <wsdl:input>
-        <soap:header message="tns:CallerIDHeader" part="callerID" use="literal" />
+        <soap:header message="tns:CallerIDHeader" part="parameters" use="literal" />
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output>
