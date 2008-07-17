@@ -33,7 +33,7 @@ public class Server implements Runnable {
     }
 
     public Server(String[] args) throws Exception {
-        this("http://pdrhas42:20003/performance/SoapHttpDocLitPort");
+        this("http://" + java.net.InetAddress.getLocalHost().getHostAddress() + ":20003/performance/SoapHttpDocLitPort");
     }
     
     public static void main(String args[]) throws Exception {
