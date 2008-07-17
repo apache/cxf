@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema     
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   targetNamespace="http://sample.com/procure"
+   xmlns:po="http://sample.com/procure"
+   elementFormDefault="qualified">
+   <xs:include schemaLocation="included.xsd"/>
+   <xs:element name="purchase-order">
+       <xs:complexType>
+           <xs:sequence>
+               <xs:element name="customer" type="po:customer"/>
+               <xs:element name="shipper" type="po:shipper" minOccurs="0"/>
+           </xs:sequence>
+       </xs:complexType>
+   </xs:element>
+</xs:schema>

@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.xml.sax.InputSource;
+
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -48,6 +50,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaType;
+import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.SchemaTypeSystem;
 import org.apache.xmlbeans.XmlAnySimpleType;
@@ -58,6 +61,8 @@ import org.apache.xmlbeans.impl.schema.BuiltinSchemaTypeSystem;
  * Walks the service model and sets up the element/type names.
  */
 class XmlBeansSchemaInitializer extends ServiceModelVisitor {
+
+
     private static final Logger LOG = LogUtils.getLogger(XmlBeansSchemaInitializer.class);
     private static final Map<Class<?>, Class<? extends XmlAnySimpleType>> CLASS_MAP 
         = new HashMap<Class<?>, Class<? extends XmlAnySimpleType>>();
@@ -97,6 +102,20 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
         dataBinding = db;
     }
     
+    public class XMLSchemaResolver implements URIResolver {
+        final SchemaTypeSystem sts;
+        public XMLSchemaResolver(SchemaTypeSystem sts) {
+            this.sts = sts;
+        }
+        
+        public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
+            InputStream ins = sts.getSourceAsStream(schemaLocation);
+            if (ins != null) {
+                return new InputSource(ins);
+            }
+            return null;
+        }
+    }
 
     XmlSchema getSchema(SchemaTypeSystem sts, String file) {
         if (schemaMap.containsKey(file)) {
@@ -122,7 +141,6 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
                     }
                 }
             }            
-            
             XmlSchema schema = dataBinding.addSchemaDocument(serviceInfo,
                                                              schemas, 
                                                              doc, 
@@ -177,6 +195,8 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             part.setProperty(SchemaType.class.getName(), st);
             
             SchemaTypeSystem sts = st.getTypeSystem();
+            schemas.getXmlSchemaCollection().setSchemaResolver(new XMLSchemaResolver(sts));
+
             XmlSchema schema = getSchema(sts, st.getSourceName());
 
             if (st.isDocumentType()) {
@@ -195,8 +215,10 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
                 part.setXmlSchema(sct);
                 part.setElement(false);
             }
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new RuntimeException(ex);
         }        
     }
     

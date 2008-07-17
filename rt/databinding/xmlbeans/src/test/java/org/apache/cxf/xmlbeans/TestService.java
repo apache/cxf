@@ -18,11 +18,15 @@
  */
 package org.apache.cxf.xmlbeans;
 
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import junit.framework.Assert;
+
+import com.sample.procure.PurchaseOrderDocument;
+
 
 @WebService(targetNamespace = "urn:TestService", 
             serviceName = "TestService")
@@ -43,7 +47,7 @@ public class TestService {
         fault.setFaultInfo("extra");
         throw fault;
     }
-
+    
     @WebMethod
     public ResponseDocument mixedRequest(
                                          @WebParam(name = "string") String string,
@@ -54,5 +58,10 @@ public class TestService {
         ResponseDocument response = ResponseDocument.Factory.newInstance();
         response.addNewResponse().addNewForm();
         return response;
+    }
+    
+    @WebMethod
+    public void submitPO(PurchaseOrderDocument doc) {
+        
     }
 }
