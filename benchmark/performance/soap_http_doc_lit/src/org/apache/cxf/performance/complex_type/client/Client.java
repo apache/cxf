@@ -31,6 +31,11 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
+
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+  
 import org.apache.cxf.pat.internal.TestCaseBase;
 import org.apache.cxf.pat.internal.TestResult;
 import org.apache.cxf.cxf.performance.DocPortType;
@@ -243,7 +248,17 @@ public final class Client extends TestCaseBase<DocPortType> {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        return cs.getSoapHttpDocLitPort();
+        DocPortType port = cs.getSoapHttpDocLitPort();
+        
+        org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        //httpClientPolicy.setAllowChunking(false);
+  
+        http.setClient(httpClientPolicy);
+  
+        return port;
     }
 
     public void printUsage() {
