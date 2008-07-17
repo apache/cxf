@@ -74,8 +74,9 @@
     </target>
 
     <target name="server" description="run complex_type server">
+        <property name="host" value="localhost"/>
         <cxf.run classname="org.apache.cxf.performance.complex_type.server.Server"
-            params="-WSDL ${wsdl.location}"
+            params="-host ${host}"
             jvmargs="-server -XX:CompileThreshold=1000 -Xmx1500M -Xms1500M -Xmn1000M -XX:+UseParallelGC -XX:+UseParallelOldGC"/>
     </target>
 

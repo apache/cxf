@@ -31,16 +31,17 @@ public class Server implements Runnable {
         Endpoint.publish(address, implementor);
         System.out.println("Server published " + address);
     }
-
-    public Server(String[] args) throws Exception {
-        this("http://" + java.net.InetAddress.getLocalHost().getHostAddress() + ":20003/performance/SoapHttpDocLitPort");
-    }
     
     public static void main(String args[]) throws Exception {
-        Server server = new Server(args);
+        String host = "localhost";
+        if ("-host".equals(args[0])) {
+            host = args[1];
+        }
+    
+        Server server = new Server("http://" + host + ":20003/performance/SoapHttpDocLitPort");
         server.run();
 
-	Thread.sleep(10000000);
+        Thread.sleep(10000000);
     }
     
     public void run() {

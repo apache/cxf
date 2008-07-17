@@ -18,7 +18,20 @@
 #  under the License.
 cd ../
 
+HOST=localhost
+
+for i in $@
+do 
+  if [ "$i" = "-Host" ]
+  then
+	HOST=$2
+  fi
+
+  shift
+done
+
+
 if [ -e /usr/lib/libumem.so.1 ]; then
     export LD_PRELOAD=/usr/lib/libumem.so.1
 fi
-ant server
+ant server -Dhost=$HOST
