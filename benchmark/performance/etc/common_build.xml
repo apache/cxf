@@ -35,9 +35,8 @@
         <available file="../../lib/cxf-manifest.jar"/>
     </condition> 
     <!-- default setting --> 
-    <property name="srcbuild_paths.file" value="../../../distribution/target/srcbuild_paths.xml"/> 
-
-    <import file="${srcbuild_paths.file}" optional="true"/>
+    <property name="srcbuild_paths.file" location="../../../distribution/target/srcbuild_env.ant"/> 
+    <loadfile property="srcbuild.classpath" srcFile="${srcbuild_paths.file}" failonerror="false"/>
     <property name="srcbuild.classpath" value=""/>    
 
     <uptodate property="codegen.notrequired" value="true">
