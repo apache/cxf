@@ -83,6 +83,21 @@ public class CodeGenBugTest extends ProcessorTestBase {
     }
     
     @Test
+    // Test for CXF-1678
+    public void testLogicalOnlyWSDL() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, 
+                getLocation("/wsdl2java_wsdl/cxf-1678/hello_world_logical_only.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+
+        assertNotNull("Trouble processing logical only wsdl", output);
+
+        Class clz = classLoader.loadClass("org.apache.cxf.cxf1678.hello_world_soap_http.GreeterImpl");
+        WebService webServiceAnn = AnnotationUtil.getPrivClassAnnotation(clz, WebService.class);
+        assertEquals("Greeter", webServiceAnn.name());
+    }
+
+    @Test
     public void testBug305729() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug305729/hello_world.wsdl"));
         processor.setContext(env);

@@ -35,9 +35,15 @@ import ${import};
  */
 
 @javax.jws.WebService(name = "$intf.Name",
+#if ($service.ServiceName != "") 
                       serviceName = "$service.ServiceName",
+#end
+#if ($port != "") 
                       portName = "$port",
+#end
+#if ($service.Namespace != "") 
                       targetNamespace = "$service.Namespace",
+#end
 #if ($intf.Location != "") 
                       wsdlLocation = "$intf.Location",
 #end
