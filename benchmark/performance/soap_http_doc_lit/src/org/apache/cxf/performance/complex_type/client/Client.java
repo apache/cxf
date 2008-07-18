@@ -184,11 +184,9 @@ public final class Client extends TestCaseBase<DocPortType> {
         }
 
         complexType.setVarEnum(ColourEnum.RED);
-        byte[] binary = new byte[256 * packetSize];
-        for (int idx = 0; idx < 1 * packetSize; idx++) {
-            for (int jdx = 0; jdx < 256; jdx++) {
-                binary[idx * 256 + jdx] = (byte)(jdx - 128);
-            }
+        byte[] binary = new byte[256];
+        for (int jdx = 0; jdx < 256; jdx++) {
+            binary[jdx] = (byte)(jdx - 128);
         }
         complexType.setVarHexBinary(binary);
         complexType.setVarBase64Binary(binary);
@@ -196,24 +194,25 @@ public final class Client extends TestCaseBase<DocPortType> {
     }
 
     public void initTestData() {
-        //for (int i = 0; i < packetSize; i++) {
         NestedComplexType ct = createComplexType();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < packetSize; i++) {
             complexTypeSeq.getItem().add(ct);
         }            
         // init String and Binary
         String temp = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+?><[]/0123456789";
-        inputBase64 = new byte[1024 * packetSize];
-        for (int idx = 0; idx < 4 * packetSize; idx++) {
+        inputBase64 = new byte[1024];
+        for (int idx = 0; idx < 4; idx++) {
             for (int jdx = 0; jdx < 256; jdx++) {
                 inputBase64[idx * 256 + jdx] = (byte)(jdx - 128);
             }
         }
 
+        StringBuilder builder = new StringBuilder(packetSize * 1024);
+        builder.append(inputString);
         for (int i = 0; i < asciiCount / temp.length() * packetSize; i++) {
-            inputString = inputString + temp;
+            builder.append(temp);
         }
-
+        inputString = builder.toString();
     }
 
     public void doJob(DocPortType port) {

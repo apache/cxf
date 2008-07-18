@@ -183,19 +183,26 @@ public abstract class TestCaseBase<T> {
                  return;
             }
 
-            System.out.println("TestCase " + name + " is warming up the jit. (20 sec/1200 iterations)");
-            final long endTime = System.currentTimeMillis() + 20000;
+            final int threadCount = 4;
+            final long timeLimit = 30;
+            final int countLimit = 1200;
+            
+            System.out.println("TestCase " + name + " is warming up the jit. (" + timeLimit + " sec/" + countLimit + " iterations, " + threadCount + " threads)");
+            final long startTime = System.currentTimeMillis();
+            final long endTime = startTime + (timeLimit * 1000l);
             final T t = getPort();
 
-            for (int x = 0; x < 12; x++) {
+            for (int x = 0; x < (threadCount - 1); x++) {
                 new Thread() {
                     public void run() {
                         try {
                             int count = 0;
-                            while (count < 1200 || System.currentTimeMillis() < endTime) {
+                            while (count < countLimit || System.currentTimeMillis() < endTime) {
                                 count++;
                                 doJob(t);
                             }
+                            //System.out.println(count);
+                            //System.out.println("" + (System.currentTimeMillis() - startTime));
                         } catch ( Exception ex ) {
                             ex.printStackTrace();
                         }
@@ -205,12 +212,15 @@ public abstract class TestCaseBase<T> {
             }
 
             int count = 0;
-            while (count < 1200 || System.currentTimeMillis() < endTime) {
+            while (count < countLimit || System.currentTimeMillis() < endTime) {
                 count++;
                 doJob(t);
             }
-            while (initDone != 12) {
-		Thread.sleep(100);
+            //System.out.println(count);
+            //System.out.println("" + (System.currentTimeMillis() - startTime));
+            ++initDone;
+            while (initDone != threadCount) {
+                Thread.sleep(100);
             }
         } catch (Exception e) {
             e.printStackTrace();
