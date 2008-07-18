@@ -301,7 +301,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
             }
         }
         
-        
         boolean doWork = cgtimestamp > doneFile.lastModified();
         if (!doneFile.exists()) {
             doWork = true;
@@ -328,10 +327,15 @@ public class WSDL2JavaMojo extends AbstractMojo {
             getLog().debug("Calling wsdl2java with args: " + list);
             try {
                 new WSDLToJava((String[])list.toArray(new String[list.size()])).run(new ToolContext());
-                doneFile.createNewFile();
             } catch (Throwable e) {
                 getLog().debug(e);
                 throw new MojoExecutionException(e.getMessage(), e);
+            }
+            try {
+                doneFile.createNewFile();
+            } catch (Throwable e) {
+                getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
+                getLog().debug(e);
             }
         }
     }
