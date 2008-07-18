@@ -28,8 +28,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class HttpHeaderHelper {
+    public static final String ACCEPT_ENCODING = "Accept-Encoding";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_ID = "Content-ID";
+    public static final String CONTENT_ENCODING = "Content-Encoding";
     public static final String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
     public static final String COOKIE = "Cookie";
     public static final String TRANSFER_ENCODING = "Transfer-Encoding";
@@ -44,6 +46,8 @@ public final class HttpHeaderHelper {
     private static Map<String, String> encodings = new ConcurrentHashMap<String, String>();
     
     static {
+        internalHeaders.put("Accept-Encoding", "accept-encoding");
+        internalHeaders.put("Content-Encoding", "content-encoding");
         internalHeaders.put("Content-Type", "content-type");
         internalHeaders.put("Content-ID", "content-id");
         internalHeaders.put("Content-Transfer-Encoding", "content-transfer-encoding"); 
