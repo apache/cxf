@@ -25,12 +25,11 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.tools.common.CommandInterfaceUtils;
 import org.apache.cxf.tools.java2ws.JavaToWS;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.ExitException;
-import org.apache.tools.ant.util.optional.NoExitSecurityManager;
 
 /**
  * @goal java2ws
@@ -131,13 +130,10 @@ public class Java2WSMojo extends AbstractMojo {
         }
         String newCp = buf.toString();
         String cp = System.getProperty("java.class.path");
-        SecurityManager oldSm = System.getSecurityManager();
         try {
             System.setProperty("java.class.path", newCp);
-            System.setSecurityManager(new NoExitSecurityManager());
             processJavaClass();
         } finally {
-            System.setSecurityManager(oldSm);
             System.setProperty("java.class.path", cp);
         }
 
@@ -245,17 +241,9 @@ public class Java2WSMojo extends AbstractMojo {
         args.add(className);
 
         try {
-            String exitOnFinish = System.getProperty("exitOnFinish", "");
-            try {
-                System.setProperty("exitOnFinish", "YES");
-                JavaToWS.main(args.toArray(new String[args.size()]));
-            } catch (ExitException e) {
-                if (e.getStatus() != 0) {
-                    throw e;
-                }
-            } finally {
-                System.setProperty("exitOnFinish", exitOnFinish);
-            }
+            CommandInterfaceUtils.commandCommonMain();
+            JavaToWS j2w = new JavaToWS(args.toArray(new String[args.size()]));
+            j2w.run();
         } catch (Throwable e) {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);

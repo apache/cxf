@@ -72,7 +72,7 @@ public class JavaToWS {
         return false;
     }
 
-    private void run() throws Exception {
+    public void run() throws Exception {
         ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
                            .getResourceAsStream("java2ws.xml"), false, args);      
     }

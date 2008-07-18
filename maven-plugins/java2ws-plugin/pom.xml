@@ -87,14 +87,6 @@
             <version>${project.version}</version>
         </dependency>
                      
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-nodeps</artifactId>
-        </dependency>
     </dependencies>
 
     <scm>
