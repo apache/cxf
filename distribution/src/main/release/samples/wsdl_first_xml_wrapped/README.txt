@@ -37,6 +37,33 @@ To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
 
 
+Building and running the demo using Maven
+---------------------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located), the pom.xml file is used to build and run the demo. 
+
+Set the variable CXF_VERSION in your environment to the version of CXF you are using.
+
+For example on Windows;
+   set CXF_VERSION=2.1.2-SNAPSHOT
+
+On Unix
+   export CXF_VERSION=2.1.2-SNAPSHOT
+
+Using either UNIX or Windows:
+
+  mvn install   (builds the demo)
+  mvn -Pserver  (from one command line window)
+  mvn -Pclient  (from a second command line window)
+  mvn -Pclient.get (client uses http GET)
+
+
+To remove the code generated from the WSDL file and the .class
+files, run "mvn clean".
+
+
+
 Building the demo using wsdl2java and javac
 -------------------------------------------
 
