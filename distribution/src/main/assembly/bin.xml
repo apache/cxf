@@ -157,7 +157,7 @@
                 <include>org.apache.cxf:*</include>
             </includes>
             <excludes>
-                <exclude>org.apache.cxf:cxf-bundle</exclude>
+                <exclude>org.apache.cxf:cxf-bundle*</exclude>
             </excludes>
             <scope>runtime</scope>
         </dependencySet>

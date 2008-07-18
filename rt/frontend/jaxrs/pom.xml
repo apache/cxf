@@ -58,15 +58,22 @@
             <artifactId>spring-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
             <version>0.8</version>
         </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>cxf-rt-bindings-xml</artifactId>
+            <version>${pom.version}</version>
+            <exclusions>
+               <exclusion>
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-rt-databinding-jaxb</artifactId>
+               </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
