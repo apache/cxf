@@ -53,4 +53,8 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
         }
         return buf;
     }
+    
+    public byte[] getRawBytes() {
+        return buf;
+    }
 }

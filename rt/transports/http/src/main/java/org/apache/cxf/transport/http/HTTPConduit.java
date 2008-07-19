@@ -51,7 +51,8 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
-import org.apache.cxf.io.AbstractWrappedOutputStream;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
+import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -510,6 +511,7 @@ public class HTTPConduit
         }
         
         boolean isChunking = false;
+        int chunkThreshold = 0;
         // We must cache the request if we have basic auth supplier
         // without preemptive basic auth.
         if (basicAuthSupplier != null) {
@@ -521,23 +523,22 @@ public class HTTPConduit
                 + " We must cache request.");
         }
         if (getClient().isAutoRedirect()) {
-            // If the AutoRedirect property is set then we cannot
-            // use chunked streaming mode. We ignore the "AllowChunking" 
-            // property if AutoRedirect is turned on.
-            
             needToCacheRequest = true;
             LOG.log(Level.INFO, "AutoRedirect is turned on.");
-        } else {
-            if (!connection.getRequestMethod().equals("GET")
-                && getClient().isAllowChunking()
-                && !needToCacheRequest) {
-                //TODO: The chunking mode be configured or at least some
-                // documented client constant.
-                //use -1 and allow the URL connection to pick a default value
-                connection.setChunkedStreamingMode(-1);
-                isChunking = true;
+        }
+        if (!connection.getRequestMethod().equals("GET")
+            && getClient().isAllowChunking()) {
+            //TODO: The chunking mode be configured or at least some
+            // documented client constant.
+            //use -1 and allow the URL connection to pick a default value
+            isChunking = true;
+            chunkThreshold = getClient().getChunkingThreshold();
+            if (chunkThreshold <= 0) {
+                chunkThreshold = 0;
+                connection.setChunkedStreamingMode(-1);                    
             }
         }
+        
         
         //Do we need to maintain a session?
         maintainSession = Boolean.TRUE.equals((Boolean)message.get(Message.MAINTAIN_SESSION));
@@ -567,8 +568,10 @@ public class HTTPConduit
         message.setContent(OutputStream.class,
                 new WrappedOutputStream(
                         message, connection,
-                        needToCacheRequest, isChunking));
-        
+                        needToCacheRequest, 
+                        isChunking,
+                        chunkThreshold));
+       
         // We are now "ready" to "send" the message. 
     }
     
@@ -1411,7 +1414,11 @@ public class HTTPConduit
                         + newURL
                         + "'");
                 }
-                return connection;
+                throw new IOException("Redirect loop detected on Conduit \"" 
+                                      + getConduitName() 
+                                      + "\" on '" 
+                                      + newURL
+                                      + "'");
             }
             // We are going to redirect.
             // Remove any Server Authentication Information for the previous
@@ -1515,7 +1522,12 @@ public class HTTPConduit
                     + "\"");
             }
                     
-            return connection;
+            throw new IOException("Authorization loop detected on Conduit \"" 
+                                  + getConduitName() 
+                                  + "\" on URL \""
+                                  + "\" with realm \""
+                                  + realm
+                                  + "\"");
         }
         
         HttpBasicAuthSupplier.UserPass up = 
@@ -1583,6 +1595,8 @@ public class HTTPConduit
         }
         message.put(KEY_HTTP_CONNECTION, connection);
 
+        connection.setFixedLengthStreamingMode(stream.size());
+        
         // Need to set the headers before the trust decision
         // because they are set before the connect().
         setURLRequestHeaders(message);
@@ -1602,7 +1616,7 @@ public class HTTPConduit
             return connection;
         }
         
-        // Trust is okay, write the cached request.
+        // Trust is okay, write the cached request
         OutputStream out = connection.getOutputStream();
         stream.writeCacheTo(out);
         
@@ -1710,7 +1724,7 @@ public class HTTPConduit
      * Wrapper output stream responsible for flushing headers and handling
      * the incoming HTTP-level response (not necessarily the MEP response).
      */
-    protected class WrappedOutputStream extends AbstractWrappedOutputStream {
+    protected class WrappedOutputStream extends AbstractThresholdOutputStream {
         /**
          * This field contains the currently active connection.
          */
@@ -1739,13 +1753,29 @@ public class HTTPConduit
                 Message m, 
                 HttpURLConnection c, 
                 boolean possibleRetransmit,
-                boolean isChunking
+                boolean isChunking,
+                int chunkThreshold
         ) {
-            super();
+            super(chunkThreshold);
             this.outMessage = m;
             connection = c;
             cachingForRetransmission = possibleRetransmit;
             chunking = isChunking;
+        }
+        
+        
+        @Override
+        public void thresholdNotReached() {
+            if (chunking) {
+                connection.setFixedLengthStreamingMode(buffer.size());
+            }
+        }
+
+        @Override
+        public void thresholdReached() {
+            if (chunking) {
+                connection.setChunkedStreamingMode(-1);
+            }
         }
 
         /**
@@ -1811,6 +1841,12 @@ public class HTTPConduit
          * Perform any actions required on stream closure (handle response etc.)
          */
         public void close() throws IOException {
+            if (buffer != null && buffer.size() > 0) {
+                thresholdNotReached();
+                LoadingByteArrayOutputStream tmp = buffer;
+                buffer = null;
+                super.write(tmp.getRawBytes(), 0, tmp.size());
+            }
             if (!written) {
                 handleHeadersTrustCaching();
             }
@@ -1988,6 +2024,8 @@ public class HTTPConduit
             
             incomingObserver.onMessage(inMessage);
         }
+
+
     }
     
     /**

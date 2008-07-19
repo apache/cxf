@@ -36,6 +36,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -408,6 +409,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             conduit.getClient().setAutoRedirect(autoRedirect);
             if (!autoRedirect) {
                 conduit.getClient().setAllowChunking(true);
+                conduit.getClient().setChunkingThreshold(0);
             }
         }
 
@@ -561,10 +563,12 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         
         control.replay();
         
-        OutputStream wrappedOS = message.getContent(OutputStream.class);
+        AbstractThresholdOutputStream wrappedOS 
+            = (AbstractThresholdOutputStream) message.getContent(OutputStream.class);
         assertNotNull("expected output stream", wrappedOS);
         
         wrappedOS.write(PAYLOAD.getBytes());
+        wrappedOS.unBuffer();
         
         control.verify();
         control.reset();

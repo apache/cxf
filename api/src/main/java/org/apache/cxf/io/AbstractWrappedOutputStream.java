@@ -50,11 +50,7 @@ public abstract class AbstractWrappedOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b) throws IOException {
-        if (!written) {
-            onFirstWrite();
-            written = true;
-        }
-        wrappedStream.write(b);
+        write(b, 0, b.length);
     }
 
     @Override

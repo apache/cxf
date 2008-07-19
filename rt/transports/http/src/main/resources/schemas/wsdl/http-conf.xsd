@@ -117,10 +117,10 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="ContentType" type="xs:string" use="optional" default="text/xml">
+                <xs:attribute name="ContentType" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        what MIME type this reply is
+                        what MIME type this reply is.  Default is set by the binding.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -204,6 +204,14 @@
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
+                <xs:attribute name="ChunkingThreshold" type="xs:int" use="optional" default="4096">
+                    <xs:annotation>
+                        <xs:documentation>
+                        If AllowChunking is true, this sets the threshold at which mesages start
+                        getting chunked.   Messages under this limit do not get chunked.
+                        </xs:documentation>
+                    </xs:annotation>      
+                </xs:attribute>
 
                 <xs:attribute name="Accept" type="xs:string" use="optional">
                     <xs:annotation>
@@ -229,7 +237,7 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="ContentType" type="xs:string" use="optional" default="text/xml">
+                <xs:attribute name="ContentType" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
                         The content type of the stream being sent in a post request 

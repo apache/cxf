@@ -302,7 +302,8 @@ public final class PolicyUtils {
         }
         
         if (compatible) {
-            compatible &= p1.getContentType().equals(p2.getContentType());
+            compatible = !p1.isSetContentType() || !p2.isSetContentType()
+                || p1.getContentType().equals(p2.getContentType());
         }
         
         if (compatible) {
@@ -495,7 +496,7 @@ public final class PolicyUtils {
         }
         
         if (compatible) {
-            compatible &= p1.getContentType().equals(p2.getContentType());
+            compatible &= compatible(p1.getContentType(), p2.getContentType());
         }
         
         if (compatible) {
