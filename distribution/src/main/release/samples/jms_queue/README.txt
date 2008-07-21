@@ -26,6 +26,10 @@ properly configured, or if you are planning on using wsdl2java,
 javac, and java to build and run the demos, you must set the
 environment.
 
+
+Building and running the demo using ant
+---------------------------------------
+
 This demo requires ActiveMQ 5.0.0. Before you run this
 demo, please make sure you had installed the ActiveMQ 5.0.0 and
 set ACTIVEMQ_HOME and ACTIVEMQ_VERSION environment variables.
@@ -44,29 +48,6 @@ export ACTIVEMQ_VERSION=5.0.0
 For Windows:
 set ACTIVEMQ_VERSION=5.0.0
 
-
-
-Before you run this demo, please start up the JMS message broker first.
-
-From your ActiveMQ 5.0.0 installation launch ActiveMQ JMS broker in a
-separate window or in the background using the commandline:
-
-For Unix:
-
-cd <activemq.home.dir>/bin
-activemq
-
-For Windows:
-cd <activemq.home.dir>\bin
-activemq.bat
-
-The location of <activemq.home.dir> depends on whether you have installed the
-binary or source release.
-
-
-Building and running the demo using ant
----------------------------------------
-
 From the base directory of this sample (i.e., where this README file is
 located), the Ant build.xml file can be used to build and run the demo. 
 The server and client targets automatically build the demo.
@@ -80,6 +61,24 @@ Using either UNIX or Windows:
 
 To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
+
+
+Building and running the demo using maven
+---------------------------------------
+  
+From the base directory of this sample (i.e., where this README file is
+located), the Ant build.xml file can be used to build and run the demo. 
+  
+Using either UNIX or Windows:
+
+    mvn install (this will build the demo)
+    In separate command windows/shells:
+    mvn -Pjms.broker
+    mvn -Pserver
+    mvn -Pclient
+
+To remove the code generated from the WSDL file and the .class
+files, run "mvn clean".
 
 
 Building the demo using wsdl2java and javac
