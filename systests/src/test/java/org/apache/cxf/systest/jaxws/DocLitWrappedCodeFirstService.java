@@ -40,7 +40,9 @@ import org.apache.cxf.systest.jaxws.types.Bar;
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService")
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT,
              use = SOAPBinding.Use.LITERAL)
-@Features(features = { "org.apache.cxf.feature.FastInfosetFeature" })
+//@Features(features = { "org.apache.cxf.feature.FastInfosetFeature" })
+@Features(features = { "org.apache.cxf.transport.http.gzip.GZIPFeature", 
+                       "org.apache.cxf.feature.FastInfosetFeature" })
 public interface DocLitWrappedCodeFirstService {
 
     @WebMethod

@@ -39,7 +39,9 @@ import org.apache.cxf.systest.jaxws.types.BarImpl;
             serviceName = "DocLitWrappedCodeFirstService",
             portName = "DocLitWrappedCodeFirstServicePort",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService")
-@Features(features = { "org.apache.cxf.feature.FastInfosetFeature" })
+//@Features(features = { "org.apache.cxf.feature.FastInfosetFeature" })
+@Features(features = { "org.apache.cxf.transport.http.gzip.GZIPFeature", 
+                       "org.apache.cxf.feature.FastInfosetFeature" })
 public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirstService {
     public static final String DATA[] = new String[] {"string1", "string2", "string3"};
     

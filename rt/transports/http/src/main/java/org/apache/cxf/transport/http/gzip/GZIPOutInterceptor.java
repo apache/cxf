@@ -37,7 +37,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
-import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -93,10 +93,6 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(GZIPOutInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(GZIPOutInterceptor.class);
 
-    /**
-     * Ending interceptor that handles the compression process.
-     */
-    private GZIPOutEndingInterceptor ending = new GZIPOutEndingInterceptor();
 
     /**
      * Compression threshold in bytes - messages smaller than this will not be
@@ -124,15 +120,15 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             // data to this later
             OutputStream os = message.getContent(OutputStream.class);
             message.put(ORIGINAL_OUTPUT_STREAM_KEY, os);
-
             message.put(USE_GZIP_KEY, use);
 
             // new stream to cache the message
-            CachedOutputStream cs = new CachedOutputStream();
+            GZipThresholdOutputStream cs 
+                = new GZipThresholdOutputStream(threshold,
+                                                os,
+                                                use == UseGzip.FORCE,
+                                                message);
             message.setContent(OutputStream.class, cs);
-
-            // add the ending interceptor that does the work
-            message.getInterceptorChain().add(ending);
         }
     }
 
@@ -156,6 +152,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             LOG.fine("Requestor role, so gzip enabled");
             permitted = UseGzip.YES;
             message.put(GZIP_ENCODING_KEY, "gzip");
+            addHeader(message, "Accept-Encoding", "gzip;q=1.0, identity; q=0.5, *;q=0"); 
         } else {
             LOG.fine("Response role, checking accept-encoding");
             Exchange exchange = message.getExchange();
@@ -238,80 +235,74 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         return permitted;
     }
-
-    /**
-     * Ending interceptor to actually do the compression.
-     */
-    public class GZIPOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
-
-        public GZIPOutEndingInterceptor() {
-            super(Phase.PREPARE_SEND_ENDING);
-            addBefore(MessageSenderInterceptor.MessageSenderEndingInterceptor.class.getName());
-        }
-
-        /**
-         * Copies the message content to the real output stream, compressing it
-         * if we have to or if the message is larger than the threshold.
-         */
-        public void handleMessage(Message message) throws Fault {
-            try {
-                CachedOutputStream cs = (CachedOutputStream)message.getContent(OutputStream.class);
-                cs.flush();
-                OutputStream originalOutput = (OutputStream)message.get(ORIGINAL_OUTPUT_STREAM_KEY);
-                if (UseGzip.FORCE == message.get(USE_GZIP_KEY) || cs.size() > threshold) {
-                    LOG.fine("Compressing message.");
-                    // Set the Content-Encoding HTTP header
-                    addHeader(message, "Content-Encoding", (String)message.get(GZIP_ENCODING_KEY));
-                    // if this is a response message, add the Vary header
-                    if (!Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE))) {
-                        addHeader(message, "Vary", "Accept-Encoding");
-                    }
-
-                    // gzip the result
-                    GZIPOutputStream zipOutput = new GZIPOutputStream(originalOutput);
-                    cs.writeCacheTo(zipOutput);
-                    zipOutput.finish();
-                } else {
-                    LOG.fine("Message is smaller than compression threshold, not compressing.");
-                    cs.writeCacheTo(originalOutput);
-                }
-
-                cs.close();
-                originalOutput.flush();
-
-                message.setContent(OutputStream.class, originalOutput);
-            } catch (IOException ex) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_ZIP", BUNDLE), ex);
+    
+    static class GZipThresholdOutputStream extends AbstractThresholdOutputStream {
+        Message message;
+        
+        public GZipThresholdOutputStream(int t, OutputStream orig,
+                                         boolean force, Message msg) {
+            super(t);
+            super.wrappedStream = orig;
+            message = msg;
+            if (force) {
+                setupGZip();
             }
         }
+        
+        private void setupGZip() {
+            
+        }
 
-        /**
-         * Adds a value to a header. If the given header name is not currently
-         * set in the message, an entry is created with the given single value.
-         * If the header is already set, the value is appended to the first
-         * element of the list, following a comma.
-         * 
-         * @param message the message
-         * @param name the header to set
-         * @param value the value to add
-         */
-        private void addHeader(Message message, String name, String value) {
-            Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
-                .get(Message.PROTOCOL_HEADERS));
-            if (protocolHeaders == null) {
-                protocolHeaders = new HashMap<String, List<String>>();
-                message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
-            }
-            List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));
-            if (header == null) {
-                header = new ArrayList<String>();
-                protocolHeaders.put(name, header);
-            }
-            if (header.size() == 0) {
-                header.add(value);
-            } else {
-                header.set(0, header.get(0) + "," + value);
-            }
+        @Override
+        public void thresholdNotReached() {
+            //nothing
+            LOG.fine("Message is smaller than compression threshold, not compressing.");
+        }
+
+        @Override
+        public void thresholdReached() throws IOException {
+            LOG.fine("Compressing message.");
+            // Set the Content-Encoding HTTP header
+            String enc = (String)message.get(GZIP_ENCODING_KEY);
+            addHeader(message, "Content-Encoding", enc);
+            // if this is a response message, add the Vary header
+            if (!Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE))) {
+                addHeader(message, "Vary", "Accept-Encoding");
+            } 
+
+            // gzip the result
+            GZIPOutputStream zipOutput = new GZIPOutputStream(wrappedStream);
+            wrappedStream = zipOutput;
         }
     }
+    
+    /**
+     * Adds a value to a header. If the given header name is not currently
+     * set in the message, an entry is created with the given single value.
+     * If the header is already set, the value is appended to the first
+     * element of the list, following a comma.
+     * 
+     * @param message the message
+     * @param name the header to set
+     * @param value the value to add
+     */
+    private static void addHeader(Message message, String name, String value) {
+        Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
+            .get(Message.PROTOCOL_HEADERS));
+        if (protocolHeaders == null) {
+            protocolHeaders = new HashMap<String, List<String>>();
+            message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
+        }
+        List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));
+        if (header == null) {
+            header = new ArrayList<String>();
+            protocolHeaders.put(name, header);
+        }
+        if (header.size() == 0) {
+            header.add(value);
+        } else {
+            header.set(0, header.get(0) + "," + value);
+        }
+    }    
+
 }

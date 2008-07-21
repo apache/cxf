@@ -111,9 +111,7 @@ public class GZIPAcceptEncodingTest extends Assert {
     private void singleTest(String encoding, boolean expectEndingInterceptor,
                             GZIPOutInterceptor.UseGzip expectedUseGzip, String expectedGzipEncoding)
         throws Exception {
-        if (expectEndingInterceptor) {
-            outInterceptors.add(EasyMock.isA(GZIPOutInterceptor.GZIPOutEndingInterceptor.class));
-        }
+
         EasyMock.replay(outInterceptors);
         setAcceptEncoding(encoding);
         interceptor.handleMessage(outMessage);

@@ -95,7 +95,12 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                     message.setContent(InputStream.class, zipInput);
 
                     // remove content encoding header as we've now dealt with it
-                    protocolHeaders.remove("Content-Encoding");
+                    for (String key : protocolHeaders.keySet()) {
+                        if (key.equalsIgnoreCase("Content-Encoding")) {
+                            protocolHeaders.remove(key);
+                            break;
+                        }
+                    }
 
                     // add the ending interceptor
                     message.getInterceptorChain().add(ending);

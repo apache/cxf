@@ -43,8 +43,8 @@ public abstract class AbstractThresholdOutputStream extends AbstractWrappedOutpu
     }
     
     
-    public abstract void thresholdReached();
-    public abstract void thresholdNotReached();
+    public abstract void thresholdReached() throws IOException;
+    public abstract void thresholdNotReached() throws IOException;
     
     
     @Override
