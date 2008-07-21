@@ -48,14 +48,6 @@ Building and running the demo using Maven
 From the base directory of this sample (i.e., where this README file is
 located), the pom.xml file is used to build and run the demo. 
 
-Set the variable CXF_VERSION in your environment to the version of CXF you are using.
-
-For example on Windows;
-   set CXF_VERSION=2.1.2-SNAPSHOT
-
-On Unix
-   export CXF_VERSION=2.1.2-SNAPSHOT
-
 Using either UNIX or Windows:
 
   mvn install   (builds the demo)
