@@ -203,6 +203,12 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         } else {
             cls = JAXBUtils.getValidClass(cls);
             if (null != cls) {
+                if (cls.getSuperclass() != null) {
+                    //JAXB should do this, but it doesn't always.
+                    //in particular, older versions of jaxb don't
+                    addClass(cls.getSuperclass());
+                }
+                
                 if (cls.isInterface()) {
                     //interfaces cannot be added directly, however, they
                     //may have some interesting annoations we should consider
