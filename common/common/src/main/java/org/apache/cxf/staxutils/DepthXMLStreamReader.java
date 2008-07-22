@@ -84,7 +84,12 @@ public class DepthXMLStreamReader implements XMLStreamReader {
     }
 
     public String getElementText() throws XMLStreamException {
-        String ret = reader.getElementText(); 
+        String ret = reader.getElementText();
+        //workaround bugs in some readers that aren't properly advancing to 
+        //the END_ELEMNT (*cough*jettison*cough*)
+        while (reader.getEventType() != XMLStreamReader.END_ELEMENT) {
+            reader.next();
+        }
         depth--;
         return ret;
     }
