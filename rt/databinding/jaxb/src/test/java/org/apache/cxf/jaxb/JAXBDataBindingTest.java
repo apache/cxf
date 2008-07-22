@@ -121,17 +121,6 @@ public class JAXBDataBindingTest extends Assert {
     }
 
     @Test
-    public void testCreateJAXBContext() throws Exception {
-        try {
-            Set<Class<?>> classes = new HashSet<Class<?>>();
-            classes.add(Class.forName("java.rmi.RemoteException"));
-            assertNotNull(new JAXBDataBinding().createJAXBContext(classes));
-        } catch (Exception e) {
-            assertFalse(true);
-        }
-        
-    }
-    @Test
     public void testCreateReader() {
         DataReader reader = jaxbDataBinding.createReader(XMLStreamReader.class);
         assertTrue(reader instanceof DataReaderImpl);

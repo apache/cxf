@@ -24,13 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -116,26 +116,26 @@ public final class JAXBDataBinding extends AbstractDataBinding {
     }
     
     private static final class CachedClassOrNull {
-        private Class<?> cachedClass;
+        private WeakReference<Class<?>> cachedClass;
 
         public CachedClassOrNull(Class<?> cachedClass) {
-            this.cachedClass = cachedClass;
+            this.cachedClass = new WeakReference<Class<?>>(cachedClass);
         }
 
         public Class<?> getCachedClass() {
-            return cachedClass;
+            return cachedClass == null ? null : cachedClass.get();
         }
 
         public void setCachedClass(Class<?> cachedClass) {
-            this.cachedClass = cachedClass;
+            this.cachedClass = new WeakReference<Class<?>>(cachedClass);
         }
     }
 
     private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE 
         = new CacheMap<Set<Class<?>>, CachedContextAndSchemas>();
     
-    private static final Map<String, CachedClassOrNull> OBJECT_FACTORY_CACHE
-        = new CacheMap<String, CachedClassOrNull>();
+    private static final Map<Package, CachedClassOrNull> OBJECT_FACTORY_CACHE
+        = new CacheMap<Package, CachedClassOrNull>();
 
     Class[] extraClass;
 
@@ -404,16 +404,6 @@ public final class JAXBDataBinding extends AbstractDataBinding {
     }
 
     public JAXBContext createJAXBContext(Set<Class<?>> classes, String defaultNs) throws JAXBException {
-        Iterator it = classes.iterator();
-        String className = "";
-        Object remoteExceptionObject = null;
-        while (it.hasNext()) {
-            remoteExceptionObject = (Class)it.next();
-            className = remoteExceptionObject.toString();
-            if (!("".equals(className)) && className.contains("RemoteException")) {
-                it.remove();
-            }
-        }
         // add user extra class into jaxb context
         if (extraClass != null && extraClass.length > 0) {
             for (Class clz : extraClass) {
@@ -432,13 +422,17 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         for (Class<?> jcls : classes) {
             String pkgName = PackageUtils.getPackageName(jcls);
             if (!packages.containsKey(pkgName)) {
+                Package pkg = jcls.getPackage();
+                
                 packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
                 packageLoaders.put(pkgName, jcls.getClassLoader());
                 String objectFactoryClassName = pkgName + "." + "ObjectFactory";
                 Class<?> ofactory = null;
                 CachedClassOrNull cachedFactory = null;
-                synchronized (OBJECT_FACTORY_CACHE) {
-                    cachedFactory = OBJECT_FACTORY_CACHE.get(objectFactoryClassName);
+                if (pkg != null) {
+                    synchronized (OBJECT_FACTORY_CACHE) {
+                        cachedFactory = OBJECT_FACTORY_CACHE.get(pkg);
+                    }
                 }
                 if (cachedFactory != null) {
                     ofactory = cachedFactory.getCachedClass();
@@ -448,9 +442,9 @@ public final class JAXBDataBinding extends AbstractDataBinding {
                         ofactory = Class.forName(objectFactoryClassName, false, jcls
                                                  .getClassLoader());
                         objectFactories.add(ofactory);
-                        addToObjectFactoryCache(objectFactoryClassName, ofactory);
+                        addToObjectFactoryCache(pkg, ofactory);
                     } catch (ClassNotFoundException e) {
-                        addToObjectFactoryCache(objectFactoryClassName, null);
+                        addToObjectFactoryCache(pkg, null);
                     }
                 } else {
                     objectFactories.add(ofactory);                    
@@ -529,9 +523,12 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         return cachedContextAndSchemas.getContext();
     }
 
-    private void addToObjectFactoryCache(String objectFactoryClassName, Class<?> ofactory) {
+    private void addToObjectFactoryCache(Package objectFactoryPkg, Class<?> ofactory) {
+        if (objectFactoryPkg == null) {
+            return;
+        }
         synchronized (OBJECT_FACTORY_CACHE) {
-            OBJECT_FACTORY_CACHE.put(objectFactoryClassName, 
+            OBJECT_FACTORY_CACHE.put(objectFactoryPkg, 
                                      new CachedClassOrNull(ofactory));
         }
     }
