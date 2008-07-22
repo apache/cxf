@@ -110,7 +110,7 @@ public abstract class AbstractCXFServlet extends HttpServlet {
         bus.getExtension(DestinationFactoryManager.class).registerDestinationFactory(namespace, factory);
     }
 
-    protected void replaceDestinationFactory() throws ServletException {
+    protected void replaceDestinationFactory() {
        
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class); 
         try {
