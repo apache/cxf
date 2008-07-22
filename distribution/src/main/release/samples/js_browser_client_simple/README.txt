@@ -42,6 +42,19 @@ To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
 
 
+Building and running the demo using maven
+---------------------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located)
+
+Using either UNIX or Windows:
+
+  mvn install
+  mvn -Pserver
+  mvn -Pclient
+
+
 Building the demo using wsdl2java and javac
 -------------------------------------------
 

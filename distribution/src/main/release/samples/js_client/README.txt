@@ -7,20 +7,18 @@ JavaScript to call a CXF server.
 The client side makes call using JAX-WS APIs. It uses the Mozilla Rhino library 
 to read the JavaScript file and run it.
 
-This demo only implements the client-side logic, and relies on the server
-provided by the wsdl_first demo.
-
 
 Building and running the demo server using ant
 ----------------------------------------------
 
-From the samples/wsdl_first directory, the Ant build.xml file
-can be used to build and run the demo.
+From the base directory of this sample (i.e., where this README file is
+located), the Ant build.xml file can be used to build and run the demo.
 
 Using either UNIX or Windows:
 
   ant build
   ant server  (in the background or another window)
+  ant client  (in another window)
 
 To remove the code generated from the WSDL file and the .class
 files, run:
@@ -28,17 +26,24 @@ files, run:
   ant clean
 
 
-Running the JavaScript client
------------------------------
+Building and running the demo using maven
+---------------------------------------
 
-In another command line window, run the ant "client" target from 
-the build.xml file located in the same directory as this README.
+From the base directory of this sample (i.e., where this README file is
+located)
 
 Using either UNIX or Windows:
-  ant client
 
-When running the client, you can terminate the server process by issuing 
-Ctrl-C in its command window.
+  mvn install
+  mvn -Pserver
+  mvn -Pclient
+
+
+
+JavaScript client output
+-----------------------------
+
+
 
 The client will show this output:
 invoke sayHi().   return Bonjour

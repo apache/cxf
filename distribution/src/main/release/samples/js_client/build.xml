@@ -17,14 +17,25 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project name="js_client" default="all" basedir=".">   
+<project name="js_client" default="build" basedir=".">   
     <property name="thirdparty.classpath" 
        value="../wsdl_first/build/classes;lib/js-1.6R5.jar;lib/xbean-2.2.0.jar"/>
 
-    <import file="../common_build.xml"/>    
+    <import file="../common_build.xml"/>   
+    
+    <target name="server" description="run demo server" depends="build">
+        <cxfrun classname="demo.hw.server.Server" 
+            param1="${basedir}/wsdl/hello_world.wsdl"/>
+    </target>
    
     <target name="client" description="run demo client">
         <cxfrun classname="org.mozilla.javascript.tools.shell.Main"
             param1="src/helloworld.js"/>
     </target> 
+    
+    <target name="generate.code">
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java file="hello_world.wsdl"/>
+    </target>
+    
 </project>
