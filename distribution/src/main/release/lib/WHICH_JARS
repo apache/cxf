@@ -31,7 +31,7 @@ For Java2WSDL and WSDL2Java:
 
 For JAX-WS support:
 - geronimo-ws-metadata.jar [6]
-- jaxws-api.jar [6]
+- geronimo-jaxws_2.1_spec-1.0.jar (Or the Sun equivalent) [6]
 - saaj-api.jar [6]
 - saaj-impl.jar [6]
 - asm.jar (semi-optional, helps with performance of wrapper types and is 
