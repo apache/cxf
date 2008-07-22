@@ -33,8 +33,10 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -234,6 +236,9 @@ public final class CustomizationParser {
         for (Node childNode = jaxwsBindingNode.getFirstChild();
             childNode != null;
             childNode = childNode.getNextSibling()) {
+            
+            copyJaxbAttributes(childNode, (Element)schemaNode);
+            
             if (!isJaxbBindings(childNode)) {
                 continue;
             }
@@ -246,8 +251,18 @@ public final class CustomizationParser {
                     copyAllJaxbDeclarations(node, childEl);
                 }
             } else {
-                final Node jaxbNode = childEl;
-                Node cloneNode = ProcessorUtil.cloneNode(schemaNode.getOwnerDocument(), jaxbNode, true);
+                Element cloneNode = (Element)ProcessorUtil.cloneNode(schemaNode.getOwnerDocument(), 
+                                                                     childEl, true);
+                
+                NamedNodeMap atts = cloneNode.getAttributes();
+                for (int x = 0; x < atts.getLength(); x++) {
+                    Attr attr = (Attr)atts.item(x);
+                    if (ToolConstants.NS_JAXB_BINDINGS.equals(attr.getNamespaceURI())) {
+                        cloneNode.removeAttributeNode(attr);
+                        atts = cloneNode.getAttributes();
+                        x = -1;
+                    }
+                }
                 appinfoNode.appendChild(cloneNode);
                 childNode = childNode.getNextSibling();
             }
@@ -258,6 +273,38 @@ public final class CustomizationParser {
         } else {
             schemaNode.appendChild(annotationNode);
         }
+    }
+
+    private void copyJaxbAttributes(Node childNode, Element schemaNode) {
+        if (childNode instanceof Element) {
+            Element el = (Element)childNode;
+            NamedNodeMap atts = el.getAttributes();
+            for (int x = 0; x < atts.getLength(); x++) {
+                Attr attr = (Attr)atts.item(x);
+                if (ToolConstants.NS_JAXB_BINDINGS.equals(attr.getNamespaceURI())) {
+                    schemaNode.setAttributeNS(attr.getNamespaceURI(),
+                                              attr.getName(),
+                                              attr.getValue());
+                    if ("extensionBindingPrefixes".equals(attr.getLocalName())) {
+                        String pfxs = attr.getValue();
+                        while (pfxs.length() > 0) {
+                            String pfx = pfxs;
+                            int idx = pfx.indexOf(',');
+                            if (idx != -1) {
+                                pfxs = pfxs.substring(idx + 1);
+                                pfx = pfx.substring(0, idx);
+                            } else {
+                                pfxs = "";
+                            }
+                            String ns = el.lookupNamespaceURI(pfx);
+                            schemaNode.setAttribute("xmlns:" + pfx,
+                                                    ns);
+                        }
+                    }
+                }
+            }
+        }
+        
     }
 
     protected void internalizeBinding(Element bindings, Element targetNode, String expression) {

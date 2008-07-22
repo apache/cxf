@@ -1002,4 +1002,21 @@ public class CodeGenBugTest extends ProcessorTestBase {
         assertEquals("int", webFault.name());
     }
     
+    @Test
+    public void testCXF1620() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, 
+                getLocation("/wsdl2java_wsdl/jaxb_custom_extensors.wsdl"));   
+        env.put(ToolConstants.CFG_BINDING,
+                getLocation("/wsdl2java_wsdl/jaxb_custom_extensors.xjb"));
+
+        processor.setContext(env);
+        processor.execute();
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.jaxb_custom_ext.types.Foo");
+        
+        assertEquals(3, clz.getDeclaredFields().length);
+        
+        clz = classLoader.loadClass("org.apache.cxf.w2j.jaxb_custom_ext.types.Foo2");
+        assertEquals(1, clz.getDeclaredFields().length);
+    }
+    
 }

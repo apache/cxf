@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -334,11 +335,13 @@ public final class ProcessorUtil {
             clone = document.createEntityReference(node.getNodeName());
             break;
         case Node.ELEMENT_NODE:
-            clone = document.createElement(node.getNodeName());
+            clone = document.createElementNS(node.getNamespaceURI(), node.getNodeName());
             NamedNodeMap attributes = node.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
-                ((Element)clone).setAttribute(attributes.item(i).getNodeName(), attributes.item(i)
-                    .getNodeValue());
+                Attr attr = (Attr)attributes.item(i);
+                ((Element)clone).setAttributeNS(attr.getNamespaceURI(),
+                                                attr.getNodeName(),
+                                                attr.getNodeValue());
             }
             break;
        
