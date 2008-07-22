@@ -397,8 +397,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         // service model?
         String syncAsyncFlag;
         if (currentOperation.isOneWay()) {
+            utils.appendLine("this.jsutils.trace('oneway operation');");
             syncAsyncFlag = "false";
         } else {
+            utils.appendLine("this.jsutils.trace('synchronous = ' + this.synchronous);");
             syncAsyncFlag = "this.synchronous";
         }
         utils.appendLine("this.client.request(this.url, xml, null, "

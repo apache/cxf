@@ -52,6 +52,12 @@ function testSuccessCallback(responseObject)
 	globalNotifier.notify();
 }
 
+function dummy()
+{
+	// for now, dummy. later, we'll want to verify correct operation
+	// of both requests.
+}
+
 function sayHiTest(url)
 {
 	org_apache_cxf_trace.trace("Enter sayHi.");
@@ -65,5 +71,23 @@ function sayHiTest(url)
     intf.sayHi(testSuccessCallback, testErrorCallback);
     // Return the notifier as a convenience to the Java code.
 	return globalNotifier;
+}
+
+function requestClosureTest(url)
+{
+	org_apache_cxf_trace.trace("Enter sayHi.");
+	resetGlobals();
+	globalNotifier = new org_apache_cxf_notifier();
+	
+	var intf;
+    intf = new cxf_apache_org_jstest_Greeter();
+	  
+	intf.url = url;
+    intf.sayHi(testSuccessCallback, testErrorCallback);
+    intf.sayHi(null, null);
+    // Return the notifier as a convenience to the Java code.
+	return globalNotifier;
+
+	
 }
 

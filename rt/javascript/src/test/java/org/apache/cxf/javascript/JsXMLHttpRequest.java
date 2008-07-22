@@ -331,7 +331,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
                         Context.exit();
                     }
                 }
-            } .run();
+            } .start();
         } else {
             communicate(Context.getCurrentContext());
         }

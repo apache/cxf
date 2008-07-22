@@ -20,6 +20,7 @@
 package org.apache.cxf.javascript.fortest;
 
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 
 import uri.cxf_apache_org.jstest.any.AcceptAny;
 import uri.cxf_apache_org.jstest.types.any.AcceptAny1;
@@ -42,10 +43,8 @@ public class AnyImpl implements AcceptAny {
     private Object anyOptionalValue;
     private String before;
     private String after;
-    /**
-     *
-     */
     private boolean returnOptional;
+    private CountDownLatch onewayNotify;
     
     public void reset() {
         any1value = null;
@@ -117,18 +116,21 @@ public class AnyImpl implements AcceptAny {
         before = in.getBefore();
         after = in.getAfter();
         any1value = in.getAny();
+        onewayNotify.countDown();
     }
 
     public void acceptAnyN(AcceptAnyN in) {
         before = in.getBefore();
         after = in.getAfter();
         anyNvalue = in.getAny().toArray();
+        onewayNotify.countDown();
     }
 
     public void acceptAnyOptional(AcceptAnyOptional in) {
         before = in.getBefore();
         after = in.getAfter();
         anyOptionalValue = in.getAny();
+        onewayNotify.countDown();
     }
 
     public AcceptAny1 returnAny1(ReturnAny1 in) {
@@ -176,6 +178,22 @@ public class AnyImpl implements AcceptAny {
 
     public void dummyAlts(uri.cxf_apache_org.jstest.types.any.alts.Alternative1 in) {
         // not used, just here to force some types into sight.
+    }
+
+    public void prepareToWaitForOneWay() { 
+        onewayNotify = new CountDownLatch(1);
+    }
+    
+    public void waitForOneWay() {
+        if (onewayNotify == null) {
+            return;
+        }
+        try {
+            onewayNotify.await();
+            onewayNotify = null;
+        } catch (InterruptedException e) {
+            //
+        }
     }
 }
 

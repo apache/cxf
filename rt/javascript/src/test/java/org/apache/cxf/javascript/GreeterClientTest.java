@@ -79,6 +79,35 @@ public class GreeterClientTest extends JavascriptRhinoTest {
             }
         });
     }
+    
+    private Void sayHiClosureCaller(Context context) {
+        Notifier notifier = 
+            testUtilities.rhinoCallConvert("requestClosureTest", Notifier.class, 
+                                           testUtilities.javaToJS(getAddress()));
+        
+        boolean notified = notifier.waitForJavascript(1000 * 10);
+        assertTrue(notified);
+        Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
+        assertNull(errorStatus);
+        String errorText = testUtilities.rhinoEvaluateConvert("globalErrorStatusText", String.class);
+        assertNull(errorText);
+
+        // this method returns a String inside of an object, since there's an @WebResponse
+        String responseObject = testUtilities.rhinoEvaluateConvert("globalResponseObject.getResponseType()", 
+                                                                   String.class);
+        assertEquals("Bonjour", responseObject);
+        return null;
+    }
+    
+    @org.junit.Ignore
+    @Test
+    public void testRequestClosure() throws Exception {
+        testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
+            public Void run(Context context) {
+                return sayHiClosureCaller(context);
+            }
+        });
+    }
 
     public String getStaticResourceURL() throws Exception {
         File staticFile = new File(this.getClass().getResource("test.html").toURI());

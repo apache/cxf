@@ -67,8 +67,10 @@ public class AegisTest extends JavascriptRhinoTest {
     
     private Void acceptAny(Context context) {
         LOG.info("About to call acceptAny with Raw XML" + getAddress());
+        implementor.prepareToWaitForOneWay();
         testUtilities.rhinoCall("testAnyNToServerRaw",  
                                 testUtilities.javaToJS(getAddress()));
+        implementor.waitForOneWay();
         assertEquals("before items", implementor.getAcceptedString());
         Collection<org.jdom.Element> something = implementor.getAcceptedCollection();
         assertNotNull(something);
@@ -86,8 +88,10 @@ public class AegisTest extends JavascriptRhinoTest {
     
     private Void acceptAnyTyped(Context context) {
         LOG.info("About to call acceptAny with Raw XML and xsi:type" + getAddress());
+        implementor.prepareToWaitForOneWay();
         testUtilities.rhinoCall("testAnyNToServerRawTyped",  
                                 testUtilities.javaToJS(getAddress()));
+        implementor.waitForOneWay();
         Collection<Object> something = implementor.getAcceptedObjects();
         assertNotNull(something);
         return null;

@@ -68,8 +68,10 @@ public class AnyTest extends JavascriptRhinoTest {
     
     private Void acceptOneChalk(Context context) {
         LOG.info("About to call accept1 with Chalk" + getAddress());
+        implementor.prepareToWaitForOneWay();
         testUtilities.rhinoCall("testAny1ToServerChalk",  
                                 testUtilities.javaToJS(getAddress()));
+        implementor.waitForOneWay();
         assertEquals("before chalk", implementor.getBefore());
         Object someAlternative = implementor.getAny1value();
         assertTrue(someAlternative instanceof Alternative1);
@@ -90,8 +92,10 @@ public class AnyTest extends JavascriptRhinoTest {
     
     private Void acceptOneRaw(Context context) {
         LOG.info("About to call accept1 with Raw XML" + getAddress());
+        implementor.prepareToWaitForOneWay();
         testUtilities.rhinoCall("testAny1ToServerRaw",  
                                 testUtilities.javaToJS(getAddress()));
+        implementor.waitForOneWay();
         assertEquals("before chalk", implementor.getBefore());
         Object something = implementor.getAny1value();
         assertNotNull(something);
@@ -114,8 +118,10 @@ public class AnyTest extends JavascriptRhinoTest {
     
     private Void acceptNRaw(Context context) {
         LOG.info("About to call acceptN with Raw XML" + getAddress());
+        implementor.prepareToWaitForOneWay();
         testUtilities.rhinoCall("testAnyNToServerRaw",  
                                 testUtilities.javaToJS(getAddress()));
+        implementor.waitForOneWay();
         assertEquals("before chalk", implementor.getBefore());
         Object[] something = implementor.getAnyNvalue();
         assertNotNull(something);

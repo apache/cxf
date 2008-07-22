@@ -19,6 +19,8 @@
 
 package org.apache.cxf.javascript.fortest;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.jws.WebService;
 
 /**
@@ -34,6 +36,7 @@ public class SimpleDocLitBareImpl implements SimpleDocLitBare {
     private double lastDouble;
     private TestBean1 lastBean1;
     private TestBean1[] lastBean1Array;
+    private CountDownLatch oneWayLatch;
     
     public void resetLastValues() {
         lastString = null;
@@ -100,10 +103,31 @@ public class SimpleDocLitBareImpl implements SimpleDocLitBare {
 
     public String actionMethod(String param) {
         lastString = param;
+        if (oneWayLatch != null) {
+            oneWayLatch.countDown();
+        }
         return param;
     }
 
     public void oneWay(String param) {
         lastString = param;
+        if (oneWayLatch != null) {
+            oneWayLatch.countDown();
+        }
+    }
+    
+    public void prepareToWaitForOneWay() {
+        oneWayLatch = new CountDownLatch(1);
+    }
+    
+    public void waitForOneWay() {
+        if (oneWayLatch != null) {
+            try {
+                oneWayLatch.await();
+            } catch (InterruptedException e) {
+                // 
+            }
+            oneWayLatch = null;
+        }
     }
 }

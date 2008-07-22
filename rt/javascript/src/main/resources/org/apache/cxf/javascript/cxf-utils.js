@@ -29,6 +29,7 @@ function CxfApacheOrgUtil() {
 	// Set up tracing if there is a trace object.
 	if ("function" == typeof(org_apache_cxf_trace)) {
 		this.trace = org_apache_cxf_trace.trace;
+		this.trace("Javascript tracing enabled.");
 	} else {
 		this.trace = cxf_apache_org_util_null_trace;
 	}

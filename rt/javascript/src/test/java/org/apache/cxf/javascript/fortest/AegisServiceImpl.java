@@ -20,6 +20,7 @@
 package org.apache.cxf.javascript.fortest;
 
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.cxf.javascript.fortest.aegis.BeanWithAnyTypeArray;
 import org.apache.cxf.javascript.fortest.aegis.Mammal;
@@ -33,6 +34,7 @@ public class AegisServiceImpl implements AegisService {
     private Collection<org.jdom.Element> acceptedCollection;
     private Collection<String> acceptedStrings;
     private Collection<Object> acceptedObjects;
+    private CountDownLatch oneWayLatch;
     
     public Collection<Object> getAcceptedObjects() {
         return acceptedObjects;
@@ -47,6 +49,9 @@ public class AegisServiceImpl implements AegisService {
     public void acceptAny(String before, Collection<org.jdom.Element> anything) {
         acceptedString = before;
         acceptedCollection = anything;
+        if (oneWayLatch != null) {
+            oneWayLatch.countDown();
+        }
     }
 
     /**
@@ -76,6 +81,9 @@ public class AegisServiceImpl implements AegisService {
 
     public void acceptObjects(Collection<Object> anything) {
         acceptedObjects = anything;
+        if (oneWayLatch != null) {
+            oneWayLatch.countDown();
+        }
     }
 
     public BeanWithAnyTypeArray returnBeanWithAnyTypeArray() {
@@ -88,4 +96,20 @@ public class AegisServiceImpl implements AegisService {
         bwata.setObjects(obs);
         return bwata;
     }
+    
+    public void prepareToWaitForOneWay() {
+        oneWayLatch = new CountDownLatch(1);
+    }
+    
+    public void waitForOneWay() {
+        if (oneWayLatch != null) {
+            try {
+                oneWayLatch.await();
+            } catch (InterruptedException e) {
+                // 
+            }
+            oneWayLatch = null;
+        }
+    }
+
 }
