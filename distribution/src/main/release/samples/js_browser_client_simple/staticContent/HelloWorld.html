@@ -30,9 +30,9 @@ Greeter.url = "/SoapContext/SoapPort";
 var responseSpan;
 
 // This is the function called upon success.
-function sayHiResponse(response)
+function sayHiResponse(response, span)
 {
-    responseSpan.firstChild.nodeValue = response.getResponseType();
+    span.firstChild.nodeValue = response.getResponseType();
 }
 
 // This is the function called for an error.
@@ -45,9 +45,14 @@ function sayHiError(error)
 // This function is invoked from the button press to run the service. 
 function invokeSayHi()
 {
-    responseSpan = document.getElementById('sayHiResponse');
-    responseSpan.firstChild.nodeValue = " - pending - ";
-    Greeter.sayHi(sayHiResponse, sayHiError);
+    responseSpan1 = document.getElementById('sayHiResponse1');
+    responseSpan1.firstChild.nodeValue = " - pending - ";
+    responseSpan2 = document.getElementById('sayHiResponse2');
+    responseSpan2.firstChild.nodeValue = " - pending - ";
+    var receiveFirstResponse = function(response) { sayHiResponse(response, responseSpan1); };
+    Greeter.sayHi(receiveFirstResponse, sayHiError);
+    var receiveSecondResponse = function(response) { sayHiResponse(response, responseSpan2); };
+    Greeter.sayHi(receiveSecondResponse, sayHiError);
 }
 </script>
 </head>
@@ -65,8 +70,12 @@ Hello World Sample
 		       onClick="invokeSayHi()">
 	  </tr>
 	  <tr>
-	    <td>sayHi response</td>
-	    <td><span id='sayHiResponse'>- not yet invoked -</span></td>
+	    <td>sayHi response 1</td>
+	    <td><span id='sayHiResponse1'>- not yet invoked -</span></td>
+	  </tr>
+	  <tr>
+	    <td>sayHi response 2</td>
+	    <td><span id='sayHiResponse2'>- not yet invoked -</span></td>
 	  </tr>
 	</table>
 </div>

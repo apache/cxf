@@ -29,9 +29,11 @@ import org.apache.hello_world_soap_http.types.FaultDetail;
                       endpointInterface = "org.apache.hello_world_soap_http.Greeter")
                   
 public class GreeterImpl implements Greeter {
-
+    
     private static final Logger LOG = 
         Logger.getLogger(GreeterImpl.class.getPackage().getName());
+
+    private int sayHiCounter;
     
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMe(java.lang.String)
@@ -58,7 +60,7 @@ public class GreeterImpl implements Greeter {
     public String sayHi() {
         LOG.info("Executing operation sayHi");
         System.out.println("Executing operation sayHi\n");
-        return "Bonjour";
+        return "Bonjour " + (++sayHiCounter);
     }
     
     public void pingMe() throws PingMeFault {
