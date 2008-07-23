@@ -26,6 +26,7 @@ var globalNotifier = null;
 var globalErrorStatus = null;
 var globalErrorStatusText = null;
 var globalResponseObject = null;
+var globalSecondResponseObject = null;
 
 function resetGlobals() {
 	globalNotifier = null;
@@ -52,10 +53,16 @@ function testSuccessCallback(responseObject)
 	globalNotifier.notify();
 }
 
-function dummy()
+function success1(responseObject)
 {
-	// for now, dummy. later, we'll want to verify correct operation
-	// of both requests.
+	globalResponseObject = responseObject;
+}
+
+
+function success2(responseObject)
+{
+	globalSecondResponseObject = responseObject;
+	globalNotifier.notify();
 }
 
 function sayHiTest(url)
@@ -83,8 +90,8 @@ function requestClosureTest(url)
     intf = new cxf_apache_org_jstest_Greeter();
 	  
 	intf.url = url;
-    intf.sayHi(testSuccessCallback, testErrorCallback);
-    intf.sayHi(null, null);
+    intf.sayHi(success1, testErrorCallback);
+    intf.sayHi(success2, testErrorCallback);
     // Return the notifier as a convenience to the Java code.
 	return globalNotifier;
 

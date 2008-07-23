@@ -167,10 +167,6 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         }
         utils.appendLine("this.client = null;");
         utils.appendLine("this.response = null;");
-        // the callback functions for a pending operation are stored in these.
-        // thus, only one pending operation at a time.
-        utils.appendLine("this._onsuccess = null;");
-        utils.appendLine("this._onerror = null;");
         generateGlobalElementDictionary();
         code.append("}\n\n");
     }
@@ -376,15 +372,17 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         // we need to pass the caller's callback functions to our callback
         // functions.
         if (!currentOperation.isOneWay()) {
-            utils.appendLine("this._onsuccess = successCallback;");
-            utils.appendLine("this._onerror = errorCallback;");
+            utils.appendLine("this.client.user_onsuccess = successCallback;");
+            utils.appendLine("this.client.user_onerror = errorCallback;");
             utils.appendLine("var closureThis = this;");
-            utils.appendLine("this.client.onsuccess = function(that) { closureThis." 
+            // client will pass itself and the response XML.
+            utils.appendLine("this.client.onsuccess = function(client, responseXml) { closureThis." 
+                                 + opFunctionPropertyName
+                                 + "_onsuccess(client, responseXml); };");
+            // client will pass itself.
+            utils.appendLine("this.client.onerror = function(client) { closureThis."
                              + opFunctionPropertyName
-                             + "_onsuccess(that); };");
-            utils.appendLine("this.client.onerror = function(that) { closureThis."
-                             + opFunctionPropertyName
-                             + "_onerror(that); };");
+                             + "_onerror(client); };");
         }
         utils.appendLine("var requestHeaders = [];");
 
@@ -418,20 +416,20 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         String errorFunctionPropertyName = opFunctionPropertyName + "_onerror";
         String errorFunctionGlobalName = opFunctionGlobalName + "_onerror";
         
-        code.append("function " + errorFunctionGlobalName + "() {\n");
-        utils.startIf("this._onerror");
+        code.append("function " + errorFunctionGlobalName + "(client) {\n");
+        utils.startIf("client.user_onerror");
         // Is this a good set of parameters for the error function?
         // Not if we want to process faults, it isn't. To be revisited.
         utils.appendLine("var httpStatus;");
         utils.appendLine("var httpStatusText;");
         utils.appendLine("try {");
-        utils.appendLine(" httpStatus = this.client.req.status;");
-        utils.appendLine(" httpStatusText = this.client.req.statusText;");
+        utils.appendLine(" httpStatus = client.req.status;");
+        utils.appendLine(" httpStatusText = client.req.statusText;");
         utils.appendLine("} catch(e) {");
         utils.appendLine(" httpStatus = -1;");
         utils.appendLine(" httpStatusText = 'Error opening connection to server';");
         utils.appendLine("}");
-        utils.appendLine("this._onerror(httpStatus, httpStatusText);");
+        utils.appendLine("client.user_onerror(httpStatus, httpStatusText);");
         utils.endBlock();
         code.append("}\n\n");
         code.append(currentInterfaceClassName + ".prototype." 
@@ -449,15 +447,13 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         // parameters.
         String successFunctionGlobalName = opFunctionGlobalName + "_onsuccess"; 
         String successFunctionPropertyName = opFunctionPropertyName + "_onsuccess"; 
-        String arglist = "()";
+        String arglist = "(client)";
         if (nonVoidOutput) {
-            arglist = "(responseXml)";
+            arglist = "(client, responseXml)";
         }
         
         code.append("function " + successFunctionGlobalName + arglist + " {\n");
-        utils.appendLine("this.jsutils.trace('" + successFunctionGlobalName + " _onsuccess: ' " 
-                         + " + this._onsuccess);");
-        utils.startIf("this._onsuccess");
+        utils.startIf("client.user_onsuccess");
         utils.appendLine("var responseObject = null;");
         if (nonVoidOutput) {
             utils.appendLine("var element = responseXml.documentElement;");
@@ -481,7 +477,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             utils.appendLine("this.jsutils.trace('calling " + deserializerFunctionName + "');");
             utils.appendLine("responseObject = " + deserializerFunctionName + "(this.jsutils, element);");
         }
-        utils.appendLine("this._onsuccess(responseObject);");
+        utils.appendLine("client.user_onsuccess(responseObject);");
         utils.endBlock();
         code.append("}\n\n");
         code.append(currentInterfaceClassName + ".prototype." 

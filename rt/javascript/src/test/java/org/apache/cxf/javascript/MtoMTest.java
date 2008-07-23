@@ -95,7 +95,6 @@ public class MtoMTest extends JavascriptRhinoTest {
         assertNotNull(unpacked);
         return null;
     }
-
     
     @Test
     public void sendMtoMStringTest() {

@@ -96,10 +96,12 @@ public class GreeterClientTest extends JavascriptRhinoTest {
         String responseObject = testUtilities.rhinoEvaluateConvert("globalResponseObject.getResponseType()", 
                                                                    String.class);
         assertEquals("Bonjour", responseObject);
+        responseObject = testUtilities.rhinoEvaluateConvert("globalSecondResponseObject.getResponseType()", 
+                                                                   String.class);
+        assertEquals("Bonjour", responseObject);
         return null;
     }
     
-    @org.junit.Ignore
     @Test
     public void testRequestClosure() throws Exception {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {

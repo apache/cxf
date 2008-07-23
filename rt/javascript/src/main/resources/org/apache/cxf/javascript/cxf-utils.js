@@ -859,7 +859,7 @@ function org_apache_cxf_client_onReadyState() {
 				// response.
 				if (!req.responseXML) {
 					if (this.parseMultipartRelated()) {
-						this.onsuccess(this.mpResponseXML);
+						this.onsuccess(this, this.mpResponseXML);
 						return;
 					}
 					if (this.onerror != null) {
@@ -867,7 +867,7 @@ function org_apache_cxf_client_onReadyState() {
 						return;
 					}
 				}
-				this.onsuccess(req.responseXML);
+				this.onsuccess(this, req.responseXML);
 			}
 		} else {
 			this.utils.trace("onreadystatechange DONE ERROR "
