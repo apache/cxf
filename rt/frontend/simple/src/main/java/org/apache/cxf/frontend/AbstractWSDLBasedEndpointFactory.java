@@ -104,6 +104,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             endpointName = serviceFactory.getEndpointName();
         }
         EndpointInfo ei = service.getEndpointInfo(endpointName);
+        
         if (ei != null) {
             if (transportId != null
                 && !ei.getTransportId().equals(transportId)) {
@@ -119,8 +120,32 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                 ei = ServiceModelUtil.findBestEndpointInfo(serviceFactory.getInterfaceName(), service
                     .getServiceInfos());
             }
+            if (ei == null && !serviceFactory.isPopulateFromClass()) {
+                ei = ServiceModelUtil.findBestEndpointInfo(serviceFactory.getInterfaceName(), service
+                                                           .getServiceInfos());
+                if (ei != null
+                    && transportId != null
+                    && !ei.getTransportId().equals(transportId)) {
+                    ei = null;
+                }
+                if (ei != null) {
+                    BindingFactoryManager bfm = getBus().getExtension(BindingFactoryManager.class);
+                    bindingFactory = bfm.getBindingFactory(ei.getBinding().getBindingId());
+                }
+
+                if (ei == null) {
+                    LOG.warning("Could not find endpoint/port for " 
+                                + endpointName + " in wsdl. Creating default.");
+                } else {
+                    LOG.warning("Could not find endpoint/port for " 
+                                + endpointName + " in wsdl. Using " 
+                                + ei.getName() + ".");                        
+                }
+            }
             if (ei == null) {
                 ei = createEndpointInfo();
+            } else if (getAddress() != null) {
+                ei.setAddress(getAddress()); 
             }
         } else if (getAddress() != null) {
             ei.setAddress(getAddress()); 

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -39,6 +40,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -48,9 +50,11 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.tools.common.extensions.soap.SoapBody;
 
 public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
-
+    private static final QName SOAP12_RESULT = new QName("http://www.w3.org/2003/05/soap-rpc",
+                                                         "result");
     private static final Logger LOG = LogUtils.getL7dLogger(RPCInInterceptor.class);
     
     public RPCInInterceptor() {
@@ -59,7 +63,30 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     }
 
     private BindingOperationInfo getOperation(Message message, QName opName) {
-        return ServiceModelUtil.getOperation(message.getExchange(), opName);
+        BindingOperationInfo bop = ServiceModelUtil.getOperation(message.getExchange(), opName);
+        if (bop == null) {
+            Endpoint ep = message.getExchange().get(Endpoint.class);
+            if (ep == null) {
+                return null;
+            }
+            BindingInfo service = ep.getEndpointInfo().getBinding();
+            boolean output = !isRequestor(message);
+            for (BindingOperationInfo info : service.getOperations()) {
+                if (info.getName().getLocalPart().equals(opName.getLocalPart())) {
+                    SoapBody body = null;
+                    if (output) {
+                        body = info.getOutput().getExtensor(SoapBody.class);
+                    } else {
+                        body = info.getInput().getExtensor(SoapBody.class);
+                    }        
+                    if (body != null 
+                        && opName.getNamespaceURI().equals(body.getNamespaceURI())) {
+                        return info;
+                    }
+                }
+            }
+        }
+        return bop;
     }
     public void handleMessage(Message message) {
         if (isGET(message)) {
@@ -110,8 +137,24 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             if (hasNext) {
                 hasNext = StaxUtils.toNextElement(xmlReader);
             }
+
             if (hasNext) {
                 QName qn = xmlReader.getName();
+                if (qn.equals(SOAP12_RESULT)) {
+                    //just ignore this.   The parts should work correctly.
+                    try {
+                        while (xmlReader.getEventType() != XMLStreamReader.END_ELEMENT) {
+                            xmlReader.next();
+                        }
+                        xmlReader.next();
+                    } catch (XMLStreamException e) {
+                        //ignore
+                    }
+                    StaxUtils.toNextElement(xmlReader);
+                    qn = xmlReader.getName();
+                }
+                
+                
                 // WSI-BP states that RPC/Lit part accessors should be completely unqualified
                 // However, older toolkits (Axis 1.x) are qualifying them.   We'll go
                 // ahead and just match on the localpart.   The RPCOutInterceptor

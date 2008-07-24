@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -34,6 +35,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.tools.common.extensions.soap.SoapBody;
 
 public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(RPCOutInterceptor.class);
@@ -55,14 +57,15 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
 
             XMLStreamWriter xmlWriter = getXMLStreamWriter(message);
 
-            addOperationNode(nsStack, message, xmlWriter);
 
             List<MessagePartInfo> parts = null;
 
             if (!isRequestor(message)) {
                 parts = operation.getOutput().getMessageParts();
+                addOperationNode(nsStack, message, xmlWriter, true, operation);
             } else {
                 parts = operation.getInput().getMessageParts();
+                addOperationNode(nsStack, message, xmlWriter, false, operation);
             }
             
             MessageContentsList objs = MessageContentsList.getContentsList(message);
@@ -95,11 +98,23 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
 
-    protected String addOperationNode(NSStack nsStack, Message message, XMLStreamWriter xmlWriter) 
+    protected String addOperationNode(NSStack nsStack, Message message, 
+                                      XMLStreamWriter xmlWriter, 
+                                      boolean output,
+                                      BindingOperationInfo boi) 
         throws XMLStreamException {
-        String responseSuffix = !isRequestor(message) ? "Response" : "";
-        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+        String responseSuffix = output ? "Response" : "";
         String ns = boi.getName().getNamespaceURI();
+        SoapBody body = null;
+        if (output) {
+            body = boi.getOutput().getExtensor(SoapBody.class);
+        } else {
+            body = boi.getInput().getExtensor(SoapBody.class);
+        }        
+        if (body != null && !StringUtils.isEmpty(body.getNamespaceURI())) {
+            ns = body.getNamespaceURI();
+        }
+
         nsStack.add(ns);
         String prefix = nsStack.getPrefix(ns);
         StaxUtils.writeStartElement(xmlWriter, prefix, boi.getName().getLocalPart() + responseSuffix, ns);

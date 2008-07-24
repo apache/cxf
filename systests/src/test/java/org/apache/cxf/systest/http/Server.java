@@ -21,6 +21,8 @@ package org.apache.cxf.systest.http;
 
 import java.net.URL;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -71,7 +73,7 @@ public class Server extends AbstractBusTestServerBase {
                     this.getClass().getResource("resources/greeting.wsdl").toString());
         // How the hell do I know what the name of the 
         // http-destination is from using this call?
-        
+        ep.setEndpointName(new QName("http://apache.org/hello_world", name));
         ep.publish(address);
     }
 

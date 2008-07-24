@@ -41,7 +41,7 @@
               http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 
-  <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination">
+  <http:destination name="{http://apache.org/hello_world}Tarpin.http-destination">
     <http:server RedirectURL="https://localhost:9001/Gordy"/>
   </http:destination>
   

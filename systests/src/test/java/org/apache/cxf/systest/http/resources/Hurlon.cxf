@@ -40,7 +40,7 @@
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-  <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination">
+  <http:destination name="{http://apache.org/hello_world}Hurlon.http-destination">
     <http:server RedirectURL="http://localhost:9007/Abost"/>
   </http:destination>
   

@@ -554,7 +554,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             if (action == null) {
                 action = "";
             }
-
             soi.setAction(action);
             soi.setStyle(soapOp.getStyle());
         }
@@ -608,6 +607,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
         SoapBodyInfo bodyInfo = new SoapBodyInfo();
         SoapBody soapBody = SOAPBindingUtil.getSoapBody(bmsg.getExtensors(ExtensibilityElement.class));
+        
         List parts = null;
         if (soapBody == null) {
             MIMEMultipartRelated mmr = bmsg.getExtensor(MIMEMultipartRelated.class);
@@ -615,6 +615,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                 parts = mmr.getMIMEParts();
             }
         } else {
+            bmsg.addExtensor(soapBody);
             bodyInfo.setUse(soapBody.getUse());
             parts = soapBody.getParts();
         }

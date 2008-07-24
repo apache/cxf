@@ -254,7 +254,11 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
 
         } else {
-            soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
+            try {
+                soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
+            } catch (SOAPException ex2) {
+                //ignore
+            }
             String msg = ex.getMessage();
             if (msg != null) {
                 soapFault.setFaultString(msg);
