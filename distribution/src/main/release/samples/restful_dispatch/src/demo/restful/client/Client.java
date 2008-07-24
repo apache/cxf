@@ -92,7 +92,7 @@ public final class Client {
         DOMSource result = dispatcher.invoke(reqMsg);
         printSource(result);
 
-        System.out.println("Client Invoking is succeeded!");
+        System.out.println("Client Invoking succeeded!");
         System.exit(0);
     }
 

@@ -20,6 +20,7 @@
 package demo.ws_rm.server;
 
 import javax.xml.ws.Endpoint;
+import java.net.URL;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -34,18 +35,19 @@ public class Server {
         String address = "http://localhost:9000/SoapContext/GreeterPort";
         Endpoint e = Endpoint.publish(address, implementor);
     }
-    
+
     public static void main(String args[]) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus("ws_rm.xml");
+        URL busFile = Server.class.getResource("ws_rm.xml");
+        Bus bus = bf.createBus(busFile.toString());
         bf.setDefaultBus(bus);
 
         new Server();
-        System.out.println("Server ready..."); 
-        
-        Thread.sleep(5 * 60 * 1000); 
-      
+        System.out.println("Server ready...");
+
+        Thread.sleep(5 * 60 * 1000);
+
         bus.shutdown(true);
         System.out.println("Server exiting");
         System.exit(0);

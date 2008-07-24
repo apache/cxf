@@ -20,6 +20,7 @@
 package demo.ws_rm.client;
 
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URL;
 
 import demo.ws_rm.common.MessageLossSimulator;
 
@@ -30,21 +31,22 @@ import org.apache.cxf.hello_world_soap_http.GreeterService;
 
 
 public final class Client {
-    
+
     private static final String USER_NAME = System.getProperty("user.name");
 
     private Client() {
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
-        try { 
-       
+        try {
+
             SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("ws_rm.xml");
+            URL busFile = Client.class.getResource("ws_rm.xml");
+            Bus bus = bf.createBus(busFile.toString());
             bf.setDefaultBus(bus);
 
             bus.getOutInterceptors().add(new MessageLossSimulator());
- 
+
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
 
@@ -61,12 +63,12 @@ public final class Client {
 
             bus.shutdown(true);
 
-        } catch (UndeclaredThrowableException ex) { 
+        } catch (UndeclaredThrowableException ex) {
             ex.getUndeclaredThrowable().printStackTrace();
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             ex.printStackTrace();
-        } finally { 
-            System.exit(0); 
+        } finally {
+            System.exit(0);
         }
     }
 }

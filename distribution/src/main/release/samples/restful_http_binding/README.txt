@@ -37,6 +37,37 @@ HTTP. To run this client, do:
 Using either UNIX or Windows:
   ant client  (from a second command line window)
 
+To remove the code generated from the WSDL file and the .class
+files, run "ant clean".
+
+
+Building and running the demo using Maven
+---------------------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located), the maven pom.xml file can be used to build and run the demo. 
+
+Build the demo:
+   mvn install
+
+The demo has a class called demo.restful.server.Server which starts up various
+endpoints. To start this server run the command:
+
+Using either UNIX or Windows:
+  mvn -Pserver  (from one command line window)
+  
+The demo also includes a Client class which accesses data using 
+HTTP. To run this client, do:
+
+Using either UNIX or Windows:
+  mvn -Pclient  (from a second command line window)
+
+To remove the code generated from the WSDL file and the .class
+files, run "mvn clean".
+
+---------------------------------------
+
+
 Once it is running try going to the following URLs:
 
 http://localhost:8080/xml/customers
@@ -63,5 +94,3 @@ And if you are interested in SOAP you can try the SOAP endpoint:
 http://localhost:8080/soap?wsdl
 
     
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".

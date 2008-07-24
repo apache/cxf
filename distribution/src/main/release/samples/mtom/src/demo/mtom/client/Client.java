@@ -40,10 +40,10 @@ import org.apache.cxf.mime.TestMtomService;
 
 public final class Client {
 
-    private static final QName SERVICE_NAME = new QName("http://cxf.apache.org/mime", 
+    private static final QName SERVICE_NAME = new QName("http://cxf.apache.org/mime",
         "TestMtomService");
 
-    private static final QName PORT_NAME = new QName("http://cxf.apache.org/mime", 
+    private static final QName PORT_NAME = new QName("http://cxf.apache.org/mime",
         "TestMtomPort");
 
     private Client() {
@@ -68,12 +68,12 @@ public final class Client {
         System.out.println(wsdlURL);
 
         TestMtomService tms = new TestMtomService(wsdlURL, SERVICE_NAME);
-        TestMtomPortType port = (TestMtomPortType) tms.getPort(PORT_NAME, 
+        TestMtomPortType port = (TestMtomPortType) tms.getPort(PORT_NAME,
             TestMtomPortType.class);
         Binding binding = ((BindingProvider)port).getBinding();
         ((SOAPBinding)binding).setMTOMEnabled(true);
 
-        URL fileURL = client.getClass().getClassLoader().getResource("me.bmp");
+        URL fileURL = Client.class.getResource("me.bmp");
         File aFile = new File(new URI(fileURL.toString()));
         long fileSize = aFile.length();
         System.out.println("Filesize of me.bmp image is: " + fileSize);
@@ -94,11 +94,11 @@ public final class Client {
         System.out.println("--Returned string value is " + name.value);
 
         Image image = ImageIO.read(new ByteArrayInputStream(param.value));
-        System.out.println("--Loaded image from byte[] successfully, hashCode=" 
+        System.out.println("--Loaded image from byte[] successfully, hashCode="
             + image.hashCode());
         System.out.println("Successfully ran MTOM/byte array demo");
 
-        System.out.println("\nStarting MTOM test with DataHandler:");        
+        System.out.println("\nStarting MTOM test with DataHandler:");
         name.value = "Bob";
         Holder<DataHandler> handler = new Holder<DataHandler>();
 
@@ -115,10 +115,10 @@ public final class Client {
             fileSize++;
         }
 
-        System.out.println("--Received DataHandler back from server, " 
+        System.out.println("--Received DataHandler back from server, "
             + "returned size is " + fileSize);
         System.out.println("--Returned string value is " + name.value);
-        
+
         System.out.println("Successfully ran MTOM/DataHandler demo");
         System.exit(0);
     }

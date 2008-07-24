@@ -81,6 +81,32 @@ To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
 
 
+Building and running the demo using Maven
+---------------------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located), the maven pom.xml file can be used to build and run the demo. 
+
+
+Using either UNIX or Windows:
+
+  mvn install (builds the demo)
+  mvn -Pserver  (from one command line window)
+  Mvn -Pclient  (from a second command line window)
+
+On startup, the client makes a sequence of 4 oneway invocations.
+The output of the logging interceptors will show that only the 1st and 3rd
+reach their destination. Notice how after approximately 2 seconds the
+messages that actually have arrived at the server will be acknowledged,
+and how after approximately 4 seconds the client will resend the 2nd and 4th
+application message. These will be acknowledged another 2 seconds
+later so that there will be no further retransmissions from the client.
+
+To remove the code generated from the WSDL file and the .class
+files, run "mvn clean".
+
+
+
 Building the demo using wsdl2java and javac
 -------------------------------------------
 

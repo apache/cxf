@@ -79,6 +79,23 @@ To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
 
 
+Building and running the demo using maven
+---------------------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located), the maven pom.xml file can be used to build and run the demo. 
+
+
+Using either UNIX or Windows:
+
+  mvn install
+  mvn -Pserver  (from one command line window)
+  mvn -Pclient  (from a second command line window)
+    
+
+To remove the target dir, run mvn clean".
+
+
 Building the demo using wsdl2java and javac
 -------------------------------------------
 
