@@ -221,5 +221,19 @@ public class StaxUtilsTest extends Assert {
         output = XMLUtils.toString(domwriter.getDocument().getDocumentElement());
         assertEquals(orig, output);
     }
-
+    
+    @Test
+    public void testRootPI() throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document doc = dbf.newDocumentBuilder().parse(getTestStream("./resources/rootMaterialTest.xml"));
+        StringWriter sw = new StringWriter();
+        XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
+        StaxUtils.writeDocument(doc, swriter, true, false);
+        swriter.flush();
+        swriter.close();
+        String output = sw.toString();
+        assertTrue(output.contains("<?pi in='the sky'?>"));
+        assertTrue(output.contains("<?e excl='gads'?>"));
+    }
 }
