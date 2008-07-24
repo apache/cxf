@@ -335,7 +335,7 @@
             <jms:server durableSubscriberName="CXF_subscriber"/>
         </port>
     </service>
-    
+        
     <service name="HelloWorldService">
            <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
                <jms:address
@@ -378,6 +378,7 @@
             <jms:server durableSubscriberName="CXF_subscriber"/>
         </port>
     </service>
+
     <service name="HWByteMsgService">
         <port binding="tns:HelloWorldPortBinding" name="HWSByteMsgPort">
             <jms:address
@@ -432,7 +433,19 @@
             </jms:address>
         </port>
     </service>
-    
+
+    <service name="JmsDestinationPubSubService">
+        <port binding="tns:HelloWorldPubSubBinding" name="JmsDestinationPubSubPort">
+            <jms:address
+               destinationStyle="topic"
+               jndiConnectionFactoryName="ConnectionFactory" 
+               jmsDestinationName="dynamicTopics/test.jmstransport.oneway.topic.jmsdest">
+               <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+               <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+            </jms:address>
+        </port>
+    </service>
+        
     <service name="JMSSOAPServiceAddressing">
         <port binding="tns:HWJMSAddressingBinding" name="HWJMSAddressingPort">
             <jms:address

@@ -33,23 +33,36 @@
     <xs:element name="clientConfig" type="jms:ClientConfig"/>
     <xs:element name="serverConfig" type="jms:ServerConfig"/>
     <xs:element name="address" type="jms:AddressType"/>
+    <xs:element name="sessionPool" type="jms:SessionPoolType"/>
 
     <xs:complexType name="SessionPoolType">
         <xs:annotation>
             <xs:documentation>JMS Session pool configuration policy</xs:documentation>
         </xs:annotation>
-        <xs:attribute name="lowWaterMark" type="xs:int" default="20"/>
-        <xs:attribute name="highWaterMark" type="xs:int" default="500" />
+        <xs:complexContent>
+            <xs:extension base="wsdl:tExtensibilityElement">
+        		<xs:attribute name="lowWaterMark" type="xs:int" default="20"/>
+        		<xs:attribute name="highWaterMark" type="xs:int" default="500" />
+        	</xs:extension>
+		</xs:complexContent>
     </xs:complexType>
     
     <xs:complexType name="ClientConfig">
-        <xs:attribute name="clientReceiveTimeout" type="xs:long" default="2000"/>
-        <xs:attribute name="messageTimeToLive" type="xs:long" default="0" />
+        <xs:complexContent>
+            <xs:extension base="wsdl:tExtensibilityElement">  
+				<xs:attribute name="clientReceiveTimeout" type="xs:long" default="2000"/>
+        		<xs:attribute name="messageTimeToLive" type="xs:long" default="0" />
+        	</xs:extension>
+		</xs:complexContent>        	
     </xs:complexType>
     
     <xs:complexType name="ServerConfig">
-        <xs:attribute name="messageTimeToLive" type="xs:long" default="0" />
-        <xs:attribute name="durableSubscriptionClientId" type="xs:string" />
+		<xs:complexContent>
+            <xs:extension base="wsdl:tExtensibilityElement">
+        		<xs:attribute name="messageTimeToLive" type="xs:long" default="0" />
+        		<xs:attribute name="durableSubscriptionClientId" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>        	
     </xs:complexType>
 
     <xs:complexType name="JMSPropertyType">
@@ -132,6 +145,7 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                
                 <xs:attribute name="jndiConnectionFactoryName" type="xs:string" use="required">
                     <xs:annotation>
                         <xs:documentation>
@@ -139,13 +153,22 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute name="jndiDestinationName" type="xs:string" use="required">
+                <xs:attribute name="jndiDestinationName" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
                           Name of the JNDI Destination queue or topic.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                
+                <xs:attribute name="jmsDestinationName" type="xs:string">
+                	<xs:annotation>
+                		<xs:documentation>
+                			JMS destination queue name or topic name.
+                		</xs:documentation>
+                	</xs:annotation>
+                </xs:attribute>
+                
                 <xs:attribute name="jndiReplyDestinationName" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
@@ -153,6 +176,15 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                
+                <xs:attribute name="jmsReplyDestinationName" type="xs:string">
+                	<xs:annotation>
+                		<xs:documentation>
+                			JMS Replyto destination queue name when using static queues for reply.
+                		</xs:documentation>
+                	</xs:annotation>
+                </xs:attribute>
+                
                 <xs:attribute name="connectionUserName" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>

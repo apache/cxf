@@ -31,12 +31,17 @@ public class Server extends AbstractBusTestServerBase {
         Object impl3  = new GreeterImplTopicOneWay();
         Object impleDoc = new GreeterImplDoc();
         Object impl4 = new GreeterByteMessageImpl();
+        Object impl5 =  new SoapService6SoapPort6Impl();
+        Object impl6 = new JmsDestPubSubImpl();
+        
         Endpoint.publish(null, impleDoc);
         String address = "http://localhost:9000/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         Endpoint.publish("http://testaddr.not.required/", impl2);
         Endpoint.publish("http://testaddr.not.required.topic/", impl3);
         Endpoint.publish("http://testaddr.not.required.byte/", impl4);
+        Endpoint.publish("http://testaddr.not.required.jms/", impl5);
+        Endpoint.publish("http://ignore", impl6);
     }
 
 

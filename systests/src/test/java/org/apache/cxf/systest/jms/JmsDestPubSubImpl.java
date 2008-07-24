@@ -20,14 +20,21 @@ package org.apache.cxf.systest.jms;
 
 import javax.jws.WebService;
 
+import org.apache.cxf.hello_world_jms.HelloWorldPubSubPort;
 
 
-
-@WebService(serviceName = "HWByteMsgService", 
-            portName = "HWSByteMsgPort",
-            endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
+@WebService(serviceName = "JmsDestinationPubSubService", 
+            portName = "JmsDestinationPubSubPort", 
+            endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPubSubPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterByteMessageImpl extends TwoWayJMSImplBase {    
-    
+
+public class JmsDestPubSubImpl implements HelloWorldPubSubPort {
+
+    public void greetMeOneWay(String stringParam0) {
+        // TODO Auto-generated method stub
+        System.out.println("*********  greetMeOneWay: " + stringParam0);
+
+    }
+
 }

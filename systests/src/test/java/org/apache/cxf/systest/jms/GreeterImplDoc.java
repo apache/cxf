@@ -20,38 +20,12 @@ package org.apache.cxf.systest.jms;
 
 import javax.jws.WebService;
 
-import org.apache.hello_world_doc_lit.Greeter;
-import org.apache.hello_world_doc_lit.PingMeFault;
-import org.apache.hello_world_doc_lit.types.FaultDetail;
-
 
 @WebService(serviceName = "SOAPService2", 
             portName = "SoapPort2", 
             endpointInterface = "org.apache.hello_world_doc_lit.Greeter",
             targetNamespace = "http://apache.org/hello_world_doc_lit",
             wsdlLocation = "testutils/hello_world_doc_lit.wsdl")
-public class GreeterImplDoc implements Greeter {
-
-    public String sayHi() {
-        System.out.println("Call sayHi here ");
-        return "Bonjour";
-    }
-
-    public String greetMe(String requestType) {
-        System.out.println("Reached here :" + requestType);
-        return "Hello " + requestType;
-    }
-
-    public void greetMeOneWay(String requestType) {
-        System.out.println("*********  greetMeOneWay: " + requestType);        
-    }
-
-    public void pingMe() throws PingMeFault {
-        FaultDetail faultDetail = new FaultDetail();
-        faultDetail.setMajor((short)2);
-        faultDetail.setMinor((short)1);
-        throw new PingMeFault("PingMeFault raised by server", faultDetail);
-        
-    }
+public class GreeterImplDoc extends GreeterImplDocBase {
 
 }

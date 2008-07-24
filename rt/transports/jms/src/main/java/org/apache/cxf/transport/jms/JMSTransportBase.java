@@ -231,21 +231,6 @@ public class JMSTransportBase {
         }
     }
     
-    protected String getAddrUriFromJMSAddrPolicy() {
-        AddressType jmsAddressPolicy = transport.getJMSAddress();
-        return "jms:" + jmsAddressPolicy.getJndiConnectionFactoryName() 
-                        + "#"
-                        + jmsAddressPolicy.getJndiDestinationName();
-    }
-    
-    protected String getReplyTotAddrUriFromJMSAddrPolicy() {
-        AddressType jmsAddressPolicy = transport.getJMSAddress();
-        return "jms:" 
-                        + jmsAddressPolicy.getJndiConnectionFactoryName() 
-                        + "#"
-                        + jmsAddressPolicy.getJndiReplyDestinationName();
-    }
-
     protected boolean isDestinationStyleQueue() {
         return JMSConstants.JMS_QUEUE.equals(
             transport.getJMSAddress().getDestinationStyle().value());

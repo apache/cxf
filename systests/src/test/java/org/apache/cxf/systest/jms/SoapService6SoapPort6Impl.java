@@ -20,14 +20,11 @@ package org.apache.cxf.systest.jms;
 
 import javax.jws.WebService;
 
+@WebService(serviceName = "SOAPService6", 
+            portName = "SoapPort6", 
+            endpointInterface = "org.apache.hello_world_doc_lit.Greeter",
+            targetNamespace = "http://apache.org/hello_world_doc_lit",
+            wsdlLocation = "testutils/hello_world_doc_lit.wsdl")
+public class SoapService6SoapPort6Impl extends GreeterImplDocBase {
 
-
-
-@WebService(serviceName = "HWByteMsgService", 
-            portName = "HWSByteMsgPort",
-            endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
-            targetNamespace = "http://cxf.apache.org/hello_world_jms",
-            wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterByteMessageImpl extends TwoWayJMSImplBase {    
-    
 }

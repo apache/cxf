@@ -227,6 +227,17 @@ targetNamespace="http://apache.org/hello_world_doc_lit" name="HelloWorld">
             <soap:address location="http://localhost:9002/SOAPService5/SoapPort5"/>
         </wsdl:port>
     </wsdl:service>
+    <wsdl:service name="SOAPService6">
+        <wsdl:port name="SoapPort6" binding="tns:Greeter_SOAPBinding">
+               <jms:address
+                   jndiConnectionFactoryName="ConnectionFactory"
+                   jmsDestinationName="dynamicQueues/routertest.SOAPService6Q.text"
+                   jmsReplyDestinationName="dynamicQueues/SoapService6.reply.queue">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+        </wsdl:port>
+    </wsdl:service>
 
     <!-- XML Binding based Services-->
     <wsdl:service name="XMLService1">

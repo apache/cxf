@@ -23,4 +23,7 @@
     <entry key="org.apache.cxf.transport.jms-1">javax.wsdl.Port=org.apache.cxf.transport.jms.AddressType</entry>
     <entry key="org.apache.cxf.transport.jms-2">javax.wsdl.Port=org.apache.cxf.transport.jms.ClientBehaviorPolicyType</entry>
     <entry key="org.apache.cxf.transport.jms-3">javax.wsdl.Port=org.apache.cxf.transport.jms.ServerBehaviorPolicyType</entry>
+    <entry key="org.apache.cxf.transport.jms-4">javax.wsdl.Port=org.apache.cxf.transport.jms.ClientConfig</entry>
+    <entry key="org.apache.cxf.transport.jms-5">javax.wsdl.Port=org.apache.cxf.transport.jms.ServerConfig</entry>
+    <entry key="org.apache.cxf.transport.jms-6">javax.wsdl.Port=org.apache.cxf.transport.jms.SessionPoolType</entry>
 </properties>
