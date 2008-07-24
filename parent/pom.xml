@@ -32,8 +32,6 @@
 
     <packaging>pom</packaging>
 
-
-
     <properties>
         <surefire.fork.mode>once</surefire.fork.mode>
         <surefire.format>brief</surefire.format>
@@ -183,6 +181,9 @@
                             <version>${project.version}</version>
                         </dependency>
                     </dependencies>
+                    <configuration>
+                      <encoding>UTF-8</encoding>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>validate</id>
@@ -218,6 +219,7 @@
                             <ruleset>cxf-pmd-ruleset.xml</ruleset>
                             <ruleset>cxf-pmd-custom.xml</ruleset>
                         </rulesets>
+                        <sourceEncoding>UTF-8</sourceEncoding>
                         <targetJdk>1.5</targetJdk>
                         <linkXRef>false</linkXRef>
                         <includeTests>true</includeTests>
