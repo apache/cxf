@@ -23,25 +23,27 @@
     xmlns:jaxws="http://cxf.apache.org/jaxws"
     xmlns:test="http://apache.org/hello_world_soap_http"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="
-        http://cxf.apache.org/core                                      http://cxf.apache.org/schemas/core.xsd
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-    ">
+    xsi:schemaLocation="http://cxf.apache.org/core
+        http://cxf.apache.org/schemas/core.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://cxf.apache.org/jaxws                                     
+        http://cxf.apache.org/schemas/jaxws.xsd">
     
-    <!-- -->
-    <!-- Enable logging at all endpoints -->
-    <!-- -->
+    <!--    
+         Enable logging at all endpoints    
+    -->
     <cxf:bus>
         <cxf:features>
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
 
-    <!-- -->
-    <!-- UsernameToken endpoint definition -->
-    <!-- This endpoint is configired to -->
-    <!-- -->
+    <!--    
+         UsernameToken endpoint definition    
+         This endpoint is configured to read the username and password tokens    
+         and validate them using a password callback handler.    
+    -->
     <jaxws:endpoint
         id="UsernameTokenEndpoint"
         implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
@@ -54,9 +56,10 @@
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <!-- -->
-    <!-- -->
-    <!-- -->
+
+    <!--    
+         WSS4JInInterceptor for UsernameTokenEndpoint above    
+    -->
     <bean 
         id="UsernameToken_Request"
         class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
@@ -70,9 +73,11 @@
         </constructor-arg>
     </bean>
 
-    <!-- -->
-    <!-- -->
-    <!-- -->
+    <!--    
+         TimestampSignEncryptEndpoint endpoint definition    
+         This endpoint is configured to work with public key certificates    
+         on both client (Alice) and service (Bob) side.    
+    -->
     <jaxws:endpoint 
         id="TimestampSignEncryptEndpoint"
         implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
@@ -89,9 +94,11 @@
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <!-- -->
-    <!-- -->
-    <!-- -->
+
+    <!--    
+         WSS4JInInterceptor for decrypting and validating the signature of the
+         SOAP request.
+    -->
     <bean 
         id="TimestampSignEncrypt_Request"
         class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
@@ -109,9 +116,10 @@
             </map>
         </constructor-arg>
     </bean>
-    <!-- -->
-    <!-- -->
-    <!-- -->
+    
+    <!--    
+         WSS4JOutInterceptor for encoding and signing the SOAP response.    
+    -->
     <bean 
         id="TimestampSignEncrypt_Response"
         class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor"
@@ -126,9 +134,9 @@
                 <entry key="signatureKeyIdentifier" value="DirectReference"/>
                 <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/>
                 <entry key="signatureParts" value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
-                <!-- -->
-                <!-- Recommendation: signatures should be encrypted -->
-                <!-- -->
+                <!--    
+                     Recommendation: signatures should be encrypted    
+                -->
                 <entry key="encryptionParts" value="{Element}{http://www.w3.org/2000/09/xmldsig#}Signature;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
                 <!-- <entry key="encryptionKeyTransportAlgorithm" value="RSA15"/> -->
                 <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>

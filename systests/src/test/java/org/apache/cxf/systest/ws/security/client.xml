@@ -20,12 +20,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xsi:schemaLocation="
-          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
-          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
-          ">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://cxf.apache.org/jaxws
+          http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <jaxws:client name="{http://apache.org/hello_world_soap_http}TimestampSignEncryptPort" createdFromAPI="true">
+    <!-- 
+         Client-side endpoint.  For this example, Alice is the client
+         and Bob is the service.
+    -->
+    <jaxws:client name="{http://apache.org/hello_world_soap_http}TimestampSignEncryptPort" 
+        createdFromAPI="true">
         <jaxws:features>
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
         </jaxws:features>
@@ -39,11 +44,11 @@
         </jaxws:inInterceptors>
     </jaxws:client>
 
-    <!-- -->
-    <!-- This bean is an Out interceptor which will add a Timestamp, -->
-    <!-- sign the Timstamp and Body, and then encrypt the Timestamp -->
-    <!-- and Body.  It uses 3DES as the symmetric key algorithm. -->
-    <!-- -->
+    <!-- 
+        This bean is an Out interceptor which will add a timestamp, 
+        sign the timestamp and body, and then encrypt the timestamp 
+        and body.  It uses 3DES as the symmetric key algorithm.
+    -->
     <bean 
         class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor"
         id="TimestampSignEncrypt_Request">
@@ -58,9 +63,9 @@
                 <entry key="signatureKeyIdentifier" value="DirectReference"/>
                 <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/>
                 <entry key="signatureParts" value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
-                <!-- -->
-                <!-- Recommendation: signatures should be encrypted -->
-                <!-- -->
+                <!--    
+                     Recommendation: signatures should be encrypted    
+                -->
                 <entry key="encryptionParts" value="{Element}{http://www.w3.org/2000/09/xmldsig#}Signature;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
                 <!-- <entry key="encryptionKeyTransportAlgorithm" value="RSA15"/> -->
                 <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
@@ -68,11 +73,10 @@
         </constructor-arg>
     </bean>
     
-    <!-- -->
-    <!-- This bean is an In interceptor which validated a signed, -->
-    <!-- encrypted resposne, and timestamped. -->
-    <!-- -->
-    <!-- -->
+    <!--    
+        This bean is an In interceptor which will validate a signed,    
+         encrypted response, and timestamp it.    
+    -->
     <bean 
         class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
         id="TimestampSignEncrypt_Response">
