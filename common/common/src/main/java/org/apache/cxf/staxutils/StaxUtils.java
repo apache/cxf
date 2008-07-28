@@ -447,7 +447,10 @@ public final class StaxUtils {
         NodeList rootChildren = d.getChildNodes();
         for (int rcx = 0; rcx < rootChildren.getLength(); rcx++) {
             Node rootChild = rootChildren.item(rcx);
-            writeNode(rootChild, writer, repairing);
+            // don't write PIs if we're not writing a prolog.
+            if (writeProlog || rootChild.getNodeType() == Node.ELEMENT_NODE) {
+                writeNode(rootChild, writer, repairing);
+            }
         }
 
         if (writeProlog) {

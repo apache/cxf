@@ -236,4 +236,19 @@ public class StaxUtilsTest extends Assert {
         assertTrue(output.contains("<?pi in='the sky'?>"));
         assertTrue(output.contains("<?e excl='gads'?>"));
     }
+    
+    @Test
+    public void testRootPInoProlog() throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document doc = dbf.newDocumentBuilder().parse(getTestStream("./resources/rootMaterialTest.xml"));
+        StringWriter sw = new StringWriter();
+        XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
+        StaxUtils.writeDocument(doc, swriter, false, false);
+        swriter.flush();
+        swriter.close();
+        String output = sw.toString();
+        assertFalse(output.contains("<?pi in='the sky'?>"));
+        assertFalse(output.contains("<?e excl='gads'?>"));
+    }
 }
