@@ -20,11 +20,20 @@
 package demo.hw_https.server;
 
 import javax.xml.ws.Endpoint;
+import java.net.URL;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 
 public class Server {
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = Server.class.getResource("CherryServer.xml");
+        Bus bus = bf.createBus(busFile.toString());
+        bf.setDefaultBus(bus);
 
         Object implementor = new GreeterImpl();
         String address = "https://localhost:9001/SoapContext/SoapPort";
