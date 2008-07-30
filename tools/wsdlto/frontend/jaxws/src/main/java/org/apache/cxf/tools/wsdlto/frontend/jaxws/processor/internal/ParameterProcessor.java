@@ -489,6 +489,48 @@ public class ParameterProcessor extends AbstractProcessor {
     private void buildParamModelsWithoutOrdering(JavaMethod method,
                                                  MessageInfo inputMessage,
                                                  MessageInfo outputMessage) throws ToolException {
+        boolean wrapped = method.isWrapperStyle();
+        if (wrapped) {
+            //check if really can be wrapper style....
+            List<MessagePartInfo> outputParts = outputMessage.getMessageParts();
+            List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
+
+            MessagePartInfo inputPart = inputParts.size() > 0 ? inputParts.iterator().next() : null;
+            MessagePartInfo outputPart = outputParts.size() > 0 ? outputParts.iterator().next() : null;
+
+            List<QName> inputWrapElement = null;
+            List<QName> outputWrapElement = null;
+
+            if (inputPart != null) {
+                inputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
+                                                                         inputPart.getElementQName());
+            }
+            if (outputPart != null) {
+                outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
+                                                                          outputPart.getElementQName());
+            }
+            for (QName item : inputWrapElement) {
+                String fullJavaName = this.dataBinding.getWrappedElementType(inputPart.getElementQName(),
+                                                                             item);
+                if (StringUtils.isEmpty(fullJavaName)) {
+                    wrapped = false;
+                    break;
+                }
+            }
+            for (QName item : outputWrapElement) {
+                String fullJavaName = this.dataBinding.getWrappedElementType(outputPart.getElementQName(),
+                                                                             item);
+                if (StringUtils.isEmpty(fullJavaName)) {
+                    wrapped = false;
+                    break;
+                }
+            }
+            if (!wrapped) {
+                //could not map one of the parameters to a java type, need to drop down to bare style
+                method.setWrapperStyle(false);
+            }
+        }
+        
         if (inputMessage != null) {
             if (method.isWrapperStyle()) {
                 processWrappedInput(method, inputMessage);
