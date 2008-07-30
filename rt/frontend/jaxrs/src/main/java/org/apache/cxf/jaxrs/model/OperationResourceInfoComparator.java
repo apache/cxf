@@ -35,26 +35,25 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             // subresource method takes precedence over a subresource locator
             return e1.getHttpMethod() != null ? -1 : 1;
         }
-        
+
+            
         String l1 = e1.getURITemplate().getLiteralChars();
         String l2 = e2.getURITemplate().getLiteralChars();
         if (!l1.equals(l2)) {
             // descending order 
             return l1.length() < l2.length() ? 1 : -1; 
         }
-                
-        if (e1.getHttpMethod() == null && e2.getHttpMethod() == null) {
-            // with two subresource locators, those with more capturing groups win
-            int g1 = e1.getURITemplate().getNumberOfGroups();
-            int g2 = e2.getURITemplate().getNumberOfGroups();
+        
+        int g1 = e1.getURITemplate().getNumberOfGroups();
+        int g2 = e2.getURITemplate().getNumberOfGroups();
+        if (g1 != g2) {
             // descending order 
-            return g1 < g2 ? 1 : g1 > g2 ? -1 : 0;
+            return g1 < g2 ? 1 : -1;
         }
         
         List<MediaType> mimeType1 = e1.getConsumeTypes();
         List<MediaType> mimeType2 = e2.getConsumeTypes();
         
-        // TODO: we actually need to check all consume and produce types here ?
         int result = JAXRSUtils.compareMediaTypes(mimeType1.get(0), 
                                                   mimeType2.get(0));
         if (result == 0) {

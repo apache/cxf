@@ -86,7 +86,7 @@ public class JAXRSInvoker extends AbstractInvoker {
              cri.getMethodDispatcher().getMethod(ori), resourceObject);
         
         if (cri.isRoot()) {
-            JAXRSUtils.handleSetters(cri, resourceObject, 
+            JAXRSUtils.handleSetters(ori, resourceObject, 
                                      exchange.getInMessage());
             
             InjectionUtils.injectContextFields(resourceObject, 

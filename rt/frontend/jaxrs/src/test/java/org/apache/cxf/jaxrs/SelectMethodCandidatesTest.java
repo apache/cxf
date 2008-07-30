@@ -42,18 +42,72 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
 
         String contentTypes = "*/*";
-        String acceptContentTypes = "*/*";
+        String acceptContentTypes = "application/xml";
 
         //If acceptContentTypes does not specify a specific Mime type, the  
         //method is declared with a most specific ProduceMime type is selected.
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/", values);
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d", values);
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
                                     values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
                                     "GET", values, contentTypes, 
                                     Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
         assertEquals("listMethod needs to be selected", "listMethod", 
+                     ori.getMethodToInvoke().getName());
+        
+        
+        acceptContentTypes = "*/*";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                        "GET", values, contentTypes, 
+                                        Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
+        assertNotNull(ori);
+        assertEquals("listMethod needs to be selected", "unlimitedPath", 
+                     ori.getMethodToInvoke().getName());
+        
+        
+        contentTypes = "application/xml";
+        acceptContentTypes = "application/xml";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                        "GET", values, contentTypes, 
+                                        Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
+        assertNotNull(ori);
+        assertEquals("listMethod needs to be selected", "readMethod", 
+                     ori.getMethodToInvoke().getName());
+        
+        contentTypes = "application/json";
+        acceptContentTypes = "application/json";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1/bar/baz/baz", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                        "GET", values, contentTypes, 
+                                        Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
+        assertNotNull(ori);
+        assertEquals("listMethod needs to be selected", "readMethod2", 
+                     ori.getMethodToInvoke().getName());
+        
+        contentTypes = "application/json";
+        acceptContentTypes = "application/json";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                        "GET", values, contentTypes, 
+                                        Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
+        assertNotNull(ori);
+        assertEquals("listMethod needs to be selected", "unlimitedPath", 
+                     ori.getMethodToInvoke().getName());
+        
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1/2", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                        "GET", values, contentTypes, 
+                                        Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
+        assertNotNull(ori);
+        assertEquals("listMethod needs to be selected", "limitedPath", 
                      ori.getMethodToInvoke().getName());
         
     }

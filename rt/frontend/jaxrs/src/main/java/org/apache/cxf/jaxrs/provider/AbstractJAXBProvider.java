@@ -77,6 +77,14 @@ public abstract class AbstractJAXBProvider
                 return context;
             }
         }
+        
+        synchronized (classContexts) {
+            JAXBContext context = classContexts.get(type);
+            if (context != null) {
+                return context;
+            }
+        }
+        
         JAXBContext context = getPackageContext(type);
         if (context == null && type != genericType) {
             context = getPackageContext(InjectionUtils.getActualType(genericType));
@@ -109,7 +117,7 @@ public abstract class AbstractJAXBProvider
                     packageContexts.put(packageName, context);
                     return context;
                 } catch (JAXBException ex) {
-                    LOG.warning("Error creating a JAXBContext using ObjectFactory : " 
+                    LOG.fine("Error creating a JAXBContext using ObjectFactory : " 
                                 + ex.getMessage());
                     return null;
                 }

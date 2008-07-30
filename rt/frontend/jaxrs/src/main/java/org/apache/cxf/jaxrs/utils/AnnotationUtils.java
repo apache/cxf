@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
@@ -44,7 +45,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyWorkers;
 
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 
 public final class AnnotationUtils {
     
@@ -220,13 +221,28 @@ public final class AnnotationUtils {
         return null;
     }
     
-    public static boolean isEncoded(Annotation[] anns, ClassResourceInfo cri) {
-        if (cri == null) {
-            return false;
-        }
-        if (cri.isEncodedEnabled()) {
+    public static boolean isEncoded(Annotation[] anns, OperationResourceInfo ori) {
+        
+        if (AnnotationUtils.getAnnotation(anns, Encoded.class) != null) {
             return true;
         }
-        return AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
+        
+        if (ori == null) {
+            return false;
+        }
+        return ori.isEncodedEnabled();
+    }
+    
+    public static String getDefaultParameterValue(Annotation[] anns, OperationResourceInfo ori) {
+        
+        DefaultValue dv = AnnotationUtils.getAnnotation(anns, DefaultValue.class);
+        if (dv != null) {
+            return dv.value();
+        }
+        
+        if (ori == null) {
+            return null;
+        }
+        return ori.getDefaultParameterValue();
     }
 }

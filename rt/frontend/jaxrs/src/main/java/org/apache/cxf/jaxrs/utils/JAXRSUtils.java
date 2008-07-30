@@ -47,7 +47,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.CookieParam;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
@@ -129,9 +128,10 @@ public final class JAXRSUtils {
 
     
     @SuppressWarnings("unchecked")
-    public static void handleSetters(ClassResourceInfo cri,
+    public static void handleSetters(OperationResourceInfo ori,
                                      Object requestObject,
                                      Message message) {
+        ClassResourceInfo cri = ori.getClassResourceInfo();
         InjectionUtils.injectContextMethods(requestObject, cri, message);
         // Param methods
         String relativePath = (String)message.get(JAXRSInInterceptor.RELATIVE_PATH);
@@ -144,7 +144,7 @@ public final class JAXRSUtils {
                                                 message,
                                                 values,
                                                 relativePath,
-                                                cri);
+                                                ori);
             if (o != null) { 
                 InjectionUtils.injectThroughMethod(requestObject, m, o);
             }
@@ -157,7 +157,7 @@ public final class JAXRSUtils {
                                                 message,
                                                 values,
                                                 relativePath,
-                                                cri);
+                                                ori);
             if (o != null) { 
                 InjectionUtils.injectFieldValue(f, requestObject, o);
             }
@@ -254,6 +254,8 @@ public final class JAXRSUtils {
         return null;
     }    
 
+    
+    
     public static List<MediaType> getConsumeTypes(ConsumeMime cm) {
         return cm == null ? Collections.singletonList(ALL_TYPES)
                           : getMediaTypes(cm.value());
@@ -370,7 +372,7 @@ public final class JAXRSUtils {
                                             message,
                                             values,
                                             path,
-                                            ori.getClassResourceInfo());
+                                            ori);
         }
     }
     
@@ -380,18 +382,16 @@ public final class JAXRSUtils {
                                             Message message,
                                             MultivaluedMap<String, String> values,
                                             String path,
-                                            ClassResourceInfo cri) {
+                                            OperationResourceInfo ori) {
        
-        boolean isEncoded = AnnotationUtils.isEncoded(anns, cri);
+        boolean isEncoded = AnnotationUtils.isEncoded(anns, ori);
+        String defaultValue = AnnotationUtils.getDefaultParameterValue(anns, ori);
         
         PathParam pathParam = AnnotationUtils.getAnnotation(anns, PathParam.class);
         if (pathParam != null) {
             return readFromUriParam(pathParam, parameterClass, genericParam, path, 
-                                    values, !isEncoded);
+                                    values, defaultValue, !isEncoded);
         } 
-        
-        DefaultValue defaultAnn = AnnotationUtils.getAnnotation(anns, DefaultValue.class);
-        String defaultValue = defaultAnn != null ? defaultAnn.value() : null;
         
         QueryParam qp = AnnotationUtils.getAnnotation(anns, QueryParam.class);
         if (qp != null) {
@@ -540,6 +540,7 @@ public final class JAXRSUtils {
                                            Type genericType,
                                            String path,
                                            MultivaluedMap<String, String> values,
+                                           String defaultValue,
                                            boolean  decoded) {
         String parameterName = uriParamAnnotation.value();
         if ("".equals(parameterName)) {
@@ -549,7 +550,7 @@ public final class JAXRSUtils {
             return InjectionUtils.createParameterObject(results, 
                                                         paramType, 
                                                         genericType,
-                                                        null,
+                                                        defaultValue,
                                                         true,
                                                         decoded);
         }
@@ -701,7 +702,7 @@ public final class JAXRSUtils {
      * @param mimeTypesB 
      * @return return a list of intersected mime types
      */   
-    private static List<MediaType> doIntersectMimeTypes(List<MediaType> requiredMediaTypes, 
+    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes, 
                                                      List<MediaType> userMediaTypes) {
         Set<MediaType> supportedMimeTypeList = new LinkedHashSet<MediaType>();
 
@@ -709,8 +710,8 @@ public final class JAXRSUtils {
             for (MediaType userType : userMediaTypes) {
                 if (requiredType.isCompatible(userType) || userType.isCompatible(requiredType)) {
                     
-                    for (Map.Entry<String, String> entry : requiredType.getParameters().entrySet()) {
-                        String value = userType.getParameters().get(entry.getKey());
+                    for (Map.Entry<String, String> entry : userType.getParameters().entrySet()) {
+                        String value = requiredType.getParameters().get(entry.getKey());
                         if (value != null && !value.equals(entry.getValue())) {
                             continue;
                         }
@@ -720,25 +721,13 @@ public final class JAXRSUtils {
                                       ? userType.getType() : requiredType.getType();
                     String subtype = requiredType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD) 
                                       ? userType.getSubtype() : requiredType.getSubtype();                  
-                    supportedMimeTypeList.add(new MediaType(type, subtype, requiredType.getParameters()));
+                    supportedMimeTypeList.add(new MediaType(type, subtype, userType.getParameters()));
                 }
             }
         }
 
         return new ArrayList<MediaType>(supportedMimeTypeList);
         
-    }
-    
-    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes, 
-                                                     List<MediaType> userMediaTypes,
-                                                     boolean userTypes) {
-        return userTypes ? doIntersectMimeTypes(userMediaTypes, requiredMediaTypes)
-                         : doIntersectMimeTypes(requiredMediaTypes, userMediaTypes);
-    }
-    
-    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes, 
-                                                     List<MediaType> userMediaTypes) {
-        return intersectMimeTypes(requiredMediaTypes, userMediaTypes, false);
     }
     
     public static List<MediaType> intersectMimeTypes(List<MediaType> mimeTypesA, 

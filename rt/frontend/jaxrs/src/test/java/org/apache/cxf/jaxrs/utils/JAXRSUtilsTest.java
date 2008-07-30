@@ -699,7 +699,11 @@ public class JAXRSUtilsTest extends Assert {
         cri.setResourceProvider(new SingletonResourceProvider(c));
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
         
-        JAXRSUtils.handleSetters(cri, c, new MessageImpl());
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
+                                                              cri); 
+        
+        
+        JAXRSUtils.handleSetters(ori, c, new MessageImpl());
         assertNotNull(c.getUriInfo());
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo().getClass());
         assertSame(UriInfoImpl.class, 
@@ -711,9 +715,11 @@ public class JAXRSUtilsTest extends Assert {
 
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         Customer c = new Customer();
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
+                                                              cri);
         Message m = new MessageImpl();
         m.put(Message.QUERY_STRING, "a=aValue&query2=b");
-        JAXRSUtils.handleSetters(cri, c, m);
+        JAXRSUtils.handleSetters(ori, c, m);
         assertEquals("aValue", c.getQueryParam());
         
     }
@@ -723,9 +729,11 @@ public class JAXRSUtilsTest extends Assert {
 
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         Customer c = new Customer();
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
+                                                              cri);
         Message m = new MessageImpl();
         m.put(Message.QUERY_STRING, "b=bValue");
-        JAXRSUtils.handleSetters(cri, c, m);
+        JAXRSUtils.handleSetters(ori, c, m);
         assertEquals("bValue", c.getB());
         
     }

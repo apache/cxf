@@ -56,12 +56,19 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:9080/bookstore/books/feed"; 
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("/bookstore/books/feed", feed.getBaseUri().toString());
+        assertEquals("http://localhost:9080/bookstore/books/feed", 
+                     feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
         
         getAndCompareJson("http://localhost:9080/bookstore/books/feed",
                                "resources/expected_atom_books_json.txt",
                                "application/json");
+        
+        getAndCompareJson("http://localhost:9080/bookstore/books/jsonfeed",
+                          "resources/expected_atom_books_jsonfeed.txt",
+                          "application/json, text/html, application/xml;q=0.9,"
+                          + " application/xhtml+xml, image/png, image/jpeg, image/gif,"
+                          + " image/x-xbitmap, */*;q=0.1");
         
         Entry e = createBookEntry(256, "AtomBook");
         StringWriter w = new StringWriter();
@@ -83,7 +90,7 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
             post.releaseConnection();
         }         
         
-        Entry entry = getEntry("http://localhost:9080" + location, null);
+        Entry entry = getEntry(location, null);
         assertEquals(location, entry.getBaseUri().toString());
         assertEquals("AtomBook", entry.getTitle());
                 

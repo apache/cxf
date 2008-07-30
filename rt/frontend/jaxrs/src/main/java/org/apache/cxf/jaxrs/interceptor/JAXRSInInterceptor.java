@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -120,7 +121,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    BUNDLE, 
                                                    path);
             LOG.severe(errorMsg.toString());
-            throw new Fault(errorMsg);
+            throw new WebApplicationException(404);
         }
         
         List<ProviderInfo<RequestHandler>> shs = 

@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 
@@ -37,12 +39,16 @@ public class OperationResourceInfo {
     private String httpMethod;
     private List<MediaType> produceMimes;
     private List<MediaType> consumeMimes;
+    private boolean encoded;
+    private String defaultParamValue;
 
     public OperationResourceInfo(Method m, ClassResourceInfo cri) {
         methodToInvoke = m;
         annotatedMethod = m;
         classResourceInfo = cri;
         checkMediaTypes();
+        checkEncoded();
+        checkDefaultParameterValue();
     }
 
     public URITemplate getURITemplate() {
@@ -118,6 +124,36 @@ public class OperationResourceInfo {
         } else if (classResourceInfo != null) {
             produceMimes = JAXRSUtils.sortMediaTypes(
                                JAXRSUtils.getProduceTypes(classResourceInfo.getProduceMime()));
+        }
+    }
+    
+    public boolean isEncodedEnabled() {
+        return encoded;
+    }
+    
+    public String getDefaultParameterValue() {
+        return defaultParamValue;
+    }
+    
+    private void checkEncoded() {
+        encoded = AnnotationUtils.getMethodAnnotation(annotatedMethod, 
+                                            Encoded.class) != null;
+        if (!encoded && classResourceInfo != null) {
+            encoded = AnnotationUtils.getClassAnnotation(classResourceInfo.getServiceClass(), 
+                                                          Encoded.class) != null;
+        }
+    }
+    
+    private void checkDefaultParameterValue() {
+        DefaultValue dv = (DefaultValue)AnnotationUtils.getMethodAnnotation(annotatedMethod, 
+                                            DefaultValue.class);
+        if (dv == null && classResourceInfo != null) {
+            dv = (DefaultValue)AnnotationUtils.getClassAnnotation(
+                                         classResourceInfo.getServiceClass(), 
+                                         DefaultValue.class);
+        }
+        if (dv != null) {
+            defaultParamValue = dv.value();
         }
     }
 }

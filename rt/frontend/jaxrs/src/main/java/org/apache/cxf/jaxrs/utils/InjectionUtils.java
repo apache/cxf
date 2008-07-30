@@ -244,7 +244,12 @@ public final class InjectionUtils {
             if (defaultValue != null) {
                 paramValues = Collections.singletonList(defaultValue);
             } else {
-                return null;
+                if (paramType.isPrimitive()) {
+                    paramValues = Collections.singletonList(
+                        boolean.class == paramType ? "false" : "0");
+                } else {
+                    return null;
+                }
             }
         }
         

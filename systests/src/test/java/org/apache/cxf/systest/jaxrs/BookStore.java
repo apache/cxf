@@ -85,8 +85,8 @@ public class BookStore {
     
     @GET
     @Path("/books/query")
-    public Book getBookQuery(@QueryParam("bookId") String id) throws BookNotFoundFault {
-        return doGetBook(id);
+    public Book getBookQuery(@QueryParam("bookId") long id) throws BookNotFoundFault {
+        return doGetBook(Long.toString(id));
     }
     
     @GET
@@ -94,6 +94,16 @@ public class BookStore {
     public Book getDefaultBookQuery(@DefaultValue("123") @QueryParam("bookId") String id) 
         throws BookNotFoundFault {
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/books/missingquery")
+    public Book getBookMissingQuery(@QueryParam("bookId") long id) 
+        throws BookNotFoundFault {
+        if (id != 0) {
+            throw new RuntimeException();
+        }
+        return doGetBook("123");
     }
     
     @GET

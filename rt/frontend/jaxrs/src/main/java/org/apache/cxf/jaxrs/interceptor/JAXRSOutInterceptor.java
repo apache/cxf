@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.interceptor;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
@@ -73,20 +74,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     @SuppressWarnings("unchecked")
     private void processResponse(Message message) {
         
-        Exchange exchange = message.getExchange();
-        OperationResourceInfo operation = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
-            .getName());
-
-        if (operation == null) {
-            return;
-        }
-
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {
             return;
         }
-        
-        OutputStream out = message.getContent(OutputStream.class);
         
         if (objs.get(0) != null) {
             Object responseObj = objs.get(0);
@@ -97,6 +88,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 response = Response.ok(responseObj).build();
             }
             
+            Exchange exchange = message.getExchange();
+            OperationResourceInfo operation = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
+                .getName());
+
             List<ProviderInfo<ResponseHandler>> handlers = 
                 ProviderFactory.getInstance().getResponseHandlers();
             for (ProviderInfo<ResponseHandler> rh : handlers) {
@@ -118,16 +113,15 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             List<MediaType> availableContentTypes = 
                 computeAvailableContentTypes(message, response);  
             
-            Method invoked = ((OperationResourceInfo)message.getExchange()
-                    .get(OperationResourceInfo.class)).getMethodToInvoke();
+            Method invoked = operation == null ? null : operation.getMethodToInvoke();
             
             MessageBodyWriter writer = null;
             MediaType responseType = null;
             for (MediaType type : availableContentTypes) { 
                 writer = ProviderFactory.getInstance()
                     .createMessageBodyWriter(targetType, 
-                          invoked.getGenericReturnType(), 
-                          invoked.getAnnotations(), 
+                          invoked != null ? invoked.getGenericReturnType() : null, 
+                          invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                           type,
                           exchange.getInMessage());
                 
@@ -136,12 +130,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                     break;
                 }
             }
-            
+        
+            OutputStream out = message.getContent(OutputStream.class);
             if (writer == null) {
                 message.put(Message.RESPONSE_CODE, 406);
                 writeResponseErrorMessage(out, 
-                                          "NO_MSG_WRITER",
-                                          invoked.getReturnType().getSimpleName());
+                      "NO_MSG_WRITER",
+                      invoked != null ? invoked.getReturnType().getSimpleName() : "");
                 return;
             }
             
@@ -153,7 +148,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 
                 LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
                 writer.writeTo(responseObj, targetType, invoked.getGenericReturnType(), 
-                               invoked.getAnnotations(), 
+                               invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                                responseType, 
                                response.getMetadata(), 
                                out);
@@ -191,15 +186,18 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             response.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE);
         Exchange exchange = message.getExchange();
         List<MediaType> produceTypes = null;
+        OperationResourceInfo operation = exchange.get(OperationResourceInfo.class);
         if (contentType != null) {
             produceTypes = Collections.singletonList(MediaType.valueOf(contentType.toString()));
+        } else if (operation != null) {
+            produceTypes = operation.getProduceTypes();
         } else {
-            produceTypes = exchange.get(OperationResourceInfo.class).getProduceTypes();
+            produceTypes = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
         List<MediaType> acceptContentTypes = 
             (List<MediaType>)exchange.get(Message.ACCEPT_CONTENT_TYPE);
         
-        return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes, true);
+        return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes);
         
     }
     

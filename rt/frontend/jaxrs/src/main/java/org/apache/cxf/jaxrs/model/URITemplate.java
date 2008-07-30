@@ -40,7 +40,8 @@ public final class URITemplate {
     /**
      * The regular expression for matching URI templates and names.
      */
-    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{([a-zA-Z0-9][-\\w.]*)\\}");
+    private static final Pattern TEMPLATE_NAMES_PATTERN = 
+        Pattern.compile("\\{(\\w[-\\w\\.]*)\\}");
 
     /**
      * A URI template is converted into a regular expression by substituting
@@ -51,20 +52,16 @@ public final class URITemplate {
     private static final String PATH_UNLIMITED_VARIABLE_REGEX = "(.*?)";
 
     private final String template;
-    private final boolean limited;
-    private final boolean encoded;
     private final List<String> templateVariables;
     private final Pattern templateRegexPattern;
     private final String literals;
 
     public URITemplate(String theTemplate) {
-        this(theTemplate, true, false);
+        this(theTemplate, true);
     }
     
-    public URITemplate(String theTemplate, boolean limited, boolean encoded) {
+    public URITemplate(String theTemplate, boolean limited) {
         this.template = theTemplate;
-        this.limited = limited;
-        this.encoded = encoded;
         
         StringBuilder literalChars = new StringBuilder();
         StringBuilder stringBuilder = new StringBuilder();
@@ -101,14 +98,6 @@ public final class URITemplate {
         templateRegexPattern = Pattern.compile(stringBuilder.toString());
     }
 
-    public boolean isLimited() {
-        return limited;
-    }
-    
-    public boolean encode() {
-        return encoded;
-    }
-    
     public String getLiteralChars() {
         return literals;
     }
@@ -175,6 +164,6 @@ public final class URITemplate {
             pathValue = "/" + pathValue;
         }
         
-        return new URITemplate(pathValue, path.limited(), path.encode());
+        return new URITemplate(pathValue, path.limited());
     }
 }

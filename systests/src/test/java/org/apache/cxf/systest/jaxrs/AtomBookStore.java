@@ -68,6 +68,14 @@ public class AtomBookStore {
     }
     
     @GET
+    @Path("/books/jsonfeed")
+    @ProduceMime({"application/xml", "application/json", "text/html", "application/atom+xml" })
+    public Feed getBooksAsJsonFeed(@Context UriInfo uParam) {
+        return getBooksAsFeed(uParam);    
+    }
+    
+    
+    @GET
     @Path("/books/feed")
     @ProduceMime({"application/json", "application/atom+xml" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {

@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.ext.MappingsHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
+import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -82,6 +83,7 @@ public final class ProviderFactory {
                      new SourceProvider(),
                      new FormEncodingReaderProvider(),
                      new PrimitiveTextProvider(),
+                     new WebApplicationExceptionMapper(),
                      new MappingsHandler());
     }
     
@@ -120,7 +122,7 @@ public final class ProviderFactory {
                     ParameterizedType pt = (ParameterizedType)t;
                     Type[] args = pt.getActualTypeArguments();
                     for (int i = 0; i < args.length; i++) {
-                        if (exceptionType.isAssignableFrom((Class<?>)args[i])) {
+                        if (((Class<?>)args[i]).isAssignableFrom(exceptionType)) {
                             InjectionUtils.injectContextFields(em.getProvider(), em, m);
                             InjectionUtils.injectContextMethods(em.getProvider(), em, m);
                             return em.getProvider();

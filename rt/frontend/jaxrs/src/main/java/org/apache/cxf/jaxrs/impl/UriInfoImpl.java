@@ -29,6 +29,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -43,7 +44,7 @@ public class UriInfoImpl implements UriInfo {
     }
     
     public URI getAbsolutePath() {
-        String address = getEndpointAddress();
+        String address = getBaseUri().toString();
         address = address.endsWith("/") ? address.substring(0, address.length() - 1)
                                         : address; 
         return URI.create(address + getPath());
@@ -54,7 +55,8 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public URI getBaseUri() {
-        return URI.create(getEndpointAddress());
+        URI u = URI.create(getEndpointAddress());
+        return HttpUtils.toAbsoluteUri(u, message);
     }
 
     public UriBuilder getBaseUriBuilder() {

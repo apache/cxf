@@ -41,7 +41,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -50,6 +50,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "This is a WebApplicationException",
                       "application/xml", 500);
     }
+    
+    @Test
+    public void testNoRootResourceException() throws Exception {
+        getAndCompare("http://localhost:9080/nobookstore/webappexception",
+                      "",
+                      "application/xml", 404);
+    }
+    
     
     @Test
     public void testAcceptTypeMismatch() throws Exception {
@@ -142,6 +150,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/xml", 200);
         
         getAndCompareAsStrings("http://localhost:9080/bookstore/books/defaultquery",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/missingquery",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         
@@ -552,9 +564,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         try {
             int result = httpClient.executeMethod(get);
             assertEquals(expectedStatus, result);
-            String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
+            String content = getStringFromInputStream(get.getResponseBodyAsStream());
             assertEquals("Expected value is wrong", 
-                         expectedValue, jsonContent);
+                         expectedValue, content);
         } finally {
             get.releaseConnection();
         }

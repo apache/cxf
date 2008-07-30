@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.Encoded;
 import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
 
@@ -141,11 +140,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     public ConsumeMime getConsumeMime() {
         return (ConsumeMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ConsumeMime.class);
-    }
-    
-    public boolean isEncodedEnabled() {
-        return AnnotationUtils.getClassAnnotation(getServiceClass(), 
-                                                  Encoded.class) != null;
     }
     
     public Path getPath() {
