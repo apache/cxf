@@ -492,37 +492,43 @@ public class ParameterProcessor extends AbstractProcessor {
         boolean wrapped = method.isWrapperStyle();
         if (wrapped) {
             //check if really can be wrapper style....
-            List<MessagePartInfo> outputParts = outputMessage.getMessageParts();
-            List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
 
-            MessagePartInfo inputPart = inputParts.size() > 0 ? inputParts.iterator().next() : null;
-            MessagePartInfo outputPart = outputParts.size() > 0 ? outputParts.iterator().next() : null;
-
-            List<QName> inputWrapElement = null;
-            List<QName> outputWrapElement = null;
-
-            if (inputPart != null) {
-                inputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
-                                                                         inputPart.getElementQName());
-            }
-            if (outputPart != null) {
-                outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
-                                                                          outputPart.getElementQName());
-            }
-            for (QName item : inputWrapElement) {
-                String fullJavaName = this.dataBinding.getWrappedElementType(inputPart.getElementQName(),
-                                                                             item);
-                if (StringUtils.isEmpty(fullJavaName)) {
-                    wrapped = false;
-                    break;
+            if (inputMessage != null) {
+                List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
+                MessagePartInfo inputPart = inputParts.size() > 0 ? inputParts.iterator().next() : null;
+                List<QName> inputWrapElement = null;
+                if (inputPart != null) {
+                    inputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
+                                                                             inputPart.getElementQName());
+                }
+                if (inputWrapElement != null) {
+                    for (QName item : inputWrapElement) {
+                        String fullJavaName = dataBinding
+                            .getWrappedElementType(inputPart.getElementQName(), item);
+                        if (StringUtils.isEmpty(fullJavaName)) {
+                            wrapped = false;
+                            break;
+                        }
+                    }                
                 }
             }
-            for (QName item : outputWrapElement) {
-                String fullJavaName = this.dataBinding.getWrappedElementType(outputPart.getElementQName(),
-                                                                             item);
-                if (StringUtils.isEmpty(fullJavaName)) {
-                    wrapped = false;
-                    break;
+            if (outputMessage != null) {
+                List<MessagePartInfo> outputParts = outputMessage.getMessageParts();
+                MessagePartInfo outputPart = outputParts.size() > 0 ? outputParts.iterator().next() : null;
+                List<QName> outputWrapElement = null;
+                if (outputPart != null) {
+                    outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
+                                                                              outputPart.getElementQName());
+                }
+                if (outputWrapElement != null) {
+                    for (QName item : outputWrapElement) {
+                        String fullJavaName = dataBinding
+                            .getWrappedElementType(outputPart.getElementQName(), item);
+                        if (StringUtils.isEmpty(fullJavaName)) {
+                            wrapped = false;
+                            break;
+                        }
+                    }
                 }
             }
             if (!wrapped) {
