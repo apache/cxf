@@ -62,9 +62,9 @@ public class PerRequestFactory implements Factory {
             }
             return o;
         } catch (InstantiationException e) {
-            throw new Fault(new Message("COULD_NOT_INSTANTIATE", BUNDLE));
+            throw new Fault(new Message("COULD_NOT_INSTANTIATE", BUNDLE), e);
         } catch (IllegalAccessException e) {
-            throw new Fault(new Message("ILLEGAL_ACCESS", BUNDLE));
+            throw new Fault(new Message("ILLEGAL_ACCESS", BUNDLE), e);
         }
     }
 

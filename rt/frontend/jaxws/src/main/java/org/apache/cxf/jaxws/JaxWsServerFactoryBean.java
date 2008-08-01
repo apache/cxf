@@ -45,6 +45,7 @@ import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.invoker.SingletonFactory;
 import org.apache.cxf.service.model.BindingInfo;
 
 /**
@@ -103,6 +104,9 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     
     @Override
     protected Invoker createInvoker() {
+        if (getServiceBean() == null) {
+            return new JAXWSMethodInvoker(new SingletonFactory(getServiceClass()));
+        }
         return new JAXWSMethodInvoker(getServiceBean());
     }
 

@@ -46,7 +46,9 @@ import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.BeanInvoker;
+import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.invoker.SingletonFactory;
 
 
 /**
@@ -117,12 +119,12 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                                     getDestinationFactory(),
                                     getBindingFactory());
 
-            if (invoker == null) {
-                if (serviceBean != null) {
+            if (ep.getService().getInvoker() == null) {
+                if (invoker == null) {
                     ep.getService().setInvoker(createInvoker());
+                } else {
+                    ep.getService().setInvoker(invoker);
                 }
-            } else {
-                ep.getService().setInvoker(invoker);
             }
 
             if (start) {
@@ -210,6 +212,9 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
 
     protected Invoker createInvoker() {
+        if (getServiceBean() == null) {
+            return new FactoryInvoker(new SingletonFactory(getServiceClass()));
+        }
         return new BeanInvoker(getServiceBean());
     }
 
