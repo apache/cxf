@@ -101,9 +101,7 @@ public class Fault extends UncheckedException {
     }
 
     /**
-     * Returns the detail node. If no detail node has been set, an empty
-     * <code>&lt;detail&gt;</code> is created.
-     * 
+     * Returns the detail node.
      * @return the detail node.
      */
     public Element getDetail() {
@@ -129,6 +127,12 @@ public class Fault extends UncheckedException {
         return this.detail != null;
     }
 
+    /**
+     * Returns the detail node. If no detail node has been set, an empty
+     * <code>&lt;detail&gt;</code> is created.
+     * 
+     * @return the detail node.
+     */
     public Element getOrCreateDetail() {
         if (detail == null) {
             detail = DOMUtils.createDocument().createElement("detail");

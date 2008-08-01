@@ -231,8 +231,8 @@ public class  TestSOAPHandler<T extends SOAPMessageContext> extends TestHandlerB
                     body.appendChild(wrapper); 
 
                     for (String info : getHandlerInfoList(ctx)) {
-                        // copy the the previously invoked handler list into the response.  
-                        // Ignore this handlers information as it will be added again later.
+                        // copy the previously invoked handler list into the response.  
+                        // Ignore this handler's information as it will be added again later.
                         //
                         if (!info.contains(getHandlerId())) {
                             Node newEl = doc.createElementNS(namespace, "HandlersInfo");
