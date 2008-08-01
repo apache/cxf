@@ -19,24 +19,32 @@
 
 package demo.ws_policy.server;
 
+import java.net.URL;
 import javax.xml.ws.Endpoint;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 
 public class Server {
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
 
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = Server.class.getResource("server.xml");
+        Bus bus = bf.createBus(busFile.toString());
+        bf.setDefaultBus(bus);
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
     }
-    
+
     public static void main(String args[]) throws Exception {
         new Server();
-        System.out.println("Server ready..."); 
-        
-        Thread.sleep(5 * 60 * 1000); 
+        System.out.println("Server ready...");
+
+        Thread.sleep(5 * 60 * 1000);
         System.out.println("Server exiting");
         System.exit(0);
     }

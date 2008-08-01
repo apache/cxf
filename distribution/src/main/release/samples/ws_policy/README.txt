@@ -58,6 +58,26 @@ To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
 
 
+Building and running the demo using maven
+---------------------------------------
+
+From the samples/ws_policy directory, the maven pom.xml can be used to
+build and run the demo.  
+
+Using either UNIX or Windows:
+
+  mvn install (builds the demo)
+  mvn -Pserver
+  mvn -Pclient
+
+Although not explicitly instructed to use these interceptors, 
+both client and server will use the MAPAggregator and MAPCodec
+interceptors to aggregate and encode the WS-Addressing MAPs.
+
+To remove the code generated from the WSDL file and the .class
+files, run "mvn clean".
+
+
 Building the demo using wsdl2java and javac
 ------------------------------------------
 

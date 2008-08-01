@@ -19,44 +19,54 @@
 
 package demo.ws_policy.client;
 
+import java.net.URL;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.SOAPService;
 
 public final class Client {
-    
+
     private static final String USER_NAME = System.getProperty("user.name");
 
     private Client() {
-    } 
+    }
 
     public static void main(String args[]) {
-        try { 
+        try {
+
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = Client.class.getResource("client.xml");
+            Bus bus = bf.createBus(busFile.toString());
+            bf.setDefaultBus(bus);
+
             SOAPService service = new SOAPService();
             Greeter port = service.getSoapPort();
 
             System.out.println("Invoking sayHi...");
             String resp = port.sayHi();
             System.out.println("Server responded with: " + resp + "\n");
-    
+
             System.out.println("Invoking greetMe...");
             resp = port.greetMe(USER_NAME);
             System.out.println("Server responded with: " + resp + "\n");
-    
+
             System.out.println("Invoking greetMeOneWay...");
             port.greetMeOneWay(USER_NAME);
             System.out.println("No response from server as method is OneWay\n");
-    
+
             try {
                 System.out.println("Invoking pingMe, expecting exception...");
                 port.pingMe();
             } catch (PingMeFault ex) {
                 System.out.println("Expected exception occurred: " + ex);
             }
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }  finally { 
-            System.exit(0); 
+        }  finally {
+            System.exit(0);
         }
     }
 
