@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -512,7 +511,8 @@ public final class CorbaUtils {
     public static void exportObjectReference(ORB orb,
                                              org.omg.CORBA.Object ref,
                                              String url,
-                                             AddressType address) 
+                                             AddressType address,
+                                             OrbConfig config) 
         throws URISyntaxException, IOException {
         
         if ((url.startsWith("ior:")) || (url.startsWith("IOR:"))) {
@@ -526,7 +526,7 @@ public final class CorbaUtils {
             URI uri = new URI(url.substring(3));
             exportObjectReferenceToFile(orb, ref, uri);
         } else if (url.startsWith("corbaloc:")) {
-            exportObjectReferenceToCorbaloc(orb, ref, url);
+            config.exportObjectReferenceToCorbaloc(orb, ref, url);
         } else if (url.startsWith("corbaname:")) {
             int hashPos = url.lastIndexOf("#");
         
@@ -655,32 +655,6 @@ public final class CorbaUtils {
                                              path);
     }
 
-
-    private static void exportObjectReferenceToCorbaloc(ORB orb,
-                                                        org.omg.CORBA.Object object,
-                                                        String location) {
-        int keyIndex = location.indexOf('/');
-        String key = location.substring(keyIndex + 1);
-        try {
-            Class<?> bootMgrHelperClass = Class.forName("org.apache.yoko.orb.OB.BootManagerHelper");
-            Class<?> bootMgrClass = Class.forName("org.apache.yoko.orb.OB.BootManager");
-            Method narrowMethod =
-                bootMgrHelperClass.getMethod("narrow", org.omg.CORBA.Object.class);
-            java.lang.Object bootMgr = narrowMethod.invoke(null,
-                                                           orb.resolve_initial_references("BootManager"));
-            Method addBindingMethod = 
-                bootMgrClass.getMethod("add_binding", byte[].class, org.omg.CORBA.Object.class);
-            addBindingMethod.invoke(bootMgr, key.getBytes(), object);
-            LOG.info("Added key " + key + " to bootmanager");
-        } catch (ClassNotFoundException ex) {
-            //Not supported by the orb. skip it.
-        } catch (java.lang.reflect.InvocationTargetException ex) {
-            //Not supported by the orb. skip it.
-        } catch (java.lang.Exception ex) {
-            throw new CorbaBindingException(ex.getMessage(), ex);
-        }
-    }
-    
 
     public static org.omg.CORBA.Object importObjectReference(ORB orb,
                                                              String url) {

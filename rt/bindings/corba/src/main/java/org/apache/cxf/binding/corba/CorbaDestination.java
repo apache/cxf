@@ -305,7 +305,7 @@ public class CorbaDestination implements Destination {
                 objectId = bindingPOA.activate_object(servant);
             }
             obj = bindingPOA.id_to_reference(objectId);
-            CorbaUtils.exportObjectReference(orb, obj, location, address);
+            CorbaUtils.exportObjectReference(orb, obj, location, address, orbConfig);
             
             populateEpr(orb.object_to_string(obj));
             LOG.info("Object Reference: " + orb.object_to_string(obj));

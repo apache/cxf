@@ -149,5 +149,7 @@ public class CorbaBindingFactory extends AbstractBindingFactory
     public OrbConfig getOrbConfig() {
         return orbConfig;
     }
-
+    public void setOrbConfig(OrbConfig config) {
+        orbConfig = config;
+    }
 }

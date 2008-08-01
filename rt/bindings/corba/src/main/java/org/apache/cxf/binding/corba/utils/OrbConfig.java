@@ -19,9 +19,12 @@
 
 package org.apache.cxf.binding.corba.utils;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.binding.corba.CorbaBindingException;
+import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
 
 public class OrbConfig {
@@ -70,6 +73,31 @@ public class OrbConfig {
     
     public List<Policy> getExtraPolicies() {
         return policies;
+    }
+    
+    
+    public void exportObjectReferenceToCorbaloc(ORB orb,
+                                                org.omg.CORBA.Object object,
+                                                String location) {
+        int keyIndex = location.indexOf('/');
+        String key = location.substring(keyIndex + 1);
+        try {
+            Class<?> bootMgrHelperClass = Class.forName("org.apache.yoko.orb.OB.BootManagerHelper");
+            Class<?> bootMgrClass = Class.forName("org.apache.yoko.orb.OB.BootManager");
+            Method narrowMethod =
+                bootMgrHelperClass.getMethod("narrow", org.omg.CORBA.Object.class);
+            java.lang.Object bootMgr = narrowMethod.invoke(null,
+                                                           orb.resolve_initial_references("BootManager"));
+            Method addBindingMethod = 
+                bootMgrClass.getMethod("add_binding", byte[].class, org.omg.CORBA.Object.class);
+            addBindingMethod.invoke(bootMgr, key.getBytes(), object);
+        } catch (ClassNotFoundException ex) {
+            //Not supported by the orb. skip it.
+        } catch (java.lang.reflect.InvocationTargetException ex) {
+            //Not supported by the orb. skip it.
+        } catch (java.lang.Exception ex) {
+            throw new CorbaBindingException(ex.getMessage(), ex);
+        }
     }
 
 }
