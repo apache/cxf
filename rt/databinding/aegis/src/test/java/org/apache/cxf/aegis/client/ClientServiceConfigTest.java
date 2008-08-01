@@ -19,16 +19,11 @@
 
 package org.apache.cxf.aegis.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.aegis.databinding.AegisXmlServiceConfiguration;
+
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.service.factory.AbstractServiceConfiguration;
-import org.apache.cxf.service.factory.DefaultServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
@@ -41,11 +36,6 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
         super.setUp();
 
         ReflectionServiceFactoryBean factory = new ReflectionServiceFactoryBean();
-        List<AbstractServiceConfiguration> configurations = 
-            new ArrayList<AbstractServiceConfiguration>();
-        configurations.add(new AegisXmlServiceConfiguration());
-        configurations.add(new DefaultServiceConfiguration());
-        factory.setConfigurations(configurations);
         factory.setInvoker(new BeanInvoker(new EchoImpl()));
         factory.setDataBinding(new AegisDatabinding());
 
@@ -60,10 +50,6 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
     @Test
     public void ordinaryParamNameTest() throws Exception {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
-        List<AbstractServiceConfiguration> configurations = 
-            new ArrayList<AbstractServiceConfiguration>();
-        configurations.add(new AegisXmlServiceConfiguration());
-        configurations.add(new DefaultServiceConfiguration());
         ReflectionServiceFactoryBean factory = new ReflectionServiceFactoryBean();
         proxyFac.setServiceFactory(factory);
         proxyFac.setDataBinding(new AegisDatabinding());

@@ -31,7 +31,6 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HeaderTest extends AbstractAegisTest {
@@ -57,7 +56,7 @@ public class HeaderTest extends AbstractAegisTest {
         factory.setInvoker(new BeanInvoker(new EchoImpl()));
 
         ServerFactoryBean svrFac = new ServerFactoryBean();
-        svrFac.setAddress("Echo");
+        svrFac.setAddress("local://Echo");
         setupAegis(svrFac);
         svrFac.setServiceFactory(factory);
         svrFac.setServiceClass(Echo.class);
@@ -66,10 +65,10 @@ public class HeaderTest extends AbstractAegisTest {
     }
 
     @Test
-    @Ignore
+    @org.junit.Ignore
     public void testHeaders() throws Exception {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
-        proxyFac.setAddress("Echo");
+        proxyFac.setAddress("local://Echo");
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
