@@ -22,13 +22,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -36,6 +39,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaStreamable;
 import org.apache.cxf.binding.corba.CorbaTypeMap;
+import org.apache.cxf.binding.corba.wsdl.AddressType;
 import org.apache.cxf.binding.corba.wsdl.Alias;
 import org.apache.cxf.binding.corba.wsdl.Anonarray;
 import org.apache.cxf.binding.corba.wsdl.Anonfixed;
@@ -73,6 +77,9 @@ import org.omg.CORBA.StructMember;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.UnionMember;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 public final class CorbaUtils {
 
@@ -458,8 +465,105 @@ public final class CorbaUtils {
         return map;
     }
     
-    public static void exportObjectReferenceToFile(org.omg.CORBA.Object obj, ORB orb,
-                                                  URI iorFile) 
+    
+    
+    public static boolean isValidURL(String url) {
+        if ((url.startsWith("ior:")) || (url.startsWith("IOR:"))) {
+            return true;
+        } else if (url.startsWith("file:")) {
+            return true;
+        } else if (url.startsWith("corbaloc:")) {
+            return true;
+        } else if (url.startsWith("corbaname:")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String getUniquePOAName(QName serviceName, String portName, String poaName) {
+        //Create a unique name of the form
+        //"{namespace_uri}service_name#port_name#user_provided_name"
+        //The last part is only appended if it is non empty
+        //
+        String result = "{" + serviceName.getNamespaceURI() + "}"
+            + serviceName.getLocalPart() + "#" + portName;
+
+        if (poaName != null) {
+            result += "#" + poaName;
+        }
+
+        return result;
+    }
+    
+    public static boolean isIOR(String location) {
+        if ((location.startsWith("ior:")) || (location.startsWith("IOR:"))) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static String exportObjectReference(org.omg.CORBA.Object obj, ORB orb) {
+        String ior = orb.object_to_string(obj);
+        LAST_EXPORT_CACHE.set(new LastExport(ior, obj));
+        return ior;
+    }
+
+    public static void exportObjectReference(ORB orb,
+                                             org.omg.CORBA.Object ref,
+                                             String url,
+                                             AddressType address) 
+        throws URISyntaxException, IOException {
+        
+        if ((url.startsWith("ior:")) || (url.startsWith("IOR:"))) {
+            // make use of Thread cache of last exported IOR
+            String ior = exportObjectReference(ref, orb);
+            address.setLocation(ior);
+        } else if (url.startsWith("file:")) {
+            URI uri = new URI(url);
+            exportObjectReferenceToFile(orb, ref, uri);
+        } else if (url.startsWith("relfile:")) {
+            URI uri = new URI(url.substring(3));
+            exportObjectReferenceToFile(orb, ref, uri);
+        } else if (url.startsWith("corbaloc:")) {
+            exportObjectReferenceToCorbaloc(orb, ref, url);
+        } else if (url.startsWith("corbaname:")) {
+            int hashPos = url.lastIndexOf("#");
+        
+            String namingServiceLocation;
+            String path;
+
+            if (hashPos == -1) {
+                namingServiceLocation = "corbaloc:" + url.substring(10);
+                path = url;
+            } else {
+                namingServiceLocation = "corbaloc:" + url.substring(10, hashPos - 12);
+                path = url.substring(hashPos + 1);
+            }
+
+            int nameServiceObjectKeyPos = namingServiceLocation.indexOf("/NameService");
+
+            if (nameServiceObjectKeyPos == -1
+                || nameServiceObjectKeyPos != namingServiceLocation.length() - 12) {
+                namingServiceLocation += "/NameService";
+            }
+
+            exportObjectReferenceToNamingService(orb,
+                                                 namingServiceLocation,
+                                                 ref,
+                                                 path);
+        } else {
+            String ior = orb.object_to_string(ref);
+            address.setLocation(ior);
+            URI uri = new URI("endpoint.ior");
+            CorbaUtils.exportObjectReferenceToFile(orb, ref, uri);
+        }
+    }
+
+
+    public static void exportObjectReferenceToFile(ORB orb,
+                                                   org.omg.CORBA.Object obj,
+                                                   URI iorFile) 
         throws IOException {
         String ref = orb.object_to_string(obj);
         File f = null;
@@ -475,12 +579,108 @@ public final class CorbaUtils {
         file.close();
     }
 
+    private static void exportObjectReferenceToNamingService(NamingContext namingService,
+                                                             org.omg.CORBA.Object object,
+                                                             String path) {
+        NameComponent[] names = namingServiceStringToNameComponents(path);
 
-    public static String exportObjectReference(org.omg.CORBA.Object obj, ORB orb) {
-        String ior = orb.object_to_string(obj);
-        LAST_EXPORT_CACHE.set(new LastExport(ior, obj));
-        return ior;
+
+        // (re)bind the object into the Naming Service
+        //
+        try {
+            namingService.rebind(names, object);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
+
+    private static NameComponent[] namingServiceStringToNameComponents(String str) {
+        if ("".equals(str)) {
+            return new NameComponent[0];
+        }
+
+        // Split the string into NameComponents, delimited by '/'
+        //
+        StringTokenizer components = new StringTokenizer(str, "/");
+        if (!components.hasMoreTokens()) {
+            return new NameComponent[0];
+        }
+
+        // Allocate space for the result
+        //
+        NameComponent[] result = new NameComponent[components.countTokens()];
+
+        if (components.countTokens() == 1) {
+            result[0] = new NameComponent(str, "");
+            return result;
+        }
+        
+        // Iterate over all the components, splitting each into
+        // its "id" and "kind" fields, and copying into "result".
+        //
+        int count = 0;
+        while (components.hasMoreTokens()) {
+            StringTokenizer idAndKind = new StringTokenizer(components.nextToken(), ".");
+            if (!idAndKind.hasMoreTokens()) {
+                return new NameComponent[0];
+            }
+            if (idAndKind.countTokens() > 2) {
+                return new NameComponent[0];
+            }
+            result[count] = new NameComponent();
+            result[count].id = idAndKind.nextToken().replaceAll("\\", "");
+            if (idAndKind.hasMoreTokens()) {
+                result[count].kind = idAndKind.nextToken().replaceAll("\\", "");
+            } else {
+                result[count].kind = "";
+            }
+            count++;
+        }
+
+        return result;
+    }
+
+
+    private static void exportObjectReferenceToNamingService(ORB orb,
+                                                             String namingServiceLocation,
+                                                             org.omg.CORBA.Object object,
+                                                             String path) {
+        org.omg.CORBA.Object obj = orb.string_to_object(namingServiceLocation);
+        NamingContext namingService = NamingContextHelper.narrow(obj);
+        if (namingService == null) {
+            throw new RuntimeException("NamingContext for " + namingServiceLocation + " not found");
+        }
+        exportObjectReferenceToNamingService(namingService,
+                                             object,
+                                             path);
+    }
+
+
+    private static void exportObjectReferenceToCorbaloc(ORB orb,
+                                                        org.omg.CORBA.Object object,
+                                                        String location) {
+        int keyIndex = location.indexOf('/');
+        String key = location.substring(keyIndex + 1);
+        try {
+            Class<?> bootMgrHelperClass = Class.forName("org.apache.yoko.orb.OB.BootManagerHelper");
+            Class<?> bootMgrClass = Class.forName("org.apache.yoko.orb.OB.BootManager");
+            Method narrowMethod =
+                bootMgrHelperClass.getMethod("narrow", org.omg.CORBA.Object.class);
+            java.lang.Object bootMgr = narrowMethod.invoke(null,
+                                                           orb.resolve_initial_references("BootManager"));
+            Method addBindingMethod = 
+                bootMgrClass.getMethod("add_binding", byte[].class, org.omg.CORBA.Object.class);
+            addBindingMethod.invoke(bootMgr, key.getBytes(), object);
+            LOG.info("Added key " + key + " to bootmanager");
+        } catch (ClassNotFoundException ex) {
+            //Not supported by the orb. skip it.
+        } catch (java.lang.reflect.InvocationTargetException ex) {
+            //Not supported by the orb. skip it.
+        } catch (java.lang.Exception ex) {
+            throw new CorbaBindingException(ex.getMessage(), ex);
+        }
+    }
+    
 
     public static org.omg.CORBA.Object importObjectReference(ORB orb,
                                                              String url) {

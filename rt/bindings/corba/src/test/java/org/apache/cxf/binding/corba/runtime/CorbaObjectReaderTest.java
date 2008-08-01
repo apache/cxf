@@ -190,13 +190,13 @@ public class CorbaObjectReaderTest extends Assert {
     @Test
     public void testReadULongLong() {
         OutputStream oStream = orb.create_output_stream();
-        oStream.write_ulonglong(-1000000000);
+        oStream.write_ulonglong(-1000000000L);
         
         InputStream iStream = oStream.create_input_stream();
         CorbaObjectReader reader = new CorbaObjectReader(iStream);
         
         BigInteger ulonglongValue = reader.readULongLong();
-        assertTrue(ulonglongValue.longValue() == -1000000000);
+        assertEquals(1, ulonglongValue.signum());
     }
     
     @Test

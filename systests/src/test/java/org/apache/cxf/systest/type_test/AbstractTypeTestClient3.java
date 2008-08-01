@@ -544,6 +544,10 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertNotNull(y.value);
         assertNotNull(z.value);
         assertNotNull(ret);
+        
+        assertTrue(y.value instanceof DerivedEmptyBaseEmptyAll);
+        assertTrue(z.value instanceof DerivedEmptyBaseEmptyAll);
+        assertTrue(ret instanceof DerivedEmptyBaseEmptyAll);
     }
 
     //org.apache.type_test.types1.DerivedEmptyBaseEmptyChoice
@@ -569,6 +573,10 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertNotNull(y.value);
         assertNotNull(z.value);
         assertNotNull(ret);
+        
+        assertTrue(y.value instanceof DerivedEmptyBaseEmptyChoice);
+        assertTrue(z.value instanceof DerivedEmptyBaseEmptyChoice);
+        assertTrue(ret instanceof DerivedEmptyBaseEmptyChoice);
     }
 
     //org.apache.type_test.types1.RestrictedChoiceBaseChoice

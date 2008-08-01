@@ -19,17 +19,23 @@
 
 package org.apache.cxf.binding.corba.types;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 
 public abstract class AbstractCorbaTypeListener implements CorbaTypeListener {
 
     protected QName currentElement;
-    protected final CorbaObjectHandler handler;
+    protected CorbaObjectHandler handler;
+    protected NamespaceContext ctx;
+    
 
     public AbstractCorbaTypeListener(CorbaObjectHandler h) {
         handler = h;
     }
 
+    public void setNamespaceContext(NamespaceContext n) {
+        ctx = n;
+    }
 
     public void processStartElement(QName name) {
         currentElement = name;

@@ -22,11 +22,14 @@ package org.apache.cxf.binding.corba.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.omg.CORBA.Policy;
+
 public class OrbConfig {
 
     String orbClass;
     String orbSingletonClass;
     List<String> orbArgs = new ArrayList<String>();
+    List<Policy> policies = new ArrayList<Policy>();
     
     boolean persistentPoa;
     
@@ -63,6 +66,10 @@ public class OrbConfig {
     }
     public boolean isPersistentPoa() {
         return persistentPoa;
+    }
+    
+    public List<Policy> getExtraPolicies() {
+        return policies;
     }
 
 }

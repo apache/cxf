@@ -60,6 +60,7 @@ public class CorbaExceptionListener extends AbstractCorbaTypeListener {
                                                   typeMap,
                                                   orb, 
                                                   sInfo);
+            currentTypeListener.setNamespaceContext(ctx);
             ((CorbaExceptionHandler)handler).addMember(currentTypeListener.getCorbaObject());
             memberCount++;
         } else {

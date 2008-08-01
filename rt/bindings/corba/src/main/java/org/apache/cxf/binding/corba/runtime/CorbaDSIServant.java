@@ -39,6 +39,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.omg.CORBA.ORB;
@@ -142,15 +143,34 @@ public class CorbaDSIServant extends DynamicImplementation {
     }
     
     public void invoke(ServerRequest request) throws CorbaBindingException {
+        String opName = request.operation();
+        QName requestOperation = operationMap.get(opName);
+        
         MessageImpl msgImpl = new MessageImpl();
         msgImpl.setDestination(getDestination());
         Exchange exg = new ExchangeImpl();
-        exg.put(String.class, operationMap.get(request.operation()).getLocalPart());
+        exg.put(String.class, requestOperation.getLocalPart());
         exg.put(ORB.class, getOrb());
         exg.put(ServerRequest.class, request);
         msgImpl.setExchange(exg);
         CorbaMessage msg = new CorbaMessage(msgImpl);
         msg.setCorbaTypeMap(typeMap);
+        
+        // If there's no output message part in our operation then it's a oneway op
+        BindingMessageInfo bindingMsgOutputInfo = null;
+        BindingOperationInfo bindingOpInfo = null;
+        try {
+            bindingOpInfo = this.destination.getEndPointInfo().getBinding().getOperation(requestOperation);
+        } catch (Exception ex) {
+            throw new CorbaBindingException("Invalid Request. Operation unknown: " + opName);
+        }
+        if (bindingOpInfo != null) {
+            bindingMsgOutputInfo = bindingOpInfo.getOutput();
+            if (bindingMsgOutputInfo == null) {
+                exg.setOneWay(true);
+            } 
+        }
+        
         // invokes the interceptors
         getObserver().onMessage(msg);
     }

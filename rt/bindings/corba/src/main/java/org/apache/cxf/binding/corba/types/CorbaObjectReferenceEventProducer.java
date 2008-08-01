@@ -92,7 +92,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                     eprInfo = getEprMetadataForTypeId(wsdlDef, typeId);
                 } else {
                     LOG.log(Level.SEVERE, "For binding with value \"" + INFER_FROM_TYPE_ID
-                                    + "\" the type_id of the object reference IOR must be set to it's most"
+                                    + "\" the type_id of the object reference IOR must be set to its most"
                                     + " derived type. It is currently null indicating CORBA:Object."
                                     + " Address Url=" + address); 
                 }

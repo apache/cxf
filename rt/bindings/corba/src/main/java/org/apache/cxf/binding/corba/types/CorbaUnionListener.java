@@ -78,6 +78,7 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
                                                           typeMap,
                                                           orb,
                                                           serviceInfo);
+                    currentTypeListener.setNamespaceContext(ctx);
                     content = currentTypeListener.getCorbaObject();
                     ((CorbaUnionHandler)handler).setValue(branchName, content);
                     if (unionType.isSetNillable() && unionType.isNillable()) {
@@ -117,6 +118,7 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
                                                   typeMap,
                                                   orb,
                                                   serviceInfo);
+            typeListener.setNamespaceContext(ctx);
             ((CorbaUnionHandler)handler).setValue("value", typeListener.getCorbaObject());
             typeListener.processCharacters(text);
         }

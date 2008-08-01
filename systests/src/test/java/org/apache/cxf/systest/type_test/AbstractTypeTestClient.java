@@ -277,7 +277,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("UnsignedInt")) {
             return;
         }
-        long valueSets[][] = {{11, 20}, {1, 0}, {0, ((long)Integer.MAX_VALUE) * 2 + 1}};
+        long valueSets[][] = {{0, ((long)Integer.MAX_VALUE) * 2 + 1}, {11, 20}, {1, 0}};
 
         for (int i = 0; i < valueSets.length; i++) {
             long x = valueSets[i][0];
@@ -294,7 +294,8 @@ public abstract class AbstractTypeTestClient
                 ret = rpcClient.testUnsignedInt(x, y, z);
             }
             if (!perfTestOnly) {
-                assertEquals("testUnsignedInt(): Incorrect value for inout param", Long.valueOf(x), y.value);
+                assertEquals("testUnsignedInt(): Incorrect value for inout param",
+                             Long.valueOf(x), y.value);
                 assertEquals("testUnsignedInt(): Incorrect value for out param",
                              Long.valueOf(yOrig), z.value);
                 assertEquals("testUnsignedInt(): Incorrect return value", x, ret);

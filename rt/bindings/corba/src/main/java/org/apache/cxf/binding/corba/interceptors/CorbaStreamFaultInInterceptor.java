@@ -107,9 +107,13 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
                     Class<?> exClass = fault.getProperty(Class.class.getName(), Class.class);
                     if (exClass != null) {
                         Class<?> beanClass = e.getClass();
-                        Constructor constructor =
+                        Constructor<?> constructor =
                             exClass.getConstructor(new Class[]{String.class, beanClass});
-                        e = constructor.newInstance(new Object[]{"", e});
+                        
+                        String repId = (message.getStreamableException()._type().id() != null) 
+                            ? message.getStreamableException()._type().id()
+                                : "";
+                        e = constructor.newInstance(new Object[]{repId, e});
                     } else {
                         // Get the Fault                         
                         Fault faultEx = (Fault) message.getContent(Exception.class);

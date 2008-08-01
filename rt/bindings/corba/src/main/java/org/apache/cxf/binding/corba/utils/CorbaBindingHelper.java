@@ -21,10 +21,10 @@ package org.apache.cxf.binding.corba.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
@@ -34,15 +34,15 @@ import org.omg.CORBA.ORB;
 public final class CorbaBindingHelper {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaBindingHelper.class);
-    private static Map<String, ORB> orbList = new HashMap<String, ORB>();
-    private static Map<String, Integer> orbUseCount = new HashMap<String, Integer>();
+    private static Map<String, ORB> orbList = new ConcurrentHashMap<String, ORB>();
+    private static Map<String, Integer> orbUseCount = new ConcurrentHashMap<String, Integer>();
     private static ORB defaultORB;
     
     private CorbaBindingHelper() {
         //utility class
     }
     
-    public static ORB getDefaultORB(OrbConfig config) {        
+    public static synchronized ORB getDefaultORB(OrbConfig config) {        
         if (defaultORB == null) {
             Properties props = System.getProperties();
             if (config.getOrbClass() != null) {

@@ -46,6 +46,7 @@ public class CorbaFaultStreamWriter extends CorbaStreamWriter {
     protected void setCurrentTypeListener(QName name) throws XMLStreamException {
         QName idlType = exType.getException();
         currentTypeListener = CorbaHandlerUtils.getTypeListener(name, idlType, typeMap, orb, serviceInfo);
+        currentTypeListener.setNamespaceContext(ctx);
         listeners[0] = currentTypeListener;
     }
 

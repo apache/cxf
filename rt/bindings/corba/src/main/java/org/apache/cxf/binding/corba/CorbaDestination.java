@@ -20,8 +20,9 @@
 package org.apache.cxf.binding.corba;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import org.apache.cxf.binding.corba.utils.CorbaBindingHelper;
 import org.apache.cxf.binding.corba.utils.CorbaUtils;
 import org.apache.cxf.binding.corba.utils.OrbConfig;
 import org.apache.cxf.binding.corba.wsdl.AddressType;
+import org.apache.cxf.binding.corba.wsdl.PolicyType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
@@ -40,19 +42,19 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.Object;
 import org.omg.CORBA.Policy;
-import org.omg.CosNaming.NameComponent;
-import org.omg.CosNaming.NamingContextExt;
-import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.IdAssignmentPolicyValue;
+import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManager;
+import org.omg.PortableServer.ThreadPolicyValue;
 
 public class CorbaDestination implements Destination {
     
-
+    private static final String IOR_SHARED_KEY = "ior:shared-key";
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaDestination.class);
+    
     private AddressType address;
     private EndpointReferenceType reference;
     private ORB orb;
@@ -63,6 +65,9 @@ public class CorbaDestination implements Destination {
     private CorbaTypeMap typeMap;
     private byte[] objectId;
     private POA bindingPOA;
+    private String poaName;
+    private String serviceId;
+    private boolean isPersistent;
     private org.omg.CORBA.Object obj;
 
     public CorbaDestination(EndpointInfo ei, OrbConfig config) {
@@ -82,6 +87,13 @@ public class CorbaDestination implements Destination {
             typeMap = tm;
         } else {
             typeMap = TypeMapCache.get(binding.getService());
+        }
+        isPersistent = orbConfig.isPersistentPoa();
+        PolicyType policy = ei.getExtensor(PolicyType.class);
+        if (policy != null) {
+            poaName = policy.getPoaname();
+            isPersistent = policy.isPersistent();
+            serviceId = policy.getServiceid();            
         }
     }
 
@@ -116,14 +128,42 @@ public class CorbaDestination implements Destination {
     public void shutdown() {
         if (orb != null) {
             try {
-                // Indicate that we are done with the ORB.  We'll ask for it to be destroyed but it
-                // someone else is using it, it really won't be (just its use count decremented)
-                CorbaBindingHelper.destroyORB(getDestinationAddress(), orb);
+                // Ask for the ORB to be destroyed.  If another destination is using it, we'll
+                // simply decrement a use count, but not destroy the ORB so that we don't break the
+                // other CorbaDestination.
+                if (CorbaUtils.isIOR(getDestinationAddress())) {
+                    CorbaBindingHelper.destroyORB(IOR_SHARED_KEY, orb);
+                } else {
+                    CorbaBindingHelper.destroyORB(getDestinationAddress(), orb);
+                }
             } catch (Exception ex) {
                 throw new CorbaBindingException(ex);
             }
             orb = null;
         }
+    }
+    
+    public ORB getORB(List<String> orbArgs, 
+                      String location, 
+                      java.util.Properties props) {
+        // See if an ORB has already been created for the given address. If so,
+        // we'll simply use it
+        // so that we don't try re-create another ORB on the same host and port.
+        if (CorbaUtils.isIOR(location)) {
+            location = IOR_SHARED_KEY;
+        }
+        orb = CorbaBindingHelper.getAddressSpecificORB(location);
+        if (orb == null) {
+            orb = ORB.init(orbArgs.toArray(new String[orbArgs.size()]), props);
+            CorbaBindingHelper.addAddressSpecificORB(location, orb);
+        }
+
+        // Get the binding helper to remember that we need this ORB kept alive, even if another
+        // destination tries to destroy it.
+        CorbaBindingHelper.keepORBAlive(location);
+        
+        return orb;
+
     }
     
     protected ORB getOrb() {
@@ -151,10 +191,66 @@ public class CorbaDestination implements Destination {
     }
 
     public void activate() {
+        java.util.Properties props = new java.util.Properties();
+        if (orbConfig.getOrbClass() != null) {
+            props.put("org.omg.CORBA.ORBClass", orbConfig.getOrbClass());
+        }
+        if (orbConfig.getOrbSingletonClass() != null) {
+            props.put("org.omg.CORBA.ORBSingletonClass", orbConfig
+                .getOrbSingletonClass());
+        }
+        
         String location = getDestinationAddress();
+        
+        if (!CorbaUtils.isValidURL(location)) {
+            throw new CorbaBindingException(
+                    "Invalid addressing specified for CORBA port location");
+        }
+        
         LOG.info("Service address retrieved: " + location);
         
-        orb = CorbaBindingHelper.getAddressSpecificORB(location);
+        
+        URI addressURI = null;
+        try {
+            addressURI = new URI(location);
+        } catch (java.net.URISyntaxException ex) {
+            throw new CorbaBindingException(
+                    "Unable to create ORB with address " + address);
+        }
+        
+        
+        List<String> orbArgs = new ArrayList<String>(orbConfig.getOrbArgs());
+
+        String scheme = addressURI.getScheme();
+        // A corbaloc address gives us host and port information to use when
+        // setting up the
+        // endpoint for the ORB. Other types of references will just create ORBs
+        // on the
+        // host and port used when no preference has been specified.
+        if (poaName != null) {
+            poaName = poaName.replace('.', '_');
+        }
+        if ("corbaloc".equals(scheme)) {
+            if (poaName == null) {
+                poaName = getEndPointInfo().getName().getLocalPart().replace('.', '_');                
+            }
+            setCorbaLocArgs(addressURI, orbArgs);
+        }
+
+        if (isPersistent) {
+            if (poaName == null) {
+                throw new CorbaBindingException(
+                        "POA name missing for corba port "
+                                + "with a persistent policy");
+            }
+        } else {
+            poaName = CorbaUtils.getUniquePOAName(getEndPointInfo()
+                    .getService().getName(), getEndPointInfo().getName()
+                    .getLocalPart(), poaName).replace('.', '_');
+        }
+
+        orb = getORB(orbArgs, location, props);        
+        
         if (orb == null) {
             LOG.log(Level.INFO, "Creating ORB with address " + location);
             orb = CorbaBindingHelper.createAddressSpecificORB(location, orbConfig);
@@ -165,52 +261,52 @@ public class CorbaDestination implements Destination {
         try {
             POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
             POAManager poaManager = rootPOA.the_POAManager();
-
             try {
-                bindingPOA = rootPOA.find_POA("BindingPOA", true);
+                bindingPOA = rootPOA.find_POA(poaName, false);
             } catch (org.omg.PortableServer.POAPackage.AdapterNonExistent ex) {
-                // An AdapterNonExistent exception will be thrown if the POA does not exist.  If
-                // this is the case, then we'll create one.
-                Policy[] policies = new Policy[ orbConfig.isPersistentPoa() ? 3 : 2];
-                policies[0] = rootPOA
-                .create_id_uniqueness_policy(
-                    org.omg.PortableServer.IdUniquenessPolicyValue.UNIQUE_ID);
-                policies[1] = rootPOA
-                        .create_implicit_activation_policy(
-                            org.omg.PortableServer.ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION);
-                if (orbConfig.isPersistentPoa()) {
-                    policies[2] = rootPOA
-                        .create_lifespan_policy(org.omg.PortableServer.LifespanPolicyValue.PERSISTENT);
-                }
-                bindingPOA = rootPOA.create_POA("BindingPOA", poaManager, policies);
+                // do nothing
             }
-            
+
+            // When using object references, we can run into a situation where
+            // we are implementing
+            // multiple instances of the same port type such that we would end
+            // up using the same
+            // poaname for each when persistance is used. Handle this case by
+            // not throwing an
+            // exception at this point during the activation, we should see an
+            // exception if we try
+            // an activate two objects with the same servant ID instead.
+            if (bindingPOA != null && !isPersistent) {
+                throw new CorbaBindingException(
+                        "Corba Port activation failed because the poa "
+                                + poaName + " already exists");
+            } else if (bindingPOA == null) {
+                bindingPOA = createPOA(poaName, rootPOA, poaManager);
+            }
+                        
             if (bindingPOA == null) {
                 throw new CorbaBindingException("Unable to create CXF CORBA Binding POA");
             }
 
             CorbaDSIServant servant = new CorbaDSIServant();
             servant.init(orb, bindingPOA, this, incomingObserver, typeMap);
-            objectId = bindingPOA.activate_object(servant);
-            obj = bindingPOA.id_to_reference(objectId);
-            
-            if (location.startsWith("relfile:")) {
-                URI iorFile = new URI(location.substring(3));
-                CorbaUtils.exportObjectReferenceToFile(obj, orb, iorFile);
-            } else if (location.startsWith("file:")) {
-                URI uri = new URI(location);
-                CorbaUtils.exportObjectReferenceToFile(obj, orb, uri);
-            } else if (location.startsWith("corbaloc")) {
-                // Try add the key to the boot manager.  This is required for a corbaloc
-                addKeyToBootManager(location, obj);
-            } else if (location.startsWith("corbaname")) {
-                addKeyToNameservice(location, obj);
-            } else {
-                String ior = orb.object_to_string(obj);
-                address.setLocation(ior);
-                URI uri = new URI("endpoint.ior");
-                CorbaUtils.exportObjectReferenceToFile(obj, orb, uri);
+            if (serviceId != null) {
+                objectId = serviceId.getBytes();
+                try {
+                    bindingPOA.activate_object_with_id(objectId, servant);
+                } catch (org.omg.PortableServer.POAPackage.ObjectAlreadyActive ex) {
+                    if (!isPersistent) {
+                        throw new CorbaBindingException("Object "
+                                                        + serviceId
+                                                        + " already active for non-persistent poa");
+                    }
+                }
+            } else {                
+                objectId = bindingPOA.activate_object(servant);
             }
+            obj = bindingPOA.id_to_reference(objectId);
+            CorbaUtils.exportObjectReference(orb, obj, location, address);
+            
             populateEpr(orb.object_to_string(obj));
             LOG.info("Object Reference: " + orb.object_to_string(obj));
             // TODO: Provide other export mechanisms? 
@@ -218,17 +314,6 @@ public class CorbaDestination implements Destination {
         } catch (Exception ex) {
             throw new CorbaBindingException("Unable to activate CORBA servant", ex);
         }
-    }
-
-    private void addKeyToNameservice(String location, Object ref) throws Exception {
-        int idx = location.indexOf("#");
-        String name = location.substring(idx + 1);
-        
-        //Register in NameService
-        org.omg.CORBA.Object nsObj = orb.resolve_initial_references("NameService");
-        NamingContextExt rootContext = NamingContextExtHelper.narrow(nsObj);
-        NameComponent[] nc = rootContext.to_name(name);
-        rootContext.rebind(nc, ref);
     }
 
     private void populateEpr(String ior) {
@@ -272,27 +357,65 @@ public class CorbaDestination implements Destination {
             }
         }
     }
+    
+    private void setCorbaLocArgs(URI addressURI, List<String> orbArgs) {
+        String schemeSpecificPart = addressURI.getSchemeSpecificPart();
+        int keyIndex = schemeSpecificPart.indexOf('/');
+        String corbaAddr = schemeSpecificPart.substring(0, keyIndex);
+        String key = schemeSpecificPart.substring(keyIndex + 1);
 
-    private void addKeyToBootManager(String location, org.omg.CORBA.Object value) {
-        int keyIndex = location.indexOf('/');
-        String key = location.substring(keyIndex + 1);
+        int index = corbaAddr.indexOf(':');
+        String protocol = "iiop";
+        if (index != 0) {
+            protocol = corbaAddr.substring(0, index);
+        }
+        int oldIndex = index;
+        index = corbaAddr.indexOf(':', oldIndex + 1);
+        String host = corbaAddr.substring(oldIndex + 1, index);
+        String port = corbaAddr.substring(index + 1);
+
+        orbArgs.add("-ORB" + key + ":" + protocol + ":host");
+        orbArgs.add(host);
+        orbArgs.add("-ORB" + key + ":" + protocol + ":port");
+        orbArgs.add(port);
+        orbArgs.add("-ORBpoa:" + poaName + ":direct_persistent");
+        orbArgs.add("true");
+        orbArgs.add("-ORBpoa:" + poaName + ":well_known_address");
+        orbArgs.add(key);
+        isPersistent = true;
+        serviceId = key;
+    }
+
+    protected POA createPOA(String name, POA parentPOA, POAManager poaManager) {
+        List<Policy> policies = new ArrayList<Policy>();
+
+        
+        policies.add(parentPOA
+                .create_thread_policy(ThreadPolicyValue.ORB_CTRL_MODEL));
+
+        if (isPersistent) {
+            policies.add(parentPOA
+                    .create_lifespan_policy(LifespanPolicyValue.PERSISTENT));
+        } else {
+            policies.add(parentPOA
+                    .create_lifespan_policy(LifespanPolicyValue.TRANSIENT));
+        }
+
+        if (serviceId != null) {
+            policies.add(parentPOA
+                            .create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID));
+        }
+
+        
+        policies.addAll(orbConfig.getExtraPolicies());
+        
+        Policy[] policyList = (Policy[])policies.toArray(new Policy[policies.size()]);
+
         try {
-            Class<?> bootMgrHelperClass = Class.forName("org.apache.yoko.orb.OB.BootManagerHelper");
-            Class<?> bootMgrClass = Class.forName("org.apache.yoko.orb.OB.BootManager");
-            Method narrowMethod =
-                bootMgrHelperClass.getMethod("narrow", org.omg.CORBA.Object.class);
-            java.lang.Object bootMgr = narrowMethod.invoke(null,
-                                                           orb.resolve_initial_references("BootManager"));
-            Method addBindingMethod = 
-                bootMgrClass.getMethod("add_binding", byte[].class, org.omg.CORBA.Object.class);
-            addBindingMethod.invoke(bootMgr, key.getBytes(), value);
-            LOG.info("Added key " + key + " to bootmanager");
-        } catch (ClassNotFoundException ex) {
-            //Not supported by the orb. skip it.
-        } catch (java.lang.reflect.InvocationTargetException ex) {
-            //Not supported by the orb. skip it.
+            return parentPOA.create_POA(name, poaManager, policyList);
         } catch (Exception ex) {
-            throw new CorbaBindingException(ex);
+            throw new CorbaBindingException(
+                    "Could not create POA during activation", ex);
         }
     }
 

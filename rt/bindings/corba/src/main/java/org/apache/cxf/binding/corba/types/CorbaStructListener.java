@@ -31,9 +31,9 @@ import org.omg.CORBA.ORB;
 
 public class CorbaStructListener extends AbstractCorbaTypeListener {
 
-    private final List<MemberType> structMembers;
     private final CorbaTypeMap typeMap;
     private final ORB orb;
+    private List<MemberType> structMembers;
     private int memberCount;
     private CorbaTypeListener currentTypeListener;
     private ServiceInfo serviceInfo;
@@ -71,6 +71,7 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
                                                   typeMap,
                                                   orb,
                                                   serviceInfo);
+            currentTypeListener.setNamespaceContext(ctx);
             ((CorbaStructHandler)handler).addMember(currentTypeListener.getCorbaObject());
             memberCount++;
             if (anonType) {
@@ -96,6 +97,22 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
     public void processWriteAttribute(String prefix, String namespaceURI, String localName, String value) {
         if (currentTypeListener != null) {
             currentTypeListener.processWriteAttribute(prefix, namespaceURI, localName, value);
+        } else {
+            if ("type".equals(localName)
+                && "http://www.w3.org/2001/XMLSchema-instance".equals(namespaceURI)) {
+                
+                String pfx = value.substring(0, value.indexOf(":"));
+                String ns = ctx.getNamespaceURI(pfx);
+                QName qn = new QName(ns, 
+                                     value.substring(value.indexOf(":") + 1));
+                CorbaTypeListener l = CorbaHandlerUtils.getTypeListener(qn,
+                                                  qn,
+                                                  typeMap,
+                                                  orb,
+                                                  serviceInfo);
+                this.handler = l.getCorbaObject();
+                structMembers = ((Struct) handler.getType()).getMember();
+            }
         }
     }
 

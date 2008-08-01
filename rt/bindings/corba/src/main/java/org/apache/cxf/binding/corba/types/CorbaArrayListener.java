@@ -63,6 +63,7 @@ public class CorbaArrayListener extends AbstractCorbaTypeListener {
                                                   typeMap,
                                                   orb,
                                                   serviceInfo);
+            currentTypeListener.setNamespaceContext(ctx);
             value.addElement(currentTypeListener.getCorbaObject());
         } else {
             currentTypeListener.processStartElement(name);

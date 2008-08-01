@@ -19,7 +19,12 @@
 
 package org.apache.cxf.binding.corba.runtime;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.xml.namespace.NamespaceContext;
@@ -44,6 +49,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
     protected CorbaTypeMap typeMap;
     protected ORB orb;
     protected CorbaTypeListener currentTypeListener;
+    protected CorbaNamespaceContext ctx = new CorbaNamespaceContext();
 
     private List<ArgType> params;
     private int paramCounter;
@@ -54,7 +60,6 @@ public class CorbaStreamWriter implements XMLStreamWriter {
 
     private boolean skipWrap;
     
-    private NamespaceContext ctx;
 
     public CorbaStreamWriter(ORB orbRef,
                              CorbaTypeMap map,
@@ -104,6 +109,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
                 currentTypeListener.processEndElement(name);
             }
         }
+        ctx.pop();
     }
 
     public void writeStartElement(java.lang.String localName)
@@ -114,7 +120,8 @@ public class CorbaStreamWriter implements XMLStreamWriter {
     public void writeStartElement(java.lang.String prefix,
                                   java.lang.String localName,
                                   java.lang.String namespaceURI)
-        throws XMLStreamException {         
+        throws XMLStreamException {
+        ctx.push();
         if (prefix != null) {
             setPrefix(prefix, namespaceURI);
         }
@@ -138,6 +145,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         QName idlType = param.getIdltype();
         if (!skipWrap || (name.getLocalPart().equals(param.getName()))) {
             currentTypeListener = CorbaHandlerUtils.getTypeListener(name, idlType, typeMap, orb, serviceInfo);
+            currentTypeListener.setNamespaceContext(ctx);
             listeners[paramCounter] = currentTypeListener;
             paramCounter++;
         } else {
@@ -268,14 +276,13 @@ public class CorbaStreamWriter implements XMLStreamWriter {
 
     public java.lang.String getPrefix(java.lang.String uri)
         throws XMLStreamException {
-        //return ctx.getPrefix(uri);
-        return null;
+        return ctx.getPrefix(uri);
     }
 
     public void setPrefix(java.lang.String prefix,
                           java.lang.String uri)
         throws XMLStreamException {
-        //ctx.setPrefix(prefix, uri);
+        ctx.setPrefix(prefix, uri);
     }
 
     public void setDefaultNamespace(java.lang.String uri)
@@ -285,7 +292,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
 
     public void setNamespaceContext(NamespaceContext context)
         throws XMLStreamException {
-        this.ctx = context;
+        //ignore
     }
 
     public NamespaceContext getNamespaceContext() {
@@ -296,5 +303,74 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         throws java.lang.IllegalArgumentException {
         return null;
     }
+    
+    
+    
+    public class CorbaNamespaceContext implements NamespaceContext {
+
+        private Map<String, String> map;
+        private CorbaNamespaceContext parent;
+
+        public CorbaNamespaceContext() {
+            this.map = new HashMap<String, String>();
+        }
+
+        private CorbaNamespaceContext(Map<String, String> map, CorbaNamespaceContext p) {
+            this.map = map;
+            this.parent = p;
+        }
+        
+        public void push() {
+            parent = new CorbaNamespaceContext(map, parent);
+            map = new HashMap<String, String>();
+        }
+        public void pop() {
+            if (parent != null) {
+                map = parent.map;
+                parent = parent.parent;
+            }
+        }
+        
+        public void setPrefix(String pfx, String ns) {
+            map.put(pfx, ns);
+        }
+        public String getNamespaceURI(String prefix) {
+            String answer = (String) map.get(prefix);
+            if (answer == null && parent != null) {
+                return parent.getNamespaceURI(prefix);
+            }
+            return answer;
+        }
+
+        public String getPrefix(String namespaceURI) {
+            for (Iterator iter = map.entrySet().iterator(); iter.hasNext();) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                if (namespaceURI.equals(entry.getValue())) {
+                    return (String) entry.getKey();
+                }
+            }
+            if (parent != null) {
+                return parent.getPrefix(namespaceURI);
+            }
+            return null;
+        }
+
+        public Iterator getPrefixes(String namespaceURI) {
+            Set<String> set = new HashSet<String>();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (namespaceURI.equals(entry.getValue())) {
+                    set.add(entry.getKey());
+                }
+            }
+            if (parent != null) {
+                Iterator iter = parent.getPrefixes(namespaceURI);
+                while (iter.hasNext()) {
+                    set.add((String)iter.next());
+                }
+            }
+            return set.iterator();
+        }
+    }
+
     
 }

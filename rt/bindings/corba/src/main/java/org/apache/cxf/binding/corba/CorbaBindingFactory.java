@@ -109,4 +109,9 @@ public class CorbaBindingFactory extends AbstractBindingFactory
         uriPrefixes.add("corba");
         return uriPrefixes;
     }
+    
+    public OrbConfig getOrbConfig() {
+        return orbConfig;
+    }
+
 }

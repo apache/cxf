@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.binding.corba.runtime;
 
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -189,7 +191,7 @@ public class CorbaObjectReader {
 
     public Integer readUShort() throws CorbaBindingException {
         try {
-            Integer result = new Integer(stream.read_ushort());
+            int result = stream.read_ushort();
             if (result < 0) {
                 result = (result - Short.MIN_VALUE) - Short.MIN_VALUE;
             }
@@ -212,7 +214,9 @@ public class CorbaObjectReader {
 
     public BigInteger readULong() throws CorbaBindingException {
         try {
-            return new BigInteger(stream.read_ulong() + "");
+            long l = stream.read_ulong();
+            l &= 0xffffffffL;
+            return BigInteger.valueOf(l);
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read unsigned long");
             throw new CorbaBindingException("CorbaObjectReader: readULong MARSHAL exception", ex);
@@ -230,7 +234,16 @@ public class CorbaObjectReader {
 
     public BigInteger readULongLong() throws CorbaBindingException {
         try {
-            return new BigInteger(stream.read_ulonglong() + "");
+            long l = stream.read_ulonglong();
+            if (l < 0) {
+                long l2 = l & 0x7FFFFFFFFFFFFFL;
+                BigInteger i = BigInteger.valueOf(l2);
+                BigInteger i2 = BigInteger.valueOf(0);
+                i2.setBit(63);
+                i = i.or(i2);
+                return i;
+            }
+            return BigInteger.valueOf(l);
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read unsigned long long");
             throw new CorbaBindingException("CorbaObjectReader: readULongLong MARSHAL exception", ex);
@@ -384,11 +397,96 @@ public class CorbaObjectReader {
         CorbaArrayHandler arrayObj = (CorbaArrayHandler)obj;
         List<CorbaObjectHandler> arrayElements = arrayObj.getElements();
 
-        for (int i = 0; i < arrayElements.size(); ++i) {
-            this.read(arrayElements.get(i));
+        Object val = null;
+        int arraySize = arrayElements.size();
+        if (arraySize > 0) {
+            switch(arrayElements.get(0).getTypeCodeKind().value()) {
+            case TCKind._tk_boolean: {
+                boolean[] values = new boolean[arraySize];
+                stream.read_boolean_array(values, 0, arraySize); 
+                val = values;
+                break;
+            }
+            case TCKind._tk_char: {
+                char[] values = new char[arraySize];
+                stream.read_char_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_wchar: {
+                char[] values = new char[arraySize];
+                stream.read_wchar_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_octet: {
+                byte[] values = new byte[arraySize];
+                stream.read_octet_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_short: {
+                short[] values = new short[arraySize];
+                stream.read_short_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_ushort: {
+                short[] values = new short[arraySize];
+                stream.read_ushort_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_long: {
+                int[] values = new int[arraySize];
+                stream.read_long_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_ulong: {
+                int[] values = new int[arraySize];
+                stream.read_ulong_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_longlong: {
+                long[] values = new long[arraySize];
+                stream.read_longlong_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_ulonglong: {
+                long[] values = new long[arraySize];
+                stream.read_ulonglong_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_float: {
+                float[] values = new float[arraySize];
+                stream.read_float_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            case TCKind._tk_double: {
+                double[] values = new double[arraySize];
+                stream.read_double_array(values, 0, arraySize);
+                val = values;
+                break;
+            }
+            default:
+                for (int i = 0; i < arrayElements.size(); ++i) {
+                    this.read(arrayElements.get(i));
+                }
+            }
+            if (val != null) {
+                int sz = Array.getLength(val);
+                for (int i = 0; i < sz; i++) {
+                    ((CorbaPrimitiveHandler)arrayElements.get(i)).setValue(Array.get(val, i));
+                }
+            }
         }
     }
-
+    
     public void readSequence(CorbaObjectHandler obj) throws CorbaBindingException {
         if (obj instanceof CorbaOctetSequenceHandler) {
             int length = stream.read_ulong();
@@ -405,7 +503,6 @@ public class CorbaObjectReader {
             // existance of template, which will be present for all unbounded sequences and for bound
             // sequences with recursive type elements.  Use the template element to construct each
             // object that is in the input stream.
-            //if (bound == 0) {
             if (sequenceObj.getTemplateElement() != null) {
                 sequenceObj.clear();
                 CorbaObjectHandler template = sequenceObj.getTemplateElement();

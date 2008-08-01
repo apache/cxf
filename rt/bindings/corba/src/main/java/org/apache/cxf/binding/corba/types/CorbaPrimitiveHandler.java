@@ -191,7 +191,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             obj = new Character(data.charAt(0));
             break;
         case TCKind._tk_octet:
-            obj = new Byte(data);
+            obj = new Short(data).byteValue();
             break;
         case TCKind._tk_short:
             obj = new Short(data);

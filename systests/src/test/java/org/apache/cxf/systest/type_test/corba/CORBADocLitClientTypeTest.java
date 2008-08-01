@@ -45,7 +45,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     private static final Set<String> NOT_RUN_TESTS = new HashSet<String>();
     static {
         String working[] = new String[] {
-            "InheritanceEmptyAllDerivedEmpty",
+            //"InheritanceEmptyAllDerivedEmpty",
             "DerivedEmptyBaseEmptyAll",
             "DerivedEmptyBaseEmptyChoice",
             "MultipleOccursSequenceInSequence",
@@ -68,7 +68,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
             "Short",
             "UnsignedShort",
             "Int",
-            //"UnsignedInt",
+            "UnsignedInt",
             "Long",
             "UnsignedLong",
             "Float",
@@ -122,11 +122,11 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
     }
     @AfterClass
-    public static void printNotRun() throws Exception {
+    public static void deleteRefFile() throws Exception {
         File file = new File("./TypeTest.ref");
         file.delete();
         //for (String s : NOT_RUN_TESTS) {
-            //System.out.println(s);
+        //    System.out.println(s);
         //}
     }
 
@@ -134,6 +134,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         if (!WORKING_TESTS.contains(name)) {
             NOT_RUN_TESTS.add(name);
             return false;
+            //return true;
         }
         return true;
     }

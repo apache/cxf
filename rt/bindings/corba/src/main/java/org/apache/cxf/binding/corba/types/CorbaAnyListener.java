@@ -19,9 +19,6 @@
 
 package org.apache.cxf.binding.corba.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaTypeMap;
@@ -38,7 +35,6 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
     private ServiceInfo serviceInfo;
     private CorbaTypeListener currentTypeListener;
     private QName containedType;
-    private Map<String, String> namespaceMap;
 
     public CorbaAnyListener(CorbaObjectHandler h,
                             CorbaTypeMap map,
@@ -48,8 +44,6 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
         orb = orbRef;
         typeMap = map;
         serviceInfo = info;
-
-        namespaceMap = new HashMap<String, String>();
     }
 
     public void processStartElement(QName name) {
@@ -62,6 +56,7 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
                                                                     orb,
                                                                     serviceInfo);
 
+            currentTypeListener.setNamespaceContext(ctx);
             CorbaAnyHandler anyHandler = (CorbaAnyHandler)handler;
             // We need an any during the write.  Since we don't have the orb in the writer, create
             // the any here and use it later.
@@ -92,6 +87,7 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
                                                                                     typeMap,
                                                                                     orb,
                                                                                     serviceInfo);
+            primitiveListener.setNamespaceContext(ctx);
             primitiveListener.processCharacters(text);
 
             CorbaObjectHandler obj = primitiveListener.getCorbaObject();
@@ -111,7 +107,7 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
             int index = value.lastIndexOf(':');
             if (index != -1) {
                 String pfx = value.substring(0, index);
-                String ns = namespaceMap.get(pfx);
+                String ns = ctx.getNamespaceURI(pfx);
                 containedType = new QName(ns, value.substring(index + 1), pfx);
             } else {
                 containedType = new QName(value);
@@ -119,9 +115,6 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
         }
     }
 
-    public void processWriteNamespace(String prefix, String namespaceURI) {
-        namespaceMap.put(prefix, namespaceURI);
-    }
 
     private QName convertSchemaToIdlType(QName schemaType) {
         QName idlType = null;

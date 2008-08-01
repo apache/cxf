@@ -2168,5 +2168,9 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         assertNotNull("testInheritanceEmptyAllDerivedEmpty()", y.value);
         assertNotNull("testInheritanceEmptyAllDerivedEmpty()", z.value);
         assertNotNull("testInheritanceEmptyAllDerivedEmpty()", ret);
+        
+        assertTrue(y.value.getClass().getName(), y.value instanceof DerivedEmptyBaseEmptyAll);
+        assertTrue(z.value.getClass().getName(), z.value instanceof DerivedEmptyBaseEmptyAll);
+        assertTrue(ret.getClass().getName(), ret instanceof DerivedEmptyBaseEmptyAll);
     }
 }

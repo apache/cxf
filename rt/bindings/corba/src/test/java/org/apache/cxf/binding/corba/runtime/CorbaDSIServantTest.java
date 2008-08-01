@@ -27,14 +27,15 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.corba.CorbaDestination;
+import org.apache.cxf.binding.corba.TestUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver; 
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.omg.CORBA.Context;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ServerRequest;
 
@@ -98,26 +99,31 @@ public class CorbaDSIServantTest extends Assert {
         
     @Test
     public void testInvoke() throws Exception {
-        CorbaDSIServant dsiServant = new CorbaDSIServant();       
-        IMocksControl control = EasyMock.createNiceControl();
-        ServerRequest request = EasyMock.createMock(ServerRequest.class);
-        String opName = "greetMe";
-        EasyMock.expect(request.operation()).andReturn(opName);
+        
+        CorbaDestination dest = new TestUtils().getComplexTypesTestDestination();
+
+        
+        CorbaDSIServant dsiServant = new CorbaDSIServant();
+        dsiServant.init(orb, null, dest, null);
+        ServerRequest request = new ServerRequest() {
+            public String operation() {
+                return "greetMe";
+            }
+            public Context ctx() {
+                return null;
+            }
+            
+        };
+        
         MessageObserver incomingObserver = new TestObserver();               
         dsiServant.setObserver(incomingObserver);
         
         Map<String, QName> map = new HashMap<String, QName>(2);
-        // REVISIT: Something is not setup quite right with this test.  In 
-        // the DSI Servant, we don't get the expected request operation name
-        // that we set above.  Instead, we get a null value.  For now, just 
-        // add null to the operation map until we know how to fix the test.
+
         map.put("greetMe", new QName("greetMe"));
-        map.put(null, new QName("greetMe"));
         dsiServant.setOperationMapping(map);
         
-        control.replay();
         dsiServant.invoke(request);
-        control.verify();        
     }
         
     class TestObserver implements MessageObserver {
