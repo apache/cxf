@@ -26,6 +26,8 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.addressing.AddressingBuilder;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
@@ -39,31 +41,37 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PRO
 
 
 public final class Client {
-    
-    private static final QName SERVICE_NAME = 
+
+    private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPService");
-    private static final ObjectFactory WSA_OBJECT_FACTORY = 
+    private static final ObjectFactory WSA_OBJECT_FACTORY =
         new ObjectFactory();
     private static final String USER_NAME = System.getProperty("user.name");
 
 
     private Client() {
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
-        if (args.length == 0) { 
+        if (args.length == 0) {
             System.out.println("please specify wsdl");
-            System.exit(1); 
+            System.exit(1);
         }
-        
+
         try {
-            URL wsdlURL; 
+            URL wsdlURL;
             File wsdlFile = new File(args[0]);
             if (wsdlFile.exists()) {
                 wsdlURL = wsdlFile.toURL();
             } else {
                 wsdlURL = new URL(args[0]);
             }
+
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = Client.class.getResource("client.xml");
+            Bus bus = bf.createBus(busFile.toString());
+            bf.setDefaultBus(bus);
+
 
             SOAPService service = new SOAPService(wsdlURL, SERVICE_NAME);
             Greeter port = service.getSoapPort();
@@ -74,12 +82,12 @@ public final class Client {
 
             implicitPropagation(port);
 
-        } catch (UndeclaredThrowableException ex) { 
+        } catch (UndeclaredThrowableException ex) {
             ex.getUndeclaredThrowable().printStackTrace();
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }  finally { 
-            System.exit(0); 
+        }  finally {
+            System.exit(0);
         }
     }
 
@@ -126,7 +134,7 @@ public final class Client {
         AddressingProperties maps = builder.newAddressingProperties();
 
         // set MessageID property
-        AttributedURIType messageID = 
+        AttributedURIType messageID =
             WSA_OBJECT_FACTORY.createAttributedURIType();
         messageID.setValue("urn:uuid:" + System.currentTimeMillis());
         maps.setMessageID(messageID);
@@ -140,7 +148,7 @@ public final class Client {
         String resp = port.sayHi();
         System.out.println("Server responded with: " + resp + "\n");
 
-        // clear the message ID to ensure a duplicate is not sent on the 
+        // clear the message ID to ensure a duplicate is not sent on the
         // next invocation
         maps.setMessageID(null);
 

@@ -24,14 +24,11 @@
     <target name="client" description="run demo client" depends="build">
         <cxfrun classname="demo.ws_addressing.client.Client"
                 param1="${basedir}/wsdl/hello_world_addr.wsdl"
-                jvmarg1="-Dcxf.config.file=client.xml"
                 logging-properties-file="./logging.properties"/>
     </target>
 
     <target name="server" description="run demo server" depends="build">
         <cxfrun classname="demo.ws_addressing.server.Server"
-                param1="${basedir}/wsdl/hello_world_addr.wsdl"
-                jvmarg1="-Dcxf.config.file=server.xml"
                 logging-properties-file="./logging.properties"/>
     </target>
 
@@ -48,8 +45,7 @@
 
     <target name="client-servlet" description="run demo client hitting servlet" depends="build">
         <property name="param" value=""/>
-        <cxfrun classname="demo.ws_addressing.client.Client" 
-            jvmarg1="-Dcxf.config.file=client.xml"
+        <cxfrun classname="demo.ws_addressing.client.Client"
             param1="${base.url}/helloworld_wsaddr/services/hello_world?wsdl" 
             param2="${op}" param3="${param}"/>
     </target>
