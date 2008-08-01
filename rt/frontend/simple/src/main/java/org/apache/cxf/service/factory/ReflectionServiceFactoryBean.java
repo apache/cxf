@@ -1123,35 +1123,24 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     addMimeType(el, methodAnnotations);
                 }
 
-                if (mpi.getTypeClass() != null && mpi.getTypeClass().isArray()
-                    && !Byte.TYPE.equals(mpi.getTypeClass().getComponentType())) {
-
-                    String min = (String)mpi.getProperty("minOccurs");
-                    String max = (String)mpi.getProperty("maxOccurs");
-                    min = min == null ? "0" : min;
-                    max = max == null ? "unbounded" : max;
-                    el.setMinOccurs(Long.parseLong(min));
-                    el.setMaxOccurs("unbounded".equals(max) ? Long.MAX_VALUE : Long.parseLong(max));
-                    Boolean b = (Boolean)mpi.getProperty("nillable");
-                    if (b != null && b.booleanValue()) {
-                        el.setNillable(b.booleanValue());
-                    }
-
-                } else if (Collection.class.isAssignableFrom(mpi.getTypeClass())
+                long min = getWrapperPartMinOccurs(mpi);
+                long max = getWrapperPartMaxOccurs(mpi);
+                boolean nillable = isWrapperPartNillable(mpi);
+                
+                if (Collection.class.isAssignableFrom(mpi.getTypeClass())
                            && mpi.getTypeClass().isInterface()) {
                     Type type = (Type)mpi.getProperty(GENERIC_TYPE);
 
                     if (!(type instanceof java.lang.reflect.ParameterizedType)
                         && el.getSchemaTypeName() == null && el.getSchemaType() == null) {
-                        el.setMinOccurs(0);
-                        el.setMaxOccurs(Long.MAX_VALUE);
+                        max = Long.MAX_VALUE;
                         el.setSchemaTypeName(Constants.XSD_ANYTYPE);
                     }
-                } else {
-                    el.setMaxOccurs(1);
-                    if (mpi.getTypeClass() != null && !mpi.getTypeClass().isPrimitive()) {
-                        el.setMinOccurs(0);
-                    }
+                }
+                el.setMinOccurs(min);
+                el.setMaxOccurs(max);
+                if (nillable) {
+                    el.setNillable(nillable);
                 }
                 seq.getItems().add(el);
                 mpi.setXmlSchema(el);
@@ -1973,6 +1962,34 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
         }
         return null;
+    }
+    
+    public boolean isWrapperPartNillable(MessagePartInfo mpi) {
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
+            Boolean b = c.isWrapperPartNillable(mpi);
+            if (b != null) {
+                return b;
+            }
+        }
+        return false;
+    }
+    public long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
+            Long b = c.getWrapperPartMaxOccurs(mpi);
+            if (b != null) {
+                return b;
+            }
+        }
+        return 1;
+    }
+    public long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
+            Long b = c.getWrapperPartMinOccurs(mpi);
+            if (b != null) {
+                return b;
+            }
+        }
+        return 1;
     }
 
     protected MethodDispatcher getMethodDispatcher() {

@@ -33,6 +33,7 @@ import org.apache.cxf.common.util.ParamReader;
 import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
@@ -283,6 +284,32 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
             rawClass = (Class)rawType;
         }
         return rawClass;
+    }
+    
+    
+    public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
+        return (Boolean)mpi.getProperty("nillable");
+    }
+    public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
+        String max = (String)mpi.getProperty("maxOccurs");
+        long maxi = 1;
+        if (max == null) {
+            if (mpi.getTypeClass() != null && mpi.getTypeClass().isArray()
+                && !Byte.TYPE.equals(mpi.getTypeClass().getComponentType())) {
+                maxi = Long.MAX_VALUE;
+            }
+        } else {
+            maxi = "unbounded".equals(max) ? Long.MAX_VALUE : Long.parseLong(max);
+        }
+        return maxi;
+    }
+    public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+        String min = (String)mpi.getProperty("minOccurs");
+        long mini = 1;
+        if (min == null && mpi.getTypeClass() != null && !mpi.getTypeClass().isPrimitive()) {
+            mini = 0;
+        }
+        return mini;
     }
 
     

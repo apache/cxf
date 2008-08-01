@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public abstract class AbstractServiceConfiguration {
@@ -185,6 +186,17 @@ public abstract class AbstractServiceConfiguration {
     }
     
     public Type getHolderType(Class<?> cls, Type type) {
+        return null;
+    }
+    
+    public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
+        return null;
+    }
+    public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
+        //return Long.MAX_VALUE for unbounded
+        return null;
+    }
+    public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
         return null;
     }
 }
