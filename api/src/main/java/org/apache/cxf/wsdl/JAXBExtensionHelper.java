@@ -40,14 +40,18 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchema;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 /**
@@ -60,9 +64,17 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
 
     JAXBContext context;
     final Class<? extends TExtensibilityElementImpl> typeClass;
+    final String namespace;
+    String jaxbNamespace;
       
-    public JAXBExtensionHelper(Class<? extends TExtensibilityElementImpl> cls) {
+    public JAXBExtensionHelper(Class<? extends TExtensibilityElementImpl> cls,
+                               String ns) {
         typeClass = cls;
+        namespace = ns;
+    }
+    
+    void setJaxbNamespace(String ns) {
+        jaxbNamespace = ns;
     }
     
     public static void addExtensions(ExtensionRegistry registry, String parentType, String elementType,
@@ -71,14 +83,21 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
 
         Class<? extends TExtensibilityElementImpl> elementTypeClass = Class.forName(elementType, true, cl)
             .asSubclass(TExtensibilityElementImpl.class);
-        addExtensions(registry, parentTypeClass, elementTypeClass);
+        addExtensions(registry, parentTypeClass, elementTypeClass, null);
     }
     
     public static void addExtensions(ExtensionRegistry registry,
                                      Class<?> parentType,
-                                     Class<? extends TExtensibilityElementImpl> cls) throws JAXBException {
+                                     Class<? extends TExtensibilityElementImpl> cls)
+        throws JAXBException {
+        addExtensions(registry, parentType, cls, null);
+    }
+    public static void addExtensions(ExtensionRegistry registry,
+                                     Class<?> parentType,
+                                     Class<? extends TExtensibilityElementImpl> cls,
+                                     String namespace) throws JAXBException {
         
-        JAXBExtensionHelper helper = new JAXBExtensionHelper(cls);
+        JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);
         boolean found = false;
         try {
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
@@ -90,7 +109,12 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     
                     XmlElementDecl elementDecl = method.getAnnotation(XmlElementDecl.class);
                     if (null != elementDecl) {
-                        QName elementType = new QName(elementDecl.namespace(), elementDecl.name());
+                        String name = elementDecl.name();
+                        String ns = namespace != null ? namespace : elementDecl.namespace();
+                        if (namespace != null) {
+                            helper.setJaxbNamespace(elementDecl.namespace());
+                        }
+                        QName elementType = new QName(ns, name);
                         registry.registerDeserializer(parentType, elementType, helper); 
                         registry.registerSerializer(parentType, elementType, helper);                         
                         registry.mapExtensionTypes(parentType, elementType, cls);
@@ -119,6 +143,10 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     }
                 }
                 if (!StringUtils.isEmpty(ns) && !StringUtils.isEmpty(name)) {
+                    if (namespace != null) {
+                        helper.setJaxbNamespace(ns);
+                        ns = namespace;
+                    }
                     QName elementType = new QName(ns, name);
                     registry.registerDeserializer(parentType, elementType, helper); 
                     registry.registerSerializer(parentType, elementType, helper);                         
@@ -229,7 +257,14 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         try {
             Unmarshaller u = getJAXBContext().createUnmarshaller();
         
-            Object o = u.unmarshal(element);
+            Object o = null;
+            if (namespace == null) {
+                o = u.unmarshal(element);
+            } else {
+                XMLStreamReader reader = StaxUtils.createXMLStreamReader(element);
+                reader = new MappingReaderDelegate(reader);
+                o = u.unmarshal(reader);
+            }
             if (o instanceof JAXBElement<?>) {
                 JAXBElement<?> el = (JAXBElement<?>)o;
                 o = el.getValue();
@@ -250,7 +285,76 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     
 
 
-    
+    class MappingReaderDelegate extends StreamReaderDelegate {
+        MappingReaderDelegate(XMLStreamReader reader) {
+            super(reader);
+        }
+        
+        @Override
+        public NamespaceContext getNamespaceContext() {
+            final NamespaceContext ctx = super.getNamespaceContext();
+            return new NamespaceContext() {
+                public String getNamespaceURI(String prefix) {
+                    String ns = ctx.getNamespaceURI(prefix);
+                    if (namespace.equals(ns)) {
+                        ns = jaxbNamespace;
+                    }                        
+                    return ns;
+                }
+
+                public String getPrefix(String namespaceURI) {
+                    if (jaxbNamespace.equals(namespaceURI)) {
+                        return ctx.getPrefix(namespace);
+                    }
+                    return ctx.getPrefix(namespaceURI);
+                }
+
+                public Iterator getPrefixes(String namespaceURI) {
+                    if (jaxbNamespace.equals(namespaceURI)) {
+                        return ctx.getPrefixes(namespace);
+                    }
+                    return ctx.getPrefixes(namespaceURI);
+                }
+            };
+        }
+
+        @Override
+        public String getNamespaceURI(int index) {
+            String ns = super.getNamespaceURI(index);
+            if (namespace.equals(ns)) {
+                ns = jaxbNamespace;
+            }                        
+            return ns;                     
+        }
+
+        @Override
+        public String getNamespaceURI(String prefix) {
+            String ns = super.getNamespaceURI(prefix);
+            if (namespace.equals(ns)) {
+                ns = jaxbNamespace;
+            }                        
+            return ns;
+        }
+
+        @Override
+        public QName getName() {
+            QName qn = super.getName();
+            if (namespace.equals(qn.getNamespaceURI())) {
+                qn = new QName(jaxbNamespace, qn.getLocalPart());
+            }
+            return qn;
+        }
+
+        @Override
+        public String getNamespaceURI() {
+            String ns = super.getNamespaceURI();
+            if (namespace.equals(ns)) {
+                ns = jaxbNamespace;
+            }                        
+            return ns; 
+        }
+        
+    };
     
 
 }

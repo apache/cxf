@@ -73,6 +73,14 @@ public class TestUtils {
                                                      "ComplexTypesCORBAPort");
         CorbaBindingFactory corbaBF = (CorbaBindingFactory)factory;        
         return (CorbaDestination)corbaBF.getDestination(endpointInfo);
-    }        
+    }
+    public CorbaDestination getComplexTypesTestDestinationYoko() throws Exception {
+        endpointInfo = setupServiceInfo("http://cxf.apache.org/bindings/corba/ComplexTypes",
+                                                     "/wsdl_corbabinding/ComplexTypesYoko.wsdl",
+                                                     "ComplexTypesCORBAService",
+                                                     "ComplexTypesCORBAPort");
+        CorbaBindingFactory corbaBF = (CorbaBindingFactory)factory;        
+        return (CorbaDestination)corbaBF.getDestination(endpointInfo);
+    }
 
 }

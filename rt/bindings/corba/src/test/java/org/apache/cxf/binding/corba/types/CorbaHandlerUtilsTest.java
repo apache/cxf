@@ -70,13 +70,16 @@ public class CorbaHandlerUtilsTest extends Assert {
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
         
-        TestUtils testUtils = new TestUtils();
-        //CorbaDestination destination = (CorbaDestination)getDestination();
-        CorbaDestination destination = testUtils.getComplexTypesTestDestination();
+        CorbaDestination destination = getDestination();
         service = destination.getBindingInfo().getService();
         List<TypeMappingType> corbaTypes 
             = service.getDescription().getExtensors(TypeMappingType.class);        
         typeMap = CorbaUtils.createCorbaTypeMap(corbaTypes);
+    }
+    
+    protected CorbaDestination getDestination() throws Exception {
+        TestUtils testUtils = new TestUtils();
+        return testUtils.getComplexTypesTestDestination();
     }
     
     @After
@@ -90,27 +93,7 @@ public class CorbaHandlerUtilsTest extends Assert {
             }
         } 
     }
-            
-    /*protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {        
-        URL wsdlUrl = getClass().getResource(wsdl);
-        assertNotNull(wsdlUrl);
-        WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlUrl, new QName(ns, serviceName));
 
-        Service service = factory.create();        
-        endpointInfo = service.getEndpointInfo(new QName(ns, portName));
-   
-    }
-    
-    public Destination getDestination() throws Exception {    
-        setupServiceInfo("http://cxf.apache.org/bindings/corba/ComplexTypes", 
-                         "/wsdl/ComplexTypes.wsdl", 
-                         "ComplexTypesCORBAService", 
-                         "ComplexTypesCORBAPort");
-        CorbaBindingFactory corbaBF = (CorbaBindingFactory)factory;
-        Destination destination = corbaBF.getDestination(endpointInfo);
-        assertNotNull(destination);
-        return destination;
-    }*/
     
     @Test
     public void testCreateTypeHandler() {

@@ -131,7 +131,7 @@ public class JAXBExtensionHelperTest extends Assert {
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        JAXBExtensionHelper helper = new JAXBExtensionHelper(NewServiceType.class);
+        JAXBExtensionHelper helper = new JAXBExtensionHelper(NewServiceType.class, null);
         helper.marshall(javax.wsdl.Definition.class,
                         new QName("http://cxf.apache.org/test/hello_world", "newService"),
                         newService,

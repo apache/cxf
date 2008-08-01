@@ -21,6 +21,7 @@
 
     <extension class="org.apache.cxf.binding.corba.CorbaBindingFactory" deferred="true">
         <namespace>http://cxf.apache.org/bindings/corba</namespace>
+        <namespace>http://schemas.apache.org/yoko/bindings/corba</namespace>
     </extension>
 
 </extensions>
