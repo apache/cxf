@@ -25,4 +25,8 @@ public class EchoImpl implements Echo {
         textAgain.value = "header2";
         return text;
     }
+
+    public String simpleEcho(String text) {
+        return text;
+    }
 }

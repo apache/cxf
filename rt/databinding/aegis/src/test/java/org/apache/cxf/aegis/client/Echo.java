@@ -28,4 +28,6 @@ public interface Echo {
     String echo(String text,
                 @WebParam(mode = Mode.OUT)
                 Holder<String> textAgain);
+    
+    String simpleEcho(String text);
 }

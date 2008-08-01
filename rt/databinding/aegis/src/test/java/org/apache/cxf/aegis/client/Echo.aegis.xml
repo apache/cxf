@@ -3,5 +3,8 @@
     <method name="echo" xmlns:e="urn:echo:header">
       <parameter index="1" componentType="java.lang.String"/>
     </method>
+    <method name="simpleEcho" xmlns:e="urn:echo:header">
+      <parameter index="0" mappedName="e:narcissus" />
+    </method>
   </mapping>
 </mappings>
