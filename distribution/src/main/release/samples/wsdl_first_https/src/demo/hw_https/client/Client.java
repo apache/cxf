@@ -61,9 +61,9 @@ public final class Client {
         } else if ("insecure".equals(args[1])) {
             busFile = Client.class.getResource("InsecureClient.xml");
         } else {
-			System.out.println("arg1 needs to be either secure or insecure");
-			System.exit(1);
-		}
+            System.out.println("arg1 needs to be either secure or insecure");
+            System.exit(1);
+        }
         Bus bus = bf.createBus(busFile.toString());
         bf.setDefaultBus(bus);
 
