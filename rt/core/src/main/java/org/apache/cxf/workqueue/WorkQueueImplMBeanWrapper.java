@@ -27,12 +27,12 @@ import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedAttribute;
 import org.apache.cxf.management.annotation.ManagedResource;
 
-@ManagedResource(componentName = "WorkQueueManager", 
-                 description = "The CXF manangement of work queues", 
+@ManagedResource(componentName = "WorkQueue", 
+                 description = "The CXF work queue", 
                  currencyTimeLimit = 15, persistPolicy = "OnUpdate", persistPeriod = 200)
                  
 public class WorkQueueImplMBeanWrapper implements ManagedComponent {    
-    private static final String TYPE_VALUE = "WorkQueueMBean";
+    private static final String TYPE_VALUE = "WorkQueues";
     
     private AutomaticWorkQueueImpl aWorkQueue;
     

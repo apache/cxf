@@ -43,6 +43,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -137,36 +138,10 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             usingDefault = true;
         }
         for (String cfgFile : cfgFiles) {
-            boolean found = false;
-            Resource cpr = new ClassPathResource(cfgFile);
-            if (!cpr.exists()) {
-                try {
-                    //see if it's a URL
-                    URL url = new URL(cfgFile);
-                    cpr = new UrlResource(url);
-                    if (cpr.exists()) {
-                        resources.add(cpr);
-                        found = true;
-                    }
-                } catch (MalformedURLException e) {
-                    //ignore
-                }
-                if (!found) {
-                    //try loading it our way
-                    URL url = ClassLoaderUtils.getResource(cfgFile, this.getClass());
-                    if (url != null) {
-                        cpr = new UrlResource(url);
-                        if (cpr.exists()) {
-                            resources.add(cpr);
-                            found = true;
-                        }
-                    }
-                }
-            } else {
+            Resource cpr = findResource(cfgFile);
+            if (cpr != null && cpr.exists()) {
                 resources.add(cpr);
-                found = true;
-            }
-            if (!found) {
+            } else {
                 if (!usingDefault) {
                     LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_NOT_FOUND_MSG", cfgFile);
                 } else {
@@ -210,6 +185,36 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         Resource[] res = new Resource[resources.size()];
         res = resources.toArray(res);
         return res;
+    }
+    
+    protected Resource findResource(String cfgFile) {
+        Resource cpr = new ClassPathResource(cfgFile);
+        if (cpr.exists()) {
+            return cpr;
+        }
+        try {
+            //see if it's a URL
+            URL url = new URL(cfgFile);
+            cpr = new UrlResource(url);
+            if (cpr.exists()) {
+                return cpr;
+            }
+        } catch (MalformedURLException e) {
+            //ignore
+        }
+        //try loading it our way
+        URL url = ClassLoaderUtils.getResource(cfgFile, this.getClass());
+        if (url != null) {
+            cpr = new UrlResource(url);
+            if (cpr.exists()) {
+                return cpr;
+            }
+        }
+        cpr = new FileSystemResource(cfgFile);
+        if (cpr.exists()) {
+            return cpr;
+        }
+        return null;
     }
     
     @Override

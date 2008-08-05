@@ -34,7 +34,7 @@ import org.apache.cxf.management.annotation.ManagedResource;
                  
 public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {    
     static final String NAME_VALUE = "Bus.WorkQueueManager";
-    static final String TYPE_VALUE = "WorkQueueManagerMBean";
+    static final String TYPE_VALUE = "WorkQueueManager";
     
     private WorkQueueManagerImpl wqManager;
     private Bus bus;
@@ -55,10 +55,9 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
         StringBuffer buffer = new StringBuffer();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
         buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
-        buffer.append(ManagementConstants.TYPE_PROP + "=" + TYPE_VALUE + ",");
-        buffer.append(ManagementConstants.NAME_PROP + "=" + NAME_VALUE);
+        buffer.append("WorkQueueManager=" + NAME_VALUE);
+        buffer.append("," + ManagementConstants.TYPE_PROP + "=" + TYPE_VALUE);
 
-       
         //Use default domain name of server
         return new ObjectName(buffer.toString());
     }

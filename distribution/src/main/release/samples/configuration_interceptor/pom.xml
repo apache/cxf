@@ -76,6 +76,7 @@
                                 <configuration>
                                     <executable>java</executable>
                                     <arguments>
+				        <argument>-Dcxf.config.file=${basedir}/src/demo/stream/server/server.xml</argument>
                                         <argument>-classpath</argument>
                                         <classpath/>
                                         <argument>demo.stream.server.Server</argument>

@@ -71,7 +71,7 @@ public class InstrumentationManagerTest extends Assert {
         MBeanServer mbs = im.getMBeanServer();
         assertNotNull("MBeanServer should be available.", mbs);
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-                                         + ":type=WorkQueueMBean,*");
+                                         + ":type=WorkQueues,*");
         Set s = mbs.queryNames(name, null);
         assertTrue(s.size() == 1);
         Iterator it = s.iterator();

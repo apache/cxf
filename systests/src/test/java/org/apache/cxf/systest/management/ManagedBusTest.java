@@ -70,7 +70,7 @@ public class ManagedBusTest extends Assert {
                 
         MBeanServer mbs = im.getMBeanServer();      
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-                                         + ":type=WorkQueueManagerMBean,*");
+                                         + ":type=WorkQueueManager,*");
         Set s = mbs.queryNames(name, null);
         StringBuilder b = new StringBuilder();
         for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
@@ -83,7 +83,7 @@ public class ManagedBusTest extends Assert {
         manager.getAutomaticWorkQueue();
 
         name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-                             + ":type=WorkQueueMBean,*");
+                             + ":type=WorkQueues,*");
         s = mbs.queryNames(name, null);
         b = new StringBuilder();
         for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
