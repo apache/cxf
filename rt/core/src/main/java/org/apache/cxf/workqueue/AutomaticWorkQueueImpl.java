@@ -19,33 +19,58 @@
 
 package org.apache.cxf.workqueue;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.management.JMException;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.management.InstrumentationManager;
 
 public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements AutomaticWorkQueue {
 
-    static final int DEFAULT_MAX_QUEUE_SIZE = 128;
+    static final int DEFAULT_MAX_QUEUE_SIZE = 256;
     private static final Logger LOG =
         LogUtils.getL7dLogger(AutomaticWorkQueueImpl.class);
     
     int maxQueueSize;
+    
+    WorkQueueManagerImpl manager;
+    String name = "default";
+    
 
-    AutomaticWorkQueueImpl(int mqs, int initialThreads, int highWaterMark, int lowWaterMark,
-                           long dequeueTimeout) {
+    public AutomaticWorkQueueImpl() {
+        this(DEFAULT_MAX_QUEUE_SIZE);
+    }    
+    public AutomaticWorkQueueImpl(int max) {
+        this(max,
+             0,
+             25,
+             5,
+             2 * 60 * 1000L);
+    }
+    
+    public AutomaticWorkQueueImpl(int mqs, 
+                                  int initialThreads, 
+                                  int highWaterMark, 
+                                  int lowWaterMark,
+                                  long dequeueTimeout) {
         
         super(-1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark, 
             -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark,
                 TimeUnit.MILLISECONDS.toMillis(dequeueTimeout), TimeUnit.MILLISECONDS, 
-                mqs == -1 ? new ArrayBlockingQueue<Runnable>(DEFAULT_MAX_QUEUE_SIZE)
-                    : new ArrayBlockingQueue<Runnable>(mqs));
+                mqs == -1 ? new LinkedBlockingQueue<Runnable>(DEFAULT_MAX_QUEUE_SIZE)
+                    : new LinkedBlockingQueue<Runnable>(mqs));
         
         maxQueueSize = mqs == -1 ? DEFAULT_MAX_QUEUE_SIZE : mqs;
+        
+        
         lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         highWaterMark = -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark;
                 
@@ -74,7 +99,36 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
             setCorePoolSize(lowWaterMark);
         }
     }
+    @Resource(name = "org.apache.cxf.workqueue.WorkQueueManager")
+    public void setManager(WorkQueueManagerImpl mgr) {
+        manager = mgr;
+    }
+    public WorkQueueManager getManager() {
+        return manager;
+    }
 
+    public void setName(String s) {
+        name = s;
+    }
+    public String getName() {
+        return name;
+    }
+    
+    @PostConstruct
+    public void register() {
+        if (manager != null) {
+            manager.addNamedWorkQueue(name, this);
+            InstrumentationManager imanager = manager.getBus().getExtension(InstrumentationManager.class);
+            if (null != imanager) {
+                try {
+                    imanager.register(new WorkQueueImplMBeanWrapper(this));
+                } catch (JMException jmex) {
+                    LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                }
+            }
+        }
+    }
+    
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(super.toString());
@@ -136,7 +190,7 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
      * Gets the maximum size (capacity) of the backing queue.
      * @return the maximum size (capacity) of the backing queue.
      */
-    long getMaxSize() {
+    public long getMaxSize() {
         return maxQueueSize;
     }
 
@@ -157,21 +211,21 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         return getQueue().remainingCapacity() == 0;
     }
 
-    int getHighWaterMark() {
+    public int getHighWaterMark() {
         int hwm = getMaximumPoolSize();
         return hwm == Integer.MAX_VALUE ? -1 : hwm;
     }
 
-    int getLowWaterMark() {
+    public int getLowWaterMark() {
         int lwm = getCorePoolSize();
         return lwm == Integer.MAX_VALUE ? -1 : lwm;
     }
 
-    void setHighWaterMark(int hwm) {
+    public void setHighWaterMark(int hwm) {
         setMaximumPoolSize(hwm < 0 ? Integer.MAX_VALUE : hwm);
     }
 
-    void setLowWaterMark(int lwm) {
+    public void setLowWaterMark(int lwm) {
         setCorePoolSize(lwm < 0 ? 0 : lwm);
     }
 }

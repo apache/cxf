@@ -80,7 +80,7 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
     
     @AfterClass
     public static void shutdownBus() throws Exception {
-        BusFactory.getDefaultBus().shutdown(false);
+        BusFactory.getDefaultBus().shutdown(true);
     }
     
     @Test
@@ -113,7 +113,8 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         
         assertEquals("The Counters are not create yet", 4, cr.getCounters().size());
         Set counterNames = mbs.queryNames(name, null);
-        assertEquals("The Counters are not export to JMX ", 4 + 2 , counterNames.size());
+        assertEquals("The Counters are not export to JMX: " + counterNames, 
+                     4 + 3 , counterNames.size());
        
         ObjectName sayHiCounter =  new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
             + ":operation=\"{http://apache.org/hello_world_soap_http}sayHi\",*"); 
@@ -143,7 +144,7 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("hello");
         assertEquals("The Counters are not create yet", 6, cr.getCounters().size());
         counterNames = mbs.queryNames(name, null);
-        assertEquals("The Counters are not export to JMX ", 6 + 2, counterNames.size());
+        assertEquals("The Counters are not export to JMX ", 6 + 3, counterNames.size());
         
         ObjectName greetMeOneWayCounter =  new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
             + ":operation=\"{http://apache.org/hello_world_soap_http}greetMeOneWay\",*");

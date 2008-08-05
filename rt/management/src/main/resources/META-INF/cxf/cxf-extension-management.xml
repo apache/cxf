@@ -23,7 +23,7 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
         
-    <bean id="org.apache.cxf.management.jmx.InstrumentationManagerImpl"
+    <bean id="org.apache.cxf.management.InstrumentationManager"
 	  class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="false"/>

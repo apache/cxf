@@ -20,9 +20,11 @@
 package org.apache.cxf.bus.spring;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.extension.BusExtension;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -58,6 +60,20 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     private Bus getBus() {
         if (bus == null) {
             bus = (Bus)context.getBean(Bus.DEFAULT_BUS_ID);
+            
+            final ApplicationContext ctx = context;
+            if (bus instanceof CXFBusImpl) {
+                CXFBusImpl b = (CXFBusImpl)bus;
+                b.setExtensionFinder(new CXFBusImpl.ExtensionFinder() {
+                    public <T> T findExtension(Class<T> cls) {
+                        try {
+                            return cls.cast(ctx.getBean(cls.getName(), cls));
+                        } catch (NoSuchBeanDefinitionException ex) {
+                            return null;
+                        }
+                    }
+                });
+            }
         }
         return bus;
     }

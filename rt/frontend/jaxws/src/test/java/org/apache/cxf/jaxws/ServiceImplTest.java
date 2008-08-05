@@ -167,6 +167,9 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     
     @Test
     public void testJAXBCachedOnRepeatGetPort() {
+        System.gc();
+        System.gc();
+        
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
         

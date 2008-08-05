@@ -27,6 +27,7 @@ import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
@@ -66,19 +67,46 @@ public class ManagedBusTest extends Assert {
         assertNotNull(imi.getMBeanServer());
 
         WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
-        manager.getAutomaticWorkQueue();
-        
-        MBeanServer mbs = im.getMBeanServer();        
+                
+        MBeanServer mbs = im.getMBeanServer();      
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-                                         + ":type=WorkQueueMBean,*");
+                                         + ":type=WorkQueueManagerMBean,*");
         Set s = mbs.queryNames(name, null);
-        assertTrue(s.size() == 1);
+        StringBuilder b = new StringBuilder();
+        for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
+            b.append(o.toString());
+            b.append("\n");
+        }
+        assertEquals("Size is wrong: " + b.toString(), 1, s.size());
+        
+        assertNotNull(manager.getNamedWorkQueue("testQueue"));
+        manager.getAutomaticWorkQueue();
+
+        name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+                             + ":type=WorkQueueMBean,*");
+        s = mbs.queryNames(name, null);
+        b = new StringBuilder();
+        for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
+            b.append(o.toString());
+            b.append("\n");
+        }
+        assertEquals("Size is wrong: " + b.toString(), 2, s.size());
+        
         Iterator it = s.iterator();
         while (it.hasNext()) {
             ObjectName n = (ObjectName)it.next();            
             Long result = 
-                (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);            
-            assertEquals(result, Long.valueOf(250));
+                (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
+            assertEquals(result, Long.valueOf(256));                
+
+            Integer hwm = 
+                (Integer)mbs.invoke(n, "getHighWaterMark", new Object[0], new String[0]);
+
+            if (n.toString().contains("testQueue")) {
+                assertEquals(hwm, Integer.valueOf(50));
+            } else {
+                assertEquals(hwm, Integer.valueOf(25));
+            }
         }
 
         name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
@@ -93,6 +121,6 @@ public class ManagedBusTest extends Assert {
             mbs.invoke(n, "shutdown", params, sig);            
         }        
         
-        bus.shutdown(false);
+        bus.shutdown(true);
     }
 }

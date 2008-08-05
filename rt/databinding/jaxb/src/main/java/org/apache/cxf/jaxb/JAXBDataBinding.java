@@ -255,7 +255,6 @@ public final class JAXBDataBinding extends AbstractDataBinding {
             return;
         }
 
-        CachedContextAndSchemas cachedContextAndSchemas = null;
 
         contextClasses = new LinkedHashSet<Class<?>>();
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
@@ -269,35 +268,37 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         }
 
         String tns = service.getName().getNamespaceURI();
+        CachedContextAndSchemas cachedContextAndSchemas = null;
         JAXBContext ctx = null;
         try {
             if (service.getServiceInfos().size() > 0) {
                 tns = service.getServiceInfos().get(0).getInterface().getName().getNamespaceURI();
             }
-            ctx = createJAXBContext(contextClasses, tns);
-            cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(contextClasses);
+            cachedContextAndSchemas = createJAXBContextAndSchemas(contextClasses, tns);
         } catch (JAXBException e1) {
             // load jaxb needed class and try to create jaxb context for more
             // times
             boolean added = addJaxbObjectFactory(e1);
-            while (ctx == null && added) {
+            while (cachedContextAndSchemas == null && added) {
                 try {
-                    synchronized (JAXBCONTEXT_CACHE) {
-                        ctx = JAXBContext.newInstance(contextClasses
-                            .toArray(new Class[contextClasses.size()]), null);
-                        cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
-                        JAXBCONTEXT_CACHE.put(contextClasses, cachedContextAndSchemas);
-                    }
+                    ctx = JAXBContext.newInstance(contextClasses
+                                                  .toArray(new Class[contextClasses.size()]), null);
+                    cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
                 } catch (JAXBException e) {
                     e1 = e;
                     added = addJaxbObjectFactory(e1);
                 }
             }
+
             if (ctx == null) {
                 throw new ServiceConstructionException(e1);
+            } else {
+                synchronized (JAXBCONTEXT_CACHE) {
+                    JAXBCONTEXT_CACHE.put(contextClasses, cachedContextAndSchemas);
+                }                
             }
         }
-
+        ctx = cachedContextAndSchemas.getContext();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "CREATED_JAXB_CONTEXT", new Object[] {ctx, contextClasses});
         }
@@ -404,6 +405,13 @@ public final class JAXBDataBinding extends AbstractDataBinding {
     }
 
     public JAXBContext createJAXBContext(Set<Class<?>> classes, String defaultNs) throws JAXBException {
+        return createJAXBContextAndSchemas(classes, defaultNs).getContext();
+    }
+    
+    public CachedContextAndSchemas createJAXBContextAndSchemas(Set<Class<?>> classes,
+                                                               String defaultNs) 
+        throws JAXBException {
+        
         // add user extra class into jaxb context
         if (extraClass != null && extraClass.length > 0) {
             for (Class clz : extraClass) {
@@ -512,15 +520,17 @@ public final class JAXBDataBinding extends AbstractDataBinding {
 
         CachedContextAndSchemas cachedContextAndSchemas = null;
         synchronized (JAXBCONTEXT_CACHE) {
-            if (!JAXBCONTEXT_CACHE.containsKey(classes)) {
-                JAXBContext ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-                cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
-                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
-            }
             cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
         }
+        if (cachedContextAndSchemas == null) {
+            JAXBContext ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+            cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
+            synchronized (JAXBCONTEXT_CACHE) {
+                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
+            }
+        }
 
-        return cachedContextAndSchemas.getContext();
+        return cachedContextAndSchemas;
     }
 
     private void addToObjectFactoryCache(Package objectFactoryPkg, Class<?> ofactory) {

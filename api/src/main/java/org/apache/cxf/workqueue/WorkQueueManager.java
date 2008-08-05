@@ -20,29 +20,24 @@ package org.apache.cxf.workqueue;
 
 public interface WorkQueueManager {
 
-    enum ThreadingModel {
-        SINGLE_THREADED, MULTI_THREADED
-    };
-
     /**
-     * Get the manager's work queue.
+     * Get the manager's default work queue.
      * @return AutomaticWorkQueue
      */
     AutomaticWorkQueue getAutomaticWorkQueue();
 
     /**
-     * Get the threading model.
-     * @return ThreadingModel - either <code>SINGLE_THREADED</code>
-     * or <code>MULTI_THREADED</code>.
+     * Get the named work queue.
+     * @return AutomaticWorkQueue
      */
-    ThreadingModel getThreadingModel();
-
+    AutomaticWorkQueue getNamedWorkQueue(String name);
+    
     /**
-     * Set the threading model.
-     * @param model either <code>SINGLE_THREADED</code>
-     * or <code>MULTI_THREADED</code>.
+     * Adds a named work queue
+     * @param name
+     * @param q
      */
-    void setThreadingModel(ThreadingModel model);
+    void addNamedWorkQueue(String name, AutomaticWorkQueue q);
     
     /**
      * Shuts down the manager's work queue. If

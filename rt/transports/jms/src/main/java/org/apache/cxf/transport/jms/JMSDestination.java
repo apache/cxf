@@ -41,6 +41,7 @@ import javax.jms.Queue;
 import javax.jms.QueueSender;
 import javax.jms.TextMessage;
 import javax.naming.NamingException;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -114,7 +115,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
             JMSProviderHub.connect(this, serverConfig, runtimePolicy);
             //Get a non-pooled session. 
             listenerSession = base.sessionFactory.get(base.targetDestination);
-            listenerThread = new JMSListenerThread(listenerSession);
+            listenerThread = new JMSListenerThread(listenerSession,
+                                                   getEndpointInfo() == null ? null 
+                                                       : getEndpointInfo().getName());
             listenerThread.start();
         } catch (JMSException ex) {
             getLogger().log(Level.SEVERE, "JMS connect failed with JMSException : ", ex);
@@ -270,13 +273,31 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
     
     protected class JMSListenerThread extends Thread {
         private final PooledSession listenSession;
-
-        public JMSListenerThread(PooledSession session) {
+        private final QName name;
+        public JMSListenerThread(PooledSession session, QName n) {
             listenSession = session;
+            name = n;
         }
 
         public void run() {
             try {
+                Executor executor = null;
+                if (executor == null) {
+                    WorkQueueManager wqm =
+                        base.bus.getExtension(WorkQueueManager.class);
+                    if (null != wqm) {
+                        if (name != null) {
+                            executor = wqm.getNamedWorkQueue("{" + name.getNamespaceURI() + "}" 
+                                                             + name.getLocalPart());
+                        }                        
+                        if (executor == null) {
+                            executor = wqm.getNamedWorkQueue("jms");
+                        }
+                        if (executor == null) {
+                            executor = wqm.getAutomaticWorkQueue();
+                        }
+                    }    
+                }
                 while (true) {
                     javax.jms.Message message = listenSession.consumer().receive();                   
                     if (message == null) {
@@ -288,14 +309,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
                     while (message != null) {
                         //REVISIT  to get the thread pool                        
                         //Executor executor = jmsDestination.callback.getExecutor();
-                        Executor executor = null;
-                        if (executor == null) {
-                            WorkQueueManager wqm =
-                                base.bus.getExtension(WorkQueueManager.class);
-                            if (null != wqm) {
-                                executor = wqm.getAutomaticWorkQueue();
-                            }    
-                        }
                         if (executor != null) {
                             try {
                                 executor.execute(new JMSExecutor(message));

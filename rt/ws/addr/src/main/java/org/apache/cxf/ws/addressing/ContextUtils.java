@@ -488,10 +488,10 @@ public final class ContextUtils {
                 WorkQueueManager workQueueManager =
                     bus.getExtension(WorkQueueManager.class);
                 Executor autoWorkQueue =
-                    workQueueManager.getAutomaticWorkQueue();
+                    workQueueManager.getNamedWorkQueue("ws-addressing");
                 executor = autoWorkQueue != null
                            ? autoWorkQueue
-                           : OneShotAsyncExecutor.getInstance();
+                           :  workQueueManager.getAutomaticWorkQueue();
             } else {
                 executor = OneShotAsyncExecutor.getInstance();
             }

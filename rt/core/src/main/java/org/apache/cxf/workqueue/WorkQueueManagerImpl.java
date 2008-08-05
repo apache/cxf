@@ -19,6 +19,8 @@
 
 package org.apache.cxf.workqueue;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,8 +37,8 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     private static final Logger LOG =
         LogUtils.getL7dLogger(WorkQueueManagerImpl.class);
 
-    ThreadingModel threadingModel = ThreadingModel.MULTI_THREADED;
-    AutomaticWorkQueue autoQueue;
+    Map<String, AutomaticWorkQueue> namedQueues 
+        = new ConcurrentHashMap<String, AutomaticWorkQueue>();
     boolean inShutdown;
     Bus bus;  
     
@@ -53,12 +55,6 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     public void register() {
         if (null != bus) {
             bus.setExtension(this, WorkQueueManager.class);
-        }
-    }
-
-    public synchronized AutomaticWorkQueue getAutomaticWorkQueue() {
-        if (autoQueue == null) {
-            autoQueue = createAutomaticWorkQueue();
             InstrumentationManager manager = bus.getExtension(InstrumentationManager.class);
             if (null != manager) {
                 try {
@@ -68,22 +64,20 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                 }
             }
         }
-        
-        return autoQueue;
     }
 
-    public ThreadingModel getThreadingModel() {
-        return threadingModel;
-    }
-
-    public void setThreadingModel(ThreadingModel model) {
-        threadingModel = model;
+    public synchronized AutomaticWorkQueue getAutomaticWorkQueue() {
+        AutomaticWorkQueue defaultQueue = getNamedWorkQueue("default");
+        if (defaultQueue == null) {
+            defaultQueue = createAutomaticWorkQueue();
+        }
+        return defaultQueue;
     }
 
     public synchronized void shutdown(boolean processRemainingTasks) {
         inShutdown = true;
-        if (autoQueue != null) {
-            autoQueue.shutdown(processRemainingTasks);
+        for (AutomaticWorkQueue q : namedQueues.values()) {
+            q.shutdown(processRemainingTasks);
         }
 
         synchronized (this) {
@@ -100,11 +94,13 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                     // ignore
                 }
             }
-            while (autoQueue != null && !autoQueue.isShutdown()) {
-                try {            
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    // ignore
+            for (AutomaticWorkQueue q : namedQueues.values()) {
+                while (!q.isShutdown()) {
+                    try {            
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        // ignore
+                    }
                 }
             }
         }
@@ -114,27 +110,18 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         
     }
 
-    private AutomaticWorkQueue createAutomaticWorkQueue() {        
-      
-        // Configuration configuration = bus.getConfiguration();
-
-        // configuration.getInteger("threadpool:initial_threads");
-        int initialThreads = 1;
-
-        // int lwm = configuration.getInteger("threadpool:low_water_mark");
-        int lwm = 5;
-
-        // int hwm = configuration.getInteger("threadpool:high_water_mark");
-        int hwm = 25;
-
-        // configuration.getInteger("threadpool:max_queue_size");
-        int maxQueueSize = 10 * hwm;
-
-        // configuration.getInteger("threadpool:dequeue_timeout");
-        long dequeueTimeout = 2 * 60 * 1000L;
-
-        return new AutomaticWorkQueueImpl(maxQueueSize, initialThreads, hwm, lwm, dequeueTimeout);
-               
+    public AutomaticWorkQueue getNamedWorkQueue(String name) {
+        return namedQueues.get(name);
+    }
+    public void addNamedWorkQueue(String name, AutomaticWorkQueue q) {
+        namedQueues.put(name, q);
     }
     
+    private AutomaticWorkQueue createAutomaticWorkQueue() {        
+        AutomaticWorkQueueImpl impl = new AutomaticWorkQueueImpl();
+        impl.setManager(this);
+        impl.register();
+        return impl;       
+    }
+
 }

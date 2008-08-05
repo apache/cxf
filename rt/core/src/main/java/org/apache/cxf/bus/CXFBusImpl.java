@@ -35,6 +35,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     private String id;
     private BusState state;      
     private Collection<AbstractFeature> features;
+    private ExtensionFinder finder;
     
     public CXFBusImpl() {
         this(null);
@@ -57,7 +58,9 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         this.state = state;
     }
     
-
+    public void setExtensionFinder(ExtensionFinder f) {
+        finder = f;
+    }
     
     public void setId(String i) {
         id = i;
@@ -65,6 +68,9 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
 
     public final <T> T getExtension(Class<T> extensionType) {
         Object obj = extensions.get(extensionType);
+        if (obj == null && finder != null) {
+            obj = finder.findExtension(extensionType);
+        }
         if (null != obj) {
             return extensionType.cast(obj);
         }
@@ -126,7 +132,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
             BusFactory.setDefaultBus(null);
         }
     }
-    
+
     protected BusState getState() {
         return state;
     }
@@ -143,4 +149,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         }
     }
     
+    public interface ExtensionFinder {
+        <T> T findExtension(Class<T> cls);
+    }
 }

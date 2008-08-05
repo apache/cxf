@@ -85,7 +85,7 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         testUtilities.rhinoCallInContext("testStateNotificationSync");
         Notifier notifier = testUtilities.rhinoCallConvert("testAsyncHttpFetch1", Notifier.class);
         testUtilities.rhinoCallInContext("testAsyncHttpFetch2");
-        boolean notified = notifier.waitForJavascript(10);
+        boolean notified = notifier.waitForJavascript(100);
         assertTrue(notified);
         assertEquals("HEADERS_RECEIVED", Boolean.TRUE, 
                      testUtilities.rhinoEvaluateConvert("asyncGotHeadersReceived", Boolean.class));
