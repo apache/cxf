@@ -1255,7 +1255,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("neutrophil");
         greeter.greetMeOneWay("basophil");
         greeter.greetMeOneWay("eosinophil");
-        stopGreeter();
+        stopGreeterButNotCloseConduit();
 
         awaitMessages(6, 8);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
@@ -1355,7 +1355,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     }
     
     private void stopGreeter() {
-        if (null != greeterBus) {                       
+        if (null != greeterBus) {
+            
+            //ensure we close the decoupled destination of the conduit,
+            //so that release the port if the destination reference count hit zero
+            ClientProxy.getClient(greeter).getConduit().close();
             greeterBus.shutdown(true);
             greeter = null;
             greeterBus = null;
@@ -1366,6 +1370,15 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         if (null != control) {  
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
             controlBus.shutdown(true);
+        }
+    }
+    
+    private void stopGreeterButNotCloseConduit() {
+        if (null != greeterBus) {
+          
+            greeterBus.shutdown(true);
+            greeter = null;
+            greeterBus = null;
         }
     }
     
