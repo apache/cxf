@@ -108,17 +108,16 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             path = path + "/";
         }
         
-        String acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-        if (acceptTypes == null) {
-            acceptTypes = "*/*";
-        }
-        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
-        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
-        
         
         //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)service).getClassResourceInfos();
+
+        String acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+        if (acceptTypes == null) {
+            acceptTypes = "*/*";
+            message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
+        }
 
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
         ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values);
@@ -128,18 +127,30 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    BUNDLE, 
                                                    path);
             LOG.severe(errorMsg.toString());
+            acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+            List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+            message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+
             throw new WebApplicationException(404);
         }
-        
+
+
         List<ProviderInfo<RequestHandler>> shs = 
             ProviderFactory.getInstance().getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
             Response response = sh.getProvider().handleRequest(message, resource);
             if (response != null) {
                 message.getExchange().put(Response.class, response);
+                acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+                List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+                message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
                 return;
             }
         }
+        
+        acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
         
         message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
         
