@@ -108,6 +108,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             path = path + "/";
         }
         
+        String acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+        if (acceptTypes == null) {
+            acceptTypes = "*/*";
+        }
+        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+        
         
         //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);
@@ -134,13 +141,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         
-        String acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-        if (acceptTypes == null) {
-            acceptTypes = "*/*";
-        }
-        
-        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
-        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
         message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
         
         LOG.fine("Request path is: " + path);
