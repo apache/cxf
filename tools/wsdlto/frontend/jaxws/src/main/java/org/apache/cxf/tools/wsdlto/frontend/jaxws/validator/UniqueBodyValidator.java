@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -84,6 +85,16 @@ public class UniqueBodyValidator extends ServiceValidator {
                     return false;
                 } else {
                     uniqueNames.put(mName, op.getName());
+                }
+            }
+            
+            for (BindingFaultInfo fault : bo.getFaults()) {
+                if (fault.getFaultInfo().getMessageParts().size() > 1) {
+                    Message msg = new Message("FAULT_WITH_MULTIPLE_PARTS", LOG, 
+                                              fault.getFaultInfo().getName()
+                                                  .getLocalPart());
+                    addErrorMessage(msg.toString());
+                    return false;
                 }
             }
         }
