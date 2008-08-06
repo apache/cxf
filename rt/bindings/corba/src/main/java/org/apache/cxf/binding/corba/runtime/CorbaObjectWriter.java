@@ -76,7 +76,7 @@ public class CorbaObjectWriter {
             this.writeLong((Integer)((CorbaPrimitiveHandler)obj).getValue());
             break;
         case TCKind._tk_ulong:
-            this.writeULong((BigInteger)((CorbaPrimitiveHandler)obj).getValue());
+            this.writeULong((Long)((CorbaPrimitiveHandler)obj).getValue());
             break;
         case TCKind._tk_longlong:
             this.writeLongLong((Long)((CorbaPrimitiveHandler)obj).getValue());
@@ -187,7 +187,7 @@ public class CorbaObjectWriter {
         }
     }
 
-    public void writeULong(java.math.BigInteger l) throws CorbaBindingException {
+    public void writeULong(Long l) throws CorbaBindingException {
         if (l == null) {
             stream.write_ulong((int)0);
         } else {

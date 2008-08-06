@@ -72,7 +72,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
                 any.insert_longlong(((Long)value).longValue());
                 break;
             case TCKind._tk_ulong:
-                any.insert_ulong((int)((java.math.BigInteger)value).longValue());
+                any.insert_ulong((int)((Long)value).longValue());
                 break;
             case TCKind._tk_ulonglong:
                 any.insert_ulonglong(((java.math.BigInteger)value).longValue());
@@ -141,6 +141,8 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             data = ((Long)value).toString();
             break;
         case TCKind._tk_ulong:
+            data = ((Long)value).toString();
+            break;
         case TCKind._tk_ulonglong:
             data = ((java.math.BigInteger)value).toString();
             break;
@@ -206,6 +208,8 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             obj = new Long(data);
             break;
         case TCKind._tk_ulong:
+            obj = new Long(data);
+            break;
         case TCKind._tk_ulonglong:
             obj = new java.math.BigInteger(data);
             break;
@@ -269,9 +273,11 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
         case TCKind._tk_longlong:
             data = Long.toString(any.extract_longlong());
             break;
-        case TCKind._tk_ulong:
-            data = Long.toString(any.extract_ulong());
+        case TCKind._tk_ulong: {
+            long l = any.extract_ulong();
+            data = Long.toString(l & 0xFFFFFFFFL);
             break;
+        }
         case TCKind._tk_ulonglong:
             data = java.math.BigInteger.valueOf(any.extract_ulonglong()).toString();
             break;

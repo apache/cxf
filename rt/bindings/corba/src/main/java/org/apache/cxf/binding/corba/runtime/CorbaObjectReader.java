@@ -212,11 +212,11 @@ public class CorbaObjectReader {
         }
     }
 
-    public BigInteger readULong() throws CorbaBindingException {
+    public long readULong() throws CorbaBindingException {
         try {
             long l = stream.read_ulong();
             l &= 0xffffffffL;
-            return BigInteger.valueOf(l);
+            return l;
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read unsigned long");
             throw new CorbaBindingException("CorbaObjectReader: readULong MARSHAL exception", ex);

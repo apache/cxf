@@ -171,8 +171,8 @@ public class CorbaObjectReaderTest extends Assert {
         InputStream iStream = oStream.create_input_stream();
         CorbaObjectReader reader = new CorbaObjectReader(iStream);
         
-        BigInteger ulongValue = reader.readULong();
-        assertTrue(ulongValue.longValue() == 100000);
+        long ulongValue = reader.readULong();
+        assertTrue(ulongValue == 100000);
     }
     
     @Test

@@ -156,12 +156,12 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
         
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        BigInteger ulongValue = new BigInteger("1234567");
+        long ulongValue = 1234567L;
         writer.writeULong(ulongValue);
         
         InputStream iStream = oStream.create_input_stream();
         long ul = iStream.read_ulong();
-        assertTrue(ul == ulongValue.longValue());
+        assertTrue(ul == ulongValue);
     }
     
     @Test
