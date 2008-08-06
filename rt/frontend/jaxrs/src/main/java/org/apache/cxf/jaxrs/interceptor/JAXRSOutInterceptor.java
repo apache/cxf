@@ -196,7 +196,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         List<MediaType> acceptContentTypes = 
             (List<MediaType>)exchange.get(Message.ACCEPT_CONTENT_TYPE);
-        
+        if (acceptContentTypes == null) {
+            acceptContentTypes = JAXRSUtils.sortMediaTypes("*/*");
+        }        
         return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes);
         
     }
