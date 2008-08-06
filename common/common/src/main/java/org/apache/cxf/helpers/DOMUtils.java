@@ -45,6 +45,9 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import org.apache.cxf.common.util.StringUtils;
+
+
 /**
  * Few simple utils to read DOM. This is originally from the Jakarta Commons
  * Modeler.
@@ -54,6 +57,7 @@ import org.xml.sax.SAXException;
 public final class DOMUtils {
     static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
     static DocumentBuilder builder;
+    private static final String XMLNAMESPACE = "xmlns";
 
     private DOMUtils() {
     }
@@ -369,12 +373,7 @@ public final class DOMUtils {
             throw new RuntimeException("Couldn't find a DOM parser.", e);
         }
     }
-
-    public static String getUniquePrefix(Element el, String ns) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
+   
     public static String getPrefixRecursive(Element el, String ns) {
         String prefix = getPrefix(el, ns);
         if (prefix == null && el.getParentNode() instanceof Element) {
@@ -389,7 +388,7 @@ public final class DOMUtils {
             Node node = atts.item(i);
             String name = node.getNodeName();
             if (ns.equals(node.getNodeValue()) 
-                && (name != null && ("xmlns".equals(name) || name.startsWith("xmlns:")))) { 
+                && (name != null && (XMLNAMESPACE.equals(name) || name.startsWith(XMLNAMESPACE + ":")))) { 
                 return node.getPrefix();
             }
         }
@@ -403,26 +402,35 @@ public final class DOMUtils {
             p = "ns" + i;
             i++;
         }
-        el.setAttribute("xmlns:" + p, ns);
+        el.setAttribute(XMLNAMESPACE + ":" + p, ns);
         return p;
     }
 
-    public static String getNamespace(Element el, String pre) {
+    /**
+     * Searches the given element including it's parent elements
+     * for a matching namspace decleration.
+     * @param el element to search for namespace definitions
+     * @param searchPrefix the prefix we are searching for
+     * @return the namespace if found.
+     */
+    public static String getNamespace(Element el, String searchPrefix) {
         NamedNodeMap atts = el.getAttributes();
         for (int i = 0; i < atts.getLength(); i++) {
-            Node node = atts.item(i);
-            String name = node.getLocalName();
-            String pre2 = node.getPrefix();
-            if (pre.equals(name) && "xmlns".equals(pre2)) {
-                return node.getNodeValue();
-            } else if (pre.length() == 0 && "xmlns".equals(name) && pre2.length() == 0) {
-                return node.getNodeValue();
+            Node currentAttribute = atts.item(i);
+            String currentLocalName = currentAttribute.getLocalName();
+            String currentPrefix = currentAttribute.getPrefix();
+            if (searchPrefix.equals(currentLocalName) && XMLNAMESPACE.equals(currentPrefix)) {
+                return currentAttribute.getNodeValue();
+            } else if (StringUtils.isEmpty(searchPrefix)
+                && XMLNAMESPACE.equals(currentLocalName) 
+                && StringUtils.isEmpty(currentPrefix)) {
+                return currentAttribute.getNodeValue();
             }
         }
         
         Node parent = el.getParentNode();
         if (parent instanceof Element) {
-            return getNamespace((Element) parent, pre);
+            return getNamespace((Element) parent, searchPrefix);
         }
         
         return null;
