@@ -202,7 +202,7 @@ public class SoapBindingFactoryTest extends Assert {
         SoapOperationInfo sboi = boi.getExtensor(SoapOperationInfo.class);
         assertNotNull(sboi);
         assertEquals("document", sboi.getStyle());
-        assertEquals("", sboi.getAction());
+        assertEquals("sayHiAction", sboi.getAction());
 
         BindingMessageInfo input = boi.getInput();
         SoapBodyInfo bodyInfo = input.getExtensor(SoapBodyInfo.class);
@@ -216,6 +216,7 @@ public class SoapBindingFactoryTest extends Assert {
         sboi = boi.getExtensor(SoapOperationInfo.class);
         assertNotNull(sboi);
         assertEquals("document", sboi.getStyle());
+        assertEquals("", sboi.getAction());
         Collection<BindingFaultInfo> faults = boi.getFaults();
         assertEquals(1, faults.size());
         BindingFaultInfo faultInfo = boi.getFault(new QName("http://apache.org/hello_world_soap12_http", 

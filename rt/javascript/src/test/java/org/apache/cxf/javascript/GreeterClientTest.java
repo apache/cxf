@@ -47,6 +47,9 @@ public class GreeterClientTest extends JavascriptRhinoTest {
     @Before
     public 
     void before() throws Exception {
+        //something seems to be cached someplace that is screwing up the second test SOMETIMES
+        //make sure the garbage collector cleans up first.
+        System.gc();
         setupRhino("greeter-service-endpoint",  
                    "/org/apache/cxf/javascript/GreeterTests.js",
                    true);

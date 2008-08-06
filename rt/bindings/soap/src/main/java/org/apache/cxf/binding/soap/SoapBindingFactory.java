@@ -49,7 +49,6 @@ import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
-import org.apache.cxf.binding.soap.interceptor.SoapActionOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapHeaderInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapHeaderOutFilterInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
@@ -342,7 +341,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             sb.getInInterceptors().add(new StaxInInterceptor());
             sb.getInInterceptors().add(new SoapActionInInterceptor());
             
-            sb.getOutInterceptors().add(new SoapActionOutInterceptor());
             sb.getOutInterceptors().add(new AttachmentOutInterceptor());
             sb.getOutInterceptors().add(new StaxOutInterceptor());
             sb.getOutInterceptors().add(new SoapHeaderOutFilterInterceptor());

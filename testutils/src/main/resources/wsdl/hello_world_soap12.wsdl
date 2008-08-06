@@ -90,7 +90,7 @@
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
 	<soap12:binding transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" style="document" />
 	<operation name="sayHi">
-	    <soap12:operation style="document" soapAction=""/>
+	    <soap12:operation style="document" soapAction="sayHiAction"/>
 	    <input>
 		<soap12:body use="literal" />
 	    </input>

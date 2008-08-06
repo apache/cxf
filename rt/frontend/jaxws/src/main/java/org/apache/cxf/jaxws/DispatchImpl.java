@@ -56,7 +56,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapBinding;
-import org.apache.cxf.binding.soap.interceptor.SoapActionOutInterceptor;
+import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -281,7 +281,7 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
         }
 
         if (getBinding() instanceof SOAPBinding) {
-            chain.add(new SoapActionOutInterceptor());
+            chain.add(new SoapPreProtocolOutInterceptor());
         }
 
         chain.add(new MessageSenderInterceptor());

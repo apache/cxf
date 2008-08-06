@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.binding.soap.interceptor.SoapActionOutInterceptor;
+import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.ExchangeImpl;
@@ -42,7 +42,7 @@ public class SoapActionInterceptorTest extends Assert {
     
     @Test
     public void testSoapAction() throws Exception {
-        SoapActionOutInterceptor i = new SoapActionOutInterceptor();
+        SoapPreProtocolOutInterceptor i = new SoapPreProtocolOutInterceptor();
         
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
@@ -52,8 +52,9 @@ public class SoapActionInterceptorTest extends Assert {
         assertNotNull(message);
         assertTrue(message instanceof SoapMessage);
         SoapMessage soapMessage = (SoapMessage) message;
+        soapMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         assertEquals(Soap11.getInstance(), soapMessage.getVersion());
-        (new SoapActionOutInterceptor()).handleMessage(soapMessage);
+        (new SoapPreProtocolOutInterceptor()).handleMessage(soapMessage);
         Map<String, List<String>> reqHeaders = CastUtils.cast((Map)soapMessage.get(Message.PROTOCOL_HEADERS));
         assertNotNull(reqHeaders);
         assertEquals("\"\"", reqHeaders.get(SoapBindingConstants.SOAP_ACTION).get(0));
@@ -61,6 +62,7 @@ public class SoapActionInterceptorTest extends Assert {
         sb.setSoapVersion(Soap12.getInstance());
         soapMessage.clear();
         soapMessage = (SoapMessage) sb.createMessage(soapMessage);
+        soapMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         i.handleMessage(soapMessage);
         String ct = (String) message.get(Message.CONTENT_TYPE);
         assertEquals("application/soap+xml", ct);
