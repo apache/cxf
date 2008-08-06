@@ -38,10 +38,12 @@ import ${import};
  * Generated source version: $version
  * 
  */
- 
-/*
+
+#if ($service.classJavaDoc != "")
+/**
  * $service.classJavaDoc
  */
+#end
 
 @WebServiceClient(name = "${service.ServiceName}", 
 #if ($wsdlLocation != "")

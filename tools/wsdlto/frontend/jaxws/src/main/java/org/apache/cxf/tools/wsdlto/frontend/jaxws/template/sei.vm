@@ -14,11 +14,11 @@
 ## KIND, either express or implied. See the License for the
 ## specific language governing permissions and limitations
 ## under the License.
-
-/*
+#if ($intf.packageJavaDoc != "")
+/**
  * $intf.packageJavaDoc
  */
-
+#end
 package $intf.PackageName;
 
 #foreach ($import in $intf.Imports)
@@ -32,22 +32,22 @@ import ${import};
  * 
  */
  
- /*
-  * $intf.classJavaDoc
-  */
-
-
+#if ($intf.classJavaDoc != "")
+/**
+ * $intf.classJavaDoc
+ */
+#end
 #foreach ($annotation in $intf.Annotations)
 $annotation
 #end
-
 public interface $intf.Name {
 #foreach ($method in $intf.Methods)
 
-/*
- * ${method.JavaDoc}
- */
-
+#if ($method.JavaDoc != "")
+    /**
+     * ${method.JavaDoc}
+     */
+#end
 #foreach ($annotation in $method.Annotations)
     $annotation
 #end
