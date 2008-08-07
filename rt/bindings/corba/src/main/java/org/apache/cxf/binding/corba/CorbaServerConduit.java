@@ -109,7 +109,7 @@ public class CorbaServerConduit implements Conduit {
     }
     
     
-    protected void buildRequestResult(CorbaMessage msg) {        
+    public void buildRequestResult(CorbaMessage msg) {        
         Exchange exg = msg.getExchange();        
         ServerRequest request = exg.get(ServerRequest.class);
         try {

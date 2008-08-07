@@ -29,6 +29,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
 
     private static final int UNSIGNED_MAX = 256; 
     private Object value;
+    private String valueAsString;
     private boolean objectSet;
     private Any any;
     
@@ -38,6 +39,9 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
     
     public Object getValue() {
         return value;
+    }
+    public Any getAny() {
+        return any;
     }
     
     public void setIntoAny(Any val, CorbaStreamable stream, boolean output) {
@@ -108,6 +112,9 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
         if (!objectSet && any != null) {
             return getDataFromAny();
         }
+        if (valueAsString != null) {
+            return valueAsString;
+        }
         String data = "";
 
         switch (this.typeCode.kind().value()) {
@@ -169,6 +176,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             // it needs.
             data = value.toString();
         }
+        valueAsString = data;
         return data;
     }
     
@@ -244,6 +252,10 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
     }
     public String getDataFromAny() {
         String data = "";
+        if (valueAsString != null) {
+            return valueAsString;
+        }
+
         switch (this.typeCode.kind().value()) {
         case TCKind._tk_boolean:
             data = any.extract_boolean() ? "true" : "false";
@@ -305,10 +317,13 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             //should not get here
             throw new RuntimeException("Unknown tc: " + this.typeCode);
         }
+        valueAsString = data;
         return data;
     }
     
     public void clear() {
         value = null;
+        objectSet = false;
+        valueAsString = null;
     }
 }

@@ -384,7 +384,7 @@
     <wsdl:service name="BankCORBAService">
         <wsdl:port name="BankCORBAPort" binding="tns:BankCORBABinding">
             <corba:address location="corbaname::localhost:1050#Bank" />
-            <corba:policy poaname="Bank" serviceid="Bank" persistent="true" />
+            <corba:policy poaname="Bank" serviceid="Bank" persistent="false" />
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

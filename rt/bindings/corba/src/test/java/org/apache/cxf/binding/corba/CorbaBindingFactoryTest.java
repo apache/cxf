@@ -60,7 +60,6 @@ public class CorbaBindingFactoryTest extends Assert {
     
     @Before
     public void setUp() throws Exception {
-        System.setProperty("cxf.config.file", "cxf-extension-corba.xml");
         bus = BusFactory.getDefaultBus();       
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);        
         factory = (CorbaBindingFactory)bfm.getBindingFactory("http://cxf.apache.org/bindings/corba");

@@ -177,7 +177,7 @@ public class CorbaConduit implements Conduit {
         return endpointInfo.getAddress();
     }
         
-    protected void buildRequest(CorbaMessage message, OperationType opType) throws Exception {        
+    public void buildRequest(CorbaMessage message, OperationType opType) throws Exception {        
         ServiceInfo service = message.getExchange().get(ServiceInfo.class);
         NVList nvlist = getArguments(message);
         NamedValue ret = getReturn(message);
@@ -221,7 +221,7 @@ public class CorbaConduit implements Conduit {
         }
     }
        
-    protected NVList getArguments(CorbaMessage message) {
+    public NVList getArguments(CorbaMessage message) {
         if (orb == null) {
             prepareOrb();
         }
@@ -243,7 +243,7 @@ public class CorbaConduit implements Conduit {
         return list;        
     }
     
-    protected NamedValue getReturn(CorbaMessage message) {
+    public NamedValue getReturn(CorbaMessage message) {
         if (orb == null) {
             prepareOrb();
         }
@@ -262,7 +262,7 @@ public class CorbaConduit implements Conduit {
         return ret;        
     }
     
-    protected ExceptionList getExceptionList(Map<TypeCode, RaisesType> exceptions,
+    public ExceptionList getExceptionList(Map<TypeCode, RaisesType> exceptions,
                                              CorbaMessage message, 
                                              OperationType opType) {
         if (orb == null) {
@@ -285,7 +285,7 @@ public class CorbaConduit implements Conduit {
         return exList;
     }
             
-    protected Request getRequest(CorbaMessage message,
+    public Request getRequest(CorbaMessage message,
                                  String opName,
                                  org.omg.CORBA.NVList nvlist, 
                                  org.omg.CORBA.NamedValue ret, 
@@ -311,7 +311,7 @@ public class CorbaConduit implements Conduit {
         return request;
     }
         
-    protected Map<TypeCode, RaisesType> getOperationExceptions(
+    public Map<TypeCode, RaisesType> getOperationExceptions(
                                          OperationType operation, 
                                          CorbaTypeMap map) {
         if (orb == null) {

@@ -21,10 +21,10 @@ package org.apache.cxf.binding.corba.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
@@ -34,8 +34,8 @@ import org.omg.CORBA.ORB;
 public final class CorbaBindingHelper {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaBindingHelper.class);
-    private static Map<String, ORB> orbList = new ConcurrentHashMap<String, ORB>();
-    private static Map<String, Integer> orbUseCount = new ConcurrentHashMap<String, Integer>();
+    private static Map<String, ORB> orbList = new HashMap<String, ORB>();
+    private static Map<String, Integer> orbUseCount = new HashMap<String, Integer>();
     private static ORB defaultORB;
     
     private CorbaBindingHelper() {
@@ -61,7 +61,19 @@ public final class CorbaBindingHelper {
         return defaultORB;
     }
     
-    public static ORB createAddressSpecificORB(String address, OrbConfig config) {
+    public static synchronized ORB getAddressSpecificORB(String address, 
+                                                         Properties props, 
+                                                         List<String> orbArgs) {
+        ORB orb = orbList.get(getORBNameFromAddress(address));
+        if (orb == null) {
+            orb = createAddressSpecificORB(address, props, orbArgs);
+        }
+        return orb;
+    }
+
+    private static ORB createAddressSpecificORB(String address, 
+                                                Properties props, 
+                                                List<String> orbArgs) {
         ORB orb = null;
         
         URI addressURI = null;
@@ -71,15 +83,6 @@ public final class CorbaBindingHelper {
             throw new CorbaBindingException("Unable to create ORB with address " + address);
         }
 
-        Properties props = System.getProperties();
-        if (config.getOrbClass() != null) {
-            props.put("org.omg.CORBA.ORBClass", config.getOrbClass());
-        }
-        if (config.getOrbSingletonClass() != null) {
-            props.put("org.omg.CORBA.ORBSingletonClass", config.getOrbSingletonClass());
-        }
-        List<String> orbArgs = config.getOrbArgs();
-        
         String scheme = addressURI.getScheme();
         // A corbaloc address gives us host and port information to use when setting up the
         // endpoint for the ORB.  Other types of references will just create ORBs on the 
@@ -124,15 +127,9 @@ public final class CorbaBindingHelper {
         return orb;
     }
     
-    public static ORB getAddressSpecificORB(String address) {
-        return orbList.get(getORBNameFromAddress(address));
-    }
 
-    public static void addAddressSpecificORB(String address, ORB orb) {
-        orbList.put(getORBNameFromAddress(address), orb);
-    }
     
-    public static String getORBNameFromAddress(String address) {
+    private static String getORBNameFromAddress(String address) {
         String name = null;
        
         URI addressURI = null;
@@ -173,7 +170,7 @@ public final class CorbaBindingHelper {
 
     // This indicates that we need to keep the ORB alive.  This allows multiple objects to share the
     // same ORB and not have one of the objects destroy it while other objects are using it.
-    public static void keepORBAlive(String address) {
+    public static synchronized void keepORBAlive(String address) {
         Integer count = orbUseCount.get(getORBNameFromAddress(address));
 
         if (count == null) {
@@ -186,7 +183,7 @@ public final class CorbaBindingHelper {
     // Signals that the ORB should be tested to see if it can be destroyed.  Actual destruction will
     // only occur if the ORB is not being used by someone else.  If it is, then we simply decrement
     // the count.
-    public static void destroyORB(String address, ORB orb) throws CorbaBindingException {
+    public static synchronized void destroyORB(String address, ORB orb) throws CorbaBindingException {
         Integer count = orbUseCount.get(getORBNameFromAddress(address));
 
         if (count == null) {
@@ -207,7 +204,6 @@ public final class CorbaBindingHelper {
         } else {
             orbUseCount.put(getORBNameFromAddress(address), count);
         }
-
     }
 
 }

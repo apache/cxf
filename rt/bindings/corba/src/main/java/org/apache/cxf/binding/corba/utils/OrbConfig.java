@@ -19,22 +19,34 @@
 
 package org.apache.cxf.binding.corba.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
+import org.apache.cxf.binding.corba.interceptors.SystemExceptionHelper;
+import org.apache.cxf.binding.corba.wsdl.AddressType;
+import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
+import org.omg.CORBA.SystemException;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAManager;
 
 public class OrbConfig {
 
-    String orbClass;
-    String orbSingletonClass;
-    List<String> orbArgs = new ArrayList<String>();
-    List<Policy> policies = new ArrayList<Policy>();
-    
-    boolean persistentPoa;
+    protected String orbClass;
+    protected String orbSingletonClass;
+    protected List<String> orbArgs = new ArrayList<String>();
     
     public OrbConfig() {
         //nothing
@@ -64,18 +76,67 @@ public class OrbConfig {
         return orbArgs;
     }
     
-    public void setPersistentPoa(boolean b) {
-        persistentPoa = b;
-    }
-    public boolean isPersistentPoa() {
-        return persistentPoa;
-    }
     
-    public List<Policy> getExtraPolicies() {
-        return policies;
+    public void addPOAPolicies(ORB orb, 
+                               String poaName,
+                               POA parentPOA,
+                               POAManager poaManager,
+                               List<Policy> policies) {
+        //nothing
     }
     
     
+    public Any createSystemExceptionAny(ORB orb, SystemException sysEx) {
+        Any exAny = orb.create_any();
+        SystemExceptionHelper.insert(exAny, sysEx);
+        return exAny;
+    }
+    
+    public void exportObjectReference(ORB orb,
+                                       org.omg.CORBA.Object ref,
+                                       String url,
+                                       AddressType address) 
+        throws URISyntaxException, IOException {
+        
+        if ((url.startsWith("ior:")) || (url.startsWith("IOR:"))) {
+            // make use of Thread cache of last exported IOR
+            String ior = CorbaUtils.exportObjectReference(ref, orb);
+            address.setLocation(ior);
+        } else if (url.startsWith("file:")) {
+            URI uri = new URI(url);
+            exportObjectReferenceToFile(orb, ref, uri);
+        } else if (url.startsWith("relfile:")) {
+            URI uri = new URI(url.substring(3));
+            exportObjectReferenceToFile(orb, ref, uri);
+        } else if (url.startsWith("corbaloc:")) {
+            exportObjectReferenceToCorbaloc(orb, ref, url);
+        } else if (url.startsWith("corbaname:")) {
+            exportObjectReferenceToNamingService(orb,
+                                                 ref,
+                                                 url);
+        } else {
+            String ior = orb.object_to_string(ref);
+            address.setLocation(ior);
+            URI uri = new URI("endpoint.ior");
+            exportObjectReferenceToFile(orb, ref, uri);
+        }
+    }
+    public void exportObjectReferenceToNamingService(ORB orb,
+                                                     org.omg.CORBA.Object ref,
+                                                     String location) {
+        int idx = location.indexOf("#");
+        String name = location.substring(idx + 1);
+        
+        //Register in NameService
+        try {
+            org.omg.CORBA.Object nsObj = orb.resolve_initial_references("NameService");
+            NamingContextExt rootContext = NamingContextExtHelper.narrow(nsObj);
+            NameComponent[] nc = rootContext.to_name(name);
+            rootContext.rebind(nc, ref);
+        } catch (Exception ex) {
+            throw new CorbaBindingException(ex);
+        }
+    }
     public void exportObjectReferenceToCorbaloc(ORB orb,
                                                 org.omg.CORBA.Object object,
                                                 String location) {
@@ -98,6 +159,25 @@ public class OrbConfig {
         } catch (java.lang.Exception ex) {
             throw new CorbaBindingException(ex.getMessage(), ex);
         }
+    }
+
+
+    public void exportObjectReferenceToFile(ORB orb,
+                                              org.omg.CORBA.Object obj,
+                                              URI iorFile) 
+        throws IOException {
+        String ref = orb.object_to_string(obj);
+        File f = null;
+        if (iorFile.isOpaque()) {
+            f = new File(iorFile.getSchemeSpecificPart());
+        } else {
+            f = new File(iorFile);
+        }
+        FileOutputStream file = new FileOutputStream(f);
+        PrintWriter out = new PrintWriter(file);
+        out.println(ref);
+        out.flush();
+        file.close();
     }
 
 }

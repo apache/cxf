@@ -19,14 +19,17 @@
 package org.apache.cxf.binding.corba.interceptors;
 
 import org.omg.CORBA.Any;
-import org.omg.CORBA.CompletionStatusHelper;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.StructMember;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
 
-public final class SystemExceptionHelper {
+public final class SystemExceptionHelper 
+    implements org.omg.CORBA.portable.Streamable {
+    
     private static final int BAD_CONTEXT = 0;
     private static final int BAD_INV_ORDER = 1;
     private static final int BAD_OPERATION = 2;
@@ -64,41 +67,6 @@ public final class SystemExceptionHelper {
     private static final int TRANSIENT = 34;
     private static final int UNKNOWN = 35;
     
-    
-
-    private static final String[] CLASSES = {
-        "org.omg.CORBA.BAD_CONTEXT", "org.omg.CORBA.BAD_INV_ORDER",
-        "org.omg.CORBA.BAD_OPERATION", "org.omg.CORBA.BAD_PARAM",
-        "org.omg.CORBA.BAD_QOS", "org.omg.CORBA.BAD_TYPECODE",
-        "org.omg.CORBA.CODESET_INCOMPATIBLE", "org.omg.CORBA.COMM_FAILURE",
-        "org.omg.CORBA.DATA_CONVERSION", "org.omg.CORBA.FREE_MEM",
-        "org.omg.CORBA.IMP_LIMIT", "org.omg.CORBA.INITIALIZE",
-        "org.omg.CORBA.INTERNAL", "org.omg.CORBA.INTF_REPOS",
-        "org.omg.CORBA.INVALID_TRANSACTION", "org.omg.CORBA.INV_FLAG",
-        "org.omg.CORBA.INV_IDENT", "org.omg.CORBA.INV_OBJREF",
-        "org.omg.CORBA.INV_POLICY", "org.omg.CORBA.MARSHAL",
-        "org.omg.CORBA.NO_IMPLEMENT", "org.omg.CORBA.NO_MEMORY",
-        "org.omg.CORBA.NO_PERMISSION", "org.omg.CORBA.NO_RESOURCES",
-        "org.omg.CORBA.NO_RESPONSE", "org.omg.CORBA.OBJECT_NOT_EXIST",
-        "org.omg.CORBA.OBJ_ADAPTER", "org.omg.CORBA.PERSIST_STORE",
-        "org.omg.CORBA.REBIND", "org.omg.CORBA.TIMEOUT",
-        "org.omg.CORBA.TRANSACTION_MODE",
-        "org.omg.CORBA.TRANSACTION_REQUIRED",
-        "org.omg.CORBA.TRANSACTION_ROLLEDBACK",
-        "org.omg.CORBA.TRANSACTION_UNAVAILABLE", "org.omg.CORBA.TRANSIENT",
-        "org.omg.CORBA.UNKNOWN"};
-
-    private static final String[] NAMES = {
-        "BAD_CONTEXT", "BAD_INV_ORDER", "BAD_OPERATION", "BAD_PARAM",
-        "BAD_QOS", "BAD_TYPECODE", "CODESET_INCOMPATIBLE", "COMM_FAILURE",
-        "DATA_CONVERSION", "FREE_MEM", "IMP_LIMIT", "INITIALIZE", "INTERNAL",
-        "INTF_REPOS", "INVALID_TRANSACTION", "INV_FLAG", "INV_IDENT",
-        "INV_OBJREF", "INV_POLICY", "MARSHAL", "NO_IMPLEMENT", "NO_MEMORY",
-        "NO_PERMISSION", "NO_RESOURCES", "NO_RESPONSE", "OBJECT_NOT_EXIST",
-        "OBJ_ADAPTER", "PERSIST_STORE", "REBIND", "TIMEOUT",
-        "TRANSACTION_MODE", "TRANSACTION_REQUIRED", "TRANSACTION_ROLLEDBACK",
-        "TRANSACTION_UNAVAILABLE", "TRANSIENT", "UNKNOWN"};
-
     private static final String[] IDS = {
         "IDL:omg.org/CORBA/BAD_CONTEXT:1.0",
         "IDL:omg.org/CORBA/BAD_INV_ORDER:1.0",
@@ -127,11 +95,17 @@ public final class SystemExceptionHelper {
         "IDL:omg.org/CORBA/TRANSACTION_UNAVAILABLE:1.0",
         "IDL:omg.org/CORBA/TRANSIENT:1.0", "IDL:omg.org/CORBA/UNKNOWN:1.0"};
 
-    private static TypeCode typeCode;
 
+    SystemException value;
+    TypeCode typeCode;
+    
     private SystemExceptionHelper() {
-        //utility class
     }
+    private SystemExceptionHelper(SystemException ex) {
+        value = ex;
+    }
+    
+    
 
     private static int binarySearch(String[] arr, String value) {
         int left = 0;
@@ -154,80 +128,13 @@ public final class SystemExceptionHelper {
         return index;
     }
 
-    private static TypeCode createTypeCode(String id, String name) {
-        ORB orb = ORB.init();
-        StructMember[] members = new StructMember[2];
-        members[0] = new StructMember();
-        members[0].name = "minor";
-        members[0].type = orb.get_primitive_tc(TCKind.tk_ulong);
-        members[1] = new StructMember();
-        members[1].name = "completed";
-        members[1].type = CompletionStatusHelper.type();
-        return orb.create_exception_tc(id, name, members);
-    }
-
-    private static void writeImpl(org.omg.CORBA.portable.OutputStream out, 
-                                  SystemException val, String id) {
-        out.write_string(id);
-        out.write_ulong(val.minor);
-        out.write_ulong(val.completed.value());
-    }
 
     public static void insert(Any any, SystemException val) {
-        String className = val.getClass().getName();
-        int index = binarySearch(CLASSES, className);
-
-        String id;
-        if (index == -1) {
-            id = IDS[UNKNOWN];
-        } else {
-            id = IDS[index];
-        }
-
-        org.omg.CORBA.portable.OutputStream out = any.create_output_stream();
-        writeImpl(out, val, id);
-        any.read_value(out.create_input_stream(), createTypeCode(id, NAMES[index]));
+        any.insert_Streamable(new SystemExceptionHelper(val));
     }
 
-    public static SystemException extract(Any any) {
-        try {
-            TypeCode tc = any.type();
-            String id = tc.id();
-            if (tc.kind() == TCKind.tk_except && (id.length() == 0 || binarySearch(IDS, id) != -1)) {
-                return read(any.create_input_stream());
-            }
-        } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {
-            //ignore
-        }
-
-        throw new org.omg.CORBA.BAD_OPERATION();
-    }
-
-    public static synchronized TypeCode type() {
-        if (typeCode == null) {
-            typeCode = createTypeCode(id(), "SystemException");
-        }
-
-        return typeCode;
-    }
-
-    public static String id() {
-        return "IDL:omg.org/CORBA/SystemException:1.0";
-    }
-    public static void write(org.omg.CORBA.portable.OutputStream out, SystemException val) {
-        String className = val.getClass().getName();
-        int index = binarySearch(CLASSES, className);
-
-        String id;
-        if (index == -1) {
-            id = IDS[UNKNOWN];
-        } else {
-            id = IDS[index];
-        }
-
-        writeImpl(out, val, id);
-    }
-
+    
+    
     //CHECKSTYLE:OFF 
     //NCSS is to high for this due to the massive switch statement
     public static SystemException read(org.omg.CORBA.portable.InputStream in) {
@@ -349,6 +256,57 @@ public final class SystemExceptionHelper {
             ex = new org.omg.CORBA.UNKNOWN(minor, status);
         }
         return ex;
+    }
+    //CHECKSTYLE:ON
+    
+    
+    
+    public void _read(InputStream instream) {
+        value = read(instream);
+    }
+    
+    public TypeCode _type() {
+        if (typeCode == null) {
+            ORB orb = ORB.init();
+            StructMember[] smBuf = new StructMember[2];
+            TypeCode minortc = orb.get_primitive_tc(TCKind.tk_long);
+            smBuf[0] = new StructMember("minor", minortc, null);
+
+            String csLabels[] = {"COMPLETED_YES", "COMPLETED_NO", "COMPLETED_MAYBE"};
+            TypeCode completedtc = orb
+                .create_enum_tc("IDL:omg.org/CORBA/CompletionStatus:1.0",
+                              "CompletionStatus", csLabels);
+
+            smBuf[1] = new StructMember("completed", completedtc, null);
+            String id;
+            String name;
+            if (value == null) {
+                name = "SystemException";
+                id = "IDL:omg.org/CORBA/SystemException:1.0";
+            } else {
+                String className = value.getClass().getName();
+                name = className.substring(className.lastIndexOf('.') + 1);
+                id = "IDL:omg.org/CORBA/" + name + ":1.0";
+            }
+            
+            typeCode = orb.create_exception_tc(id, name, smBuf);
+        }
+        return typeCode;
+    }
+    public void _write(OutputStream outstream) {
+        String id;
+        if (value == null) {
+            value = new org.omg.CORBA.UNKNOWN();
+            id = "IDL:omg.org/CORBA/UNKNOWN";
+        } else {
+            String className = value.getClass().getName();
+            id = "IDL:omg.org/CORBA/" 
+                + className.substring(className.lastIndexOf('.') + 1) + ":1.0";
+        }
+
+        outstream.write_string(id);
+        outstream.write_ulong(value.minor);
+        outstream.write_ulong(value.completed.value());
     }
 
 }

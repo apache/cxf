@@ -64,9 +64,6 @@ import org.omg.CORBA.ServerRequest;
 
 public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private ORB orb;
-    private ServiceInfo service;
-    private CorbaDestination destination;
 
 
     public CorbaStreamInInterceptor() {
@@ -74,13 +71,6 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
     }   
 
     public void handleMessage(Message message) throws Fault {
-        if (message.getDestination() != null) {
-            destination = (CorbaDestination)message.getDestination();
-        } else {
-            destination = (CorbaDestination)message.getExchange().getDestination();
-        }
-        service = destination.getBindingInfo().getService();
-
         if (ContextUtils.isRequestor(message)) {
             handleReply(message);
         } else {
@@ -89,6 +79,16 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     private void handleReply(Message msg) {
+        ORB orb;
+        ServiceInfo service;
+        CorbaDestination destination;
+        if (msg.getDestination() != null) {
+            destination = (CorbaDestination)msg.getDestination();
+        } else {
+            destination = (CorbaDestination)msg.getExchange().getDestination();
+        }
+        service = destination.getBindingInfo().getService();
+
         CorbaMessage message = (CorbaMessage)msg;
         if (message.getStreamableException() != null || message.getSystemException() != null) {
             Endpoint ep = message.getExchange().get(Endpoint.class);
@@ -131,6 +131,15 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     private void handleRequest(Message msg) {
+        ORB orb;
+        ServiceInfo service;
+        CorbaDestination destination;
+        if (msg.getDestination() != null) {
+            destination = (CorbaDestination)msg.getDestination();
+        } else {
+            destination = (CorbaDestination)msg.getExchange().getDestination();
+        }
+        service = destination.getBindingInfo().getService();
 
         CorbaMessage message = (CorbaMessage) msg;
 
@@ -161,7 +170,9 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
         orb = (ORB)exchange.get(ORB.class);
 
         ServerRequest request = exchange.get(ServerRequest.class);
-        NVList list = prepareArguments(message, info, opType, opQName, typeMap);
+        NVList list = prepareArguments(message, info, opType, 
+                                       opQName, typeMap,
+                                       destination, service);
         request.arguments(list);
         message.setList(list);
 
@@ -194,7 +205,9 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
                                       InterfaceInfo info,
                                       OperationType opType,
                                       QName opQName,
-                                      CorbaTypeMap typeMap) {        
+                                      CorbaTypeMap typeMap,
+                                      CorbaDestination destination,
+                                      ServiceInfo service) {        
         BindingInfo bInfo = destination.getBindingInfo();                              
         EndpointInfo eptInfo = destination.getEndPointInfo();
         BindingOperationInfo bOpInfo = bInfo.getOperation(opQName);
@@ -215,7 +228,10 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
                        
         List<ParamType> paramTypes = opType.getParam();       
         CorbaStreamable[] arguments = new CorbaStreamable[paramTypes.size()];                               
-        NVList list = prepareDIIArgsList(corbaMsg, bOpInfo, arguments, paramTypes, typeMap);         
+        NVList list = prepareDIIArgsList(corbaMsg, bOpInfo, 
+                                         arguments, paramTypes, 
+                                         typeMap,
+                                         exg.get(ORB.class), service);         
         
         return list;
         
@@ -225,7 +241,9 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
                                         BindingOperationInfo boi,
                                         CorbaStreamable[] streamables, 
                                         List<ParamType> paramTypes,
-                                        CorbaTypeMap map) {
+                                        CorbaTypeMap map,
+                                        ORB orb,
+                                        ServiceInfo service) {
         try {
             // Build the list of DII arguments, returns, and exceptions        
             NVList list = orb.create_list(streamables.length);        

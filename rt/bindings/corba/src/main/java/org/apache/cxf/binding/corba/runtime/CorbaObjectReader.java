@@ -21,6 +21,8 @@ package org.apache.cxf.binding.corba.runtime;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,7 +52,9 @@ import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
 import org.apache.cxf.common.logging.LogUtils;
 import org.omg.CORBA.Any;
+import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.InputStream;
 
 public class CorbaObjectReader {
@@ -232,18 +236,20 @@ public class CorbaObjectReader {
         }
     }
 
+    private BigInteger convertLongToULong(long l) {
+        if (l < 0) {
+            long l2 = l & 0x7FFFFFFFFFFFFFL;
+            BigInteger i = BigInteger.valueOf(l2);
+            BigInteger i2 = BigInteger.valueOf(0);
+            i2.setBit(63);
+            i = i.or(i2);
+            return i;
+        }
+        return BigInteger.valueOf(l);
+    }
     public BigInteger readULongLong() throws CorbaBindingException {
         try {
-            long l = stream.read_ulonglong();
-            if (l < 0) {
-                long l2 = l & 0x7FFFFFFFFFFFFFL;
-                BigInteger i = BigInteger.valueOf(l2);
-                BigInteger i2 = BigInteger.valueOf(0);
-                i2.setBit(63);
-                i = i.or(i2);
-                return i;
-            }
-            return BigInteger.valueOf(l);
+            return convertLongToULong(stream.read_ulonglong());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read unsigned long long");
             throw new CorbaBindingException("CorbaObjectReader: readULongLong MARSHAL exception", ex);
@@ -328,9 +334,21 @@ public class CorbaObjectReader {
     public void readFixed(CorbaObjectHandler obj) throws CorbaBindingException {
         CorbaFixedHandler fixedHandler = (CorbaFixedHandler)obj;
         long scale = fixedHandler.getScale();
-        
-        java.math.BigDecimal fixedValue = stream.read_fixed().movePointLeft((int)scale);
-        fixedHandler.setValue(fixedValue);
+        try {
+            java.math.BigDecimal fixedValue = stream.read_fixed().movePointLeft((int)scale);
+            fixedHandler.setValue(fixedValue);
+        } catch (NO_IMPLEMENT ex) {
+            //the read_fixed method is a "late addition" and not all orbs implement it.
+            //Some of them have a "read_fixed(TypeCode)" method, we'll try that
+            Method m = null;
+            try {
+                m = stream.getClass().getMethod("read_fixed", new Class[] {TypeCode.class});
+                BigDecimal fixedValue = (BigDecimal)m.invoke(stream, new Object[] {obj.getTypeCode()});
+                fixedHandler.setValue(fixedValue);
+            } catch (Throwable e1) {
+                throw ex;
+            }
+        }
     }
 
     public void readEnumDiscriminator(CorbaUnionHandler unionHandler, CorbaEnumHandler disc)
@@ -393,6 +411,7 @@ public class CorbaObjectReader {
         }
     }
 
+    //CHECKSTYLE:OFF  -  processing the typecodes in a switch makes this method fairly long/complex
     public void readArray(CorbaObjectHandler obj) throws CorbaBindingException {
         CorbaArrayHandler arrayObj = (CorbaArrayHandler)obj;
         List<CorbaObjectHandler> arrayElements = arrayObj.getElements();
@@ -446,7 +465,12 @@ public class CorbaObjectReader {
             case TCKind._tk_ulong: {
                 int[] values = new int[arraySize];
                 stream.read_ulong_array(values, 0, arraySize);
-                val = values;
+                long[] v2 = new long[arraySize];
+                for (int x = 0; x < arraySize; x++) {
+                    v2[x] = values[x];
+                    v2[x] &= 0xFFFFFFFFL;
+                }
+                val = v2;
                 break;
             }
             case TCKind._tk_longlong: {
@@ -458,7 +482,11 @@ public class CorbaObjectReader {
             case TCKind._tk_ulonglong: {
                 long[] values = new long[arraySize];
                 stream.read_ulonglong_array(values, 0, arraySize);
-                val = values;
+                BigInteger[] v2 = new BigInteger[arraySize];
+                for (int x = 0; x < arraySize; x++) {
+                    v2[x] = convertLongToULong(values[x]);
+                }
+                val = v2;
                 break;
             }
             case TCKind._tk_float: {
@@ -486,7 +514,8 @@ public class CorbaObjectReader {
             }
         }
     }
-    
+    //CHECKSTYLE:ON
+
     public void readSequence(CorbaObjectHandler obj) throws CorbaBindingException {
         if (obj instanceof CorbaOctetSequenceHandler) {
             int length = stream.read_ulong();

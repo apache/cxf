@@ -114,15 +114,15 @@ public class CorbaDSIServant extends DynamicImplementation {
         }
     }
 
-    protected MessageObserver getObserver() {
+    public MessageObserver getObserver() {
         return incomingObserver;
     }
     
-    protected void setObserver(MessageObserver observer) {
+    public void setObserver(MessageObserver observer) {
         incomingObserver = observer;
     }
     
-    protected ORB getOrb() {
+    public ORB getOrb() {
         return orb;
     }
 

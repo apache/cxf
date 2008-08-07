@@ -49,6 +49,12 @@ public class HandlerIterator implements Iterator<CorbaObjectHandler> {
                     || mode == org.omg.CORBA.ARG_INOUT.value) {
                     next = params[count].getObject();
                 }
+                if (!isServer 
+                    && mode == org.omg.CORBA.ARG_INOUT.value
+                    && next instanceof CorbaPrimitiveHandler) {
+                    CorbaPrimitiveHandler prim = (CorbaPrimitiveHandler)next;
+                    prim.clear();
+                }
                 count++;
             }
         }

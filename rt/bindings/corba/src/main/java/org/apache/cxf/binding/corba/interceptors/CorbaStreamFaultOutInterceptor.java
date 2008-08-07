@@ -112,7 +112,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         }
 
         if (ex instanceof SystemException) {
-            setSystemException(message, ex);
+            setSystemException(message, ex, destination);
             return;
         }
         
@@ -221,12 +221,12 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
     }
 
     protected void setSystemException(CorbaMessage message,
-                                      Throwable ex) {
+                                      Throwable ex,
+                                      CorbaDestination dest) {
         SystemException sysEx = (SystemException)ex;
         message.setSystemException(sysEx);
         ServerRequest request  = message.getExchange().get(ServerRequest.class);
-        Any exAny = orb.create_any();
-        SystemExceptionHelper.insert(exAny, sysEx);
+        Any exAny = dest.getOrbConfig().createSystemExceptionAny(orb, sysEx);
         request.set_exception(exAny);
     }
 

@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.corba.runtime.CorbaDSIServant;
@@ -37,20 +37,25 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.MultiplexDestination;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
+import org.omg.PortableServer.Current;
 import org.omg.PortableServer.IdAssignmentPolicyValue;
+import org.omg.PortableServer.IdUniquenessPolicyValue;
 import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManager;
+import org.omg.PortableServer.RequestProcessingPolicyValue;
+import org.omg.PortableServer.Servant;
 import org.omg.PortableServer.ThreadPolicyValue;
 
-public class CorbaDestination implements Destination {
+public class CorbaDestination implements MultiplexDestination {
     
     private static final String IOR_SHARED_KEY = "ior:shared-key";
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaDestination.class);
@@ -88,7 +93,6 @@ public class CorbaDestination implements Destination {
         } else {
             typeMap = TypeMapCache.get(binding.getService());
         }
-        isPersistent = orbConfig.isPersistentPoa();
         PolicyType policy = ei.getExtensor(PolicyType.class);
         if (policy != null) {
             poaName = policy.getPoaname();
@@ -152,11 +156,7 @@ public class CorbaDestination implements Destination {
         if (CorbaUtils.isIOR(location)) {
             location = IOR_SHARED_KEY;
         }
-        orb = CorbaBindingHelper.getAddressSpecificORB(location);
-        if (orb == null) {
-            orb = ORB.init(orbArgs.toArray(new String[orbArgs.size()]), props);
-            CorbaBindingHelper.addAddressSpecificORB(location, orb);
-        }
+        orb = CorbaBindingHelper.getAddressSpecificORB(location, props, orbArgs);
 
         // Get the binding helper to remember that we need this ORB kept alive, even if another
         // destination tries to destroy it.
@@ -235,6 +235,11 @@ public class CorbaDestination implements Destination {
                 poaName = getEndPointInfo().getName().getLocalPart().replace('.', '_');                
             }
             setCorbaLocArgs(addressURI, orbArgs);
+        } else if ("corbaname".equals(scheme)) {
+            int idx = location.indexOf("#");
+            if (idx != -1) {
+                serviceId = location.substring(idx + 1);
+            }
         }
 
         if (isPersistent) {
@@ -251,13 +256,7 @@ public class CorbaDestination implements Destination {
 
         orb = getORB(orbArgs, location, props);        
         
-        if (orb == null) {
-            LOG.log(Level.INFO, "Creating ORB with address " + location);
-            orb = CorbaBindingHelper.createAddressSpecificORB(location, orbConfig);
-        }
-        // Need to indicate that this ORB can't be destroyed while we are using it
-        CorbaBindingHelper.keepORBAlive(location);
-        
+
         try {
             POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
             POAManager poaManager = rootPOA.the_POAManager();
@@ -276,7 +275,7 @@ public class CorbaDestination implements Destination {
             // exception at this point during the activation, we should see an
             // exception if we try
             // an activate two objects with the same servant ID instead.
-            if (bindingPOA != null && !isPersistent) {
+            if (bindingPOA != null && !isPersistent && serviceId == null) {
                 throw new CorbaBindingException(
                         "Corba Port activation failed because the poa "
                                 + poaName + " already exists");
@@ -304,8 +303,9 @@ public class CorbaDestination implements Destination {
             } else {                
                 objectId = bindingPOA.activate_object(servant);
             }
+            bindingPOA.set_servant(servant);
             obj = bindingPOA.id_to_reference(objectId);
-            CorbaUtils.exportObjectReference(orb, obj, location, address, orbConfig);
+            orbConfig.exportObjectReference(orb, obj, location, address);
             
             populateEpr(orb.object_to_string(obj));
             LOG.info("Object Reference: " + orb.object_to_string(obj));
@@ -388,8 +388,6 @@ public class CorbaDestination implements Destination {
 
     protected POA createPOA(String name, POA parentPOA, POAManager poaManager) {
         List<Policy> policies = new ArrayList<Policy>();
-
-        
         policies.add(parentPOA
                 .create_thread_policy(ThreadPolicyValue.ORB_CTRL_MODEL));
 
@@ -403,11 +401,15 @@ public class CorbaDestination implements Destination {
 
         if (serviceId != null) {
             policies.add(parentPOA
-                            .create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID));
+                         .create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID));
+            
         }
 
+        policies.add(parentPOA.create_id_uniqueness_policy(IdUniquenessPolicyValue.MULTIPLE_ID));
+        RequestProcessingPolicyValue value = RequestProcessingPolicyValue.USE_DEFAULT_SERVANT;
+        policies.add(parentPOA.create_request_processing_policy(value));        
         
-        policies.addAll(orbConfig.getExtraPolicies());
+        orbConfig.addPOAPolicies(orb, name, parentPOA, poaManager, policies);
         
         Policy[] policyList = (Policy[])policies.toArray(new Policy[policies.size()]);
 
@@ -417,6 +419,46 @@ public class CorbaDestination implements Destination {
             throw new CorbaBindingException(
                     "Could not create POA during activation", ex);
         }
+    }
+    public EndpointReferenceType getAddressWithId(String id) {
+        EndpointReferenceType ref = null;
+        if (bindingPOA == null) {
+            throw new CorbaBindingException(
+                 "getAddressWithId failed because the poa is null");
+        }
+        try {
+            Servant servant = bindingPOA.id_to_servant(objectId);
+            org.omg.CORBA.Object objRef 
+                = bindingPOA.create_reference_with_id(id.getBytes(),
+                                               servant._all_interfaces(bindingPOA, objectId)[0]);
+            AddressType addr = new AddressType();
+            orbConfig.exportObjectReference(orb, objRef,
+                                            address.getLocation(),
+                                            addr);
+            ref = EndpointReferenceUtils.getEndpointReference(addr.getLocation());
+            EndpointInfo ei = getEndPointInfo();
+            if (ei.getService() != null) {
+                EndpointReferenceUtils.setServiceAndPortName(ref, ei.getService().getName(), 
+                                                             ei.getName().getLocalPart());
+            }
+        } catch (Exception e) {
+            throw new CorbaBindingException("Failed to getAddressWithId, reason:" + e.toString(), e);
+        }
+        return ref;
+    }
+
+    public String getId(Map contextMap) {
+        String id = null;
+        try {
+            Current currentPoa = (Current) orb
+                .resolve_initial_references("POACurrent");
+            byte[] idBytes = currentPoa.get_object_id();
+            id = new String(idBytes);
+        } catch (Exception e) {
+            throw new CorbaBindingException("Unable to getId, current is unavailable, reason: "
+                                             + e, e);
+        }
+        return id;
     }
 
 }

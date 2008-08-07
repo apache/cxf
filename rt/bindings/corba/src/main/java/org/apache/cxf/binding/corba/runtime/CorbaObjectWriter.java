@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.binding.corba.runtime;
 
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -297,8 +299,18 @@ public class CorbaObjectWriter {
 
     public void writeFixed(CorbaObjectHandler obj) throws CorbaBindingException {
         CorbaFixedHandler fixedHandler = (CorbaFixedHandler)obj;
-        long scale = fixedHandler.getScale();
-        stream.write_fixed(fixedHandler.getValue().movePointRight((int)scale));
+        short scale = (short)fixedHandler.getScale();
+        short fixed = (short)fixedHandler.getDigits();
+        //the write_fixed method is a "late addition" and not all orbs implement it.
+        //Some of them have a "write_fixed(BigDecimal, short, short)" method, we'll try that
+        try {
+            Method m = stream.getClass().getMethod("write_fixed", new Class[] {BigDecimal.class,
+                                                                               Short.TYPE,
+                                                                               Short.TYPE});
+            m.invoke(stream, fixedHandler.getValue(), fixed, scale);
+        } catch (Throwable e1) {
+            stream.write_fixed(fixedHandler.getValue().movePointRight(scale));
+        }
     }
 
     public void writeUnion(CorbaObjectHandler obj) throws CorbaBindingException {
