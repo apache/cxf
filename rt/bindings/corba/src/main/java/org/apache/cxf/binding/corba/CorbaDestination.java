@@ -453,7 +453,7 @@ public class CorbaDestination implements MultiplexDestination {
             Current currentPoa = (Current) orb
                 .resolve_initial_references("POACurrent");
             byte[] idBytes = currentPoa.get_object_id();
-            id = new String(idBytes);
+            id = new String(idBytes); //NOPMD
         } catch (Exception e) {
             throw new CorbaBindingException("Unable to getId, current is unavailable, reason: "
                                              + e, e);
