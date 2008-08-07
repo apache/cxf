@@ -145,7 +145,12 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             if (ei == null) {
                 ei = createEndpointInfo();
             } else if (getAddress() != null) {
-                ei.setAddress(getAddress()); 
+                ei.setAddress(getAddress());
+                if (ei.getAddress().startsWith("camel")
+                        || ei.getAddress().startsWith("local")) {
+                    modifyTransportIdPerAddress(ei);
+                }
+                
             }
         } else if (getAddress() != null) {
             ei.setAddress(getAddress()); 
@@ -185,6 +190,35 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             ep.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
         }
         return ep;
+    }
+    private void modifyTransportIdPerAddress(EndpointInfo ei) {
+        //get chance to set transportId according to the the publish address prefix
+        //this is useful for local & camel transport
+        if (transportId == null && getAddress() != null) {
+            DestinationFactory df = getDestinationFactory();
+            if (df == null) {
+                DestinationFactoryManager dfm = getBus().getExtension(
+                        DestinationFactoryManager.class);
+                df = dfm.getDestinationFactoryForUri(getAddress());
+            }
+
+            if (df != null) {
+                transportId = df.getTransportIds().get(0);
+            } else {
+                // check conduits (the address could be supported on
+                // client only)
+                ConduitInitiatorManager cim = getBus().getExtension(
+                        ConduitInitiatorManager.class);
+                ConduitInitiator ci = cim
+                        .getConduitInitiatorForUri(getAddress());
+                if (ci != null) {
+                    transportId = ci.getTransportIds().get(0);
+                }
+            }
+        }
+        if (transportId != null) {
+            ei.setTransportId(transportId);
+        }
     }
 
     protected void initializeServiceFactory() {

@@ -30,12 +30,8 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.transport.ConduitInitiatorManager;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalConduit;
-import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.hello_world_soap_http.Greeter;
 
 import org.junit.BeforeClass;
@@ -52,7 +48,6 @@ public class DirectDispatchClientTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         staticBus = BusFactory.getDefaultBus(); 
-        setupLocalTransport(staticBus);
         BusFactory.setThreadDefaultBus(staticBus);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
@@ -67,27 +62,6 @@ public class DirectDispatchClientTest extends AbstractBusClientServerTestBase {
         invokeService(false);
     }
     
-    public static void setupLocalTransport(Bus bus) {
-        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-
-        SoapTransportFactory soapDF = new SoapTransportFactory();
-        soapDF.setBus(bus);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/", soapDF);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/", soapDF);
-        
-
-        LocalTransportFactory localTransport = new LocalTransportFactory();
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/bindings/xformat", localTransport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", localTransport);
-
-        ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
-        extension.registerConduitInitiator("http://cxf.apache.org/transports/local", localTransport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http", localTransport);
-        extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", localTransport);
-    }
 
     private void invokeService(boolean isDirectDispatch) {
         BusFactory.setThreadDefaultBus(staticBus);
