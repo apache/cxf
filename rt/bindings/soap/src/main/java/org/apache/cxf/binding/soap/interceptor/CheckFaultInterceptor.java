@@ -54,6 +54,10 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
                 && xmlReader.hasNext()) {
                 x = xmlReader.next();
             }
+            if (!xmlReader.hasNext()) {
+                //end of document, just return
+                return;
+            }
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("XML_STREAM_EXC", LOG), e, 
                                 message.getVersion().getSender());

@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.service.factory;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.hello_world_doc_lit.Greeter;
+import org.apache.hello_world_doc_lit.GreeterImplDoc;
 import org.junit.Test;
 
 public class RountripTest extends AbstractSimpleFrontendTest {
@@ -34,6 +38,7 @@ public class RountripTest extends AbstractSimpleFrontendTest {
         svrBean.setAddress("http://localhost/Hello");
         svrBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
         svrBean.setServiceBean(new HelloServiceImpl());
+        svrBean.setServiceClass(HelloService.class);        
         svrBean.setBus(getBus());
         
         svrBean.create();
@@ -53,5 +58,23 @@ public class RountripTest extends AbstractSimpleFrontendTest {
         c.getInInterceptors().add(new LoggingInInterceptor());
         
         assertEquals("hello", client.sayHello());
+        assertEquals("hello", client.echo("hello"));
+    }
+
+    @Test
+    public void testOneWay() throws Exception {
+        ServerFactoryBean svrBean = new ServerFactoryBean();
+        svrBean.setAddress("http://localhost/Hello2");
+        svrBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
+        svrBean.setServiceBean(new GreeterImplDoc());
+        svrBean.setServiceClass(Greeter.class);
+        svrBean.setEndpointName(new QName("http://apache.org/hello_world_doc_lit",
+                                        "SoapPort"));
+        svrBean.setServiceName(new QName("http://apache.org/hello_world_doc_lit",
+                                         "SOAPService"));
+        svrBean.setWsdlLocation("testutils/hello_world_doc_lit.wsdl");
+        svrBean.setBus(getBus());
+        
+        svrBean.create();
     }
 }

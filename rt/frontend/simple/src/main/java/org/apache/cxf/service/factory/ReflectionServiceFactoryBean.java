@@ -615,7 +615,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         Class paramType = method.getReturnType();
         Type genericType = method.getGenericReturnType();
 
-        if (!initializeParameter(o, method, -1, paramType, genericType)) {
+        if (o.hasOutput()
+            && !initializeParameter(o, method, -1, paramType, genericType)) {
             return false;
         }
 

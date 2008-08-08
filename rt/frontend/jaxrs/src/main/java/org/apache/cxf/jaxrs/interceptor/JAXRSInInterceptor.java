@@ -134,6 +134,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new WebApplicationException(404);
         }
 
+        message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
 
         List<ProviderInfo<RequestHandler>> shs = 
             ProviderFactory.getInstance().getRequestHandlers();
@@ -144,6 +145,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
                 List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
                 message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+                OperationResourceInfo ori = 
+                    JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                               httpMethod, values, requestContentType, acceptContentTypes);
+                message.getExchange().put(OperationResourceInfo.class, ori);
+
                 return;
             }
         }
@@ -151,8 +157,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
         List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
-        
-        message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
         
         LOG.fine("Request path is: " + path);
         LOG.fine("Request HTTP method is: " + httpMethod);
