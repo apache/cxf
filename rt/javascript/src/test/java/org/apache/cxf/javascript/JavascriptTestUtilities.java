@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -124,6 +126,42 @@ public class JavascriptTestUtilities extends TestUtilities {
         // CHECKSTYLE:ON
     }
 
+    public static class CountDownNotifier extends ScriptableObject {
+
+        private CountDownLatch latch;
+
+        public CountDownNotifier() {
+        }
+
+        @Override
+        public String getClassName() {
+            return "org_apache_cxf_count_down_notifier";
+        }
+
+        public synchronized boolean waitForJavascript(long timeout) {
+            while (true) {
+                try {
+                    return latch.await(timeout, TimeUnit.MILLISECONDS);
+                    // if it returns at all, we're done.
+                } catch (InterruptedException ie) {
+                    // empty on purpose.
+                }
+            }
+
+        }
+
+        // CHECKSTYLE:OFF
+
+        public void jsConstructor(int count) {
+            latch = new CountDownLatch(count);
+        }
+
+        public void jsFunction_count() {
+            latch.countDown();
+        }
+        // CHECKSTYLE:ON
+    }
+
     public JavascriptTestUtilities(Class<?> classpathReference) {
         super(classpathReference);
     }
@@ -143,9 +181,10 @@ public class JavascriptTestUtilities extends TestUtilities {
             ScriptableObject.defineClass(rhinoScope, JsAssert.class);
             ScriptableObject.defineClass(rhinoScope, Trace.class);
             ScriptableObject.defineClass(rhinoScope, Notifier.class);
+            ScriptableObject.defineClass(rhinoScope, CountDownNotifier.class);
+
             // so that the stock test for IE can gracefully fail.
-            rhinoContext.evaluateString(rhinoScope, "var window = new Object();", 
-                                        "<internal>", 0, null);
+            rhinoContext.evaluateString(rhinoScope, "var window = new Object();", "<internal>", 0, null);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InstantiationException e) {
@@ -241,8 +280,9 @@ public class JavascriptTestUtilities extends TestUtilities {
     }
 
     /**
-     * Call a method on a Javascript object and convert result to specified class. Convert to the
-     * requested class.
+     * Call a method on a Javascript object and convert result to specified class. Convert to the requested
+     * class.
+     * 
      * @param <T> type
      * @param clazz class object.
      * @param that Javascript object.
@@ -256,6 +296,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     /**
      * Call a method on a Javascript object inside context brackets.
+     * 
      * @param <T> return type.
      * @param clazz class for the return type.
      * @param that object
@@ -263,9 +304,8 @@ public class JavascriptTestUtilities extends TestUtilities {
      * @param args arguments. Caller must run javaToJS as appropriate
      * @return return value.
      */
-    public <T> T rhinoCallMethodInContext(final Class<T> clazz, final Scriptable that, 
-                                          final String methodName, 
-                                          final Object... args) {
+    public <T> T rhinoCallMethodInContext(final Class<T> clazz, final Scriptable that,
+                                          final String methodName, final Object... args) {
         // we end up performing the cast twice to make the compiler happy.
         return runInsideContext(clazz, new JSRunnable<T>() {
             public T run(Context context) {
@@ -275,8 +315,7 @@ public class JavascriptTestUtilities extends TestUtilities {
     }
 
     /**
-     * Evaluate a Javascript expression, converting the return value to a
-     * convenient Java type.
+     * Evaluate a Javascript expression, converting the return value to a convenient Java type.
      * 
      * @param <T> The desired type
      * @param jsExpression the javascript expression.
@@ -288,14 +327,12 @@ public class JavascriptTestUtilities extends TestUtilities {
     }
 
     /**
-     * Call a JavaScript function within the Context. Optionally, require it to
-     * throw an exception equal to a supplied object. If the exception is called
-     * for, this function will either return null or Assert.
+     * Call a JavaScript function within the Context. Optionally, require it to throw an exception equal to a
+     * supplied object. If the exception is called for, this function will either return null or Assert.
      * 
      * @param expectingException Exception desired, or null.
      * @param functionName Function to call.
-     * @param args args for the function. Be sure to Javascript-ify them as
-     *                appropriate.
+     * @param args args for the function. Be sure to Javascript-ify them as appropriate.
      * @return
      */
     public Object rhinoCallExpectingExceptionInContext(final Object expectingException,
@@ -308,8 +345,8 @@ public class JavascriptTestUtilities extends TestUtilities {
     }
 
     /**
-     * Call a Javascript function, identified by name, on a set of arguments.
-     * Optionally, expect it to throw an exception.
+     * Call a Javascript function, identified by name, on a set of arguments. Optionally, expect it to throw
+     * an exception.
      * 
      * @param expectingException
      * @param functionName
@@ -363,15 +400,13 @@ public class JavascriptTestUtilities extends TestUtilities {
             readStringIntoRhino(allThatJavascript, schema.toString() + ".js");
         }
 
-        ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, 
-                                                                               null,
-                                                                               prefixManager,
-                                                                               nameManager);
+        ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, null,
+                                                                               prefixManager, nameManager);
         serviceBuilder.walk();
         String serviceJavascript = serviceBuilder.getCode();
         readStringIntoRhino(serviceJavascript, serviceInfo.getName() + ".js");
     }
-    
+
     public static String scriptableToString(Scriptable scriptable) {
         StringBuilder builder = new StringBuilder();
         for (Object propid : scriptable.getIds()) {

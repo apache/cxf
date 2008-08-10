@@ -58,11 +58,16 @@ function success1(responseObject)
 	globalResponseObject = responseObject;
 }
 
+function closure_success1(responseObject)
+{
+	globalResponseObject = responseObject;
+	globalNotifier.count();
+}
 
-function success2(responseObject)
+function closure_success2(responseObject)
 {
 	globalSecondResponseObject = responseObject;
-	globalNotifier.notify();
+	globalNotifier.count();
 }
 
 function sayHiTest(url)
@@ -84,14 +89,14 @@ function requestClosureTest(url)
 {
 	org_apache_cxf_trace.trace("Enter sayHi.");
 	resetGlobals();
-	globalNotifier = new org_apache_cxf_notifier();
+	globalNotifier = new org_apache_cxf_count_down_notifier(2);
 	
 	var intf;
     intf = new cxf_apache_org_jstest_Greeter();
 	  
 	intf.url = url;
-    intf.sayHi(success1, testErrorCallback);
-    intf.sayHi(success2, testErrorCallback);
+    intf.sayHi(closure_success1, testErrorCallback);
+    intf.sayHi(closure_success2, testErrorCallback);
     // Return the notifier as a convenience to the Java code.
 	return globalNotifier;
 

@@ -22,6 +22,7 @@ package org.apache.cxf.javascript;
 import java.io.File;
 import java.net.URL;
 
+import org.apache.cxf.javascript.JavascriptTestUtilities.CountDownNotifier;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.junit.Before;
@@ -84,8 +85,8 @@ public class GreeterClientTest extends JavascriptRhinoTest {
     }
     
     private Void sayHiClosureCaller(Context context) {
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("requestClosureTest", Notifier.class, 
+        CountDownNotifier notifier = 
+            testUtilities.rhinoCallConvert("requestClosureTest", CountDownNotifier.class, 
                                            testUtilities.javaToJS(getAddress()));
         
         boolean notified = notifier.waitForJavascript(1000 * 10);
