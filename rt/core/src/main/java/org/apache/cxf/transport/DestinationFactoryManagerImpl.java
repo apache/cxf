@@ -68,19 +68,19 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     public void setBus(Bus b) {
         bus = b;
     }
-    
+
     @PostConstruct
     public void register() {
         if (null != bus) {
             bus.setExtension(this, DestinationFactoryManager.class);
         }
     }
-    
+
 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.bus.DestinationFactoryManager#registerDestinationFactory(java.lang.String,
      *      org.apache.cxf.transports.DestinationFactory)
      */
@@ -90,7 +90,7 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.bus.DestinationFactoryManager#deregisterDestinationFactory(java.lang.String)
      */
     public void deregisterDestinationFactory(String namespace) {
@@ -99,14 +99,14 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.bus.DestinationFactoryManager#DestinationFactory(java.lang.String)
      */
     /**
      * Returns the conduit initiator for the given namespace, constructing it
      * (and storing in the cache for future reference) if necessary, using its
      * list of factory classname to namespace mappings.
-     * 
+     *
      * @param namespace the namespace.
      */
     public DestinationFactory getDestinationFactory(String namespace) throws BusException {
@@ -123,6 +123,10 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     }
 
     public DestinationFactory getDestinationFactoryForUri(String uri) {
+        //If the uri is related path or has no protocol prefix , we will set it to be http
+        if (uri.startsWith("/") || uri.indexOf(":") < 0) {
+            uri = "http://" + uri;
+        }
         //first attempt the ones already registered
         for (Map.Entry<String, DestinationFactory> df : destinationFactories.entrySet()) {
             for (String prefix : df.getValue().getUriPrefixes()) {
@@ -142,7 +146,7 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
                 }
             }
         }
-        
+
         return null;
     }
 

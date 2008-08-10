@@ -22,10 +22,10 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.systest.jaxws.HelloImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.hello_world_soap_http.GreeterImpl;
-
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.servlet.Context;
@@ -42,22 +42,25 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             httpServer = new Server(9000);
             ContextHandlerCollection contexts = new ContextHandlerCollection();
             httpServer.setHandler(contexts);
-            
+
             Context root = new Context(contexts, "/", Context.SESSIONS);
-            
+
             CXFNonSpringServlet cxf = new CXFNonSpringServlet();
             ServletHolder servlet = new ServletHolder(cxf);
             servlet.setName("soap");
             servlet.setForcedPath("soap");
             root.addServlet(servlet, "/soap/*");
-            
+
             httpServer.start();
-            
+
             Bus bus = cxf.getBus();
             setBus(bus);
             BusFactory.setDefaultBus(bus);
             GreeterImpl impl = new GreeterImpl();
             Endpoint.publish("/Greeter", impl);
+            HelloImpl helloImpl = new HelloImpl();
+            Endpoint.publish("/Hello", helloImpl);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -69,13 +72,13 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             }
         }
     }
-    
+
     public void tearDown() throws Exception {
         if (httpServer != null) {
             httpServer.stop();
-        }    
+        }
     }
-    
+
     public static void main(String[] args) {
         try {
             NoSpringServletServer s = new NoSpringServletServer();

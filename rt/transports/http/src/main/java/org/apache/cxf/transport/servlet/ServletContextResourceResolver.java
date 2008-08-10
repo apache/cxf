@@ -37,11 +37,11 @@ import org.apache.cxf.resource.ResourceResolver;
 public class ServletContextResourceResolver implements ResourceResolver {
     ServletContext servletContext;
     Map<String, URL> urlMap = new ConcurrentHashMap<String, URL>();
-    
+
     public ServletContextResourceResolver(ServletContext sc) {
         servletContext = sc;
     }
-    
+
 
     public final InputStream getAsStream(final String string) {
         if (urlMap.containsKey(string)) {
@@ -55,19 +55,21 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     public final <T> T resolve(final String entryName, final Class<T> clz) {
-        
+
         Object obj = null;
         try {
-            InitialContext ic = new InitialContext();
-            obj = ic.lookup(entryName);
+            if (entryName != null) {
+                InitialContext ic = new InitialContext();
+                obj = ic.lookup(entryName);
+            }
         } catch (NamingException e) {
             //do nothing
         }
-        
+
         if (obj != null && clz.isInstance(obj)) {
             return clz.cast(obj);
         }
-        
+
         if (clz.isAssignableFrom(URL.class)) {
             if (urlMap.containsKey(entryName)) {
                 return clz.cast(urlMap.get(entryName));
@@ -92,7 +94,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
             }
         } else if (clz.isAssignableFrom(InputStream.class)) {
             return clz.cast(getAsStream(entryName));
-        }        
+        }
         return null;
     }
 }

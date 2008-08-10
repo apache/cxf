@@ -26,6 +26,8 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.systest.jaxws.Hello;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -41,11 +43,11 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(NoSpringServletServer.class));
     }
-    
+
     @Test
     public void testBasicConnection() throws Exception {
         SOAPService service = new SOAPService(new URL(serviceURL + "Greeter?wsdl"));
-        Greeter greeter = service.getPort(portName, Greeter.class);        
+        Greeter greeter = service.getPort(portName, Greeter.class);
         try {
             String reply = greeter.greetMe("test");
             assertNotNull("no response received from service", reply);
@@ -57,14 +59,25 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
     }
-    
+
+    @Test
+    public void testHelloService() throws Exception {
+        JaxWsProxyFactoryBean cpfb = new JaxWsProxyFactoryBean();
+        String address = serviceURL + "Hello";
+        cpfb.setServiceClass(Hello.class);
+        cpfb.setAddress(address);
+        Hello hello = (Hello) cpfb.create();
+        String reply = hello.sayHi(" Willem");
+        assertEquals("Get the wrongreply ", reply, "get Willem");
+    }
+
     @Test
     public void testGetServiceList() throws Exception {
         WebConversation client = new WebConversation();
         WebResponse res = client.getResponse(serviceURL);
         WebLink[] links = res.getLinks();
-        assertEquals("There should get two links for the service", 1, links.length);
-        assertEquals(serviceURL + "Greeter?wsdl", links[0].getURLString()); 
+        assertEquals("There should get two links for the service", 2, links.length);
+        assertEquals(serviceURL + "Greeter?wsdl", links[0].getURLString());
         assertEquals("text/html", res.getContentType());
     }
 }
