@@ -82,7 +82,15 @@ cxf dev list, cxf-dev@incubator.apache.org.  You can also file issues in JIRA at
 http://issues.apache.org/jira/browse/CXF
 
 
-6. Specific issues, features, and improvements fixed in this version 
+6. JAX-RS/JSR-311
+
+2.1.2 upgrades the JAX-RS/JSR-311 support level to 0.8 from 0.7.   This may cause 
+existing JAX-RS applications to fail.  JAX-RS/JSR-311 is a work in progress and as
+the specification changes, we'll be updating the implementation to keep track with 
+the specification.
+
+
+7. Specific issues, features, and improvements fixed in this version 
 
 
 Release Notes - CXF - Version 2.1.2
