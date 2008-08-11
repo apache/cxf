@@ -80,7 +80,7 @@ public class PluginTransformer implements ResourceTransformer {
     }
 
     public boolean hasTransformedResource() {
-        return true;
+        return doc != null;
     }
 
     public void modifyOutputStream(JarOutputStream jos) throws IOException {
