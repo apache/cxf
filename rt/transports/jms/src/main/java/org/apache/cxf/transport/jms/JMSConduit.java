@@ -257,10 +257,11 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
                 if (!isOneWay) {
                     handleResponse();
                 }
-                base.sessionFactory.recycle(pooledSession);
             } catch (JMSException jmsex) {
                 getLogger().log(Level.WARNING, "JMS connect failed with JMSException : ", jmsex);            
                 throw new IOException(jmsex.toString());
+            } finally {
+                base.sessionFactory.recycle(pooledSession);
             }
         }
         
