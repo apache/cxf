@@ -84,7 +84,7 @@ http://issues.apache.org/jira/browse/CXF
 
 6. JAX-RS/JSR-311
 
-2.1.2 upgrades the JAX-RS/JSR-311 support level to 0.8 from 0.7.   This may cause 
+2.1.2 upgrades the JAX-RS/JSR-311 support level to 0.8 from 0.6.   This may cause 
 existing JAX-RS applications to fail.  JAX-RS/JSR-311 is a work in progress and as
 the specification changes, we'll be updating the implementation to keep track with 
 the specification.
