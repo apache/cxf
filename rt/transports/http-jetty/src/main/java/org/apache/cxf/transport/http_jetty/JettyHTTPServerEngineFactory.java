@@ -88,7 +88,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      */
     @Resource(name = "cxf")
     public void setBus(Bus bus) {
-        if (this.bus != null) {
+        if (this.bus == null) {
             this.bus = bus;
         }
     }
