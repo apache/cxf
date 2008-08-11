@@ -262,6 +262,16 @@ public abstract class AbstractDOMStreamReader implements XMLStreamReader {
      * @see javax.xml.stream.XMLStreamReader#isWhiteSpace()
      */
     public boolean isWhiteSpace() {
+        if (currentEvent == CHARACTERS || currentEvent == CDATA) {
+            String text = getText();
+            int len = text.length();
+            for (int i = 0; i < len; ++i) {
+                if (text.charAt(i) > 0x0020) {
+                    return false;
+                }
+            }
+            return true;
+        }
         return currentEvent == SPACE;
     }
 
