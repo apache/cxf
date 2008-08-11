@@ -1,9 +1,9 @@
-Apache CXF 2.1.1 Release Notes
+Apache CXF 2.1.2 Release Notes
 
 1. Overview
 
-Apache CXF 2.1.1 delivers the latest set of patches and bug fixes for Apache
-CXF.   This release fixes 74 JIRA issues that have been reported by users.
+Apache CXF 2.1.2 delivers the latest set of patches and bug fixes for Apache
+CXF.   This release fixes 62 JIRA issues that have been reported by users.
 
 2. Installation Prerequisites 
 
@@ -60,7 +60,7 @@ is completely usable as namespace declarations may be lost.
 The latest version of the WSS4J library that is used to implement WS-Security 
 requires the opensaml jar to be on the classpath.  This is different than previous
 versions that only required it if doing SAML assertions.  When upgrading
-to CXF 2.1.1, you will need to add the opensaml jar to your application.   
+to CXF 2.1.2, you will need to add the opensaml jar to your application.   
 
 3. Building the Samples
 
@@ -84,91 +84,75 @@ http://issues.apache.org/jira/browse/CXF
 
 6. Specific issues, features, and improvements fixed in this version 
 
-Release Notes - CXF - Version 2.1.1
 
-Bug
-[CXF-1160] - Remove ridiculous XmlSchema workaround hack in ReflectionServiceFactoryBean
-[CXF-1623] - Wrong org.apache.cxf.jaxws.handler.AnnotationHandlerChainBuilder.protocolMatches() method implementation or preconditions
-[CXF-1204] - Dynamic client does not filter out JDK packages....
-[CXF-1367] - Building tools fails when there is a space in the path name
-[CXF-1379] - tools tests fail on Linux
-[CXF-1457] - cxf-codegen-plugin misinterprets relative paths in pom.xml
-[CXF-1512] - wsdl2java doesn't generate method and class javadoc from jaxws:javadoc element
-[CXF-1533] - Clients generated with CXF from java using Aegis DataBinding and SimpleFrontEnd sends the header SoapAction empty. This prevent interaction with oracle soa products wich depends on this header to execute correctly.
-[CXF-1538] - message.getContent(OutputStream.class) cannot be null
-[CXF-1546] - CDATA section markers removed from WSDL comments
-[CXF-1551] - validation against XML schema - leads to invalid soap response
-[CXF-1552] - When publish the endpoint by using Serlvet transport without the spring , get the NPE for injecting the bus resource to JMSTransportFactory
-[CXF-1553] - TunedDocumentLoader fails to resolve xsi prefix properly when not using WSTX.
-[CXF-1554] - Content type is set as if for soap 1.2 even though javascript client generator only supports 1.1.
-[CXF-1555] - Javascript generator does not include the usual web service 'port' model
-[CXF-1558] - Webservice method returning a Set results in java.lang.ClassCastException: java.util.LinkedHashSet cannot be cast to java.util.List
-[CXF-1559] - Missing Client side Soap Attachments Support in CXF
-[CXF-1560] - EndpointReferenceUtils.getSchema threading issue
-[CXF-1562] - OSGI needed manifest modifications
-[CXF-1564] - ArrayType does not work correctly if isWriteOuter == false
-[CXF-1565] - wsdl2java jaxws binding issues
-[CXF-1567] - DynamicClientFactory throws NullPointerException while building classpath if jar does not have Manifest file
-[CXF-1568] - cxf client error throws exception while invoking strikeIron ws with implicit headers
-[CXF-1569] - java.util.ConcurrentModificationException on client with JAXBFrontend
-[CXF-1570] - NullPointerException in JAXRSUtils
-[CXF-1571] - CachedOutputStream#writeCacheTo(StringBuilder, int) fails with StringIndexOutOfBoundsException
-[CXF-1573] - JBIDestinationOutputStream should copy attachments into NormalizedMessage to support outbound attachments
-[CXF-1574] - JBI transport should support copy inbound normalizedmessage property to outbound normalizedmessage
-[CXF-1575] - SoapFault is not being properly propagated up the stack
-[CXF-1579] - The web documentation don't show the examples
-[CXF-1580] - CXF uses unpredictable string constructor
-[CXF-1581] - ?wsdl not working if using the sun stax parser instead of woodstox
-[CXF-1583] - DynamicClientFactory.setupClasspath method cannot handle spaces in path to jar file
-[CXF-1584] - DynamicClientFactory.setupClasspath method throws Exception if jar file does not exist
-[CXF-1585] - Error in javadoc of org.apache.cxf.common.logging.LogUtils
-[CXF-1587] - Aegis Databinding cannot handle wildcard as a Map value type (ex: Map<String, ?>)
-[CXF-1588] - NullPointerException in JbiConduitOutputStream
-[CXF-1589] - Exception is thrown only the first time an error occur while trying to publish a webservice with HTTP transport
-[CXF-1592] - DynamicClientFactory throws inside JAXB when presented with Aegis-generated WSDL
-[CXF-1593] - cxf-codegen-plugin : wsdl2java does not take packagename argument into account
-[CXF-1595] - NPE in W3CDOMStreamWriter.writeCharacters caused by StaxUtils.copy
-[CXF-1596] - DynamicClientFactory.setupClasspath throws a null pointer exception if classloader does not contain jars
-[CXF-1600] - Paramaters are being generated for parts in out-of-band messages that aren't listed in the "part" of the soap:header
-[CXF-1602] - DataTypeAdapter causes NPE with jaxb-impl 2.1.6 if multiple bindings go to the same java type
-[CXF-1603] - Can not generate subs or dynamic client for a web service with no Body Parts (NullPointerException)
-[CXF-1604] - Passing null to an "object array" or "object list" parameter results in NPE
-[CXF-1606] - wsdl_first_https sample doesn't work caused by the Certificate we are using expired
-[CXF-1609] - The setSynchronousTimeout on the ClientImpl does not prevent reading the socket to timeout...
-[CXF-1611] - testWsaddressingServerIdlgen(org.apache.cxf.tools.corba.processors.WSDLToIDLGenerationTest) fails import of addressing schema
-[CXF-1612] - javax.xml.stream.XMLStreamException when process WSDL
-[CXF-1614] - Bug in CXF Validation, SOAP Fault produces invalid XML
-[CXF-1618] - ReflectionServiceFactoryBean creates inconsistent schema for messages with parts with types and no elements
-[CXF-1621] - Memory Leak in WSDLManagerImpl - SchemaCacheMap
-[CXF-1622] - org.apache.cxf.interceptor.StaxOutInterceptor uses StAX API incorrectly
-[CXF-1625] - ServletDestination does not support decoupled responses
-[CXF-1629] - jaxws:endpoint properties not honored
-[CXF-1633] - http conduit authorization not applied in spring configuration with simple:client
-[CXF-1639] - Memory leak due to literal keys in WSDLDefinition map
-[CXF-1640] - Clientside EndpointPolicy details never removed from PolicyEngineImpl.
-[CXF-1642] - CXF Bundle is missing an Import-Package for woodstox
-[CXF-1643] - Move runtime resources found in META-INF to META-INF/cxf so that they can be found in an OSGi runtime environment
-[CXF-1644] - Adding value to wsdl parameter causes NullPointerException
-[CXF-1645] - ResourceInjector fails to inject into (Spring) proxies if resource to be in injected is subclassed
-[CXF-1646] - Maven codegen-plugin skips generation of multiple wsdl options of equally named wsdl files
-[CXF-1649] - localtransport Concurrent problem
+Release Notes - CXF - Version 2.1.2
 
-Improvement
-[CXF-1556] - JAXRSInInterceptor a bit chatty
-[CXF-1586] - option in wsdl2java generation to NOT create a @Webservice.wsdlLocation
-[CXF-1597] - setStackTrace method of org.apache.cxf.interceptor.ClientFaultConverter make me can't put stackTrace elment under fault detail element
-[CXF-1619] - Move bus wiring out of Spring XML handlers
-[CXF-1627] - Upgrade to WSS4J 1.5.4
-[CXF-1630] - Make nicer service list for CXFServlet
-[CXF-1632] - Improve WS-Security error handling
-[CXF-1638] - more package need export of cxf bundle for package resolution
+** Sub-task
+    * [CXF-1016] - Context injection - Preconditions
+    * [CXF-1018] - Transfer encoding
 
-New Feature
-[CXF-1601] - Add the equivilent of the JAX-WS RI -XautoNameResolution flag on wsimport
+** Bug
+    * [CXF-1406] - CXF JAX-RS implementation creates a new JAXBContext for each top level type.
+    * [CXF-1572] - @Path is not mapping to required methods
+    * [CXF-1578] - Json marshall/unmarshall error
+    * [CXF-1617] - Basic Authentication failure
+    * [CXF-1620] - wsdl2java ignores jaxb2 xjc globalBindings with namespace xjc
+    * [CXF-1652] - CXF Decoupled Endpoints are not getting cleaned up properly even after bus.Shutdown() in org.apache.cxf.systest.ws.rm.SequenceTest.
+    * [CXF-1653] - Deviation from spec: unnecessary check for @ProduceMime of sub-resource locators
+    * [CXF-1655] - NPE when no sub-resource method found that matches to the request
+    * [CXF-1657] - CheckFaultInterceptor causes XMLStreamReader to throw IllegalState at doc end
+    * [CXF-1658] - The jbi transport should honor the sendSync flag so that xa transactions are handled correctly in smx3
+    * [CXF-1659] - Eclipse plugin has ${cxf.version} in directory name
+    * [CXF-1660] - Nested namespace defined spring beans aren't properly unique
+    * [CXF-1661] - style="rpc" in soapBinging configuration is not honored
+    * [CXF-1663] - Attempting to use a Spring configured HTTPConduit causing compatability problems with Spring 2.5.4 testing framework
+    * [CXF-1665] - org.apache.cxf.jaxws.interceptors.SwAOutInterceptor:197 | Unreachable Code
+    * [CXF-1667] - WsdlLocation can't not be set from <simple:server> or <jaxws:server>
+    * [CXF-1669] - MTOM does not work when add WSS4J interceptors(UsernameToken and Timestamp)
+    * [CXF-1674] - JAXB unmarshalling cannot be configured to use the ObjectFactory
+    * [CXF-1675] - @QueryParam is not following reference javadoc for primitive types
+    * [CXF-1676] - oneway request followed by two-way request fails while using JMS Transport. 
+    * [CXF-1678] - wsdl2java does not generate impl stubs when only logical wsdl is present
+    * [CXF-1681] - Base URL caching in ServletController avoids needed updateDests() call on republishing endpoints
+    * [CXF-1682] - Generated Web service Client fails for http://demo.aws.air-worldwide.com/aws/passporttogo.asmx?wsdl
+    * [CXF-1683] - ExtendedURIResolver returns relative paths after resolving a URI relative to another one.
+    * [CXF-1687] - Lots of NPE when parsing documents at start time
+    * [CXF-1689] - CXF assumes class.getPackage() is never null
+    * [CXF-1691] - Potential for NPE in AbstractResourceInfo.clearProxies
+    * [CXF-1696] - wsdl2java issues with implicit headers
+    * [CXF-1699] - Content type not set on http response
+    * [CXF-1700] - XMLBeans - XmlBeansSchemaInitializer (Lline #177) can't handle xs:include 
+    * [CXF-1707] - Security Exception when using java2ws via the cxf-java2ws-plugin in Netbeans
+    * [CXF-1709] - "No service was found." after refresh of Spring's ApplicationContext 
+    * [CXF-1711] - Server failed to start and receieved IllegalAnnotationExceptions 
+    * [CXF-1712] - ObjectFactory cache doesn't take classloaders into accout
+    * [CXF-1713] - Generated Javascript does not handle simultaneous soap requests correctly
+    * [CXF-1719] - RPC/Lit not honoring namespace in soap:body wsdl extensor
+    * [CXF-1720] - RPC/Lit soap 1.2 not processing the soap-rpc:result element
+    * [CXF-1721] - Generated WS-Addressing action uses wrong separator for urns
+    * [CXF-1722] - CXF does not write out PIs at the root of the WSDL file
+    * [CXF-1723] - wsdl2java generates errorneous code
+    * [CXF-1724] - Nullpointer error in DOMUtils
+    * [CXF-1727] - I guess there is an error in the ProviderFactory of jaxrs component.
+    * [CXF-1728] - wsdl2java does not generate properly formatted javadoc when jaxws:javadoc tags are used
+    * [CXF-1733] - SoapPreProtocolOutInterceptor overrides SoapActionOutInterceptor 
+    * [CXF-1737] - NPE in ClientProxyFactoryBean on void methods 
+    * [CXF-1741] - NPE is thrown when publish the code first service  in NoSpringServlet
 
+** Improvement
+    * [CXF-341] - Display user supplied wsdl in HTTP transports
+    * [CXF-1634] - Add XMLBean data provider to JAX-RS front end
+    * [CXF-1671] - Add a setter to JSONProvider to set the XML Namespace to Jettison prefix map
+    * [CXF-1677] - Support Unmarshaller.Listener and Marshaller.Listener
+    * [CXF-1680] - Map ws-security principals into WebServiceContext.getUserPrincipal() call
+    * [CXF-1684] - URIResolver cannot resolve relative paths with with zip: scheme
+    * [CXF-1685] - Not possible to pass empty parameter to the maven-codegen-plugin
+    * [CXF-1686] - maven-codegen-plugin: Add ability to specify a default set of options for all wsdls in a project.
+    * [CXF-1688] - Make the JBI binding and transport OSGi bundles
+    * [CXF-1692] - cfx-codegen-plugin: Should be possible to configure using named parameters.
+    * [CXF-1705] - Servlet 2.3 compliance
+    * [CXF-1734] - AutomaticWorkQueue not configurable
+    * [CXF-1738] - AbstractWSDLBasedEndpointFactory should setTransportId for local and camel transport according to the publish address 
 
-
-
-
-
-
+** New Feature
+    * [CXF-1387] - Support for GZIP compression of HTTP payloads
