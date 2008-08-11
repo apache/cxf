@@ -69,7 +69,7 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
         controller = c;
     }
 
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         super.setBus(b);
     }

@@ -45,7 +45,7 @@ public class JMSTransportFactory extends AbstractTransportFactory
 
     private Bus bus;
 
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }

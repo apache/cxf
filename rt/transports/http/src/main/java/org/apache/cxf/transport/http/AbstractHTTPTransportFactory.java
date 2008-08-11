@@ -88,7 +88,7 @@ public abstract class AbstractHTTPTransportFactory
      * This method is used by Spring to inject the bus.
      * @param b The CXF bus.
      */
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }

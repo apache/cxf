@@ -59,7 +59,7 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
 
     private Collection<String> activationNamespaces;
 
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }

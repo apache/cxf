@@ -41,70 +41,95 @@ public final class BindingAnnotator implements Annotator {
         if (processBinding(intf)) {
             JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
             if (!SOAPBinding.Style.DOCUMENT.equals(intf.getSOAPStyle())) {
-                bindingAnnotation.addElement(new JAnnotationElement("style", intf.getSOAPStyle()));
+                bindingAnnotation.addElement(new JAnnotationElement("style",
+                                                                    intf.getSOAPStyle()));
             }
             if (!SOAPBinding.Use.LITERAL.equals(intf.getSOAPUse())) {
                 bindingAnnotation.addElement(new JAnnotationElement("use", intf.getSOAPUse()));
             }            
-            if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT) {
+            if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT
+                && intf.getSOAPParameterStyle() != SOAPBinding.ParameterStyle.WRAPPED) {
                 bindingAnnotation.addElement(new JAnnotationElement("parameterStyle", 
-                                                                           intf.getSOAPParameterStyle()));
+                                                                     intf.getSOAPParameterStyle()));
             }
             intf.addAnnotation(bindingAnnotation);
+        }
+        
+        
+        for (JavaMethod method : intf.getMethods()) {
+            if (!method.isAsync()) {
+                method.annotate(new SoapBindingAnnotator());
+            }
         }
     }
     
     private boolean processBinding(JavaInterface intf) {
         SOAPBinding.Style soapStyle = intf.getSOAPStyle();
         SOAPBinding.Use soapUse = intf.getSOAPUse();
-        boolean isWrapped = true;
-        int count = 0;
+        boolean allWrapped = true;
+        boolean allBare = true;
+        boolean allRPC = true;
+        boolean allDOC = true;
         for (JavaMethod method : intf.getMethods()) {
             if (!method.isWrapperStyle()) {
-                isWrapped = false;
-                count++;
+                allWrapped = false;
+            } else {
+                allBare = false;
+            }
+            SOAPBinding.Style mStyle = method.getSoapStyle();
+            if (mStyle == null) {
+                mStyle = soapStyle;
+            }
+            if (mStyle == null) {
+                mStyle = SOAPBinding.Style.DOCUMENT;
             }
             if (soapStyle == null
                 && method.getSoapStyle() != null) {
                 soapStyle = method.getSoapStyle();
             }
+            if (SOAPBinding.Style.DOCUMENT.equals(mStyle)) {
+                allRPC = false;
+            } else {
+                allDOC = false;
+            }
+          
             if (soapUse == null
                 && method.getSoapUse() != null) {
                 soapUse = method.getSoapUse();
             }
         }
+        if (allDOC) {
+            soapStyle = SOAPBinding.Style.DOCUMENT;
+        } else if (allRPC) {
+            soapStyle = SOAPBinding.Style.RPC;            
+        }
 
         if (soapStyle == SOAPBinding.Style.DOCUMENT) {
             intf.setSOAPStyle(SOAPBinding.Style.DOCUMENT);
-            if (isWrapped) {
+            if (allWrapped) {
                 intf.setSOAPParameterStyle(SOAPBinding.ParameterStyle.WRAPPED);
-            } else {
+            } else if (allBare) {
                 intf.setSOAPParameterStyle(SOAPBinding.ParameterStyle.BARE);
             }
         } else if (soapStyle == null) {
             intf.setSOAPStyle(SOAPBinding.Style.DOCUMENT);
-            if (isWrapped) {
+            if (allWrapped) {
                 intf.setSOAPParameterStyle(SOAPBinding.ParameterStyle.WRAPPED);
-            } else {
+            } else if (allBare) {
                 intf.setSOAPParameterStyle(SOAPBinding.ParameterStyle.BARE);
             }
-            
         } else {
             intf.setSOAPStyle(SOAPBinding.Style.RPC);
         }
-        
+        if (intf.getSOAPParameterStyle() == null) {
+            intf.setSOAPParameterStyle(SOAPBinding.ParameterStyle.WRAPPED);
+        }
         if (soapUse == SOAPBinding.Use.LITERAL) {
             intf.setSOAPUse(SOAPBinding.Use.LITERAL);
         } else if (soapUse == null) {
             intf.setSOAPUse(SOAPBinding.Use.LITERAL);
         } else {
             intf.setSOAPUse(SOAPBinding.Use.ENCODED);
-        }
-
-        if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT
-            && count != 0
-            && count != intf.getMethods().size()) {
-            return false;
         }
 
         if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT

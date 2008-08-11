@@ -45,7 +45,7 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
         super();
     }
     
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         super.setBus(b);
     }

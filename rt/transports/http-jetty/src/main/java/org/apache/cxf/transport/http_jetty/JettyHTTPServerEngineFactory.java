@@ -86,10 +86,11 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      * This call is used to set the bus. It should only be called once.
      * @param bus
      */
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus bus) {
-        assert this.bus == null;
-        this.bus = bus;
+        if (this.bus != null) {
+            this.bus = bus;
+        }
     }
     
     public Bus getBus() {

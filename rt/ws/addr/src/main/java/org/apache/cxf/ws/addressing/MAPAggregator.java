@@ -546,7 +546,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
 
     private String getDelimiter(String uri) {
         if (uri.startsWith("urn")) {
-            return ".";
+            return ":";
         }
         return "/";
     }

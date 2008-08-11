@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.configuration.jsse;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.configuration.security.ClientAuthentication;
 
 /**
@@ -35,7 +33,6 @@ public class TLSServerParameters extends TLSParameterBase {
      * This parameter configures the server side to request and/or
      * require client authentication.
      */
-    @Resource
     public final void setClientAuthentication(ClientAuthentication clientAuth) {
         clientAuthentication = clientAuth;
     }

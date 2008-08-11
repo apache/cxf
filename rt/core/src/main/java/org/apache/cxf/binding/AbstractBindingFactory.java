@@ -170,7 +170,7 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
         return bus;
     }
 
-    @Resource(name = "bus")
+    @Resource
     public void setBus(Bus bus) {
         this.bus = bus;
     }

@@ -73,11 +73,16 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         properties.put(BUS_ID_PROPERTY_NAME, BUS_PROPERTY_NAME);
         properties.put(BUS_PROPERTY_NAME, this);
+        properties.put(DEFAULT_BUS_ID, this);
         
         ResourceResolver propertiesResolver = new PropertiesResolver(properties);
         resourceManager.addResourceResolver(propertiesResolver);
         
         ResourceResolver busResolver = new SinglePropertyResolver(BUS_PROPERTY_NAME, this);
+        resourceManager.addResourceResolver(busResolver);
+        resourceManager.addResourceResolver(new ObjectTypeResolver(this));
+        
+        busResolver = new SinglePropertyResolver(DEFAULT_BUS_ID, this);
         resourceManager.addResourceResolver(busResolver);
         resourceManager.addResourceResolver(new ObjectTypeResolver(this));
         

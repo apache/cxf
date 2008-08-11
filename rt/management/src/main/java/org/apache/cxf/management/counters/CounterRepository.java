@@ -53,7 +53,7 @@ public class CounterRepository {
         counters = new ConcurrentHashMap<ObjectName, Counter>();
     }
     
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }

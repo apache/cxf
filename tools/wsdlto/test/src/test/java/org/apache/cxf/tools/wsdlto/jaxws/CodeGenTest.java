@@ -773,9 +773,11 @@ public class CodeGenTest extends ProcessorTestBase {
 
         Method method = clz.getMethod("inoutHeader", new Class[] {para, Holder.class});
 
-        soapBindingAnno = AnnotationUtil.getPrivMethodAnnotation(method, SOAPBinding.class);
-        assertNotNull(soapBindingAnno);
-        assertEquals(SOAPBinding.ParameterStyle.BARE, soapBindingAnno.parameterStyle());
+        //the SOAPBinding annotation on the class sets it to bare, thus, this annotation may
+        //not be generated as it would be redundant
+        //soapBindingAnno = AnnotationUtil.getPrivMethodAnnotation(method, SOAPBinding.class);
+        //assertNotNull(soapBindingAnno);
+        //assertEquals(SOAPBinding.ParameterStyle.BARE, soapBindingAnno.parameterStyle());
 
         WebParam webParamAnno = AnnotationUtil.getWebParam(method, "SOAPHeaderInfo");
         assertEquals("INOUT", webParamAnno.mode().name());

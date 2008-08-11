@@ -82,7 +82,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         messageIncludeProperties.add(Message.RESPONSE_CODE);
     }
     
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }

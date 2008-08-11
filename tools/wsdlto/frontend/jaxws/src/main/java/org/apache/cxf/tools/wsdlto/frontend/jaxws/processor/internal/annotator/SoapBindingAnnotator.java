@@ -51,6 +51,11 @@ public class SoapBindingAnnotator implements Annotator {
                                                                         SOAPBinding.ParameterStyle.WRAPPED));
                 method.addAnnotation("SOAPBinding", bindingAnnotation);                
             }
+        } else if (!SOAPBinding.Style.RPC.equals(method.getInterface().getSOAPStyle())) {
+            JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
+            bindingAnnotation.addElement(new JAnnotationElement("style", 
+                                                                       SOAPBinding.Style.RPC));
+            method.addAnnotation("SOAPBinding", bindingAnnotation);            
         }
     }
     

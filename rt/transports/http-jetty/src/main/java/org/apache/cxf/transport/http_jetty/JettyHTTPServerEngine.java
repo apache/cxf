@@ -143,7 +143,7 @@ public class JettyHTTPServerEngine
     /**
      * The bus.
      */
-    @Resource(name = "bus")
+    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }

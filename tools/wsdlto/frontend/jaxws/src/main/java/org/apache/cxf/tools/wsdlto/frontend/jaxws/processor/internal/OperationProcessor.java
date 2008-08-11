@@ -42,7 +42,6 @@ import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaReturn;
 import org.apache.cxf.tools.common.model.JavaType;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.SoapBindingAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.WSActionAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.WebMethodAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.WebResultAnnotator;
@@ -101,7 +100,6 @@ public class OperationProcessor  extends AbstractProcessor {
         }
 
         method.annotate(new WebResultAnnotator());
-        method.annotate(new SoapBindingAnnotator());                
 
         JAXWSBinding opBinding = (JAXWSBinding)operation.getExtensor(JAXWSBinding.class);
 
