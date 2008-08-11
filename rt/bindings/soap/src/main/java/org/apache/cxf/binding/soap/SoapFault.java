@@ -148,6 +148,17 @@ public class SoapFault extends Fault {
 
     public static SoapFault createFault(Fault f, SoapVersion v) {
         if (f instanceof SoapFault) {
+            //make sure the fault code is per spec
+            //if it's one of our internal codes, map it to the proper soap code
+            if (f.getFaultCode().getNamespaceURI().equals(Fault.FAULT_CODE_CLIENT.getNamespaceURI())) {
+                QName fc = f.getFaultCode();
+                if (Fault.FAULT_CODE_CLIENT.equals(fc)) {
+                    fc = v.getSender();
+                } else if (Fault.FAULT_CODE_SERVER.equals(fc)) { 
+                    fc = v.getReceiver();
+                }
+                f.setFaultCode(fc);
+            }
             return (SoapFault)f;
         }
 
