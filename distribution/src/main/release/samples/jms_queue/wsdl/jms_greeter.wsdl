@@ -100,7 +100,7 @@
     </wsdl:portType>
     
     <wsdl:binding name="JMSGreeterPortBinding" type="tns:JMSGreeterPortType">
-        <soap:binding style="document" transport="http://cxf.apache.org/transport/jms"/>
+        <soap:binding style="document" transport="http://cxf.apache.org/transports/jms"/>
        
         <wsdl:operation name="greetMe">
             <soap:operation soapAction="" style="document"/>
