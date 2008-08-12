@@ -3,7 +3,7 @@ Apache CXF 2.1.2 Release Notes
 1. Overview
 
 Apache CXF 2.1.2 delivers the latest set of patches and bug fixes for Apache
-CXF.   This release fixes 62 JIRA issues that have been reported by users.
+CXF.   This release fixes 67 JIRA issues that have been reported by users.
 
 2. Installation Prerequisites 
 
@@ -92,7 +92,6 @@ the specification.
 
 7. Specific issues, features, and improvements fixed in this version 
 
-
 Release Notes - CXF - Version 2.1.2
 
 ** Sub-task
@@ -135,17 +134,22 @@ Release Notes - CXF - Version 2.1.2
     * [CXF-1711] - Server failed to start and receieved IllegalAnnotationExceptions 
     * [CXF-1712] - ObjectFactory cache doesn't take classloaders into accout
     * [CXF-1713] - Generated Javascript does not handle simultaneous soap requests correctly
+    * [CXF-1716] - Wrong namespace for faultcode
     * [CXF-1719] - RPC/Lit not honoring namespace in soap:body wsdl extensor
     * [CXF-1720] - RPC/Lit soap 1.2 not processing the soap-rpc:result element
     * [CXF-1721] - Generated WS-Addressing action uses wrong separator for urns
     * [CXF-1722] - CXF does not write out PIs at the root of the WSDL file
     * [CXF-1723] - wsdl2java generates errorneous code
     * [CXF-1724] - Nullpointer error in DOMUtils
+    * [CXF-1726] - Upgrade from CXF 2.1 to CXF 2.1.1 results in two BouncyCastle JARs being used
     * [CXF-1727] - I guess there is an error in the ProviderFactory of jaxrs component.
     * [CXF-1728] - wsdl2java does not generate properly formatted javadoc when jaxws:javadoc tags are used
     * [CXF-1733] - SoapPreProtocolOutInterceptor overrides SoapActionOutInterceptor 
+    * [CXF-1736] - Error in finding the DestinationFactory when using Soap/JMS with configuration
     * [CXF-1737] - NPE in ClientProxyFactoryBean on void methods 
     * [CXF-1741] - NPE is thrown when publish the code first service  in NoSpringServlet
+    * [CXF-1742] - JMS Conduit Pooled Session Recycling
+    * [CXF-1743] - Temporary files are not deleted
 
 ** Improvement
     * [CXF-341] - Display user supplied wsdl in HTTP transports
@@ -164,3 +168,5 @@ Release Notes - CXF - Version 2.1.2
 
 ** New Feature
     * [CXF-1387] - Support for GZIP compression of HTTP payloads
+
+
