@@ -75,6 +75,20 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
     }
     
+    private static String updatePath(String path, String address) {
+        if (path.startsWith(address)) {
+            path = path.substring(address.length());
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+        }
+
+        if (!path.endsWith("/")) {
+            path = path + "/";
+        }
+        return path;
+    }
+    
     private void processRequest(Message message) {
         RequestPreprocessor rp = 
             ProviderFactory.getInstance().getRequestPreprocessor();
@@ -96,18 +110,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 address = address.substring(idx);
             }
         }
-
-        if (path.startsWith(address)) {
-            path = path.substring(address.length());
-            if (!path.startsWith("/")) {
-                path = "/" + path;
-            }
-        }
-
-        if (!path.endsWith("/")) {
-            path = path + "/";
-        }
-        
+        path = updatePath(path, address);
         
         //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);
@@ -118,6 +121,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             acceptTypes = "*/*";
             message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
         }
+        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
         ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values);
@@ -127,47 +132,58 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    BUNDLE, 
                                                    path);
             LOG.severe(errorMsg.toString());
-            acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-            List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
-            message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
             throw new WebApplicationException(404);
         }
 
         message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
 
+        OperationResourceInfo ori = null;     
+        
         List<ProviderInfo<RequestHandler>> shs = 
             ProviderFactory.getInstance().getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
+            String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+            if (!acceptTypes.equals(newAcceptTypes) || ori == null) {
+                acceptTypes = newAcceptTypes;
+                acceptContentTypes = JAXRSUtils.sortMediaTypes(newAcceptTypes);
+                message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+                
+                if (ori != null) {
+                    values = new MetadataMap<String, String>();
+                    resource = JAXRSUtils.selectResourceClass(resources, path, values);
+                }
+                ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                                  httpMethod, values, requestContentType, acceptContentTypes);
+                message.getExchange().put(OperationResourceInfo.class, ori);
+            }
             Response response = sh.getProvider().handleRequest(message, resource);
             if (response != null) {
                 message.getExchange().put(Response.class, response);
-                acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-                List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
-                message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
-                OperationResourceInfo ori = 
-                    JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
-                                               httpMethod, values, requestContentType, acceptContentTypes);
-                message.getExchange().put(OperationResourceInfo.class, ori);
-
                 return;
             }
         }
         
-        acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
-        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+        String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+        if (!acceptTypes.equals(newAcceptTypes) || ori == null) {
+            acceptTypes = newAcceptTypes;
+            acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+            message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+            if (ori != null) {
+                values = new MetadataMap<String, String>();
+                resource = JAXRSUtils.selectResourceClass(resources, path, values);
+            }
+            ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                              httpMethod, values, requestContentType, acceptContentTypes);
+            message.getExchange().put(OperationResourceInfo.class, ori);
+        }
+
         
         LOG.fine("Request path is: " + path);
         LOG.fine("Request HTTP method is: " + httpMethod);
         LOG.fine("Request contentType is: " + requestContentType);
         LOG.fine("Accept contentType is: " + acceptTypes);
         
-        
-        OperationResourceInfo ori = 
-            JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
-                                       httpMethod, values, requestContentType, acceptContentTypes);
-
         if (ori == null) {
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("NO_OP_EXC", 
