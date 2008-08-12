@@ -208,18 +208,16 @@ public class PhaseInterceptorChain implements InterceptorChain {
     @SuppressWarnings("unchecked")
     public synchronized boolean doIntercept(Message message) {
         updateIterator();
-        
+        boolean isFineLogging = LOG.isLoggable(Level.FINE);
         pausedMessage = message;
         while (state == State.EXECUTING && iterator.hasNext()) {
             try {
                 Interceptor currentInterceptor = iterator.next();
-               
-                if (LOG.isLoggable(Level.FINE)) {
+                if (isFineLogging) {
                     LOG.fine("Invoking handleMessage on interceptor " + currentInterceptor);
                 }
                 //System.out.println("-----------" + currentInterceptor);
                 currentInterceptor.handleMessage(message);
-                
             } catch (RuntimeException ex) {
                 if (!faultOccurred) {
  
@@ -324,9 +322,10 @@ public class PhaseInterceptorChain implements InterceptorChain {
     
     @SuppressWarnings("unchecked")
     private void unwind(Message message) {
+        boolean isFineLogging = LOG.isLoggable(Level.FINE);
         while (iterator.hasPrevious()) {
             Interceptor currentInterceptor = iterator.previous();
-            if (LOG.isLoggable(Level.FINE)) {
+            if (isFineLogging) {
                 LOG.fine("Invoking handleFault on interceptor " + currentInterceptor);
             }
             currentInterceptor.handleFault(message);

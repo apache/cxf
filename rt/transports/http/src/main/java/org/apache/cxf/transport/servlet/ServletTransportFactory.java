@@ -105,8 +105,9 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
             if (controller != null
                 && !StringUtils.isEmpty(controller.getLastBaseURL())) {
                 String ad = d.getEndpointInfo().getAddress();
-                if (ad.equals(path)
-                    || ad.equals(controller.getLastBaseURL() + path)) {
+                if (ad != null 
+                    && (ad.equals(path)
+                    || ad.equals(controller.getLastBaseURL() + path))) {
                     d.getEndpointInfo().setAddress(controller.getLastBaseURL() + path);
                     if (d.getEndpointInfo().getExtensor(AddressType.class) != null) {
                         d.getEndpointInfo().getExtensor(AddressType.class)
