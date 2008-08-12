@@ -59,7 +59,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtilities.setKeepAliveSystemProperty(false);
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
     @AfterClass
@@ -88,19 +88,27 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
             InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");
-            long fileSize = 0;
+            int fileSize = 0;
             for (int i = pre.read(); i != -1; i = pre.read()) {
                 fileSize++;
             }
             Holder<DataHandler> param = new Holder<DataHandler>();
-            byte[] data = new byte[(int)fileSize];
-            this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data);
-
+            
+            int count = 50;
+            byte[] data = new byte[fileSize *  count];
+            for (int x = 0; x < count; x++) {
+                this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data, 
+                                                                                fileSize * x,
+                                                                                fileSize);
+            }
+            
             param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
             Holder<String> name = new Holder<String>("call detail");
             mtomPort.testXop(name, param);
             assertEquals("name unchanged", "return detail + call detail", name.value);
             assertNotNull(param.value);
+            param.value.getInputStream().close();
+            
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }

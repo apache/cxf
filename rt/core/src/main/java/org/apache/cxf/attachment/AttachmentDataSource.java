@@ -37,6 +37,7 @@ public class AttachmentDataSource implements DataSource {
         this.ct = ctParam;        
         cache = new CachedOutputStream();
         IOUtils.copy(inParam, cache);
+        cache.lockOutputStream();
     }
 
     public String getContentType() {

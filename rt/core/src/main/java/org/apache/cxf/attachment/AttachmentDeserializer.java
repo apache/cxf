@@ -212,7 +212,10 @@ public class AttachmentDeserializer {
 
         for (Attachment a : attachments.getLoadedAttachments()) {
             DataSource s = a.getDataHandler().getDataSource();
-            cache((DelegatingInputStream) s.getInputStream(), false);
+            if (!(s instanceof AttachmentDataSource)) {
+                //AttachementDataSource objects are already cached
+                cache((DelegatingInputStream) s.getInputStream(), false);
+            }
         }
     }
 
@@ -222,11 +225,13 @@ public class AttachmentDeserializer {
         }
         loaded.add(input);
         CachedOutputStream out = null;
+        InputStream origIn = input.getInputStream();
         try {
             out = new CachedOutputStream();
             setStreamedAttachmentProperties(out);
             IOUtils.copy(input, out);
             input.setInputStream(out.getInputStream());
+            origIn.close();
         } finally {
             if (out != null) {
                 out.close();

@@ -64,6 +64,7 @@ public class CachedOutputStream extends OutputStream {
         }
     }
 
+    protected boolean outputLocked;
     protected OutputStream currentStream;
 
     private long threshold = DEFAULT_THRESHOLD;
@@ -145,6 +146,17 @@ public class CachedOutputStream extends OutputStream {
         
     }
 
+    /**
+     * Locks the output stream to prevent additional writes, but maintains
+     * a pointer to it so an InputStream can be obtained
+     * @throws IOException
+     */
+    public void lockOutputStream() throws IOException {
+        currentStream.flush();
+        outputLocked = true;
+        streamList.remove(currentStream);
+    }
+    
     public void close() throws IOException {
         currentStream.flush();
         if (null != callbacks) {
@@ -152,7 +164,6 @@ public class CachedOutputStream extends OutputStream {
                 cb.onClose(this);
             }
         }
-        
         doClose();
         currentStream.close();
         maybeDeleteTempFile(currentStream);
@@ -205,6 +216,7 @@ public class CachedOutputStream extends OutputStream {
             }
         }
         currentStream = out;
+        outputLocked = false;
     }
 
     public static void copyStream(InputStream in, OutputStream out, int bufferSize) throws IOException {
@@ -331,30 +343,36 @@ public class CachedOutputStream extends OutputStream {
     }
 
     public void write(byte[] b, int off, int len) throws IOException {
-        onWrite();
-        this.totalLength += len;
-        if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
-            createFileOutputStream();
+        if (!outputLocked) {
+            onWrite();
+            this.totalLength += len;
+            if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
+                createFileOutputStream();
+            }
+            currentStream.write(b, off, len);
         }
-        currentStream.write(b, off, len);
     }
 
     public void write(byte[] b) throws IOException {
-        onWrite();
-        this.totalLength += b.length;
-        if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
-            createFileOutputStream();
+        if (!outputLocked) {
+            onWrite();
+            this.totalLength += b.length;
+            if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
+                createFileOutputStream();
+            }
+            currentStream.write(b);
         }
-        currentStream.write(b);
     }
 
     public void write(int b) throws IOException {
-        onWrite();
-        this.totalLength++;
-        if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
-            createFileOutputStream();
+        if (!outputLocked) {
+            onWrite();
+            this.totalLength++;
+            if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
+                createFileOutputStream();
+            }
+            currentStream.write(b);
         }
-        currentStream.write(b);
     }
 
     private void createFileOutputStream() throws IOException {
