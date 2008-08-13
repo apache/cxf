@@ -441,7 +441,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
         if (schemaList != null) {
             for (int i = 0; i < schemaList.length; i++) {
                 if (schemaList[i].getTargetNamespace().equals(Constants.URI_2001_SCHEMA_XSD)) {
-                    XmlSchemaType anyType = new XmlSchemaType(schemaList[0]);
+                    XmlSchemaType anyType = new XmlSchemaType(schemaList[i]);
                     anyType.setName(Constants.XSD_ANYTYPE.getLocalPart());
                     schemaList[i].addType(anyType);
                     break;
