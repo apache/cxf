@@ -155,6 +155,10 @@
                                     <bindingFile>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
                                     <extension>true</extension>
                                 </xsdOption>
+                                   <xsdOption>
+                                    <xsd>${basedir}/target/schemas/schemas/wsdl/addressing200403.xsd</xsd>
+                                    <bindingFile>${basedir}/target/schemas/schemas/wsdl/addressing200403.xjb</bindingFile>
+                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>

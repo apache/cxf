@@ -84,7 +84,8 @@ public class VersionTransformer {
      */
     public boolean isSupported(String namespace) {
         return NATIVE_VERSION.equals(namespace) 
-               || Names200408.WSA_NAMESPACE_NAME.equals(namespace);
+               || Names200408.WSA_NAMESPACE_NAME.equals(namespace)
+               || Names200403.WSA_NAMESPACE_NAME.equals(namespace);
     }
     
     /**
@@ -108,6 +109,23 @@ public class VersionTransformer {
     }
 
     /**
+     * Convert from 2005/08 AttributedURI to 2004/03 AttributedURI.
+     * 
+     * @param internal the 2005/08 AttributedURIType
+     * @return an equivalent 2004/08 or 2004/03 AttributedURI
+     */
+    public static org.apache.cxf.ws.addressing.v200403.AttributedURI 
+    convertTo200403(AttributedURIType internal) {
+        org.apache.cxf.ws.addressing.v200403.AttributedURI exposed = Names200403.WSA_OBJECT_FACTORY
+            .createAttributedURI();
+        String exposedValue = Names.WSA_ANONYMOUS_ADDRESS.equals(internal.getValue())
+            ? Names200403.WSA_ANONYMOUS_ADDRESS : Names.WSA_NONE_ADDRESS.equals(internal.getValue())
+                ? Names200403.WSA_NONE_ADDRESS : internal.getValue();
+        exposed.setValue(exposedValue);
+        putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
+        return exposed;
+    }
+    /**
      * Convert from 2004/08 AttributedURI to 2005/08 AttributedURI.
      * 
      * @param exposed the 2004/08 AttributedURI
@@ -127,6 +145,22 @@ public class VersionTransformer {
         return internal; 
     }
     
+    /**
+     * Convert from 2004/03 AttributedURI to 2005/08 AttributedURI.
+     * 
+     * @param exposed the 2004/03 AttributedURI
+     * @return an equivalent 2005/08 AttributedURIType
+     */
+    public static AttributedURIType convert(org.apache.cxf.ws.addressing.v200403.AttributedURI exposed) {
+        AttributedURIType internal = ContextUtils.WSA_OBJECT_FACTORY.createAttributedURIType();
+        String internalValue = Names200403.WSA_ANONYMOUS_ADDRESS.equals(exposed.getValue())
+            ? Names.WSA_ANONYMOUS_ADDRESS : Names200403.WSA_NONE_ADDRESS.equals(exposed.getValue())
+                ? Names.WSA_NONE_ADDRESS : exposed.getValue();
+        internal.setValue(internalValue);
+        putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
+        return internal;
+    }    
+
     /**
      * Convert from 2005/08 EndpointReferenceType to 2004/08 
      * EndpointReferenceType.
@@ -167,6 +201,40 @@ public class VersionTransformer {
     }
     
     /**
+     * Convert from 2005/08 EndpointReferenceType to 2004/03 EndpointReferenceType.
+     * 
+     * @param internal the 2005/08 EndpointReferenceType
+     * @return an equivalent 2004/03 EndpointReferenceType
+     */
+    public static org.apache.cxf.ws.addressing.v200403.EndpointReferenceType 
+    convertTo200403(EndpointReferenceType internal) {
+        org.apache.cxf.ws.addressing.v200403.EndpointReferenceType exposed = Names200403.WSA_OBJECT_FACTORY
+            .createEndpointReferenceType();
+        exposed.setAddress(convertTo200403(internal.getAddress()));
+
+        QName serviceQName = EndpointReferenceUtils.getServiceName(internal, null);
+        if (serviceQName != null) {
+            org.apache.cxf.ws.addressing.v200403.ServiceNameType serviceName = Names200403.WSA_OBJECT_FACTORY
+                .createServiceNameType();
+            serviceName.setValue(serviceQName);
+            exposed.setServiceName(serviceName);
+        }
+        String portLocalName = EndpointReferenceUtils.getPortName(internal);
+        if (portLocalName != null) {
+            String namespace = serviceQName.getNamespaceURI() != null
+                ? serviceQName.getNamespaceURI() : Names.WSDL_INSTANCE_NAMESPACE_NAME;
+            QName portQName = new QName(namespace, portLocalName);
+            org.apache.cxf.ws.addressing.v200403.AttributedQName portType = Names200403.WSA_OBJECT_FACTORY
+                .createAttributedQName();
+            portType.setValue(portQName);
+            exposed.setPortType(portType);
+        }
+        // no direct analogue for Metadata
+        addAll(exposed.getAny(), internal.getAny());
+        putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
+        return exposed;
+    }
+    /**
      * Convert from 2004/08 EndpointReferenceType to 2005/08 
      * EndpointReferenceType.
      * 
@@ -195,6 +263,31 @@ public class VersionTransformer {
     }
 
     /**
+     * Convert from 2004/03 EndpointReferenceType to 2005/08 EndpointReferenceType.
+     * 
+     * @param exposed the 2004/03 EndpointReferenceType
+     * @return an equivalent 2005/08 EndpointReferenceType
+     */
+    public static EndpointReferenceType 
+    convert(org.apache.cxf.ws.addressing.v200403.EndpointReferenceType exposed) {
+        EndpointReferenceType internal = ContextUtils.WSA_OBJECT_FACTORY.createEndpointReferenceType();
+        internal.setAddress(convert(exposed.getAddress()));
+        // TODO ref parameters not present in 2004/03
+        // internal.setReferenceParameters(convert(exposed
+        // .getReferenceParameters()));
+        org.apache.cxf.ws.addressing.v200403.ServiceNameType serviceName = exposed.getServiceName();
+        org.apache.cxf.ws.addressing.v200403.AttributedQName portName = exposed.getPortType();
+        if (serviceName != null && portName != null) {
+            EndpointReferenceUtils.setServiceAndPortName(internal, serviceName.getValue(), portName
+                .getValue().getLocalPart());
+        }
+
+        // no direct analogue for ReferenceProperties
+        addAll(internal.getAny(), exposed.getAny());
+        putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
+        return internal;
+    }    
+/**
      * Convert from EndpointReference to CXF internal 2005/08 EndpointReferenceType
      * 
      * @param external the javax.xml.ws.EndpointReference
@@ -269,6 +362,7 @@ public class VersionTransformer {
         }
         return internal; 
     }
+     // THERE IS NO ReferenceParametersType for 2004/03
 
     /**
      * Convert from 2005/08 RelatesToType to 2004/08 Relationship.
@@ -295,7 +389,30 @@ public class VersionTransformer {
     }
 
     /**
-     * Convert from 2004/08 Relationship to 2005/08 RelatesToType.
+     * Convert from 2005/08 RelatesToType to 2004/03 Relationship.
+     * 
+     * @param internal the 2005/08 RelatesToType
+     * @return an equivalent 2004/03 Relationship
+     */
+    public static org.apache.cxf.ws.addressing.v200403.Relationship convertTo200403(RelatesToType internal) {
+        org.apache.cxf.ws.addressing.v200403.Relationship exposed = null;
+        if (internal != null) {
+            exposed = Names200403.WSA_OBJECT_FACTORY.createRelationship();
+            exposed.setValue(internal.getValue());
+            String internalRelationshipType = internal.getRelationshipType();
+            if (internalRelationshipType != null) {
+                QName exposedRelationshipType = null;
+                if (!Names.WSA_RELATIONSHIP_REPLY.equals(internalRelationshipType)) {
+                    exposedRelationshipType = new QName(internalRelationshipType);
+                }
+                exposed.setRelationshipType(exposedRelationshipType);
+            }
+            putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
+        }
+        return exposed;
+    }
+    
+    /** Convert from 2004/08 Relationship to 2005/08 RelatesToType.
      * 
      * @param exposed the 2004/08 Relationship
      * @return an equivalent 2005/08 RelatesToType
@@ -319,15 +436,38 @@ public class VersionTransformer {
         return internal; 
     }
     
-    /** 
+    /**
+     * Convert from 2004/03 Relationship to 2005/08 RelatesToType.
+     * 
+     * @param exposed the 2004/03 Relationship
+     * @return an equivalent 2005/08 RelatesToType
+     */
+    public static RelatesToType convert(org.apache.cxf.ws.addressing.v200403.Relationship exposed) {
+        RelatesToType internal = null;
+        if (exposed != null) {
+            internal = ContextUtils.WSA_OBJECT_FACTORY.createRelatesToType();
+            internal.setValue(exposed.getValue());
+            QName exposedRelationshipType = exposed.getRelationshipType();
+            if (exposedRelationshipType != null) {
+                String internalRelationshipType = Names.WSA_REPLY_NAME.equals(exposedRelationshipType
+                    .getLocalPart()) ? Names.WSA_RELATIONSHIP_REPLY : exposedRelationshipType.toString();
+                internal.setRelationshipType(internalRelationshipType);
+            }
+            internal.getOtherAttributes().putAll(exposed.getOtherAttributes());
+        }
+        return internal;
+    }
+
+    /**
      * @param exposedURI specifies the version WS-Addressing
      * @return JABXContext for the exposed namespace URI
      */
-    public static JAXBContext getExposedJAXBContext(String exposedURI) 
-        throws JAXBException {
+    public static JAXBContext getExposedJAXBContext(String exposedURI) throws JAXBException {
+
         return NATIVE_VERSION.equals(exposedURI)
-               ? ContextUtils.getJAXBContext()
-               : Names200408.getJAXBContext();
+            ? ContextUtils.getJAXBContext() : Names200408.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200408
+                .getJAXBContext() : Names200403.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200403
+                .getJAXBContext() : null;
     }
 
     /**
@@ -404,4 +544,49 @@ public class VersionTransformer {
             }
         }        
     }
+    /**
+     * Holder for 2004/03 Names
+     */
+    public static class Names200403 {
+        public static final String WSA_NAMESPACE_NAME = "http://schemas.xmlsoap.org/ws/2004/03/addressing";
+        public static final String WSA_ANONYMOUS_ADDRESS = WSA_NAMESPACE_NAME + "/role/anonymous";
+        public static final String WSA_NONE_ADDRESS = WSA_NAMESPACE_NAME + "/role/none";
+        public static final org.apache.cxf.ws.addressing.v200403.ObjectFactory WSA_OBJECT_FACTORY = 
+            new org.apache.cxf.ws.addressing.v200403.ObjectFactory();
+        public static final Class<org.apache.cxf.ws.addressing.v200403.EndpointReferenceType> EPR_TYPE = 
+            org.apache.cxf.ws.addressing.v200403.EndpointReferenceType.class;
+
+        private static JAXBContext jaxbContext;
+
+        protected Names200403() {
+        }
+
+        /**
+         * Retrieve a JAXBContext for marshalling and unmarshalling JAXB generated types for the 2004/08
+         * version.
+         * 
+         * @return a JAXBContext
+         */
+        public static JAXBContext getJAXBContext() throws JAXBException {
+            synchronized (Names200403.class) {
+                if (jaxbContext == null) {
+                    Class clz = org.apache.cxf.ws.addressing.v200403.ObjectFactory.class;
+                    jaxbContext = JAXBContext.newInstance(clz.getPackage().getName(), clz.getClassLoader());
+                }
+            }
+            return jaxbContext;
+        }
+
+        /**
+         * Set the encapsulated JAXBContext (used by unit tests).
+         * 
+         * @param ctx JAXBContext
+         */
+        public static void setJAXBContext(JAXBContext ctx) throws JAXBException {
+            synchronized (Names200403.class) {
+                jaxbContext = ctx;
+            }
+        }
+    }
+
 }
