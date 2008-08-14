@@ -98,6 +98,11 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
     }
     
     @Test
+    public void testStructMultipleDclGeneration() throws Exception {
+        testWSDLGeneration("/idl/Struct_multiple_dcl.idl", "/idl/expected_Struct_multiple_dcl.wsdl");
+    }
+    
+    @Test
     public void testScopedStructGeneration() throws Exception {
         testWSDLGeneration("/idl/scopedStruct.idl", "/idl/expected_scopedStruct.wsdl");
     }

@@ -703,5 +703,79 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
         }
     }    
     
+    @Test
+    public void testRestrictedStruct() throws Exception {
         
+        try {
+            URI fileName = getClass().getResource("/wsdl/restrictedStruct.wsdl").toURI();
+            generator.setWsdlFile(new File(fileName).getAbsolutePath());
+            generator.addInterfaceName("TypeTestPortType");
+            
+            Definition model = generator.generateCORBABinding();
+            Document document = writer.getDocument(model);
+            Element typemap = getElementNode(document, "corba:typeMapping");            
+            assertNotNull(typemap);            
+            assertEquals(7, typemap.getElementsByTagName("corba:struct").getLength());
+            assertEquals(3, typemap.getElementsByTagName("corba:union").getLength());
+        } finally {
+            new File("restrictedStruct-corba.wsdl").deleteOnExit();
+        }
+    }    
+    
+    @Test
+    public void testComplexRestriction() throws Exception {
+        
+        try {
+            URI fileName = getClass().getResource("/wsdl/complexRestriction.wsdl").toURI();
+            generator.setWsdlFile(new File(fileName).getAbsolutePath());
+            generator.addInterfaceName("TypeTestPortType");
+            
+            Definition model = generator.generateCORBABinding();
+            Document document = writer.getDocument(model);
+            Element typemap = getElementNode(document, "corba:typeMapping");            
+            assertNotNull(typemap);            
+            assertEquals(1, typemap.getElementsByTagName("corba:struct").getLength());                       
+        } finally {
+            new File("complexRestriction-corba.wsdl").deleteOnExit();
+        }
+    }    
+    
+    @Test
+    public void testListType() throws Exception {
+        
+        try {
+            URI fileName = getClass().getResource("/wsdl/listType.wsdl").toURI();
+            generator.setWsdlFile(new File(fileName).getAbsolutePath());
+            generator.addInterfaceName("TypeTestPortType");
+            
+            Definition model = generator.generateCORBABinding();
+            Document document = writer.getDocument(model);
+            Element typemap = getElementNode(document, "corba:typeMapping");            
+            assertNotNull(typemap);
+            assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());
+            assertEquals(1, typemap.getElementsByTagName("corba:sequence").getLength());
+        } finally {
+            new File("listType-corba.wsdl").deleteOnExit();
+        }
+    }    
+    
+    @Test
+    public void testImportSchemaInTypes() throws Exception {
+        
+        try {
+            URI fileName = getClass().getResource("/wsdl/importType.wsdl").toURI();
+            generator.setWsdlFile(new File(fileName).getAbsolutePath());
+            generator.addInterfaceName("TypeTestPortType");
+            
+            Definition model = generator.generateCORBABinding();
+            Document document = writer.getDocument(model);
+            Element typemap = getElementNode(document, "corba:typeMapping");            
+            assertNotNull(typemap);
+            assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());
+            assertEquals(1, typemap.getElementsByTagName("corba:sequence").getLength());
+        } finally {
+            new File("importType-corba.wsdl").deleteOnExit();
+        }
+    }    
+
 }

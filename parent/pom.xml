@@ -36,6 +36,7 @@
         <surefire.fork.mode>once</surefire.fork.mode>
         <surefire.format>brief</surefire.format>
         <surefire.usefile>false</surefire.usefile>
+	<surefire.fork.vmargs>-ea</surefire.fork.vmargs>
         <compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</compile.flags>
         <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
         <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
@@ -256,7 +257,7 @@
                         <useFile>${surefire.usefile}</useFile>
                         <forkMode>${surefire.fork.mode}</forkMode>
                         <childDelegation>false</childDelegation>
-                        <argLine>-ea</argLine>
+                        <argLine>${surefire.fork.vmargs}</argLine>
                         <systemProperties>
                             <property>
                                 <name>java.awt.headless</name>
@@ -278,6 +279,10 @@
                                 <name>spring.validation.mode</name>
                                 <value>${spring.validation.mode}</value>
                             </property>
+			    <property>
+			        <name>surefire.fork.vmargs</name>
+				<value>${surefire.fork.vmargs}</value>
+		            </property>
                             <property>
                                 <!-- If we close the port after a client in the same JVM has oppened a keep-alive
                                 connection, on some Linux's, the socket remains consumed until
@@ -538,7 +543,7 @@
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>wstx-asl</artifactId>
-                <version>3.2.4</version>
+                <version>3.2.6</version>
                 <exclusions>
                     <exclusion>
                         <groupId>stax</groupId>
