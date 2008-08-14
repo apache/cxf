@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 
 public class ServerLauncher {
     public static final int DEFAULT_TIMEOUT = 3 * 60 * 1000;
@@ -331,7 +332,19 @@ public class ServerLauncher {
         if (Boolean.getBoolean("java.awt.headless")) {
             cmd.add("-Djava.awt.headless=true");
         }
-        cmd.add("-ea");
+        String vmargs = System.getProperty("surefire.fork.vmargs");
+        if (StringUtils.isEmpty(vmargs)) {
+            cmd.add("-ea");
+        } else {
+            vmargs = vmargs.trim();
+            int idx = vmargs.indexOf(' ');
+            while (idx != -1) {
+                cmd.add(vmargs.substring(0, idx));
+                vmargs = vmargs.substring(idx + 1);
+                idx = vmargs.indexOf(' ');
+            }
+            cmd.add(vmargs);
+        }
         
         cmd.add("-Djavax.xml.ws.spi.Provider=org.apache.cxf.jaxws.spi.ProviderImpl");
         String portClose = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
