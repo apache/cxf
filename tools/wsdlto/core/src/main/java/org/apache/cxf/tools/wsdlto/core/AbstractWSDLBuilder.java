@@ -19,8 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.core;
 
-import java.util.Map;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -44,5 +42,4 @@ public abstract class AbstractWSDLBuilder<T> implements WSDLBuilder<T> {
 
     public abstract T getWSDLModel();
     
-    public abstract Map<String, String> getCataLogResolvedMap();
 }

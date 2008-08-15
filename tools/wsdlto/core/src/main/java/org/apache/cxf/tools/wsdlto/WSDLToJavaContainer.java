@@ -123,7 +123,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     builder.setContext(context);
                     builder.setBus(getBus());
                     context.put(Bus.class, getBus());
-                    builder.build(URIParserUtil.getAbsoluteURI(wsdlURL));
+                    wsdlURL = URIParserUtil.getAbsoluteURI(wsdlURL);
+                    builder.build(wsdlURL);
                     builder.customize();
                     Definition definition = builder.getWSDLModel();
 
@@ -132,7 +133,6 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     builder.validate(definition);
 
                     WSDLServiceBuilder serviceBuilder = new WSDLServiceBuilder(getBus());
-                    serviceBuilder.setCatalogResolvedMap(builder.getCataLogResolvedMap());
                     String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
 
                     if (serviceName != null) {

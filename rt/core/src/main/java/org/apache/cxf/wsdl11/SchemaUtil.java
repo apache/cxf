@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl11;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,21 +48,29 @@ import static org.apache.cxf.helpers.CastUtils.cast;
 
 public final class SchemaUtil {
     private final Map<String, Element> schemaList;
+    private final Map<String, String> catalogResolved = new HashMap<String, String>();
     private final Bus bus;
-    private Map<String, String> catalogResolvedMap;
-
 
     public SchemaUtil(final Bus b, final Map<String, Element> s) {
         this.bus = b;
         this.schemaList = s;
     }
-
     public void getSchemas(final Definition def, final ServiceInfo serviceInfo) {
         SchemaCollection schemaCol = serviceInfo.getXmlSchemaCollection();
+        getSchemas(def, schemaCol, serviceInfo);
+    }
+    public void getSchemas(final Definition def, 
+                           SchemaCollection schemaCol, 
+                           ServiceInfo serviceInfo) {
+        getSchemas(def, schemaCol, serviceInfo.getSchemas());
+    }
 
+    public void getSchemas(final Definition def, 
+                           final SchemaCollection schemaCol,
+                           List<SchemaInfo> schemas) {
         List<Definition> defList = new ArrayList<Definition>();
         parseImports(def, defList);
-        extractSchema(def, schemaCol, serviceInfo);
+        extractSchema(def, schemaCol, schemas);
         // added
         getSchemaList(def);
         
@@ -69,7 +78,7 @@ public final class SchemaUtil {
         done.put(def, def);
         for (Definition def2 : defList) {
             if (!done.containsKey(def2)) {
-                extractSchema(def2, schemaCol, serviceInfo);
+                extractSchema(def2, schemaCol, schemas);
                 // added
                 getSchemaList(def2);
                 done.put(def2, def2);
@@ -77,7 +86,7 @@ public final class SchemaUtil {
         }
     }
 
-    private void extractSchema(Definition def, SchemaCollection schemaCol, ServiceInfo serviceInfo) {
+    private void extractSchema(Definition def, SchemaCollection schemaCol, List<SchemaInfo> schemaInfos) {
         Types typesElement = def.getTypes();
         if (typesElement != null) {
             int schemaCount = 1;
@@ -109,11 +118,12 @@ public final class SchemaUtil {
                         schemaCol.setSchemaResolver(schemaResolver);
                         
                         XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
+                        catalogResolved.putAll(schemaResolver.getResolvedMap());
                         SchemaInfo schemaInfo = new SchemaInfo(xmlSchema.getTargetNamespace());
                         schemaInfo.setElement(schemaElem);
                         schemaInfo.setSchema(xmlSchema);
                         schemaInfo.setSystemId(systemId);
-                        serviceInfo.addSchema(schemaInfo);
+                        schemaInfos.add(schemaInfo);
                         schemaCount++;
                     }
                 }
@@ -179,10 +189,11 @@ public final class SchemaUtil {
                     if (importNamespace == null && tempImport != null) {
                         importNamespace = tempImport.getDocumentBaseURI();
                     }
-                    if ((catalogResolvedMap == null || !catalogResolvedMap.containsKey(key)) 
-                        && tempImport != null) {                 
+                    
+                    if (tempImport != null && !catalogResolved.containsKey(key)) {                 
                         key = tempImport.getDocumentBaseURI();
                     }
+                    
                     if (tempImport != null
                         && !isSchemaParsed(key, importNamespace)
                         && !schemaList.containsValue(tempImport.getElement())) {
@@ -203,9 +214,5 @@ public final class SchemaUtil {
             }
         }
         return false;
-    }
-
-    public void setCatalogResolvedMap(Map<String, String> resolvedMap) {
-        catalogResolvedMap = resolvedMap;
     }
 }

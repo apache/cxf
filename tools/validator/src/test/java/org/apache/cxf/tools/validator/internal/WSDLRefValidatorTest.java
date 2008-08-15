@@ -21,19 +21,28 @@ package org.apache.cxf.tools.validator.internal;
 
 import java.util.HashSet;
 import java.util.Set;
+import javax.wsdl.Definition;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.validator.internal.model.XNode;
+import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class WSDLRefValidatorTest extends Assert {
 
+    private Definition getWSDL(String wsdl) throws Exception {
+        Bus b = BusFactory.getDefaultBus();
+        WSDLDefinitionBuilder wsdlBuilder = new WSDLDefinitionBuilder(b);
+        return wsdlBuilder.build(wsdl);
+    }
+    
     @Test
     public void testNoService() throws Exception {
         String wsdl = getClass().getResource("resources/b.wsdl").toURI().toString();
-        WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+        WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         assertFalse(validator.isValid());
         ValidationResult results = validator.getValidationResults();
         assertEquals(0, results.getWarnings().size());
@@ -42,7 +51,7 @@ public class WSDLRefValidatorTest extends Assert {
     @Test
     public void testWSDLImport1() throws Exception {
         String wsdl = getClass().getResource("resources/a.wsdl").toURI().toString();
-        WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+        WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         validator.isValid();
         ValidationResult results = validator.getValidationResults();
         assertEquals(2, results.getErrors().size());
@@ -61,7 +70,7 @@ public class WSDLRefValidatorTest extends Assert {
     @Test
     public void testWSDLImport2() throws Exception {
         String wsdl = getClass().getResource("resources/physicalpt.wsdl").toURI().toString();
-        WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+        WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         assertTrue(validator.isValid());
         String expected = "/wsdl:definitions[@targetNamespace='http://schemas.apache.org/yoko/idl/OptionsPT']"
             + "/wsdl:portType[@name='foo.bar']";
@@ -77,7 +86,7 @@ public class WSDLRefValidatorTest extends Assert {
     @Test
     public void testNoTypeRef() throws Exception {
         String wsdl = getClass().getResource("resources/NoTypeRef.wsdl").toURI().toString();
-        WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+        WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         assertFalse(validator.isValid());
         assertEquals(3, validator.getValidationResults().getErrors().size());
 
@@ -98,13 +107,13 @@ public class WSDLRefValidatorTest extends Assert {
     @Test
     public void testNoBindingWSDL() throws Exception {
         String wsdl = getClass().getResource("resources/nobinding.wsdl").toURI().toString();
-        WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+        WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         validator.isValid();
         ValidationResult results = validator.getValidationResults();
 
         assertEquals(0, results.getWarnings().size());
 
-        WSDLRefValidator v = new WSDLRefValidator(wsdl);
+        WSDLRefValidator v = new WSDLRefValidator(getWSDL(wsdl), null);
         v.setSuppressWarnings(true);
         assertTrue(v.isValid());
     }
@@ -112,7 +121,7 @@ public class WSDLRefValidatorTest extends Assert {
     @Test
     public void testLogicalWSDL() throws Exception {
         String wsdl = getClass().getResource("resources/logical.wsdl").toURI().toString();
-        WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+        WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         validator.isValid();
         ValidationResult results = validator.getValidationResults();
         
@@ -129,15 +138,14 @@ public class WSDLRefValidatorTest extends Assert {
 
     @Test
     public void testNotAWsdl() throws Exception {
-        String wsdl = getClass().getResource("resources/c.xsd").toURI().toString();
         try {        
-            WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+            String wsdl = getClass().getResource("resources/c.xsd").toURI().toString();
+            WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
             validator.isValid();
         } catch (Exception e) {
-            assertTrue(e instanceof ToolException);
             String expected = "WSDLException (at /xs:schema): faultCode=INVALID_WSDL: "
                 + "Expected element '{http://schemas.xmlsoap.org/wsdl/}definitions'.";
-            assertEquals(expected, e.getMessage());
+            assertTrue(e.getMessage().contains(expected));
         }
     }
 
@@ -145,7 +153,7 @@ public class WSDLRefValidatorTest extends Assert {
     public void testXSDAnyType() throws Exception {
         String wsdl = getClass().getResource("resources/anytype.wsdl").toURI().toString();
         try {
-            WSDLRefValidator validator = new WSDLRefValidator(wsdl);
+            WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
             assertTrue(validator.isValid());
         } catch (Exception e) {
             fail("Valid wsdl, no exception should be thrown" + e.getMessage());

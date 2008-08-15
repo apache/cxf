@@ -101,7 +101,6 @@ public class WSDLServiceBuilder {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceBuilder.class);
     private Bus bus;
     private Map<String, Element> schemaList = new HashMap<String, Element>();
-    private Map<String, String> catalogResolvedMap;
 
     public WSDLServiceBuilder(Bus bus) {
         this.bus = bus;
@@ -165,7 +164,6 @@ public class WSDLServiceBuilder {
         List<Definition> defList = new ArrayList<Definition>();
         defList.add(d);
         parseImports(d, defList);
-        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class); 
         for (Definition def : defList) {
 
             for (Iterator ite = def.getPortTypes().entrySet().iterator(); ite.hasNext();) {
@@ -188,12 +186,6 @@ public class WSDLServiceBuilder {
                 service.setDescription(description);
                 service.setProperty(WSDL_DEFINITION, def);
                 getSchemas(def, service);
-                if (wsdlManager != null) {
-                    ServiceSchemaInfo serviceSchemaInfo = new ServiceSchemaInfo();
-                    serviceSchemaInfo.setSchemaCollection(service.getXmlSchemaCollection());
-                    serviceSchemaInfo.setSchemaInfoList(service.getSchemas());
-                    wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
-                }
 
                 service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
                 serviceList.add(service);
@@ -218,14 +210,6 @@ public class WSDLServiceBuilder {
         service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
 
         buildInterface(service, p);
-
-        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class); 
-        if (wsdlManager != null) {
-            ServiceSchemaInfo serviceSchemaInfo = new ServiceSchemaInfo();
-            serviceSchemaInfo.setSchemaCollection(service.getXmlSchemaCollection());
-            serviceSchemaInfo.setSchemaInfoList(service.getSchemas());
-            wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
-        }
 
         return service;
     }
@@ -259,7 +243,7 @@ public class WSDLServiceBuilder {
                 service.setProperty(WSDL_DEFINITION, def);
                 service.setProperty(WSDL_SERVICE, serv);
                 getSchemas(def, service);
-                
+
                 service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
                 service.setTargetNamespace(def.getTargetNamespace());
                 service.setName(serv.getQName());
@@ -291,9 +275,9 @@ public class WSDLServiceBuilder {
         
         if (serviceSchemaInfo == null) {
             SchemaUtil schemaUtil = new SchemaUtil(bus, this.schemaList);
-            schemaUtil.setCatalogResolvedMap(this.catalogResolvedMap);
             schemaUtil.getSchemas(def, serviceInfo);
             serviceSchemaInfo = new ServiceSchemaInfo();
+            serviceSchemaInfo.setSchemaElementList(this.schemaList);
             serviceSchemaInfo.setSchemaCollection(serviceInfo.getXmlSchemaCollection());
             serviceSchemaInfo.setSchemaInfoList(serviceInfo.getSchemas());
             if (wsdlManager != null) {
@@ -301,6 +285,7 @@ public class WSDLServiceBuilder {
             }
         } else {
             serviceInfo.setServiceSchemaInfo(serviceSchemaInfo);
+            schemaList.putAll(serviceSchemaInfo.getSchemaElementList());
         }
     }
 
@@ -735,8 +720,4 @@ public class WSDLServiceBuilder {
         }
     }
     
-    public void setCatalogResolvedMap(Map<String, String> resolvedMap) {
-        catalogResolvedMap = resolvedMap;
-    }
-
 }

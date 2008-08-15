@@ -145,7 +145,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         for (String key : schemaLists.keySet()) {
             Element ele = schemaLists.get(key);
-            this.removeImportElement(ele);
+            ele = removeImportElement(ele);
             String tns = ele.getAttribute("targetNamespace");
             if (StringUtils.isEmpty(tns)) {
                 continue;
@@ -378,11 +378,15 @@ public class JAXBDataBinding implements DataBindingProfile {
         return null;
     }
 
-    private void removeImportElement(Element element) {
+    private Element removeImportElement(Element element) {
         NodeList nodeList = element.getElementsByTagNameNS(ToolConstants.SCHEMA_URI, "import");
+        if (nodeList.getLength() == 0) {
+            return element;
+        }
+        element = (Element)cloneNode(element.getOwnerDocument(), element, true);
+        nodeList = element.getElementsByTagNameNS(ToolConstants.SCHEMA_URI, "import");
         List<Node> ns = new ArrayList<Node>();
         for (int tmp = 0; tmp < nodeList.getLength(); tmp++) {
-
             Node importNode = nodeList.item(tmp);
             ns.add(importNode);
         }
@@ -390,7 +394,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             Node schemaNode = item.getParentNode();
             schemaNode.removeChild(item);
         }
-
+        return element;
     }
 
     public Node cloneNode(Document document, Node node, boolean deep) throws DOMException {

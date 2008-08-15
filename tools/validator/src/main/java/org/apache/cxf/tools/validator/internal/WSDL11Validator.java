@@ -37,6 +37,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -47,13 +48,13 @@ import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.validator.AbstractValidator;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.xml.resolver.Catalog;
 
 public class WSDL11Validator extends AbstractDefinitionValidator {
@@ -87,7 +88,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
             if (nw == null) {
                 nw = wsdl;
             }
-            return XMLUtils.parse(new InputSource(URIParserUtil.getAbsoluteURI(nw)));
+            return new Stax2DOM().getDocument(URIParserUtil.getAbsoluteURI(nw));
         } catch (FileNotFoundException fe) {
             LOG.log(Level.WARNING, "Cannot find the wsdl " + wsdl + "to validate");
             return null;
@@ -111,15 +112,22 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         if (doc == null) {
             return true;
         }
-        WSDLRefValidator wsdlRefValidator = new WSDLRefValidator(wsdl, doc, getBus());
-        wsdlRefValidator.setSuppressWarnings(env.optionSet(ToolConstants.CFG_SUPPRESS_WARNINGS));
-        Definition wsdlDef = wsdlRefValidator.getDefinition();        
+        if (this.def == null) {
+            try {
+                this.def = getBus().getExtension(WSDLManager.class).getDefinition(wsdl);
+            } catch (WSDLException e) {
+                throw new ToolException(e);
+            }
+        }
+        
+        WSDLRefValidator wsdlRefValidator = new WSDLRefValidator(this.def, doc, getBus());
+        wsdlRefValidator.setSuppressWarnings(env.optionSet(ToolConstants.CFG_SUPPRESS_WARNINGS));        
         validators.add(wsdlRefValidator);
-
+        
         if (env.optionSet(ToolConstants.CFG_VALIDATE_WSDL)) {
-            validators.add(new UniqueBodyPartsValidator(wsdlDef));
-            validators.add(new WSIBPValidator(wsdlDef));
-            validators.add(new MIMEBindingValidator(wsdlDef));
+            validators.add(new UniqueBodyPartsValidator(this.def));
+            validators.add(new WSIBPValidator(this.def));
+            validators.add(new MIMEBindingValidator(this.def));
         }
 
         for (AbstractValidator validator : validators) {

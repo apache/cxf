@@ -137,7 +137,7 @@ public class ServiceImpl extends ServiceDelegate {
         }
     }
     
-    private void initializePorts() {        
+    private void initializePorts() {   
         WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
         Service service = sf.create();
         for (ServiceInfo si : service.getServiceInfos()) { 

@@ -21,6 +21,9 @@ package org.apache.cxf.service.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 
@@ -31,6 +34,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 public class ServiceSchemaInfo {
     private SchemaCollection schemaCollection;
     private List<SchemaInfo> schemaInfoList;
+    private Map<String, Element> schemaElementList;
     
     public SchemaCollection getSchemaCollection() {
         return schemaCollection;
@@ -44,5 +48,10 @@ public class ServiceSchemaInfo {
     public void setSchemaInfoList(List<SchemaInfo> schemaInfoList) {
         this.schemaInfoList = new ArrayList<SchemaInfo>(schemaInfoList);
     }
-
+    public Map<String, Element> getSchemaElementList() {
+        return schemaElementList;
+    }
+    public void setSchemaElementList(Map<String, Element> l) {
+        schemaElementList = l;
+    }
 }

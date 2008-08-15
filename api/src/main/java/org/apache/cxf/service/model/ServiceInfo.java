@@ -166,7 +166,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     }
 
     public List<SchemaInfo> getSchemas() {
-        return Collections.unmodifiableList(schemas);
+        return schemas;
     }
 
     public SchemaCollection getXmlSchemaCollection() {

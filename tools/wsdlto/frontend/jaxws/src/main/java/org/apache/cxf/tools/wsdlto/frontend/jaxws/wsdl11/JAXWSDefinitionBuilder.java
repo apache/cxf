@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11;
 
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,6 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
 
     private List<InputSource> jaxbBindings;
     private Element handlerChain;
-    private Map<String, String> cataLogResolvedMap = new HashMap<String, String>();
 
     public JAXWSDefinitionBuilder() {
     }
@@ -107,11 +105,11 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
     }
 
     public void customize() {
-        WSDLManager mgr = bus.getExtension(WSDLManager.class);
         if (!context.containsKey(ToolConstants.CFG_BINDING)) {
-            mgr.removeDefinition(wsdlDefinition);
             return;
         }
+        WSDLManager mgr = bus.getExtension(WSDLManager.class);
+        mgr.removeDefinition(wsdlDefinition);
         cusParser = new CustomizationParser();
         cusParser.parse(context);
 
@@ -132,8 +130,6 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
                                      (String)context.get(ToolConstants.CFG_WSDLURL));
             throw new RuntimeException(msg.toString(), e);
         }
-        
-        mgr.removeDefinition(wsdlDefinition); 
 
     }
 
@@ -187,10 +183,7 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setExtensionRegistry(mgr.getExtensionRegistry());       
 
-        Definition def = reader.readWSDL(wsdlLocator);
-        cataLogResolvedMap.putAll(wsdlLocator.getResolvedMap());
-        return def;
-
+        return reader.readWSDL(wsdlLocator);
     }
 
     public Definition getWSDLModel() {
@@ -208,7 +201,4 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         return new WSDL11Validator(def, context, bus).isValid();
     }
     
-    public Map<String, String> getCataLogResolvedMap() {
-        return this.cataLogResolvedMap;
-    }
 }

@@ -111,7 +111,6 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
                 builder.validate(definition);
 
                 WSDLServiceBuilder serviceBuilder = new WSDLServiceBuilder(getBus());
-                serviceBuilder.setCatalogResolvedMap(builder.getCataLogResolvedMap());
                 String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
 
                 if (serviceName != null) {
