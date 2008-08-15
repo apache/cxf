@@ -84,7 +84,6 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(this.bus);
         wsdlDefinition = builder.build(wsdlURL);
-        mgr.removeDefinition(wsdlDefinition);
         context.put(Bus.class, bus);
         context.put(ToolConstants.IMPORTED_DEFINITION, builder.getImportedDefinitions());
         checkSupported(wsdlDefinition);
@@ -108,7 +107,9 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
     }
 
     public void customize() {
+        WSDLManager mgr = bus.getExtension(WSDLManager.class);
         if (!context.containsKey(ToolConstants.CFG_BINDING)) {
+            mgr.removeDefinition(wsdlDefinition);
             return;
         }
         cusParser = new CustomizationParser();
@@ -117,8 +118,12 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         jaxbBindings = cusParser.getJaxbBindings();
         handlerChain = cusParser.getHandlerChains();
 
+
         context.setJaxbBindingFiles(jaxbBindings);
         context.put(ToolConstants.HANDLER_CHAIN, handlerChain);
+        
+        
+        
         try {
             this.wsdlDefinition = buildCustomizedDefinition();
         } catch (Exception e) {
@@ -127,6 +132,9 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
                                      (String)context.get(ToolConstants.CFG_WSDLURL));
             throw new RuntimeException(msg.toString(), e);
         }
+        
+        mgr.removeDefinition(wsdlDefinition); 
+
     }
 
     private void checkSupported(Definition def) throws ToolException {

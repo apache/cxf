@@ -242,7 +242,6 @@ public class WSDLServiceBuilder {
             copyExtensors(description, def.getExtensibilityElements());
             copyExtensionAttributes(description, def);
         }
-
         for (Port port : cast(serv.getPorts().values(), Port.class)) {
             Binding binding = port.getBinding();
             PortType bindingPt = binding.getPortType();
@@ -259,24 +258,8 @@ public class WSDLServiceBuilder {
                 description.getDescribed().add(service);
                 service.setProperty(WSDL_DEFINITION, def);
                 service.setProperty(WSDL_SERVICE, serv);
-                WSDLManager wsdlManager = bus.getExtension(WSDLManager.class); 
-                ServiceSchemaInfo serviceSchemaInfo = null;
-                if (wsdlManager != null) {
-                    serviceSchemaInfo = wsdlManager.getSchemasForDefinition(def);
-                }
+                getSchemas(def, service);
                 
-                if (serviceSchemaInfo != null) {
-                    service.setServiceSchemaInfo(serviceSchemaInfo);
-                } else {
-                    getSchemas(def, service);
-                    if (wsdlManager != null) {
-                        serviceSchemaInfo = new ServiceSchemaInfo();
-                        serviceSchemaInfo.setSchemaCollection(service.getXmlSchemaCollection());
-                        serviceSchemaInfo.setSchemaInfoList(service.getSchemas());
-                        wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
-                    }
-                }
-
                 service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
                 service.setTargetNamespace(def.getTargetNamespace());
                 service.setName(serv.getQName());
@@ -297,12 +280,30 @@ public class WSDLServiceBuilder {
 
         return new ArrayList<ServiceInfo>(services.values());
     }
-
+ 
+    
     private void getSchemas(Definition def, ServiceInfo serviceInfo) {
-        SchemaUtil schemaUtil = new SchemaUtil(bus, this.schemaList);
-        schemaUtil.setCatalogResolvedMap(this.catalogResolvedMap);
-        schemaUtil.getSchemas(def, serviceInfo);
+        ServiceSchemaInfo serviceSchemaInfo = null;
+        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
+        if (wsdlManager != null) {
+            serviceSchemaInfo = wsdlManager.getSchemasForDefinition(def);
+        }
+        
+        if (serviceSchemaInfo == null) {
+            SchemaUtil schemaUtil = new SchemaUtil(bus, this.schemaList);
+            schemaUtil.setCatalogResolvedMap(this.catalogResolvedMap);
+            schemaUtil.getSchemas(def, serviceInfo);
+            serviceSchemaInfo = new ServiceSchemaInfo();
+            serviceSchemaInfo.setSchemaCollection(serviceInfo.getXmlSchemaCollection());
+            serviceSchemaInfo.setSchemaInfoList(serviceInfo.getSchemas());
+            if (wsdlManager != null) {
+                wsdlManager.putSchemasForDefinition(def, serviceSchemaInfo);
+            }
+        } else {
+            serviceInfo.setServiceSchemaInfo(serviceSchemaInfo);
+        }
     }
+
 
     private void parseImports(Definition def, List<Definition> defList) {
         List<Import> importList = new ArrayList<Import>();
