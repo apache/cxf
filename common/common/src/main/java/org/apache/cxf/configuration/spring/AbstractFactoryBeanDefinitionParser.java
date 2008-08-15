@@ -34,6 +34,7 @@ import org.springframework.beans.factory.xml.ParserContext;
  */
 public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
     
+    @SuppressWarnings("deprecation")
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         BeanDefinitionBuilder factoryBean = BeanDefinitionBuilder.rootBeanDefinition(getFactoryClass());

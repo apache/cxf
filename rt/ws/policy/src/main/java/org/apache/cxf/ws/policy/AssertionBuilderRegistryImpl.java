@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -64,6 +65,13 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
         return AssertionBuilderRegistry.class;
     }
     
+    public void register(AssertionBuilder builder) {
+        Collection<QName> names = builder.getKnownElements();
+        for (QName n : names) {
+            super.register(n, builder);
+        }
+    }
+
     public boolean isIgnoreUnknownAssertions() {
         return ignoreUnknownAssertions;
     }

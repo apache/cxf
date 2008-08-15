@@ -36,7 +36,7 @@
         <surefire.fork.mode>once</surefire.fork.mode>
         <surefire.format>brief</surefire.format>
         <surefire.usefile>false</surefire.usefile>
-	<surefire.fork.vmargs>-ea</surefire.fork.vmargs>
+        <surefire.fork.vmargs>-ea</surefire.fork.vmargs>
         <compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</compile.flags>
         <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
         <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
@@ -48,8 +48,8 @@
         <jetty.version>6.1.9</jetty.version>
         <saaj.version>1.3</saaj.version>
         <saaj.impl.version>1.3</saaj.impl.version>
-        <spring.version>2.0.8</spring.version>
-        <spring.mock>spring-mock</spring.mock>
+        <spring.version>2.5.5</spring.version>
+        <spring.mock>spring-test</spring.mock>
         <wsdl4j.version>1.6.2</wsdl4j.version>
         <derby.version>10.2.2.0</derby.version>
         <activemq.version>4.1.1</activemq.version>
@@ -1159,10 +1159,10 @@
             </build>
         </profile>
         <profile>
-            <id>spring2.5</id>
+            <id>spring2.0</id>
             <properties>
-                <spring.version>2.5.4</spring.version>
-                <spring.mock>spring-test</spring.mock>
+                <spring.version>2.0.8</spring.version>
+                <spring.mock>spring-mock</spring.mock>
             </properties>
         </profile>
     </profiles>

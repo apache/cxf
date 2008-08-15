@@ -232,6 +232,7 @@ public abstract class AbstractBeanDefinitionParser
         mapElementToJaxbProperty(parent, bean, name, propertyName, null);
     }
    
+    @SuppressWarnings("deprecation")
     protected void mapElementToJaxbProperty(Element parent, 
                                             BeanDefinitionBuilder bean, 
                                             QName name,
