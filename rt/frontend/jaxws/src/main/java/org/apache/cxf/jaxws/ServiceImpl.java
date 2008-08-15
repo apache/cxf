@@ -201,7 +201,6 @@ public class ServiceImpl extends ServiceDelegate {
         } catch (WebServiceException e) {
             throw e;
         } catch (Throwable e) {
-            e.printStackTrace();
             WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
             Service service = sf.create();
             for (ServiceInfo si : service.getServiceInfos()) { 
