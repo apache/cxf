@@ -462,10 +462,24 @@ public class ObjectReferenceVisitor extends VisitorBase {
                     scopedName = new Scope(currentScope, node);
                 }
                 if (scopedNames.getScope(scopedName) != null) {
-                    XmlSchema wsaSchema = new XmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE, schemas);
-                    XmlSchemaType wsaType = new XmlSchemaType(wsaSchema);
-                    wsaType.setName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
-                    result = wsaType;
+                    XmlSchema wsaSchema = null;
+                    // check whether a schema with the required namespace has already been created
+                    XmlSchema[] existingSchemas = schemas.getXmlSchemas();
+                    for (XmlSchema xs : existingSchemas) {
+                        if (xs.getTargetNamespace().equals(ReferenceConstants.WSADDRESSING_NAMESPACE)) {
+                            // if it has been created, reuse it
+                            wsaSchema = xs;
+                            result = wsaSchema.getTypeByName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
+                            break;
+                        }
+                    }
+                    // if not, create a new one and create the WS-Addressing EndpointReferenceType
+                    if (wsaSchema == null) {
+                        wsaSchema = new XmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE, schemas);
+                        XmlSchemaType wsaType = new XmlSchemaType(wsaSchema);
+                        wsaType.setName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
+                        result = wsaType;
+                    }
                 }                
                 currentScope = currentScope.getParent();
             }
@@ -478,10 +492,24 @@ public class ObjectReferenceVisitor extends VisitorBase {
                 scopedName = scope;
             }
             if (scopedNames.getScope(scopedName) != null) {
-                XmlSchema wsaSchema = new XmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE, schemas);
-                XmlSchemaType wsaType = new XmlSchemaType(wsaSchema);
-                wsaType.setName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
-                result = wsaType;
+                XmlSchema wsaSchema = null;
+                // check whether a schema with the required namespace has already been created
+                XmlSchema[] existingSchemas = schemas.getXmlSchemas();
+                for (XmlSchema xs : existingSchemas) {
+                    if (xs.getTargetNamespace().equals(ReferenceConstants.WSADDRESSING_NAMESPACE)) {
+                        // if it has been created, reuse it
+                        wsaSchema = xs;
+                        result = wsaSchema.getTypeByName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
+                        break;
+                    }
+                }
+                // if not, create a new one and create the WS-Addressing EndpointReferenceType
+                if (wsaSchema == null) {
+                    wsaSchema = new XmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE, schemas);
+                    XmlSchemaType wsaType = new XmlSchemaType(wsaSchema);
+                    wsaType.setName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
+                    result = wsaType;
+                }
             }
         }
         
