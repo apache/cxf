@@ -35,6 +35,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jws.WebService;
+import javax.wsdl.Definition;
+import javax.wsdl.Port;
+import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.soap.SOAPAddress;
+import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.extensions.soap12.SOAP12Address;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Dispatch;
@@ -62,6 +69,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.binding.soap.JaxWsSoapBindingConfiguration;
 import org.apache.cxf.jaxws.handler.HandlerResolverImpl;
@@ -79,6 +87,8 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
+import org.apache.cxf.tools.common.extensions.soap.SoapAddress;
+import org.apache.cxf.tools.common.extensions.soap.SoapBinding;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -86,6 +96,8 @@ import org.apache.cxf.workqueue.OneShotAsyncExecutor;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
 public class ServiceImpl extends ServiceDelegate {
@@ -97,11 +109,13 @@ public class ServiceImpl extends ServiceDelegate {
     private String wsdlURL;
 
     private HandlerResolver handlerResolver;
-    private final Collection<QName> ports = new HashSet<QName>();
-    private Map<QName, PortInfoImpl> portInfos = new HashMap<QName, PortInfoImpl>();
     private Executor executor;
     private QName serviceName;
     private Class<?> clazz;
+
+    private final Collection<QName> ports = new HashSet<QName>();
+    private Map<QName, PortInfoImpl> portInfos = new HashMap<QName, PortInfoImpl>();
+
 
     public ServiceImpl(Bus b, URL url, QName name, Class<?> cls) {
         bus = b;
@@ -137,14 +151,65 @@ public class ServiceImpl extends ServiceDelegate {
         }
     }
     
-    private void initializePorts() {   
-        WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
-        Service service = sf.create();
-        for (ServiceInfo si : service.getServiceInfos()) { 
-            for (EndpointInfo ei : si.getEndpoints()) {
-                this.ports.add(ei.getName());
-                String bindingID = BindingID.getJaxwsBindingID(ei.getTransportId());
-                addPort(ei.getName(), bindingID, ei.getAddress());
+    private void initializePorts() {
+        try {
+            Definition def = bus.getExtension(WSDLManager.class).getDefinition(wsdlURL);
+            javax.wsdl.Service serv = def.getService(serviceName);
+            if (serv == null) {
+                throw new WebServiceException("Could not find service named " + serviceName 
+                                              + " in wsdl " + wsdlURL);
+            }
+            
+            Map<String, Port> wsdlports = CastUtils.cast(serv.getPorts());
+            for (Port port : wsdlports.values()) {
+                QName name = new QName(serviceName.getNamespaceURI(), port.getName());
+                
+                String tpId = null;
+                String address = null;
+                List<? extends ExtensibilityElement> extensions 
+                    = CastUtils.cast(port.getBinding().getExtensibilityElements());
+                if (!extensions.isEmpty()) {
+                    ExtensibilityElement e = extensions.get(0);
+                    if (e instanceof SoapBinding) {
+                        tpId = ((SoapBinding)e).getTransportURI();
+                    } else if (e instanceof SOAP12Binding) {
+                        tpId = ((SOAP12Binding)e).getTransportURI();
+                    } else if (e instanceof SOAPBinding) {
+                        tpId = ((SOAPBinding)e).getTransportURI();
+                    }
+                }
+                extensions = CastUtils.cast(port.getExtensibilityElements());
+                if (!extensions.isEmpty()) {
+                    ExtensibilityElement e = extensions.get(0);
+                    if (tpId == null) {
+                        tpId = e.getElementType().getNamespaceURI();
+                    }
+                    if (e instanceof SoapAddress) {
+                        address = ((SoapAddress)e).getLocationURI();
+                    } else if (e instanceof AddressType) {
+                        address = ((AddressType)e).getLocation();                        
+                    } else if (e instanceof SOAP12Address) {
+                        address = ((SOAP12Address)e).getLocationURI();
+                    } else if (e instanceof SOAPAddress) {
+                        address = ((SOAPAddress)e).getLocationURI();                        
+                    }
+                }
+                this.ports.add(name);
+                String bindingID = BindingID.getJaxwsBindingID(tpId);
+                addPort(name, bindingID, address);
+            }
+        } catch (WebServiceException e) {
+            throw e;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
+            Service service = sf.create();
+            for (ServiceInfo si : service.getServiceInfos()) { 
+                for (EndpointInfo ei : si.getEndpoints()) {
+                    this.ports.add(ei.getName());
+                    String bindingID = BindingID.getJaxwsBindingID(ei.getTransportId());
+                    addPort(ei.getName(), bindingID, ei.getAddress());
+                }
             }
         }
     }
