@@ -1,0 +1,72 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DoubleIt" 
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+   xmlns:tns="http://www.example.org/DoubleIt"
+   targetNamespace="http://www.example.org/DoubleIt">
+   <wsdl:types>
+      <xsd:schema targetNamespace="http://www.example.org/DoubleIt">
+         <xsd:element name="DoubleIt">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="numberToDouble" type="xsd:integer"/>
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="DoubleItResponse">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="doubledNumber" type="xsd:integer" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+      </xsd:schema>
+   </wsdl:types>
+   <wsdl:message name="DoubleItRequest">
+      <wsdl:part element="tns:DoubleIt" name="parameters" />
+   </wsdl:message>
+   <wsdl:message name="DoubleItResponse">
+      <wsdl:part element="tns:DoubleItResponse" name="parameters" />
+   </wsdl:message>
+   <wsdl:portType name="DoubleItPortType">
+      <wsdl:operation name="DoubleIt">
+         <wsdl:input message="tns:DoubleItRequest" />
+         <wsdl:output message="tns:DoubleItResponse" />
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="DoubleItBinding" type="tns:DoubleItPortType">
+      <soap:binding style="document"
+         transport="http://schemas.xmlsoap.org/soap/http" />
+      <wsdl:operation name="DoubleIt">
+         <soap:operation soapAction=""/>
+         <wsdl:input><soap:body use="literal"/></wsdl:input>
+         <wsdl:output><soap:body use="literal"/></wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="DoubleItService">
+      <wsdl:port name="DoubleItPort" binding="tns:DoubleItBinding">
+         <soap:address 
+            location="http://localhost:8080/doubleit/services/doubleit"/>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>
