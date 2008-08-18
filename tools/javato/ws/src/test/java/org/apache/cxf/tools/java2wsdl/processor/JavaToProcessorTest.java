@@ -501,10 +501,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(requestWrapperClass.exists());
         assertTrue(responseWrapperClass.exists());
 
-        assertTrue(getStringFromFile(requestWrapperClass).indexOf("String  arg0") != -1);
-        assertTrue(getStringFromFile(requestWrapperClass).indexOf("Holder") == -1);
-        assertTrue(getStringFromFile(responseWrapperClass).indexOf("String  arg0") != -1);
-        assertTrue(getStringFromFile(responseWrapperClass).indexOf("Holder") == -1);
+        String req = getStringFromFile(requestWrapperClass);
+        String resp = getStringFromFile(responseWrapperClass);
+        assertTrue(req.indexOf("String  arg0") != -1);
+        assertTrue(req.indexOf("Holder") == -1);
+        assertTrue(resp.indexOf("String  arg0") != -1);
+        assertTrue(resp.indexOf("Holder") == -1);
     }
 
     @Test

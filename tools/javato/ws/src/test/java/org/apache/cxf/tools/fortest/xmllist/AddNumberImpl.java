@@ -21,9 +21,18 @@ package org.apache.cxf.tools.fortest.xmllist;
 import java.util.List;
 
 import javax.jws.WebService;
+
+import org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType.UserObject;
 @WebService(endpointInterface = "org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType")
 public class AddNumberImpl implements AddNumbersPortType {
     public List<Integer> addNumbers(List<String> arg) {
+        return null;
+    }
+
+    public UserObject testCXF1752(List<Long> receivers, UserObject item, 
+                                  byte[] binaryContent, UserObject[] objects,
+                                  List<UserObject> objects2,
+                                  String fileName) {
         return null;
     }
 

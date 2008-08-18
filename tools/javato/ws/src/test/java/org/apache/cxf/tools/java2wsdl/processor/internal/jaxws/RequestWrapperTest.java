@@ -30,6 +30,7 @@ import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.fortest.withannotation.doc.GreeterArray;
+import org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -163,5 +164,22 @@ public class RequestWrapperTest extends Assert {
         assertFalse(wrapper.isWrapperBeanClassNotExist());
         assertEquals(pkgName, wrapper.getJavaClass().getPackageName());
         assertEquals("SayHi", wrapper.getJavaClass().getName());
+    }
+    
+    @Test
+    public void testCXF1752() throws Exception {
+        OperationInfo opInfo = getOperation(AddNumbersPortType.class, "testCXF1752");
+        RequestWrapper wrapper = new RequestWrapper();
+        wrapper.setOperationInfo(opInfo);
+        
+        wrapper.buildWrapperBeanClass();
+        List<JavaField> fields = wrapper.getJavaClass().getFields();
+        assertEquals(6, fields.size());
+        assertEquals("java.util.List<java.lang.Long>", fields.get(0).getClassName());
+        assertEquals("byte[]", fields.get(2).getClassName());
+        assertEquals("org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType.UserObject[]",
+                     fields.get(3).getClassName());
+        assertEquals("java.util.List<org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType.UserObject>",
+                     fields.get(4).getClassName());
     }
 }
