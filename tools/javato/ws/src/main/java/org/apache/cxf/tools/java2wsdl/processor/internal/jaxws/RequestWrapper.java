@@ -20,12 +20,14 @@
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jws.WebParam;
+import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.MessageInfo;
@@ -61,39 +63,49 @@ public class RequestWrapper extends Wrapper {
         return buildFields(getMethod(), getOperationInfo().getUnwrappedOperation().getInput());
     }
 
+    private String getTypeString(Type t) {
+        String type = "Object";
+        if (t instanceof Class) {
+            Class clz = (Class) t;
+            if (clz.isArray()) {
+                if (isBuiltInTypes(clz.getComponentType())) {
+                    type = clz.getComponentType().getSimpleName() + "[]";
+                } else {
+                    type = clz.getComponentType().getName() + "[]";
+                }
+            } else {
+                type = clz.getName();
+            }
+        } else if (t instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) t;
+            Class c = (Class)pt.getRawType();
+            if (Holder.class.isAssignableFrom(c)
+                && pt.getActualTypeArguments().length == 1
+                && pt.getActualTypeArguments()[0] instanceof Class) {
+                type = getTypeString(pt.getActualTypeArguments()[0]);
+            } else {
+                type = t.toString();
+            }
+        } else if (t instanceof GenericArrayType) {
+            GenericArrayType gat = (GenericArrayType)t;
+            type = gat.toString();
+        }
+        type = type.replace('$', '.');
+        return type;
+    }
+    
+    
     protected List<JavaField> buildFields(final Method method, final MessageInfo message) {
         List<JavaField> fields = new ArrayList<JavaField>();
-        String name;
-        String type = "Object";
 
         final Type[] paramClasses = method.getGenericParameterTypes();
         final Annotation[][] paramAnnotations = method.getParameterAnnotations();
 
         for (MessagePartInfo mpi : message.getMessageParts()) {
             int idx = mpi.getIndex();
-            name = mpi.getName().getLocalPart();
+            String name = mpi.getName().getLocalPart();
             Type t = paramClasses[idx];
-
-            Class clz = null;
-            if (t instanceof Class) {
-                clz = (Class) t;
-                if (clz.isArray()) {
-                    if (isBuiltInTypes(clz.getComponentType())) {
-                        type = clz.getComponentType().getSimpleName() + "[]";
-                    } else {
-                        type = clz.getComponentType().getName() + "[]";
-                    }
-                } else {
-                    type = clz.getName();
-                }
-            } else if (t instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) t;
-                if (pt.getActualTypeArguments().length > 0
-                    && pt.getActualTypeArguments()[0] instanceof Class) {
-                    clz = (Class)pt.getActualTypeArguments()[0];
-                    type = clz.getName();
-                }
-            }
+            String type = getTypeString(t);
 
             JavaField field = new JavaField(name, type, "");
 
