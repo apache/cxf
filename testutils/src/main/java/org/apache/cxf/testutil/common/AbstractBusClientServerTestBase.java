@@ -60,17 +60,18 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         BusFactory.setDefaultBus(bus);
     }
     
-    public static void createStaticBus(String config) throws Exception {
+    public static Bus createStaticBus(String config) throws Exception {
         defaultConfigFileName = config;
-        createStaticBus();
+        return createStaticBus();
     }
-    public static void createStaticBus() throws Exception {
+    public static Bus createStaticBus() throws Exception {
         if (defaultConfigFileName != null) {
             System.setProperty("cxf.config.file", defaultConfigFileName);
         }
         BusFactory bf = BusFactory.newInstance();
         staticBus = bf.createBus();
-        BusFactory.setDefaultBus(staticBus);  
+        BusFactory.setDefaultBus(staticBus);
+        return staticBus;
     }
     
     @After

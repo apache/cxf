@@ -109,7 +109,9 @@ public class WSDLServiceBuilder {
     private void copyExtensors(AbstractPropertiesHolder info, List<?> extList) {
         if (info != null) {
             for (ExtensibilityElement ext : cast(extList, ExtensibilityElement.class)) {
-                info.addExtensor(ext);
+                if (!info.containsExtensor(ext)) {
+                    info.addExtensor(ext);
+                }
             }
         }
     }

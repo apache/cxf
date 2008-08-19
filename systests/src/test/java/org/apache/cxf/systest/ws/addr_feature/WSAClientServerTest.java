@@ -102,7 +102,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
     }
 
     private AddNumbersPortType getPort() {
-        URL wsdl = getClass().getResource("/wsdl/add_numbers.wsdl");
+        URL wsdl = getClass().getResource("/wsdl_systest/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);

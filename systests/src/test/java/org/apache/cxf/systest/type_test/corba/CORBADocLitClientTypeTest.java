@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final String WSDL_PATH 
-        = "/wsdl/type_test_corba/type_test_corba-corba.wsdl";
+        = "/wsdl_systest/type_test_corba/type_test_corba-corba.wsdl";
     
     
     protected static final QName SERVICE_NAME = new QName("http://apache.org/type_test/doc",

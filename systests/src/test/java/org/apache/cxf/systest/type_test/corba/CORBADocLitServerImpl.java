@@ -56,7 +56,7 @@ public class CORBADocLitServerImpl extends AbstractBusTestServerBase {
     @WebService(serviceName = "TypeTestCORBAService", portName = "TypeTestCORBAPort",
                 endpointInterface = "org.apache.type_test.doc.TypeTestPortType",
                 targetNamespace = "http://apache.org/type_test/doc",
-                wsdlLocation = "classpath:/wsdl/type_test_corba/type_test_corba-corba.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest/type_test_corba/type_test_corba-corba.wsdl")
     class CORBATypeTestImpl extends TypeTestImpl implements TypeTestPortType {
     }
 }

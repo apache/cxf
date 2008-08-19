@@ -83,7 +83,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     private Pizza getPort() {
-        URL wsdl = getClass().getResource("/wsdl/pizza_service.wsdl");
+        URL wsdl = getClass().getResource("/wsdl_systest/pizza_service.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         PizzaService service = new PizzaService(wsdl, serviceName);
@@ -93,7 +93,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
     }
     
     private PizzaNoHeader getPortNoHeader() {
-        URL wsdl = getClass().getResource("/wsdl/pizza_service.wsdl");
+        URL wsdl = getClass().getResource("/wsdl_systest/pizza_service.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         PizzaService service = new PizzaService(wsdl, serviceName);

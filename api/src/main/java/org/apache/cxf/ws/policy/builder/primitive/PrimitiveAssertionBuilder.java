@@ -36,6 +36,13 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
     protected Bus bus;
     private Collection<QName> knownElements = new ArrayList<QName>();
     
+    public PrimitiveAssertionBuilder() {
+        knownElements = new ArrayList<QName>();
+    }
+    public PrimitiveAssertionBuilder(Collection<QName> els) {
+        knownElements = els;
+    }
+    
     public void setBus(Bus b) {
         bus = b;
     }

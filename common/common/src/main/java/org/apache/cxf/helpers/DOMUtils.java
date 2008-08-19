@@ -235,6 +235,17 @@ public final class DOMUtils {
         }
         return (Element) n;
     }
+    public static Element getNextElement(Element el) {
+        Node nd = el.getNextSibling();
+        while (nd != null) {
+            if (nd.getNodeType() == Node.ELEMENT_NODE) {
+                return (Element)nd;
+            }
+            nd = nd.getNextSibling();
+        }
+        return null;
+    }
+    
     public static Element getFirstChildWithName(Element parent, QName q) { 
         String ns = q.getNamespaceURI();
         String lp = q.getLocalPart();

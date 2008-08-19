@@ -17,31 +17,25 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.policy;
+package org.apache.cxf.systest.ws.security;
 
-import java.util.Collection;
-import java.util.List;
+import java.math.BigInteger;
 
-import javax.xml.namespace.QName;
+import javax.jws.WebService;
 
-import org.apache.cxf.extension.Registry;
-import org.apache.cxf.interceptor.Interceptor;
-
+import org.apache.cxf.policytest.doubleit.DoubleItPortType;
 
 /**
- * InterceptorProviderRegistry is used to manage InterceptorProviders that provide
- * assertion domain specific interceptors.
+ * 
  */
-public interface PolicyInterceptorProviderRegistry 
-    extends Registry<QName, PolicyInterceptorProvider> {
-    
-    /**
-     * Register the builder for all qnames from the provider
-     * getAssertionTypes call.
-     * @param provider the provider to register 
-     */
-    void register(PolicyInterceptorProvider provider);
-    
-    List<Interceptor> getInterceptors(Collection<PolicyAssertion> alterative, boolean out, boolean fault);
-
+@WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+            portName = "DoubleItPort",
+            serviceName = "DoubleItService", 
+            endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+            wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
+public class DoubleItImpl implements DoubleItPortType {
+    /** {@inheritDoc}*/
+    public BigInteger doubleIt(BigInteger numberToDouble) {
+        return numberToDouble.multiply(new BigInteger("2"));
+    }
 }

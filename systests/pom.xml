@@ -65,7 +65,7 @@
                         <phase>generate-test-sources</phase>
                         <configuration>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <testWsdlRoot>${basedir}/src/test/resources/wsdl</testWsdlRoot>
+                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest</testWsdlRoot>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -82,10 +82,10 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <outputDir>${basedir}/target/generated/src/test/resources/wsdl/type_test_corba/</outputDir>
+                            <outputDir>${basedir}/target/generated/src/test/resources/wsdl_systest/type_test_corba/</outputDir>
                             <wsdltoidlOptions>
                                 <wsdltoidlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl/type_test_corba/type_test_corba.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest/type_test_corba/type_test_corba.wsdl</wsdl>
                                     <corbabinding>true</corbabinding>
                                 </wsdltoidlOption>
                             </wsdltoidlOptions>

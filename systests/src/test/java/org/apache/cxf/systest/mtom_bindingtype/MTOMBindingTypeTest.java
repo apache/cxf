@@ -124,7 +124,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
     }
 
     private Hello getPort() {
-        URL wsdl = getClass().getResource("/wsdl/mtom.wsdl");
+        URL wsdl = getClass().getResource("/wsdl_systest/mtom.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         HelloService service = new HelloService(wsdl, serviceName);

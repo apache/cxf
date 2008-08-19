@@ -42,7 +42,7 @@ public class Server extends AbstractBusTestServerBase {
 
     private String getWsdl() {
         try {
-            java.net.URL wsdl = getClass().getResource("/wsdl/add_numbers.wsdl");
+            java.net.URL wsdl = getClass().getResource("/wsdl_systest/add_numbers.wsdl");
             return wsdl.toString();
         } catch (Exception e) {
             e.printStackTrace();

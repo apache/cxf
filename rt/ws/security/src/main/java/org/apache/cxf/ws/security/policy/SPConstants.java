@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 
 public abstract class SPConstants {
     
-    public static final String P_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";
+    public static final String P_NS = "http://www.w3.org/ns/ws-policy";
 
     public static final String P_PREFIX = "wsp";
 

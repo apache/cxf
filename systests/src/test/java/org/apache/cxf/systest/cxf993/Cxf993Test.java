@@ -44,7 +44,7 @@ public class Cxf993Test extends AbstractBusClientServerTestBase {
     }
 
     private NotificationServicePort getPort() {
-        URL wsdl = getClass().getResource("/wsdl/cxf-993.wsdl");
+        URL wsdl = getClass().getResource("/wsdl_systest/cxf-993.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         NotificationService service = new NotificationService(wsdl, serviceName);

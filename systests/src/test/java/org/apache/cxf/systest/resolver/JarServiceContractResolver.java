@@ -55,7 +55,7 @@ public class JarServiceContractResolver implements ServiceContractResolver {
         }
         path.append(local).append(".wsdl");
         try {
-            URL jarURL = this.getClass().getResource("/wsdl/hello_world_resolver.jar");
+            URL jarURL = this.getClass().getResource("/wsdl_systest/hello_world_resolver.jar");
             JarFile jar = new JarFile(new File(jarURL.toURI()));
             JarEntry jarEntry = jar.getJarEntry(path.toString());
             uri = new URI("jar:" + jarURL + "!/" + jarEntry.toString());

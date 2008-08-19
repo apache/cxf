@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.policy.builders;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -38,8 +37,6 @@ import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.policy.model.TransportToken;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.Policy;
 
 public class TransportBindingBuilder implements AssertionBuilder {
     private static final List<QName> KNOWN_ELEMENTS 
@@ -58,18 +55,7 @@ public class TransportBindingBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         TransportBinding transportBinding = new TransportBinding(consts);
-
-        Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
-
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List)iterator.next(), transportBinding, consts);
-
-            /*
-             * since there should be only one alternative
-             */
-            break;
-        }
+        processAlternative(element, transportBinding, consts);
 
         return transportBinding;
     }
@@ -78,31 +64,36 @@ public class TransportBindingBuilder implements AssertionBuilder {
         return KNOWN_ELEMENTS;
     }
 
-    private void processAlternative(List assertionList, 
+    private void processAlternative(Element element, 
                                     TransportBinding parent,
                                     SPConstants consts) {
-
-        for (Iterator iterator = assertionList.iterator(); iterator.hasNext();) {
-
-            Assertion primitive = (Assertion)iterator.next();
-            QName name = primitive.getName();
-
-            if (!consts.getNamespace().equals(name.getNamespaceURI())) {
-                continue;
-            }
-            
-            if (name.getLocalPart().equals(SPConstants.ALGO_SUITE)) {
-                parent.setAlgorithmSuite((AlgorithmSuite)primitive);
-            } else if (name.getLocalPart().equals(SPConstants.TRANSPORT_TOKEN)) {
-                parent.setTransportToken((TransportToken)primitive);
-            } else if (name.getLocalPart().equals(SPConstants.INCLUDE_TIMESTAMP)) {
-                parent.setIncludeTimestamp(true);
-            } else if (name.getLocalPart().equals(SPConstants.LAYOUT)) {
-                parent.setLayout((Layout)primitive);
-            } else if (name.getLocalPart().equals(SPConstants.SIGNED_SUPPORTING_TOKENS)) {
-                parent.setSignedSupportingToken((SupportingToken)primitive);
-            } else if (name.getLocalPart().equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
-                parent.setSignedEndorsingSupportingTokens((SupportingToken)primitive);
+        Element polEl = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
+        if (polEl != null) {
+            Element child = DOMUtils.getFirstElement(polEl);
+            while (child != null) {
+                String name = child.getLocalName();
+                if (name.equals(SPConstants.ALGO_SUITE)) {
+                    parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder().build(child));
+                } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
+                    parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)
+                                                    .build(child));
+                } else if (name.equals(SPConstants.INCLUDE_TIMESTAMP)) {
+                    parent.setIncludeTimestamp(true);
+                } else if (name.equals(SPConstants.LAYOUT)) {
+                    parent.setLayout((Layout)new LayoutBuilder().build(child));
+                } else if (name.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
+                    || name.equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
+                    
+                    if (consts.getVersion() == SPConstants.Version.SP_V11) {
+                        parent.setSignedSupportingToken((SupportingToken)new SupportingTokensBuilder(builder)
+                                                        .build(child));
+                    } else {
+                        parent.setSignedSupportingToken((SupportingToken)
+                                                        new SupportingTokens12Builder(builder)
+                                                            .build(child));                        
+                    }
+                }
+                child = DOMUtils.getNextElement(child);
             }
         }
     }

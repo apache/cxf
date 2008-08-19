@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.security.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.builders.AsymmetricBindingBuilder;
 import org.apache.cxf.ws.security.policy.builders.ContentEncryptedElementsBuilder;
@@ -53,6 +54,7 @@ import org.apache.cxf.ws.security.policy.builders.UsernameTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.WSS10Builder;
 import org.apache.cxf.ws.security.policy.builders.WSS11Builder;
 import org.apache.cxf.ws.security.policy.builders.X509TokenBuilder;
+import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
 
 
 public class WSSecurityPolicyLoader {
@@ -82,7 +84,7 @@ public class WSSecurityPolicyLoader {
         reg.register(new HttpsTokenBuilder(pbuild));
         reg.register(new InitiatorTokenBuilder(pbuild));
         reg.register(new IssuedTokenBuilder(pbuild));
-        reg.register(new LayoutBuilder(pbuild));
+        reg.register(new LayoutBuilder());
         reg.register(new ProtectionTokenBuilder(pbuild));
         reg.register(new RecipientTokenBuilder(pbuild));
         reg.register(new RequiredElementsBuilder());
@@ -99,13 +101,18 @@ public class WSSecurityPolicyLoader {
         reg.register(new Trust10Builder());
         reg.register(new Trust13Builder());
         reg.register(new UsernameTokenBuilder(pbuild));
-        reg.register(new WSS10Builder(pbuild));
-        reg.register(new WSS11Builder(pbuild));
+        reg.register(new WSS10Builder());
+        reg.register(new WSS11Builder());
         reg.register(new X509TokenBuilder(pbuild));
     }
     
     public void registerProviders() {
         //interceptor providers for all of the above
+        PolicyInterceptorProviderRegistry reg = bus.getExtension(PolicyInterceptorProviderRegistry.class);
+        if (reg == null) {
+            return;
+        }
+        reg.register(new WSSecurityPolicyInterceptorProvider());
     }
 
 }

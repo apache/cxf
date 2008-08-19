@@ -142,7 +142,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
     }
 
     private AddNumberImpl getPort() {
-        URL wsdl = getClass().getResource("/wsdl/add_numbers-fromjava.wsdl");
+        URL wsdl = getClass().getResource("/wsdl_systest/add_numbers-fromjava.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         AddNumberImplService service = new AddNumberImplService(wsdl);

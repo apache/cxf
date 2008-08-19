@@ -74,27 +74,32 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
 
     }
     
-    public boolean supportsAlternative(Collection<PolicyAssertion> alternative) {
+    public boolean supportsAlternative(Collection<PolicyAssertion> alternative,
+                                       List<QName> errors) {
+        boolean pass = true;
         for (PolicyAssertion a : alternative) {          
             if (!a.isAsserted(this)) {
-                return false;
+                errors.add(a.getName());
+                pass = false;
             }
         }
-        return true;
+        return pass;
     }
     
     public void checkEffectivePolicy(Policy policy) {
+        List<QName> errors = new ArrayList<QName>();
         Iterator alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {      
             List<PolicyAssertion> alternative = CastUtils.cast((List)alternatives.next(), 
                                                                PolicyAssertion.class);
-            if (supportsAlternative(alternative)) {
+            if (supportsAlternative(alternative, errors)) {
                 return;
             }
         }
-        throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE));
+        throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, errors));
     }
-        
+
+    
     public void check() {
         for (Collection<AssertionInfo> ais : values()) {
             for (AssertionInfo ai : ais) {

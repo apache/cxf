@@ -19,6 +19,10 @@
 
 package org.apache.cxf.ws.policy.builder.xml;
 
+import java.util.Collection;
+
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -26,6 +30,14 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 
 public class XMLPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
  
+    public XMLPrimitiveAssertionBuilder() {
+        super();
+    }
+    public XMLPrimitiveAssertionBuilder(Collection<QName> els) {
+        super(els);
+    }
+    
+    
     public PolicyAssertion build(Element element) {
         return new XmlPrimitiveAssertion(element, getPolicyConstants());
     }

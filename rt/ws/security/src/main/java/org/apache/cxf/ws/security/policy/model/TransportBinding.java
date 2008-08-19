@@ -86,7 +86,7 @@ public class TransportBinding extends Binding {
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
         List configurations = algorithmSuite.getConfigurations();
 
-        if (configurations != null && configurations.size() == 1) {
+        if (configurations == null || configurations.size() == 1) {
             setNormalized(true);
             return this;
         }
