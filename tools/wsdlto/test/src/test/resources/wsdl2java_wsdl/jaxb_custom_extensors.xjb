@@ -20,14 +20,14 @@
 <jaxws:bindings wsdlLocation="jaxb_custom_extensors.wsdl"
     xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" 
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:extensionBindingPrefixes="xjc"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xsd:schema">
             
         <jaxb:globalBindings 
-           	jaxb:version="2.0"
-            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-           	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-           	jaxb:extensionBindingPrefixes="xjc">
+           	jaxb:version="2.0">
             <xjc:simple />
         </jaxb:globalBindings>
     </jaxws:bindings>

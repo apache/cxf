@@ -278,6 +278,9 @@ public final class CustomizationParser {
     private void copyJaxbAttributes(Node childNode, Element schemaNode) {
         if (childNode instanceof Element) {
             Element el = (Element)childNode;
+            if (el.getParentNode() != null) {
+                copyJaxbAttributes(el.getParentNode(), schemaNode);
+            }
             NamedNodeMap atts = el.getAttributes();
             for (int x = 0; x < atts.getLength(); x++) {
                 Attr attr = (Attr)atts.item(x);
