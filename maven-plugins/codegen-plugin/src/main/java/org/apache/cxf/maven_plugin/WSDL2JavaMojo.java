@@ -218,14 +218,13 @@ public class WSDL2JavaMojo extends AbstractMojo {
         Map<Object, Object> origProps = new HashMap<Object, Object>(System.getProperties());
         
         String cp = System.getProperty("java.class.path");
-        long timestamp = CodegenUtils.getCodegenTimestamp();
         boolean result = true;
         
         try {
             Thread.currentThread().setContextClassLoader(loader);
             System.setProperty("java.class.path", newCp);
             for (WsdlOption o : wsdlOptions) {
-                processWsdl(o, timestamp);
+                processWsdl(o);
 
                 File dirs[] = o.getDeleteDirs();
                 if (dirs != null) {
@@ -261,8 +260,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         System.gc();
     }
 
-    private void processWsdl(WsdlOption wsdlOption,
-                             long cgtimestamp) throws MojoExecutionException {
+    private void processWsdl(WsdlOption wsdlOption) throws MojoExecutionException {
         
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
@@ -301,7 +299,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             }
         }
         
-        boolean doWork = cgtimestamp > doneFile.lastModified();
+        boolean doWork = false;
         if (!doneFile.exists()) {
             doWork = true;
         } else if (timestamp > doneFile.lastModified()) {
