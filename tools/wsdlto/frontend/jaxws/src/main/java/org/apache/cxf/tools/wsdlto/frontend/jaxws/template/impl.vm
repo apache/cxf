@@ -34,7 +34,7 @@ import ${import};
  * 
  */
 
-@javax.jws.WebService(name = "$intf.Name",
+@javax.jws.WebService(
 #if ($service.ServiceName != "") 
                       serviceName = "$service.ServiceName",
 #end

@@ -315,7 +315,6 @@ public class CodeGenTest extends ProcessorTestBase {
         assertTrue("Webservice annotation wsdlLocation should begin with file", ws.wsdlLocation()
             .startsWith("file"));
         assertEquals("org.apache.cxf.w2j.hello_world_rpclit.GreeterRPCLit", ws.endpointInterface());
-        assertEquals("GreeterRPCLit", ws.name());
 
     }
 

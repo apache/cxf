@@ -271,7 +271,7 @@ public class JavaToWSTest extends ToolTestBase {
         File wsdlFile = outputFile("tmp.wsdl");
         String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/tmp.wsdl", "-verbose", "-s",
                                       output.getPath(), "-frontend", "jaxws", "-client", "-server",
-                                      "org.apache.cxf.tools.fortest.GreeterImpl"};
+                                      org.apache.cxf.tools.fortest.GreeterImpl.class.getName()};
         JavaToWS.main(args);
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
 
