@@ -145,29 +145,31 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (method == null
             || method.getReturnType().equals(Future.class)
             || method.getReturnType().equals(Response.class)) {
-            return false;
+            return Boolean.FALSE;
         }
         
-        if (method != null) {
-            WebMethod wm = method.getAnnotation(WebMethod.class);
-            if (wm != null) {
-                if (wm.exclude()) {
-                    return Boolean.FALSE;
-                } else {
-                    return Boolean.TRUE;
-                }
+        WebMethod wm = method.getAnnotation(WebMethod.class);
+        if (wm != null) {
+            if (wm.exclude()) {
+                return Boolean.FALSE;
             } else {
-                if (method.getDeclaringClass().isInterface()) {
-                    return hasWebServiceAnnotation(method);
-                }
-                return hasWebServiceAnnotation(method);              
+                return Boolean.TRUE;
             }
+        } 
+        if (method.getDeclaringClass().isInterface()) {
+            return hasWebServiceAnnotation(method);
         }
-        return Boolean.FALSE;
+        if (implInfo.getSEIClass() == null) {
+            return hasWebServiceAnnotation(method);
+        }
+        return implInfo.getSEIClass().isAssignableFrom(method.getDeclaringClass());
     }
 
     @Override
     public Boolean isOperation(final Method method) {
+        if (Object.class.equals(method.getDeclaringClass())) {
+            return false;
+        }
         Class implClz = implInfo.getImplementorClass();
         if (isWebMethod(getDeclaredMethod(implClz, method))) {
             return true;
@@ -190,7 +192,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             } catch (SecurityException e) {
                 throw new ServiceConstructionException(e);
             } catch (NoSuchMethodException e) {
-                return null;
+                return isWebMethod(method) ? method : null;
             }
         }
         return method;
