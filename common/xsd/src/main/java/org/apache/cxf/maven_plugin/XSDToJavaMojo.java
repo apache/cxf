@@ -74,7 +74,6 @@ public class XSDToJavaMojo extends AbstractMojo {
         outputDirFile.mkdirs();
         markerDirectory.mkdirs();
 
-        long timestamp = CodegenUtils.getCodegenTimestamp();
         boolean result = true;
         
         if (xsdOptions == null) {
@@ -117,7 +116,7 @@ public class XSDToJavaMojo extends AbstractMojo {
                 }
             }
             
-            boolean doWork = timestamp > doneFile.lastModified();
+            boolean doWork = false;
             if (!doneFile.exists()) {
                 doWork = true;
             } else if (srctimestamp > doneFile.lastModified()) {

@@ -115,12 +115,12 @@ public class WSDLValidatorMojo extends AbstractMojo {
         }
     }
     
-    private void processWsdl(File file, long cgtimestamp) throws MojoExecutionException {
+    private void processWsdl(File file) throws MojoExecutionException {
         
         // If URL to WSDL, replace ? and & since they're invalid chars for file names
         File doneFile =
             new File(markerDirectory, "." + file.getName().replace('?', '_').replace('&', '_') + ".DONE");
-        boolean doWork = cgtimestamp > doneFile.lastModified();
+        boolean doWork = false;
         if (!doneFile.exists()) {
             doWork = true;
         } else if (file.lastModified() > doneFile.lastModified()) {
@@ -183,9 +183,8 @@ public class WSDLValidatorMojo extends AbstractMojo {
             wsdls.addAll(getWsdlFiles(testWsdlRoot));
         }
 
-        long timestamp = CodegenUtils.getCodegenTimestamp();
         for (File wsdl : wsdls) {
-            processWsdl(wsdl, timestamp);
+            processWsdl(wsdl);
         }
 
 
