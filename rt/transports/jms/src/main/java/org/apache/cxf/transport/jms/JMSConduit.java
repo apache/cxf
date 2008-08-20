@@ -373,6 +373,7 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
             //set the message header back to the incomeMessage
             inMessage.put(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS, 
                           outMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS));
+            inMessage.put(Message.PROTOCOL_HEADERS, outMessage.get(Message.PROTOCOL_HEADERS));
 
             getLogger().log(Level.FINE, "The Response Message is : [" + response + "]");
             
