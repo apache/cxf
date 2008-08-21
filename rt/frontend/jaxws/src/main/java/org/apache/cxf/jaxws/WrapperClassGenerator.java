@@ -47,6 +47,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
+import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -66,8 +67,10 @@ public final class WrapperClassGenerator extends ASMHelper {
     private Set<Class<?>> wrapperBeans = new LinkedHashSet<Class<?>>();
     private InterfaceInfo interfaceInfo;
     private boolean qualified;
+    private JaxWsServiceFactoryBean factory;
     
-    public WrapperClassGenerator(InterfaceInfo inf, boolean q) {
+    public WrapperClassGenerator(JaxWsServiceFactoryBean fact, InterfaceInfo inf, boolean q) {
+        factory = fact;
         interfaceInfo = inf;
         qualified = q;
     }
@@ -295,21 +298,14 @@ public final class WrapperClassGenerator extends ASMHelper {
         
         AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
         av0.visit("name", name);
-        
-        
-        Annotation[] a = (Annotation[])mpi.getProperty(ReflectionServiceFactoryBean.PARAM_ANNOTATION);
-        if (a != null) {
-            for (Annotation an : a) {
-                String tns = null;
-                if (an instanceof WebParam) {
-                    tns = ((WebParam)an).targetNamespace();
-                } else if (an instanceof WebResult) {
-                    tns = ((WebResult)an).targetNamespace();                    
-                }
-                if (tns != null && !StringUtils.isEmpty(tns)) {
-                    av0.visit("namespace", tns);
-                }
-            }
+        if (factory.isWrapperPartQualified(mpi)) {
+            av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());            
+        }
+        if (factory.isWrapperPartNillable(mpi)) {
+            av0.visit("nillable", "true");
+        }
+        if (factory.getWrapperPartMinOccurs(mpi) == 1) {
+            av0.visit("required", "true");
         }
         av0.visitEnd();
 
