@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
 import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
