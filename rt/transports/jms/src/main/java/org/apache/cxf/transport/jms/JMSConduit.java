@@ -138,10 +138,11 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
      * Receive mechanics.
      *
      * @param pooledSession the shared JMS resources
+     * @param inMessage 
      * @retrun the response buffer
      */
     private Object receive(PooledSession pooledSession,
-                           Message outMessage) throws JMSException {
+                           Message outMessage, Message inMessage) throws JMSException {
         
         Object result = null;
         
@@ -158,7 +159,7 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
 
         if (jmsMessage != null) {
             
-            base.populateIncomingContext(jmsMessage, outMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+            base.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
             result = base.unmarshal(jmsMessage);
             return result;
         } else {
@@ -364,16 +365,12 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
             //              outMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS));
                         
             try {
-                response = receive(pooledSession, outMessage);
+                response = receive(pooledSession, outMessage, inMessage);
             } catch (JMSException jmsex) {
                 getLogger().log(Level.FINE, "JMS connect failed with JMSException : ", jmsex);            
                 throw new IOException(jmsex.toString());
             }  
 
-            //set the message header back to the incomeMessage
-            inMessage.put(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS, 
-                          outMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS));
-            inMessage.put(Message.PROTOCOL_HEADERS, outMessage.get(Message.PROTOCOL_HEADERS));
 
             getLogger().log(Level.FINE, "The Response Message is : [" + response + "]");
             
