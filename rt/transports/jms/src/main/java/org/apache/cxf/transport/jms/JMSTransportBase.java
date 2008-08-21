@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 
 
@@ -161,6 +163,11 @@ public class JMSTransportBase {
             props.add(prop);
             
             protHeaders.put(name, Collections.singletonList(val));
+            if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE)
+                    && val != null) {
+                inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, val);
+            }
+
         }
         inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
         return headers;
@@ -235,4 +242,30 @@ public class JMSTransportBase {
         return JMSConstants.JMS_QUEUE.equals(
             transport.getJMSAddress().getDestinationStyle().value());
     }
+
+    protected void setContentToProtocalHeader(org.apache.cxf.message.Message message) {
+        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+
+        Map<String, List<String>> headers = getSetProtocolHeaders(message);
+        if (headers.get(org.apache.cxf.message.Message.CONTENT_TYPE) == null) {
+            List<String> ct = new ArrayList<String>();
+            ct.add(contentType);
+            headers.put(org.apache.cxf.message.Message.CONTENT_TYPE, ct);
+        }  else {
+            List<String> ct = headers.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+            ct.add(contentType);
+        }
+    }
+
+    protected Map<String, List<String>> getSetProtocolHeaders(
+            org.apache.cxf.message.Message message) {
+        Map<String, List<String>> headers =
+            CastUtils.cast((Map<?, ?>)message.get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
+        if (null == headers) {
+            headers = new HashMap<String, List<String>>();
+            message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
+        }
+        return headers;
+    }
+
 }

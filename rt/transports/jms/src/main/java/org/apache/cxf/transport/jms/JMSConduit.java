@@ -314,8 +314,10 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSTran
             if (ttl <= 0) {
                 ttl = getClientConfig().getMessageTimeToLive();
             }
-            
+             
             base.setMessageProperties(headers, jmsMessage);
+            //ensure that the contentType is set to the out jms message header
+            base.setContentToProtocalHeader(outMessage);
             Map<String, List<String>> protHeaders = 
                 CastUtils.cast((Map<?, ?>)outMessage.get(Message.PROTOCOL_HEADERS));
             base.addProtocolHeaders(jmsMessage, protHeaders);
