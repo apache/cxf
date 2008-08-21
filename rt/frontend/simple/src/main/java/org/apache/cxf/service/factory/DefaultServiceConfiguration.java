@@ -285,8 +285,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
         return rawClass;
     }
-    
-    
+
     public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
         return (Boolean)mpi.getProperty("nillable");
     }

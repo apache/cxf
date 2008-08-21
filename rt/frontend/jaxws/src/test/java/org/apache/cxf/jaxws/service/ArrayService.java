@@ -48,6 +48,7 @@ public interface ArrayService {
     @WebMethod
     List<String> listOutput();
     @WebMethod
-    String listInput(@WebParam(name = "input")List<String> inputs);
+    String listInput(@WebParam(name = "input",
+        targetNamespace = "http://service.jaxws.cxf.apache.org/") List<String> inputs);
 
 }

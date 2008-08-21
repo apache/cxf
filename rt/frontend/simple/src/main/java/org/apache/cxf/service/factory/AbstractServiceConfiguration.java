@@ -192,6 +192,9 @@ public abstract class AbstractServiceConfiguration {
     public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
         return null;
     }
+    public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
+        return null;
+    }
     public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
         //return Long.MAX_VALUE for unbounded
         return null;

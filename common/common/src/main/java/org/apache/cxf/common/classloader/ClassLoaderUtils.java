@@ -120,12 +120,11 @@ public final class ClassLoaderUtils {
 
             if (cl != null) {
                 return cl.loadClass(className);
-            }
-            
-            return loadClass2(className, callingClass);
+            }            
         } catch (ClassNotFoundException e) {
-            return loadClass2(className, callingClass);
+            //ignore
         }
+        return loadClass2(className, callingClass);
     }
 
     private static Class<?> loadClass2(String className, Class<?> callingClass)
@@ -134,10 +133,15 @@ public final class ClassLoaderUtils {
             return Class.forName(className);
         } catch (ClassNotFoundException ex) {
             try {
-                return ClassLoaderUtils.class.getClassLoader().loadClass(className);
+                if (ClassLoaderUtils.class.getClassLoader() != null) {
+                    return ClassLoaderUtils.class.getClassLoader().loadClass(className);
+                }
             } catch (ClassNotFoundException exc) {
-                return callingClass.getClassLoader().loadClass(className);
+                if (callingClass != null && callingClass.getClassLoader() != null) {
+                    return callingClass.getClassLoader().loadClass(className);
+                }
             }
+            throw ex;
         }
     }
 }

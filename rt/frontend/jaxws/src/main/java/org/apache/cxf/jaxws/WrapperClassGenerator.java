@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
@@ -293,6 +295,22 @@ public final class WrapperClassGenerator extends ASMHelper {
         
         AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
         av0.visit("name", name);
+        
+        
+        Annotation[] a = (Annotation[])mpi.getProperty(ReflectionServiceFactoryBean.PARAM_ANNOTATION);
+        if (a != null) {
+            for (Annotation an : a) {
+                String tns = null;
+                if (an instanceof WebParam) {
+                    tns = ((WebParam)an).targetNamespace();
+                } else if (an instanceof WebResult) {
+                    tns = ((WebResult)an).targetNamespace();                    
+                }
+                if (tns != null && !StringUtils.isEmpty(tns)) {
+                    av0.visit("namespace", tns);
+                }
+            }
+        }
         av0.visitEnd();
 
         List<Annotation> jaxbAnnos = getJaxbAnnos(mpi);
