@@ -466,6 +466,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
 
                     setReplyCorrelationID(request, reply);
                     base.setMessageProperties(headers, reply);
+                    //ensure that the contentType is set to the out jms message header
+                    base.setContentToProtocalHeader(outMessage);
                     Map<String, List<String>> protHeaders = 
                         CastUtils.cast((Map<?, ?>)outMessage.get(Message.PROTOCOL_HEADERS));
                     base.addProtocolHeaders(reply, protHeaders);

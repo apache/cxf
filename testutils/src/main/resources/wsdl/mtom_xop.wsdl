@@ -22,6 +22,7 @@
 <wsdl:definitions name="SOAPBuilders-mime-cr-test" xmlns:types="http://cxf.apache.org/mime/types"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/mime"
+    xmlns:jms="http://cxf.apache.org/transports/jms"
     xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/mime">
 
     <wsdl:types>
@@ -105,6 +106,19 @@
     <wsdl:service name="TestMtomService">
         <wsdl:port name="TestMtomPort" binding="tns:TestMtomBinding">
             <soap:address location="http://localhost:9036/mime-test" />
+        </wsdl:port>
+    </wsdl:service>
+    
+    <wsdl:service name="TestMtomJMSService">
+        <wsdl:port name="TestMtomJMSPort" binding="tns:TestMtomBinding">
+            <jms:address
+               destinationStyle="queue"
+               jndiConnectionFactoryName="ConnectionFactory"
+               jndiDestinationName="dynamicQueues/person.queue">
+               <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+               <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+          </jms:address>
+
         </wsdl:port>
     </wsdl:service>
 
