@@ -1981,7 +1981,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return null;
     }
     
-    public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
+    public boolean isWrapperPartQualified(MessagePartInfo mpi) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isWrapperPartQualified(mpi);
             if (b != null) {
