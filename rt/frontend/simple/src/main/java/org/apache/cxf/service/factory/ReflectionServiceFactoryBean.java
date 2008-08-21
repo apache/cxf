@@ -56,6 +56,7 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaTools;
 import org.apache.cxf.databinding.DataBinding;
@@ -1129,6 +1130,19 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 long min = getWrapperPartMinOccurs(mpi);
                 long max = getWrapperPartMaxOccurs(mpi);
                 boolean nillable = isWrapperPartNillable(mpi);
+                Boolean qualified = isWrapperPartQualified(mpi);
+                if (qualified == null) {
+                    qualified = this.isQualifyWrapperSchema();
+                }
+                if (qualified 
+                    && StringUtils.isEmpty(mpi.getConcreteName().getNamespaceURI())) {
+                    QName newName = new QName(wrapperName.getNamespaceURI(),
+                                              mpi.getConcreteName().getLocalPart());
+                    mpi.setElement(true);
+                    mpi.setElementQName(newName);
+                    mpi.setConcreteName(newName); 
+                    XmlSchemaTools.setElementQName(el, newName);
+                }
                 
                 if (Collection.class.isAssignableFrom(mpi.getTypeClass())
                            && mpi.getTypeClass().isInterface()) {
@@ -1967,6 +1981,15 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return null;
     }
     
+    public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
+            Boolean b = c.isWrapperPartQualified(mpi);
+            if (b != null) {
+                return b;
+            }
+        }
+        return false;
+    }
     public boolean isWrapperPartNillable(MessagePartInfo mpi) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isWrapperPartNillable(mpi);

@@ -52,6 +52,7 @@ import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
@@ -750,6 +751,24 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
 
         return cls;
-    }   
+    }
+    
+    public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
+        Annotation[] annotations = (Annotation[])mpi.getProperty("parameter.annotations");
+        if (annotations != null) {
+            for (Annotation an : annotations) {
+                String tns = null;
+                if (an instanceof WebParam) {
+                    tns = ((WebParam)an).targetNamespace();
+                } else if (an instanceof WebResult) {
+                    tns = ((WebResult)an).targetNamespace();                    
+                }
+                if (tns != null && !StringUtils.isEmpty(tns)) {
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return null;
+    }
     
 }
