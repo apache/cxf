@@ -753,4 +753,14 @@ public class BeanType extends Type {
         element.setAttribute("namespace", AbstractXOPType.XML_MIME_NS);
         root.addNamespaceDeclaration(Namespace.getNamespace("xmime", AbstractXOPType.XML_MIME_NS));
     }
+
+    @Override
+    public long getMinOccurs() {
+        return info.getMinOccurs();
+    }
+
+    @Override
+    public boolean hasMinOccurs() {
+        return true;
+    }
 }

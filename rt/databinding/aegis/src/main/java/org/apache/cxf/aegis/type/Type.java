@@ -212,6 +212,22 @@ public abstract class Type {
     public boolean usesXmime() {
         return false;
     }
+    
+    public boolean hasMinOccurs() {
+        return false;
+    }
+    
+    public boolean hasMaxOccurs() {
+        return false;
+    }
+    
+    public long getMinOccurs() {
+        return 0; // not valid in general
+    }
+    
+    public long getMaxOccurs() {
+        return 0;
+    }
 
     @Override
     public String toString() {
