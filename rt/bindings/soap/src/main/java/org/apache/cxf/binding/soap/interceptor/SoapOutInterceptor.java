@@ -210,10 +210,6 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         return endedHeader;
     }       
     
-    protected boolean isRequestor(Message message) {
-        return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
-    }
-
     protected DataWriter<XMLStreamWriter> getDataWriter(Message message) {
         Service service = ServiceModelUtil.getService(message.getExchange());
         DataWriter<XMLStreamWriter> dataWriter = service.getDataBinding().createWriter(XMLStreamWriter.class);

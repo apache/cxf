@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import java.util.Collection;
+
+import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -48,7 +51,7 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     }
 
     public boolean equal(PolicyComponent policyComponent) {
-        throw new UnsupportedOperationException();
+        return policyComponent == this;
     }
 
     public void setNormalized(boolean normalized) {
@@ -60,18 +63,21 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     }
 
     public PolicyComponent normalize() {
-
-        /*
-         * TODO: Handling the isOptional:TRUE case
-         */
         return this;
     }
 
-    public boolean isAsserted(AssertionInfoMap aim) {
-        return false;
-    }
     
     public Policy getPolicy() {
         return null;
+    }
+    
+    public boolean isAsserted(AssertionInfoMap aim) {
+        Collection<AssertionInfo> ail = aim.getAssertionInfo(getName());
+        for (AssertionInfo ai : ail) {
+            if (ai.isAsserted() && ai.getAssertion().equal(this)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

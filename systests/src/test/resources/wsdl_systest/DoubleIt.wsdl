@@ -69,9 +69,13 @@
       </wsdl:operation>
    </wsdl:binding>
    <wsdl:service name="DoubleItService">
-      <wsdl:port name="DoubleItPort" binding="tns:DoubleItBinding">
+      <wsdl:port name="DoubleItPortHttps" binding="tns:DoubleItBinding">
          <soap:address 
-            location="http://localhost:9009/doubleit/services/doubleit"/>
+            location="https://localhost:9009/SecPolTest"/>
+      </wsdl:port>
+      <wsdl:port name="DoubleItPortHttp" binding="tns:DoubleItBinding">
+         <soap:address 
+            location="http://localhost:9010/SecPolTest"/>
       </wsdl:port>
    </wsdl:service>
    
@@ -99,7 +103,7 @@
                   </sp:AlgorithmSuite>
                </wsp:Policy>
             </sp:TransportBinding>
-            <sp:Wss10>
+            <!-- sp:Wss10>
                <wsp:Policy>
                   <sp:MustSupportRefKeyIdentifier/>
                </wsp:Policy>
@@ -112,7 +116,7 @@
                      </wsp:Policy>
                   </sp:UsernameToken>
                </wsp:Policy>
-            </sp:SignedSupportingTokens>
+            </sp:SignedSupportingTokens -->
          </wsp:All>
       </wsp:ExactlyOne>
    </wsp:Policy>

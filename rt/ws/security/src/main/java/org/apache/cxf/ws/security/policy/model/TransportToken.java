@@ -45,13 +45,13 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
     }
 
     public boolean isOptional() {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
+        return transportToken;
     }
-
+    
     public short getType() {
         return org.apache.neethi.Constants.TYPE_ASSERTION;
     }

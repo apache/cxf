@@ -30,7 +30,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.WSSPolicyException;
 import org.apache.neethi.PolicyComponent;
 
-public class AlgorithmSuite extends AbstractConfigurableSecurityAssertion {
+public class AlgorithmSuite extends AbstractSecurityAssertion {
     private static final Logger LOG = LogUtils.getL7dLogger(AlgorithmSuite.class);
     
     private String algoSuiteString;

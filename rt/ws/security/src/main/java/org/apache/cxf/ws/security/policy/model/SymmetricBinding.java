@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
-import java.util.Iterator;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -108,37 +105,30 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         }
 
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configurations = algorithmSuite.getConfigurations();
 
         Policy policy = new Policy();
         ExactlyOne exactlyOne = new ExactlyOne();
 
-        All wrapper;
-        SymmetricBinding symmetricBinding;
+        All wrapper = new All();
+        SymmetricBinding symmetricBinding = new SymmetricBinding(constants);
 
-        for (Iterator iterator = configurations.iterator(); iterator.hasNext();) {
-            wrapper = new All();
-            symmetricBinding = new SymmetricBinding(constants);
+        symmetricBinding.setAlgorithmSuite(algorithmSuite);
 
-            algorithmSuite = (AlgorithmSuite)iterator.next();
-            symmetricBinding.setAlgorithmSuite(algorithmSuite);
+        symmetricBinding.setEncryptionToken(getEncryptionToken());
+        symmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
+        symmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
+        symmetricBinding.setLayout(getLayout());
+        symmetricBinding.setProtectionOrder(getProtectionOrder());
+        symmetricBinding.setProtectionToken(getProtectionToken());
+        symmetricBinding.setSignatureProtection(isSignatureProtection());
+        symmetricBinding.setSignatureToken(getSignatureToken());
+        symmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
+        symmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
+        symmetricBinding.setTokenProtection(isTokenProtection());
 
-            symmetricBinding.setEncryptionToken(getEncryptionToken());
-            symmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-            symmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-            symmetricBinding.setLayout(getLayout());
-            symmetricBinding.setProtectionOrder(getProtectionOrder());
-            symmetricBinding.setProtectionToken(getProtectionToken());
-            symmetricBinding.setSignatureProtection(isSignatureProtection());
-            symmetricBinding.setSignatureToken(getSignatureToken());
-            symmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            symmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
-            symmetricBinding.setTokenProtection(isTokenProtection());
-
-            symmetricBinding.setNormalized(true);
-            wrapper.addPolicyComponent(symmetricBinding);
-            exactlyOne.addPolicyComponent(wrapper);
-        }
+        symmetricBinding.setNormalized(true);
+        wrapper.addPolicyComponent(symmetricBinding);
+        exactlyOne.addPolicyComponent(wrapper);
 
         policy.addPolicyComponent(exactlyOne);
         return policy;

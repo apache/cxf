@@ -101,4 +101,10 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
+    
+    protected boolean isRequestor(T message) {
+        return Boolean.TRUE.equals(message.containsKey(
+            org.apache.cxf.message.Message.REQUESTOR_ROLE));
+    }  
+
 }

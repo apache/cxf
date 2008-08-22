@@ -18,10 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,8 +31,6 @@ import org.apache.neethi.PolicyComponent;
 public class TransportBinding extends Binding {
 
     private TransportToken transportToken;
-
-    private List<TransportBinding> transportBindings;
 
     public TransportBinding(SPConstants version) {
         super(version);
@@ -56,66 +50,10 @@ public class TransportBinding extends Binding {
         this.transportToken = transportToken;
     }
 
-    public List getConfigurations() {
-        return transportBindings;
-    }
-
-    public TransportBinding getDefaultConfiguration() {
-        if (transportBindings != null) {
-            return (TransportBinding)transportBindings.get(0);
-        }
-        return null;
-    }
-
-    public void addConfiguration(TransportBinding transportBinding) {
-        if (transportBindings == null) {
-            transportBindings = new ArrayList<TransportBinding>();
-        }
-        transportBindings.add(transportBinding);
-    }
-
     public QName getName() {
         return constants.getTransportBinding();
     }
 
-    public PolicyComponent normalize() {
-        if (isNormalized()) {
-            return this;
-        }
-
-        AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configurations = algorithmSuite.getConfigurations();
-
-        if (configurations == null || configurations.size() == 1) {
-            setNormalized(true);
-            return this;
-        }
-
-        Policy policy = new Policy();
-        ExactlyOne exactlyOne = new ExactlyOne();
-
-        All wrapper;
-        TransportBinding transportBinding;
-
-        for (Iterator iterator = configurations.iterator(); iterator.hasNext();) {
-            wrapper = new All();
-            transportBinding = new TransportBinding(constants);
-
-            algorithmSuite = (AlgorithmSuite)iterator.next();
-            transportBinding.setAlgorithmSuite(algorithmSuite);
-            transportBinding.setIncludeTimestamp(isIncludeTimestamp());
-            transportBinding.setLayout(getLayout());
-            transportBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            transportBinding.setSignedSupportingToken(getSignedSupportingToken());
-            transportBinding.setTransportToken(getTransportToken());
-
-            wrapper.addPolicyComponent(transportBinding);
-            exactlyOne.addPolicyComponent(wrapper);
-        }
-
-        policy.addPolicyComponent(exactlyOne);
-        return policy;
-    }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         String localName = getName().getLocalPart();
@@ -181,5 +119,13 @@ public class TransportBinding extends Binding {
         writer.writeEndElement();
 
     }
-
+    public PolicyComponent normalize() {        
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        ea.addPolicyComponent(all);
+        all.addPolicyComponent(transportToken);
+        return p.normalize(true);
+    }
 }

@@ -119,7 +119,7 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
         } catch (WebServiceException wse) {
             SoapFault sf = (SoapFault)wse.getCause();
             assertEquals("Server", sf.getFaultCode().getLocalPart());
-            assertEquals("These policy alternatives can be satisfied: "
+            assertEquals("These policy alternatives can not be satisfied: "
                          + "[{http://cxf.apache.org/transports/http/configuration}server]",
                          sf.getMessage());
             // assertEquals("INCOMPATIBLE_HTTPSERVERPOLICY_ASSERTIONS", ex.getCode());

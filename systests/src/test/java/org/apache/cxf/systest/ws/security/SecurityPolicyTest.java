@@ -21,9 +21,8 @@ package org.apache.cxf.systest.ws.security;
 
 import java.math.BigInteger;
 
-import javax.xml.ws.BindingProvider;
+import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
 import org.apache.cxf.policytest.doubleit.DoubleItService;
@@ -35,10 +34,16 @@ import org.junit.Test;
 
 
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
-    public static final String POLICY_ADDRESS = "http://localhost:9009/SecPolTest";
+    public static final String POLICY_ADDRESS = "http://localhost:9010/SecPolTest";
+    public static final String POLICY_HTTPS_ADDRESS = "https://localhost:9009/SecPolTest";
+
     @BeforeClass 
     public static void init() throws Exception {
-        createStaticBus().getExtension(PolicyEngine.class).setEnabled(true);
+        
+        createStaticBus(SecurityPolicyTest.class.getResource("https_config.xml").toString())
+            .getExtension(PolicyEngine.class).setEnabled(true);
+        Endpoint.publish(POLICY_HTTPS_ADDRESS,
+                         new DoubleItImplHttps());
         Endpoint.publish(POLICY_ADDRESS,
                          new DoubleItImpl());
     }
@@ -46,16 +51,41 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     @Test
     public void testPolicy() throws Exception {
         DoubleItService service = new DoubleItService();
-        DoubleItPortType pt = service.getDoubleItPort();
-        ((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                      POLICY_ADDRESS);
+        DoubleItPortType pt = service.getDoubleItPortHttp();
         try {
             pt.doubleIt(BigInteger.valueOf(25));
-        } catch (SOAPFaultException ex) {
+            fail("https policy should have triggered");
+        } catch (Exception ex) {
             assertTrue(ex.getCause().getCause() instanceof PolicyException);
-            //expected - we don't support any of the policies yet
         }
+        
+        pt = service.getDoubleItPortHttps();
+        pt.doubleIt(BigInteger.valueOf(25));
     }
     
     
+    
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortHttp",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
+    public static class DoubleItImpl implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
+    
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortHttps",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
+    public static class DoubleItImplHttps implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
 }

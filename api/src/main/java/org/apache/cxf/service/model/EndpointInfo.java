@@ -42,6 +42,7 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
         service = serv;
     }
     
+    
     public String getTransportId() {
         return transportId;
     }    
@@ -54,6 +55,9 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
         return service.getInterface();
     }
     
+    public void setService(ServiceInfo s) {
+        service = s;
+    }
     public ServiceInfo getService() {
         return service;
     }
@@ -128,8 +132,8 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     }
 
     public String toString() {
-        return "BindingQName=" + binding.getName()
-                + ", ServiceQName=" + binding.getService().getName()
+        return "BindingQName=" + (binding == null ? "" : (binding.getName()
+                + ", ServiceQName=" + (binding.getService() == null ? "" : binding.getService().getName())))
                 + ", QName=" + name;
     }
 }

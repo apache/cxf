@@ -54,6 +54,7 @@ import org.apache.cxf.ws.security.policy.builders.UsernameTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.WSS10Builder;
 import org.apache.cxf.ws.security.policy.builders.WSS11Builder;
 import org.apache.cxf.ws.security.policy.builders.X509TokenBuilder;
+import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
 
 
@@ -113,6 +114,9 @@ public class WSSecurityPolicyLoader {
             return;
         }
         reg.register(new WSSecurityPolicyInterceptorProvider());
+        
+        reg.register(new HttpsTokenInterceptorProvider(SP11Constants.HTTPS_TOKEN));
+        reg.register(new HttpsTokenInterceptorProvider(SP12Constants.HTTPS_TOKEN));
     }
 
 }

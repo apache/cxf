@@ -36,7 +36,6 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES = new ArrayList<QName>();
         ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
         ASSERTION_TYPES.add(SP11Constants.TRANSPORT_TOKEN);
-        ASSERTION_TYPES.add(SP11Constants.HTTPS_TOKEN);
         ASSERTION_TYPES.add(SP11Constants.LAYOUT);
         ASSERTION_TYPES.add(SP11Constants.INCLUDE_TIMESTAMP);
         ASSERTION_TYPES.add(SP11Constants.ALGORITHM_SUITE);

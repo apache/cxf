@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
-import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -80,34 +78,29 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         }
 
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configs = algorithmSuite.getConfigurations();
 
         Policy policy = new Policy();
         ExactlyOne exactlyOne = new ExactlyOne();
 
         policy.addPolicyComponent(exactlyOne);
 
-        All wrapper;
-        AsymmetricBinding asymmetricBinding;
 
-        for (Iterator iterator = configs.iterator(); iterator.hasNext();) {
-            wrapper = new All();
-            asymmetricBinding = new AsymmetricBinding(constants);
+        All wrapper = new All();
+        AsymmetricBinding asymmetricBinding = new AsymmetricBinding(constants);
 
-            asymmetricBinding.setAlgorithmSuite((AlgorithmSuite)iterator.next());
-            asymmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-            asymmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-            asymmetricBinding.setInitiatorToken(getInitiatorToken());
-            asymmetricBinding.setLayout(getLayout());
-            asymmetricBinding.setProtectionOrder(getProtectionOrder());
-            asymmetricBinding.setRecipientToken(getRecipientToken());
-            asymmetricBinding.setSignatureProtection(isSignatureProtection());
-            asymmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            asymmetricBinding.setTokenProtection(isTokenProtection());
+        asymmetricBinding.setAlgorithmSuite(algorithmSuite);
+        asymmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
+        asymmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
+        asymmetricBinding.setInitiatorToken(getInitiatorToken());
+        asymmetricBinding.setLayout(getLayout());
+        asymmetricBinding.setProtectionOrder(getProtectionOrder());
+        asymmetricBinding.setRecipientToken(getRecipientToken());
+        asymmetricBinding.setSignatureProtection(isSignatureProtection());
+        asymmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
+        asymmetricBinding.setTokenProtection(isTokenProtection());
 
-            asymmetricBinding.setNormalized(true);
-            wrapper.addPolicyComponent(wrapper);
-        }
+        asymmetricBinding.setNormalized(true);
+        wrapper.addPolicyComponent(wrapper);
 
         return policy;
 
