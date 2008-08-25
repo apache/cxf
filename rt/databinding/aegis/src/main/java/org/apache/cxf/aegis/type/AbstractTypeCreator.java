@@ -316,12 +316,12 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         String localName = "ArrayOf" + first.toUpperCase() + last;
         if (info.nonDefaultAttributes()) {
             localName += "-";
-            if (info.getMaxOccurs() >= 0) {
-                localName += info.maxOccurs;
-            }
-            localName += "-";
             if (info.getMinOccurs() >= 0) {
                 localName += info.minOccurs;
+            }
+            localName += "-";
+            if (info.getMaxOccurs() >= 0) {
+                localName += info.maxOccurs;
             }
             if (info.isFlat()) {
                 localName += "Flat";
