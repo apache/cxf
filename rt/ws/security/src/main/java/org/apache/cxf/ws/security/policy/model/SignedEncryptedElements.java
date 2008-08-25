@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.PolicyComponent;
 
@@ -91,13 +92,13 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localName = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -125,11 +126,17 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
         writer.writeEndElement();
     }
 
-    public QName getName() {
+    public QName getRealName() {
         if (signedElemets) {
             return constants.getSignedElements();
         }
         return constants.getEncryptedElements();
+    }
+    public QName getName() {
+        if (signedElemets) {
+            return SP12Constants.INSTANCE.getSignedElements();
+        }
+        return SP12Constants.INSTANCE.getEncryptedElements();
     }
 
     public PolicyComponent normalize() {

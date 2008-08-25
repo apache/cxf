@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.PolicyComponent;
 
@@ -78,14 +79,14 @@ public class RequiredElements extends AbstractSecurityAssertion {
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localName = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix;
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         } else {
             prefix = writerPrefix;
@@ -120,8 +121,11 @@ public class RequiredElements extends AbstractSecurityAssertion {
         writer.writeEndElement();
     }
 
-    public QName getName() {
+    public QName getRealName() {
         return constants.getRequiredElements();
+    }
+    public QName getName() {
+        return SP12Constants.INSTANCE.getRequiredElements();
     }
 
     public PolicyComponent normalize() {

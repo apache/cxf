@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
 import org.apache.cxf.policytest.doubleit.DoubleItService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -42,6 +43,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
         createStaticBus(SecurityPolicyTest.class.getResource("https_config.xml").toString())
             .getExtension(PolicyEngine.class).setEnabled(true);
+        getStaticBus().getOutInterceptors().add(new LoggingOutInterceptor());
         Endpoint.publish(POLICY_HTTPS_ADDRESS,
                          new DoubleItImplHttps());
         Endpoint.publish(POLICY_ADDRESS,
@@ -51,16 +53,21 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     @Test
     public void testPolicy() throws Exception {
         DoubleItService service = new DoubleItService();
-        DoubleItPortType pt = service.getDoubleItPortHttp();
+        DoubleItPortType pt;
+
+        pt = service.getDoubleItPortHttps();
+        pt.doubleIt(BigInteger.valueOf(25));
+        
         try {
+            pt = service.getDoubleItPortHttp();
             pt.doubleIt(BigInteger.valueOf(25));
             fail("https policy should have triggered");
         } catch (Exception ex) {
-            assertTrue(ex.getCause().getCause() instanceof PolicyException);
+            if (!(ex.getCause().getCause() instanceof PolicyException)) {
+                throw ex;
+            }
         }
         
-        pt = service.getDoubleItPortHttps();
-        pt.doubleIt(BigInteger.valueOf(25));
     }
     
     

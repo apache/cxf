@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
 public class Layout extends AbstractSecurityAssertion {
 
@@ -54,23 +54,22 @@ public class Layout extends AbstractSecurityAssertion {
         }
     }
 
-    public QName getName() {
+    public QName getRealName() {
         return constants.getLayout();
     }
-
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
+    public QName getName() {
+        return SP12Constants.INSTANCE.getLayout();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localName = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

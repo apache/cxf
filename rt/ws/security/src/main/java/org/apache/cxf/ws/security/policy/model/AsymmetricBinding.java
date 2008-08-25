@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
@@ -67,10 +68,12 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         this.recipientToken = recipientToken;
     }
 
-    public QName getName() {
+    public QName getRealName() {
         return constants.getAsymmetricBinding();
     }
-
+    public QName getName() {
+        return SP12Constants.INSTANCE.getAsymmetricBinding();
+    }
     public PolicyComponent normalize() {
 
         if (isNormalized()) {
@@ -107,13 +110,13 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localname = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

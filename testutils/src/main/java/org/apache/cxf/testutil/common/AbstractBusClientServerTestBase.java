@@ -59,7 +59,9 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
     }
-    
+    public static Bus getStaticBus() {
+        return staticBus;
+    }
     public static Bus createStaticBus(String config) throws Exception {
         defaultConfigFileName = config;
         return createStaticBus();

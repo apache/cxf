@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,8 +32,15 @@ import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
@@ -136,4 +144,35 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     public void setBefore(Set<String> before) {
         this.before = before;
     }
+    
+    protected void checkPolicies(SoapMessage message, RequestData data) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        // extract Assertion information
+        if (aim != null) {
+            Collection<AssertionInfo> ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    String action = getString(WSHandlerConstants.ACTION, message);
+                    if (action == null) {
+                        action = WSHandlerConstants.TIMESTAMP;
+                    } else {
+                        action += " " + WSHandlerConstants.TIMESTAMP;
+                    }
+                    message.put(WSHandlerConstants.ACTION, action);
+                    ai.setAsserted(true);
+                }                    
+            }
+            ais = aim.get(SP12Constants.LAYOUT);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    Layout lay = (Layout)ai.getAssertion();
+                    //wss4j can only do "Lax"
+                    if (SPConstants.LAYOUT_LAX.equals(lay.getValue())) {
+                        ai.setAsserted(true);
+                    }
+                }                    
+            }
+        }
+    }
+
 }

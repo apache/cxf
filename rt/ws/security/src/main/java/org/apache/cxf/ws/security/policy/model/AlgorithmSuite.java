@@ -26,9 +26,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.WSSPolicyException;
-import org.apache.neethi.PolicyComponent;
 
 public class AlgorithmSuite extends AbstractSecurityAssertion {
     private static final Logger LOG = LogUtils.getL7dLogger(AlgorithmSuite.class);
@@ -235,22 +235,21 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
     }
 
     public QName getName() {
-        return constants.getAlgorithmSuite();
+        return SP12Constants.INSTANCE.getAlgorithmSuite();
     }
-
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException("AlgorithmSuite.normalize() is not supported");
+    public QName getRealName() {
+        return constants.getAlgorithmSuite();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localName = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

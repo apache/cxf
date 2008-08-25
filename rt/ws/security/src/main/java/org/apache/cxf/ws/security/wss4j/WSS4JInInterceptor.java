@@ -105,6 +105,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             doc = msg.getContent(SOAPMessage.class);
         }
         
+        
         boolean doDebug = LOG.isLoggable(Level.FINE);
         boolean doTimeLog = TIME_LOG.isLoggable(Level.FINE);
 
@@ -129,6 +130,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         try {
             reqData.setMsgContext(msg);
+            checkPolicies(msg, reqData);
 
             Vector actions = new Vector();
             String action = getAction(msg, version);

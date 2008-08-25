@@ -24,7 +24,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
 /**
  * Model bean to capture Trust10 assertion info
@@ -111,35 +110,21 @@ public class Trust10 extends AbstractSecurityAssertion {
         this.requireServerEntropy = requireServerEntropy;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.neethi.Assertion#getName()
-     */
+    public QName getRealName() {
+        return SP11Constants.TRUST_10;
+    }
     public QName getName() {
         return SP11Constants.TRUST_10;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.neethi.Assertion#isOptional()
-     */
-    public boolean isOptional() {
-        // TODO TODO Sanka
-        throw new UnsupportedOperationException("TODO Sanka");
-    }
-
-    public PolicyComponent normalize() {
-        return this;
-    }
-
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localname = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

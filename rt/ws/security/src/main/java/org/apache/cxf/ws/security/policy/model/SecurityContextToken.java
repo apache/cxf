@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
 /**
  * Model class of SecurityContextToken assertion
@@ -68,20 +68,15 @@ public class SecurityContextToken extends Token {
 
     /*
      * (non-Javadoc)
-     * @see org.apache.neethi.Assertion#getName()
+     * @see org.apache.neethi.Assertion#getRealName()
      */
-    public QName getName() {
+    public QName getRealName() {
         return constants.getSecurityContextToken();
     }
-
-    /*
-     * (non-Javadoc)
-     * @see org.apache.neethi.Assertion#normalize()
-     */
-    public PolicyComponent normalize() {
-        // TODO TODO Sanka
-        throw new UnsupportedOperationException("TODO Sanka");
+    public QName getName() {
+        return SP12Constants.INSTANCE.getSecurityContextToken();
     }
+
 
     /*
      * (non-Javadoc)

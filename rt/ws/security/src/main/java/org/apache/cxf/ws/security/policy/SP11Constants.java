@@ -414,6 +414,8 @@ public final class SP11Constants extends SPConstants {
     public QName getRequiredDerivedKeys() {
         return REQUIRE_DERIVED_KEYS;
     }
-
+    public QName getIncludeTimestamp() {
+        return INCLUDE_TIMESTAMP;
+    }
     
 }

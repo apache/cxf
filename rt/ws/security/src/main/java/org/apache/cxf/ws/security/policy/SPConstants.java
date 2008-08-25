@@ -439,6 +439,7 @@ public abstract class SPConstants {
     public abstract QName getEncryptedElements();
     public abstract QName getSignedParts();
     public abstract QName getEncryptedParts();
+    public abstract QName getIncludeTimestamp();
     
     public abstract QName getSymmetricBinding();
     public abstract QName getTransportBinding();

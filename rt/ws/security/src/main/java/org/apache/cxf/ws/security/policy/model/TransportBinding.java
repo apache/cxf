@@ -22,6 +22,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
@@ -50,19 +52,22 @@ public class TransportBinding extends Binding {
         this.transportToken = transportToken;
     }
 
-    public QName getName() {
+    public QName getRealName() {
         return constants.getTransportBinding();
+    }
+    public QName getName() {
+        return SP12Constants.INSTANCE.getTransportBinding();
     }
 
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localName = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -125,7 +130,16 @@ public class TransportBinding extends Binding {
         p.addPolicyComponent(ea);
         All all = new All();
         ea.addPolicyComponent(all);
-        all.addPolicyComponent(transportToken);
+        if (transportToken != null) {
+            all.addPolicyComponent(transportToken);
+        }
+        if (isIncludeTimestamp()) {
+            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+        }
+        if (getLayout() != null) {
+            all.addPolicyComponent(getLayout());
+        }
+        
         return p.normalize(true);
     }
 }

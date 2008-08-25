@@ -52,6 +52,9 @@ public class RequiredParts extends AbstractSecurityAssertion {
         this.headers.add(header);
     }
 
+    public QName getRealName() {
+        return SP12Constants.REQUIRED_PARTS;
+    }
     public QName getName() {
         return SP12Constants.REQUIRED_PARTS;
     }
@@ -61,13 +64,13 @@ public class RequiredParts extends AbstractSecurityAssertion {
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localName = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

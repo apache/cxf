@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
 public class Wss10 extends AbstractSecurityAssertion {
 
@@ -92,21 +92,21 @@ public class Wss10 extends AbstractSecurityAssertion {
         this.mustSupportRefKeyIdentifier = mustSupportRefKeyIdentifier;
     }
 
-    public QName getName() {
+    public QName getRealName() {
         return constants.getWSS10();
     }
-
-    public PolicyComponent normalize() {
-        return this;
+    public QName getName() {
+        return SP12Constants.INSTANCE.getWSS10();
     }
 
+
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localname = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

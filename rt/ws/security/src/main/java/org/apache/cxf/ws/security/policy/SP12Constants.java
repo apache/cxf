@@ -479,5 +479,9 @@ public final class SP12Constants extends SPConstants {
     public QName getRequiredDerivedKeys() {
         return REQUIRE_DERIVED_KEYS;
     }
+    public QName getIncludeTimestamp() {
+        return INCLUDE_TIMESTAMP;
+    }
+
 
 }

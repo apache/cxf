@@ -20,14 +20,13 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -38,6 +37,8 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.SP11Constants;
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.HttpsToken;
 
 /**
@@ -45,12 +46,12 @@ import org.apache.cxf.ws.security.policy.model.HttpsToken;
  */
 public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
-    public HttpsTokenInterceptorProvider(QName name) {
-        super(Collections.singleton(name));
-        this.getOutInterceptors().add(new HttpsTokenOutInterceptor(name));
-        this.getOutFaultInterceptors().add(new HttpsTokenOutInterceptor(name));
-        this.getInInterceptors().add(new HttpsTokenInInterceptor(name));
-        this.getInFaultInterceptors().add(new HttpsTokenInInterceptor(name));
+    public HttpsTokenInterceptorProvider() {
+        super(Arrays.asList(SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
+        this.getOutInterceptors().add(new HttpsTokenOutInterceptor());
+        this.getOutFaultInterceptors().add(new HttpsTokenOutInterceptor());
+        this.getInInterceptors().add(new HttpsTokenInInterceptor());
+        this.getInFaultInterceptors().add(new HttpsTokenInInterceptor());
     }
     
     private static Map<String, List<String>> getSetProtocolHeaders(Message message) {
@@ -64,16 +65,14 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
     }
 
     static class HttpsTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        QName name;
-        public HttpsTokenOutInterceptor(QName n) {
+        public HttpsTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
-            name = n;
         }
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(name);
+                Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
                 if (ais == null) {
                     return;
                 }
@@ -126,17 +125,15 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
     }
     
     static class HttpsTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
-        QName name;
-        public HttpsTokenInInterceptor(QName n) {
+        public HttpsTokenInInterceptor() {
             super(Phase.PRE_STREAM);
-            name = n;
         }
 
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(name);
+                Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
                 if (ais == null) {
                     return;
                 }

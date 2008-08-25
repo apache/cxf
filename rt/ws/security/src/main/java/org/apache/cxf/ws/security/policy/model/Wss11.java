@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class Wss11 extends Wss10 {
@@ -76,17 +77,20 @@ public class Wss11 extends Wss10 {
         this.requireSignatureConfirmation = requireSignatureConfirmation;
     }
 
-    public QName getName() {
+    public QName getRealName() {
         return constants.getWSS11();
+    }
+    public QName getName() {
+        return SP12Constants.INSTANCE.getWSS11();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        String localname = getRealName().getLocalPart();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

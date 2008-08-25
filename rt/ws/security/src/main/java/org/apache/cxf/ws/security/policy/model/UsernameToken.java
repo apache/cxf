@@ -22,17 +22,13 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
 public class UsernameToken extends Token {
-
     private boolean useUTProfile10;
-
     private boolean useUTProfile11;
-
     private boolean noPassword;
-
     private boolean hashPassword;
 
     public UsernameToken(SPConstants version) {
@@ -78,20 +74,17 @@ public class UsernameToken extends Token {
     }
 
     public QName getName() {
-        return constants.getUserNameToken();
-    }
-
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
+        return SP12Constants.INSTANCE.getUserNameToken();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+        QName name = constants.getUserNameToken();
+        String localname = name.getLocalPart();
+        String namespaceURI = name.getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = name.getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

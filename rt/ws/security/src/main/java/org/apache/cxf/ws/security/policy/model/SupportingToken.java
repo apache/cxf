@@ -166,7 +166,7 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
         this.addToken(tok);
     }
 
-    public QName getName() {
+    public QName getRealName() {
         QName ret = null;
         
         switch (type) {
@@ -181,6 +181,39 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
             break;
         case SUPPORTING_TOKEN_SIGNED_ENDORSING:
             ret = constants.getSignedEndorsingSupportingTokens();
+            break;
+        case SUPPORTING_TOKEN_ENCRYPTED:
+            ret = SP12Constants.ENCRYPTED_SUPPORTING_TOKENS;
+            break;
+        case SUPPORTING_TOKEN_SIGNED_ENCRYPTED:
+            ret = SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS;
+            break;
+        case SUPPORTING_TOKEN_ENDORSING_ENCRYPTED:
+            ret = SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
+            break;
+        case SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED:
+            ret = SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
+            break;
+        default:
+            ret = null;
+            break;
+        }
+        return ret;
+    }
+    public QName getName() {
+        QName ret = null;
+        switch (type) {
+        case SUPPORTING_TOKEN_SUPPORTING:
+            ret = SP12Constants.INSTANCE.getSupportingTokens();
+            break;
+        case SUPPORTING_TOKEN_SIGNED:
+            ret = SP12Constants.INSTANCE.getSignedSupportingTokens();
+            break;
+        case SUPPORTING_TOKEN_ENDORSING:
+            ret = SP12Constants.INSTANCE.getEndorsingSupportingTokens();
+            break;
+        case SUPPORTING_TOKEN_SIGNED_ENDORSING:
+            ret = SP12Constants.INSTANCE.getSignedEndorsingSupportingTokens();
             break;
         case SUPPORTING_TOKEN_ENCRYPTED:
             ret = SP12Constants.ENCRYPTED_SUPPORTING_TOKENS;
@@ -221,15 +254,15 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String namespaceURI = getName().getNamespaceURI();
+        String namespaceURI = getRealName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getName().getPrefix();
+            prefix = getRealName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
-        String localname = getName().getLocalPart();
+        String localname = getRealName().getLocalPart();
 
         // <sp:SupportingToken>
         writer.writeStartElement(prefix, localname, namespaceURI);
