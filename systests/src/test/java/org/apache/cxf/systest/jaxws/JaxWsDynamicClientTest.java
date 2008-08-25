@@ -58,7 +58,6 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
                    launchServer(ServerNoBodyParts.class, true));
     }
     
-    //@org.junit.Ignore // until we sort out the wsdl4j problem.
     @Test
     public void testInvocation() throws Exception {
         JaxWsDynamicClientFactory dcf = 

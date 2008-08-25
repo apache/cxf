@@ -885,6 +885,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         el.setNillable(true);
 
         XmlSchemaType tp = (XmlSchemaType)mpi.getXmlSchema();
+        if (tp == null) {
+            throw new ServiceConstructionException(new Message("INTRACTABLE_PART", LOG,
+                                                               mpi.getName(),
+                                                               mpi.getMessageInfo().getName()));
+        }
         el.setSchemaTypeName(tp.getQName());
         mpi.setXmlSchema(el);
     }
