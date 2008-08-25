@@ -247,7 +247,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
                                                   vNode.getPlainText()));
                 }
             }
-        } catch (ToolException e) {
+        } catch (Exception e) {
             this.vResults.addError(e.getMessage());
             return false;
         }
@@ -393,7 +393,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     @SuppressWarnings("unchecked")
-    private void collectValidationPoints() {
+    private void collectValidationPoints() throws Exception {
         if (services.size() == 0) {
             LOG.log(Level.WARNING, "WSDL document " 
                     + this.definition.getDocumentBaseURI() + " does not define any services");
@@ -407,7 +407,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         collectValidationPointsForMessages();
     }
 
-    private void collectValidationPointsForBindings() {
+    private void collectValidationPointsForBindings() throws Exception {
         Map<QName, XNode> vBindingNodes = new HashMap<QName, XNode>();
         for (Service service : services.values()) {
             vBindingNodes.putAll(getBindings(service));
@@ -415,6 +415,12 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
         for (QName bName : vBindingNodes.keySet()) {
             Binding binding = this.definition.getBinding(bName);
+            if (binding == null) {
+                LOG.log(Level.SEVERE, bName.toString() 
+                        + " is not correct, please check that the correct namespace is being used");
+                throw new Exception(bName.toString() 
+                        + " is not correct, please check that the correct namespace is being used");
+            }
             XNode vBindingNode = getXNode(binding);
             vBindingNode.setFailurePoint(vBindingNodes.get(bName));
             vNodes.add(vBindingNode);
