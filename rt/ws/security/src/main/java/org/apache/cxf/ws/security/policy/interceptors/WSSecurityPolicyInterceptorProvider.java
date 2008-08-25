@@ -35,9 +35,9 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();
-        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
+        //ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
+        //ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
         ASSERTION_TYPES.add(SP11Constants.TRANSPORT_TOKEN);
-        ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
         ASSERTION_TYPES.add(SP12Constants.TRANSPORT_TOKEN);
     }
 

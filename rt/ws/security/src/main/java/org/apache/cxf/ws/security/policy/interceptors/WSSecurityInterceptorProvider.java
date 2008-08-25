@@ -52,6 +52,9 @@ public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProv
         ASSERTION_TYPES.add(SP12Constants.WSS11);
         ASSERTION_TYPES.add(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         ASSERTION_TYPES.add(SP12Constants.USERNAME_TOKEN);
+        
+        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
+        ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
 
     }
 

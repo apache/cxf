@@ -21,8 +21,11 @@ package org.apache.cxf.ws.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +34,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -130,18 +134,41 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     void initialiseInterceptors(PolicyEngineImpl engine) {
         PolicyInterceptorProviderRegistry reg 
             = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
-        List<Interceptor> out = new ArrayList<Interceptor>();
+        Set<Interceptor> out = new LinkedHashSet<Interceptor>();
         for (PolicyAssertion a : getChosenAlternative()) {
-            if (a.isOptional()) {
-                continue;
-            }
-            QName qn = a.getName();
-            PolicyInterceptorProvider pp = reg.get(qn);
-            if (null != pp) {
-                out.addAll(pp.getOutInterceptors());
+            initialiseInterceptors(reg, engine, out, a);
+        }        
+        setInterceptors(new ArrayList<Interceptor>(out));
+    }
+    
+    
+    protected Collection<PolicyAssertion> getSupportedAlternatives(PolicyEngineImpl engine,
+                                                                   Policy p) {
+        Collection<PolicyAssertion> alternatives = new ArrayList<PolicyAssertion>();
+        for (Iterator it = p.getAlternatives(); it.hasNext();) {
+            List<PolicyAssertion> alternative = CastUtils.cast((List)it.next(), PolicyAssertion.class);
+            if (engine.supportsAlternative(alternative, null)) {
+                alternatives.addAll(alternative);
             }
         }
-        setInterceptors(out);
+        return alternatives;
+    }
+
+    void initialiseInterceptors(PolicyInterceptorProviderRegistry reg,
+                                PolicyEngineImpl engine,
+                                Set<Interceptor> out,
+                                PolicyAssertion a) {
+        QName qn = a.getName();
+        PolicyInterceptorProvider pp = reg.get(qn);
+        if (null != pp) {
+            out.addAll(pp.getOutInterceptors());
+        }
+        Policy p = a.getPolicy();
+        if (p != null) {
+            for (PolicyAssertion a2 : getSupportedAlternatives(engine, p)) {
+                initialiseInterceptors(reg, engine, out, a2);
+            }
+        }
     }
     
     // for tests

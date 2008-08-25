@@ -113,6 +113,12 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         }
                     }                    
                 }
+                ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
+                    }                    
+                }
                 if (timestamp != null) {
                     timestamp.prependToHeader(secHeader);
                 }

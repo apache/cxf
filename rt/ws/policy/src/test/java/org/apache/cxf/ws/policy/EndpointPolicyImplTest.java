@@ -346,19 +346,20 @@ public class EndpointPolicyImplTest extends Assert {
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));
         fv.addAll(v);
         epi.setVocabulary(v);
+        epi.setChosenAlternative(v);
         epi.setFaultVocabulary(fv);
         
         PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
         setupPolicyInterceptorProviderRegistry(engine, reg);
         
         PolicyInterceptorProvider app = control.createMock(PolicyInterceptorProvider.class);               
-        EasyMock.expect(reg.get(aqn)).andReturn(app).times(requestor ? 2 : 1);
+        EasyMock.expect(reg.get(aqn)).andReturn(app).anyTimes();
         Interceptor api = control.createMock(Interceptor.class);
         EasyMock.expect(app.getInInterceptors())
-            .andReturn(Collections.singletonList(api));
+            .andReturn(Collections.singletonList(api)).anyTimes();
         if (requestor) {
             EasyMock.expect(app.getInFaultInterceptors())
-                .andReturn(Collections.singletonList(api));
+                .andReturn(Collections.singletonList(api)).anyTimes();
         }
         
         control.replay();

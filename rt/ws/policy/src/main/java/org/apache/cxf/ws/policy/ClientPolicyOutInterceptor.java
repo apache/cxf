@@ -84,7 +84,7 @@ public class ClientPolicyOutInterceptor extends AbstractPolicyInterceptor {
         List<Interceptor> interceptors = effectivePolicy.getInterceptors();
         for (Interceptor i : interceptors) {            
             msg.getInterceptorChain().add(i);
-            LOG.log(Level.INFO, "Added interceptor of type {0}", i.getClass().getSimpleName());
+            LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
         }
         
         // insert assertions of the chosen alternative into the message

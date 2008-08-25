@@ -124,12 +124,13 @@ public class TransportBinding extends Binding {
         writer.writeEndElement();
 
     }
-    public PolicyComponent normalize() {        
+    public PolicyComponent normalize() {
+        return this;
+        /*
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
         p.addPolicyComponent(ea);
         All all = new All();
-        ea.addPolicyComponent(all);
         if (transportToken != null) {
             all.addPolicyComponent(transportToken);
         }
@@ -139,7 +140,40 @@ public class TransportBinding extends Binding {
         if (getLayout() != null) {
             all.addPolicyComponent(getLayout());
         }
+        ea.addPolicyComponent(all);
+        PolicyComponent pc = p.normalize(true);
+        if (pc instanceof Policy) {
+            return new NestedPrimitiveAssertion(getName(), false, (Policy)pc, true);
+        } else {
+            p = new Policy();
+            p.addPolicyComponent(pc);
+            return new NestedPrimitiveAssertion(getName(), false, p, true);
+        }
+        */
+    }
+    public Policy getPolicy() {
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        if (transportToken != null) {
+            all.addPolicyComponent(transportToken);
+        }
+        if (isIncludeTimestamp()) {
+            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+        }
+        if (getLayout() != null) {
+            all.addPolicyComponent(getLayout());
+        }
+        ea.addPolicyComponent(all);
+        PolicyComponent pc = p.normalize(true);
+        if (pc instanceof Policy) {
+            return (Policy)pc;
+        } else {
+            p = new Policy();
+            p.addPolicyComponent(pc);
+            return p;
+        }
         
-        return p.normalize(true);
     }
 }

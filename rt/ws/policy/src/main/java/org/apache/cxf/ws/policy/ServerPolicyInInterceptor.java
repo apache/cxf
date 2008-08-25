@@ -76,7 +76,7 @@ public class ServerPolicyInInterceptor extends AbstractPolicyInterceptor {
         List<Interceptor> interceptors = ep.getInterceptors();
         for (Interceptor i : interceptors) {
             msg.getInterceptorChain().add(i);
-            LOG.log(Level.INFO, "Added interceptor of type {0}", i.getClass().getSimpleName());
+            LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
         }
         
         // insert assertions of endpoint's vocabulary into message

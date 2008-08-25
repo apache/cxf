@@ -45,7 +45,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     }
     
     public AssertionInfoMap(Collection<PolicyAssertion> assertions) {
-        super(assertions.size());
+        super(assertions.size() < 6 ? 6 : assertions.size());
         for (PolicyAssertion a : assertions) {
             putAssertionInfo(a);
         }
@@ -74,14 +74,31 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
 
     }
     
+    public boolean supportsAlternative(PolicyAssertion assertion,
+                                       List<QName> errors) {
+        boolean pass = true;
+        PolicyAssertion a = (PolicyAssertion)assertion;
+        if (!a.isAsserted(this) && !a.isOptional()) {
+            errors.add(a.getName());
+            pass = false;
+        }
+        Policy p = a.getPolicy();
+        if (p != null) {
+            Iterator it = p.getAlternatives();
+            while (it.hasNext()) {
+                List<PolicyAssertion> lst = CastUtils.cast((List<?>)it.next());
+                for (PolicyAssertion p2 : lst) {
+                    pass &= supportsAlternative(p2, errors);
+                }
+            }
+        }
+        return pass || a.isOptional();
+    }
     public boolean supportsAlternative(Collection<PolicyAssertion> alternative,
                                        List<QName> errors) {
         boolean pass = true;
-        for (PolicyAssertion a : alternative) {          
-            if (!a.isAsserted(this)) {
-                errors.add(a.getName());
-                pass = false;
-            }
+        for (PolicyAssertion a : alternative) {
+            pass &= supportsAlternative(a, errors);
         }
         return pass;
     }

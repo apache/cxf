@@ -21,8 +21,8 @@ package org.apache.cxf.ws.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -194,41 +194,54 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
 
+    Collection<PolicyAssertion> getSupportedAlternatives(Policy p) {
+        Collection<PolicyAssertion> alternatives = new ArrayList<PolicyAssertion>();
+        for (Iterator it = p.getAlternatives(); it.hasNext();) {
+            List<PolicyAssertion> alternative = CastUtils.cast((List)it.next(), PolicyAssertion.class);
+            if (engine.supportsAlternative(alternative, null)) {
+                alternatives.addAll(alternative);
+            }
+        }
+        return alternatives;
+    }
+
+    void initializeInterceptors(PolicyInterceptorProviderRegistry reg,
+                                Set<Interceptor> out,
+                                PolicyAssertion a, 
+                                boolean fault) {
+        QName qn = a.getName();
+        PolicyInterceptorProvider pp = reg.get(qn);
+        if (null != pp) {
+            out.addAll(fault ? pp.getInFaultInterceptors() : pp.getInInterceptors());
+        }
+        Policy p = a.getPolicy();
+        if (p != null) {
+            for (PolicyAssertion a2 : getSupportedAlternatives(p)) {
+                initializeInterceptors(reg, out, a2, fault);
+            }
+        }
+    }
+
     void initializeInterceptors() {
         PolicyInterceptorProviderRegistry reg 
             = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
-        interceptors = new ArrayList<Interceptor>();
-        if (requestor) {
-            faultInterceptors = new ArrayList<Interceptor>();
-        }
         
-        Set<QName> v = new HashSet<QName>();
-        for (PolicyAssertion a : vocabulary) {
-            v.add(a.getName());
-        }
-        
-        for (QName qn : v) {
-            PolicyInterceptorProvider pp = reg.get(qn);
-            if (null != pp) {
-                interceptors.addAll(pp.getInInterceptors());
+        Set<Interceptor> out = new LinkedHashSet<Interceptor>();
+        if (getChosenAlternative() != null) {
+            for (PolicyAssertion a : getChosenAlternative()) {
+                initializeInterceptors(reg, out, a, false);
             }
         }
-        
+        interceptors = new ArrayList<Interceptor>(out);
+
         if (!requestor) {
             return;
         }
-        
-        Set<QName> faultV = new HashSet<QName>();
-        for (PolicyAssertion a : faultVocabulary) {
-            faultV.add(a.getName());
+        out.clear();
+        for (PolicyAssertion a : getChosenAlternative()) {
+            initializeInterceptors(reg, out, a, true);
         }
-        
-        for (QName qn : faultV) {
-            PolicyInterceptorProvider pp = reg.get(qn);
-            if (null != pp) {
-                faultInterceptors.addAll(pp.getInFaultInterceptors());
-            }
-        }        
+        faultInterceptors = new ArrayList<Interceptor>(out);
     }
     
     // for test

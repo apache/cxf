@@ -90,7 +90,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         List<Interceptor> interceptors = effectivePolicy.getInterceptors();
         for (Interceptor oi : interceptors) {
             msg.getInterceptorChain().add(oi);
-            LOG.log(Level.INFO, "Added interceptor of type {0}", oi.getClass().getSimpleName());
+            LOG.log(Level.FINE, "Added interceptor of type {0}", oi.getClass().getSimpleName());
         }
         
         // insert assertions of the chosen alternative into the message

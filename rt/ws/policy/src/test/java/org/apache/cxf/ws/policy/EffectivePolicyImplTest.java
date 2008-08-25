@@ -274,7 +274,6 @@ public class EffectivePolicyImplTest extends Assert {
         setupPolicyInterceptorProviderRegistry(engine, reg);
         PolicyAssertion a = control.createMock(PolicyAssertion.class);        
         alternative.add(a);
-        EasyMock.expect(a.isOptional()).andReturn(true);
         control.replay();
         epi.initialiseInterceptors(engine);
         assertEquals(0, epi.getInterceptors().size());
@@ -282,7 +281,6 @@ public class EffectivePolicyImplTest extends Assert {
         
         control.reset();
         setupPolicyInterceptorProviderRegistry(engine, reg);
-        EasyMock.expect(a.isOptional()).andReturn(false);
         QName qn = new QName("http://x.y.z", "a");
         EasyMock.expect(a.getName()).andReturn(qn);
         EasyMock.expect(reg.get(qn)).andReturn(null);
@@ -293,7 +291,6 @@ public class EffectivePolicyImplTest extends Assert {
         
         control.reset();
         setupPolicyInterceptorProviderRegistry(engine, reg);
-        EasyMock.expect(a.isOptional()).andReturn(false);
         EasyMock.expect(a.getName()).andReturn(qn);        
         PolicyInterceptorProvider pp = control.createMock(PolicyInterceptorProvider.class);               
         EasyMock.expect(reg.get(qn)).andReturn(pp);
