@@ -20,15 +20,11 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerLifeCycleListener;
-import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -49,8 +45,17 @@ import org.apache.neethi.PolicyRegistry;
 /**
  * 
  */
-public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeCycleListener {
-
+public class PolicyEngineImpl implements PolicyEngine, BusExtension {
+    private static final String POLICY_INFO_REQUEST_SERVER = "policy-engine-info-serve-request";
+    private static final String POLICY_INFO_FAULT_SERVER = "policy-engine-info-serve-fault";
+    private static final String POLICY_INFO_RESPONSE_SERVER = "policy-engine-info-serve-response";
+    private static final String POLICY_INFO_ENDPOINT_SERVER = "policy-engine-info-serve-rendpoint";
+    
+    private static final String POLICY_INFO_REQUEST_CLIENT = "policy-engine-info-client-request";
+    private static final String POLICY_INFO_FAULT_CLIENT = "policy-engine-info-client-fault";
+    private static final String POLICY_INFO_RESPONSE_CLIENT = "policy-engine-info-client-response";
+    private static final String POLICY_INFO_ENDPOINT_CLIENT = "policy-engine-info-client-endpoint";
+    
     private Bus bus;
     private PolicyRegistry registry;
     private Collection<PolicyProvider> policyProviders;
@@ -59,14 +64,6 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
     private boolean addedBusInterceptors;
     private AlternativeSelector alternativeSelector;
 
-    private Map<BindingOperation, EffectivePolicy> clientRequestInfo;
-    private Map<BindingOperation, EffectivePolicy> clientResponseInfo;
-    private Map<BindingFault, EffectivePolicy> clientFaultInfo;
-    private Map<BindingOperation, EffectivePolicy> serverRequestInfo;
-    private Map<BindingOperation, EffectivePolicy> serverResponseInfo;
-    private Map<BindingFault, EffectivePolicy> serverFaultInfo;
-    private Map<EndpointInfo, EndpointPolicy> serverEndpointInfo;
-    private Map<EndpointInfo, EndpointPolicy> clientEndpointInfo;
 
     public PolicyEngineImpl() { 
         init();
@@ -137,16 +134,15 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
 
     public EffectivePolicy getEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
                                                            Conduit c) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        EffectivePolicy effectivePolicy = clientRequestInfo.get(bo);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = null;
             if (c instanceof Assertor) {
                 assertor = (Assertor)c;
             }
-            epi.initialise(ei, bo.getBindingOperation(), this, assertor, true);
-            clientRequestInfo.put(bo, epi);
+            epi.initialise(ei, boi, this, assertor, true);
+            boi.setProperty(POLICY_INFO_REQUEST_CLIENT, epi);
             effectivePolicy = epi;
         }
         return effectivePolicy;
@@ -154,22 +150,21 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
 
     public void setEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
                                                 EffectivePolicy ep) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        clientRequestInfo.put(bo, ep);
+        boi.setProperty(POLICY_INFO_REQUEST_CLIENT, ep);
     }
 
-    public EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi,
+    public EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei,
+                                                            BindingOperationInfo boi,
                                                             Destination d) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        EffectivePolicy effectivePolicy = serverResponseInfo.get(bo);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = null;
             if (d instanceof Assertor) {
                 assertor = (Assertor)d;
             }
-            epi.initialise(ei, bo.getBindingOperation(), this, assertor, false);
-            serverResponseInfo.put(bo, epi);
+            epi.initialise(ei, boi, this, assertor, false);
+            boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
             effectivePolicy = epi;
         }
         return effectivePolicy;
@@ -177,14 +172,12 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
 
     public void setEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, 
                                                  EffectivePolicy ep) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        serverResponseInfo.put(bo, ep);
+        boi.setProperty(POLICY_INFO_RESPONSE_SERVER, ep);
     }
   
     public EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, 
                                                          Destination d) {
-        BindingFault bf = new BindingFault(ei, bfi);
-        EffectivePolicy effectivePolicy = serverFaultInfo.get(bf);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = null;
@@ -192,30 +185,33 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
                 assertor = (Assertor)d;
             }
             epi.initialise(ei, bfi, this, assertor);
-            serverFaultInfo.put(bf, epi);
+            bfi.setProperty(POLICY_INFO_FAULT_SERVER, epi);
             effectivePolicy = epi;
         }
         return effectivePolicy;
     }
 
     public void setEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep) {
-        BindingFault bf = new BindingFault(ei, bfi);
-        serverFaultInfo.put(bf, ep);
+        bfi.setProperty(POLICY_INFO_FAULT_SERVER, ep);
     }
 
     public EndpointPolicy getClientEndpointPolicy(EndpointInfo ei, Conduit conduit) {
         Assertor assertor = conduit instanceof Assertor ? (Assertor)conduit : null;
-        return getEndpointPolicy(ei, clientEndpointInfo.get(ei), true, assertor);
+        return getEndpointPolicy(ei, true, assertor);
     }
    
     public EndpointPolicy getServerEndpointPolicy(EndpointInfo ei, Destination destination) {
     
         Assertor assertor = destination instanceof Assertor ? (Assertor)destination : null;
-        return getEndpointPolicy(ei, serverEndpointInfo.get(ei), false, assertor);
+        return getEndpointPolicy(ei, false, assertor);
     }
 
     private EndpointPolicy getEndpointPolicy(
-        EndpointInfo ei, EndpointPolicy ep, boolean isRequestor, Assertor assertor) {
+        EndpointInfo ei, 
+        boolean isRequestor,
+        Assertor assertor) {
+        EndpointPolicy ep = (EndpointPolicy)ei.getProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT 
+                            : POLICY_INFO_ENDPOINT_SERVER);
         if (null != ep) {
             return ep; 
         }
@@ -223,20 +219,19 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
     }
 
     public void setClientEndpointPolicy(EndpointInfo ei, EndpointPolicy ep) {
-        clientEndpointInfo.put(ei, ep);
+        ei.setProperty(POLICY_INFO_ENDPOINT_CLIENT, ep);
     }
 
     public void setServerEndpointPolicy(EndpointInfo ei, EndpointPolicy ep) {
-        serverEndpointInfo.put(ei, ep);
+        ei.setProperty(POLICY_INFO_ENDPOINT_SERVER, ep);
     }
 
     public EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        EffectivePolicy effectivePolicy = serverRequestInfo.get(bo);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialisePolicy(ei, bo.getBindingOperation(), this, false);
-            serverRequestInfo.put(bo, epi);
+            epi.initialisePolicy(ei, boi, this, false);
+            boi.setProperty(POLICY_INFO_REQUEST_SERVER, epi);
             effectivePolicy = epi;
         }
         return effectivePolicy;
@@ -244,17 +239,15 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
 
     public void setEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
                                                 EffectivePolicy ep) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        serverRequestInfo.put(bo, ep);
+        boi.setProperty(POLICY_INFO_REQUEST_SERVER, ep);        
     }
 
     public EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        EffectivePolicy effectivePolicy = clientResponseInfo.get(bo);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialisePolicy(ei, bo.getBindingOperation(), this, true);        
-            clientResponseInfo.put(bo, epi);
+            epi.initialisePolicy(ei, boi, this, true);        
+            boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
             effectivePolicy = epi;
         }
         return effectivePolicy;
@@ -262,55 +255,29 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
 
     public void setEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, 
                                                  EffectivePolicy ep) {
-        BindingOperation bo = new BindingOperation(ei, boi);
-        clientResponseInfo.put(bo, ep);
+        boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, ep);
     }
 
     public EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi) {
-        BindingFault bf = new BindingFault(ei, bfi);
-        EffectivePolicy effectivePolicy = clientFaultInfo.get(bf);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             epi.initialisePolicy(ei, bfi, this);
-            clientFaultInfo.put(bf, epi);
+            bfi.setProperty(POLICY_INFO_FAULT_CLIENT, epi);
             effectivePolicy = epi;
         }
         return effectivePolicy;
     }
 
     public void setEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep) {
-        BindingFault bf = new BindingFault(ei, bfi);
-        clientFaultInfo.put(bf, ep);
+        bfi.setProperty(POLICY_INFO_FAULT_CLIENT, ep);
     }
 
     // implementation
 
     protected final void init() {
-    
         registry = new PolicyRegistryImpl();
-    
-        clientRequestInfo 
-            = new ConcurrentHashMap<BindingOperation, EffectivePolicy>();
 
-        clientResponseInfo 
-            = new ConcurrentHashMap<BindingOperation, EffectivePolicy>();
-
-        clientFaultInfo 
-            = new ConcurrentHashMap<BindingFault, EffectivePolicy>();
-
-        serverEndpointInfo 
-            = new EndpointPolicyMap();
-        clientEndpointInfo 
-            = new EndpointPolicyMap();
-
-        serverRequestInfo 
-            = new ConcurrentHashMap<BindingOperation, EffectivePolicy>();
-
-        serverResponseInfo 
-            = new ConcurrentHashMap<BindingOperation, EffectivePolicy>();
-
-        serverFaultInfo 
-            = new ConcurrentHashMap<BindingFault, EffectivePolicy>();    
     }
 
 
@@ -363,14 +330,6 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
     
         addedBusInterceptors = true;
     }  
-
-    @PostConstruct
-    public void registerListener() {
-        ServerLifeCycleManager slm = bus.getExtension(ServerLifeCycleManager.class);
-        if (slm != null) {
-            slm.registerListener(this);
-        }
-    }
 
     Policy getAggregatedServicePolicy(ServiceInfo si) {
         Policy aggregated = null;
@@ -500,13 +459,12 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
         return vocabulary;
     } 
 
-    EndpointPolicyImpl createEndpointPolicyInfo(EndpointInfo ei, boolean isRequestor, Assertor assertor) {
+    EndpointPolicyImpl createEndpointPolicyInfo(EndpointInfo ei, 
+                                                boolean isRequestor, 
+                                                Assertor assertor) {
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, this, isRequestor, assertor);
         epi.initialize();
-    
-        Map<EndpointInfo, EndpointPolicy> map = isRequestor ? clientEndpointInfo : serverEndpointInfo;
-        map.put(ei, epi);
-
+        ei.setProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER, epi);
         return epi;
     }
 
@@ -534,160 +492,11 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension, ServerLifeC
         return true;
     }
 
-    public void startServer(Server server) {
-        // empty
-    }
-
-    /**
-     * Callback recieved while the server side endpoint is being undeployed.
-     *
-     * @param server
-     */
-    public void stopServer(Server server) {
-        EndpointInfo ei = server.getEndpoint().getEndpointInfo();
-        serverEndpointInfo.remove(ei);
-        clientEndpointInfo.remove(ei);
-
-        /**
-         * While cleaning up the entries of requestInfo's, responseInfo's and faultInfo's map, we create
-         * a temperory Set with all the keys. Later we iterate over the keys of this temp set,
-         * and if it's same as that of the endpoint being undeployed, we remove the corresponding
-         * entries from the client and server maps.
-         */
-
-        cleanupBindingOperations(ei, new HashSet<BindingOperation>(clientRequestInfo.keySet()),
-                clientRequestInfo);
-        cleanupBindingOperations(ei, new HashSet<BindingOperation>(clientResponseInfo.keySet()),
-                clientResponseInfo);
-
-        cleanupBindingOperations(ei, new HashSet<BindingOperation>(serverRequestInfo.keySet()),
-                serverRequestInfo);
-        cleanupBindingOperations(ei, new HashSet<BindingOperation>(serverResponseInfo.keySet()),
-                serverResponseInfo);
-
-        cleanupBindingFaults(ei, new HashSet<BindingFault>(clientFaultInfo.keySet()),
-                clientFaultInfo);
-        cleanupBindingFaults(ei, new HashSet<BindingFault>(serverFaultInfo.keySet()),
-                serverFaultInfo);
-    }
-
-    private void cleanupBindingOperations(EndpointInfo ei,
-                                          Set<BindingOperation> bindingOperations,
-                                          Map<BindingOperation, EffectivePolicy> originalMap) {
-        
-        Iterator<BindingOperation> bindingOpsItr = bindingOperations.iterator();
-        while (bindingOpsItr.hasNext()) {
-            BindingOperation bindingOperation = bindingOpsItr.next();
-            if (ei.isSameAs(bindingOperation.getEndpoint())) {
-                originalMap.remove(bindingOperation);
-            }
-        }
-    }
-
-    private void cleanupBindingFaults(EndpointInfo ei, Set <BindingFault> bindingFaults,
-                                      Map<BindingFault, EffectivePolicy> originalMap) {
-        Iterator<BindingFault> bindingFaultsItr = bindingFaults.iterator();
-        while (bindingFaultsItr.hasNext()) {
-            BindingFault bindingFault = bindingFaultsItr.next();
-            if (ei.isSameAs(bindingFault.getEndpoint())) {
-                originalMap.remove(bindingFault);
-            }
-        }
-    }
-    /**
-     * Class used as key in the client request policy and server response policy maps.
-     */
-    class BindingOperation {
-        private EndpointInfo ei;
-        private BindingOperationInfo boi;
-    
-        BindingOperation(EndpointInfo e, BindingOperationInfo b) {
-            ei = e;
-            boi = b.isUnwrapped() ? b.getWrappedOperation() : b;
-        }
-    
-        EndpointInfo getEndpoint() {
-            return ei;
-        }
-    
-        BindingOperationInfo getBindingOperation() {
-            return boi;
-        }
-
-        @Override
-        public int hashCode() {
-            return boi.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            BindingOperation other = (BindingOperation)obj;
-            return boi.equals(other.boi) && ei.equals(other.ei);
-        }
-    
-        @Override
-        public String toString() {
-            return ei.getName().toString() + "." + boi.getName().toString();
-        }
-    
-    
-    }
-
-    /**
-     * Class used as key in the server fault policy map.
-     */
-    class BindingFault {
-        private EndpointInfo ei;
-        private BindingFaultInfo bfi;
-    
-        BindingFault(EndpointInfo e, BindingFaultInfo b) {
-            ei = e;
-            bfi = b;
-        }
-    
-        EndpointInfo getEndpoint() {
-            return ei;
-        }
-    
-        BindingFaultInfo getBindingFault() {
-            return bfi;
-        }
-    
-        @Override
-        public int hashCode() {
-            return bfi.hashCode();
-        }
-    
-        @Override
-        public boolean equals(Object obj) {
-            BindingFault other = (BindingFault)obj;
-            return bfi.equals(other.bfi) && ei.equals(other.ei);
-        }
-    
-        @Override
-        public String toString() {
-            return ei.getName().toString() + "." + bfi.getFaultInfo().toString();
-        }
-    }
 
     // for test
-
     EffectivePolicyImpl createOutPolicyInfo() {
         return new EffectivePolicyImpl();
     }
     
-    private class EndpointPolicyMap extends ConcurrentHashMap<EndpointInfo, EndpointPolicy> {
-        public EndpointPolicy remove(Object key) {
-            EndpointInfo toRemove = (EndpointInfo) key;
-            EndpointPolicy pol = null;
-            for (EndpointInfo info : keySet()) {
-                if (info.isSameAs(toRemove)) {
-                    pol = super.remove(info);
-                }
-            }
-            return pol;
-        }
-    }
-
 
 }

@@ -68,6 +68,9 @@ public class PrimitiveAssertion implements PolicyAssertion {
         }
     }
 
+    public String toString() {
+        return name.toString();
+    }
     public boolean equal(PolicyComponent policyComponent) {
         if (policyComponent.getType() != Constants.TYPE_ASSERTION) {
             return false;
