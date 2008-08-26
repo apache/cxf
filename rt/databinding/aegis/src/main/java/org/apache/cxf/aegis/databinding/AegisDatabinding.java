@@ -383,6 +383,14 @@ public class AegisDatabinding
                     part.setElementQName(type.getSchemaType());
                 }
             }
+            
+            part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
+            if (type.hasMinOccurs()) {
+                part.setProperty("minOccurs", Long.valueOf(type.getMinOccurs()).toString());
+            }
+            if (type.hasMaxOccurs()) {
+                part.setProperty("maxOccurs", Long.valueOf(type.getMaxOccurs()).toString());
+            }
 
             part2Type.put(part, type);
 

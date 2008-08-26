@@ -21,14 +21,11 @@ package org.apache.cxf.javascript.fortest;
 
 import javax.jws.WebService;
 
-//import org.apache.cxf.feature.Features;
-
 /**
  * 
  */
 @WebService(endpointInterface = "org.apache.cxf.javascript.fortest.SimpleDocLitWrapped",
             targetNamespace = "uri:org.apache.cxf.javascript.fortest")
-//@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature") 
 public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     
     private String lastString;
@@ -38,6 +35,8 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     private double lastDouble;
     private TestBean1 lastBean1;
     private TestBean1[] lastBean1Array;
+    private SpecificGenericClass lastSpecificGeneric;
+    private GenericGenericClass<Double> lastGenericGeneric;
 
     /** {@inheritDoc}*/
     public int basicTypeFunctionReturnInt(String s, int i, long l, float f, double d) {
@@ -114,5 +113,18 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
 
     public TestBean1[] getLastBean1Array() {
         return lastBean1Array;
+    }
+
+    public void genericTestFunction(SpecificGenericClass sgc, GenericGenericClass<Double> ggc) {
+        lastSpecificGeneric = sgc;
+        lastGenericGeneric = ggc;
+    }
+
+    public SpecificGenericClass getLastSpecificGeneric() {
+        return lastSpecificGeneric;
+    }
+
+    public GenericGenericClass<Double> getLastGenericGeneric() {
+        return lastGenericGeneric;
     }
 }

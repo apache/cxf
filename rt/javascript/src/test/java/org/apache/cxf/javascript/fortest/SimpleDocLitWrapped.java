@@ -66,4 +66,8 @@ public interface SimpleDocLitWrapped {
     @WebMethod
     void beanFunction(@WebParam(name = "bean1") TestBean1 bean, 
                       @WebParam(name = "beanArray") TestBean1[] beans);
+    
+    @WebMethod
+    void genericTestFunction(@WebParam(name = "g1") SpecificGenericClass sgc,
+                             @WebParam(name = "g2") GenericGenericClass<Double> ggc);
 }

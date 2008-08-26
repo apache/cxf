@@ -304,7 +304,13 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     }
     public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
         String min = (String)mpi.getProperty("minOccurs");
+        
         long mini = 1;
+        
+        if (min != null) {
+            mini = Long.parseLong(min);
+        }
+        
         if (min == null && mpi.getTypeClass() != null && !mpi.getTypeClass().isPrimitive()) {
             mini = 0;
         }

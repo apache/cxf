@@ -382,6 +382,10 @@ public class BeanTypeInfo {
     public int getMinOccurs(QName name) {
         return minOccurs;
     }
+    
+    public long getMinOccurs() {
+        return minOccurs;
+    }
 
     public void setDefaultMinOccurs(int m) {
         this.minOccurs = m;

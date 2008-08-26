@@ -416,4 +416,14 @@ public class ArrayType extends Type {
         setWriteOuter(!flat);
         this.flat = flat;
     }
+    
+    @Override
+    public boolean hasMaxOccurs() {
+        return true;
+    }
+
+    @Override
+    public boolean hasMinOccurs() {
+        return true;
+    }
 }
