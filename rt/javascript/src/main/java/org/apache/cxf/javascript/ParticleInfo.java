@@ -213,6 +213,9 @@ public final class ParticleInfo {
                             .toString(), element.getQName(), element);
                 }
             }
+        } else if (elementInfo.type.getQName() != null
+            && XmlSchemaConstants.ANY_TYPE_QNAME.equals(elementInfo.type.getQName())) {
+            elementInfo.anyType = true;
         }
     }
 
