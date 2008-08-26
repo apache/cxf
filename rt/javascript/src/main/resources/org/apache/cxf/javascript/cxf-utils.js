@@ -605,12 +605,69 @@ function org_apache_cxf_make_uuid(type) {
 	return null;
 }
 
+//
+// Returns XMLHttpRequest object.
+//
+var ORG_APACHE_CXF_XMLHTTPREQUEST_MS_PROGIDS = new Array(
+    "Msxml2.XMLHTTP.7.0",
+    "Msxml2.XMLHTTP.6.0",
+    "Msxml2.XMLHTTP.5.0",
+    "Msxml2.XMLHTTP.4.0",
+    "MSXML2.XMLHTTP.3.0",
+    "MSXML2.XMLHTTP",
+    "Microsoft.XMLHTTP"
+    );    
+
+function org_apache_cxf_getXMLHttpRequest()
+{
+    var httpRequest = null;
+ 
+    // Create the appropriate HttpRequest object for the browser.
+    try {
+        httpRequest = new XMLHttpRequest();
+        return httpRequest;
+    } catch(ex) {
+    }
+    
+    if (window.ActiveXObject != null) {
+        // Must be IE, find the right ActiveXObject.
+   
+        var success = false;
+        //
+        // Define a list of Microsoft XML HTTP ProgIDs.
+        //
+        for (var i = 0;
+             i < ORG_APACHE_CXF_XMLHTTPREQUEST_MS_PROGIDS.length && !success;
+             i++)
+        {
+            try
+            {
+                httpRequest = new ActiveXObject(ORG_APACHE_CXF_XMLHTTPREQUEST_MS_PROGIDS[i]);
+                success = true;
+            }
+            catch (ex)
+            {
+                // no reason to log unless we come up empty.
+            }
+        }
+        if(!success) {
+            this.utils.trace("Unable to get any Microsoft XML HttpRequest object.");
+            throw "org_apache_cxf no Microsoft XMLHttpRequest";
+        }
+    }
+    // Return it.
+    return httpRequest;
+}
+
+CxfApacheOrgClient.prototype.getXMLHttpRequest = org_apache_cxf_getXMLHttpRequest;
+
 var ORG_APACHE_CXF_MTOM_REQUEST_HEADER = 'Content-Type: application/xop+xml; type="text/xml"; charset=utf-8\r\n';
 
 // Caller must avoid stupid mistakes like 'GET' with a request body.
 // This does not support attempts to cross-script.
 // This imposes a relatively straightforward set of HTTP options.
-function org_apache_cxf_client_request(url, requestXML, method, sync, headers) {
+function org_apache_cxf_client_request(url, requestXML, method, sync, headers) 
+{
 	this.utils.trace("request " + url);
 
 	this.url = url;
@@ -628,18 +685,10 @@ function org_apache_cxf_client_request(url, requestXML, method, sync, headers) {
 	}
 
 	try {
-		this.req = new XMLHttpRequest();
+		this.req = this.getXMLHttpRequest();
 	} catch (err) {
-		this.utils.trace("Error creating XMLHttpRequest " + err);
+		this.utils.trace("Error creating XMLHttpRequest: " + err);
 		this.req = null;
-	}
-
-	if (this.req == null) {
-		if (window.ActiveXObject) {
-			this.req = new ActiveXObject("MSXML2.XMLHTTP.6.0"); // Microsoft's
-			// recommended
-			// version
-		}
 	}
 
 	if (this.req == null) {
