@@ -386,10 +386,18 @@ public class AegisDatabinding
             
             part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
             if (type.hasMinOccurs()) {
-                part.setProperty("minOccurs", Long.valueOf(type.getMinOccurs()).toString());
+                long miValue = type.getMinOccurs();
+                if (miValue != 0) {
+                    part.setProperty("minOccurs", Long.toString(miValue));
+                }
             }
             if (type.hasMaxOccurs()) {
-                part.setProperty("maxOccurs", Long.valueOf(type.getMaxOccurs()).toString());
+                String moValue;
+                long mo = type.getMaxOccurs();
+                if (mo != Long.MAX_VALUE) {
+                    moValue = Long.toString(mo);
+                    part.setProperty("maxOccurs", moValue);
+                }
             }
 
             part2Type.put(part, type);
