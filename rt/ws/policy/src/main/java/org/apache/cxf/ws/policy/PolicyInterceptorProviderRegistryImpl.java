@@ -49,6 +49,12 @@ public class PolicyInterceptorProviderRegistryImpl
         super(interceptors.createMap());
     }    
 
+    public void register(PolicyInterceptorProvider provider) {
+        for (QName qn : provider.getAssertionTypes()) {
+            super.register(qn, provider);
+        }
+    }
+
     public Class<?> getRegistrationType() {
         return PolicyInterceptorProviderRegistry.class;
     }

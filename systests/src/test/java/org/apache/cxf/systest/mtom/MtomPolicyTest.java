@@ -76,7 +76,9 @@ public class MtomPolicyTest extends AbstractCXFTest {
         
         Node res = invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
         
-        assertValid("//faultstring[text()='None of the policy alternatives can be satisfied.']", res);
+        assertValid("//faultstring[text()='These policy alternatives can not be satisfied: "
+                    + "[{http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization}"
+                    + "OptimizedMimeSerialization]']", res);
     }
     
     @Test

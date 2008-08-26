@@ -97,8 +97,8 @@ public class AssertionInfoMapTest extends Assert {
         alt2.add(c);
                 
         control.replay();
-        assertTrue(!aim.supportsAlternative(alt1));
-        assertTrue(aim.supportsAlternative(alt2));
+        assertTrue(!aim.supportsAlternative(alt1, new ArrayList<QName>()));
+        assertTrue(aim.supportsAlternative(alt2, new ArrayList<QName>()));
         control.verify();     
     }  
     

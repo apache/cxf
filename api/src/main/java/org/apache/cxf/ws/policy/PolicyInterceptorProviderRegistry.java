@@ -35,6 +35,13 @@ import org.apache.cxf.interceptor.Interceptor;
 public interface PolicyInterceptorProviderRegistry 
     extends Registry<QName, PolicyInterceptorProvider> {
     
+    /**
+     * Register the builder for all qnames from the provider
+     * getAssertionTypes call.
+     * @param provider the provider to register 
+     */
+    void register(PolicyInterceptorProvider provider);
+    
     List<Interceptor> getInterceptors(Collection<PolicyAssertion> alterative, boolean out, boolean fault);
 
 }

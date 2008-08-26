@@ -62,7 +62,17 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
     }
     
-    
+    public boolean containsExtensor(Object el) {
+        Object exts[] = extensors.get();
+        if (exts != null) {
+            for (Object o : exts) {
+                if (o == el) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public void addExtensor(Object el) {
         Object exts[] = extensors.get();
         Object exts2[];
