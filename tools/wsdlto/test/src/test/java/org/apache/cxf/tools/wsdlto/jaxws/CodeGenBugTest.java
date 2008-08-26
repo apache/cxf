@@ -1041,5 +1041,18 @@ public class CodeGenBugTest extends ProcessorTestBase {
         assertEquals("GreeterSOAPService", webServiceAnn.serviceName());
         assertEquals("PingSoapPort", webServiceAnn.portName());
     }
+
+    
+    @Test
+    public void testCXF1694() throws Exception {
+
+        try {
+            env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf1694/test.wsdl"));
+            processor.setContext(env);
+            processor.execute();
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("{http://child/}Binding is not correct"));
+        }
+    }
     
 }

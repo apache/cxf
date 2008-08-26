@@ -1,0 +1,3 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="Parent">
+    <wsdl:import namespace="http://incorrect-namespace" location="child.wsdl" />
+</wsdl:definitions>
