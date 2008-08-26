@@ -74,18 +74,23 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
 
         JavaServiceClass service = null;
         String port = "";
+        Iterator portIterator = null;
         if (!services.values().isEmpty()) {
             JavaServiceClass javaservice = services.values().iterator().next();
             service = javaservice;
-           
+      
             if (javaservice.getPorts().size() != 0) {
-                JavaPort jport = (JavaPort)javaservice.getPorts().get(0);
-                port = jport.getPortName();
+                portIterator = javaservice.getPorts().iterator();
             }
         }
         for (Iterator iter = interfaces.keySet().iterator(); iter.hasNext();) {
             String interfaceName = (String)iter.next();
             JavaInterface intf = interfaces.get(interfaceName);
+            
+            if (portIterator != null) {
+                JavaPort jport = (JavaPort)portIterator.next();
+                port = jport.getPortName();
+            }
 
             clearAttributes();
             setAttributes("intf", intf);

@@ -1022,5 +1022,24 @@ public class CodeGenBugTest extends ProcessorTestBase {
         clz = classLoader.loadClass("org.apache.cxf.w2j.jaxb_custom_ext.types.Foo2");
         assertEquals(1, clz.getDeclaredFields().length);
     }
+ 
+    
+    @Test
+    public void testCXF1048() throws Exception {
+
+        env.put(ToolConstants.CFG_COMPILE, "compile");
+        env.put(ToolConstants.CFG_IMPL, ToolConstants.CFG_IMPL);
+        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf1048/test.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+        Class clz = classLoader.loadClass("org.apache.hello_world_soap_http.PingImpl");
+
+        WebService webServiceAnn = AnnotationUtil.getPrivClassAnnotation(clz, WebService.class);
+        assertEquals("org.apache.hello_world_soap_http.Ping", webServiceAnn.endpointInterface());
+        assertEquals("GreeterSOAPService", webServiceAnn.serviceName());
+        assertEquals("PingSoapPort", webServiceAnn.portName());
+    }
     
 }
