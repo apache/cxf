@@ -56,7 +56,6 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.jaxws.handler.AbstractProtocolHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
-import org.apache.cxf.jaxws.support.ContextPropertiesMapping;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -230,8 +229,6 @@ public class SOAPHandlerInterceptor extends
     protected MessageContext createProtocolMessageContext(SoapMessage message) {
         SOAPMessageContextImpl sm = new SOAPMessageContextImpl(message);
         
-        boolean requestor = isRequestor(message);
-        ContextPropertiesMapping.mapCxf2Jaxws(message.getExchange(), sm, requestor);
         Exchange exch = message.getExchange();
         setupBindingOperationInfo(exch, sm);
         SOAPMessage msg = sm.getMessage();

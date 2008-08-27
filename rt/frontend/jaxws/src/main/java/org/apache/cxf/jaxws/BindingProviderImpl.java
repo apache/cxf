@@ -27,7 +27,9 @@ import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.MessageContext.Scope;
 
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 
 public class BindingProviderImpl implements BindingProvider {
@@ -62,7 +64,9 @@ public class BindingProviderImpl implements BindingProvider {
 
     public Map<String, Object> getResponseContext() {
         if (null == responseContext.get()) {
-            responseContext.set(new HashMap<String, Object>());
+            responseContext.set(new WrappedMessageContext(new HashMap<String, Object>(),
+                                                          null,
+                                                          Scope.APPLICATION));
         }
         return responseContext.get();
     }

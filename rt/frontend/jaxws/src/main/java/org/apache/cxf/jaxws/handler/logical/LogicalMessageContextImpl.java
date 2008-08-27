@@ -19,8 +19,11 @@
 
 package org.apache.cxf.jaxws.handler.logical;
 
+import java.util.Map;
+
 import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.handler.LogicalMessageContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Message;
@@ -34,6 +37,26 @@ public class LogicalMessageContextImpl extends WrappedMessageContext implements 
       
     public LogicalMessage getMessage() {
         return new LogicalMessageImpl(this);
+    }
+    
+    public Object get(Object key) {
+        Object o = super.get(key);
+        if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
+            || MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+            Map mp = (Map)o;
+            if (mp != null) {
+                if (mp.isEmpty()) {
+                    return null;
+                }
+                if (!isResponse() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
+                    return null;
+                }
+                if (isRequestor() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+                    return null;
+                }
+            }
+        }
+        return o;
     }
 
 }

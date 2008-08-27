@@ -58,7 +58,11 @@ public class DoMerges {
         if (c == 'N') {
             return;
         }
-        Process p = Runtime.getRuntime().exec(new String[] {"svn", "commit", "-F", "svnmerge-commit-message.txt"});
+        Process p = Runtime.getRuntime().exec(new String[] {"svn", "resolved", "."});
+        if (p.waitFor() != 0) {
+            Thread.sleep(10);
+        }
+        p = Runtime.getRuntime().exec(new String[] {"svn", "commit", "-F", "svnmerge-commit-message.txt"});
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line = reader.readLine();
         while (line != null) {

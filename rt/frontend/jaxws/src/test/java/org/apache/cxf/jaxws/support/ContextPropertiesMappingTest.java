@@ -18,11 +18,9 @@
  */
 package org.apache.cxf.jaxws.support;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -30,16 +28,16 @@ import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.MessageContext.Scope;
 
 
 import org.apache.cxf.attachment.AttachmentImpl;
-import org.apache.cxf.headers.Header;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +46,6 @@ public class ContextPropertiesMappingTest extends Assert {
     private static final String ADDRESS = "test address";
     private static final String REQUEST_METHOD = "GET";
     private static final String HEADER = "header";
-    private static final Integer RESPONSE_CODE = 401; 
     
     private Map<String, Object> message = new HashMap<String, Object>();
     private Map<String, Object> requestContext = new HashMap<String, Object>();
@@ -67,35 +64,6 @@ public class ContextPropertiesMappingTest extends Assert {
         responseContext.clear();
     }
     
-    @Test
-    public void testMapRequestfromJaxws2Cxf() {
-        Object address = requestContext.get(Message.ENDPOINT_ADDRESS);
-        assertNull("address should be null", address);
-        ContextPropertiesMapping.mapRequestfromJaxws2Cxf(requestContext);
-        address = requestContext.get(Message.ENDPOINT_ADDRESS);
-        assertNotNull("address should not be null", address);
-        assertEquals("address should get from requestContext", address, ADDRESS + "jaxws");
-        message.putAll(requestContext);
-        address = message.get(Message.ENDPOINT_ADDRESS);        
-        assertNotNull("address should not be null", address);
-        assertEquals("address should get from requestContext", address, ADDRESS + "jaxws");
-        Object header = message.get(Message.PROTOCOL_HEADERS);
-        assertEquals("the message PROTOCOL_HEADERS should be updated", header, HEADER + "jaxws");
-    }
-    
-    @Test
-    public void testMapResponseCxf2Jaxws() {        
-        responseContext.putAll(message);
-        Object requestMethod = responseContext.get(MessageContext.HTTP_REQUEST_METHOD);
-        assertNull("requestMethod should be null", requestMethod);
-        ContextPropertiesMapping.mapResponsefromCxf2Jaxws(responseContext);
-        requestMethod = responseContext.get(MessageContext.HTTP_REQUEST_METHOD);
-        assertNotNull("requestMethod should not be null", requestMethod);
-        assertEquals(requestMethod, REQUEST_METHOD);
-        Object header = responseContext.get(MessageContext.HTTP_RESPONSE_HEADERS);
-        assertNotNull("the HTTP_RESPONSE_HEADERS should not be null ", header);
-        assertEquals("the HTTP_RESPONSE_HEADERS should be updated", header, HEADER);
-    }
     
     @Test
     public void testCreateWebServiceContext() {
@@ -108,7 +76,7 @@ public class ContextPropertiesMappingTest extends Assert {
         exchange.setInMessage(inMessage);
         exchange.setOutMessage(outMessage);
         
-        MessageContext ctx = ContextPropertiesMapping.createWebServiceContext(exchange);
+        MessageContext ctx = new WrappedMessageContext(exchange.getInMessage(), Scope.APPLICATION);
         
         Object requestHeader = ctx.get(MessageContext.HTTP_REQUEST_HEADERS);
         assertNotNull("the request header should not be null", requestHeader);
@@ -124,42 +92,6 @@ public class ContextPropertiesMappingTest extends Assert {
         assertTrue("no inbound attachments expected", ((Map)inAttachments).isEmpty());
     }
     
-    @Test
-    public void testUpdateWebServiceContext() {
-        Exchange xchng = new ExchangeImpl();
-        Message outMsg = new MessageImpl();
-        List<Header> hdrList = new ArrayList<Header>();
-        xchng.setOutMessage(outMsg);
-        
-        responseContext.put(MessageContext.HTTP_RESPONSE_CODE, RESPONSE_CODE);
-        
-        MessageContext ctx = EasyMock.createMock(MessageContext.class);
-        ctx.containsKey(MessageContext.HTTP_RESPONSE_CODE);
-        EasyMock.expectLastCall().andReturn(true);
-        ctx.get(MessageContext.HTTP_RESPONSE_CODE);
-        EasyMock.expectLastCall().andReturn(RESPONSE_CODE);
-        
-        ctx.containsKey(Header.HEADER_LIST);
-        EasyMock.expectLastCall().andReturn(true);
-        ctx.get(Header.HEADER_LIST);
-        EasyMock.expectLastCall().andReturn(hdrList);
-        ctx.get(Header.HEADER_LIST);
-        EasyMock.expectLastCall().andReturn(hdrList);
-
-        ctx.containsKey(MessageContext.HTTP_RESPONSE_HEADERS);
-        EasyMock.expectLastCall().andReturn(false);
-        
-        ctx.get(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
-        EasyMock.expectLastCall().andReturn(null);
-
-        EasyMock.replay(ctx);
-        
-        ContextPropertiesMapping.updateWebServiceContext(xchng, ctx);
-        Integer respCode = (Integer)outMsg.get(Message.RESPONSE_CODE);
-        assertNotNull("no response code set on out message", respCode);
-        assertEquals("incorrect response code returned", RESPONSE_CODE, respCode);
-    }
-
     @Test
     @SuppressWarnings("unchecked")
     public void testCreateWebServiceContextWithInAttachments() {
@@ -180,7 +112,7 @@ public class ContextPropertiesMappingTest extends Assert {
         exchange.setInMessage(inMessage);
         exchange.setOutMessage(new MessageImpl());
         
-        MessageContext ctx = ContextPropertiesMapping.createWebServiceContext(exchange);
+        MessageContext ctx = new WrappedMessageContext(exchange.getInMessage(), Scope.APPLICATION);
         
         Object inAttachments = ctx.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
         assertNotNull("inbound attachments object must be initialized", inAttachments);
