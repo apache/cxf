@@ -123,7 +123,7 @@ public class WrappedMessageContext implements MessageContext {
         if (scopes == null && reqMessage != null) {
             scopes = CastUtils.cast((Map<?, ?>)reqMessage.get(SCOPES));
             m.put(SCOPES, scopes);
-            copyScoped(message);
+            copyScoped(reqMessage);
         }
         if (scopes == null) {
             scopes = new HashMap<String, Scope>();
@@ -206,7 +206,8 @@ public class WrappedMessageContext implements MessageContext {
                 }
                 ret = createAttachments(getWrappedMessage(), MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
             } else if (MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
-                ret = createAttachments(createResponseMessage(), MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
+                ret = createAttachments(isRequestor() ? getWrappedMessage() : createResponseMessage(),
+                    MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
             } else if (MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(key)) {
                 ret = isOutbound();
             } else if (MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
@@ -249,19 +250,40 @@ public class WrappedMessageContext implements MessageContext {
     }
 
     private Message createResponseMessage() {
-        if (exchange == null || isRequestor()) {
+        if (exchange == null || exchange.isOneWay()) {
             return null;
         }
-        Message m = exchange.getOutMessage();
-        if (m == null && !exchange.isOneWay()) {
-            Endpoint ep = exchange.get(Endpoint.class);
-            m = ep.getBinding().createMessage();
-            exchange.setOutMessage(m);
+        if (isResponse()) {
+            return getWrappedMessage();
+        }
+        Message m = null;
+        if (isRequestor()) {
+            m = exchange.getInFaultMessage();
+            if (m == null) {
+                m = exchange.getInMessage();
+            }
+            if (m == null) {
+                Endpoint ep = exchange.get(Endpoint.class);
+                m = ep.getBinding().createMessage();
+                exchange.setInMessage(m);
+            }
+        } else {
+            m = exchange.getOutMessage();
+            if (m == null) {
+                m = exchange.getOutFaultMessage();
+            }
+            if (m == null) {
+                Endpoint ep = exchange.get(Endpoint.class);
+                m = ep.getBinding().createMessage();
+                exchange.setOutMessage(m);
+            }
         }
         return m;
     }
     private Object createAttachments(Message mc, String propertyName) {
-
+        if (mc == null) {
+            return null;
+        }
         Collection<Attachment> attachments = mc.getAttachments();
         Map<String, DataHandler> dataHandlers = getDHMap(attachments);
         mc.put(propertyName, 
