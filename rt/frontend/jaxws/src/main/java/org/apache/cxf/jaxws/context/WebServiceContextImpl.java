@@ -102,7 +102,6 @@ public class WebServiceContextImpl implements WebServiceContext {
     }
 
     public static void setMessageContext(MessageContext ctx) {
-        //ContextPropertiesMapping.mapCxf2Jaxws(ctx);
         context.set(ctx);
     }
 
