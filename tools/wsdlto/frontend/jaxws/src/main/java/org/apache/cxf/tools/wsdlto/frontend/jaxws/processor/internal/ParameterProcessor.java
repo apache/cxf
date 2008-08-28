@@ -200,11 +200,11 @@ public class ParameterProcessor extends AbstractProcessor {
             && countOutOfBandHeader(inputMessage) == 0) {
             return;
         }
-        boolean isSchemaQualified = ProcessorUtil.isSchemaFormQualified(context, part.getElementQName());
         for (QName item : wrappedElements) {
             JavaParameter jp = getParameterFromQName(part.getElementQName(),
                                   item, JavaType.Style.IN, part);
-            if (!isSchemaQualified) {
+            
+            if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) { 
                 jp.setTargetNamespace("");
             }
 
