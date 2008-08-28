@@ -46,6 +46,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -325,7 +326,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         CallbackHandler cbHandler = null;
         if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-            cbHandler = getPasswordCB(reqData);
+            cbHandler 
+                = (CallbackHandler)((SoapMessage)reqData.getMsgContext())
+                    .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+            if (cbHandler == null) {
+                cbHandler = getPasswordCB(reqData);
+            }
         }
         return cbHandler;
     }

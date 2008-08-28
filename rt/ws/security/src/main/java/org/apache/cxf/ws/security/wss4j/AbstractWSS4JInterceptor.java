@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +38,9 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.SupportingToken;
+import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
@@ -145,20 +149,26 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         this.before = before;
     }
     
+    private boolean isRequestor(SoapMessage message) {
+        return Boolean.TRUE.equals(message.containsKey(
+            org.apache.cxf.message.Message.REQUESTOR_ROLE));
+    }  
+    
+    
     protected void checkPolicies(SoapMessage message, RequestData data) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
+        String action = getString(WSHandlerConstants.ACTION, message);
+        if (action == null) {
+            action = "";
+        }
         if (aim != null) {
             Collection<AssertionInfo> ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
             if (ais != null) {
                 for (AssertionInfo ai : ais) {
-                    String action = getString(WSHandlerConstants.ACTION, message);
-                    if (action == null) {
-                        action = WSHandlerConstants.TIMESTAMP;
-                    } else {
-                        action += " " + WSHandlerConstants.TIMESTAMP;
+                    if (!action.contains(WSHandlerConstants.TIMESTAMP)) {
+                        action = WSHandlerConstants.TIMESTAMP + " " + action;
                     }
-                    message.put(WSHandlerConstants.ACTION, action);
                     ai.setAsserted(true);
                 }                    
             }
@@ -167,7 +177,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 for (AssertionInfo ai : ais) {
                     Layout lay = (Layout)ai.getAssertion();
                     //wss4j can only do "Lax"
-                    if (SPConstants.LAYOUT_LAX.equals(lay.getValue())) {
+                    if (SPConstants.Layout.Lax == lay.getValue()) {
                         ai.setAsserted(true);
                     }
                 }                    
@@ -178,8 +188,38 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     ai.setAsserted(true);
                 }                    
             }
-
+            ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    SupportingToken sp = (SupportingToken)ai.getAssertion();
+                    action = doTokens(sp.getTokens(), action, aim, message);
+                    ai.setAsserted(true);
+                }                    
+            }
+            message.put(WSHandlerConstants.ACTION, action.trim());
         }
     }
-
+    
+    private String doTokens(List<Token> tokens, 
+                            String action, 
+                            AssertionInfoMap aim,
+                            SoapMessage msg) {
+        for (Token token : tokens) {
+            if (token instanceof UsernameToken) {
+                if (!action.contains(WSHandlerConstants.USERNAME_TOKEN)
+                    && !isRequestor(msg)) {
+                    action = WSHandlerConstants.USERNAME_TOKEN + " " + action;
+                }
+                Collection<AssertionInfo> ais2 = aim.get(SP12Constants.USERNAME_TOKEN);
+                if (ais2 != null && !ais2.isEmpty()) {
+                    for (AssertionInfo ai2 : ais2) {
+                        if (ai2.getAssertion() == token) {
+                            ai2.setAsserted(true);
+                        }
+                    }                    
+                }
+            }
+        }        
+        return action;
+    }
 }

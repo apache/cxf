@@ -77,18 +77,6 @@ public final class SP12Constants extends SPConstants {
     public static final QName LAYOUT = new QName(SP_NS, SPConstants.LAYOUT, SP_PREFIX);
 
 
-    public static final QName STRICT = new QName(SP12Constants.SP_NS, SPConstants.LAYOUT_STRICT,
-            SP12Constants.SP_PREFIX);
-
-    public static final QName LAX = new QName(SP12Constants.SP_NS, SPConstants.LAYOUT_LAX ,
-            SP12Constants.SP_PREFIX);
-
-    public static final QName LAXTSFIRST = new QName(SP12Constants.SP_NS,
-            SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST, SP12Constants.SP_PREFIX);
-
-    public static final QName LAXTSLAST = new QName(SP12Constants.SP_NS,
-            SPConstants.LAYOUT_LAX_TIMESTAMP_LAST, SP12Constants.SP_PREFIX);
-
     // ////////////////
 
     public static final QName INCLUDE_TIMESTAMP = new QName(SP12Constants.SP_NS,

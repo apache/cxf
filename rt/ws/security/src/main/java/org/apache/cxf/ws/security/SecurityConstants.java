@@ -17,39 +17,17 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.policy;
-
+package org.apache.cxf.ws.security;
 
 /**
  * 
  */
-public class AssertionInfo {
+public final class SecurityConstants {
+    public static final String USERNAME = "ws-security.username";
+    public static final String PASSWORD = "ws-security.password";
+    public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     
-    private boolean asserted;
-    private final PolicyAssertion assertion;
-    private String errorMessage;
-    
-    public AssertionInfo(PolicyAssertion a) {
-        assertion = a;
-    }
-    public boolean isAsserted() {
-        return asserted;
-    }
-    public void setAsserted(boolean a) {
-        asserted = a;
-    }
-    public void setNotAsserted(String message) {
-        asserted = false;
-        errorMessage = message;
-    }
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-    
-    public PolicyAssertion getAssertion() {
-        return assertion;
-    }
-    public String toString() {
-        return assertion.getName() + ":" + asserted;
+    private SecurityConstants() {
+        //utility class
     }
 }

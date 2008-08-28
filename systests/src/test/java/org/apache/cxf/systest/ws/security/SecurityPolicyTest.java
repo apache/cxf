@@ -19,17 +19,24 @@
 
 package org.apache.cxf.systest.ws.security;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 import javax.jws.WebService;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
 import org.apache.cxf.policytest.doubleit.DoubleItService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyEngine;
-import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,14 +45,32 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String POLICY_ADDRESS = "http://localhost:9010/SecPolTest";
     public static final String POLICY_HTTPS_ADDRESS = "https://localhost:9009/SecPolTest";
 
+    
+    public static class ServerPasswordCallback implements CallbackHandler {
+        public void handle(Callback[] callbacks) throws IOException,
+                UnsupportedCallbackException {
+            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+
+            if (pc.getIdentifer().equals("bob")) {
+                // set the password on the callback. This will be compared to the
+                // password which was sent from the client.
+                pc.setPassword("pwd");
+            }
+        }
+    }
+    
+    
+    
     @BeforeClass 
     public static void init() throws Exception {
         
         createStaticBus(SecurityPolicyTest.class.getResource("https_config.xml").toString())
             .getExtension(PolicyEngine.class).setEnabled(true);
         getStaticBus().getOutInterceptors().add(new LoggingOutInterceptor());
-        Endpoint.publish(POLICY_HTTPS_ADDRESS,
-                         new DoubleItImplHttps());
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish(POLICY_HTTPS_ADDRESS,
+                                       new DoubleItImplHttps());
+        ep.getServer().getEndpoint().getEndpointInfo().setProperty(SecurityConstants.CALLBACK_HANDLER,
+                                                                   new ServerPasswordCallback());
         Endpoint.publish(POLICY_ADDRESS,
                          new DoubleItImpl());
     }
@@ -56,6 +81,16 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleItPortType pt;
 
         pt = service.getDoubleItPortHttps();
+        try {
+            pt.doubleIt(BigInteger.valueOf(25));
+        } catch (Exception ex) {
+            String msg = ex.getMessage();
+            if (!msg.contains("UsernameToken: No user")) {
+                throw ex;
+            }
+        }
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "bob");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.PASSWORD, "pwd");
         pt.doubleIt(BigInteger.valueOf(25));
         
         try {
@@ -63,7 +98,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             pt.doubleIt(BigInteger.valueOf(25));
             fail("https policy should have triggered");
         } catch (Exception ex) {
-            if (!(ex.getCause().getCause() instanceof PolicyException)) {
+            String msg = ex.getMessage();
+            if (!msg.contains("HttpsToken")) {
                 throw ex;
             }
         }

@@ -33,10 +33,9 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.TransportBinding;
+import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecTimestamp;
 
 public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     private PolicyBasedWSS4JOutInterceptorInternal ending;
@@ -83,46 +82,21 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                WSSecTimestamp timestamp = null;
-                ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        timestamp = new WSSecTimestamp();
-                        timestamp.prepare(saaj.getSOAPPart());
-                        ai.setAsserted(true);
-                    }                    
-                }
-                ais = aim.get(SP12Constants.LAYOUT);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        Layout layout = (Layout)ai.getAssertion();
-                        if (SPConstants.LAYOUT_LAX_TIMESTAMP_LAST.equals(layout.getValue())) {
-                            if (timestamp == null) {
-                                ai.setAsserted(false);
-                            } else {
-                                ai.setAsserted(true);
-                                //get the timestamp into the header first before anything else
-                                timestamp.prependToHeader(secHeader);
-                                timestamp = null;
-                            }
-                        } else if (SPConstants.LAYOUT_STRICT.equals(layout.getValue())) {
-                            //FIXME - don't have strict writing working yet
-                            ai.setAsserted(false);
-                        } else {
-                            ai.setAsserted(true);                            
-                        }
-                    }                    
-                }
+                TransportBinding transport = null;
                 ais = aim.get(SP12Constants.TRANSPORT_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
+                        transport = (TransportBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
-                if (timestamp != null) {
-                    timestamp.prependToHeader(secHeader);
+                
+                
+                if (transport != null) {
+                    new TransportBindingHandler(transport, saaj, secHeader, aim, message).handleBinding();
                 }
             }
+            
         }
 
         public Set<String> getAfter() {

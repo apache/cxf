@@ -90,11 +90,11 @@
                         <sp:HttpsToken RequireClientCertificate="false"/>
                      </wsp:Policy>
                   </sp:TransportToken>
-                  <!--sp:Layout>
+                  <sp:Layout>
                      <wsp:Policy>
                         <sp:Lax/>
                      </wsp:Policy>
-                  </sp:Layout-->
+                  </sp:Layout>
                   <sp:IncludeTimestamp/>
                   <!--sp:AlgorithmSuite>
                      <wsp:Policy>
@@ -108,7 +108,7 @@
                   <sp:MustSupportRefKeyIdentifier/>
                </wsp:Policy>
             </sp:Wss10-->
-            <!-- sp:SignedSupportingTokens>
+            <sp:SignedSupportingTokens>
                <wsp:Policy>
                   <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                      <wsp:Policy>
@@ -116,7 +116,7 @@
                      </wsp:Policy>
                   </sp:UsernameToken>
                </wsp:Policy>
-            </sp:SignedSupportingTokens-->
+            </sp:SignedSupportingTokens>
          </wsp:All>
       </wsp:ExactlyOne>
    </wsp:Policy>

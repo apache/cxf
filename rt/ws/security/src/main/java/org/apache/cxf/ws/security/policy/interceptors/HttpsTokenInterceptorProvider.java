@@ -90,35 +90,34 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             for (AssertionInfo ai : ais) {
                 HttpsToken token = (HttpsToken)ai.getAssertion();
                 
-                boolean asserted = true;
                 HttpURLConnection connection = 
                     (HttpURLConnection) message.get("http.connection");
                 
+                ai.setAsserted(true);
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);
                 if (connection instanceof HttpsURLConnection) {
                     HttpsURLConnection https = (HttpsURLConnection)connection;
                     if (token.isRequireClientCertificate()
                         && https.getLocalCertificates().length == 0) {
-                        asserted = false;
+                        ai.setNotAsserted("RequireClientCertificate is set, but no local certificates");
                     }
                     if (token.isHttpBasicAuthentication()) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Basic")) {
-                            asserted = false;
+                            ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
                         }
                     }
                     if (token.isHttpDigestAuthentication()) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Digest")) {
-                            asserted = false;
+                            ai.setNotAsserted("HttpDigestAuthentication is set, but not being used");
                         }                        
                     }
                 } else {
-                    asserted = false;
+                    ai.setNotAsserted("HttpURLConnection is not a HttpsURLConnection");
                 }
-                ai.setAsserted(asserted);
             }            
         }
 

@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.policy.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -29,6 +28,9 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
+import org.apache.neethi.All;
+import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 
 public class SupportingToken extends AbstractSecurityAssertion implements AlgorithmWrapper, TokenWrapper {
@@ -279,22 +281,17 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
         writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
-        Token token;
-        for (Iterator iterator = getTokens().iterator(); iterator.hasNext();) {
+        for (Token token : getTokens()) {
             // [Token Assertion] +
-            token = (Token)iterator.next();
             token.serialize(writer);
         }
 
         if (signedParts != null) {
             signedParts.serialize(writer);
-
         } else if (signedElements != null) {
             signedElements.serialize(writer);
-
         } else if (encryptedParts != null) {
             encryptedParts.serialize(writer);
-
         } else if (encryptedElements != null) {
             encryptedElements.serialize(writer);
         }
@@ -304,4 +301,37 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
         writer.writeEndElement();
         // </sp:SupportingToken>
     }
+    
+    
+    public Policy getPolicy() {
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+
+        for (Token token : getTokens()) {
+            all.addPolicyComponent(token);
+        }
+        
+        if (signedParts != null) {
+            all.addPolicyComponent(signedParts);
+        } else if (signedElements != null) {
+            all.addPolicyComponent(signedElements);
+        } else if (encryptedParts != null) {
+            all.addPolicyComponent(encryptedParts);
+        } else if (encryptedElements != null) {
+            all.addPolicyComponent(encryptedElements);
+        }        
+        
+        ea.addPolicyComponent(all);
+        PolicyComponent pc = p.normalize(true);
+        if (pc instanceof Policy) {
+            return (Policy)pc;
+        } else {
+            p = new Policy();
+            p.addPolicyComponent(pc);
+            return p;
+        }
+    }
+
 }

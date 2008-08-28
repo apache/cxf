@@ -37,27 +37,16 @@ public abstract class SPConstants {
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
+    
     public static final String LAYOUT = "Layout";
 
-    /**
-     * Security Header Layout : Strict
-     */
-    public static final String LAYOUT_STRICT = "Strict";
+    public enum Layout {
+        Lax,
+        Strict,
+        LaxTimestampFirst,
+        LaxTimestampLast
+    };
 
-    /**
-     * Security Header Layout : Lax
-     */
-    public static final String LAYOUT_LAX = "Lax";
-
-    /**
-     * Security Header Layout : LaxTimestampFirst
-     */
-    public static final String LAYOUT_LAX_TIMESTAMP_FIRST = "LaxTimestampFirst";
-
-    /**
-     * Security Header Layout : LaxTimestampLast
-     */
-    public static final String LAYOUT_LAX_TIMESTAMP_LAST = "LaxTimestampLast";
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

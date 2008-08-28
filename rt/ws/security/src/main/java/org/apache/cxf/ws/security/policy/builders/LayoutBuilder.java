@@ -62,15 +62,7 @@ public class LayoutBuilder implements AssertionBuilder {
         if (polEl != null) {
             Element child = DOMUtils.getFirstElement(polEl);
             if (child != null) {
-                if (SPConstants.LAYOUT_STRICT.equals(child.getLocalName())) {
-                    parent.setValue(SPConstants.LAYOUT_STRICT);
-                } else if (SPConstants.LAYOUT_LAX.equals(child.getLocalName())) {
-                    parent.setValue(SPConstants.LAYOUT_LAX);
-                } else if (SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST.equals(child.getLocalName())) {
-                    parent.setValue(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
-                } else if (SPConstants.LAYOUT_LAX_TIMESTAMP_LAST.equals(child.getLocalName())) {
-                    parent.setValue(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
-                }
+                parent.setValue(SPConstants.Layout.valueOf(child.getLocalName()));
             }
         }
     }
