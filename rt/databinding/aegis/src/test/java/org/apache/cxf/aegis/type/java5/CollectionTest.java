@@ -24,12 +24,16 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
@@ -38,8 +42,11 @@ import org.apache.cxf.aegis.type.java5.dto.CollectionDTO;
 import org.apache.cxf.aegis.type.java5.dto.DTOService;
 import org.apache.cxf.aegis.type.java5.dto.ObjectDTO;
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
+
+
 
 public class CollectionTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
@@ -203,25 +210,55 @@ public class CollectionTest extends AbstractAegisTest {
                     doc);
         
     }
-
-    public class CollectionService {
+    
+    @Test
+    public void testSortedSet() throws Exception {
+        createService(CollectionService.class, new CollectionService(), null);
         
+        ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
+        proxyFac.getServiceFactory().getServiceConfigurations().add(0, 
+                                                              new XFireCompatibilityServiceConfiguration());
+        proxyFac.setServiceClass(CollectionServiceInterface.class);
+        proxyFac.setDataBinding(new AegisDatabinding());
+        proxyFac.setAddress("local://CollectionService");
+        proxyFac.setBus(getBus());
+
+        CollectionServiceInterface csi = (CollectionServiceInterface)proxyFac.create();
+        SortedSet<String> strings = new TreeSet<String>();
+        strings.add("Able");
+        strings.add("Baker");
+        String first = csi.takeSortedStrings(strings);
+        assertEquals("Able", first);
+    }
+
+    public class CollectionService implements CollectionServiceInterface {
+        
+        /** {@inheritDoc}*/
         public Collection<String> getStrings() {
             return null;
         }
 
+        /** {@inheritDoc}*/
         public void setLongs(Collection<Long> longs) {
         }
 
+        /** {@inheritDoc}*/
         public Collection getUnannotatedStrings() {
             return null;
         }
 
+        /** {@inheritDoc}*/
         public Collection<Collection<String>> getStringCollections() {
             return null;
         }
         
+        /** {@inheritDoc}*/
         public void takeDoubleList(List<Double> doublesList) {
+        }
+        
+        /** {@inheritDoc}*/
+        public String takeSortedStrings(SortedSet<String> strings) {
+            return strings.first();
         }
     }
 }
