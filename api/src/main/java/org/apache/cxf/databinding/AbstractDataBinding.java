@@ -35,6 +35,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -55,6 +56,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     
     private Collection<DOMSource> schemas;
     private Map<String, String> namespaceMap;
+    private boolean hackAroundEmptyNamespaceIssue;
 
     public Collection<DOMSource> getSchemas() {
         return schemas;
@@ -68,11 +70,18 @@ public abstract class AbstractDataBinding implements DataBinding {
                                           String systemId) {
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
         if (StringUtils.isEmpty(ns)) {
+            if (DOMUtils.getFirstElement(d.getDocumentElement()) == null) {
+                hackAroundEmptyNamespaceIssue = true;
+                return null;
+            }
             //create a copy of the dom so we 
             //can modify it.
             d = copy(d);
             ns = serviceInfo.getInterface().getName().getNamespaceURI();
             d.getDocumentElement().setAttribute("targetNamespace", ns);
+        }
+        if (hackAroundEmptyNamespaceIssue) {
+            d = doEmptyNamespaceHack(d);            
         }
 
         Node n = d.getDocumentElement().getFirstChild();
@@ -96,6 +105,36 @@ public abstract class AbstractDataBinding implements DataBinding {
         serviceInfo.addSchema(schema);
         return xmlSchema;
     }
+    private Document doEmptyNamespaceHack(Document d) {
+        boolean hasStuffToRemove = false;
+        Element el = DOMUtils.getFirstElement(d.getDocumentElement());
+        while (el != null) {
+            if ("import".equals(el.getLocalName())
+                && StringUtils.isEmpty(el.getAttribute("targetNamespace"))) {
+                hasStuffToRemove = true;
+                break;
+            }
+            el = DOMUtils.getNextElement(el);
+        }
+        if (hasStuffToRemove) {
+            //create a copy of the dom so we 
+            //can modify it.
+            d = copy(d);
+            el = DOMUtils.getFirstElement(d.getDocumentElement());
+            while (el != null) {
+                if ("import".equals(el.getLocalName())
+                    && StringUtils.isEmpty(el.getAttribute("targetNamespace"))) {
+                    d.getDocumentElement().removeChild(el);
+                    el = DOMUtils.getFirstElement(d.getDocumentElement());
+                } else {
+                    el = DOMUtils.getNextElement(el);
+                }
+            }
+        }
+            
+        return d;
+    }
+
     private Document copy(Document doc) {
         try {
             return StaxUtils.copy(doc);
