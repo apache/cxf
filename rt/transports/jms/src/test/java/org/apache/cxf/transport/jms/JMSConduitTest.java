@@ -140,9 +140,9 @@ public class JMSConduitTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduit(true, false); 
         Message msg = new MessageImpl();
         conduit.prepare(msg);
-        PooledSession sess = conduit.base.sessionFactory.get(true);
+        PooledSession sess = conduit.sessionFactory.get(true);
         byte [] b = testMsg.getBytes();
-        javax.jms.Message message = conduit.base.marshal(b, 
+        javax.jms.Message message = JMSUtils.marshal(b, 
                                                          sess.session(), 
                                                          null, JMSConstants.BYTE_MESSAGE_TYPE);
         

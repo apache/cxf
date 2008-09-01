@@ -25,15 +25,14 @@ import javax.jms.Destination;
  * Common accessors between the conduit and destination which are needed for common code.
  *
  */
-public interface JMSTransport {
+public interface JMSOnConnectCallback {
 
     AddressType getJMSAddress();
 
     SessionPoolType getSessionPool();
 
     /**
-     * Callback from the JMSProviderHub indicating the ClientTransport has
-     * been sucessfully connected.
+     * Callback from the JMSProviderHub indicating the ClientTransport has been sucessfully connected.
      *
      * @param targetDestination the target destination
      * @param sessionFactory used to get access to a pooled JMS resources
