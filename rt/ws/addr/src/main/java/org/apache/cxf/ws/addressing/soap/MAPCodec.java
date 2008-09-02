@@ -19,13 +19,12 @@
 
 package org.apache.cxf.ws.addressing.soap;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,8 +79,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * REVISIT: map usage that the *same* interceptor instance 
      * is used in all chains.
      */
-    protected final Map<String, Exchange> uncorrelatedExchanges =
-        Collections.synchronizedMap(new HashMap<String, Exchange>());
+    protected final Map<String, Exchange> uncorrelatedExchanges 
+        = new ConcurrentHashMap<String, Exchange>();
 
     private VersionTransformer transformer;
     private HeaderFactory headerFactory;
@@ -734,7 +733,18 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 LOG.log(Level.WARNING, "CORRELATION_FAILURE_MSG");
                 message.getInterceptorChain().abort();
             }
+        } else if (maps == null && isRequestor(message)) {
+            Message m = message.getExchange().getOutMessage();
+            maps = ContextUtils.retrieveMAPs(m, false, true, false);
+            if (maps != null) {
+                Exchange ex = uncorrelatedExchanges.get(maps.getMessageID().getValue());
+                if (ex == message.getExchange()) {
+                    uncorrelatedExchanges.remove(maps.getMessageID().getValue());
+                    LOG.log(Level.WARNING, "RESPONSE_NOT_USING_WSADDRESSING");
+                }
+            }
         }
+        
     }
 
     /**

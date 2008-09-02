@@ -47,6 +47,10 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
         flowThroughStream.close();
     }
     
+    public OutputStream getFlowThroughStream() {
+        return flowThroughStream;
+    }
+    
     
     @Override
     protected void onWrite() throws IOException {
