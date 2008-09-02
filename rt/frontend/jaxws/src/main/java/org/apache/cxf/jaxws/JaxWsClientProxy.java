@@ -55,7 +55,6 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
-import org.apache.cxf.jaxws.support.ContextPropertiesMapping;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -160,9 +159,6 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         
         Map<String, Object> context = new HashMap<String, Object>();
 
-        // need to do context mapping from jax-ws to cxf message
-        ContextPropertiesMapping.mapRequestfromJaxws2Cxf(reqContext);
-
         context.put(Client.REQUEST_CONTEXT, reqContext);
         context.put(Client.RESPONSE_CONTEXT, respContext);
        
@@ -208,8 +204,6 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
         }
         
-        // need to do context mapping from cxf message to jax-ws
-        ContextPropertiesMapping.mapResponsefromCxf2Jaxws(respContext);
         Map<String, Scope> scopes = CastUtils.cast((Map<?, ?>)respContext.get(WrappedMessageContext.SCOPES));
         if (scopes != null) {
             for (Map.Entry<String, Scope> scope : scopes.entrySet()) {
@@ -314,6 +308,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     private Map<String, Object> getRequestContextCopy() {
         Map<String, Object> realMap = new HashMap<String, Object>();
         WrappedMessageContext ctx = new WrappedMessageContext(realMap,
+                                                              null,
                                                               Scope.APPLICATION);
         // thread local contexts reflect currentRequestContext as of 
         // last call to getRequestContext()
@@ -338,7 +333,9 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
 
     public Map<String, Object> getResponseContext() {
         if (null == responseContext.get()) {
-            responseContext.set(new HashMap<String, Object>());
+            responseContext.set(new WrappedMessageContext(new HashMap<String, Object>(),
+                                                          null,
+                                                          Scope.APPLICATION));
         }        
         return responseContext.get();
     }

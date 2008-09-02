@@ -972,10 +972,6 @@ public class HandlerChainInvokerTest extends Assert {
 
         invoker.invokeLogicalHandlers(requestorProperty, lmc);
 
-        assertNotNull(message.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
-        assertEquals(outboundProperty, message.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY));
-        // assertNotNull(message.get(ObjectMessageContext.REQUESTOR_ROLE_PROPERTY));
-        // assertEquals(requestorProperty, message.get(ObjectMessageContext.REQUESTOR_ROLE_PROPERTY));
         assertTrue("handler not invoked", logicalHandlers[0].isHandleMessageInvoked());
         assertTrue("handler not invoked", logicalHandlers[1].isHandleMessageInvoked());
         assertTrue(invoker.getInvokedHandlers().contains(logicalHandlers[0]));

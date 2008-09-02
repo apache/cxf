@@ -20,124 +20,354 @@
 package org.apache.cxf.jaxws.context;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.activation.DataHandler;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.MessageContext.Scope;
 
+import org.apache.cxf.attachment.LazyAttachmentCollection;
+import org.apache.cxf.binding.soap.SoapBindingConstants;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
 public class WrappedMessageContext implements MessageContext {
     public static final String SCOPES = WrappedMessageContext.class.getName() + ".SCOPES";
     
-    private final Map<String, Object> contextMap;
-    private final Message message;
+    private static Map<String, String> cxf2jaxwsMap = new HashMap<String, String>();
+    private static Map<String, String> jaxws2cxfMap = new HashMap<String, String>();
+    
+    static {
+        cxf2jaxwsMap.put(Message.ENDPOINT_ADDRESS, 
+                          BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
+        cxf2jaxwsMap.put(Message.MAINTAIN_SESSION,
+                         BindingProvider.SESSION_MAINTAIN_PROPERTY);
+        
+        cxf2jaxwsMap.put(Message.HTTP_REQUEST_METHOD,
+                          MessageContext.HTTP_REQUEST_METHOD);
+        cxf2jaxwsMap.put(Message.RESPONSE_CODE, 
+                          MessageContext.HTTP_RESPONSE_CODE);        
+        cxf2jaxwsMap.put(Message.PATH_INFO, 
+                          MessageContext.PATH_INFO);
+        cxf2jaxwsMap.put(Message.QUERY_STRING, 
+                          MessageContext.QUERY_STRING);
+        cxf2jaxwsMap.put("HTTP.REQUEST", 
+                         MessageContext.SERVLET_REQUEST);
+        cxf2jaxwsMap.put("HTTP.RESPONSE", 
+                         MessageContext.SERVLET_RESPONSE);
+        cxf2jaxwsMap.put("HTTP.CONTEXT", 
+                         MessageContext.SERVLET_CONTEXT);
+       
+        jaxws2cxfMap.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                         Message.ENDPOINT_ADDRESS);
+        jaxws2cxfMap.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, 
+                         Message.MAINTAIN_SESSION);
+                
+        jaxws2cxfMap.put(MessageContext.HTTP_REQUEST_METHOD,
+                         Message.HTTP_REQUEST_METHOD);
+        jaxws2cxfMap.put(MessageContext.HTTP_RESPONSE_CODE,
+                         Message.RESPONSE_CODE);        
+        jaxws2cxfMap.put(MessageContext.PATH_INFO,
+                         Message.PATH_INFO);
+        jaxws2cxfMap.put(MessageContext.QUERY_STRING,
+                         Message.QUERY_STRING);
+        
+        jaxws2cxfMap.put(MessageContext.SERVLET_REQUEST, 
+                         "HTTP.REQUEST"); 
+        jaxws2cxfMap.put(MessageContext.SERVLET_RESPONSE, 
+                         "HTTP.RESPONSE");
+        jaxws2cxfMap.put(MessageContext.SERVLET_CONTEXT, 
+                        "HTTP.CONTEXT");
+        
+        jaxws2cxfMap.put(BindingProvider.SOAPACTION_URI_PROPERTY, SoapBindingConstants.SOAP_ACTION);
+    }
+
+    private final Map<String, Object> message;
+    private final Map<String, Object> reqMessage;
+    private final Exchange exchange;
     private Map<String, Scope> scopes;
     private Scope defaultScope;
 
     public WrappedMessageContext(Message m) {
-        this(m, m, Scope.HANDLER);
+        this(m, Scope.HANDLER);
     }
     public WrappedMessageContext(Message m, Scope defScope) {
-        this(m, m, defScope);
-    }
-    
-    public WrappedMessageContext(Map<String, Object> m, Scope defScope) {
-        this(null, m, defScope);
-    }
-    
-    public WrappedMessageContext(Message m, Map<String, Object> map, Scope defScope) {
+        this(m, m.getExchange(), defScope);
+    }    
+    public WrappedMessageContext(Map<String, Object> m, Exchange ex, Scope defScope) {
         message = m;
-        contextMap = map;
+        exchange = ex;
         defaultScope = defScope;
-        scopes = CastUtils.cast((Map<?, ?>)contextMap.get(SCOPES));
-        if (scopes == null && message != null && message.getExchange() != null) { 
-            if (isRequestor() && !isOutbound() && m.getExchange().getOutMessage() != null) {
-                scopes = CastUtils.cast((Map<?, ?>)m.getExchange().getOutMessage().get(SCOPES));
-                copyScopedProperties(m.getExchange().getOutMessage());
-                m.put(SCOPES, scopes);
-            } else if (!isRequestor() && isOutbound() && m.getExchange().getInMessage() != null) {
-                scopes = CastUtils.cast((Map<?, ?>)m.getExchange().getInMessage().get(SCOPES));
-                copyScopedProperties(m.getExchange().getInMessage());
-                m.put(SCOPES, scopes);
+        scopes = CastUtils.cast((Map<?, ?>)message.get(SCOPES));
+        
+        if (isResponse() && exchange != null) {
+            if (isRequestor()) {
+                reqMessage = exchange.getOutMessage();
+            } else {
+                reqMessage = exchange.getInMessage();
             }
+        } else {
+            reqMessage = null;
+        }
+        
+        if (scopes == null && reqMessage != null) {
+            scopes = CastUtils.cast((Map<?, ?>)reqMessage.get(SCOPES));
+            m.put(SCOPES, scopes);
+            copyScoped(message);
         }
         if (scopes == null) {
             scopes = new HashMap<String, Scope>();
-            contextMap.put(SCOPES, scopes);
+            message.put(SCOPES, scopes);
+        }
+    }
+    private void copyScoped(Map<String, Object> msg) {
+        for (String s : scopes.keySet()) {
+            message.put(s, msg.get(s));
         }
     }
     
-    protected final void copyScopedProperties(Message m) {
-        for (String k : scopes.keySet()) {
-            if (!contextMap.containsKey(k)
-                && !MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(k)) {
-                contextMap.put(k, m.get(k));
-            }
+    private String mapKey(String key) {
+        String k2 = jaxws2cxfMap.get(key);
+        if (k2 != null) {
+            return k2;
         }
+        return key;
+    }
+    private String mapKeyReverse(String key) {
+        String k2 = cxf2jaxwsMap.get(key);
+        if (k2 != null) {
+            return k2;
+        }
+        if (Message.PROTOCOL_HEADERS.equals(key)) {
+            return isResponse() ? MessageContext.HTTP_RESPONSE_HEADERS : MessageContext.HTTP_REQUEST_HEADERS;
+        }
+        return key;
+    }
+    
+    
+    protected final boolean isResponse() {
+        return isOutbound() ^ isRequestor();
     }
     protected final boolean isRequestor() {
-        return Boolean.TRUE.equals(contextMap.containsKey(Message.REQUESTOR_ROLE));
+        return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
     protected final boolean isOutbound() {
-        Exchange ex = message.getExchange();
         return message != null 
-            && (message == ex.getOutMessage()
-                || message == ex.getOutFaultMessage());
+            && exchange != null
+            && (message == exchange.getOutMessage()
+                || message == exchange.getOutFaultMessage());
     }
     
     public final Message getWrappedMessage() {
-        return message;
+        return message instanceof Message ? (Message)message : null;
     }
     
     public void clear() {
-        contextMap.clear();      
+        //just clear the JAXWS things....
+        for (String key : jaxws2cxfMap.keySet()) {
+            remove(key);
+        }
     }
 
     public final boolean containsKey(Object key) {
-        return contextMap.containsKey(key);
+        return message.containsKey(mapKey((String)key));
     }
 
     public final boolean containsValue(Object value) {
-        return contextMap.containsValue(value);
+        return message.containsValue(value);
     }
 
-    public final Set<Entry<String, Object>> entrySet() {
-        return contextMap.entrySet();
-    }
-
-    public final Object get(Object key) {
-        Object ret = contextMap.get(key);
-        if (ret == null
-            && Message.class.getName().equals(key)) {
-            return message;
+    public Object get(Object key) {
+        String mappedkey = mapKey((String)key);
+        Object ret = message.get(mappedkey);
+        if (ret == null) {
+            if (Message.class.getName().equals(mappedkey)) {
+                return message;
+            }
+            if (exchange != null) {
+                ret = exchange.get(mappedkey);
+                if (ret != null) {
+                    return ret;
+                }
+            }
+            if (MessageContext.INBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
+                if (isOutbound()) {
+                    ret = reqMessage.get(key);
+                }
+                ret = createAttachments(getWrappedMessage(), MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
+            } else if (MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
+                ret = createAttachments(createResponseMessage(), MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
+            } else if (MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(key)) {
+                ret = isOutbound();
+            } else if (MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+                if (!isResponse()) {
+                    ret = message.get(Message.PROTOCOL_HEADERS);
+                } else if (reqMessage != null && !isRequestor()) {
+                    ret = reqMessage.get(Message.PROTOCOL_HEADERS);
+                }
+            } else if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
+                Map mp = null;
+                if (isResponse()) {
+                    mp = (Map)message.get(Message.PROTOCOL_HEADERS);
+                } else if (exchange != null) {
+                    //may have to create the out message and add the headers
+                    Message tmp = createResponseMessage();
+                    if (tmp != null) {
+                        ret = (Map)tmp.get(Message.PROTOCOL_HEADERS);
+                    }
+                }
+                ret = mp;
+            } else if (BindingProvider.USERNAME_PROPERTY.equals(key)) {
+                AuthorizationPolicy authPolicy =
+                    (AuthorizationPolicy)message.get(AuthorizationPolicy.class.getName());
+                if (authPolicy != null) {
+                    ret = authPolicy.getUserName();
+                }
+            } else if (BindingProvider.PASSWORD_PROPERTY.equals(key)) {
+                AuthorizationPolicy authPolicy =
+                    (AuthorizationPolicy)message.get(AuthorizationPolicy.class.getName());
+                if (authPolicy != null) {
+                    ret = authPolicy.getPassword();
+                }
+            }
+            
+            if (ret == null && reqMessage != null) { 
+                ret = reqMessage.get(mappedkey);
+            }
         }
         return ret;
     }
 
+    private Message createResponseMessage() {
+        if (exchange == null || isRequestor()) {
+            return null;
+        }
+        Message m = exchange.getOutMessage();
+        if (m == null && !exchange.isOneWay()) {
+            Endpoint ep = exchange.get(Endpoint.class);
+            m = ep.getBinding().createMessage();
+            exchange.setOutMessage(m);
+        }
+        return m;
+    }
+    private Object createAttachments(Message mc, String propertyName) {
+
+        Collection<Attachment> attachments = mc.getAttachments();
+        Map<String, DataHandler> dataHandlers = getDHMap(attachments);
+        mc.put(propertyName, 
+               dataHandlers);
+        scopes.put(propertyName, Scope.APPLICATION);
+        return dataHandlers;
+    }    
+    private static Map<String, DataHandler> getDHMap(Collection<Attachment> attachments) {
+        Map<String, DataHandler> dataHandlers = null;
+        if (attachments != null) {
+            if (attachments instanceof LazyAttachmentCollection) {
+                dataHandlers = ((LazyAttachmentCollection)attachments).createDataHandlerMap();
+            } else {
+                //preserve the order of iteration
+                dataHandlers = new LinkedHashMap<String, DataHandler>();
+                for (Attachment attachment : attachments) {
+                    dataHandlers.put(attachment.getId(), attachment.getDataHandler());
+                }
+            }
+        }
+        return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
+    }    
     public final boolean isEmpty() {
-        return contextMap.isEmpty();
+        return message.isEmpty();
     }
 
+    // map to jaxws
     public final Set<String> keySet() {
-        return contextMap.keySet();
+        Set<String> set = new HashSet<String>();
+        for (String s : message.keySet()) {
+            set.add(s);
+            set.add(mapKeyReverse(s));
+        }
+        return Collections.unmodifiableSet(set);
     }
+    public final Set<Entry<String, Object>> entrySet() {
+        Set<Entry<String, Object>> set = new HashSet<Entry<String, Object>>();
+        for (Map.Entry<String, Object> s : message.entrySet()) {
+            set.add(s);
+            
+            final String s2 = mapKeyReverse(s.getKey());
+            final Object o = s.getValue();
+            if (s2.equals(s.getKey())) {
+                Map.Entry<String, Object> entry = new Map.Entry<String, Object>() {
+                    public String getKey() {
+                        return s2;
+                    }
+                    public Object getValue() {
+                        return o;
+                    }
+                    public Object setValue(Object value) {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+                set.add(entry);
+            }
+        }
+        return Collections.unmodifiableSet(set);
+    }
+
 
     public final Object put(String key, Object value) {
-        if (!MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(key)
-            && !scopes.containsKey(key)) {
-            scopes.put(key, defaultScope);
-        }
-        return contextMap.put(key, value);
+        return put(key, value, defaultScope);
     }
     public final Object put(String key, Object value, Scope scope) {
-        if (!MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(key)) {
-            scopes.put(key, scope);
+        String mappedKey = mapKey(key);
+        if (!MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(mappedKey)) {
+            scopes.put(mappedKey, scope);
         }
-        return contextMap.put(key, value);
+        if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
+            || MessageContext.HTTP_RESPONSE_CODE.equals(key)
+            || MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)
+            || MessageContext.HTTP_RESPONSE_CODE.equals(key))
+            && !isResponse() && !isRequestor()) { 
+            Message tmp = createResponseMessage();
+            if (tmp != null) {
+                if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
+                    return tmp.put(Message.PROTOCOL_HEADERS, value);
+                } else {
+                    return tmp.put(mappedKey, value);
+                }
+            }
+            return null;
+        } else if (BindingProvider.USERNAME_PROPERTY.equals(key)) {
+            AuthorizationPolicy authPolicy =
+                (AuthorizationPolicy)message.get(AuthorizationPolicy.class.getName());
+            if (authPolicy == null) {
+                authPolicy = new AuthorizationPolicy();
+                message.put(AuthorizationPolicy.class.getName(), authPolicy);
+            }
+            String ret = authPolicy.getUserName();
+            authPolicy.setUserName((String)value);
+            return ret;
+        } else if (BindingProvider.PASSWORD_PROPERTY.equals(key)) {
+            AuthorizationPolicy authPolicy =
+                (AuthorizationPolicy)message.get(AuthorizationPolicy.class.getName());
+            if (authPolicy == null) {
+                authPolicy = new AuthorizationPolicy();
+                message.put(AuthorizationPolicy.class.getName(), authPolicy);
+            }
+            String ret = authPolicy.getPassword();
+            authPolicy.setPassword((String)value);
+            return ret;
+        } else {
+            return message.put(mappedKey, value);
+        }
     }
 
     public final void putAll(Map<? extends String, ? extends Object> t) {
@@ -147,16 +377,17 @@ public class WrappedMessageContext implements MessageContext {
     }
 
     public final Object remove(Object key) {
+        key = mapKey((String)key);
         scopes.remove(key);
-        return contextMap.remove(key);
+        return message.remove(key);
     }
 
     public final int size() {
-        return contextMap.size();
+        return message.size();
     }
 
     public final Collection<Object> values() {
-        return contextMap.values();
+        return message.values();
     }
 
     public final void setScope(String key, Scope arg1) {

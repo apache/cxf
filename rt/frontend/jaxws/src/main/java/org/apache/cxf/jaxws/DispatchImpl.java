@@ -48,6 +48,7 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.http.HTTPBinding;
 import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPBinding;
@@ -66,11 +67,11 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.handler.logical.DispatchLogicalHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.soap.DispatchSOAPHandlerInterceptor;
 import org.apache.cxf.jaxws.interceptors.DispatchInDatabindingInterceptor;
 import org.apache.cxf.jaxws.interceptors.DispatchOutDatabindingInterceptor;
-import org.apache.cxf.jaxws.support.ContextPropertiesMapping;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -140,14 +141,17 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
             }
             
             
-            Map<String, Object> reqContext = new HashMap<String, Object>(this.getRequestContext());
+            Map<String, Object> reqContext = new HashMap<String, Object>();
+            WrappedMessageContext ctx = new WrappedMessageContext(reqContext,
+                                                                  null,
+                                                                  Scope.APPLICATION);
+            ctx.putAll(this.getRequestContext());
             Map<String, Object> respContext = this.getResponseContext();
             // clear the response context's hold information
             // Not call the clear Context is to avoid the error 
             // that getResponseContext() would be called by Client code first
             respContext.clear();
             
-            ContextPropertiesMapping.mapRequestfromJaxws2Cxf(reqContext);
             message.putAll(reqContext);
             //need to do context mapping from jax-ws to cxf message
             
@@ -220,8 +224,6 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
                     Message inMsg = waitResponse(exchange);
                     respContext.putAll(inMsg);
                     getConduitSelector().complete(exchange);
-                    //need to do context mapping from cxf message to jax-ws 
-                    ContextPropertiesMapping.mapResponsefromCxf2Jaxws(respContext);
                     return cl.cast(inMsg.getContent(Object.class));
                 }
             }

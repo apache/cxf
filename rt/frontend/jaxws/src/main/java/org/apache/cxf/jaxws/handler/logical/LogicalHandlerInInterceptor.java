@@ -33,7 +33,6 @@ import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.jaxws.handler.soap.SOAPHandlerInterceptor;
-import org.apache.cxf.jaxws.support.ContextPropertiesMapping;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -63,7 +62,6 @@ public class LogicalHandlerInInterceptor<T extends Message>
             setupBindingOperationInfo(message.getExchange(), lctx);
         }
         
-        ContextPropertiesMapping.mapCxf2Jaxws(message.getExchange(), lctx, requestor);
         if (!invoker.invokeLogicalHandlers(requestor, lctx)) {
             if (!requestor) {
                 //server side 

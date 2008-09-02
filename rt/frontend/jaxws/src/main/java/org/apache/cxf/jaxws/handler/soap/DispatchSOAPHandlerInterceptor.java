@@ -37,7 +37,6 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.handler.AbstractProtocolHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
-import org.apache.cxf.jaxws.support.ContextPropertiesMapping;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -125,10 +124,7 @@ public class DispatchSOAPHandlerInterceptor extends
     
     @Override
     protected MessageContext createProtocolMessageContext(SoapMessage message) {
-        SOAPMessageContextImpl sm = new SOAPMessageContextImpl(message);
-        boolean requestor = isRequestor(message);
-        ContextPropertiesMapping.mapCxf2Jaxws(message.getExchange(), sm, requestor);
-        return sm;
+        return new SOAPMessageContextImpl(message);
     }
 
     public void handleFault(SoapMessage message) {

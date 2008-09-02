@@ -120,24 +120,18 @@ public class HandlerChainInvoker {
     }
 
     public boolean invokeLogicalHandlers(boolean requestor, LogicalMessageContext context) {
-        context.put(MessageContext.MESSAGE_OUTBOUND_PROPERTY, isOutbound());
         return invokeHandlerChain(logicalHandlers, context);
     }
 
     public boolean invokeLogicalHandlersHandleFault(boolean requestor, LogicalMessageContext context) {
-        context.put(MessageContext.MESSAGE_OUTBOUND_PROPERTY, isOutbound());
         return invokeHandlerChainHandleFault(logicalHandlers, context);
     }
 
     public boolean invokeProtocolHandlers(boolean requestor, MessageContext context) {
-        context.put(MessageContext.MESSAGE_OUTBOUND_PROPERTY, isOutbound());
-
         return invokeHandlerChain(protocolHandlers, context);
     }
 
     public boolean invokeProtocolHandlersHandleFault(boolean requestor, MessageContext context) {
-        context.put(MessageContext.MESSAGE_OUTBOUND_PROPERTY, isOutbound());
-
         return invokeHandlerChainHandleFault(protocolHandlers, context);
     }
 
@@ -248,7 +242,6 @@ public class HandlerChainInvoker {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "invoking handlers, direction: " + (outbound ? "outbound" : "inbound"));
         }
-        setMessageOutboundProperty(ctx);
 
         if (!outbound) {
             handlerChain = reverseHandlerChain(handlerChain);

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
@@ -116,6 +117,26 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
 
     private SoapMessage getWrappedSoapMessage() {
         return (SoapMessage)getWrappedMessage();
+    }
+    
+    public Object get(Object key) {
+        Object o = super.get(key);
+        if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
+            || MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+            Map mp = (Map)o;
+            if (mp != null) {
+                if (mp.isEmpty()) {
+                    return null;
+                }
+                if (!isRequestor() && isOutbound() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
+                    return null;
+                }
+                if (isRequestor() && isOutbound() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+                    return null;
+                }
+            }
+        }
+        return o;
     }
    
 }
