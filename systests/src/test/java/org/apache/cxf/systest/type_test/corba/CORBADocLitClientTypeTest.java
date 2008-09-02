@@ -195,10 +195,13 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     }
     
     protected float[][] getTestFloatData() {
-        return new float[][] {{0.0f, 1.0f}, {-1.0f, (float)java.lang.Math.PI}, {-100.0f, 100.0f}};
+        return new float[][] {{0.0f, 1.0f}, {-1.0f, (float)java.lang.Math.PI},
+                              {-100.0f, 100.0f},
+                              {Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY}};
     }
     protected double[][] getTestDoubleData() {
-        return new double[][] {{0.0f, 1.0f}, {-1, java.lang.Math.PI}, {-100.0, 100.0}};
+        return new double[][] {{0.0f, 1.0f}, {-1, java.lang.Math.PI}, {-100.0, 100.0},
+                               {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY}};
     }
 
 }
