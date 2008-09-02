@@ -751,13 +751,15 @@ public final class StaxUtils {
     }
 
     private static void declare(Element node, String uri, String prefix) {
+        String qualname;
         if (prefix != null && prefix.length() > 0) {
-            node.setAttributeNS(XML_NS, "xmlns:" + prefix, uri);
+            qualname = "xmlns:" + prefix;
         } else {
-            if (uri != null /* && uri.length() > 0 */) {
-                node.setAttributeNS(XML_NS, "xmlns", uri);
-            }
+            qualname = "xmlns";
         }
+        Attr attr = node.getOwnerDocument().createAttributeNS(XML_NS, qualname);
+        attr.setValue(uri);
+        node.setAttributeNodeNS(attr);
     }
 
     /**

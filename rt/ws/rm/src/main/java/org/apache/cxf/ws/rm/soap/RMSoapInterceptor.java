@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -182,9 +183,12 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                     version.getHeader().getLocalPart());
             // add WSRM namespace declaration to header, instead of
             // repeating in each individual child node
-            hdr.setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                  "xmlns:" + RMConstants.getNamespacePrefix(),
-                                 RMConstants.getNamespace());
+            
+            Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
+                                   "xmlns:" + RMConstants.getNamespacePrefix());
+            attr.setValue(RMConstants.getNamespace());
+            hdr.setAttributeNodeNS(attr);
+
             Marshaller marshaller = getJAXBContext().createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
            
@@ -262,9 +266,11 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                            marshaller);
             Node node = hdr.getFirstChild();
             if (node instanceof Element) {
-                ((Element)node).setAttributeNS("http://www.w3.org/2000/xmlns/",
-                        "xmlns:" + RMConstants.getNamespacePrefix(),
-                       RMConstants.getNamespace());
+                
+                Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
+                                                  "xmlns:" + RMConstants.getNamespacePrefix());
+                attr.setValue(RMConstants.getNamespace());
+                ((Element)node).setAttributeNodeNS(attr);
             }
             
             header.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
