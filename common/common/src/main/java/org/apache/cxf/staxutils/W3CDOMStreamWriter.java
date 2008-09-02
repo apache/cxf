@@ -150,12 +150,16 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         if (prefix.length() == 0) {
             writeDefaultNamespace(namespace);
         } else {
-            currentNode.setAttributeNS(XML_NS, "xmlns:" + prefix, namespace);
+            Attr attr = document.createAttributeNS(XML_NS, "xmlns:" + prefix);
+            attr.setValue(namespace);
+            currentNode.setAttributeNodeNS(attr);
         }
     }
 
     public void writeDefaultNamespace(String namespace) throws XMLStreamException {
-        currentNode.setAttributeNS(XML_NS, "xmlns", namespace);
+        Attr attr = document.createAttributeNS(XML_NS, "xmlns");
+        attr.setValue(namespace);
+        currentNode.setAttributeNodeNS(attr);
     }
 
     public void writeComment(String value) throws XMLStreamException {

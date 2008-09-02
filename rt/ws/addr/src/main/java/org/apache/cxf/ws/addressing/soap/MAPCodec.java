@@ -327,9 +327,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
             //attributes cannot be in empty namespace...
             if (lastAdded.lookupNamespaceURI(JAXWSAConstants.WSA_PREFIX) == null) {
                 pfx = JAXWSAConstants.WSA_PREFIX;
-                lastAdded.setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                         "xmlns:wsa",
-                                         namespaceURI);
+                Attr attr = lastAdded.getOwnerDocument()
+                    .createAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:wsa");
+                attr.setValue(namespaceURI);
+                lastAdded.setAttributeNodeNS(attr);
             } else if (lastAdded.lookupNamespaceURI(JAXWSAConstants.WSA_PREFIX).equals(namespaceURI)) {
                 pfx = JAXWSAConstants.WSA_PREFIX;
             } else {
@@ -338,9 +339,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     cnt++;
                 }
                 pfx = JAXWSAConstants.WSA_PREFIX + cnt;
-                lastAdded.setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                         "xmlns:wsa" + cnt,
-                                         namespaceURI);
+                Attr attr = lastAdded.getOwnerDocument()
+                    .createAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:wsa" + cnt);
+                attr.setValue(namespaceURI);
+                lastAdded.setAttributeNodeNS(attr);
             }
         }
         Attr isRefParamAttr = 
