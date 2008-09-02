@@ -22,7 +22,7 @@ package org.apache.cxf.transport.jbi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -112,12 +112,14 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                         }
                     }
                     //copy properties
-                    Set<String> keys = inMessage.keySet();
-                    for (String key : keys) {
-                        if (inMessage.get(key) instanceof Serializable) {
-                            msg.setProperty(key, inMessage.get(key));
+                    
+                    for (Map.Entry<String, Object> ent : inMessage.entrySet()) {
+                        if (ent.getValue() instanceof Serializable) {
+                            msg.setProperty(ent.getKey(), ent.getValue());
                         }
                     }
+
+
                     //copy contents
                     msg.setContent(new DOMSource(doc));
                     xchng.setMessage(msg, "out");
