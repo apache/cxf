@@ -74,16 +74,18 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
             // Write the output while caching it for the log message
             final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
             message.setContent(OutputStream.class, newOut);
-            newOut.registerCallback(new LoggingCallback(message));
+            newOut.registerCallback(new LoggingCallback(message, os));
         }
     }
 
     class LoggingCallback implements CachedOutputStreamCallback {
         
         private final Message message;
+        private final OutputStream origStream;
         
-        public LoggingCallback(final Message msg) {
+        public LoggingCallback(final Message msg, final OutputStream os) {
             this.message = msg;
+            this.origStream = os;
         }
 
         public void onFlush(CachedOutputStream cos) {  
@@ -128,6 +130,15 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
             } else if (LOG.isLoggable(Level.INFO)) {
                 LOG.info(buffer.toString());
             }
+            try {
+                //empty out the cache
+                cos.lockOutputStream();
+                cos.resetOut(null, false);
+            } catch (Exception ex) {
+                //ignore
+            }
+            message.setContent(OutputStream.class, 
+                               origStream);
         }
     } 
 }

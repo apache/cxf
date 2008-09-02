@@ -186,6 +186,10 @@ public class CachedOutputStream extends OutputStream {
      * @throws IOException
      */
     public void resetOut(OutputStream out, boolean copyOldContent) throws IOException {
+        if (out == null) {
+            out = new ByteArrayOutputStream();
+        }
+
         if (currentStream instanceof CachedOutputStream) {
             CachedOutputStream ac = (CachedOutputStream) currentStream;
             InputStream in = ac.getInputStream();
@@ -210,6 +214,7 @@ public class CachedOutputStream extends OutputStream {
                 if (copyOldContent) {
                     IOUtils.copyAndCloseInput(fin, out);
                 }
+                streamList.remove(currentStream);
                 tempFile.delete();
                 tempFile = null;
                 inmem = true;

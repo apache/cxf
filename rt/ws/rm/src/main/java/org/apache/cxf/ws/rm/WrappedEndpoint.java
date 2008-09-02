@@ -32,12 +32,14 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.ws.addressing.MAPAggregator;
 
 public class WrappedEndpoint implements Endpoint {
 
     private Endpoint wrappedEndpoint;
     private EndpointInfo endpointInfo;
     private Service service;
+    private Boolean usingAddressing;
     
     WrappedEndpoint(Endpoint wrapped, EndpointInfo info, Service s) {
         wrappedEndpoint = wrapped;
@@ -118,6 +120,9 @@ public class WrappedEndpoint implements Endpoint {
     }
 
     public Object get(Object key) {
+        if (MAPAggregator.USING_ADDRESSING == key) {
+            return usingAddressing;
+        }
         return wrappedEndpoint.get(key);
     }
 
@@ -130,6 +135,10 @@ public class WrappedEndpoint implements Endpoint {
     }
 
     public Object put(String key, Object value) {
+        if (MAPAggregator.USING_ADDRESSING == key) {
+            usingAddressing = (Boolean)value;
+            return null;
+        }
         return wrappedEndpoint.put(key, value);
     }
 
