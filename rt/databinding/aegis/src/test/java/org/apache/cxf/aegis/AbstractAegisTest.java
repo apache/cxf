@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -221,10 +222,10 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         assertXPathEquals(xpath, value, doc);
     }
     
-    protected void assertValid(String xpath, Element element) throws Exception {
+    protected NodeList assertValid(String xpath, Element element) throws Exception {
         org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
         
-        assertValid(xpath, doc);
+        return assertValid(xpath, doc);
     }
 
     protected void assertInvalid(String xpath, Element element) throws Exception {

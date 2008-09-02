@@ -45,6 +45,7 @@ import org.apache.cxf.aegis.type.basic.BigDecimalType;
 import org.apache.cxf.aegis.type.basic.BigIntegerType;
 import org.apache.cxf.aegis.type.basic.BooleanType;
 import org.apache.cxf.aegis.type.basic.CalendarType;
+import org.apache.cxf.aegis.type.basic.CharacterAsStringType;
 import org.apache.cxf.aegis.type.basic.CharacterType;
 import org.apache.cxf.aegis.type.basic.DateTimeType;
 import org.apache.cxf.aegis.type.basic.DoubleType;
@@ -230,7 +231,8 @@ public class DefaultTypeMapping implements TypeMapping {
                         new BooleanType());
         defaultRegister(tm, defaultNillable, Calendar.class, XMLSchemaQNames.XSD_DATETIME,
                         new CalendarType());
-        defaultRegister(tm, defaultNillable, Character.class, Soap11.ENCODED_CHAR, new CharacterType());
+        defaultRegister(tm, defaultNillable, Character.class, XMLSchemaQNames.XSD_STRING, 
+                        new CharacterAsStringType());
         defaultRegister(tm, defaultNillable, Date.class, XMLSchemaQNames.XSD_DATETIME, new DateTimeType());
         defaultRegister(tm, defaultNillable, Document.class, XMLSchemaQNames.XSD_ANY, new DocumentType());
         defaultRegister(tm, defaultNillable, Element.class, XMLSchemaQNames.XSD_ANY,

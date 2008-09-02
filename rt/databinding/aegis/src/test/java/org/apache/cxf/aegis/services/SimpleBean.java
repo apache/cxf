@@ -29,6 +29,8 @@ public class SimpleBean {
     private String howdy;
     
     private int[] numbers;
+    
+    private Character character;
 
     public int[] getNumbers() {
         return numbers;
@@ -62,5 +64,13 @@ public class SimpleBean {
 
     public void setHowdy(String howdy) {
         this.howdy = howdy;
+    }
+
+    public Character getCharacter() {
+        return character;
+    }
+
+    public void setCharacter(Character character) {
+        this.character = character;
     }
 }
