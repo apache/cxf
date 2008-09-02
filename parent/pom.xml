@@ -773,14 +773,9 @@
                 <version>2.2.3</version>
             </dependency>
             <dependency>
-                <groupId>velocity</groupId>
+                <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>velocity</groupId>
-                <artifactId>velocity-dep</artifactId>
-                <version>1.4</version>
+                <version>1.5</version>
             </dependency>
             <dependency>
                 <groupId>wsdl4j</groupId>
