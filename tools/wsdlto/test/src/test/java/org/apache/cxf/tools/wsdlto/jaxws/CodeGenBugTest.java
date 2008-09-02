@@ -36,6 +36,7 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
+import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
@@ -81,7 +82,7 @@ public class CodeGenBugTest extends ProcessorTestBase {
         //processor = null;
         env = null;
     }
-    
+
     @Test
     // Test for CXF-1678
     public void testLogicalOnlyWSDL() throws Exception {
@@ -1055,4 +1056,30 @@ public class CodeGenBugTest extends ProcessorTestBase {
         }
     }
     
+    @Test
+    public void testCXF1662() throws Exception {
+        String[] args = new String[] {"-d", output.getCanonicalPath(), "-p", "org.cxf",
+                getLocation("/wsdl2java_wsdl/cxf1662/test.wsdl")};
+
+        try {
+            WSDLToJava.main(args);
+        } catch (ToolException tex) {
+            assertTrue(tex.getMessage().contains(" -p option cannot be used when "
+                + "wsdl contains mutiple schemas"));
+        }    
+        
+        
+        String[] args2 = new String[] {"-d", output.getCanonicalPath(), "-p", "org.cxf",
+                getLocation("/wsdl2java_wsdl/cxf1662/test2.wsdl")};       
+        try {
+            WSDLToJava.main(args2);
+        } catch (ToolException tex) {
+            assertNull(tex);
+        }
+        assertNotNull(output);
+        File file = new File(output, "org/cxf/package-info.java");
+        assertTrue(file.exists());
+        String str = FileUtils.getStringFromFile(file);
+        assertTrue(str.contains("http://child/xsd"));
+    }   
 }

@@ -1,0 +1,39 @@
+<wsdl:definitions name="Child2"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://child2/"
+  xmlns:xsd="http://child2/xsd"
+  targetNamespace="http://child2/">
+  <wsdl:types>
+    <xs:schema targetNamespace="http://child2/xsd">
+      <xs:element name="Child2Message">
+        <xs:complexType>
+          <xs:sequence/>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="Child2Message">
+    <wsdl:part name="msg" element="xsd:Child2Message"/>
+  </wsdl:message>
+  <wsdl:portType name="Child2PortType">
+    <wsdl:operation name="Child2Operation">
+      <wsdl:input message="tns:Child2Message"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Child2Binding" type="tns:Child2PortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Child2Operation">
+      <soap:operation style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Child2Service">
+        <wsdl:port name="Child2Port" binding="tns:Child2Binding">
+            <soap:address location="http://localhost/service/child2" />
+        </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -169,6 +169,13 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     }
                 }
             }
+            
+            if (context.isPackageNameChanged() && schemas.size() > 1 
+                && context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
+                throw new ToolException(new Message("-p option cannot be used "
+                    + "when wsdl contains mutiple schemas", LOG));
+            }
+            
             context.put(ToolConstants.SCHEMA_MAP, schemas);
             context.put(ToolConstants.PORTTYPE_MAP, interfaces);
             context.put(ClassCollector.class, new ClassCollector());
@@ -217,7 +224,6 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 }
             }
         }
-
     }
 
     private boolean isSuppressCodeGen() {
@@ -237,6 +243,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
             throw ex;
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new ToolException(ex);
         } finally {
             tearDown();
@@ -341,6 +348,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 }
             }
         }
+        
     }
 
     public void validate(ToolContext env) throws ToolException {

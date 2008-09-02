@@ -39,6 +39,7 @@ public class ToolContext {
     protected JavaModel javaModel;
     private Map<String, Object> paramMap;
     private String packageName;
+    private boolean packageNameChanged;
     private Map<String, String> namespacePackageMap = new HashMap<String, String>();
     private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
     private List<InputSource> jaxbBindingFiles = new ArrayList<InputSource>();
@@ -191,6 +192,7 @@ public class ToolContext {
 
     public void setPackageName(String pkgName) {
         this.packageName = pkgName;
+        packageNameChanged = true;
     }
 
     public String getPackageName() {
@@ -256,5 +258,9 @@ public class ToolContext {
     
     public Map<String, String> getNamespacePackageMap() {
         return namespacePackageMap;
+    }
+    
+    public boolean isPackageNameChanged() {
+        return packageNameChanged;
     }
 }
