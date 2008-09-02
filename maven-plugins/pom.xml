@@ -37,7 +37,6 @@
         <module>wsdl-validator-plugin</module>
         <module>corba</module>
         <module>archetypes</module>
-        <module>eclipse-plugin-generator</module>
     </modules>
 
 </project>

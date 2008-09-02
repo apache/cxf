@@ -162,15 +162,10 @@
             <id>everything</id>
             <modules>
                 <module>distribution</module>
-                <module>tools/eclipse-plugin</module>
             </modules>
         </profile>
         <profile>
             <id>setup.eclipse</id>
-            <modules>
-                <!--module>distribution</module-->
-                <module>tools/eclipse-plugin</module>
-            </modules>
             <properties>
                 <eclipse.workspace.dir>${basedir}/../workspace</eclipse.workspace.dir>
             </properties>
