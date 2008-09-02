@@ -60,7 +60,7 @@
                     <artifactId>spring-context</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>velocity</groupId>
+                    <groupId>org.apache.velocity</groupId>
                     <artifactId>velocity</artifactId>
                 </exclusion>
             </exclusions>
@@ -116,14 +116,14 @@
                     <artifactId>spring-context</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>velocity</groupId>
+                    <groupId>org.apache.velocity</groupId>
                     <artifactId>velocity</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>velocity</groupId>
-            <artifactId>velocity-dep</artifactId>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
         </dependency>
     </dependencies>
 
