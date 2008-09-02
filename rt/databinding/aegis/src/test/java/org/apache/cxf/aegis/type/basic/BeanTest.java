@@ -25,9 +25,6 @@ import java.util.Date;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
@@ -240,33 +237,6 @@ public class BeanTest extends AbstractAegisTest {
         assertValid("/b:root[@b2:bleh='bleh']", element);
         assertValid("/b:root[@b2:howdy='howdy']", element);
     }
-    
-    @Test
-    public void testCharStringMapping() throws Exception {
-        BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
-        info.setTypeMapping(mapping);
-        BeanType type = new BeanType(info);
-        type.setTypeClass(SimpleBean.class);
-        type.setTypeMapping(mapping);
-        type.setSchemaType(new QName("urn:Bean", "bean"));
-        Element types = new Element("types", "xsd", SOAPConstants.XSD);
-        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
-        types.addContent(schema);
-
-        new Document(types);
-
-        type.writeSchema(schema);
-
-        NodeList charNodes 
-            = assertValid("//xsd:complexType[@name='bean']/xsd:sequence/xsd:element[@name='character']", 
-                          schema);
-        Node charNode = charNodes.item(0);
-        org.w3c.dom.Element charElement = (org.w3c.dom.Element)charNode;
-        assertNotNull(charElement);
-        String xsdType = charElement.getAttribute("type");
-        assertEquals("xsd:string", xsdType);
-        
-    }
 
     @Test
     public void testNullProperties() throws Exception {
@@ -393,7 +363,7 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         PropertyDescriptor[] pds = info.getPropertyDescriptors();
-        assertEquals(5, pds.length);
+        assertEquals(4, pds.length);
 
         ExtendedBean bean = new ExtendedBean();
         bean.setHowdy("howdy");
