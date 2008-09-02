@@ -154,14 +154,18 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             data = ((java.math.BigInteger)value).toString();
             break;
         case TCKind._tk_float:
-            if (((Float)value).isInfinite()) {
+            if (((Float)value).equals(Float.NEGATIVE_INFINITY)) {
+                data = "-INF";
+            } else if (((Float)value).equals(Float.POSITIVE_INFINITY)) {
                 data = "INF";
             } else {
                 data = ((Float)value).toString();
             }
             break;
         case TCKind._tk_double:
-            if (((Double)value).isInfinite()) {
+            if (((Double)value).equals(Double.NEGATIVE_INFINITY)) {
+                data = "-INF";
+            } else if (((Double)value).equals(Double.POSITIVE_INFINITY)) {
                 data = "INF";
             } else {
                 data = ((Double)value).toString();
@@ -294,17 +298,23 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             data = java.math.BigInteger.valueOf(any.extract_ulonglong()).toString();
             break;
         case TCKind._tk_float:
-            if (Float.isInfinite(any.extract_float())) {
+            Float f = any.extract_float();
+            if (f.equals(Float.NEGATIVE_INFINITY)) {
+                data = "-INF";
+            } else if (f.equals(Float.POSITIVE_INFINITY)) {
                 data = "INF";
             } else {
-                data = Float.toString(any.extract_float());
+                data = f.toString();
             }
             break;
         case TCKind._tk_double:
-            if (Double.isInfinite(any.extract_double())) {
+            Double d = any.extract_double();
+            if (d.equals(Double.NEGATIVE_INFINITY)) {
+                data = "-INF";
+            } else if (d.equals(Double.POSITIVE_INFINITY)) {
                 data = "INF";
             } else {
-                data = Double.toString(any.extract_double());
+                data = d.toString();
             }
             break;
         case TCKind._tk_string:
