@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -76,9 +77,11 @@ public class MtomPolicyTest extends AbstractCXFTest {
         
         Node res = invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
         
-        assertValid("//faultstring[text()='These policy alternatives can not be satisfied: "
-                    + "[{http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization}"
-                    + "OptimizedMimeSerialization]']", res);
+        NodeList list = assertValid("//faultstring", res);
+        String text = list.item(0).getTextContent();
+        assertTrue(text.contains("These policy alternatives can not be satisfied: "));
+        assertTrue(text.contains("{http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization}"
+                    + "OptimizedMimeSerialization"));
     }
     
     @Test

@@ -27,6 +27,7 @@ public class AssertionInfo {
     
     private boolean asserted;
     private final PolicyAssertion assertion;
+    private String errorMessage;
     
     public AssertionInfo(PolicyAssertion a) {
         assertion = a;
@@ -37,6 +38,14 @@ public class AssertionInfo {
     public void setAsserted(boolean a) {
         asserted = a;
     }
+    public void setNotAsserted(String message) {
+        asserted = false;
+        errorMessage = message;
+    }
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+    
     public PolicyAssertion getAssertion() {
         return assertion;
     }

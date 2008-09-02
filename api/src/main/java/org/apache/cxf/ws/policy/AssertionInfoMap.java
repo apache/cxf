@@ -96,7 +96,22 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
                 return;
             }
         }
-        throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, errors));
+        StringBuilder error = new StringBuilder("\n");
+        for (QName name : errors) {
+            Collection<AssertionInfo> ais = getAssertionInfo(name);
+            for (AssertionInfo ai : ais) {
+                if (!ai.isAsserted()) {
+                    error.append("\n      ");
+                    error.append(name.toString());
+                    if (ai.getErrorMessage() != null) {
+                        error.append(": ").append(ai.getErrorMessage());
+                    }
+                }
+            }
+        }
+        
+        
+        throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, error.toString()));
     }
 
     
