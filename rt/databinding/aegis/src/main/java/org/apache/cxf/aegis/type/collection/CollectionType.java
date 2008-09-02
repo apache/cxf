@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.cxf.aegis.Context;
@@ -58,6 +60,8 @@ public class CollectionType extends ArrayType {
 
         if (getTypeClass().isAssignableFrom(List.class)) {
             values = new ArrayList();
+        } else if (getTypeClass().isAssignableFrom(SortedSet.class)) {
+            values = new TreeSet();
         } else if (getTypeClass().isAssignableFrom(Set.class)) {
             values = new HashSet();
         } else if (getTypeClass().isAssignableFrom(Vector.class)) {
