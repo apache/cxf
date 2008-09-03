@@ -48,6 +48,7 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -77,12 +78,13 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         jaxbNamespace = ns;
     }
     
-    public static void addExtensions(ExtensionRegistry registry, String parentType, String elementType,
-                                     ClassLoader cl) throws JAXBException, ClassNotFoundException {
-        Class<?> parentTypeClass = Class.forName(parentType, true, cl);
+    public static void addExtensions(ExtensionRegistry registry, String parentType, String elementType)
+        throws JAXBException, ClassNotFoundException {
+        Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
-        Class<? extends TExtensibilityElementImpl> elementTypeClass = Class.forName(elementType, true, cl)
-            .asSubclass(TExtensibilityElementImpl.class);
+        Class<? extends TExtensibilityElementImpl> elementTypeClass = 
+            ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
+                .asSubclass(TExtensibilityElementImpl.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, null);
     }
     
