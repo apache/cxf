@@ -17,7 +17,6 @@ The following jars are required for all CXF usage:
 - neethi.jar
 - jaxb-api.jar  [6]
 - jaxb-impl.jar
-- stax-utils.jar
 - XmlSchema.jar
 - wstx-asl.jar  [6]
 - wsdl4j.jar
