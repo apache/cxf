@@ -322,7 +322,6 @@
             <id>deploy</id>
             <modules>
                 <module>distribution</module>
-                <module>tools/eclipse-plugin</module>
             </modules>
             <build>
                 <defaultGoal>deploy</defaultGoal>
