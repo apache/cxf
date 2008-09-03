@@ -42,8 +42,8 @@ public class JavaToWS {
         JavaToWS j2w = new JavaToWS(args);
         try {
             j2w.run();
-        } catch (Exception ex) {
-            System.err.println("JavaToWS Error: " + ex.getMessage());
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
             System.err.println();
             if (j2w.isVerbose()) {
                 ex.printStackTrace();
