@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,6 +45,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
@@ -501,7 +503,8 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         addWsAddressingTypes(classes);
 
         for (Class<?> clz : classes) {
-            if (clz.getName().endsWith("ObjectFactory")) {
+            if (clz.getName().endsWith("ObjectFactory")
+                && checkObjectFactoryNamespaces(clz)) {
                 // kind of a hack, but ObjectFactories may be created with empty
                 // namespaces
                 defaultNs = null;
@@ -531,6 +534,19 @@ public final class JAXBDataBinding extends AbstractDataBinding {
         }
 
         return cachedContextAndSchemas;
+    }
+
+    private boolean checkObjectFactoryNamespaces(Class<?> clz) {
+        for (Method meth : clz.getMethods()) {
+            XmlElementDecl decl = meth.getAnnotation(XmlElementDecl.class);
+            if (decl != null 
+                && XmlElementDecl.GLOBAL.class.equals(decl.scope())
+                && StringUtils.isEmpty(decl.namespace())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void addToObjectFactoryCache(Package objectFactoryPkg, Class<?> ofactory) {
