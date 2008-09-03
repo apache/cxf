@@ -43,6 +43,7 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.SoapVersionFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
@@ -160,8 +161,10 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                                                           soapVersion.getAttrNameMustUnderstand());
                             String act = hel.getAttributeNS(soapVersion.getNamespace(),
                                                             soapVersion.getAttrNameRole());
-                            
-                            shead.setActor(act);
+
+                            if (!StringUtils.isEmpty(act)) {
+                                shead.setActor(act);
+                            }
                             shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
                             //mark header as inbound header.(for distinguishing between the  direction to 
                             //avoid piggybacking of headers from request->server->response.

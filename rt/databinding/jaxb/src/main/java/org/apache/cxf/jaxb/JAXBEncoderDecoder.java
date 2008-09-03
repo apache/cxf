@@ -158,6 +158,8 @@ public final class JAXBEncoderDecoder {
                            && part.getTypeQName().getLocalPart().equals("hexBinary")) {
                     mObj = new HexBinaryAdapter().marshal((byte[])mObj);
                     writeObject(marshaller, source, new JAXBElement(elName, String.class, mObj));
+                } else if (mObj instanceof JAXBElement) {
+                    writeObject(marshaller, source, mObj);
                 } else {
                     writeObject(marshaller, source, new JAXBElement(elName, cls, mObj));
                 }

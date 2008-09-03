@@ -69,6 +69,7 @@ public class TestBase extends Assert {
         phases.add(phase2);
         phases.add(phase3);
         phases.add(phase4);
+        phases.add(new Phase(Phase.INVOKE, 5));
         chain = new PhaseInterceptorChain(phases);
 
         soapMessage = TestUtil.createEmptySoapMessage(Soap11.getInstance(), chain);

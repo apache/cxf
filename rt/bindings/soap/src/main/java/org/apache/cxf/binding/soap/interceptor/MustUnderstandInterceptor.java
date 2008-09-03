@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -34,11 +35,15 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.phase.Phase;
 
 public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
+
+
     private static final Logger LOG = LogUtils.getL7dLogger(MustUnderstandInterceptor.class);
 
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
@@ -54,22 +59,35 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         SoapVersion soapVersion = soapMessage.getVersion();              
         Set<Header> mustUnderstandHeaders = new HashSet<Header>();
         Set<URI> serviceRoles = new HashSet<URI>();
-        Set<QName> notUnderstandQNames = new HashSet<QName>();
+        Set<Header> notUnderstandHeaders = new HashSet<Header>();
+        Set<Header> ultimateReceiverHeaders = new HashSet<Header>();
         Set<QName> mustUnderstandQNames = new HashSet<QName>();
 
-        buildMustUnderstandHeaders(mustUnderstandHeaders, soapMessage, serviceRoles);
+        buildMustUnderstandHeaders(mustUnderstandHeaders, soapMessage,
+                                   serviceRoles, ultimateReceiverHeaders);
         initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles);
         
-        if (!checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames, notUnderstandQNames)) {
+        if (!checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames,
+                             notUnderstandHeaders)) {
             StringBuffer sb = new StringBuffer(300);
-            int pos = 0;
-            for (QName qname : notUnderstandQNames) {
-                pos = pos + qname.toString().length() + 2;
-                sb.append(qname.toString() + ", ");
+            boolean first = true;
+            for (Header head : notUnderstandHeaders) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(", ");
+                }
+                sb.append(head.getName().toString());
             }
-            sb.delete(pos - 2, pos);
-            throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, sb.toString()),
+            if (sb.length() > 0) {
+                throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, sb.toString()),
                                 soapVersion.getMustUnderstand());
+            }
+        }
+        if (!ultimateReceiverHeaders.isEmpty()) {
+            soapMessage.getInterceptorChain()
+                .add(new UltimateReceiverMustUnderstandInterceptor(ultimateReceiverHeaders,
+                                                                   mustUnderstandQNames));
         }
     }
 
@@ -98,15 +116,17 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
 
     private void buildMustUnderstandHeaders(Set<Header> mustUnderstandHeaders,
                                             SoapMessage soapMessage,
-                                            Set<URI> serviceRoles) {
+                                            Set<URI> serviceRoles,
+                                            Set<Header> ultimateReceiverHeaders) {
         for (Header header : soapMessage.getHeaders()) {
             if (header instanceof SoapHeader && ((SoapHeader)header).isMustUnderstand()) {
                 String role = ((SoapHeader)header).getActor();
-                if (role != null) {
+                if (!StringUtils.isEmpty(role)) {
                     role = role.trim();
-                    if (role.equals(soapMessage.getVersion().getNextRole())
-                                    || role.equals(soapMessage.getVersion().getUltimateReceiverRole())) {
+                    if (role.equals(soapMessage.getVersion().getNextRole())) {
                         mustUnderstandHeaders.add(header);
+                    } else if (role.equals(soapMessage.getVersion().getUltimateReceiverRole())) {
+                        ultimateReceiverHeaders.add(header);                        
                     } else {
                         for (URI roleFromBinding : serviceRoles) {
                             if (role.equals(roleFromBinding.toString())) {
@@ -117,7 +137,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                 } else {
                     // if role omitted, the soap node is ultimate receiver,
                     // needs to understand
-                    mustUnderstandHeaders.add(header);
+                    ultimateReceiverHeaders.add(header);
                 }
             }
         }
@@ -125,17 +145,64 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
 
     private boolean checkUnderstand(Set<Header> mustUnderstandHeaders,
                                     Set<QName> mustUnderstandQNames,
-                                    Set<QName> notUnderstandQNames) {
+                                    Set<Header> notUnderstandHeaders) {
 
         for (Header header : mustUnderstandHeaders) {
             QName qname = header.getName();
             if (!mustUnderstandQNames.contains(qname)) {
-                notUnderstandQNames.add(qname);
+                notUnderstandHeaders.add(header);
             }
         }
-        if (notUnderstandQNames.size() > 0) {
+        if (notUnderstandHeaders.size() > 0) {
             return false;
         }
         return true;
+    }
+    
+    
+    
+    /**
+     * 
+     */
+    private class UltimateReceiverMustUnderstandInterceptor extends AbstractSoapInterceptor {
+        Set<Header> ultimateReceiverHeaders;
+        Set<QName> knownHeaders;
+        public UltimateReceiverMustUnderstandInterceptor(Set<Header> ult,
+                                                         Set<QName> knownHeaders) {
+            super(Phase.INVOKE);
+            this.knownHeaders = knownHeaders;
+            ultimateReceiverHeaders = ult;
+        }
+        public void handleMessage(SoapMessage soapMessage) throws Fault {
+            SoapVersion soapVersion = soapMessage.getVersion();
+            Set<Header> notFound = new HashSet<Header>();
+            List<Header> heads = soapMessage.getHeaders();
+            for (Header header : ultimateReceiverHeaders) {
+                if (heads.contains(header)
+                    && header.getDirection() == Header.Direction.DIRECTION_IN
+                    && !knownHeaders.contains(header.getName())) {
+                    notFound.add(header);
+                }
+            }
+            
+            
+            if (!notFound.isEmpty()) {
+                StringBuffer sb = new StringBuffer(300);
+                boolean first = true;
+                for (Header head : notFound) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(", ");
+                    }
+                    sb.append(head.getName().toString());
+                }
+                if (sb.length() > 0) {
+                    throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, sb.toString()),
+                                    soapVersion.getMustUnderstand());
+                }
+            }            
+        }
+
     }
 }

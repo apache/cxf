@@ -24,8 +24,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,8 +31,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
@@ -101,24 +97,8 @@ public class SourceType extends Type {
             }
 
             StaxUtils.writeElement(element, writer, false);
-        } else if (object instanceof SAXSource) {
-            SAXSource source = (SAXSource)object;
-
-            try {
-                XMLReader xmlReader = source.getXMLReader();
-                if (xmlReader == null) {
-                    xmlReader = createXMLReader();
-                }
-
-                xmlReader.setContentHandler(new FilteringContentHandlerToXMLStreamWriter(writer));
-
-                xmlReader.parse(source.getInputSource());
-            } catch (Exception e) {
-                throw new DatabindingException("Could not send xml.", e);
-            }
-        } else if (object instanceof StreamSource) {
-            StreamSource ss = (StreamSource)object;
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(ss.getInputStream(), null);
+        } else {
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader((Source)object);
             StaxUtils.copy(reader, writer);
         }
     }
@@ -136,17 +116,4 @@ public class SourceType extends Type {
         }
     }
 
-    class FilteringContentHandlerToXMLStreamWriter extends ContentHandlerToXMLStreamWriter {
-        public FilteringContentHandlerToXMLStreamWriter(XMLStreamWriter xmlStreamWriter) {
-            super(xmlStreamWriter);
-        }
-
-        @Override
-        public void startDocument() throws SAXException {
-        }
-
-        @Override
-        public void endDocument() throws SAXException {
-        }
-    }
 }
