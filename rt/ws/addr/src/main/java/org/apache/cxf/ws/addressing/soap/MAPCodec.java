@@ -116,6 +116,13 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param message the messsage message
      */
     public void handleFault(SoapMessage message) {
+        AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, true, false);
+        if (ContextUtils.isRequestor(message) 
+            && !message.getExchange().isOneWay()
+            && maps != null) {
+            //fault occured trying to sent the message, remove it
+            uncorrelatedExchanges.remove(maps.getMessageID().getValue());
+        }
     }
 
     /**

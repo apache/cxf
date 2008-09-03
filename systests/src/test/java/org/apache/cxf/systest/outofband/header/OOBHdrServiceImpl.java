@@ -104,35 +104,36 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
         MessageContext ctx = context == null ? null : context.getMessageContext();
         if (ctx.containsKey(Header.HEADER_LIST)) {
             List oobHdr = (List) ctx.get(Header.HEADER_LIST);
-            
-            if (oobHdr instanceof List) {
-                Iterator iter = oobHdr.iterator();
-                while (iter.hasNext()) {
-                    Object hdr = iter.next();
-                    if (hdr instanceof Header && ((Header) hdr).getObject() instanceof Node) {
-                        Header hdr1 = (Header) hdr;
-                        //System.out.println("Node conains : " + hdr1.getObject().toString());
-                        try {
-                            JAXBElement job = (JAXBElement) JAXBContext.newInstance(ObjectFactory.class)
-                                .createUnmarshaller()
-                                .unmarshal((Node) hdr1.getObject());
-                            OutofBandHeader ob = (OutofBandHeader) job.getValue();
-                            if ("testOobHeader".equals(ob.getName())
-                                && "testOobHeaderValue".equals(ob.getValue())
-                                && "testHdrAttribute".equals(ob.getHdrAttribute())) {
+            Iterator iter = oobHdr.iterator();
+            while (iter.hasNext()) {
+                Object hdr = iter.next();
+                if (hdr instanceof Header && ((Header) hdr).getObject() instanceof Node) {
+                    Header hdr1 = (Header) hdr;
+                    //System.out.println("Node conains : " + hdr1.getObject().toString());
+                    try {
+                        JAXBElement job = (JAXBElement) JAXBContext.newInstance(ObjectFactory.class)
+                            .createUnmarshaller()
+                            .unmarshal((Node) hdr1.getObject());
+                        OutofBandHeader ob = (OutofBandHeader) job.getValue();
+                        if ("testOobHeader".equals(ob.getName())
+                            && "testOobHeaderValue".equals(ob.getValue())) { 
+                            if ("testHdrAttribute".equals(ob.getHdrAttribute())) {
                                 success = true;
-                            } else {
-                                throw new RuntimeException("test failed");
+                                iter.remove(); //mark it processed
+                            } else if ("dontProcess".equals(ob.getHdrAttribute())) {
+                                //we won't remove it so we won't let the runtime know
+                                //it's processed.   It SHOULD throw an exception 
+                                //saying the mustunderstand wasn't processed
+                                success = true;
                             }
-                        } catch (JAXBException ex) {
-                            //
-                            ex.printStackTrace();
+                        } else {
+                            throw new RuntimeException("test failed");
                         }
+                    } catch (JAXBException ex) {
+                        //
+                        ex.printStackTrace();
                     }
                 }
-            } else {
-                throw new RuntimeException("Header should not be null"
-                                           + "and should be of type JAXBHeaderHolder");
             }
         } else {
             throw new RuntimeException("MessageContext is null or doesnot contain OOBHeaders");
