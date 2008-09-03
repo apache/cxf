@@ -66,16 +66,13 @@ public class JAXBExtensionHelperTest extends Assert {
     public void testAddTestExtension() throws Exception {
 
         JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
-                        "org.apache.cxf.abc.test.TestPolicyType", Thread.currentThread()
-                                        .getContextClassLoader());
+                        "org.apache.cxf.abc.test.TestPolicyType");
 
         JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
-                        "org.apache.cxf.abc.test.AnotherPolicyType", Thread.currentThread()
-                                        .getContextClassLoader());
+                        "org.apache.cxf.abc.test.AnotherPolicyType");
 
         JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Definition",
-                        "org.apache.cxf.abc.test.NewServiceType", Thread.currentThread()
-                                        .getContextClassLoader());
+                        "org.apache.cxf.abc.test.NewServiceType");
 
         String file = this.getClass().getResource("/wsdl/test_ext.wsdl").toURI().toString();
 
@@ -109,8 +106,7 @@ public class JAXBExtensionHelperTest extends Assert {
     @Test
     public void testPrettyPrintXMLStreamWriter() throws Exception {
         JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Definition",
-                        "org.apache.cxf.abc.test.NewServiceType", Thread.currentThread()
-                                        .getContextClassLoader());
+                        "org.apache.cxf.abc.test.NewServiceType");
 
         String file = this.getClass().getResource("/wsdl/test_ext.wsdl").toURI().toString();
 

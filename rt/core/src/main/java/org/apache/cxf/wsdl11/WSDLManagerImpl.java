@@ -238,9 +238,7 @@ public class WSDLManagerImpl implements WSDLManager {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Registering extension: " + elementType + " for parent: " + parentType);
                 }
-                JAXBExtensionHelper.addExtensions(registry, parentType, elementType, 
-                                                  Thread.currentThread()
-                                                      .getContextClassLoader());
+                JAXBExtensionHelper.addExtensions(registry, parentType, elementType);
             } catch (ClassNotFoundException ex) {
                 LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
             } catch (JAXBException ex) {
