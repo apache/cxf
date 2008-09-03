@@ -22,6 +22,7 @@ package org.apache.cxf.transport.jbi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,7 +115,11 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                     //copy properties
                     
                     for (Map.Entry<String, Object> ent : inMessage.entrySet()) {
-                        if (ent.getValue() instanceof Serializable) {
+                        //check if value is Serializable, and if value is Map or collection,
+                        //just exclude it since the entry of it may not be Serializable as well
+                        if (ent.getValue() instanceof Serializable 
+                                && !(ent.getValue() instanceof Map)
+                                && !(ent.getValue() instanceof Collection)) {
                             msg.setProperty(ent.getKey(), ent.getValue());
                         }
                     }
