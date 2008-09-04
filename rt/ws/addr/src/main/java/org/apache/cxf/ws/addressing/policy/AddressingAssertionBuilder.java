@@ -63,15 +63,14 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
         QName qn = new QName(elem.getNamespaceURI(), localName);
         
         boolean optional = false;
-        PolicyConstants constants = bus.getExtension(PolicyConstants.class);
-        Attr attribute = elem.getAttributeNodeNS(constants.getNamespace(), 
-                                                 constants.getOptionalAttrName());
+        
+        Attr attribute = PolicyConstants.findOptionalAttribute(elem);
         if (attribute != null) {
             optional = Boolean.valueOf(attribute.getValue());
         }
         if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)) {
             PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-            return new NestedPrimitiveAssertion(elem, builder, constants);
+            return new NestedPrimitiveAssertion(elem, builder);
         } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)) {
             return new PrimitiveAssertion(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME, 
                                           optional);

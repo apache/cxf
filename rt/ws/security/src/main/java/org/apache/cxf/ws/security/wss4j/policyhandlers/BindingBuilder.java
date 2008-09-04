@@ -33,6 +33,7 @@ import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
+import org.apache.velocity.util.ClassUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.message.WSSecHeader;
@@ -111,9 +112,18 @@ public class BindingBuilder {
             if (StringUtils.isEmpty(password)) {
                 
                 //Then try to get the password from the given callback handler
-                CallbackHandler handler 
-                    = (CallbackHandler)message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+                Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
             
+                CallbackHandler handler = null;
+                if (o instanceof CallbackHandler) {
+                    handler = (CallbackHandler)o;
+                } else if (o instanceof String) {
+                    try {
+                        handler = (CallbackHandler)ClassUtils.getNewInstance(o.toString());
+                    } catch (Exception e) {
+                        handler = null;
+                    }
+                }
                 if (handler == null) {
                     info.setNotAsserted("No callback handler and not password available");
                     return null;

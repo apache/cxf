@@ -23,7 +23,6 @@ import java.util.Collection;
 import junit.framework.Assert;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.policy.PolicyProvider;
@@ -53,8 +52,6 @@ public class PolicyBeansTest extends Assert {
         assertEquals(MaximalAlternativeSelector.class.getName(), 
                      pe.getAlternativeSelector().getClass().getName()); 
         
-        assertEquals(PolicyConstants.NAMESPACE_WS_POLICY,
-                     bus.getExtension(PolicyConstants.class).getNamespace());
         
         PolicyEngineImpl pei = (PolicyEngineImpl)pe;
         Collection<PolicyProvider> providers = pei.getPolicyProviders();

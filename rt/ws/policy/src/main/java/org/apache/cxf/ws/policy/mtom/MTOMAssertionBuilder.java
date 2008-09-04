@@ -28,7 +28,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyConstants;
@@ -37,29 +36,16 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 
 public class MTOMAssertionBuilder implements AssertionBuilder {
     private static final Collection<QName> KNOWN = new ArrayList<QName>();
-    private Bus bus;
     static {
         KNOWN.add(MetadataConstants.MTOM_ASSERTION_QNAME);
     }
     
-    public void setBus(Bus b) {
-        bus = b;
-    }
-
     public PolicyAssertion build(Element elem) {
         String localName = elem.getLocalName();
         QName qn = new QName(elem.getNamespaceURI(), localName);
 
         boolean optional = false;
-        PolicyConstants constants = null;
-        if (null != bus) {
-            constants = bus.getExtension(PolicyConstants.class);
-        }
-        if (null == constants) {
-            constants = new PolicyConstants();
-        }
-        Attr attribute = elem.getAttributeNodeNS(constants.getNamespace(),
-                                                 constants.getOptionalAttrName());
+        Attr attribute = PolicyConstants.findOptionalAttribute(elem);
         if (attribute != null) {
             optional = Boolean.valueOf(attribute.getValue());
         }

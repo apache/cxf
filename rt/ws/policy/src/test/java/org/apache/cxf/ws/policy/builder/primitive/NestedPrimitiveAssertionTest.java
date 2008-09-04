@@ -31,7 +31,6 @@ import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilderImpl;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.util.PolicyComparator;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
@@ -56,7 +55,6 @@ public class NestedPrimitiveAssertionTest extends Assert {
     private PolicyBuilderImpl builder;
     private IMocksControl control;
     private Bus bus;
-    private PolicyConstants constants;
     
     @Before
     public void setUp() {
@@ -64,9 +62,6 @@ public class NestedPrimitiveAssertionTest extends Assert {
         control = EasyMock.createNiceControl();
         
         bus = control.createMock(Bus.class);
-        constants = new PolicyConstants();
-        constants.setNamespace(PolicyConstants.NAMESPACE_XMLSOAP_200409);
-        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(constants).anyTimes();
         
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder = new PolicyBuilderImpl();

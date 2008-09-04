@@ -60,7 +60,6 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
     private Collection<Element> policyElements;
     private Collection<Element> policyReferenceElements;
     private boolean ignoreUnknownAssertions;
-    private String namespace;
     private AlternativeSelector alternativeSelector; 
     private ApplicationContext context;
   
@@ -90,10 +89,6 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         synchronized (pe) {
             pe.setEnabled(true);
             pe.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
-            if (null != namespace) {
-                PolicyConstants pc = bus.getExtension(PolicyConstants.class);
-                pc.setNamespace(namespace);
-            }
             if (null != alternativeSelector) {
                 pe.setAlternativeSelector(alternativeSelector);
             }
@@ -198,9 +193,6 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         ignoreUnknownAssertions = ignore;
     } 
     
-    public void setNamespace(String ns) {
-        namespace = ns;
-    }
     
     public void setAlternativeSelector(AlternativeSelector as) {
         alternativeSelector = as;
@@ -248,8 +240,7 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
     
     protected Policy resolveExternal(PolicyReference ref,  String baseURI, Bus bus) {
         PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder,
-            bus.getExtension(PolicyConstants.class));
+        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
         PolicyRegistry registry = bus.getExtension(PolicyEngine.class).getRegistry();
         Policy resolved = registry.lookup(ref.getURI());
         if (null != resolved) {

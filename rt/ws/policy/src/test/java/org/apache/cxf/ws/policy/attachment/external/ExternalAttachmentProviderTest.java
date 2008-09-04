@@ -37,7 +37,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Policy;
@@ -190,10 +189,7 @@ public class ExternalAttachmentProviderTest extends Assert {
     @Test
     public void testReadDocumentUnknownDomainExpression() throws MalformedURLException {
 
-        PolicyConstants pc = new PolicyConstants();
-        pc.setNamespace(PolicyConstants.NAMESPACE_W3_200607);
         Bus bus = control.createMock(Bus.class);
-        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(pc);
         
         eap = new ExternalAttachmentProvider(bus);
         DomainExpressionBuilderRegistry debr = control.createMock(DomainExpressionBuilderRegistry.class);

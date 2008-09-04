@@ -141,10 +141,9 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
     }
 
     private PolicyOperator processOperationElement(Element operationElement, PolicyOperator operator) {
-        
+
         if (Constants.TYPE_POLICY == operator.getType()) {
             Policy policyOperator = (Policy)operator;
-
             QName key;
 
             NamedNodeMap nnm = operationElement.getAttributes();
@@ -166,9 +165,6 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
             }            
         }
 
-        String policyNsURI = 
-            bus == null ? PolicyConstants.NAMESPACE_WS_POLICY
-                        : bus.getExtension(PolicyConstants.class).getNamespace();
         
         Element childElement;
         for (Node n = operationElement.getFirstChild(); n != null; n = n.getNextSibling()) {
@@ -179,21 +175,15 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
             String namespaceURI = childElement.getNamespaceURI();
             String localName = childElement.getLocalName();
 
-            if (policyNsURI.equals(namespaceURI)) {
-
-                if (Constants.ELEM_POLICY.equals(localName)) {
-                    operator.addPolicyComponent(getPolicyOperator(childElement));
-
-                } else if (Constants.ELEM_EXACTLYONE.equals(localName)) {
-                    operator.addPolicyComponent(getExactlyOneOperator(childElement));
-
-                } else if (Constants.ELEM_ALL.equals(localName)) {
-                    operator.addPolicyComponent(getAllOperator(childElement));
-
-                } else if (Constants.ELEM_POLICY_REF.equals(localName)) {
-                    operator.addPolicyComponent(getPolicyReference(childElement));
-                }
-
+            QName qn = new QName(namespaceURI, localName);
+            if (PolicyConstants.isPolicyElem(qn)) {
+                operator.addPolicyComponent(getPolicyOperator(childElement));
+            } else if (PolicyConstants.isAll(qn)) {
+                operator.addPolicyComponent(getAllOperator(childElement));
+            } else if (PolicyConstants.isExactlyOne(qn)) {
+                operator.addPolicyComponent(getExactlyOneOperator(childElement));
+            } else if (PolicyConstants.isPolicyRefElem(qn)) {
+                operator.addPolicyComponent(getPolicyReference(childElement));                
             } else if (null != assertionBuilderRegistry) {
                 PolicyAssertion a = assertionBuilderRegistry.build(childElement);
                 if (null != a) {

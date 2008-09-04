@@ -35,7 +35,6 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.ServerPolicyInInterceptor;
 import org.apache.cxf.ws.policy.ServerPolicyOutInterceptor;
 import org.junit.BeforeClass;
@@ -88,8 +87,6 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
         SpringBusFactory bf = new SpringBusFactory();
         
         bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy-old.xml");
-        PolicyTestUtils.setPolicyConstants(bus, 
-                                           PolicyConstants.NAMESPACE_W3_200607);
         
         BusFactory.setDefaultBus(bus);
         

@@ -21,7 +21,6 @@ package org.apache.cxf.ws.policy.attachment.reference;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
@@ -39,12 +38,10 @@ public class RemoteReferenceResolver implements ReferenceResolver {
     
     private String baseURI;
     private PolicyBuilder builder;
-    private PolicyConstants constants;
     
-    public RemoteReferenceResolver(String uri, PolicyBuilder b, PolicyConstants c) {
+    public RemoteReferenceResolver(String uri, PolicyBuilder b) {
         baseURI = uri;
         builder = b;
-        constants = c;
     }
 
     public Policy resolveReference(String uri) {
@@ -61,14 +58,13 @@ public class RemoteReferenceResolver implements ReferenceResolver {
         } catch (Exception ex) {
             throw new PolicyException(ex);
         }
-
-        NodeList nl = doc.getElementsByTagNameNS(constants.getNamespace(), 
-                                                 constants.getPolicyElemName());
         String id = uri.substring(pos + 1);
-        for (int i = 0; i < nl.getLength(); i++) {
-            Element elem = (Element)nl.item(i);
-            if (id.equals(elem.getAttributeNS(constants.getWSUNamespace(), 
-                                              constants.getIdAttrName()))) {
+        for (Element elem : PolicyConstants
+                .findAllPolicyElementsOfLocalName(doc,
+                                                  PolicyConstants.POLICY_ELEM_NAME)) {
+            
+            if (id.equals(elem.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                              PolicyConstants.WSU_ID_ATTR_NAME))) {
                 return builder.getPolicy(elem);
             }
         }

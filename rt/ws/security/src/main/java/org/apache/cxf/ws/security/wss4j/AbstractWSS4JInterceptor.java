@@ -196,6 +196,18 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     ai.setAsserted(true);
                 }                    
             }
+            ais = aim.get(SP12Constants.WSS10);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
+                }                    
+            }
+            ais = aim.get(SP12Constants.WSS11);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
+                }                    
+            }
             message.put(WSHandlerConstants.ACTION, action.trim());
         }
     }

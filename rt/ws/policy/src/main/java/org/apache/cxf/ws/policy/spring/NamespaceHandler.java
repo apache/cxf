@@ -24,7 +24,6 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
         registerBeanDefinitionParser("policies", new PolicyFeatureBeanDefinitionParser());
         registerBeanDefinitionParser("engine", new PolicyEngineBeanDefinitionParser());
-        registerBeanDefinitionParser("constants", new PolicyConstantsBeanDefinitionParser());
         registerBeanDefinitionParser("externalAttachment", 
                                      new ExternalAttachmentProviderBeanDefinitionParser()); 
     }

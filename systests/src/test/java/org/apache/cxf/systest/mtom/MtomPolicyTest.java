@@ -47,7 +47,6 @@ import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.WSPolicyFeature;
 import org.apache.cxf.ws.policy.selector.FirstAlternativeSelector;
@@ -113,8 +112,6 @@ public class MtomPolicyTest extends AbstractCXFTest {
             policyElements.add(DOMUtils.readXml(
                 getClass().getResourceAsStream("mtom-policy-optional.xml"))
                            .getDocumentElement());
-            getBus().getExtension(PolicyConstants.class)
-               .setNamespace(PolicyConstants.NAMESPACE_W3_200607);
         } 
         policyFeature.setPolicyElements(policyElements);       
         

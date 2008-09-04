@@ -104,20 +104,7 @@
     </xsd:complexType>
   </xsd:element>
  
-  <xsd:element name="constants">
-    <xsd:complexType>
-      <xsd:attribute name="namespace" type="xsd:string" default="http://www.w3.org/2006/07/ws-policy">
-        <xsd:annotation>
-          <xsd:documentation>
-              The namespace of the WS-Policy Framework specification. 
-              This attribute can be set to support older versions of the specification.           
-          </xsd:documentation>
-        </xsd:annotation>
-      </xsd:attribute>
-    </xsd:complexType>
-  </xsd:element>
-  
-    <xsd:element name="externalAttachment">
+  <xsd:element name="externalAttachment">
     <xsd:complexType>
       <xsd:complexContent>
         <xsd:extension base="beans:identifiedType">

@@ -26,9 +26,7 @@ import java.util.List;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.ws.policy.PolicyBuilder;
@@ -46,7 +44,6 @@ import org.junit.Test;
 public class ReferenceResolverTest extends Assert {
 
     private IMocksControl control;
-    private PolicyConstants constants = new PolicyConstants();
     
     @Before
     public void setUp() {
@@ -58,7 +55,7 @@ public class ReferenceResolverTest extends Assert {
         DescriptionInfo di = control.createMock(DescriptionInfo.class);
         PolicyBuilder builder = control.createMock(PolicyBuilder.class);
         LocalServiceModelReferenceResolver resolver = 
-            new LocalServiceModelReferenceResolver(di, builder, constants);
+            new LocalServiceModelReferenceResolver(di, builder);
         
         List<UnknownExtensibilityElement> extensions = new ArrayList<UnknownExtensibilityElement>();
         EasyMock.expect(di.getExtensors(UnknownExtensibilityElement.class)).andReturn(extensions);
@@ -73,9 +70,11 @@ public class ReferenceResolverTest extends Assert {
         EasyMock.expect(di.getExtensors(UnknownExtensibilityElement.class)).andReturn(extensions);
         Element e = control.createMock(Element.class);
         EasyMock.expect(extension.getElement()).andReturn(e).times(2);
-        QName qn = new QName(constants.getNamespace(), constants.getPolicyElemName());
-        EasyMock.expect(extension.getElementType()).andReturn(qn).times(2);
-        EasyMock.expect(e.getAttributeNS(constants.getWSUNamespace(), constants.getIdAttrName()))
+        QName qn = new QName(PolicyConstants.NAMESPACE_WS_POLICY, 
+                             PolicyConstants.POLICY_ELEM_NAME);
+        EasyMock.expect(extension.getElementType()).andReturn(qn).anyTimes();
+        EasyMock.expect(e.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                         PolicyConstants.WSU_ID_ATTR_NAME))
                         .andReturn("A");
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(builder.getPolicy(e)).andReturn(p);        
@@ -84,37 +83,6 @@ public class ReferenceResolverTest extends Assert {
         assertSame(p, resolver.resolveReference("A"));
         control.verify();
         
-    }
-    
-    @Test
-    public void testLocalDocumentReferenceResolver() {
-        Document doc = control.createMock(Document.class);
-        PolicyBuilder builder = control.createMock(PolicyBuilder.class);
-        LocalDocumentReferenceResolver resolver = new LocalDocumentReferenceResolver(doc, builder, constants);
-        
-        NodeList nl = control.createMock(NodeList.class);
-        EasyMock.expect(doc.getElementsByTagNameNS(constants.getNamespace(),
-                                                   constants.getPolicyElemName())).andReturn(nl);
-        EasyMock.expect(nl.getLength()).andReturn(0);
-        
-        control.replay();
-        assertNull(resolver.resolveReference("A"));
-        control.verify();
-        
-        control.reset();
-        EasyMock.expect(doc.getElementsByTagNameNS(constants.getNamespace(),
-                                                   constants.getPolicyElemName())).andReturn(nl);
-        EasyMock.expect(nl.getLength()).andReturn(1);
-        Element e = control.createMock(Element.class);
-        EasyMock.expect(nl.item(0)).andReturn(e);
-        EasyMock.expect(e.getAttributeNS(constants.getWSUNamespace(), constants.getIdAttrName()))
-                        .andReturn("A");
-        Policy p = control.createMock(Policy.class);
-        EasyMock.expect(builder.getPolicy(e)).andReturn(p);        
-        
-        control.replay();
-        assertSame(p, resolver.resolveReference("A"));
-        control.verify();
     }
     
     @Test
@@ -130,11 +98,10 @@ public class ReferenceResolverTest extends Assert {
     
     private void doTestRemoteResolver(String policyNs) {
         
-        constants.setNamespace(policyNs);
         URL url = ReferenceResolverTest.class.getResource("referring.wsdl");
         String baseURI = url.toString();
         PolicyBuilder builder = control.createMock(PolicyBuilder.class);
-        RemoteReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder, constants);
+        RemoteReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
     
         assertNull(resolver.resolveReference("referred.wsdl#PolicyB"));
         

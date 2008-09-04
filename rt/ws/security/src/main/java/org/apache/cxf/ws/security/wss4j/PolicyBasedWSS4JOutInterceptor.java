@@ -95,6 +95,20 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 if (transport != null) {
                     new TransportBindingHandler(transport, saaj, secHeader, aim, message).handleBinding();
                 }
+                
+                ais = aim.get(SP12Constants.WSS10);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
+                    }                    
+                }
+                ais = aim.get(SP12Constants.WSS11);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
+                    }                    
+                }
+
             }
             
         }
