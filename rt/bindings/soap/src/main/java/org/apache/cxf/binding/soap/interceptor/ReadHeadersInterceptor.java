@@ -47,6 +47,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -111,66 +112,62 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     .getLocalPart());
                 for (int i = 0; i < headerEls.getLength(); i++) {
                     Node currentHead  = headerEls.item(i);
-                    Node node = currentHead;
-                    NodeList heads = node.getChildNodes();
-                    int len = heads.getLength();
-                    for (int x = 0; x < len; x++) {
-                        node = (Node)heads.item(x);
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            Element hel = (Element)node;
-                            // Need to add any attributes that are present on the parent element
-                            // which otherwise would be lost.
-                            if (currentHead.hasAttributes()) {
-                                NamedNodeMap nnp = currentHead.getAttributes();
-                                for (int ct = 0; ct < nnp.getLength(); ct++) {
-                                    Node attr = nnp.item(ct);
-                                    Node headerAttrNode = hel.hasAttributes() 
-                                            ?  hel.getAttributes().getNamedItemNS(
-                                                            attr.getNamespaceURI(), attr.getLocalName()) 
-                                            : null;
-                                    
-                                    if (headerAttrNode == null) {
-                                        Attr attribute = hel.getOwnerDocument().createAttributeNS(
-                                                attr.getNamespaceURI(), 
-                                                attr.getNodeName());
-                                        attribute.setNodeValue(attr.getNodeValue());
-                                        hel.setAttributeNodeNS(attribute);
-                                    }
+                    Element hel = DOMUtils.getFirstElement(currentHead);
+                    while (hel != null) {
+                        // Need to add any attributes that are present on the parent element
+                        // which otherwise would be lost.
+                        if (currentHead.hasAttributes()) {
+                            NamedNodeMap nnp = currentHead.getAttributes();
+                            for (int ct = 0; ct < nnp.getLength(); ct++) {
+                                Node attr = nnp.item(ct);
+                                Node headerAttrNode = hel.hasAttributes() 
+                                        ?  hel.getAttributes().getNamedItemNS(
+                                                        attr.getNamespaceURI(), attr.getLocalName()) 
+                                        : null;
+                                
+                                if (headerAttrNode == null) {
+                                    Attr attribute = hel.getOwnerDocument().createAttributeNS(
+                                            attr.getNamespaceURI(), 
+                                            attr.getNodeName());
+                                    attribute.setNodeValue(attr.getNodeValue());
+                                    hel.setAttributeNodeNS(attribute);
                                 }
                             }
-                            
+                        }
+                        
 //                            System.out.println("READHEADERSINTERCEPTOR : node name : " 
 //                            + node.getLocalName() +  " namespace URI" + node.getNamespaceURI());
-                            HeaderProcessor p = bus.getExtension(HeaderManager.class)
-                                .getHeaderProcessor(hel.getNamespaceURI());
+                        HeaderProcessor p = bus.getExtension(HeaderManager.class)
+                            .getHeaderProcessor(hel.getNamespaceURI());
 
-                            Object obj;
-                            DataBinding dataBinding = null;
-                            if (p == null || p.getDataBinding() == null) {
-                                obj = node;
-                            } else {
-                                obj = p.getDataBinding().createReader(Node.class).read(node);
-                            }
-                            //TODO - add the interceptors
-                            
-                            SoapHeader shead = new SoapHeader(new QName(node.getNamespaceURI(),
-                                                                        node.getLocalName()),
-                                                               obj,
-                                                               dataBinding);
-                            String mu = hel.getAttributeNS(soapVersion.getNamespace(),
-                                                          soapVersion.getAttrNameMustUnderstand());
-                            String act = hel.getAttributeNS(soapVersion.getNamespace(),
-                                                            soapVersion.getAttrNameRole());
+                        Object obj;
+                        DataBinding dataBinding = null;
+                        if (p == null || p.getDataBinding() == null) {
+                            obj = hel;
+                        } else {
+                            obj = p.getDataBinding().createReader(Node.class).read(hel);
+                        }
+                        //TODO - add the interceptors
+                        
+                        SoapHeader shead = new SoapHeader(new QName(hel.getNamespaceURI(),
+                                                                    hel.getLocalName()),
+                                                           obj,
+                                                           dataBinding);
+                        String mu = hel.getAttributeNS(soapVersion.getNamespace(),
+                                                      soapVersion.getAttrNameMustUnderstand());
+                        String act = hel.getAttributeNS(soapVersion.getNamespace(),
+                                                        soapVersion.getAttrNameRole());
 
-                            if (!StringUtils.isEmpty(act)) {
-                                shead.setActor(act);
-                            }
-                            shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
-                            //mark header as inbound header.(for distinguishing between the  direction to 
-                            //avoid piggybacking of headers from request->server->response.
-                            shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
-                            message.getHeaders().add(shead);
-                        }                        
+                        if (!StringUtils.isEmpty(act)) {
+                            shead.setActor(act);
+                        }
+                        shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
+                        //mark header as inbound header.(for distinguishing between the  direction to 
+                        //avoid piggybacking of headers from request->server->response.
+                        shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
+                        message.getHeaders().add(shead);
+                        
+                        hel = DOMUtils.getNextElement(hel);
                     }
                 }
                 //advance to just outside the <soap:body> opening tag, but not 
