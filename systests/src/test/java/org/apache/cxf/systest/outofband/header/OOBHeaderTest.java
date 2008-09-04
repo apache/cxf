@@ -191,7 +191,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
             putLastTradedPrice.sayHi(holder);
             fail("mustUnderstand header should not have been processed");
         } catch (Exception ex) {
-            assertTrue(ex.getMessage().contains("Can not understand"));
+            assertTrue(ex.getMessage(), ex.getMessage().contains("MustUnderstand"));
         }
     }
 }
