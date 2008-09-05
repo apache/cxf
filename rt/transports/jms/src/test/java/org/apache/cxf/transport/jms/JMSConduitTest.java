@@ -88,11 +88,8 @@ public class JMSConduitTest extends AbstractJMSTester {
     }
     
     public void verifySentMessage(boolean send, Message message) {
-        PooledSession pooledSession = (PooledSession)message.get(JMSConstants.JMS_POOLEDSESSION);
         OutputStream os = message.getContent(OutputStream.class);
-        assertTrue("pooled Session should not be null ", pooledSession != null);
-        assertTrue("OutputStream should not be null", os != null);
-        
+        assertTrue("OutputStream should not be null", os != null);        
     }
     
     @Test
@@ -140,11 +137,11 @@ public class JMSConduitTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduit(true, false); 
         Message msg = new MessageImpl();
         conduit.prepare(msg);
-        PooledSession sess = conduit.sessionFactory.get(true);
+        PooledSession sess = conduit.getOrCreateSessionFactory().get();
         byte [] b = testMsg.getBytes();
-        javax.jms.Message message = JMSUtils.marshal(b, 
+        javax.jms.Message message = JMSUtils.createAndSetPayload(b, 
                                                          sess.session(), 
-                                                         null, JMSConstants.BYTE_MESSAGE_TYPE);
+                                                         JMSConstants.BYTE_MESSAGE_TYPE);
         
         assertTrue("Message should have been of type BytesMessage ", 
                    message instanceof BytesMessage);

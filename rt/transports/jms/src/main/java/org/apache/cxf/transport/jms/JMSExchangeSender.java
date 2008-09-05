@@ -16,26 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.transport.jms;
 
-import javax.jms.Destination;
+import org.apache.cxf.message.Exchange;
 
-/**
- * Common accessors between the conduit and destination which are needed for common code.
- *
- */
-public interface JMSOnConnectCallback {
-
-    AddressType getJMSAddress();
-
-    SessionPoolType getSessionPool();
-
-    /**
-     * Callback from the JMSProviderHub indicating the ClientTransport has been sucessfully connected.
-     *
-     * @param targetDestination the target destination
-     * @param sessionFactory used to get access to a pooled JMS resources
-     */
-    void connected(Destination target, Destination reply, JMSSessionFactory factory);
+interface JMSExchangeSender {
+    void sendExchange(Exchange exchange, Object payload);
 }

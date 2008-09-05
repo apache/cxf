@@ -19,24 +19,18 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.Queue;
 import javax.jms.QueueConnection;
-import javax.jms.QueueSession;
+import javax.jms.QueueConnectionFactory;
 import javax.jms.Session;
-import javax.jms.Topic;
 import javax.jms.TopicConnection;
-import javax.jms.TopicSession;
-import javax.jms.TopicSubscriber;
+import javax.jms.TopicConnectionFactory;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -57,7 +51,7 @@ import org.apache.cxf.common.util.AbstractTwoStageCache;
  * unidentified producer to send the request message
  * <p>
  * server-side send: each dispatch of a twoway request requires relatively short-term exclusive use of a
- * session and an indentified producer (but not a consumer) - note that the session used for the recieve side
+ * session and an identified producer (but not a consumer) - note that the session used for the receive side
  * cannot be re-used for the send, as MessageListener usage precludes any synchronous sends or receives on
  * that session
  * <p>
@@ -68,13 +62,13 @@ import org.apache.cxf.common.util.AbstractTwoStageCache;
  * strategies make sense ...
  * <p>
  * client-side: a SoftReference-based cache of send/receive sessions is maintained containing an aggregate of
- * a session, indentified producer, temporary reply destination & consumer for same
+ * a session, identified producer, temporary reply destination & consumer for same
  * <p>
  * server-side receive: as sessions cannot be usefully recycled, they are simply created on demand and closed
  * when no longer required
  * <p>
  * server-side send: a SoftReference-based cache of send-only sessions is maintained containing an aggregate
- * of a session and an indentified producer
+ * of a session and an identified producer
  * <p>
  * In a pure client or pure server, only a single cache is ever populated. Where client and server logic is
  * co-located, a client session retrieval for a twoway invocation checks the reply-capable cache first and
@@ -93,80 +87,118 @@ public class JMSSessionFactory {
     private int highWaterMark;
 
     private final Context initialContext;
-    private final Connection theConnection;
-    private AbstractTwoStageCache<PooledSession> replyCapableSessionCache;
-    private AbstractTwoStageCache<PooledSession> sendOnlySessionCache;
-    private final Destination theReplyDestination;
-    private final ServerBehaviorPolicyType runtimePolicy;
+    private ConnectionFactory connectionFactory;
+    private final Connection connection;
+    private AbstractTwoStageCache<PooledSession> sessionCache;
     private boolean destinationIsQueue;
 
     /**
      * Constructor.
      * 
+     * @param connectionFactory
      * @param connection the shared {Queue|Topic}Connection
      */
-    public JMSSessionFactory(Connection connection, Destination replyDestination, Context context,
-                             boolean destinationIsQueue, SessionPoolType sessionPoolConfig,
-                             ServerBehaviorPolicyType runtimePolicy) {
-        theConnection = connection;
-        theReplyDestination = replyDestination;
+    protected JMSSessionFactory(ConnectionFactory connectionFactory, Connection connection,
+                                Destination replyDestination, Context context, boolean destinationIsQueue,
+                                SessionPoolType sessionPoolConfig) {
+        this.connectionFactory = connectionFactory;
+        this.connection = connection;
+        this.destinationIsQueue = destinationIsQueue;
         initialContext = context;
-        this.runtimePolicy = runtimePolicy;
 
         lowWaterMark = sessionPoolConfig.getLowWaterMark();
         highWaterMark = sessionPoolConfig.getHighWaterMark();
-        this.destinationIsQueue = destinationIsQueue;
 
         // create session caches (REVISIT sizes should be configurable)
-        //
+        try {
+            sessionCache = new AbstractTwoStageCache<PooledSession>(lowWaterMark, highWaterMark, 0, this) {
+                public final PooledSession create() throws JMSException {
+                    return createSession();
+                }
+            };
+            sessionCache.populateCache();
+        } catch (Throwable t) {
+            LOG.log(Level.FINE, "JMS Session cache populate failed: " + t);
+        }
+    }
 
+    /**
+     * Helper method to create a point-to-point pooled session.
+     * 
+     * @return an appropriate pooled session
+     */
+    private PooledSession createSession() throws JMSException {
+        Session session = null;
         if (destinationIsQueue) {
-            // the reply capable cache is only required in the point-to-point
-            // domain
-            //
-            replyCapableSessionCache = new AbstractTwoStageCache<PooledSession>(lowWaterMark, highWaterMark,
-                0, this) {
-                public final PooledSession create() throws JMSException {
-                    return createPointToPointReplyCapableSession();
-                }
-            };
-
-            try {
-                replyCapableSessionCache.populateCache();
-            } catch (Throwable t) {
-                LOG.log(Level.FINE, "JMS Session cache populate failed: " + t);
-            }
-
-            // send-only cache for point-to-point oneway requests and replies
-            //
-            sendOnlySessionCache = new AbstractTwoStageCache<PooledSession>(lowWaterMark, highWaterMark, 0,
-                this) {
-                public final PooledSession create() throws JMSException {
-                    return createPointToPointSendOnlySession();
-                }
-            };
-
-            try {
-                sendOnlySessionCache.populateCache();
-            } catch (Throwable t) {
-                LOG.log(Level.FINE, "JMS Session cache populate failed: " + t);
-            }
+            session = ((QueueConnection)connection).createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         } else {
-            // send-only cache for pub-sub oneway requests
-            //
-            sendOnlySessionCache = new AbstractTwoStageCache<PooledSession>(lowWaterMark, highWaterMark, 0,
-                this) {
-                public final PooledSession create() throws JMSException {
-                    return createPubSubSession(true, false, null);
-                }
-            };
+            session = ((TopicConnection)connection).createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+        }
+        return new PooledSession(session, destinationIsQueue);
+    }
 
-            try {
-                sendOnlySessionCache.populateCache();
-            } catch (Throwable t) {
-                LOG.log(Level.FINE, "JMS Session cache populate failed: " + t);
+    /**
+     * This class acts as the hub of JMS provider usage, creating shared JMS Connections and providing access
+     * to a pool of JMS Sessions.
+     * <p>
+     * A new JMS connection is created for each each port based <jms:address> - however its likely that in
+     * practice the same JMS provider will be specified for each port, and hence the connection resources
+     * could be shared accross ports.
+     * <p>
+     * For the moment this class is realized as just a container for static methods, but the intention is to
+     * support in future sharing of JMS resources accross compatible ports.
+     */
+    protected static JMSSessionFactory connect(AddressType addrDetails, SessionPoolType sessionPoolConfig,
+                                               ServerConfig serverConfig) throws JMSException,
+        NamingException {
+
+        Context context = JMSUtils.getInitialContext(addrDetails);
+        ConnectionFactory connectionFactory;
+        Connection connection = null;
+
+        if (JMSUtils.isDestinationStyleQueue(addrDetails)) {
+            QueueConnectionFactory qcf = (QueueConnectionFactory)context.lookup(addrDetails
+                .getJndiConnectionFactoryName());
+            if (addrDetails.isSetConnectionUserName()) {
+                connection = qcf.createQueueConnection(addrDetails.getConnectionUserName(), addrDetails
+                    .getConnectionPassword());
+            } else {
+                connection = qcf.createQueueConnection();
+            }
+            connectionFactory = qcf;
+        } else {
+            TopicConnectionFactory tcf = (TopicConnectionFactory)context.lookup(addrDetails
+                .getJndiConnectionFactoryName());
+            if (addrDetails.isSetConnectionUserName()) {
+                connection = tcf.createTopicConnection(addrDetails.getConnectionUserName(), addrDetails
+                    .getConnectionPassword());
+            } else {
+                connection = tcf.createTopicConnection();
+            }
+            connectionFactory = tcf;
+        }
+
+        if (null != serverConfig) {
+            String clientID = serverConfig.getDurableSubscriptionClientId();
+
+            if (clientID != null) {
+                connection.setClientID(clientID);
             }
         }
+        connection.start();
+        /*
+         * Destination requestDestination = resolveRequestDestination(context, connection, addrDetails);
+         */
+
+        Destination replyDestination = JMSUtils.resolveReplyDestination(context, connection, addrDetails);
+
+        // create session factory to manage session, reply destination,
+        // producer and consumer pooling
+        //
+        JMSSessionFactory sf = new JMSSessionFactory(connectionFactory, connection, replyDestination,
+                                                     context, JMSUtils.isDestinationStyleQueue(addrDetails),
+                                                     sessionPoolConfig);
+        return sf;
     }
 
     // --java.lang.Object Overrides----------------------------------------------
@@ -175,123 +207,37 @@ public class JMSSessionFactory {
     }
 
     // --Methods-----------------------------------------------------------------
+
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+    
     protected Connection getConnection() {
-        return theConnection;
+        return connection;
     }
 
-    public Queue getQueueFromInitialContext(String queueName) throws NamingException {
-        return (Queue)initialContext.lookup(queueName);
-    }
-
-    public PooledSession get(boolean replyCapable) throws JMSException {
-        return get(null, replyCapable);
+    public Context getInitialContext() {
+        return initialContext;
     }
 
     /**
      * Retrieve a new or cached Session.
      * 
-     * @param replyDest Destination name if coming from wsa:Header
-     * @param replyCapable true iff the session is to be used to receive replies (implies client side twoway
-     *                invocation )
      * @return a new or cached Session
      */
-    public PooledSession get(Destination replyDest, boolean replyCapable) throws JMSException {
+    public PooledSession get() {
         PooledSession ret = null;
 
         synchronized (this) {
-            if (replyCapable) {
-                // first try reply capable cache
-                //
-                ret = replyCapableSessionCache.poll();
+            ret = sessionCache.poll();
 
-                if (ret == null) {
-                    // fall back to send only cache, creating temporary reply
-                    // queue and consumer
-                    //
-                    ret = sendOnlySessionCache.poll();
-
-                    if (ret != null) {
-                        QueueSession session = (QueueSession)ret.session();
-                        Queue destination = null;
-                        String selector = null;
-
-                        if (null != theReplyDestination || null != replyDest) {
-                            destination = null != replyDest ? (Queue)replyDest : (Queue)theReplyDestination;
-
-                            selector = "JMSCorrelationID = '" + generateUniqueSelector(ret) + "'";
-                        }
-
-                        if (destination == null) {
-                            // neither replyDestination not replyDest are present.
-                            destination = session.createTemporaryQueue();
-                            selector = "JMSCorrelationID = '" + generateUniqueSelector(ret) + "'";
-                        }
-
-                        ret.destination(destination);
-                        MessageConsumer consumer = session.createReceiver(destination, selector);
-                        ret.consumer(consumer);
-                    } else {
-                        // no pooled session available in either cache => create one in
-                        // in the reply capable cache
-                        //
-                        try {
-                            ret = replyCapableSessionCache.get();
-                        } catch (Throwable t) {
-                            // factory method may only throw JMSException
-                            //
-                            throw (JMSException)t;
-                        }
-                    }
-                }
-            } else {
-                // first try send only cache
-                //
-                ret = sendOnlySessionCache.poll();
-
-                if (ret == null) {
-                    // fall back to reply capable cache if one exists (only in the
-                    // point-to-point domain), ignoring temporary reply destination
-                    // and consumer
-                    //
-                    if (replyCapableSessionCache != null) {
-                        ret = replyCapableSessionCache.poll();
-                    }
-
-                    if (ret == null) {
-                        // no pooled session available in either cache => create one in
-                        // in the send only cache
-                        //
-                        try {
-                            ret = sendOnlySessionCache.get();
-                        } catch (Throwable t) {
-                            // factory method may only throw JMSException
-                            //
-                            throw (JMSException)t;
-                        }
-                    }
+            if (ret == null) {
+                try {
+                    ret = sessionCache.get();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Retrieve a new
-     * 
-     * @param destination the target JMS queue or topic (non-null implies server receive side)
-     * @return a new or cached Session
-     */
-    public PooledSession get(Destination destination) throws JMSException {
-        PooledSession ret = null;
-
-        // the destination is only specified on the server receive side,
-        // in which case a new session is always created
-        //
-        if (destinationIsQueue) {
-            ret = createPointToPointServerSession(destination);
-        } else {
-            ret = createPubSubSession(false, true, destination);
         }
 
         return ret;
@@ -305,15 +251,14 @@ public class JMSSessionFactory {
     public void recycle(PooledSession pooledSession) {
         // sessions used long-term by the server receive side are not cached,
         // only non-null destinations are temp queues
-        final boolean replyCapable = pooledSession.destination() != null;
+        if (pooledSession == null) {
+            return;
+        }
         boolean discard = false;
 
+        // re-cache session, closing if it cannot be it can be accomodated
         synchronized (this) {
-            // re-cache session, closing if it cannot be it can be accomodated
-            //
-            discard = replyCapable
-                ? (!replyCapableSessionCache.recycle(pooledSession)) : (!sendOnlySessionCache
-                    .recycle(pooledSession));
+            discard = !sessionCache.recycle(pooledSession);
         }
 
         if (discard) {
@@ -332,124 +277,21 @@ public class JMSSessionFactory {
         try {
             PooledSession curr;
 
-            if (replyCapableSessionCache != null) {
-                curr = replyCapableSessionCache.poll();
+            if (sessionCache != null) {
+                curr = sessionCache.poll();
                 while (curr != null) {
                     curr.close();
-                    curr = replyCapableSessionCache.poll();
+                    curr = sessionCache.poll();
                 }
             }
 
-            if (sendOnlySessionCache != null) {
-                curr = sendOnlySessionCache.poll();
-                while (curr != null) {
-                    curr.close();
-                    curr = sendOnlySessionCache.poll();
-                }
-            }
-
-            theConnection.close();
+            connection.close();
         } catch (JMSException e) {
             LOG.log(Level.WARNING, "queue connection close failed: " + e);
         }
 
         // help GC
         //
-        replyCapableSessionCache = null;
-        sendOnlySessionCache = null;
-    }
-
-    /**
-     * Helper method to create a point-to-point pooled session.
-     * 
-     * @param producer true iff producing
-     * @param consumer true iff consuming
-     * @param destination the target destination
-     * @return an appropriate pooled session
-     */
-    PooledSession createPointToPointReplyCapableSession() throws JMSException {
-        QueueSession session = ((QueueConnection)theConnection).createQueueSession(false,
-                                                                                   Session.AUTO_ACKNOWLEDGE);
-        Destination destination = null;
-        String selector = null;
-
-        if (null != theReplyDestination) {
-            destination = theReplyDestination;
-
-            selector = "JMSCorrelationID = '" + generateUniqueSelector(session) + "'";
-
-        } else {
-            destination = session.createTemporaryQueue();
-        }
-
-        MessageConsumer consumer = session.createReceiver((Queue)destination, selector);
-        return new PooledSession(session, destination, session.createSender(null), consumer);
-    }
-
-    /**
-     * Helper method to create a point-to-point pooled session.
-     * 
-     * @return an appropriate pooled session
-     */
-    PooledSession createPointToPointSendOnlySession() throws JMSException {
-        QueueSession session = ((QueueConnection)theConnection).createQueueSession(false,
-                                                                                   Session.AUTO_ACKNOWLEDGE);
-
-        return new PooledSession(session, null, session.createSender(null), null);
-    }
-
-    /**
-     * Helper method to create a point-to-point pooled session for consumer only.
-     * 
-     * @param destination the target destination
-     * @return an appropriate pooled session
-     */
-    private PooledSession createPointToPointServerSession(Destination destination) throws JMSException {
-        QueueSession session = ((QueueConnection)theConnection).createQueueSession(false,
-                                                                                   Session.AUTO_ACKNOWLEDGE);
-
-        return new PooledSession(session, destination, session.createSender(null), session
-            .createReceiver((Queue)destination, runtimePolicy.getMessageSelector()));
-    }
-
-    /**
-     * Helper method to create a pub-sub pooled session.
-     * 
-     * @param producer true iff producing
-     * @param consumer true iff consuming
-     * @param destination the target destination
-     * @return an appropriate pooled session
-     */
-    PooledSession createPubSubSession(boolean producer, boolean consumer, Destination destination)
-        throws JMSException {
-        TopicSession session = ((TopicConnection)theConnection).createTopicSession(false,
-                                                                                   Session.AUTO_ACKNOWLEDGE);
-        TopicSubscriber sub = null;
-        if (consumer) {
-            String messageSelector = runtimePolicy.getMessageSelector();
-            String durableName = runtimePolicy.getDurableSubscriberName();
-            if (durableName != null) {
-                sub = session
-                    .createDurableSubscriber((Topic)destination, durableName, messageSelector, false);
-            } else {
-                sub = session.createSubscriber((Topic)destination, messageSelector, false);
-            }
-        }
-
-        return new PooledSession(session, null, producer ? session.createPublisher(null) : null, sub);
-    }
-
-    private String generateUniqueSelector(Object obj) {
-        String host = "localhost";
-
-        try {
-            InetAddress addr = InetAddress.getLocalHost();
-            host = addr.getHostName();
-        } catch (UnknownHostException ukex) {
-            // Default to localhost.
-        }
-
-        long time = Calendar.getInstance().getTimeInMillis();
-        return host + "_" + System.getProperty("user.name") + "_" + obj + time;
+        sessionCache = null;
     }
 }
