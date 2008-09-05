@@ -30,12 +30,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.QueueSender;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.jms.TopicPublisher;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -136,7 +142,7 @@ public final class JMSUtils {
      * @param replyTo the ReplyTo destination if any
      * @return a JMS of the appropriate type populated with the given payload
      */
-    public static Message marshal(Object payload, Session session, Destination replyTo, String messageType)
+    public static Message createAndSetPayload(Object payload, Session session, String messageType)
         throws JMSException {
         Message message = null;
 
@@ -150,32 +156,26 @@ public final class JMSUtils {
             ((ObjectMessage)message).setObject((byte[])payload);
         }
 
-        if (replyTo != null) {
-            message.setJMSReplyTo(replyTo);
-        }
-
         return message;
     }
 
     /**
-     * Unmarshal the payload of an incoming message.
+     * Extract the payload of an incoming message.
      * 
      * @param message the incoming message
-     * @return the unmarshalled message payload, either of type String or byte[] depending on payload type
+     * @return the message payload as byte[]
      */
-    public static Object unmarshal(Message message) throws JMSException {
-        Object ret = null;
+    public static byte[] retrievePayload(Message message) throws JMSException {
+        byte[] ret = null;
 
         if (message instanceof TextMessage) {
-            ret = ((TextMessage)message).getText();
+            ret = ((TextMessage)message).getText().getBytes();
         } else if (message instanceof BytesMessage) {
-            byte[] retBytes = new byte[(int)((BytesMessage)message).getBodyLength()];
-            ((BytesMessage)message).readBytes(retBytes);
-            ret = retBytes;
+            ret = new byte[(int)((BytesMessage)message).getBodyLength()];
+            ((BytesMessage)message).readBytes(ret);
         } else {
             ret = (byte[])((ObjectMessage)message).getObject();
         }
-
         return ret;
     }
 
@@ -251,7 +251,7 @@ public final class JMSUtils {
         return headers;
     }
 
-    public static void setContentToProtocalHeader(org.apache.cxf.message.Message message) {
+    public static void setContentToProtocolHeader(org.apache.cxf.message.Message message) {
         String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
 
         Map<String, List<String>> headers = JMSUtils.getSetProtocolHeaders(message);
@@ -267,5 +267,108 @@ public final class JMSUtils {
 
     public static boolean isDestinationStyleQueue(AddressType address) {
         return JMSConstants.JMS_QUEUE.equals(address.getDestinationStyle().value());
+    }
+
+    public static Message buildJMSMessageFromCXFMessage(org.apache.cxf.message.Message outMessage,
+                                                        Object payload, String messageType, Session session,
+                                                        Destination replyTo, String correlationId)
+        throws JMSException {
+        Message jmsMessage = JMSUtils.createAndSetPayload(payload, session, messageType);
+
+        if (replyTo != null) {
+            jmsMessage.setJMSReplyTo(replyTo);
+        }
+
+        JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
+            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+
+        String correlationID = JMSUtils.getCorrelationId(headers);
+
+        JMSUtils.setMessageProperties(headers, jmsMessage);
+        // ensure that the contentType is set to the out jms message header
+        JMSUtils.setContentToProtocolHeader(outMessage);
+        Map<String, List<String>> protHeaders = CastUtils.cast((Map<?, ?>)outMessage
+            .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
+        JMSUtils.addProtocolHeaders(jmsMessage, protHeaders);
+        if (!outMessage.getExchange().isOneWay()) {
+            String id = correlationId;
+
+            if (id != null) {
+                if (correlationID != null) {
+                    String error = "User cannot set JMSCorrelationID when "
+                                   + "making a request/reply invocation using " + "a static replyTo Queue.";
+                    throw new JMSException(error);
+                }
+                correlationID = id;
+            }
+        }
+
+        if (correlationID != null) {
+            jmsMessage.setJMSCorrelationID(correlationID);
+        } else {
+            // No message correlation id is set. Whatever comeback will be accepted as responses.
+            // We assume that it will only happen in case of the temp. reply queue.
+        }
+        return jmsMessage;
+    }
+
+    public static void sendMessage(MessageProducer producer, Destination destination, Message jmsMessage,
+                                   long timeToLive, int deliveryMode, int priority) throws JMSException {
+        /*
+         * Can this be changed to producer.send(destination, jmsMessage, deliveryMode, priority, timeToLive);
+         */
+
+        if (destination instanceof Queue) {
+            QueueSender sender = (QueueSender)producer;
+            sender.setTimeToLive(timeToLive);
+            sender.send((Queue)destination, jmsMessage, deliveryMode, priority, timeToLive);
+        } else {
+            TopicPublisher publisher = (TopicPublisher)producer;
+            publisher.setTimeToLive(timeToLive);
+            publisher.publish((Topic)destination, jmsMessage, deliveryMode, priority, timeToLive);
+        }
+    }
+
+    public static Destination resolveRequestDestination(Context context, Connection connection,
+                                                        AddressType addrDetails) throws JMSException,
+        NamingException {
+        Destination requestDestination = null;
+        // see if jndiDestination is set
+        if (addrDetails.getJndiDestinationName() != null) {
+            requestDestination = (Destination)context.lookup(addrDetails.getJndiDestinationName());
+        }
+
+        // if no jndiDestination or it fails see if jmsDestination is set
+        // and try to create it.
+        if (requestDestination == null && addrDetails.getJmsDestinationName() != null) {
+            if (JMSUtils.isDestinationStyleQueue(addrDetails)) {
+                requestDestination = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
+                    .createQueue(addrDetails.getJmsDestinationName());
+            } else {
+                requestDestination = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
+                    .createTopic(addrDetails.getJmsDestinationName());
+            }
+        }
+        return requestDestination;
+    }
+
+    public static Queue resolveReplyDestination(Context context, Connection connection,
+                                                      AddressType addrDetails) throws NamingException,
+        JMSException {
+        Queue replyDestination = null;
+
+        // Reply Destination is used (if present) only if the session is
+        // point-to-point session
+        if (JMSUtils.isDestinationStyleQueue(addrDetails)) {
+            if (addrDetails.getJndiReplyDestinationName() != null) {
+                replyDestination = (Queue)context.lookup(addrDetails.getJndiReplyDestinationName());
+            }
+            if (replyDestination == null && addrDetails.getJmsReplyDestinationName() != null) {
+                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                replyDestination = session.createQueue(addrDetails.getJmsReplyDestinationName());
+                session.close();
+            }
+        }
+        return replyDestination;
     }
 }

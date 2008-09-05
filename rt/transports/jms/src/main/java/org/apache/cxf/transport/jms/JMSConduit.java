@@ -23,42 +23,39 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
 import javax.jms.Queue;
-import javax.jms.QueueSender;
-import javax.jms.Topic;
-import javax.jms.TopicPublisher;
-import javax.naming.NamingException;
+import javax.naming.Context;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
-import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-public class JMSConduit extends AbstractConduit implements Configurable, JMSOnConnectCallback {
+/**
+ * JMSConduit is instantiated by the JMSTransportfactory which is selected by a client if the transport
+ * protocol starts with jms:// JMSConduit converts CXF Messages to JMS Messages and sends the request by using
+ * JMS topics or queues. If the Exchange is not oneway it then recevies the response and converts it to a CXF
+ * Message. This is then provided in the Exchange and also sent to the incomingObserver
+ */
+public class JMSConduit extends AbstractConduit implements Configurable, JMSExchangeSender {
 
     protected static final String BASE_BEAN_NAME_SUFFIX = ".jms-conduit-base";
 
-    private static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
+    static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
 
     protected Destination targetDestination;
-    protected Destination replyDestination;
     protected JMSSessionFactory sessionFactory;
     protected Bus bus;
     protected EndpointInfo endpointInfo;
@@ -69,122 +66,23 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSOnCo
     protected AddressType address;
     protected SessionPoolType sessionPool;
 
+    private Queue replyDestination;
+
+    private Context context;
+
     public JMSConduit(Bus b, EndpointInfo endpointInfo) {
         this(b, endpointInfo, null);
     }
 
     public JMSConduit(Bus b, EndpointInfo endpointInfo, EndpointReferenceType target) {
         super(target);
-
         this.bus = b;
         this.endpointInfo = endpointInfo;
         this.beanNameSuffix = BASE_BEAN_NAME_SUFFIX;
         initConfig();
     }
 
-    // prepare the message for send out , not actually send out the message
-    public void prepare(Message message) throws IOException {
-        getLogger().log(Level.FINE, "JMSConduit send message");
-
-        try {
-            if (null == sessionFactory) {
-                JMSProviderHub.connect(this, getJMSAddress(), getSessionPool());
-            }
-        } catch (JMSException jmsex) {
-            getLogger().log(Level.WARNING, "JMS connect failed with JMSException : ", jmsex);
-            throw new IOException(jmsex.toString());
-        } catch (NamingException ne) {
-            getLogger().log(Level.WARNING, "JMS connect failed with NamingException : ", ne);
-            throw new IOException(ne.toString());
-        }
-
-        if (sessionFactory == null) {
-            throw new java.lang.IllegalStateException("JMSClientTransport not connected");
-        }
-
-        try {
-            boolean isOneWay = false;
-            // test if the message is oneway message
-            Exchange ex = message.getExchange();
-            if (null != ex) {
-                isOneWay = ex.isOneWay();
-            }
-            // get the pooledSession with response expected
-            PooledSession pooledSession = sessionFactory.get(!isOneWay);
-            // put the PooledSession into the outMessage
-            message.put(JMSConstants.JMS_POOLEDSESSION, pooledSession);
-
-        } catch (JMSException jmsex) {
-            throw new IOException(jmsex.getMessage());
-        }
-
-        message.setContent(OutputStream.class, new JMSOutputStream(message));
-
-    }
-
-    public void close() {
-        getLogger().log(Level.FINE, "JMSConduit closed ");
-
-        // ensure resources held by session factory are released
-        //
-        if (sessionFactory != null) {
-            sessionFactory.shutdown();
-        }
-    }
-
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    /**
-     * Receive mechanics.
-     * 
-     * @param pooledSession the shared JMS resources
-     * @param inMessage
-     * @retrun the response buffer
-     */
-    private Object receive(PooledSession pooledSession, Message outMessage, Message inMessage)
-        throws JMSException {
-
-        Object result = null;
-
-        long timeout = getClientConfig().getClientReceiveTimeout();
-
-        Long receiveTimeout = (Long)outMessage.get(JMSConstants.JMS_CLIENT_RECEIVE_TIMEOUT);
-
-        if (receiveTimeout != null) {
-            timeout = receiveTimeout.longValue();
-        }
-
-        javax.jms.Message jmsMessage = pooledSession.consumer().receive(timeout);
-        getLogger().log(Level.FINE, "client received reply: ", jmsMessage);
-
-        if (jmsMessage != null) {
-
-            JMSUtils.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-            result = JMSUtils.unmarshal(jmsMessage);
-            return result;
-        } else {
-            String error = "JMSClientTransport.receive() timed out. No message available.";
-            getLogger().log(Level.SEVERE, error);
-            // TODO: Review what exception should we throw.
-            throw new JMSException(error);
-
-        }
-    }
-
-    public void connected(Destination target, Destination reply, JMSSessionFactory factory) {
-        this.targetDestination = target;
-        this.replyDestination = reply;
-        this.sessionFactory = factory;
-    }
-
-    public String getBeanName() {
-        return endpointInfo.getName().toString() + ".jms-conduit";
-    }
-
     private void initConfig() {
-
         this.address = endpointInfo.getTraversedExtensor(new AddressType(), AddressType.class);
         this.sessionPool = endpointInfo.getTraversedExtensor(new SessionPoolType(), SessionPoolType.class);
         this.clientConfig = endpointInfo.getTraversedExtensor(new ClientConfig(), ClientConfig.class);
@@ -197,8 +95,162 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSOnCo
         }
     }
 
+    public JMSSessionFactory getOrCreateSessionFactory() {
+        if (this.sessionFactory == null) {
+            try {
+                this.context = JMSUtils.getInitialContext(address);
+                this.sessionFactory = JMSSessionFactory
+                    .connect(getJMSAddress(), getSessionPool(), null);
+                this.targetDestination = JMSUtils.resolveRequestDestination(sessionFactory
+                    .getInitialContext(), sessionFactory.getConnection(), address);
+                this.replyDestination = JMSUtils.resolveReplyDestination(context, sessionFactory
+                    .getConnection(), address);
+            } catch (Exception jmsex) {
+                throw new RuntimeException("JMS connect failed: ", jmsex);
+            }
+        }
+        if (this.targetDestination == null) {
+            throw new RuntimeException("Failed to lookup or create requestDestination");
+        }
+        return this.sessionFactory;
+    }
+
+    // prepare the message for send out , not actually send out the message
+    public void prepare(Message message) throws IOException {
+        if (this.address == null || this.address.getJndiConnectionFactoryName() == null) {
+            throw new RuntimeException("Insufficient configuration for Conduit. "
+                + "Did you configure a <jms:conduit name=\"" 
+                + getBeanName() + "\"> and set the jndiConnectionFactoryName ?");
+        }
+        message.setContent(OutputStream.class, new JMSOutputStream(this, 
+            message.getExchange(), isTextPayload()));
+        // After this step flow will continue in JMSOutputStream.doClose()
+    }
+
+    /**
+     * Send the JMS Request out and if not oneWay receive the response
+     * 
+     * @param outMessage
+     * @param request
+     * @return inMessage
+     */
+    public void sendExchange(Exchange exchange, Object request) {
+        LOG.log(Level.FINE, "JMSConduit send message");
+
+        sessionFactory = getOrCreateSessionFactory();
+        PooledSession pooledSession = null;
+        try {
+            pooledSession = sessionFactory.get();
+            Destination replyTo = null;
+            if (!exchange.isOneWay()) {
+                pooledSession.initConsumerAndReplyDestination(replyDestination);
+                replyTo = pooledSession.getReplyDestination();
+            }
+
+            // TODO setting up the responseExpected
+
+            // We don't want to send temp queue in
+            // replyTo header for oneway calls
+            if (exchange.isOneWay() && (getJMSAddress().getJndiReplyDestinationName() == null)) {
+                replyTo = null;
+            }
+            Message outMessage = exchange.getOutMessage();
+            if (outMessage == null) {
+                throw new RuntimeException("Exchange to be sent has no outMessage");
+            }
+            sendMessage(outMessage, request, pooledSession, replyTo);
+
+            if (!exchange.isOneWay()) {
+                long receiveTimeout = clientConfig.getClientReceiveTimeout();
+                Long messageReceiveTimeout = (Long)exchange.getOutMessage()
+                    .get(JMSConstants.JMS_CLIENT_RECEIVE_TIMEOUT);
+                if (messageReceiveTimeout != null) {
+                    receiveTimeout = messageReceiveTimeout.longValue();
+                }
+                Message inMessage = receiveResponse(pooledSession.consumer(), receiveTimeout);
+                exchange.setInMessage(inMessage);
+                incomingObserver.onMessage(inMessage);
+            }
+        } finally {
+            sessionFactory.recycle(pooledSession);
+        }
+    }
+
+    private void sendMessage(Message outMessage, Object request, PooledSession pooledSession,
+                             Destination replyTo) {
+        try {
+            String messageType = runtimePolicy.getMessageType().value();
+            javax.jms.Message jmsMessage;
+            jmsMessage = JMSUtils.buildJMSMessageFromCXFMessage(outMessage, request, messageType,
+                                                                pooledSession.session(), replyTo,
+                                                                pooledSession.getCorrelationID());
+
+            // Retrieve JMS QoS parameters from CXF message headers
+            JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
+                .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+            long ttl = JMSUtils.getTimeToLive(headers);
+            if (ttl <= 0) {
+                ttl = clientConfig.getMessageTimeToLive();
+            }
+            int deliveryMode = JMSUtils.getJMSDeliveryMode(headers);
+            int priority = JMSUtils.getJMSPriority(headers);
+
+            LOG.log(Level.FINE, "client sending request: ", jmsMessage);
+            JMSUtils.sendMessage(pooledSession.producer(), targetDestination, jmsMessage, ttl, deliveryMode,
+                                 priority);
+        } catch (JMSException e) {
+            throw new RuntimeException("Problem while sending JMS message", e);
+        }
+    }
+
+    private Message receiveResponse(MessageConsumer consumer, long receiveTimeout) {
+        // TODO if outMessage need to get the response
+        try {
+            Message inMessage = new MessageImpl();
+            // set the message header back to the incomeMessage
+            // inMessage.put(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS,
+            // outMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS));
+
+            byte[] response = null;
+            javax.jms.Message jmsMessage = consumer.receive(receiveTimeout);
+            if (jmsMessage == null) {
+                // TODO: Review what exception should we throw.
+                throw new JMSException("JMS receive timed out");
+            }
+            LOG.log(Level.FINE, "client received reply: ", jmsMessage);
+            JMSUtils.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+            response = JMSUtils.retrievePayload(jmsMessage);
+            LOG.log(Level.FINE, "The Response Message payload is : [" + response + "]");
+
+            // setup the inMessage response stream
+            inMessage.setContent(InputStream.class, new ByteArrayInputStream(response));
+            LOG.log(Level.FINE, "incoming observer is " + incomingObserver);
+
+            return inMessage;
+        } catch (JMSException e) {
+            throw new RuntimeException("Problem while receiving JMS message", e);
+        }
+
+    }
+
     private boolean isTextPayload() {
-        return JMSConstants.TEXT_MESSAGE_TYPE.equals(getRuntimePolicy().getMessageType().value());
+        return JMSConstants.TEXT_MESSAGE_TYPE.equals(runtimePolicy.getMessageType().value());
+    }
+
+    public void close() {
+        getLogger().log(Level.FINE, "JMSConduit closed ");
+        // ensure resources held by session factory are released
+        if (sessionFactory != null) {
+            sessionFactory.shutdown();
+        }
+    }
+
+    protected Logger getLogger() {
+        return LOG;
+    }
+
+    public String getBeanName() {
+        return endpointInfo.getName().toString() + ".jms-conduit";
     }
 
     public AddressType getJMSAddress() {
@@ -232,190 +284,4 @@ public class JMSConduit extends AbstractConduit implements Configurable, JMSOnCo
     public void setSessionPool(SessionPoolType sessionPool) {
         this.sessionPool = sessionPool;
     }
-
-    private class JMSOutputStream extends CachedOutputStream {
-        private Message outMessage;
-        private javax.jms.Message jmsMessage;
-        private PooledSession pooledSession;
-        private boolean isOneWay;
-
-        public JMSOutputStream(Message m) {
-            outMessage = m;
-            pooledSession = (PooledSession)outMessage.get(JMSConstants.JMS_POOLEDSESSION);
-        }
-
-        protected void doFlush() throws IOException {
-            // do nothing here
-        }
-
-        protected void doClose() throws IOException {
-            try {
-                isOneWay = outMessage.getExchange().isOneWay();
-                commitOutputMessage();
-                if (!isOneWay) {
-                    handleResponse();
-                }
-            } catch (JMSException jmsex) {
-                getLogger().log(Level.WARNING, "JMS connect failed with JMSException : ", jmsex);
-                throw new IOException(jmsex.toString());
-            } finally {
-                sessionFactory.recycle(pooledSession);
-            }
-        }
-
-        protected void onWrite() throws IOException {
-
-        }
-
-        private void commitOutputMessage() throws JMSException {
-            javax.jms.Destination replyTo = pooledSession.destination();
-            // TODO setting up the responseExpected
-
-            // We don't want to send temp queue in
-            // replyTo header for oneway calls
-            if (isOneWay && (getJMSAddress().getJndiReplyDestinationName() == null)) {
-                replyTo = null;
-            }
-
-            Object request = null;
-            try {
-                if (isTextPayload()) {
-                    StringBuilder builder = new StringBuilder(2048);
-                    this.writeCacheTo(builder);
-                    request = builder.toString();
-                } else {
-                    request = getBytes();
-                }
-            } catch (IOException ex) {
-                JMSException ex2 = new JMSException("Error creating request");
-                ex2.setLinkedException(ex);
-                throw ex2;
-            }
-            if (getLogger().isLoggable(Level.FINE)) {
-                getLogger().log(Level.FINE, "Conduit Request is :[" + request + "]");
-            }
-
-            jmsMessage = JMSUtils.marshal(request, pooledSession.session(), replyTo, getRuntimePolicy()
-                .getMessageType().value());
-
-            JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
-                .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
-
-            int deliveryMode = JMSUtils.getJMSDeliveryMode(headers);
-            int priority = JMSUtils.getJMSPriority(headers);
-            String correlationID = JMSUtils.getCorrelationId(headers);
-            long ttl = JMSUtils.getTimeToLive(headers);
-            if (ttl <= 0) {
-                ttl = getClientConfig().getMessageTimeToLive();
-            }
-
-            JMSUtils.setMessageProperties(headers, jmsMessage);
-            // ensure that the contentType is set to the out jms message header
-            JMSUtils.setContentToProtocalHeader(outMessage);
-            Map<String, List<String>> protHeaders = CastUtils.cast((Map<?, ?>)outMessage
-                .get(Message.PROTOCOL_HEADERS));
-            JMSUtils.addProtocolHeaders(jmsMessage, protHeaders);
-            if (!isOneWay) {
-                String id = pooledSession.getCorrelationID();
-
-                if (id != null) {
-                    if (correlationID != null) {
-                        String error = "User cannot set JMSCorrelationID when "
-                                       + "making a request/reply invocation using "
-                                       + "a static replyTo Queue.";
-                        throw new JMSException(error);
-                    }
-                    correlationID = id;
-                }
-            }
-
-            if (correlationID != null) {
-                jmsMessage.setJMSCorrelationID(correlationID);
-            } else {
-                // No message correlation id is set. Whatever comeback will be accepted as responses.
-                // We assume that it will only happen in case of the temp. reply queue.
-            }
-
-            getLogger().log(Level.FINE, "client sending request: ", jmsMessage);
-            // getting Destination Style
-            if (JMSUtils.isDestinationStyleQueue(address)) {
-                QueueSender sender = (QueueSender)pooledSession.producer();
-                sender.setTimeToLive(ttl);
-                sender.send((Queue)targetDestination, jmsMessage, deliveryMode, priority, ttl);
-            } else {
-                TopicPublisher publisher = (TopicPublisher)pooledSession.producer();
-                publisher.setTimeToLive(ttl);
-                publisher.publish((Topic)targetDestination, jmsMessage, deliveryMode, priority, ttl);
-            }
-        }
-
-        private void handleResponse() throws IOException {
-            // REVISIT distinguish decoupled case or oneway call
-            Object response = null;
-
-            // TODO if outMessage need to get the response
-            Message inMessage = new MessageImpl();
-            outMessage.getExchange().setInMessage(inMessage);
-            // set the message header back to the incomeMessage
-            // inMessage.put(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS,
-            // outMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS));
-
-            try {
-                response = receive(pooledSession, outMessage, inMessage);
-            } catch (JMSException jmsex) {
-                getLogger().log(Level.FINE, "JMS connect failed with JMSException : ", jmsex);
-                throw new IOException(jmsex.toString());
-            }
-
-            getLogger().log(Level.FINE, "The Response Message is : [" + response + "]");
-
-            // setup the inMessage response stream
-            byte[] bytes = null;
-            if (response instanceof String) {
-                String requestString = (String)response;
-                bytes = requestString.getBytes();
-            } else {
-                bytes = (byte[])response;
-            }
-            inMessage.setContent(InputStream.class, new ByteArrayInputStream(bytes));
-            getLogger().log(Level.FINE, "incoming observer is " + incomingObserver);
-            incomingObserver.onMessage(inMessage);
-        }
-    }
-
-    /**
-     * Represented decoupled response endpoint.
-     */
-    protected class DecoupledDestination implements Destination {
-        protected MessageObserver decoupledMessageObserver;
-        private EndpointReferenceType address;
-
-        DecoupledDestination(EndpointReferenceType ref, MessageObserver incomingObserver) {
-            address = ref;
-            decoupledMessageObserver = incomingObserver;
-        }
-
-        public EndpointReferenceType getAddress() {
-            return address;
-        }
-
-        public Conduit getBackChannel(Message inMessage, Message partialResponse, EndpointReferenceType addr)
-            throws IOException {
-            // shouldn't be called on decoupled endpoint
-            return null;
-        }
-
-        public void shutdown() {
-            // TODO Auto-generated method stub
-        }
-
-        public synchronized void setMessageObserver(MessageObserver observer) {
-            decoupledMessageObserver = observer;
-        }
-
-        public synchronized MessageObserver getMessageObserver() {
-            return decoupledMessageObserver;
-        }
-    }
-
 }

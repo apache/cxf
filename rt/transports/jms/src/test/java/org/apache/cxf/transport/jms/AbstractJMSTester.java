@@ -92,13 +92,13 @@ public abstract class AbstractJMSTester extends Assert {
         Exchange exchange = new ExchangeImpl();
         exchange.setOneWay(isOneWay);
         message.setExchange(exchange);
-        exchange.setInMessage(message);
+        exchange.setOutMessage(message);
         try {
             conduit.prepare(message);
         } catch (IOException ex) {
             assertFalse("JMSConduit can't perpare to send out message", false);
             ex.printStackTrace();            
-        }            
+        }
         OutputStream os = message.getContent(OutputStream.class);
         assertTrue("The OutputStream should not be null ", os != null);
         os.write("HelloWorld".getBytes());
