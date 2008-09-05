@@ -36,6 +36,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
+import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
 
 /**
  * 
@@ -47,7 +48,7 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
     private static final Logger LOG 
         = LogUtils.getL7dLogger(AssertionBuilderRegistryImpl.class);
     private static final int IGNORED_CACHE_SIZE = 10;
-    private boolean ignoreUnknownAssertions; 
+    private boolean ignoreUnknownAssertions = true; 
     private List<QName> ignored = new ArrayList<QName>(IGNORED_CACHE_SIZE);
     
     public AssertionBuilderRegistryImpl() {
@@ -100,7 +101,7 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
                 if (!alreadyWarned) {
                     LOG.warning(m.toString());
                 }
-                return null;
+                return new XmlPrimitiveAssertion(element);
             } else {
                 throw new PolicyException(m);
             }

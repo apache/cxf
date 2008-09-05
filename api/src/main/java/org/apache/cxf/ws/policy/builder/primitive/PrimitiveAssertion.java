@@ -63,11 +63,13 @@ public class PrimitiveAssertion implements PolicyAssertion {
     public PrimitiveAssertion(Element element) {
         name = new QName(element.getNamespaceURI(), element.getLocalName());
         NamedNodeMap atts = element.getAttributes();
-        for (int x = 0; x < atts.getLength(); x++) {
-            Attr att = (Attr)atts.item(x);
-            QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
-            if (PolicyConstants.isOptionalAttribute(qn)) {
-                optional = Boolean.valueOf(att.getValue());                
+        if (atts != null) {
+            for (int x = 0; x < atts.getLength(); x++) {
+                Attr att = (Attr)atts.item(x);
+                QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
+                if (PolicyConstants.isOptionalAttribute(qn)) {
+                    optional = Boolean.valueOf(att.getValue());                
+                }
             }
         }
     }

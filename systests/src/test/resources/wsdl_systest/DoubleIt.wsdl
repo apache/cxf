@@ -82,6 +82,9 @@
    <wsp:Policy wsu:Id="DoubleItBindingPolicy">
       <wsp:ExactlyOne>
          <wsp:All>
+            <foo:unknownPolicy xmlns:foo="http://cxf.apache.org/not/a/policy"/>
+         </wsp:All>
+         <wsp:All>
             <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl"/>
             <sp:TransportBinding>
                <wsp:Policy>
