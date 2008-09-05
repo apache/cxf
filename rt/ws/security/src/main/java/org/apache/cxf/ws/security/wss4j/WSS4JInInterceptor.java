@@ -99,13 +99,17 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    public void handleMessage(SoapMessage msg) throws Fault {
+    private SOAPMessage getSOAPMessage(SoapMessage msg) {
         SOAPMessage doc = msg.getContent(SOAPMessage.class);
         if (doc == null) {
             saajIn.handleMessage(msg);
             doc = msg.getContent(SOAPMessage.class);
         }
-        
+        return doc;
+    }
+    
+    public void handleMessage(SoapMessage msg) throws Fault {
+        SOAPMessage doc = getSOAPMessage(msg);
         
         boolean doDebug = LOG.isLoggable(Level.FINE);
         boolean doTimeLog = TIME_LOG.isLoggable(Level.FINE);
@@ -167,6 +171,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             if (wsResult == null) { // no security header found
                 if (doAction == WSConstants.NO_SECURITY) {
+                    return;
+                } else if (doc.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                    LOG.warning("Request does not contain required Security header, " 
+                                + "but it's a fault.");
                     return;
                 } else {
                     LOG.warning("Request does not contain required Security header");
