@@ -30,6 +30,7 @@
 	<xsd:attribute name="name" type="xsd:string">
 	    <xsd:annotation>
 	        <xsd:documentation>
+	            A unique identifier for the bean. This can also be a list of identifiers.
                     See documentation for attribute name in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>
@@ -38,6 +39,9 @@
         <xsd:attribute name="abstract" type="xsd:boolean">
             <xsd:annotation>
                 <xsd:documentation>
+                    Specifies if the bean is an abstract bean. Abstract beans act as parents for 
+                    concrete bean definitions and are not instantiated. The default is "false".
+                    Setting this to "true" instructs the bean factory not to instantiate the bean,
                     See documentation for attribute abstract in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>
@@ -46,6 +50,8 @@
         <xsd:attribute name="depends-on" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
+                    A list of beans that the bean depends on being instantiated before the bean 
+                    can be instantiated.
                     See documentation for attribute depends-on in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>
@@ -54,6 +60,12 @@
         <xsd:attribute name="createdFromAPI" type="xsd:boolean">
             <xsd:annotation>
                 <xsd:documentation>
+                    Specifies that the user created that bean using CXF APIs like
+                    Endpoint.publish or Service.getPort.
+                    The default is "false".
+                    Setting this to "true" does the following: Changes the internal name of the
+                    bean by appending either ".jaxws-client" or ".jaxws-endpoint" to the bean's
+                    id. Make the bean abstract.
                     See documentation for attribute abstract in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>
