@@ -57,7 +57,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 
@@ -443,16 +442,15 @@ public final class StaxUtils {
         if (writeProlog) {
             writer.writeStartDocument();
         }
-
-        NodeList rootChildren = d.getChildNodes();
-        for (int rcx = 0; rcx < rootChildren.getLength(); rcx++) {
-            Node rootChild = rootChildren.item(rcx);
-            // don't write PIs if we're not writing a prolog.
-            if (writeProlog || rootChild.getNodeType() == Node.ELEMENT_NODE) {
-                writeNode(rootChild, writer, repairing);
+        
+        Node node = d.getFirstChild();
+        while (node != null) {
+            if (writeProlog || node.getNodeType() == Node.ELEMENT_NODE) {
+                writeNode(node, writer, repairing);
             }
+            node = node.getNextSibling();
         }
-
+        
         if (writeProlog) {
             writer.writeEndDocument();
         }

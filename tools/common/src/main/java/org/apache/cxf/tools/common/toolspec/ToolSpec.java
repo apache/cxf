@@ -279,14 +279,15 @@ public class ToolSpec {
     public String getAnnotation() {
         String result = null;
         Element element = doc.getDocumentElement();
-        NodeList list = element.getChildNodes();
-
-        for (int i = 0; i < list.getLength(); i++) {
-            if ((list.item(i).getNodeType() == Node.ELEMENT_NODE)
-                && ("annotation".equals(list.item(i).getNodeName()))) {
-                result = list.item(i).getFirstChild().getNodeValue();
+        
+        Node node = element.getFirstChild();
+        while (node != null) {
+            if ((node.getNodeType() == Node.ELEMENT_NODE)
+                && ("annotation".equals(node.getNodeName()))) {
+                result = node.getNodeValue();
                 break;
             }
+            node = node.getNextSibling();
         }
         return result;
     }

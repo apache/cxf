@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -95,9 +95,10 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 Element detail = fault.getDetail();
                 writer.writeStartElement(defaultPrefix, "Detail", ns);
 
-                NodeList details = detail.getChildNodes();
-                for (int i = 0; i < details.getLength(); i++) {
-                    StaxUtils.writeNode(details.item(i), writer, true);
+                Node node = detail.getFirstChild();
+                while (node != null) {
+                    StaxUtils.writeNode(node, writer, true);
+                    node = node.getNextSibling();
                 }
 
                 // Details

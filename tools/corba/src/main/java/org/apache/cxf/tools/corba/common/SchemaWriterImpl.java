@@ -35,7 +35,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.ibm.wsdl.Constants;
 import com.ibm.wsdl.util.xml.DOM2Writer;
@@ -128,15 +127,16 @@ public class SchemaWriterImpl extends WSDLWriterImpl {
         }                
         
         pw.print(">");
-        NodeList list = element.getChildNodes();
+        Node node = element.getFirstChild();
         pw.println();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node node = list.item(i);
+        while (node != null) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 printDOMElement((Element) node, pw, indentCount + 2);
                 pw.println();
             }
+            node = node.getNextSibling();
         }
+        
         indent(pw, indentCount);
         if (element.getLocalName().equals("schema")) {
             pw.print("</xs:" + element.getLocalName() + ">");

@@ -34,7 +34,6 @@ import javax.xml.ws.WebFault;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaDestination;
@@ -294,13 +293,14 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         Document faultDoc = DOMUtils.createDocument();
         Element faultElement = faultDoc.createElement(exType.getException().getLocalPart());
         faultDoc.appendChild(faultElement);
-       
-        NodeList nodeList = faultDetail.getChildNodes();
         
-        for (int i = 0; i < nodeList.getLength(); i++) { 
-            Node importedFaultData = faultDoc.importNode(nodeList.item(i), true);
+        Node node = faultDetail.getFirstChild();
+        while (node != null) {
+            Node importedFaultData = faultDoc.importNode(node, true);
             faultElement.appendChild(importedFaultData);
+            node = node.getNextSibling();     
         }
+        
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Exception DOM: " + XMLUtils.toString(faultElement));
         }

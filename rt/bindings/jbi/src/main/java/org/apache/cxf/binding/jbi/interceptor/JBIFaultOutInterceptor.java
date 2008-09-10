@@ -24,13 +24,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.jbi.JBIConstants;
 import org.apache.cxf.binding.jbi.JBIFault;
 import org.apache.cxf.binding.jbi.JBIMessage;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -64,13 +64,10 @@ public class JBIFaultOutInterceptor extends AbstractPhaseInterceptor<JBIMessage>
                 writer.writeEmptyElement("fault");
             } else {
                 Element detail = jbiFault.getDetail();
-                NodeList details = detail.getChildNodes();
-                for (int i = 0; i < details.getLength(); i++) {
-                    if (details.item(i) instanceof Element) {
-                        StaxUtils.writeNode(details.item(i), writer, true);
-                        break;
-                    }
-                }
+                Element elem = DOMUtils.getFirstElement(detail);
+                if (elem != null) {
+                    StaxUtils.writeNode(elem, writer, true);    
+                }              
             }
             writer.writeEndElement();
             writer.flush();

@@ -39,8 +39,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -280,14 +278,15 @@ public class CXFServiceUnit {
             return root;
         } 
         
-        NodeList children = root.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) { 
-            Node child = children.item(i);
-            Node found = findNode(child, name);
-            if (found != null) { 
+        Node node = root.getFirstChild();
+        
+        while (node != null) {
+            Node found = findNode(node, name);
+            if (found != null) {
                 return found;
-            } 
-        } 
+            }
+            node = node.getNextSibling();
+        }
         return null;
     } 
     

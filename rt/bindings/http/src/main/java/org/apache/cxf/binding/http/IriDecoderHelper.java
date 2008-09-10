@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -332,10 +331,10 @@ public final class IriDecoderHelper {
                     root.appendChild(ec);
                 }
             } else {
-                NodeList childNodes = ec.getChildNodes();
-                for (int j = 0; j < childNodes.getLength(); j++) {
-                    Node n = childNodes.item(j);
-                    ec.removeChild(n);
+                Node node = ec.getFirstChild();
+                while (node != null) {
+                    ec.removeChild(node);
+                    node = node.getNextSibling();
                 }
             }
 
@@ -348,29 +347,26 @@ public final class IriDecoderHelper {
     }
 
     private static Element getIndexedElement(Element e, int i) {
-        NodeList childNodes = e.getChildNodes();
+        Element elem = DOMUtils.getFirstElement(e);
         int elNum = 0;
-        for (int j = 0; j < childNodes.getLength(); j++) {
-            Node n = childNodes.item(j);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
-                if (i == elNum) {
-                    return (Element) n;
-                }
-                elNum++;
+        while (elem != null) {
+            if (i == elNum) {
+                return elem;
             }
+            elNum++;
+            elem = DOMUtils.getNextElement(elem);
         }
         return null;
     }
 
     private static Element getElement(Element element, QName name) {
-        NodeList childNodes = element.getChildNodes();
-        for (int j = 0; j < childNodes.getLength(); j++) {
-            Node n = childNodes.item(j);
-            if (n.getNodeType() == Node.ELEMENT_NODE
-                && n.getLocalName().equals(name.getLocalPart())
-                && n.getNamespaceURI().equals(name.getNamespaceURI())) {
-                return (Element)n;
+        Element elem = DOMUtils.getFirstElement(element);
+        while (elem != null) {
+            if (elem.getLocalName().equals(name.getLocalPart())
+                && elem.getNamespaceURI().equals(name.getNamespaceURI())) {
+                return elem;
             }
+            elem = DOMUtils.getNextElement(elem);         
         }
         return null;
     }

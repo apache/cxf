@@ -26,8 +26,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -36,6 +34,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
@@ -97,29 +96,27 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
         
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node n = children.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
-                String name = n.getLocalName();
-                if ("properties".equals(name)) {
-                    Map map = ctx.getDelegate().parseMapElement((Element) n, bean.getBeanDefinition());
-                    bean.addPropertyValue("properties", map);
-                } else if ("binding".equals(name)) {
-                    setFirstChildAsProperty((Element) n, ctx, bean, "bindingConfig");
-                } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
-                    || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
-                    || "features".equals(name) || "schemaLocations".equals(name)
-                    || "handlers".equals(name)) {
-                    List list = ctx.getDelegate().parseListElement((Element) n, bean.getBeanDefinition());
-                    bean.addPropertyValue(name, list);
-                } else if (IMPLEMENTOR.equals(name)) {
-                    ctx.getDelegate()
-                        .parseConstructorArgElement((Element)n, bean.getBeanDefinition());
-                } else {
-                    setFirstChildAsProperty((Element) n, ctx, bean, name);
-                }
+        Element elem = DOMUtils.getFirstElement(element);
+        while (elem != null) {
+            String name = elem.getLocalName();
+            if ("properties".equals(name)) {
+                Map map = ctx.getDelegate().parseMapElement(elem, bean.getBeanDefinition());
+                bean.addPropertyValue("properties", map);
+            } else if ("binding".equals(name)) {
+                setFirstChildAsProperty(elem, ctx, bean, "bindingConfig");
+            } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
+                || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
+                || "features".equals(name) || "schemaLocations".equals(name)
+                || "handlers".equals(name)) {
+                List list = ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
+                bean.addPropertyValue(name, list);
+            } else if (IMPLEMENTOR.equals(name)) {
+                ctx.getDelegate()
+                    .parseConstructorArgElement(elem, bean.getBeanDefinition());
+            } else {
+                setFirstChildAsProperty(elem, ctx, bean, name);
             }
+            elem = DOMUtils.getNextElement(elem);
         }
         if (!isAbstract) {
             bean.setInitMethodName("publish");

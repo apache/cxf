@@ -23,7 +23,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -67,14 +66,13 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             addBusWiringAttribute(factoryBean, BusWiringType.PROPERTY);
         }
         
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node n = children.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
-                String name = n.getLocalName();
-               
-                mapElement(ctx, factoryBean, (Element) n, name);
+        Node node = element.getFirstChild();
+        while (node != null) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                String name = node.getLocalName();
+                mapElement(ctx, factoryBean, (Element) node, name);
             }
+            node = node.getNextSibling();
         }
         
         String id = getIdOrName(element);
