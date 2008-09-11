@@ -21,6 +21,7 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -93,9 +94,11 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
             if (e.getPrefix() == null
                 && !WSDLConstants.NS_SCHEMA_XSD.equals(e.getAttributeNS(WSDLConstants.NS_XMLNS,
                                                                         WSDLConstants.NP_XMLNS))) {
-                e.setAttributeNS(WSDLConstants.NS_XMLNS, 
-                                 WSDLConstants.NP_XMLNS, 
-                                 WSDLConstants.NS_SCHEMA_XSD);
+                
+                Attr attr = e.getOwnerDocument().createAttributeNS(WSDLConstants.NS_XMLNS, 
+                                                                   WSDLConstants.NP_XMLNS);
+                attr.setValue(WSDLConstants.NS_SCHEMA_XSD);
+                e.setAttributeNodeNS(attr);
             }
             setElement(e);
         }

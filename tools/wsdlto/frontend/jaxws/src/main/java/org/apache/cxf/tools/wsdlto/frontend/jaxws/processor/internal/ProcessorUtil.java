@@ -338,10 +338,12 @@ public final class ProcessorUtil {
             clone = document.createElementNS(node.getNamespaceURI(), node.getNodeName());
             NamedNodeMap attributes = node.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
-                Attr attr = (Attr)attributes.item(i);
-                ((Element)clone).setAttributeNS(attr.getNamespaceURI(),
-                                                attr.getNodeName(),
-                                                attr.getNodeValue());
+                Attr attr = (Attr)attributes.item(i);                
+                Attr attrnew = 
+                    ((Element)clone).getOwnerDocument().createAttributeNS(attr.getNamespaceURI(), 
+                                                                      attr.getNodeName());
+                attrnew.setValue(attr.getNodeValue());
+                ((Element)clone).setAttributeNodeNS(attrnew);    
             }
             break;
        

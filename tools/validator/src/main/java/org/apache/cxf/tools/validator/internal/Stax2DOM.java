@@ -36,6 +36,7 @@ import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -154,7 +155,9 @@ public class Stax2DOM {
             Namespace ns = (Namespace) ite.next();
             String name = ns.getPrefix();
             if (!StringUtils.isEmpty(name)) {
-                element.setAttributeNS(xmlns, name, ns.getNamespaceURI());
+                Attr attr = element.getOwnerDocument().createAttributeNS(xmlns, name);
+                attr.setValue(ns.getNamespaceURI());
+                element.setAttributeNodeNS(attr);
             } else {
                 xmlns = ns.getNamespaceURI();
             }
