@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaMessage;
@@ -142,13 +141,11 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
             faultDoc.createElementNS(partInfoName.getNamespaceURI(), partInfoName.getLocalPart());
         
         Element faultDataElement = (Element) faultData.getFirstChild();
-        
-        NodeList nodeList = faultDataElement.getChildNodes();
-       
-        for (int i = 0; i < nodeList.getLength(); i++) { 
-            Node importedFaultData = faultDoc.
-                            importNode(nodeList.item(i), true);
+        Node node = faultDataElement.getFirstChild();
+        while (node != null) {
+            Node importedFaultData = faultDoc.importNode(node, true);
             partElement.appendChild(importedFaultData);
+            node = node.getNextSibling();
         }
         faultElement.appendChild(partElement);
         faultEx.setDetail(faultElement);

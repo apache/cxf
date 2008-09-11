@@ -21,7 +21,6 @@ package org.apache.cxf.binding.http.interceptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.http.URIMapper;
 import org.apache.cxf.endpoint.Endpoint;
@@ -89,15 +88,14 @@ public class URIParameterOutInterceptor extends AbstractPhaseInterceptor<Message
                     int locEnd = locPath.indexOf('}', idx1);
                     String name = locPath.substring(idx1 + 1, locEnd);
                     idx1 = locEnd;
-
-                    NodeList childNodes = root.getChildNodes();
-                    for (int i = 0; i < childNodes.getLength(); i++) {
-                        Node n = childNodes.item(i);
-
-                        if (n.getNodeType() == Node.ELEMENT_NODE && name.equals(n.getLocalName())) {
-                            builder.append(DOMUtils.getContent(n));
+                    
+                    Node node = root.getFirstChild();
+                    while (node != null) {
+                        if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getLocalName())) {
+                            builder.append(DOMUtils.getContent(node));
                             break;
-                        }
+                        }   
+                        node = node.getNextSibling();
                     }
 
                     start = locEnd + 1;

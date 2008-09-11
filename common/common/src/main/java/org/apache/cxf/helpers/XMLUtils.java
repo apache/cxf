@@ -316,11 +316,11 @@ public final class XMLUtils {
         return createTextNode(node.getOwnerDocument(), data);
     }
 
-    public static void removeContents(Node node) {
-        NodeList list = node.getChildNodes();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node entry = list.item(i);
-            node.removeChild(entry);
+    public static void removeContents(Node parent) {     
+        Node node = parent.getFirstChild();
+        while (node != null) {
+            parent.removeChild(node);
+            node = node.getNextSibling();
         }
     }
 

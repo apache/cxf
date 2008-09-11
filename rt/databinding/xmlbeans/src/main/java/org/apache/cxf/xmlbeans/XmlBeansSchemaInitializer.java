@@ -34,8 +34,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
@@ -43,6 +41,7 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -127,20 +126,17 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             schemaMap.put(file, null);
 
             Document doc = XMLUtils.parse(ins);
-            
-            NodeList nodes = doc.getDocumentElement().getChildNodes();
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node n = nodes.item(i);
-                if (n instanceof Element) {
-                    Element e = (Element)n;
-                    if (e.getLocalName().equals("import")) {
-                        String loc = e.getAttribute("schemaLocation");
-                        if (!StringUtils.isEmpty(loc)) {
-                            getSchema(sts, loc);
-                        }
+            Element elem = DOMUtils.getFirstElement(doc.getDocumentElement());
+            while (elem != null) {
+                if (elem.getLocalName().equals("import")) {
+                    String loc = elem.getAttribute("schemaLocation");
+                    if (!StringUtils.isEmpty(loc)) {
+                        getSchema(sts, loc);
                     }
-                }
-            }            
+                }                 
+                elem = DOMUtils.getNextElement(elem);
+            }
+                
             XmlSchema schema = dataBinding.addSchemaDocument(serviceInfo,
                                                              schemas, 
                                                              doc, 

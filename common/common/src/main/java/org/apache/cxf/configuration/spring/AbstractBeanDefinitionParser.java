@@ -34,7 +34,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
@@ -110,14 +109,11 @@ public abstract class AbstractBeanDefinitionParser
     }
     
     protected void parseChildElements(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node n = children.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
-                String name = n.getLocalName();
-                
-                mapElement(ctx, bean, (Element) n, name);
-            }
+        Element el = DOMUtils.getFirstElement(element);
+        while (el != null) {
+            String name = el.getLocalName();
+            mapElement(ctx, bean, el, name);
+            el = DOMUtils.getNextElement(el);     
         }
     }
 
@@ -209,15 +205,7 @@ public abstract class AbstractBeanDefinitionParser
     }
 
     protected Element getFirstChild(Element element) {
-        Element first = null;
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node n = children.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
-                first = (Element) n;
-            }
-        }
-        return first;
+        return DOMUtils.getFirstElement(element);
     }
 
     protected void addBusWiringAttribute(BeanDefinitionBuilder bean, BusWiringType type) {
@@ -238,14 +226,15 @@ public abstract class AbstractBeanDefinitionParser
                                             String propertyName, 
                                             Class<?> c) {
         Element data = null;
-        NodeList nl = parent.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node n = nl.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(n.getLocalName())
-                && name.getNamespaceURI().equals(n.getNamespaceURI())) {
-                data = (Element)n;
+        
+        Node node = parent.getFirstChild();
+        while (node != null) {
+            if (node.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(node.getLocalName())
+                && name.getNamespaceURI().equals(node.getNamespaceURI())) {
+                data = (Element)node;
                 break;
             }
+            node = node.getNextSibling();
         }
 
         if (data == null) {
