@@ -22,6 +22,7 @@ package org.apache.cxf.tools.util;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,6 +32,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ToolConstants;
+//import org.apache.cxf.wsdl.WSDLConstants;
 
 public final class JAXBUtils {
     private JAXBUtils() {
@@ -72,7 +74,10 @@ public final class JAXBUtils {
         Document doc = schema.getOwnerDocument();
 
         if (!XMLUtils.hasAttribute(schema, ToolConstants.NS_JAXB_BINDINGS)) {
-            schema.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "version", "2.0");
+            Attr attr = 
+                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "version");
+            attr.setValue("2.0");
+            schema.setAttributeNodeNS(attr);
         }
 
         Node schemaBindings = innerJaxbBinding(schema);

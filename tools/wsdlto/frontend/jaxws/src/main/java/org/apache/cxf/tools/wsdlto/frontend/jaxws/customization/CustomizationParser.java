@@ -284,10 +284,12 @@ public final class CustomizationParser {
             NamedNodeMap atts = el.getAttributes();
             for (int x = 0; x < atts.getLength(); x++) {
                 Attr attr = (Attr)atts.item(x);
-                if (ToolConstants.NS_JAXB_BINDINGS.equals(attr.getNamespaceURI())) {
-                    schemaNode.setAttributeNS(attr.getNamespaceURI(),
-                                              attr.getName(),
-                                              attr.getValue());
+                if (ToolConstants.NS_JAXB_BINDINGS.equals(attr.getNamespaceURI())) { 
+                    Attr attrnew = schemaNode.getOwnerDocument().createAttributeNS(attr.getNamespaceURI(), 
+                                                                                attr.getName());
+                    attrnew.setValue(attr.getValue());
+                    schemaNode.setAttributeNodeNS(attrnew);
+                    
                     if ("extensionBindingPrefixes".equals(attr.getLocalName())) {
                         String pfxs = attr.getValue();
                         while (pfxs.length() > 0) {

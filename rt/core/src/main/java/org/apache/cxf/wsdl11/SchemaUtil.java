@@ -33,6 +33,7 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -106,8 +107,12 @@ public final class SchemaUtil {
                         for (Object prefix : def.getNamespaces().keySet()) {
                             String ns = (String)def.getNamespaces().get(prefix);
                             if (!"".equals(prefix) && !schemaElem.hasAttribute("xmlns:" + prefix)) {
-                                schemaElem.setAttributeNS(javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
-                                                          "xmlns:" + prefix, ns);
+                                String namespace = javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+                                Attr attr = 
+                                    schemaElem.getOwnerDocument().createAttributeNS(namespace, 
+                                                                                    "xmlns:" + prefix);
+                                attr.setValue(ns);
+                                schemaElem.setAttributeNodeNS(attr);
                             }
                         }
                         String systemId = def.getDocumentBaseURI() + "#types" + schemaCount;

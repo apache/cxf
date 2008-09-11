@@ -35,6 +35,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -98,11 +99,12 @@ public class CommandLineParser {
             LOG.log(Level.SEVERE, "FAIL_CREATE_DOM_MSG");
         }
         Element commandEl = resultDoc.createElementNS("http://cxf.apache.org/Xutil/Command", "command");
-
-        // resultDoc.createAttributeNS("http://www.w3.org/2001/XMLSchema-instance","schemaLocation");
-        commandEl.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation",
-                                 "http://cxf.apache.org/Xutil/Command http://cxf.apache.org/schema/xutil/c"
-                                     + "ommand.xsd");
+        
+        Attr attr = 
+            commandEl.getOwnerDocument().createAttributeNS("http://www.w3.org/2001/XMLSchema-instance", 
+                                                                   "xsi:schemaLocation");
+        attr.setValue("http://cxf.apache.org/Xutil/Command http://cxf.apache.org/schema/xutil/commnad.xsd");
+        commandEl.setAttributeNodeNS(attr);     
         commandEl.setAttribute("xmlns", "http://cxf.apache.org/Xutil/Command");
         commandEl.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         resultDoc.appendChild(commandEl);
@@ -114,8 +116,7 @@ public class CommandLineParser {
 
         NodeList usageForms = toolspec.getUsageForms();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG
-                .fine("Found " + usageForms.getLength()
+            LOG.fine("Found " + usageForms.getLength()
                       + " alternative forms of usage, will use default form");
         }
         if (usageForms.getLength() > 0) {
