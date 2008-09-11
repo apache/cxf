@@ -132,6 +132,47 @@ public class WSDL2JavaMojo extends AbstractMojo {
         return options;
     }
     
+    private void mergeOptions(List<WsdlOption> options) {
+        File outputDirFile = testSourceRoot == null ? sourceRoot : testSourceRoot;
+        for (WsdlOption o : wsdlOptions) {
+            if (o.getOutputDir() == null) {
+                o.setOutputDir(outputDirFile);
+            }
+            
+            File file = new File(o.getWsdl());
+            if (!file.exists()) {
+                file = new File(project.getBasedir(), o.getWsdl());
+            }
+            if (file.exists()) {
+                file = file.getAbsoluteFile();
+                for (WsdlOption o2 : options) {
+                    File file2 = null;
+                    try {
+                        URI uri = new URI(o2.getWsdl());
+                        if (uri.isAbsolute()) {
+                            file2 = new File(uri);
+                        }
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                    if (file2 == null || !file2.exists()) {
+                        file2 = new File(o2.getWsdl());
+                    }
+                    if (file2 == null || !file2.exists()) {
+                        file2 = new File(project.getBasedir(), o2.getWsdl());
+                    }
+                    if (file2.exists() 
+                        && file2.getAbsoluteFile().equals(file)) {
+                        o.getExtraargs().addAll(0, o2.getExtraargs());
+                        options.remove(o2);
+                        break;
+                    }
+                }
+            }
+            options.add(0, o);
+        }        
+    }
+    
     public void execute() throws MojoExecutionException {
         if (includes == null) {
             includes = new String[] {"*.wsdl"};
@@ -150,26 +191,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
 
         if (wsdlOptions != null) {
-            File outputDirFile = testSourceRoot == null ? sourceRoot : testSourceRoot;
-            for (WsdlOption o : wsdlOptions) {
-                if (o.getOutputDir() == null) {
-                    o.setOutputDir(outputDirFile);
-                }
-                
-                File file = new File(project.getBasedir(), o.getWsdl());                
-                if (file.exists()) {
-                    for (WsdlOption o2 : options) {
-                        File file2 = new File(o2.getWsdl());
-                        if (file2.exists() 
-                            && file2.equals(file)) {
-                            o.getExtraargs().addAll(0, o2.getExtraargs());
-                            options.remove(o2);
-                            break;
-                        }
-                    }
-                }
-                options.add(o);
-            }
+            mergeOptions(options);
         }
         wsdlOptions = options.toArray(new WsdlOption[options.size()]);
 
