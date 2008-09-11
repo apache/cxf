@@ -128,6 +128,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         bus = control.createMock(Bus.class);
         EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(constants).anyTimes();
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();        
+        abr.setIgnoreUnknownAssertions(false);
         XMLPrimitiveAssertionBuilder ab = new XMLPrimitiveAssertionBuilder();
         ab.setBus(bus);
         abr.register(new QName("http://cxf.apache.org/test/assertions", "A"), ab);

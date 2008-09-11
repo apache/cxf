@@ -43,9 +43,9 @@
                 <executions>
                     <execution>
                         <id>add-source</id>
-                        <phase>generate-sources</phase>
+                        <phase>generate-test-sources</phase>
                         <goals>
-                            <goal>add-source</goal>
+                            <goal>add-test-source</goal>
                         </goals>
                         <configuration>
                             <sources>
@@ -79,8 +79,8 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-sources</phase>
+                        <id>generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
                         <configuration>
                             <outputDir>${basedir}/target/generated/src/test/resources/wsdl/type_test_corba/</outputDir>
                             <wsdltoidlOptions>

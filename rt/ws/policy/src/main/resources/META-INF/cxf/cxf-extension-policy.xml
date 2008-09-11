@@ -29,6 +29,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
               <property name="idsProperty" value="knownElements"/>
             </bean>
         </constructor-arg>
+        <property name="bus" ref="cxf"/>
     </bean>
     
     <bean class="org.apache.cxf.ws.policy.PolicyConstants"

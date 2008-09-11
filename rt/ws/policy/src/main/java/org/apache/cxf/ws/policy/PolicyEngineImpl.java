@@ -60,7 +60,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     private PolicyRegistry registry;
     private Collection<PolicyProvider> policyProviders;
     private boolean enabled;
-    private boolean ignoreUnknownAssertions;
+    private boolean ignoreUnknownAssertions = true;
     private boolean addedBusInterceptors;
     private AlternativeSelector alternativeSelector;
 

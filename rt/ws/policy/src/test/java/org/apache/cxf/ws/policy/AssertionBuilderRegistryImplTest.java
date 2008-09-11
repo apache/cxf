@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -50,6 +51,7 @@ public class AssertionBuilderRegistryImplTest extends Assert {
     @Test
     public void testBuildUnknownAssertion() {
         AssertionBuilderRegistry reg = new AssertionBuilderRegistryImpl();
+        reg.setIgnoreUnknownAssertions(false);
         Element[] elems = new Element[11];
         QName[] qnames = new QName[11];
         for (int i = 0; i < 11; i++) {
@@ -71,11 +73,11 @@ public class AssertionBuilderRegistryImplTest extends Assert {
         reg.setIgnoreUnknownAssertions(true);
         assertTrue(reg.isIgnoreUnknownAssertions());
         for (int i = 0; i < 10; i++) {
-            assertNull(reg.build(elems[i]));
+            assertTrue(reg.build(elems[i]) instanceof XmlPrimitiveAssertion);
         }
         for (int i = 9; i >= 0; i--) {
-            assertNull(reg.build(elems[i]));
+            assertTrue(reg.build(elems[i]) instanceof XmlPrimitiveAssertion);
         }
-        assertNull(reg.build(elems[10]));        
+        assertTrue(reg.build(elems[10]) instanceof XmlPrimitiveAssertion);
     }
 }
