@@ -38,7 +38,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
@@ -51,6 +50,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.Phase;
@@ -129,47 +129,44 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
         if (header == null) {
             return;
         }
-        NodeList headerEls = header.getChildNodes();
-        int len = headerEls.getLength();
-        for (int i = 0; i < len; i++) {
-            Node nd = headerEls.item(i);
-            if (Node.ELEMENT_NODE == nd.getNodeType()) {
-                Element hel = (Element)nd;
-                Bus b = message.getExchange().get(Bus.class);
-                HeaderProcessor p =  null;
-                if (b != null && b.getExtension(HeaderManager.class) != null) {
-                    p = b.getExtension(HeaderManager.class).getHeaderProcessor(hel.getNamespaceURI());
-                }
-                
-                Object obj;
-                DataBinding dataBinding = null;
-                if (p == null || p.getDataBinding() == null) {
-                    obj = nd;
-                } else {
-                    obj = p.getDataBinding().createReader(Node.class).read(nd);
-                }
-                //TODO - add the interceptors
-                
-                SoapHeader shead = new SoapHeader(new QName(nd.getNamespaceURI(),
-                        nd.getLocalName()),
-                                                   obj,
-                                                   dataBinding);
-                shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
-                
-                String mu = hel.getAttributeNS(message.getVersion().getNamespace(),
-                        message.getVersion().getAttrNameMustUnderstand());
-                String act = hel.getAttributeNS(message.getVersion().getNamespace(),
-                        message.getVersion().getAttrNameRole());
-                
-                shead.setActor(act);
-                shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
-                Header oldHdr = message.getHeader(
-                        new QName(nd.getNamespaceURI(), nd.getLocalName()));
-                if (oldHdr != null) {
-                    message.getHeaders().remove(oldHdr);
-                } 
-                message.getHeaders().add(shead);                        
+        Element elem = DOMUtils.getFirstElement(header);
+        while (elem != null) {
+            Bus b = message.getExchange().get(Bus.class);
+            HeaderProcessor p =  null;
+            if (b != null && b.getExtension(HeaderManager.class) != null) {
+                p = b.getExtension(HeaderManager.class).getHeaderProcessor(elem.getNamespaceURI());
             }
+                
+            Object obj;
+            DataBinding dataBinding = null;
+            if (p == null || p.getDataBinding() == null) {
+                obj = elem;
+            } else {
+                obj = p.getDataBinding().createReader(Node.class).read(elem);
+            }
+            //TODO - add the interceptors
+                
+            SoapHeader shead = new SoapHeader(new QName(elem.getNamespaceURI(),
+                                                        elem.getLocalName()),
+                                               obj,
+                                               dataBinding);
+            shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
+                
+            String mu = elem.getAttributeNS(message.getVersion().getNamespace(),
+                    message.getVersion().getAttrNameMustUnderstand());
+            String act = elem.getAttributeNS(message.getVersion().getNamespace(),
+                    message.getVersion().getAttrNameRole());
+                
+            shead.setActor(act);
+            shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
+            Header oldHdr = message.getHeader(
+                    new QName(elem.getNamespaceURI(), elem.getLocalName()));
+            if (oldHdr != null) {
+                message.getHeaders().remove(oldHdr);
+            } 
+            message.getHeaders().add(shead);                        
+            
+            elem = DOMUtils.getNextElement(elem);
         }
     }
 

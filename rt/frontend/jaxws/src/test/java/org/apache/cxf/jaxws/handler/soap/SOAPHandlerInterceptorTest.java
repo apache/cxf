@@ -58,6 +58,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.SoapVersionFactory;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.io.CachedOutputStream;
@@ -246,10 +247,9 @@ public class SOAPHandlerInterceptorTest extends Assert {
         control.verify();
 
         // Verify SOAPMessage header
-        SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
-        NodeList headerEls = soapMessageNew.getSOAPHeader().getChildNodes();
+        SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);       
 
-        Element headerElementNew = (Element)headerEls.item(0);
+        Element headerElementNew = DOMUtils.getFirstElement(soapMessageNew.getSOAPHeader());
         
         SoapVersion soapVersion = Soap11.getInstance();
         assertEquals("false", headerElementNew.getAttributeNS(soapVersion.getNamespace(), "mustUnderstand"));
