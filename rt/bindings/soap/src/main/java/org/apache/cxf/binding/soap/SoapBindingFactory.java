@@ -724,6 +724,33 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
         if (mo instanceof ChainInitiationObserver) {
             ChainInitiationObserver cio = (ChainInitiationObserver) mo;
+            
+            Binding b = e.getBinding();
+            Binding b2 = cio.getEndpoint().getBinding();
+            if (b == b2) {
+                //re-registering the same endpoint?
+                return;
+            }
+            Object o = cio.getEndpoint().get("allow-multiplex-endpoint");
+            if (o instanceof String) {
+                o = Boolean.parseBoolean((String)o);
+            } else if (o == null) {
+                o = Boolean.FALSE;
+            }
+            
+            if (b instanceof org.apache.cxf.binding.soap.SoapBinding 
+                && b2 instanceof org.apache.cxf.binding.soap.SoapBinding
+                && ((org.apache.cxf.binding.soap.SoapBinding)b).getSoapVersion()
+                    .equals(((org.apache.cxf.binding.soap.SoapBinding)b2).getSoapVersion())
+                && Boolean.FALSE.equals(o)) {
+                
+                throw new RuntimeException("Soap " 
+                                           + ((org.apache.cxf.binding.soap.SoapBinding)b)
+                                               .getSoapVersion().getVersion()
+                                           + " endpoint already registered on address "
+                                           + e.getEndpointInfo().getAddress());
+            }
+            
             MultipleEndpointObserver newMO = new MultipleEndpointObserver(getBus()) {
                 @Override
                 protected Message createMessage(Message message) {
