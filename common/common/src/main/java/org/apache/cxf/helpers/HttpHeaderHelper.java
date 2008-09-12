@@ -54,6 +54,7 @@ public final class HttpHeaderHelper {
         internalHeaders.put("Transfer-Encoding", "transfer-encoding");
         internalHeaders.put("Connection", "connection");
         internalHeaders.put("authorization", "Authorization");
+        internalHeaders.put("soapaction", "SOAPAction");
     }
     
     private HttpHeaderHelper() {
