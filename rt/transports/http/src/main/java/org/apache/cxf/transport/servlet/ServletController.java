@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,16 +49,18 @@ public class ServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
 
     private ServletTransportFactory transport;
-    private AbstractCXFServlet cxfServlet;
+    private ServletContext servletContext;
+    private Bus bus;
     private String lastBase = "";
     private boolean isHideServiceList;
     private boolean disableAddressUpdates;
     private String forcedBaseAddress;
     private String serviceListStyleSheet;
  
-    public ServletController(ServletTransportFactory df, AbstractCXFServlet servlet) {
+    public ServletController(ServletTransportFactory df, ServletContext context, Bus b) {
         this.transport = df;
-        this.cxfServlet = servlet;
+        this.servletContext = context;
+        this.bus = b;
         df.setServletController(this);
     }
     
@@ -130,7 +133,6 @@ public class ServletController {
                 }
             } else {
                 ei = d.getEndpointInfo();
-                Bus bus = cxfServlet.getBus();
                 if (null != request.getQueryString() 
                     && request.getQueryString().length() > 0
                     && bus.getExtension(QueryHandlerRegistry.class) != null) {                    
@@ -182,7 +184,7 @@ public class ServletController {
         return null; 
     }
     
-    private void generateServiceList(HttpServletRequest request, HttpServletResponse response)
+    protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         
         if (request.getParameter("stylesheet") != null) {
@@ -280,7 +282,7 @@ public class ServletController {
         }
 
         try {
-            d.invoke(cxfServlet.getServletContext(), request, response);
+            d.invoke(servletContext, request, response);
         } catch (IOException e) {
             throw new ServletException(e);
         } finally {

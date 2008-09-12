@@ -53,7 +53,8 @@ public abstract class AbstractCXFServlet extends HttpServlet {
     
     public ServletController createServletController(ServletConfig servletConfig) {
         String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
-        ServletController newController = new ServletController(servletTransportFactory, this);
+        ServletController newController =
+            new ServletController(servletTransportFactory, this.getServletContext(), bus);
         if (hideServiceList != null) {
             newController.setHideServiceList(Boolean.valueOf(hideServiceList));
         }

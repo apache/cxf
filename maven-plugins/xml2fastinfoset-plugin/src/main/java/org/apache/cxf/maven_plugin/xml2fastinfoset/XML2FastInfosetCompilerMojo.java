@@ -106,7 +106,7 @@ public class XML2FastInfosetCompilerMojo extends AbstractMojo {
             }
 
             if (!resourceDirectory.exists()) {
-                getLog().info("Resource directory does not exist: " + resourceDirectory);
+                getLog().debug("Resource directory does not exist: " + resourceDirectory);
                 continue;
             }
 
@@ -136,8 +136,7 @@ public class XML2FastInfosetCompilerMojo extends AbstractMojo {
 
             List includedFiles = Arrays.asList(scanner.getIncludedFiles());
 
-            getLog().info(
-                          "FastInfosetting " + includedFiles.size() + " resource"
+            getLog().debug("FastInfosetting " + includedFiles.size() + " resource"
                               + (includedFiles.size() > 1 ? "s" : "")
                               + (targetPath == null ? "" : " to " + targetPath));
 
