@@ -36,7 +36,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
 
 /**
