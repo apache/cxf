@@ -27,5 +27,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver" 
 	  id="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver" lazy-init="false"/>
     <bean class="org.apache.cxf.jaxws.context.WebServiceContextImpl" 
-	  id="org.apache.cxf.jaxws.context.WebServiceContextImpl"/>
+	  id="org.apache.cxf.jaxws.context.WebServiceContextImpl" lazy-init="true"/>
+    <bean class="org.apache.cxf.jaxws.context.WebServiceContextImpl" 
+          id="javax.xml.ws.WebServiceContext" lazy-init="true"/>
 </beans>
