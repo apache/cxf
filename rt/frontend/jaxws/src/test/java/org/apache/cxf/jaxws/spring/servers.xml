@@ -38,20 +38,21 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
           </list>
       </property>
   </bean>
-
-  <jaxws:server id="simple" serviceBean="#greeter" xmlns:test="urn:foo" xmlns="urn:foo"/>
-
   <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
 
-  <jaxws:server id="simpleWithAddress"
-    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"/>
+  <jaxws:server id="simple" serviceBean="#greeter" 
+        xmlns:test="urn:foo" xmlns="urn:foo"
+        address="http://localhost:8080/testrpc1"/>
 
-  <jaxws:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress">
+
+  <jaxws:server id="simpleWithAddress"
+    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress1"/>
+
+  <jaxws:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress10">
     <jaxws:serviceBean>
       <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
     </jaxws:serviceBean>
   </jaxws:server>
-
   <jaxws:server id="inlineInvoker"
     serviceClass="org.apache.hello_world_soap_http.GreeterImpl"
     address="http://localhost:8080/simpleWithAddress"
@@ -97,7 +98,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
       </jaxws:dataBinding>
   </jaxws:server>
 
-   <jaxws:client id="bookClient"
+  <jaxws:client id="bookClient"
     serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexType"
     address="http://localhost:8080/act"/>
 
@@ -125,13 +126,11 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
   <jaxws:server id="inlineDataBinding"
     serviceClass="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test">
+    address="http://localhost:8080/test1">
     <jaxws:dataBinding>
       <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
     </jaxws:dataBinding>
   </jaxws:server>
 
-  <!-- We should auto generate this id -->
-  <jaxws:server serviceBean="#greeter"/>
-
+  <jaxws:server serviceBean="#greeter" address="http://localhost:8080/test3"/>
 </beans>

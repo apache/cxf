@@ -36,15 +36,16 @@ public class Server extends AbstractBusTestServerBase {
         EndpointImpl ep1 = (EndpointImpl) Endpoint.publish(address, implementor1);
 
         ep1.getServer().getEndpoint().put("version", "1");
-        
+        ep1.getServer().getEndpoint().put("allow-multiplex-endpoint", Boolean.TRUE);
+
+        //Register a MediatorInInterceptor on this dummy service
+
         Object implementor2 = new GreeterImplMixedStyle(" version2");
         EndpointImpl ep2 = (EndpointImpl) Endpoint.publish(address, implementor2);
         ep2.getServer().getEndpoint().put("version", "2");
         
-        //Register a MediatorInInterceptor on this dummy service
-        
         MultipleEndpointObserver meo = (MultipleEndpointObserver)
-            ep2.getServer().getDestination().getMessageObserver();
+            ep1.getServer().getDestination().getMessageObserver();
         meo.getRoutingInterceptors().clear();
         meo.getRoutingInterceptors().add(new MediatorInInterceptor());
     }
