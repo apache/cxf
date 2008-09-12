@@ -55,6 +55,7 @@ public final class HttpHeaderHelper {
         internalHeaders.put("Connection", "connection");
         internalHeaders.put("authorization", "Authorization");
         internalHeaders.put("soapaction", "SOAPAction");
+        internalHeaders.put("accept", "Accept");
     }
     
     private HttpHeaderHelper() {
