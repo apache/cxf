@@ -205,7 +205,8 @@ public final class HttpsURLConnectionFactory
             // The SSLSocketFactoryWrapper enables certain cipher suites
             // from the policy.
             socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(),
-                                                        cipherSuites);
+                                                        cipherSuites,
+                                                        tlsClientParameters.getSecureSocketProtocol());
         }
         if (tlsClientParameters.isDisableCNCheck()) {
             connection.setHostnameVerifier(DISABLE_HOSTNAME_VERIFIER);
