@@ -39,13 +39,16 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
     
     private SSLSocketFactory sslSocketFactory;
     private String[] ciphers;
+    private String protocol;
     
     public SSLSocketFactoryWrapper(
         SSLSocketFactory sslSocketFactoryParam,
-        String[]         ciphersParam
+        String[]         ciphersParam,
+        String           protocolParam
     ) {
         sslSocketFactory = sslSocketFactoryParam;
         ciphers          = ciphersParam;
+        protocol         = protocolParam;
     }
 
     public String[] getDefaultCipherSuites() {
@@ -54,6 +57,11 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
     
     public String[] getSupportedCipherSuites() {
         return sslSocketFactory.getSupportedCipherSuites(); 
+    }
+    
+    public Socket createSocket() throws IOException {
+        return enableCipherSuites(sslSocketFactory.createSocket(), 
+                                  new Object[] {"unconnected", "unconnected"});
     }
         
     public Socket createSocket(Socket s, String host, int port, boolean autoClose)
@@ -90,7 +98,9 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         if ((socket != null) && (ciphers != null)) {
             socket.setEnabledCipherSuites(ciphers);
         }
-
+        if ((socket != null) && (protocol != null)) {
+            socket.setEnabledProtocols(new String[] {protocol});
+        }
         if (socket == null) {
             LogUtils.log(LOG, Level.SEVERE,
                          "PROBLEM_CREATING_OUTBOUND_REQUEST_SOCKET", 
