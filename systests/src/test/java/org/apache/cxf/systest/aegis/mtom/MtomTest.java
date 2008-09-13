@@ -36,9 +36,6 @@ import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.aegis.mtom.fortest.DataHandlerBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl;
 import org.apache.cxf.test.TestUtilities;
@@ -75,11 +72,7 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
             props.put("mtom-enabled", Boolean.TRUE);
         }
         proxyFac.setProperties(props);
-        ServerFactoryBean server = (ServerFactoryBean)applicationContext.getBean("mtom-server");
-        
-        server.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        server.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         client = (org.apache.cxf.systest.aegis.mtom.fortest.MtomTest)proxyFac.create();
         impl = (MtomTestImpl)applicationContext.getBean("mtomImpl");
     }

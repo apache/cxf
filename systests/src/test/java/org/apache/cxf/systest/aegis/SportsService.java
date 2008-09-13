@@ -23,11 +23,15 @@ import java.util.Collection;
 
 import javax.jws.WebService;
 
+import org.apache.cxf.aegis.services.SimpleBean;
+
 @WebService(targetNamespace = "http://cxf.apache.org/systest/aegis/sports")
 public interface SportsService {
     Collection<Team> getTeams();
     
     String testForMinOccurs0(String a, Integer b, String c);
     AttributeBean getAttributeBean();
+    // SimpleBean has relevant properties
+    SimpleBean getSimpleBean();
 }
 

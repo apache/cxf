@@ -213,6 +213,14 @@ public abstract class Type {
         return false;
     }
     
+    /**
+     * True if this type requires the import of the aegisTypes schema.
+     * @return
+     */
+    public boolean usesUtilityTypes() {
+        return false;
+    }
+    
     public boolean hasMinOccurs() {
         return false;
     }

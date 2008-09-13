@@ -19,6 +19,8 @@
 
 package org.apache.cxf.aegis.type.basic;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
@@ -30,20 +32,20 @@ import org.apache.cxf.aegis.xml.MessageWriter;
  */
 public class CharacterAsStringType extends Type {
     
-    private StringType stringType;
+    public static final QName CHARACTER_AS_STRING_TYPE_QNAME 
+        = new QName("http://cxf.apache.org/aegisTypes", "char");
+    
+    private IntType intType;
     
     public CharacterAsStringType() {
-        stringType = new StringType();
+        intType = new IntType();
     }
 
     /** {@inheritDoc}*/
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
-        String string = (String)stringType.readObject(reader, context);
-        if (string.length() == 0) {
-            return Character.valueOf((char)0);
-        }
-        return new Character(string.charAt(0));
+        Integer readInteger = (Integer)intType.readObject(reader, context);
+        return new Character((char)readInteger.intValue());
     }
 
     /** {@inheritDoc}*/
@@ -51,6 +53,12 @@ public class CharacterAsStringType extends Type {
     public void writeObject(Object object, MessageWriter writer, Context context) 
         throws DatabindingException {
         Character charObject = (Character) object;
-        stringType.writeObject(charObject.toString(), writer, context);
+        intType.writeObject(Integer.valueOf(charObject.charValue()), writer, context);
     }
+
+    @Override
+    public boolean usesUtilityTypes() {
+        return true;
+    }
+
 }

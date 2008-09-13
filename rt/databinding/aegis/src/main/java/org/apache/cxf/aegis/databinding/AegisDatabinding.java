@@ -104,7 +104,7 @@ public class AegisDatabinding
      * @deprecated 2.1
      */
     public static final String READ_XSI_TYPE_KEY = "readXsiType";
-
+    
     protected static final int IN_PARAM = 0;
     protected static final int OUT_PARAM = 1;
     protected static final int FAULT_PARAM = 2;
@@ -460,6 +460,8 @@ public class AegisDatabinding
 
         Map<String, String> namespaceMap = getDeclaredNamespaceMappings();
         boolean needXmimeSchema = false;
+        // utility types.
+        boolean needTypesSchema = false;
 
         for (Map.Entry<String, Set<Type>> entry : tns2Type.entrySet()) {
             String xsdPrefix = SOAPConstants.XSD_PREFIX;
@@ -500,6 +502,9 @@ public class AegisDatabinding
 
             if (schemaImportsXmime(e)) {
                 needXmimeSchema = true;
+            }
+            if (AegisContext.schemaImportsUtilityTypes(e)) {
+                needTypesSchema = true;
             }
 
             try {
@@ -545,6 +550,15 @@ public class AegisDatabinding
                 addSchemaDocument(si, col, xmimeSchemaDocument, AbstractXOPType.XML_MIME_NS);
             }
         }
+        
+        if (needTypesSchema) {
+            org.w3c.dom.Document schema = aegisContext.getTypesSchemaDocument(); 
+            for (ServiceInfo si : s.getServiceInfos()) {
+                SchemaCollection col = si.getXmlSchemaCollection();
+                addSchemaDocument(si, col, schema, AegisContext.SCHEMA_NS);
+            }
+        }
+        
     }
 
     public QName getSuggestedName(Service s, TypeMapping tm, OperationInfo op, int param) {
