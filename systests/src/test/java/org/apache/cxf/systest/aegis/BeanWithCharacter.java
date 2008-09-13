@@ -16,35 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.systest.aegis;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+public class BeanWithCharacter {
+    private Character character;
+    private char primitiveCharacter;
 
-/**
- * 
- */
-public class SportsServiceImpl implements SportsService {
-
-    /** {@inheritDoc}*/
-    public Collection<Team> getTeams() {
-        List<Team> teams = new ArrayList<Team>();
-        teams.add(new Team("Patriots", "New England"));
-        return teams;
-    }
-    
-    public String testForMinOccurs0(String a, Integer b, String c) {
-        return a + b + c;
+    public Character getCharacter() {
+        return character;
     }
 
-    public AttributeBean getAttributeBean() {
-        return new AttributeBean();
+    public void setCharacter(Character character) {
+        this.character = character;
     }
 
-    public BeanWithCharacter getCharBean() {
-        return new BeanWithCharacter();
+    public char getPrimitiveChar() {
+        return primitiveCharacter;
     }
 
+    public void setPrimitiveChar(char pchar) {
+        this.primitiveCharacter = pchar;
+    }
 }
