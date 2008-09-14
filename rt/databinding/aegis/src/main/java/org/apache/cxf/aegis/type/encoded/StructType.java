@@ -140,7 +140,7 @@ public class StructType extends BeanType {
         }
 
         // find the matching property and get it's name
-        for (BeanType sooper = this; sooper != null; sooper = sooper.getSuperType()) {
+        for (BeanType sooper = this; sooper != null; sooper = superBeanType(sooper)) {
             QName qualifiedName = new QName(sooper.getTypeInfo().getDefaultNamespace(), name.getLocalPart());
 
             if (sooper.getTypeInfo().getType(qualifiedName) != null) {
@@ -149,6 +149,17 @@ public class StructType extends BeanType {
         }
 
         return name;
+    }
+    
+    private BeanType superBeanType(Type t) {
+        if (t instanceof BeanType) {
+            BeanType bt = (BeanType)t;
+            Type supertype = bt.getSuperType();
+            if (supertype instanceof BeanType) {
+                return (BeanType)supertype;
+            }
+        }
+        return null;
     }
 
     /**
