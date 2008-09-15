@@ -21,12 +21,13 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import javax.jws.HandlerChain;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -72,9 +73,10 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         }
 
         Element e = this.intf.getHandlerChains();
-        NodeList nl = e.getElementsByTagNameNS(ToolConstants.HANDLER_CHAINS_URI,
-                                               ToolConstants.HANDLER_CHAIN);
-        if (nl.getLength() > 0) {
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(e, 
+                                                                     ToolConstants.HANDLER_CHAINS_URI, 
+                                                                     ToolConstants.HANDLER_CHAIN);
+        if (elemList.size() > 0) {
             String fName = ProcessorUtil.getHandlerConfigFileName(this.intf.getName());
             handlerChainAnnotation = new JAnnotation(HandlerChain.class);
             handlerChainAnnotation.addElement(new JAnnotationElement("name", 

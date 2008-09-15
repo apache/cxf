@@ -21,18 +21,17 @@ package org.apache.cxf.tools.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ToolConstants;
-//import org.apache.cxf.wsdl.WSDLConstants;
 
 public final class JAXBUtils {
     private JAXBUtils() {
@@ -40,27 +39,30 @@ public final class JAXBUtils {
 
     private static Node innerJaxbBinding(Element schema) {
         String schemaNamespace = schema.getNamespaceURI();
-        NodeList annoList = schema.getElementsByTagNameNS(schemaNamespace, "annotation");
+        List<Element> annoList = DOMUtils.findAllElementsByTagNameNS(schema, schemaNamespace, "annotation");
         Element annotation = null;
-        if (annoList.getLength() > 0) {
-            annotation = (Element)annoList.item(0);
+        if (annoList.size() > 0) {
+            annotation = (Element)annoList.get(0);
         } else {
             annotation = schema.getOwnerDocument().createElementNS(schemaNamespace, "annotation");
         }
-
-        NodeList appList = annotation.getElementsByTagNameNS(schemaNamespace, "appinfo");
+        List<Element> appList = DOMUtils.findAllElementsByTagNameNS(annotation, 
+                                                                    schemaNamespace, 
+                                                                    "appinfo");
         Element appInfo = null;
-        if (appList.getLength() > 0) {
-            appInfo = (Element)appList.item(0);
+        if (appList.size() > 0) {
+            appInfo = (Element)appList.get(0);
         } else {
             appInfo = schema.getOwnerDocument().createElementNS(schemaNamespace, "appinfo");
             annotation.appendChild(appInfo);
         }
 
         Element jaxbBindings = null;
-        NodeList jaxbList = schema.getElementsByTagNameNS(ToolConstants.NS_JAXB_BINDINGS, "schemaBindings");
-        if (jaxbList.getLength() > 0) {
-            jaxbBindings = (Element)jaxbList.item(0);
+        List<Element> jaxbList = DOMUtils.findAllElementsByTagNameNS(schema, 
+                                                                     ToolConstants.NS_JAXB_BINDINGS, 
+                                                                     "schemaBindings");
+        if (jaxbList.size() > 0) {
+            jaxbBindings = (Element)jaxbList.get(0);
         } else {
             jaxbBindings = schema.getOwnerDocument().createElementNS(ToolConstants.NS_JAXB_BINDINGS, 
                                                                      "schemaBindings");
@@ -75,18 +77,20 @@ public final class JAXBUtils {
 
         if (!XMLUtils.hasAttribute(schema, ToolConstants.NS_JAXB_BINDINGS)) {
             Attr attr = 
-                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "version");
+                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS, 
+                                                            "version");
             attr.setValue("2.0");
             schema.setAttributeNodeNS(attr);
         }
 
         Node schemaBindings = innerJaxbBinding(schema);
 
-        NodeList pkgList = doc.getElementsByTagNameNS(ToolConstants.NS_JAXB_BINDINGS,
-                                                      "package");
+        List<Element> pkgList = DOMUtils.findAllElementsByTagNameNS(schema, 
+                                                                    ToolConstants.NS_JAXB_BINDINGS, 
+                                                                    "package");
         Element packagename = null;
-        if (pkgList.getLength() > 0) {
-            packagename = (Element)pkgList.item(0);
+        if (pkgList.size() > 0) {
+            packagename = (Element)pkgList.get(0);
         } else {
             packagename = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "package");
         }
