@@ -61,7 +61,7 @@ public class CharacterSchemaTest extends AbstractDependencyInjectionSpringContex
         Document wsdl = testUtilities.getWSDLDocument(s); 
         assertNotNull(wsdl);
         NodeList typeAttrList = 
-            testUtilities.assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence"
+            testUtilities.assertValid("//xsd:complexType[@name='BeanWithCharacter']/xsd:sequence"
                                       + "/xsd:element[@name='character']"
                                       + "/@type", 
                                       wsdl); 
