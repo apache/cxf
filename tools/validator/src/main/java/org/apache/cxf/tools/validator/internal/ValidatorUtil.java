@@ -39,7 +39,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.BusFactory;
@@ -89,11 +88,11 @@ public final class ValidatorUtil {
             baseURI = URLEncoder.encode(baseURI, "utf-8");
             SchemaCollection schemaCol = new SchemaCollection();
             schemaCol.setBaseUri(baseURI);
-            NodeList nodes = document.getElementsByTagNameNS(
-                WSDLConstants.NS_SCHEMA_XSD, "schema");
-            for (int x = 0; x < nodes.getLength(); x++) {
-                Node schemaNode = nodes.item(x);
-                Element schemaEl = (Element) schemaNode;
+            
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(document.getDocumentElement(), 
+                                                                         WSDLConstants.NS_SCHEMA_XSD, 
+                                                                         "schema");
+            for (Element schemaEl : elemList) {
                 String tns = schemaEl.getAttribute("targetNamespace");
                 try {
                     schemaCol.read(schemaEl, tns);
@@ -152,7 +151,6 @@ public final class ValidatorUtil {
             throw new ToolException(e);
         }
         
-        NodeList nodes = document.getElementsByTagNameNS(WSDLConstants.NS_WSDL11, "import");
         //
         // Remove the scheme part of a URI - need to escape spaces in
         // case we are on Windows and have spaces in directory names.
@@ -163,8 +161,12 @@ public final class ValidatorUtil {
         } catch (URISyntaxException e1) {
             // This will be problematic...
         }
-        for (int x = 0; x < nodes.getLength(); x++) {
-            NamedNodeMap attributes = nodes.item(x).getAttributes();
+        
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(document.getDocumentElement(), 
+                                                                     WSDLConstants.NS_WSDL11, 
+                                                                     "import");
+        for (Element elem : elemList) {
+            NamedNodeMap attributes = elem.getAttributes();
             String systemId;
             String namespace = attributes.getNamedItem("namespace").getNodeValue();
             // Is this ok?

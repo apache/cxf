@@ -45,7 +45,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+//import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
@@ -54,6 +54,7 @@ import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -219,32 +220,31 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
     
     private void updateDoc(Document doc, String base,
                            Map<String, Definition> mp,
-                           Map<String, SchemaReference> smp) {
-        NodeList nl = doc.getDocumentElement()
-            .getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema",
-                                    "import");
-        for (int x = 0; x < nl.getLength(); x++) {
-            Element el = (Element)nl.item(x);
+                           Map<String, SchemaReference> smp) {        
+        List<Element> elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                                       "http://www.w3.org/2001/XMLSchema",
+                                                                       "import");
+        for (Element el : elementList) {
             String sl = el.getAttribute("schemaLocation");
             if (smp.containsKey(sl)) {
                 el.setAttribute("schemaLocation", base + "?xsd=" + sl);
             }
         }
-        nl = doc.getDocumentElement()
-            .getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema",
-                                    "include");
-        for (int x = 0; x < nl.getLength(); x++) {
-            Element el = (Element)nl.item(x);
+        
+        elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                          "http://www.w3.org/2001/XMLSchema",
+                                                          "include");
+        for (Element el : elementList) {
             String sl = el.getAttribute("schemaLocation");
             if (smp.containsKey(sl)) {
                 el.setAttribute("schemaLocation", base + "?xsd=" + sl);
             }
         }
-        nl = doc.getDocumentElement()
-            .getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/",
-                                "import");
-        for (int x = 0; x < nl.getLength(); x++) {
-            Element el = (Element)nl.item(x);
+        
+        elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                          "http://schemas.xmlsoap.org/wsdl/",
+                                                          "import");
+        for (Element el : elementList) {
             String sl = el.getAttribute("location");
             if (mp.containsKey(sl)) {
                 el.setAttribute("location", base + "?wsdl=" + sl);

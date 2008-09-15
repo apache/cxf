@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.dom.ExtendedDocumentBuilder;
@@ -92,10 +93,12 @@ public class ToolSpec {
         if (streams == null) {
             return false;
         }
-        NodeList nl = streams.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "instream");
-
-        for (int i = 0; i < nl.getLength(); i++) {
-            if (((Element)nl.item(i)).getAttribute("id").equals(id)) {
+        
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams, 
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                     "instream");
+        for (Element elem : elemList) {
+            if (elem.getAttribute("id").equals(id)) {
                 return true;
             }
         }
@@ -158,11 +161,12 @@ public class ToolSpec {
         return handler;
     }
 
-    public Element getStreams() {
-        NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "streams");
-
-        if (nl.getLength() > 0) {
-            return (Element)nl.item(0);
+    public Element getStreams() {        
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                     "streams");
+        if (elemList.size() > 0) {
+            return elemList.get(0);
         } else {
             return null;
         }
@@ -173,10 +177,11 @@ public class ToolSpec {
         Element streams = getStreams();
 
         if (streams != null) {
-            NodeList nl = streams.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "instream");
-
-            for (int i = 0; i < nl.getLength(); i++) {
-                res.add(((Element)nl.item(i)).getAttribute("id"));
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams, 
+                                                                         Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                         "instream");
+            for (Element elem : elemList) {
+                res.add(elem.getAttribute("id"));
             }
         }
         return Collections.unmodifiableList(res);
@@ -187,18 +192,21 @@ public class ToolSpec {
         Element streams = getStreams();
 
         if (streams != null) {
-            NodeList nl = streams.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "outstream");
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams, 
+                                                                         Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                         "outstream");
 
-            for (int i = 0; i < nl.getLength(); i++) {
-                res.add(((Element)nl.item(i)).getAttribute("id"));
+            for (Element elem : elemList) {
+                res.add(elem.getAttribute("id"));
             }
         }
         return Collections.unmodifiableList(res);
     }
 
     public Element getUsage() {
-        return (Element)doc.getDocumentElement().getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "usage")
-            .item(0);
+        return DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
+                                            Tool.TOOL_SPEC_PUBLIC_ID, 
+                                            "usage").get(0);
     }
 
     public void transform(InputStream stylesheet, OutputStream out) throws TransformerException {
@@ -207,10 +215,12 @@ public class ToolSpec {
     }
 
     public Element getPipeline() {
-        NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "pipeline");
-
-        if (nl.getLength() > 0) {
-            return (Element)nl.item(0);
+        
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
+                                            Tool.TOOL_SPEC_PUBLIC_ID, 
+                                            "pipeline");
+        if (elemList.size() > 0) {
+            return elemList.get(0);
         } else {
             return null;
         }
@@ -229,18 +239,22 @@ public class ToolSpec {
      * sort out, but that is the reason why this getter method exists.
      */
     public String getStreamRefName(String streamId) {
-        if (getUsage() != null) {
-            NodeList nl = getUsage().getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "associatedArgument");
-
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (((Element)nl.item(i)).getAttribute("streamref").equals(streamId)) {
-                    return ((Element)nl.item(i).getParentNode()).getAttribute("id");
+        if (getUsage() != null) {            
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(getUsage(), 
+                                                                        Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                        "associatedArgument");
+            for (Element elem : elemList) {
+                if (elem.getAttribute("streamref").equals(streamId)) {
+                    return ((Element)elem.getParentNode()).getAttribute("id");
                 }
             }
-            nl = getUsage().getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "argument");
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (((Element)nl.item(i)).getAttribute("streamref").equals(streamId)) {
-                    return ((Element)nl.item(i)).getAttribute("id");
+            
+            elemList = DOMUtils.findAllElementsByTagNameNS(getUsage(), 
+                                                           Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                           "argument");
+            for (Element elem : elemList) {
+                if (elem.getAttribute("streamref").equals(streamId)) {
+                    return elem.getAttribute("id");
                 }
             }
         }
@@ -260,13 +274,13 @@ public class ToolSpec {
                 if (el.hasAttribute("default")) {
                     return el.getAttribute("default");
                 }
-            } else if ("option".equals(el.getLocalName())) {
-                NodeList assArgs = el.getElementsByTagNameNS("http://cxf.apache.org/Xpipe/ToolSpecification",
-                                                             "associatedArgument");
-
-                if (assArgs.getLength() > 0) {
-                    Element assArg = (Element)assArgs.item(0);
-
+            } else if ("option".equals(el.getLocalName())) {              
+                List<Element> elemList = 
+                    DOMUtils.findAllElementsByTagNameNS(el, 
+                                                        "http://cxf.apache.org/Xpipe/ToolSpecification", 
+                                                        "associatedArgument");
+                if (elemList.size() > 0) {
+                    Element assArg = elemList.get(0);
                     if (assArg.hasAttribute("default")) {
                         return assArg.getAttribute("default");
                     }

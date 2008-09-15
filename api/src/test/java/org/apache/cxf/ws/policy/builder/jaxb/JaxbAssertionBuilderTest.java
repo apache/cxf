@@ -66,9 +66,10 @@ public class JaxbAssertionBuilderTest extends Assert {
         JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
         assertNotNull(ab);
         InputStream is = JaxbAssertionBuilderTest.class.getResourceAsStream("foo.xml");
-        Document doc = DOMUtils.readXml(is);
-        Element elem = (Element)doc.getDocumentElement()
-            .getElementsByTagNameNS("http://cxf.apache.org/test/assertions/foo", "foo").item(0);
+        Document doc = DOMUtils.readXml(is);        
+        Element elem =  DOMUtils.findAllElementsByTagNameNS((Element)doc.getDocumentElement(), 
+                                                          "http://cxf.apache.org/test/assertions/foo", 
+                                                          "foo").get(0);
         PolicyAssertion a = ab.build(elem);
         JaxbAssertion<FooType> jba = JaxbAssertion.cast(a, FooType.class);
         FooType foo = jba.getData();

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -445,5 +447,28 @@ public final class DOMUtils {
         }
         
         return null;
+    }
+    
+    public static List<Element> findAllElementsByTagNameNS(Element elem, 
+                                                           String nameSpaceURI,
+                                                           String localName) {
+        List<Element> ret = new LinkedList<Element>();
+        findAllElementsByTagNameNS(elem, nameSpaceURI, localName, ret);
+        return ret;
+    }
+    
+    public static void findAllElementsByTagNameNS(Element el, 
+                                                  String nameSpaceURI, 
+                                                  String localName, 
+                                                  List<Element> elementList) {
+        
+        if (localName.equals(el.getLocalName()) && nameSpaceURI.contains(el.getNamespaceURI())) {
+            elementList.add(el);
+        }     
+        Element elem = getFirstElement(el);
+        while (elem != null) {
+            findAllElementsByTagNameNS(elem, nameSpaceURI, localName, elementList);
+            elem = getNextElement(elem);
+        }
     }
 }

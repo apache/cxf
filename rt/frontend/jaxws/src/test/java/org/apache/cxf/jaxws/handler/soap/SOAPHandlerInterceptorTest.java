@@ -52,7 +52,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -179,10 +178,11 @@ public class SOAPHandlerInterceptorTest extends Assert {
         Iterator outIt = bodyElementNew
             .getChildElements(new QName("http://apache.org/hello_world_rpclit/types", "out"));
         Element outElement = (SOAPElement)outIt.next();
-        assertNotNull(outElement);
-        NodeList elem3NodeList = outElement
-            .getElementsByTagNameNS("http://apache.org/hello_world_rpclit/types", "elem3");
-        Node elem3Element = elem3NodeList.item(0);
+        assertNotNull(outElement);        
+        Element elem3Element = 
+            DOMUtils.findAllElementsByTagNameNS(outElement, 
+                                                "http://apache.org/hello_world_rpclit/types", 
+                                                "elem3").get(0);
         assertEquals("100", elem3Element.getTextContent());
     }
 

@@ -45,7 +45,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -71,6 +70,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -379,15 +379,19 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private Element removeImportElement(Element element) {
-        NodeList nodeList = element.getElementsByTagNameNS(ToolConstants.SCHEMA_URI, "import");
-        if (nodeList.getLength() == 0) {
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                                     ToolConstants.SCHEMA_URI, 
+                                                                     "import");
+        if (elemList.size() == 0) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
-        nodeList = element.getElementsByTagNameNS(ToolConstants.SCHEMA_URI, "import");
+        elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                       ToolConstants.SCHEMA_URI, 
+                                                       "import");
         List<Node> ns = new ArrayList<Node>();
-        for (int tmp = 0; tmp < nodeList.getLength(); tmp++) {
-            Node importNode = nodeList.item(tmp);
+        for (Element elem : elemList) {
+            Node importNode = elem;
             ns.add(importNode);
         }
         for (Node item : ns) {
