@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.cxf.aegis.services.SimpleBean;
+
 /**
  * 
  */
@@ -41,6 +43,10 @@ public class SportsServiceImpl implements SportsService {
 
     public AttributeBean getAttributeBean() {
         return new AttributeBean();
+    }
+
+    public SimpleBean getSimpleBean() {
+        return new SimpleBean();
     }
 
 }

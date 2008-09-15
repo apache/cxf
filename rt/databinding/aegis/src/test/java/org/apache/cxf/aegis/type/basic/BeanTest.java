@@ -25,6 +25,9 @@ import java.util.Date;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.NodeList;
+
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
@@ -329,6 +332,37 @@ public class BeanTest extends AbstractAegisTest {
         assertInvalid("//xsd:complexType[@name='IntBean']/xsd:sequence/xsd:element[@name='int1'][@nillable]",
                       schema);
     }
+    
+    @Test
+    public void testCharMappings() throws Exception {
+        context = new AegisContext();
+        context.initialize();
+        mapping = context.getTypeMapping();
+
+        BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
+        type.setTypeClass(SimpleBean.class);
+        type.setTypeMapping(mapping);
+
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
+
+        new Document(types);
+
+        type.writeSchema(schema);
+
+        NodeList typeAttrNode = 
+            assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence/xsd:element[@name='character']"
+                       + "/@type", 
+                       schema); 
+        assertEquals(1, typeAttrNode.getLength());
+        Attr typeAttr = (Attr)typeAttrNode.item(0);
+        String typeQnameString = typeAttr.getValue();
+        String[] pieces = typeQnameString.split(":");
+        assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME.getLocalPart(),
+                     pieces[1]);
+    }
+    
     @Test
     public void testNullNonNillableWithDate() throws Exception {
         BeanTypeInfo info = new BeanTypeInfo(DateBean.class, "urn:Bean");
@@ -363,7 +397,7 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         PropertyDescriptor[] pds = info.getPropertyDescriptors();
-        assertEquals(4, pds.length);
+        assertEquals(6, pds.length);
 
         ExtendedBean bean = new ExtendedBean();
         bean.setHowdy("howdy");

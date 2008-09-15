@@ -117,4 +117,9 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
     public void setProperties(Map<String, Object> properties) {
         this.putAll(properties);
     }
+    
+    @Override
+    public String toString() {
+        return "[ServiceImpl " + getName() + "]";
+    }
 }

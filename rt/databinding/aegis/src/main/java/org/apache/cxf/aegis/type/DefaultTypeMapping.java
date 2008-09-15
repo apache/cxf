@@ -45,6 +45,7 @@ import org.apache.cxf.aegis.type.basic.BigDecimalType;
 import org.apache.cxf.aegis.type.basic.BigIntegerType;
 import org.apache.cxf.aegis.type.basic.BooleanType;
 import org.apache.cxf.aegis.type.basic.CalendarType;
+import org.apache.cxf.aegis.type.basic.CharacterAsStringType;
 import org.apache.cxf.aegis.type.basic.CharacterType;
 import org.apache.cxf.aegis.type.basic.DateTimeType;
 import org.apache.cxf.aegis.type.basic.DoubleType;
@@ -230,7 +231,6 @@ public class DefaultTypeMapping implements TypeMapping {
                         new BooleanType());
         defaultRegister(tm, defaultNillable, Calendar.class, XMLSchemaQNames.XSD_DATETIME,
                         new CalendarType());
-        defaultRegister(tm, defaultNillable, Character.class, Soap11.ENCODED_CHAR, new CharacterType());
         defaultRegister(tm, defaultNillable, Date.class, XMLSchemaQNames.XSD_DATETIME, new DateTimeType());
         defaultRegister(tm, defaultNillable, Document.class, XMLSchemaQNames.XSD_ANY, new DocumentType());
         defaultRegister(tm, defaultNillable, Element.class, XMLSchemaQNames.XSD_ANY,
@@ -282,6 +282,7 @@ public class DefaultTypeMapping implements TypeMapping {
         fillStandardMappings(soapTM, defaultNillable, enableMtomXmime);
 
         defaultRegister(soapTM, defaultNillable, boolean.class, Soap11.ENCODED_BOOLEAN, new BooleanType());
+        defaultRegister(soapTM, defaultNillable, char.class, Soap11.ENCODED_CHAR, new CharacterType());
         defaultRegister(soapTM, defaultNillable, int.class, Soap11.ENCODED_INT, new IntType());
         defaultRegister(soapTM, defaultNillable, short.class, Soap11.ENCODED_SHORT, new ShortType());
         defaultRegister(soapTM, defaultNillable, double.class, Soap11.ENCODED_DOUBLE, new DoubleType());
@@ -314,6 +315,12 @@ public class DefaultTypeMapping implements TypeMapping {
         // by convention, the default mapping is against the XML schema URI.
         DefaultTypeMapping tm = new DefaultTypeMapping(SOAPConstants.XSD);
         fillStandardMappings(tm, defaultNillable, enableMtomXmime);
+        defaultRegister(tm, defaultNillable, Character.class, 
+                        CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
+                        new CharacterAsStringType());
+        defaultRegister(tm, defaultNillable, char.class, 
+                        CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
+                        new CharacterAsStringType());
 
         registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.Duration", XMLSchemaQNames.XSD_DURATION,
                             "org.apache.cxf.aegis.type.java5.DurationType");

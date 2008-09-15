@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
@@ -454,6 +455,7 @@ public class BeanType extends Type {
 
         Element seq = null;
         boolean needXmime = false;
+        boolean needUtilityTypes = false;
         
         // Write out schema for elements
         for (Iterator itr = inf.getElements(); itr.hasNext();) {
@@ -486,10 +488,15 @@ public class BeanType extends Type {
 
             writeTypeReference(name, nameWithPrefix, element, type, prefix, root);
             needXmime |= type.usesXmime();
+            needUtilityTypes |= type.usesUtilityTypes();
         }
         
         if (needXmime) {
             addXmimeToSchema(root);
+        }
+        
+        if (needUtilityTypes) {
+            AegisContext.addUtilityTypesToSchema(root);
         }
 
         /**

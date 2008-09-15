@@ -39,9 +39,11 @@ import org.apache.cxf.javascript.XmlSchemaUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAny;
+import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaObjectTable;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
@@ -311,6 +313,8 @@ public class SchemaJavascriptBuilder {
         utils.startIf("extraNamespaces");
         utils.appendExpression("' ' + extraNamespaces");
         utils.endBlock();
+        // attributes
+        complexTypeSerializeAttributes(type, "this._");
         utils.appendString(">");
         utils.endBlock();
         code.append(bodyCode);
@@ -322,6 +326,14 @@ public class SchemaJavascriptBuilder {
         utils.appendLine("return xml;");
         code.append("}\n\n");
         code.append(nameManager.getJavascriptName(name) + ".prototype.serialize = " + functionName + ";\n\n");
+    }
+
+    private void complexTypeSerializeAttributes(XmlSchemaComplexType type, String string) {
+        XmlSchemaObjectCollection attributes = type.getAttributes();
+        for (int ax = 0; ax < attributes.getCount(); ax++) {
+            @SuppressWarnings("unused") // work in progress.
+            XmlSchemaAttribute attribute = (XmlSchemaAttribute)attributes.getItem(ax);
+        }
     }
 
     /**
