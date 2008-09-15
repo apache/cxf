@@ -1270,4 +1270,14 @@ public class CodeGenTest extends ProcessorTestBase {
         assertEquals(1, sei.getMethods().length);
         assertFalse(Void.TYPE.equals(sei.getMethods()[0].getReturnType()));
     }
+
+    @Test
+    public void testsafasdasf()  throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, 
+                "/tmp/cxf-1793/src/main/resources/com/edb/adnfond/transport/ws/misc/HeaderInRequestMsg.wsdl");
+        env.put(ToolConstants.CFG_EXTRA_SOAPHEADER, "TRUE");
+        env.put(ToolConstants.CFG_VALIDATE_WSDL, ToolConstants.CFG_VALIDATE_WSDL);
+        processor.setContext(env);
+        processor.execute();
+    }
 }

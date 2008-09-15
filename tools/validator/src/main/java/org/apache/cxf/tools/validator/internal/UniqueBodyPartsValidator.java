@@ -19,16 +19,25 @@
 
 package org.apache.cxf.tools.validator.internal;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.wsdl.Binding;
+import javax.wsdl.BindingInput;
+import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Message;
 import javax.wsdl.Operation;
 import javax.wsdl.Part;
-import javax.wsdl.PortType;
+import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.soap.SOAPHeader;
 import javax.xml.namespace.QName;
+
+import org.apache.cxf.helpers.CastUtils;
 
 public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
     private Map<QName, String> uniqueBodyPartsMap;
@@ -38,44 +47,65 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
     }
 
     public boolean isValid() {
-        Iterator ite = def.getPortTypes().values().iterator();
-        while (ite.hasNext()) {
-            //
-            // Only check for unique body parts per portType.
-            // (Create a new Map for each portType.)
-            //
+        Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
+        for (Binding binding : bindings) {
             uniqueBodyPartsMap = new HashMap<QName, String>();
-            PortType portType = (PortType)ite.next();
-            Iterator ite2 = portType.getOperations().iterator();
-            while (ite2.hasNext()) {
-                Operation operation = (Operation)ite2.next();
+            List<BindingOperation> ops = CastUtils.cast(binding.getBindingOperations());
+            for (BindingOperation op : ops) {
+                Operation operation = op.getOperation();
                 if (operation.getInput() != null) {
                     Message inMessage = operation.getInput().getMessage();
-                    if (inMessage != null && !isUniqueBodyPart(operation.getName(), inMessage)) {
+                    BindingInput bin = op.getBindingInput();
+                    Set<String> headers = new HashSet<String>();
+                    if (bin != null) {
+                        List<ExtensibilityElement> lst = CastUtils.cast(bin.getExtensibilityElements());
+                        for (ExtensibilityElement ext : lst) {
+                            if (!(ext instanceof SOAPHeader)) {
+                                continue;
+                            }
+                            SOAPHeader header = (SOAPHeader)ext;
+                            if (!header.getMessage().equals(inMessage.getQName())) {
+                                continue;
+                            }
+                            headers.add(header.getPart());
+                        }
+                    }
+                    
+                    //find the headers as they don't contribute to the body
+                    
+                    if (inMessage != null && !isUniqueBodyPart(operation.getName(), 
+                                                               inMessage,
+                                                               headers,
+                                                               binding.getQName())) {
                         return false;
                     }
                 }
             }
         }
         return true;
-
     }
 
-    private boolean isUniqueBodyPart(String operationName, Message msg) {
-        Map partsMap = msg.getParts();
-        Iterator ite = partsMap.values().iterator();
-        if (ite.hasNext()) {
-            Part part = (Part)ite.next();
+    private boolean isUniqueBodyPart(String operationName, Message msg,
+                                     Collection<String> headers, QName bindingName) {
+        List<Part> partList = CastUtils.cast(msg.getOrderedParts(null));
+        for (Part part : partList) {
+            if (headers.contains(part.getName())) {
+                continue;
+            }
             if (part.getElementName() == null) {
                 return true;
             }
             String opName = getOperationNameWithSamePart(operationName, part);
             if (opName != null) {
                 addErrorMessage("Non unique body parts, operation " + "[ " + opName + " ] "
-                                + "and  operation [ " + operationName + " ] have the same body block "
+                                + "and  operation [ " + operationName + " ] in binding "
+                                + bindingName.toString()
+                                + " have the same body block: "
                                 + part.getElementName());
                 return false;
             }
+            //just need to check the first element
+            return true;
         }
         return true;
     }

@@ -132,7 +132,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         for (InputSource is : xsdsInJar) {
             Message msg = new Message("CREATE_SCHEMA_LOADED_FROM_JAR", LOG, is.getSystemId());
-            LOG.log(Level.INFO, msg.toString());
+            LOG.log(Level.FINE, msg.toString());
             Document doc = docBuilder.parse(is.getByteStream());
             DOMSource stream = new DOMSource(doc, is.getSystemId());
             stream.setSystemId(is.getSystemId());
@@ -361,7 +361,7 @@ class SchemaResourceResolver implements LSResourceResolver {
     public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId,
             String baseURI) {
         Message msg = new Message("RESOLVE_SCHEMA", LOG, namespaceURI, systemId, baseURI);
-        LOG.log(Level.INFO, msg.toString());
+        LOG.log(Level.FINE, msg.toString());
         if (NSFILEMAP.containsKey(namespaceURI)) {
             return loadLSInput(namespaceURI);
         }
@@ -398,7 +398,7 @@ class SchemaResourceResolver implements LSResourceResolver {
                     lsin.setSystemId(resURL);
                     lsin.setByteStream(urlCon.getInputStream());
                     msg = new Message("RESOLVE_FROM_REMOTE", LOG, url);
-                    LOG.log(Level.INFO, msg.toString());
+                    LOG.log(Level.FINE, msg.toString());
                     return lsin;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -415,7 +415,7 @@ class SchemaResourceResolver implements LSResourceResolver {
         URIResolver resolver;
         try {
             msg = new Message("RESOLVE_FROM_LOCAL", LOG, localFile);
-            LOG.log(Level.INFO, msg.toString());
+            LOG.log(Level.FINE, msg.toString());
 
             resolver = new URIResolver(localFile);
             if (resolver.isResolved()) {

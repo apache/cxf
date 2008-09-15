@@ -117,6 +117,14 @@ public class WSDLValidationTest extends ToolTestBase {
         assertTrue("Is not valid wsdl: " + getStdOut(),
                    getStdOut().indexOf("Passed Validation") > -1);
     }
+    @Test
+    public void testSOAPHeadersInMultiOperations() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/cxf1793.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr(), getStdOut().indexOf("Passed Validation : Valid WSDL") > -1);
+    }
+
 
     @Test
     public void testWSIBP2210() throws Exception {

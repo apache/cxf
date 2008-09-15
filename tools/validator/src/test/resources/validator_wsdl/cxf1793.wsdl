@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions
+targetNamespace="http://cxf.apache.org/test/cxf1793/"
+xmlns:m="http://cxf.apache.org/test/cxf1793/"
+xmlns:misc="http://cxf.apache.org/test/cxf1793/types"
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <wsdl:documentation/>
+            <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
+                targetNamespace="http://cxf.apache.org/test/cxf1793/types">
+            <element name="AutHeader">
+                <complexType>
+                    <sequence>
+                        <element name="headerVal" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="opOne">
+                <complexType>
+                    <sequence>
+                        <element name="foo" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="opOneResponse">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+
+
+            <element name="opTwo">
+                <complexType>
+                    <sequence>
+                        <element name="foo" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+
+            <element name="opTwoResponse">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </wsdl:types>
+        
+        <wsdl:message name="opOne">
+                <wsdl:part name="header" element="misc:AutHeader"/>
+                <wsdl:part name="request" element="misc:opOne"/>
+        </wsdl:message>
+        
+        <wsdl:message name="opOneResponse">
+                <wsdl:part name="response" element="misc:opOneResponse" />
+        </wsdl:message>
+
+        <wsdl:message name="opTwo">
+                <wsdl:part name="header" element="misc:AutHeader"/>
+                <wsdl:part name="request" element="misc:opTwo"/>
+        </wsdl:message>
+        
+        <wsdl:message name="opTwoResponse">
+                <wsdl:part name="response" element="misc:opTwoResponse"/>
+        </wsdl:message>
+
+        <wsdl:portType name="MiscPort">
+                <wsdl:operation name="opOne">
+                        <wsdl:input message="m:opOne" />
+                        <wsdl:output message="m:opOneResponse"/>
+                </wsdl:operation>       
+                <wsdl:operation name="opTwo">
+                        <wsdl:input message="m:opTwo"/>
+                        <wsdl:output message="m:opTwoResponse"/>
+                </wsdl:operation>
+        </wsdl:portType>
+        
+        <wsdl:binding name="MiscSoapBinding" type="m:MiscPort">
+                <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+                <wsdl:operation name="opOne">
+                        <soap:operation soapAction="opOne" style="document"/>
+                        <wsdl:input>
+                                <soap:header message="m:opOne" part="header" use="literal"/>
+                                <soap:body parts="request" use="literal"/>
+                        </wsdl:input>
+                        <wsdl:output>
+                                <soap:body use="literal"/>
+                        </wsdl:output>
+                </wsdl:operation>
+                <wsdl:operation name="opTwo">
+                        <soap:operation soapAction="opTwo" style="document"/>
+                        <wsdl:input>
+                                <soap:header message="m:opTwo" part="header2" use="literal"/>
+                                <soap:body parts="request" use="literal"/>
+                        </wsdl:input>
+                        <wsdl:output>
+                                <soap:body use="literal"/>
+                        </wsdl:output>
+                </wsdl:operation>
+        </wsdl:binding>
+        
+        
+        <wsdl:service name="MiscService">
+                <wsdl:port name="MiscSoapPort" binding="m:MiscSoapBinding">
+                        <soap:address location="http://localhost:8080/adnfond/services/MiscService"/>
+                </wsdl:port>
+        </wsdl:service>
+</wsdl:definitions>
