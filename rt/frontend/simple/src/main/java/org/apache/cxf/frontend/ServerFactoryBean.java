@@ -227,13 +227,22 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     /**
-     * Whether or not the Server should be started upon creation.
-     * @return
-     */
+           * Whether or not the Server should be started upon creation.
+           *
+          * @return <code>false</code> if the server should not be started upon creation
+          */
     public boolean isStart() {
         return start;
     }
 
+    /**
+           * Specifies if the Server should be started upon creation. The 
+           * default is for Servers to be started upon creation. Passing 
+           * <code>false</code> tells the factory that the Server will be 
+           * started manually using the start method.
+           *
+           * @param start <code>false</code> specifies that the Server will not be started upon creation
+           */
     public void setStart(boolean start) {
         this.start = start;
     }
@@ -251,11 +260,11 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     /**
-     * Set the backing service bean. If this is set a BeanInvoker is created for
-     * the provided bean.
-     *
-     * @return
-     */
+           * Sets the bean implementing the service. If this is set a 
+           * <code>BeanInvoker</code> is created for the provided bean.
+          *
+          * @param serviceBean an instantiated implementaiton object
+          */
     public void setServiceBean(Object serviceBean) {
         this.serviceBean = serviceBean;
     }
@@ -276,6 +285,13 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
         this.invoker = invoker;
     }
 
+    /**
+          * Specifies the location of the WSDL defining the service interface 
+          * used by the factory to create services. Typically, the WSDL 
+          * location is specified as a URL.
+          * 
+          * @param locaiton the URL of the WSDL defining the service interface
+          */          
     public void setWsdlLocation(String location) {
         setWsdlURL(location);
     }
