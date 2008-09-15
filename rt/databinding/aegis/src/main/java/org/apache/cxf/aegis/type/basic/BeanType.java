@@ -652,7 +652,14 @@ public class BeanType extends Type {
             type = beanType.getTypeInfo().getType(name);
 
             if (type == null) {
-                beanType = beanType.getSuperType();
+                Type superType = beanType.getSuperType(); /* The class might inherit from, say, 'Integer'.
+                                                             In which case we've got no BeanType 
+                                                             to work with. */
+                if (superType instanceof BeanType) {
+                    beanType = (BeanType) superType;
+                } else {
+                    break; // give up.
+                }
             }
         }
 
@@ -660,13 +667,13 @@ public class BeanType extends Type {
         if (beanType != null) {
             elementTypeInfo = beanType.getTypeInfo();
         } else {
-            // didn't find a bean type so just use this bean't type info
+            // didn't find a bean type so just use this bean's type info
             elementTypeInfo = getTypeInfo();
         }
         return elementTypeInfo;
     }
 
-    public BeanType getSuperType() {
+    public Type getSuperType() {
         BeanTypeInfo inf = getTypeInfo();
         Class c = inf.getTypeClass().getSuperclass();
         /*
@@ -674,12 +681,13 @@ public class BeanType extends Type {
          */
         if (c != null && c != Object.class && c != Exception.class && c != RuntimeException.class) {
             TypeMapping tm = inf.getTypeMapping();
-            BeanType superType = (BeanType)tm.getType(c);
+            Type superType = tm.getType(c);
             if (superType == null) {
+                // if we call createType, we know that we'll get a BeanType. */
                 superType = (BeanType)getTypeMapping().getTypeCreator().createType(c);
                 Class cParent = c.getSuperclass();
                 if (cParent != null && cParent != Object.class) {
-                    superType.getTypeInfo().setExtension(true);
+                    ((BeanType)superType).getTypeInfo().setExtension(true);
                 }
                 tm.register(superType);
             }
@@ -769,5 +777,13 @@ public class BeanType extends Type {
     @Override
     public boolean hasMinOccurs() {
         return true;
+    }
+
+    @Override
+    public void setTypeMapping(TypeMapping typeMapping) {
+        super.setTypeMapping(typeMapping);
+        if (info != null) {
+            info.setTypeMapping(typeMapping);
+        }
     }
 }

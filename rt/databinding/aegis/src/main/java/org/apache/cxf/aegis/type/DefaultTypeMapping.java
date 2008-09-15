@@ -127,6 +127,9 @@ public class DefaultTypeMapping implements TypeMapping {
         register(type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void register(Type type) {
         type.setTypeMapping(this);
         /*
