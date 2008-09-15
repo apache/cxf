@@ -72,10 +72,10 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-           * Creates a proxy object that can be used to make remote invocations.
-           *
-           * @return the proxy. You must cast the returned object to the appropriate class before using it.
-           */
+     * Creates a proxy object that can be used to make remote invocations.
+     *
+     * @return the proxy. You must cast the returned object to the appropriate class before using it.
+     */
     public Object create() {
         if (properties == null) {
             properties = new HashMap<String, Object>();
@@ -152,10 +152,10 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-           * Specifies the class representing the SEI the proxy implements.
-           *
-           * @param serviceClass the SEI's class
-           */
+     * Specifies the class representing the SEI the proxy implements.
+     *
+     * @param serviceClass the SEI's class
+     */
     public void setServiceClass(Class serviceClass) {
         clientFactoryBean.setServiceClass(serviceClass);
     }
@@ -173,11 +173,11 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
     
     /**
-          * Specifies the URL where the proxy can find the WSDL defining the 
-          * service the proxy implements.
-          *
-          * @param wsdlURL a string containing the WSDL's URL
-          */
+     * Specifies the URL where the proxy can find the WSDL defining the 
+     * service the proxy implements.
+     *
+     * @param wsdlURL a string containing the WSDL's URL
+     */
     public void setWsdlLocation(String wsdlURL) {
         setWsdlURL(wsdlURL);
     }
@@ -187,11 +187,11 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-          * Specifies the URL where the proxy can find the WSDL defining the 
-          * service the proxy implements.
-          *
-          * @param wsdlURL a string containing the WSDL's URL
-          */
+     * Specifies the URL where the proxy can find the WSDL defining the 
+     * service the proxy implements.
+     *
+     * @param wsdlURL a string containing the WSDL's URL
+     */
     public void setWsdlURL(String wsdlURL) {
         clientFactoryBean.getServiceFactory().setWsdlURL(wsdlURL);
     }
@@ -205,20 +205,20 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-           * Returns the QName of the WSDL service the proxy implements
-           * 
-           * @return the WSDL service's QName
-           */
+     * Returns the QName of the WSDL service the proxy implements
+     * 
+     * @return the WSDL service's QName
+     */
     public QName getServiceName() {
         return getServiceFactory().getServiceQName();
     }
 
     /**
-           * Specifies the QName of the WSDL service the proxy implements. The 
-           * service must exist or an error will result.
-           *
-           * @param serviceName the QName of the service for the proxy
-           */
+     * Specifies the QName of the WSDL service the proxy implements. The 
+     * service must exist or an error will result.
+     *
+     * @param serviceName the QName of the service for the proxy
+     */
     public void setServiceName(QName serviceName) {
         getServiceFactory().setServiceName(serviceName);
     }
@@ -265,21 +265,21 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-          * Returns the property map for the proxy factory.
-          *
-          * @return the property map
-          */
+     * Returns the property map for the proxy factory.
+     *
+     * @return the property map
+     */
     public Map<String, Object> getProperties() {
         return properties;
     }
 
     /**
-           * Specifies a set of properties used to configure the proxies 
-           * provided by the factory. These properties include things like 
-           * adding a namespace map to the JAXB databinding.
-           *
-           * @param properties the property map
-           */
+     * Specifies a set of properties used to configure the proxies 
+     * provided by the factory. These properties include things like 
+     * adding a namespace map to the JAXB databinding.
+     *
+     * @param properties the property map
+     */
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
