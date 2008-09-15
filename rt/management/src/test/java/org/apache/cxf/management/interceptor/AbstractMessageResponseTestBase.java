@@ -46,11 +46,11 @@ public class AbstractMessageResponseTestBase extends Assert {
     protected static final String CLIENT_SERVICE_ONAME =
         "org.apache.cxf:type=Performance.Counter.Client,bus.id=cxf,service=\"" 
         + SERVICE_NAME.toString() + "\",port=\"" 
-        + PORT_NAME + "\"";
+        + PORT_NAME.getLocalPart() + "\"";
     protected static final String SERVER_SERVICE_ONAME = 
         "org.apache.cxf:type=Performance.Counter.Server,bus.id=cxf,service=\"" 
         + SERVICE_NAME.toString() + "\",port=\"" 
-        + PORT_NAME + "\"";
+        + PORT_NAME.getLocalPart() + "\"";
     protected ObjectName clientServiceCounterOName;
     protected ObjectName serverServiceCounterOName;
     protected ObjectName clientOperationCounterOName;
@@ -70,13 +70,9 @@ public class AbstractMessageResponseTestBase extends Assert {
         clientServiceCounterOName = new ObjectName(CLIENT_SERVICE_ONAME);
         serverServiceCounterOName = new ObjectName(SERVER_SERVICE_ONAME);
         clientOperationCounterOName = new ObjectName(CLIENT_SERVICE_ONAME 
-                                               + ",operation=\"" 
-                                               + OPERATION_NAME.toString() + "\"");
+            + ",operation=\"" + OPERATION_NAME.getLocalPart() + "\"");
         serverOperationCounterOName = new ObjectName(SERVER_SERVICE_ONAME 
-                                                     + ",operation=\"" 
-                                                     + OPERATION_NAME.toString() + "\"");
-        
-        
+            + ",operation=\"" + OPERATION_NAME.getLocalPart() + "\"");
     }
     
     protected void setupCounterRepository(boolean increase, boolean isClient) {
@@ -95,7 +91,7 @@ public class AbstractMessageResponseTestBase extends Assert {
         if (increase) {
             EasyMock.expect(bus.getId()).andReturn(Bus.DEFAULT_BUS_ID);
             cRepository.increaseCounter(EasyMock.eq(serviceCounterOName),
-                                               EasyMock.isA(MessageHandlingTimeRecorder.class));
+                EasyMock.isA(MessageHandlingTimeRecorder.class));
             EasyMock.expectLastCall();
             cRepository.increaseCounter(EasyMock.eq(operationCounterOName), 
                 EasyMock.isA(MessageHandlingTimeRecorder.class));
