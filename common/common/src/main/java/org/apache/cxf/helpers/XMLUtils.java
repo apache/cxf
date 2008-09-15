@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -54,7 +55,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -355,17 +355,14 @@ public final class XMLUtils {
     }
 
     public static Element fetchElementByNameAttribute(Element parent, String targetName, String nameValue) {
-        Element ret = null;
-        NodeList nodeList = parent.getElementsByTagName(targetName);
-        Node node = null;
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            node = nodeList.item(i);
-            if (node instanceof Element && ((Element)node).getAttribute("name").equals(nameValue)) {
-                ret = (Element)node;
-                break;
+        
+        List<Element> elemList = DOMUtils.findAllElementsByTagName(parent, targetName);
+        for (Element elem : elemList) {
+            if (elem.getAttribute("name").equals(nameValue)) {
+                return elem;
             }
         }
-        return ret;
+        return null;
     }
 
     public static QName getQName(String value, Node node) {

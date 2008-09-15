@@ -22,12 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -37,6 +34,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 
@@ -101,17 +99,14 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
     private List getRequiredElementsList(Element parent, ParserContext ctx, QName name,
                                          BeanDefinitionBuilder bean) {
        
-        NodeList nl = parent.getChildNodes();
-        ManagedList list = new ManagedList(nl.getLength());
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent, 
+                                                                     name.getNamespaceURI(), 
+                                                                     name.getLocalPart());
+        ManagedList list = new ManagedList(elemList.size());
         list.setSource(ctx.extractSource(parent));
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node n = nl.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(n.getLocalName())
-                && name.getNamespaceURI().equals(n.getNamespaceURI())) {
-                list.add(ctx.getDelegate().
-                         parsePropertySubElement((Element)n, bean.getBeanDefinition()));
-
-            }
+        
+        for (Element elem : elemList) {
+            list.add(ctx.getDelegate().parsePropertySubElement(elem, bean.getBeanDefinition()));
         }
         return list;
     }

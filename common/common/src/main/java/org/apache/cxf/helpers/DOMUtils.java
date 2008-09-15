@@ -462,12 +462,34 @@ public final class DOMUtils {
                                                   String localName, 
                                                   List<Element> elementList) {
         
-        if (localName.equals(el.getLocalName()) && nameSpaceURI.contains(el.getNamespaceURI())) {
+        if (localName.equals(el.getLocalName()) 
+            && nameSpaceURI.contains(el.getNamespaceURI())) {
             elementList.add(el);
         }     
         Element elem = getFirstElement(el);
         while (elem != null) {
             findAllElementsByTagNameNS(elem, nameSpaceURI, localName, elementList);
+            elem = getNextElement(elem);
+        }
+    }
+    
+    
+    
+    
+    public static List<Element> findAllElementsByTagName(Element elem, String tagName) {
+        List<Element> ret = new LinkedList<Element>();
+        findAllElementsByTagName(elem, tagName, ret);
+        return ret;
+    }
+    
+    public static void findAllElementsByTagName(Element el, String tagName, List<Element> elementList) {
+        
+        if (tagName.equals(el.getTagName())) {
+            elementList.add(el);
+        }     
+        Element elem = getFirstElement(el);
+        while (elem != null) {
+            findAllElementsByTagName(elem, tagName, elementList);
             elem = getNextElement(elem);
         }
     }
