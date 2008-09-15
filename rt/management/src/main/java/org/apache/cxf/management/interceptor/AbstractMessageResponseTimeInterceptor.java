@@ -104,9 +104,9 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             OperationInfo opInfo = ex.get(OperationInfo.class);
             Endpoint endpoint = ex.get(Endpoint.class);
             
-            String portName = "\"" + endpoint.getEndpointInfo().getName() + "\"";
             String serviceName = "\"" + service.getName() + "\"";            
-            String operationName = "\"" + opInfo.getName().toString() + "\"";
+            String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
+            String operationName = "\"" + opInfo.getName().getLocalPart() + "\"";
             
             StringBuffer buffer = new StringBuffer();
             buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");

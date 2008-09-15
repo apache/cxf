@@ -88,7 +88,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
 
         String serviceName = ObjectName.quote(endpoint.getService().getName().toString());
         buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
-        String endpointName = ObjectName.quote(endpoint.getEndpointInfo().getName().toString());
+        String endpointName = ObjectName.quote(endpoint.getEndpointInfo().getName().getLocalPart());
         buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName);
         
         //Use default domain name of server
@@ -110,8 +110,5 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
                 mgr.unRegisterListener(this);                
             }
         }
-    }    
-    
-    
-    
+    }
 }

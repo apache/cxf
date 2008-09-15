@@ -97,8 +97,7 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         
         MBeanServer mbs = im.getMBeanServer();
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-                                         + ":" + ManagementConstants.BUS_ID_PROP
-                                         + "=cxf" + bus.hashCode() + ",*");        
+            + ":" + ManagementConstants.BUS_ID_PROP + "=cxf" + bus.hashCode() + ",*");        
         
         SOAPService service = new SOAPService();
         assertNotNull(service);        
@@ -116,8 +115,8 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("The Counters are not export to JMX: " + counterNames, 
                      4 + 3 , counterNames.size());
        
-        ObjectName sayHiCounter =  new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-            + ":operation=\"{http://apache.org/hello_world_soap_http}sayHi\",*"); 
+        ObjectName sayHiCounter =  new ObjectName(
+            ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"sayHi\",*"); 
         
         Set s = mbs.queryNames(sayHiCounter, null);        
         Iterator it = s.iterator();
@@ -146,8 +145,8 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         counterNames = mbs.queryNames(name, null);
         assertEquals("The Counters are not export to JMX ", 6 + 3, counterNames.size());
         
-        ObjectName greetMeOneWayCounter =  new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-            + ":operation=\"{http://apache.org/hello_world_soap_http}greetMeOneWay\",*");
+        ObjectName greetMeOneWayCounter =  new ObjectName(
+            ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"greetMeOneWay\",*");
         
         s = mbs.queryNames(greetMeOneWayCounter, null);        
         it = s.iterator();
@@ -157,8 +156,5 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
             Object val = mbs.getAttribute(counterName, "NumInvocations");    
             assertEquals("Wrong Counters Number of Invocations", val, 1);
         }
-        
-       
     }
-    
 }
