@@ -39,7 +39,6 @@ import org.w3c.dom.Document;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.type.basic.BigDecimalType;
 import org.apache.cxf.aegis.type.basic.BigIntegerType;
@@ -68,7 +67,6 @@ import org.apache.cxf.aegis.type.xml.JDOMElementType;
 import org.apache.cxf.aegis.type.xml.SourceType;
 import org.apache.cxf.aegis.type.xml.XMLStreamReaderType;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.jdom.Element;
@@ -322,53 +320,33 @@ public class DefaultTypeMapping implements TypeMapping {
                         CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
                         new CharacterAsStringType());
 
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.Duration", XMLSchemaQNames.XSD_DURATION,
-                            "org.apache.cxf.aegis.type.java5.DurationType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.Duration.class, XMLSchemaQNames.XSD_DURATION,
+                            new org.apache.cxf.aegis.type.java5.DurationType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_DATE,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_TIME,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_G_DAY,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_G_MONTH,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_G_MONTH_DAY,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_G_YEAR,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_G_YEAR_MONTH,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
-        registerIfAvailable(tm, defaultNillable, "javax.xml.datatype.XMLGregorianCalendar",
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
+        defaultRegister(tm, defaultNillable, javax.xml.datatype.XMLGregorianCalendar.class,
                             XMLSchemaQNames.XSD_DATETIME,
-                            "org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType");
+                            new org.apache.cxf.aegis.type.java5.XMLGregorianCalendarType());
         return tm;
-    }
-
-    private static void registerIfAvailable(TypeMapping tm, boolean defaultNillable, String className,
-                                            QName typeName, String typeClassName) {
-        try {
-            Class cls = ClassLoaderUtils.loadClass(className, DefaultTypeMapping.class);
-            Class typeCls = ClassLoaderUtils.loadClass(typeClassName, DefaultTypeMapping.class);
-            try {
-                Type type = (Type)typeCls.newInstance();
-
-                defaultRegister(tm, defaultNillable, cls, typeName, type);
-            } catch (InstantiationException e) {
-                throw new DatabindingException("Couldn't instantiate Type ", e);
-            } catch (IllegalAccessException e) {
-                throw new DatabindingException("Couldn't instantiate Type ", e);
-            }
-        } catch (ClassNotFoundException e) {
-            LOG.debug("Could not find optional Type " + className + ". Skipping.");
-        }
-
     }
 
     public String getMappingIdentifierURI() {
