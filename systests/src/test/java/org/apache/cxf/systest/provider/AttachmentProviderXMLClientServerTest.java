@@ -22,12 +22,13 @@ package org.apache.cxf.systest.provider;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -72,8 +73,8 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
 
         Document result = XMLUtils.parse(root);
         
-        NodeList resList = result.getDocumentElement().getElementsByTagName("att");
-        assertEquals("Two attachments must've been encoded", 2, resList.getLength());
+        List<Element> resList = DOMUtils.findAllElementsByTagName(result.getDocumentElement(), "att");
+        assertEquals("Two attachments must've been encoded", 2, resList.size());
         
         verifyAttachment(resList, "foo", "foobar");
         verifyAttachment(resList, "bar", "barbaz");
@@ -83,10 +84,9 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
         assertTrue(input.contains("ABCDEFGHIJKLMNOP"));
     }
 
-    private void verifyAttachment(NodeList atts, String contentId, String value) {
+    private void verifyAttachment(List<Element> atts, String contentId, String value) {
 
-        for (int i = 0; i < atts.getLength(); i++) {
-            Element expElem = (Element)atts.item(i);
+        for (Element expElem : atts) {
             String child = expElem.getFirstChild().getNodeValue();
             String contentIdVal = expElem.getAttribute("contentId");
             if (contentId.equals(contentIdVal)

@@ -34,7 +34,6 @@ import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -95,16 +94,14 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
             hdr.setPrefix(ver.getHeader().getPrefix());
             
             marshallFrom("urn:piggyback_responder", hdr, getMarshaller());
-            NodeList nl = hdr.getChildNodes();
-            for (int i = 0; i < nl.getLength(); i++) {
-                Object obj = nl.item(i);
-                if (obj instanceof Element) {
-                    Element elem = (Element) obj;
-                    Header holder = new Header(
-                            new QName(elem.getNamespaceURI(), elem.getLocalName()), 
-                            elem, null);
-                    header.add(holder);
-                }
+            Element elem = DOMUtils.getFirstElement(hdr);
+            while (elem != null) {
+                Header holder = new Header(
+                        new QName(elem.getNamespaceURI(), elem.getLocalName()), 
+                        elem, null);
+                header.add(holder);
+                
+                elem = DOMUtils.getNextElement(elem);
             }
             
         } catch (Exception e) {

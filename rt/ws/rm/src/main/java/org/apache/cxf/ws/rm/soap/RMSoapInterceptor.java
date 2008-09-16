@@ -41,7 +41,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-//import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.Soap11;
@@ -311,7 +310,6 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             if (header != null) {
                 Unmarshaller unmarshaller = 
                     getJAXBContext().createUnmarshaller();
-//                NodeList headerElements = header.getChildNodes();
                 Iterator<Header> iter = header.iterator();
                 while (iter.hasNext()) {
                     Object node = iter.next().getObject();
@@ -342,33 +340,6 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                                 requested.add(ar);
                             }
                         }
-//                for (int i = 0; i < headerElements.getLength(); i++) {
-//                    Node node = headerElements.item(i);
-//                    if (Node.ELEMENT_NODE != node.getNodeType()) {
-//                        continue;
-//                    }
-//                    Element headerElement = (Element)headerElements.item(i);
-//                    String headerURI = headerElement.getNamespaceURI();
-//                    String localName = headerElement.getLocalName();
-//                    if (RMConstants.getNamespace().equals(headerURI)) {
-//                        LOG.log(Level.FINE, "decoding RM header {0}", localName);
-//                        if (RMConstants.getSequenceName().equals(localName)) {
-//                            SequenceType s = decodeProperty(SequenceType.class,
-//                                                            headerElement,
-//                                                            unmarshaller);
-//                            
-//                            rmps.setSequence(s);
-//                        } else if (RMConstants.getSequenceAckName().equals(localName)) {
-//                            SequenceAcknowledgement ack = decodeProperty(SequenceAcknowledgement.class,
-//                                                            headerElement,
-//                                                            unmarshaller);
-//                            acks.add(ack);                            
-//                        } else if (RMConstants.getAckRequestedName().equals(localName)) {
-//                            AckRequestedType ar = decodeProperty(AckRequestedType.class,
-//                                                            headerElement,
-//                                                            unmarshaller);
-//                            requested.add(ar);
-//                        }
                     }
                 }
                 if (acks.size() > 0) {
@@ -455,15 +426,6 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                 iter.remove();
             }
         }
-        
-//        NodeList headerElements =
-//            header.getElementsByTagNameNS(RMConstants.getNamespace(), "*");
-//        for (int i = 0; i < headerElements.getLength(); i++) {
-//            Node headerElement = headerElements.item(i);
-//            if (RMConstants.getNamespace().equals(headerElement.getNamespaceURI())) {
-//                header.removeChild(headerElement);
-//            }
-//        }
     }
     
     
