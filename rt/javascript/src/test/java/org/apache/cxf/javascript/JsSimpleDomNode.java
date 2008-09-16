@@ -190,24 +190,6 @@ public class JsSimpleDomNode extends ScriptableObject {
                     node = node.getNextSibling();
                     x++;
                 }
-                
-   /*             
-                
-                
-                
-                NodeList nodeChildren = wrappedNode.getChildNodes();
-                children = new JsSimpleDomNode[nodeChildren.getLength()];
-                for (int x = 0; x < nodeChildren.getLength(); x++) {
-                    JsSimpleDomNode prev = null;
-                    if (x > 0) {
-                        prev = (JsSimpleDomNode)children[x - 1]; 
-                    }
-                    children[x] = newObject(nodeChildren.item(x), prev);
-                    if (x > 0) {
-                        children[x - 1].setNext(children[x]);
-                    }
-                }
-                */
             } else {
                 children = new JsSimpleDomNode[0];
             }
