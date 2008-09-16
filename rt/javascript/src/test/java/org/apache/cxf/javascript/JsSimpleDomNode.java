@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -176,6 +175,26 @@ public class JsSimpleDomNode extends ScriptableObject {
     private void establishChildren() {
         if (!childrenWrapped) {
             if (wrappedNode.hasChildNodes()) {
+                children = new JsSimpleDomNode[wrappedNode.getChildNodes().getLength()];
+                Node node = wrappedNode.getFirstChild();
+                int x = 0;
+                while (node != null) {
+                    JsSimpleDomNode prev = null;
+                    if (x > 0) {
+                        prev = (JsSimpleDomNode)children[x - 1]; 
+                    }
+                    children[x] = newObject(node, prev);
+                    if (x > 0) {
+                        children[x - 1].setNext(children[x]);
+                    }                    
+                    node = node.getNextSibling();
+                    x++;
+                }
+                
+   /*             
+                
+                
+                
                 NodeList nodeChildren = wrappedNode.getChildNodes();
                 children = new JsSimpleDomNode[nodeChildren.getLength()];
                 for (int x = 0; x < nodeChildren.getLength(); x++) {
@@ -188,6 +207,7 @@ public class JsSimpleDomNode extends ScriptableObject {
                         children[x - 1].setNext(children[x]);
                     }
                 }
+                */
             } else {
                 children = new JsSimpleDomNode[0];
             }
