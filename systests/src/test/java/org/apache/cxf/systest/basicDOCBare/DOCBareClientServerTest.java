@@ -71,7 +71,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
 
         for (int i = 0; i < 5; i++) {
             putLastTradedPrice.sayHi(holder);
-            assertEquals(4.5f, holder.value.getTickerPrice());
+            assertEquals(4.5f, holder.value.getTickerPrice(), 0.01);
             assertEquals("APACHE", holder.value.getTickerSymbol());
             putLastTradedPrice.putLastTradedPrice(priceData);
         }

@@ -60,8 +60,9 @@ public class DestinationSequenceTest extends Assert {
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
+        control.makeThreadSafe(true);
         factory = new ObjectFactory();
-        ref = control.createMock(EndpointReferenceType.class); 
+        ref = control.createMock(EndpointReferenceType.class);
         id = factory.createIdentifier();
         id.setValue("seq");
     }

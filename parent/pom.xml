@@ -45,7 +45,7 @@
         <jaxb.version>2.1</jaxb.version>
         <jaxb.impl.version>2.1.7</jaxb.impl.version>
         <jaxb.xjc.version>2.1.7</jaxb.xjc.version>
-        <jetty.version>6.1.9</jetty.version>
+        <jetty.version>6.1.11</jetty.version>
         <saaj.version>1.3</saaj.version>
         <saaj.impl.version>1.3</saaj.impl.version>
         <spring.version>2.5.5</spring.version>
@@ -62,7 +62,7 @@
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
 
         <downloadSources>true</downloadSources>
-        <servicemix.version>3.2.1</servicemix.version>
+        <servicemix.version>3.2.2</servicemix.version>
     </properties>
 
 
@@ -434,6 +434,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.codehaus.jra</groupId>
+                <artifactId>jra</artifactId>
+                <version>1.0-alpha-4</version>
+            </dependency>
+            <dependency>
                 <groupId>jtidy</groupId>
                 <artifactId>jtidy</artifactId>
                 <version>4aug2000r7-dev</version>
@@ -769,7 +774,7 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymockclassextension</artifactId>
-                <version>2.2.2</version>
+                <version>2.4</version>
             </dependency>
             <dependency>
                 <groupId>asm</groupId>
@@ -815,7 +820,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                <version>1.3</version>
+                <version>1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
