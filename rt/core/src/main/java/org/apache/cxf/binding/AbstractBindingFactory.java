@@ -49,9 +49,9 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
 
     public static final String DATABINDING_DISABLED = "databinding.disabled";
 
-    Collection<String> activationNamespaces;
+    protected Collection<String> activationNamespaces;
 
-    Bus bus;
+    protected Bus bus;
 
     @PostConstruct
     void registerWithBindingManager() {
