@@ -98,6 +98,9 @@ public class EffectivePolicyImpl implements EffectivePolicy {
                           BindingOperationInfo boi,  
                           PolicyEngineImpl engine, 
                           boolean requestor) {
+        if (boi.isUnwrapped()) {
+            boi = boi.getUnwrappedOperation();
+        }
         BindingMessageInfo bmi = requestor ? boi.getInput() : boi.getOutput();
         if (requestor) {
             policy = engine.getClientEndpointPolicy(ei, (Conduit)null).getPolicy();
