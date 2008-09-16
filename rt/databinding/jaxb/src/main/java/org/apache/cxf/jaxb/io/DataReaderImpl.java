@@ -60,6 +60,9 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             if (databinding.getUnmarshallerListener() != null) {
                 um.setListener(databinding.getUnmarshallerListener());
             }
+            if (databinding.getValidationEventHandler() != null) {
+                um.setEventHandler(databinding.getValidationEventHandler());
+            }
             if (databinding.getUnmarshallerProperties() != null) {
                 for (Map.Entry<String, Object> propEntry 
                     : databinding.getUnmarshallerProperties().entrySet()) {

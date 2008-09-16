@@ -45,6 +45,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -151,7 +152,9 @@ public final class JAXBDataBinding extends AbstractDataBinding {
     private Map<String, Object> unmarshallerProperties = Collections.emptyMap();
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
+    private ValidationEventHandler validationEventHandler;
     
+
     private boolean qualifiedSchemas;
     private Service service;
 
@@ -704,6 +707,15 @@ public final class JAXBDataBinding extends AbstractDataBinding {
      */
     public void setMarshallerListener(Marshaller.Listener marshallerListener) {
         this.marshallerListener = marshallerListener;
+    }
+    
+    
+    public ValidationEventHandler getValidationEventHandler() {
+        return validationEventHandler;
+    }
+
+    public void setValidationEventHandler(ValidationEventHandler validationEventHandler) {
+        this.validationEventHandler = validationEventHandler;
     }
 
     
