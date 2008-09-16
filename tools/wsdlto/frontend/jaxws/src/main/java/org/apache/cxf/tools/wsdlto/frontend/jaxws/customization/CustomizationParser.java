@@ -171,14 +171,17 @@ public final class CustomizationParser {
     
     private void buildHandlerChains() {
 
-        for (Element jaxwsBinding : jaxwsBindingsMap.keySet()) {
-            NodeList nl = jaxwsBinding.getElementsByTagNameNS(ToolConstants.HANDLER_CHAINS_URI,
-                                                              ToolConstants.HANDLER_CHAINS);
-            if (nl.getLength() == 0) {
+        for (Element jaxwsBinding : jaxwsBindingsMap.keySet()) {            
+            List<Element> elemList = 
+                DOMUtils.findAllElementsByTagNameNS(jaxwsBinding, 
+                                                    ToolConstants.HANDLER_CHAINS_URI, 
+                                                    ToolConstants.HANDLER_CHAINS);         
+            if (elemList.size() == 0) {
                 continue;
-            }
+            }         
             // take the first one, anyway its 1 handler-config per customization
-            this.handlerChains = (Element)nl.item(0);
+            this.handlerChains = elemList.get(0);
+ 
             return;
         }
 
@@ -393,16 +396,16 @@ public final class CustomizationParser {
 
         Element cloneEle = (Element)cloneNode;
         cloneEle.removeAttribute("node");
-        for (int i = 0; i < cloneNode.getChildNodes().getLength(); i++) {
-            Node child = cloneNode.getChildNodes().item(i);
-            if (child.getNodeType() == Element.ELEMENT_NODE) {
-                Element childElement = (Element)child;
-                Node attrNode = childElement.getAttributeNode("node");
-                if (attrNode != null) {
-                    cloneNode.removeChild(child);
-                }
-            }
+        
+        Element elem = DOMUtils.getFirstElement(cloneNode);
+        while (elem != null) {
+            Node attrNode = elem.getAttributeNode("node");
+            if (attrNode != null) {
+                cloneNode.removeChild(elem);
+            }        
+            elem = DOMUtils.getNextElement(elem);       
         }
+
         firstChild.appendChild(cloneNode);
     }
 

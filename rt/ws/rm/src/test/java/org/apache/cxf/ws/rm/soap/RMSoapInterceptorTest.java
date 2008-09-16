@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
-//import org.w3c.dom.NodeList;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -359,7 +358,6 @@ public class RMSoapInterceptorTest extends Assert {
 
         for (String name : names) {
             boolean found = false;
-//            NodeList headerElements = header.getChildNodes();
             Iterator<Header> iter = header.iterator();
             while (iter.hasNext()) {
                 Object obj = iter.next().getObject();
@@ -378,20 +376,6 @@ public class RMSoapInterceptorTest extends Assert {
                     }
                 }
             }
-//            for (int i = 0; i < headerElements.getLength(); i++) {
-//                Element headerElement = (Element)headerElements.item(i);
-//                String namespace = headerElement.getNamespaceURI();
-//                String localName = headerElement.getLocalName();
-//                if (RMConstants.getNamespace().equals(namespace)
-//                    && localName.equals(name)) {
-//                    found = true;
-//                    break;
-//                } else if (RMConstants.getAddressingNamespace().equals(namespace)
-//                    && localName.equals(name)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
             assertTrue("Could not find header element " + name, found);
         }
 
@@ -416,22 +400,6 @@ public class RMSoapInterceptorTest extends Assert {
                 assertTrue("Unexpected header element " + localName, found);
             }
         }
-//        NodeList headerElements = header.getChildNodes();
-//        for (int i = 0; i < headerElements.getLength(); i++) {
-//            Element headerElement = (Element)headerElements.item(i);  
-//            String namespace = headerElement.getNamespaceURI();
-//            String localName = headerElement.getLocalName();
-//            assertTrue(RMConstants.getNamespace().equals(namespace) 
-//                || RMConstants.getAddressingNamespace().equals(namespace));
-//            boolean found = false;
-//            for (String name : names) {
-//                if (localName.equals(name)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//            assertTrue("Unexpected header element " + localName, found);
-//        }
     }
     
     private SoapMessage setUpInboundMessage(String resource) throws XMLStreamException {

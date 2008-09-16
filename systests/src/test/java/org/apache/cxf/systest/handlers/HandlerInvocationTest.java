@@ -29,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Detail;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
@@ -49,12 +50,11 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.handler_test.HandlerTest;
 import org.apache.handler_test.HandlerTestService;
@@ -1073,7 +1073,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         String[] handlerNames = {"soapHandler4", "soapHandler3", "handler2", "handler1", "servant",
                                  "handler1", "handler2", "soapHandler3", "soapHandler4"};
 
-        List<String> resp = getHandlerNames(inMsg.getSOAPBody().getChildNodes());
+        List<String> resp = getHandlerNames(inMsg.getSOAPBody());
         assertEquals(handlerNames.length, resp.size());
 
         Iterator iter = resp.iterator();
@@ -1090,17 +1090,10 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    List<String> getHandlerNames(NodeList nodes) throws Exception {
+    List<String> getHandlerNames(SOAPBody soapBody) throws Exception {
+        
+        Element elNode = DOMUtils.getFirstElement(soapBody);
         List<String> stringList = null;
-        Node elNode = null;
-        for (int idx = 0; idx < nodes.getLength(); idx++) {
-            Node n = nodes.item(idx);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
-                elNode = n;
-                break;
-            }
-        }
-
         JAXBContext jaxbCtx = JAXBContext.newInstance(PingResponse.class);
         Unmarshaller um = jaxbCtx.createUnmarshaller();
         Object obj = um.unmarshal(elNode);
