@@ -397,6 +397,11 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         return serviceClass;
     }
 
+    /**
+          * Specifies the class implementing the service.
+          *
+          * @param serviceClass the service's implementaiton class
+          */
     public void setServiceClass(Class serviceClass) {
         this.serviceClass = serviceClass;
     }
