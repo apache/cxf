@@ -62,7 +62,7 @@
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
 
         <downloadSources>true</downloadSources>
-        <servicemix.version>3.2.2</servicemix.version>
+        <servicemix.version>3.2.1</servicemix.version>
     </properties>
 
 
