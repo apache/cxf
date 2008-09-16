@@ -29,6 +29,9 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.namespace.QName;
 
 import com.sun.xml.bind.api.TypeReference;
@@ -40,6 +43,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
+import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
@@ -56,7 +60,28 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     public void write(Object obj, T output) {
         write(obj, null, output);
     }
-    
+    private static class MtomValidationHandler implements ValidationEventHandler {
+        ValidationEventHandler origHandler;
+        JAXBAttachmentMarshaller marshaller;
+        public MtomValidationHandler(ValidationEventHandler v,
+                                     JAXBAttachmentMarshaller m) {
+            origHandler = v;
+            marshaller = m;
+        }
+        
+        public boolean handleEvent(ValidationEvent event) {
+            String msg = event.getMessage();
+            if (msg.startsWith("cvc-type.3.1.2: ")
+                && msg.contains(marshaller.getLastMTOMElementName().getLocalPart())) {
+                return true;
+            }
+            if (origHandler != null) {
+                return origHandler.handleEvent(event);
+            }
+            return false;
+        }
+        
+    }
     public Marshaller createMarshaller(Object elValue, MessagePartInfo part) {
         Class<?> cls = null;
         if (part != null) {
@@ -79,7 +104,9 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
-            
+            if (databinding.getValidationEventHandler() != null) {
+                marshaller.setEventHandler(databinding.getValidationEventHandler());
+            }
             marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
                                    databinding.getNamespacePrefixMapper());
             if (databinding.getMarshallerProperties() != null) {
@@ -94,7 +121,15 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             }
             
             marshaller.setSchema(schema);
-            marshaller.setAttachmentMarshaller(getAttachmentMarshaller());
+            AttachmentMarshaller atmarsh = getAttachmentMarshaller();
+            marshaller.setAttachmentMarshaller(atmarsh);
+            
+            if (schema != null
+                && atmarsh instanceof JAXBAttachmentMarshaller) {
+                //we need a special even handler for XOP attachments 
+                marshaller.setEventHandler(new MtomValidationHandler(marshaller.getEventHandler(),
+                                                            (JAXBAttachmentMarshaller)atmarsh));
+            }
         } catch (JAXBException ex) {
             if (ex instanceof javax.xml.bind.MarshalException) {
                 javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
