@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.binding.AbstractBindingFactory;
@@ -38,8 +39,10 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class CorbaBindingFactory extends AbstractBindingFactory
@@ -48,6 +51,34 @@ public class CorbaBindingFactory extends AbstractBindingFactory
     protected List<String> transportIds;
     protected OrbConfig orbConfig = new OrbConfig();
 
+    @PostConstruct
+    void registerWithDestinationManager() {
+        if (null == bus) {
+            return;
+        }
+
+        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+        if (null != dfm && activationNamespaces != null) {
+            for (String ns : activationNamespaces) {
+                dfm.registerDestinationFactory(ns, this);
+            }
+        }
+    }
+
+    @PostConstruct
+    void registerWithConduitManager() {
+        if (null == bus) {
+            return;
+        }
+
+        ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
+        if (null != cim && activationNamespaces != null) {
+            for (String ns : activationNamespaces) {
+                cim.registerConduitInitiator(ns, this);
+            }
+        }
+    }
+
     public void setOrbClass(String cls) {
         orbConfig.setOrbClass(cls);
     }
@@ -55,7 +86,6 @@ public class CorbaBindingFactory extends AbstractBindingFactory
     public void setOrbSingletonClass(String cls) {
         orbConfig.setOrbSingletonClass(cls);
     }
-   
 
     public Binding createBinding(BindingInfo bindingInfo) {
         CorbaBinding binding = new CorbaBinding();
