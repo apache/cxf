@@ -94,9 +94,7 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
             if (!interfaces.contains(intf)) {
                 intf.annotate(new WebServiceAnnotator());
                 intf.annotate(new XmlSeeAlsoAnnotator(context.get(ClassCollector.class)));
-                if (serviceInfo.getBindings().size() > 0) {
-                    intf.annotate(new BindingAnnotator());
-                }
+                intf.annotate(new BindingAnnotator());
             }
         }
         return javaModel;
