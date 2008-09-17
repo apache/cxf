@@ -5,6 +5,12 @@ INBOUND CONNECTION CXF J2EE DEMO
 This demo shows how to expose an Enterprise Java Bean over
 SOAP/HTTP using CXF. This demo is based on JBoss4.0.5GA. 
 
+Notice that a new CXF inbound resource adapter has been
+introduced.  Please read "Introduction to the inbound-mdb* 
+Samples" section in the inbound-mdb/README.txt.  It contains
+important information.
+
+
 
 Running the Demo
 ================
