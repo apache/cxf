@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+    <!--
+        Licensed to the Apache Software Foundation (ASF) under one or
+        more contributor license agreements. See the NOTICE file
+        distributed with this work for additional information regarding
+        copyright ownership. The ASF licenses this file to you under the
+        Apache License, Version 2.0 (the "License"); you may not use
+        this file except in compliance with the License. You may obtain
+        a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+        applicable law or agreed to in writing, software distributed
+        under the License is distributed on an "AS IS" BASIS, WITHOUT
+        WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions
+        and limitations under the License.
+    -->
+<ejb-jar>
+  <enterprise-beans>
+    <message-driven>
+      <ejb-name>Greeter MDB</ejb-name>
+      <ejb-class>demo.ejb.GreeterBean</ejb-class>
+      <messaging-type>
+        org.apache.hello_world_soap_http.Greeter
+      </messaging-type>
+      <transaction-type>Bean</transaction-type>
+      <activation-config>
+
+        <!-- displayName -->
+        <activation-config-property>
+          <activation-config-property-name>
+            displayName
+          </activation-config-property-name>
+          <activation-config-property-value>
+            MyCxfEndpoint
+          </activation-config-property-value>
+        </activation-config-property>
+        
+        <!-- service endpoint interface -->
+        <activation-config-property>
+          <activation-config-property-name>
+            serviceInterfaceClass
+          </activation-config-property-name>
+          <activation-config-property-value>
+            org.apache.hello_world_soap_http.Greeter
+          </activation-config-property-value>
+        </activation-config-property>
+        
+        <!-- address -->
+        <activation-config-property>
+          <activation-config-property-name>
+            address
+          </activation-config-property-name>
+          <activation-config-property-value>
+            http://localhost:9999/GreeterBean
+          </activation-config-property-value>
+        </activation-config-property>
+
+      </activation-config>
+    </message-driven>
+  </enterprise-beans>
+
+    <assembly-descriptor>
+    <method-permission>
+      <unchecked/>
+      <method>
+	<ejb-name>GreeterBean</ejb-name>
+	<method-name>*</method-name>
+      </method>
+    </method-permission>
+      <container-transaction>
+	<description/>
+	<method>
+	  <description/>
+	  <ejb-name>GreeterBean</ejb-name>
+	  <method-name>*</method-name>
+	</method>
+	<trans-attribute>Supports</trans-attribute>
+      </container-transaction>
+    </assembly-descriptor>
+</ejb-jar>

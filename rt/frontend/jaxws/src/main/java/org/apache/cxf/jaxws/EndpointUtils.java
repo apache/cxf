@@ -35,7 +35,7 @@ public final class EndpointUtils {
         // Utility class - never constructed
     }
 
-    private static boolean hasWebServiceAnnotation(Class<?> cls) {
+    public static boolean hasWebServiceAnnotation(Class<?> cls) {
         if (cls == null) {
             return false;
         }

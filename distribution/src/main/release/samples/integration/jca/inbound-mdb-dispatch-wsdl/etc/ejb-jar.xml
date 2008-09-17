@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<ejb-jar xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+  http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd"
+  version="3.0">
+
+    <!--
+        Licensed to the Apache Software Foundation (ASF) under one or
+        more contributor license agreements. See the NOTICE file
+        distributed with this work for additional information regarding
+        copyright ownership. The ASF licenses this file to you under the
+        Apache License, Version 2.0 (the "License"); you may not use
+        this file except in compliance with the License. You may obtain
+        a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+        applicable law or agreed to in writing, software distributed
+        under the License is distributed on an "AS IS" BASIS, WITHOUT
+        WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions
+        and limitations under the License.
+    -->
+
+  <enterprise-beans>
+    <session>
+      <ejb-name>GreeterWithWsdlBean</ejb-name>
+      <local-home>demo.ejb.GreeterLocalHome</local-home>
+      <local>demo.ejb.GreeterLocal</local>
+      <ejb-class>demo.ejb.GreeterBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>
+
+    <message-driven>
+      <ejb-name>GreeterEndpointActivator</ejb-name>
+      <ejb-class>org.apache.cxf.jca.inbound.DispatchMDBMessageListenerImpl</ejb-class>
+      <messaging-type>org.apache.cxf.jca.inbound.DispatchMDBMessageListener</messaging-type>
+      <transaction-type>Bean</transaction-type>
+
+      <activation-config>
+        <!-- bus configuration location -->
+        <activation-config-property>
+          <activation-config-property-name>
+            busConfigLocation
+          </activation-config-property-name>
+          <activation-config-property-value>
+            etc/cxf.xml
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- wsdl location -->
+        <activation-config-property>
+          <activation-config-property-name>
+            wsdlLocation
+          </activation-config-property-name>
+          <activation-config-property-value>
+            wsdl/hello_world.wsdl
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- service name -->
+        <activation-config-property>
+          <activation-config-property-name>
+            serviceName
+          </activation-config-property-name>
+          <activation-config-property-value>
+            {http://apache.org/hello_world_soap_http}SOAPService
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- endpoint name -->
+        <activation-config-property>
+          <activation-config-property-name>
+            endpointName
+          </activation-config-property-name>
+          <activation-config-property-value>
+            {http://apache.org/hello_world_soap_http}SOAPPort
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- service interface class -->
+        <activation-config-property>
+          <activation-config-property-name>
+            serviceInterfaceClass
+          </activation-config-property-name>
+          <activation-config-property-value>
+            org.apache.hello_world_soap_http.Greeter
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- address -->
+        <activation-config-property>
+          <activation-config-property-name>
+            address
+          </activation-config-property-name>
+          <activation-config-property-value>
+            http://localhost:9000/SoapContext/SoapPort
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- display name-->
+        <activation-config-property>
+          <activation-config-property-name>
+            displayName
+          </activation-config-property-name>
+          <activation-config-property-value>
+            GreeterWithWsdlEndpoint
+          </activation-config-property-value>
+        </activation-config-property>
+        <!-- targetBeanJndiName -->
+        <activation-config-property>
+          <activation-config-property-name>
+            targetBeanJndiName
+          </activation-config-property-name>
+          <activation-config-property-value>
+            java:comp/env/GreeterWithWsdlLocalHome
+          </activation-config-property-value>
+        </activation-config-property>
+      </activation-config>
+
+      <ejb-local-ref>
+        <ejb-ref-name>GreeterWithWsdlLocalHome</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local-home>demo.ejb.GreeterLocalHome</local-home>
+        <local>demo.ejb.GreeterLocal</local>
+        <ejb-link>GreeterWithWsdlBean</ejb-link>
+      </ejb-local-ref>
+    </message-driven>
+
+  </enterprise-beans>
+</ejb-jar>

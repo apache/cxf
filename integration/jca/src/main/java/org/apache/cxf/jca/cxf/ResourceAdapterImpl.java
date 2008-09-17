@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.jca.cxf;
 
-
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.resource.NotSupportedException;
@@ -32,18 +34,24 @@ import javax.resource.spi.BootstrapContext;
 import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.Work;
 import javax.transaction.xa.XAResource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.resourceadapter.ResourceBean;
 
+import org.apache.cxf.jca.inbound.InboundEndpoint;
+import org.apache.cxf.jca.inbound.MDBActivationSpec;
+import org.apache.cxf.jca.inbound.MDBActivationWork;
+
 public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceAdapterImpl.class);
     private BootstrapContext ctx;
     private Set <Bus> busCache = new HashSet<Bus>();
-   
+    private Map<String, InboundEndpoint> endpoints = new ConcurrentHashMap<String, InboundEndpoint>();
+    
     public ResourceAdapterImpl() {
         super();
     }
@@ -83,6 +91,16 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
                 bus.shutdown(true);
             }
         }   
+        
+        // shutdown all the inbound endpoints
+        for (Map.Entry<String, InboundEndpoint> entry : endpoints.entrySet()) {
+            try {
+                entry.getValue().shutdown();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to stop endpoint " + entry.getKey(), e); 
+            }
+        }
+        endpoints.clear();
     }
 
     public XAResource[] getXAResources(ActivationSpec as[])
@@ -92,16 +110,46 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
 
     public void endpointActivation(MessageEndpointFactory mef, ActivationSpec as)
         throws ResourceException {
-        throw new NotSupportedException();
+        
+        if  (!(as instanceof MDBActivationSpec)) {
+            LOG.fine("Ignored unknown activation spec " + as);
+            return;
+        }
+        
+        MDBActivationSpec spec = (MDBActivationSpec)as;
+        LOG.info("CXF resource adapter is activating " + spec.getDisplayName());
+
+        Work work = new MDBActivationWork(spec, mef, endpoints);
+        ctx.getWorkManager().scheduleWork(work);        
+
     }
 
     public void endpointDeactivation(MessageEndpointFactory mef, ActivationSpec as) {
+        
+        if  (!(as instanceof MDBActivationSpec)) {
+            LOG.fine("Ignored unknown activation spec " + as);
+            return;
+        }
+        
+        MDBActivationSpec spec = (MDBActivationSpec)as;
+        LOG.info("CXF resource adapter is deactivating " + spec.getDisplayName());
+        
+        InboundEndpoint endpoint = endpoints.remove(spec.getDisplayName());
+        if (endpoint != null) {
+            try {
+                endpoint.shutdown();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to stop endpoint " 
+                        + spec.getDisplayName(), e); 
+            }
+        }
     }
 
     public BootstrapContext getBootstrapContext() {
         return ctx;
     }
 }
+
 
 
 
