@@ -34,33 +34,33 @@ under the License.
     <usage>
         <optionGroup id="options">
             <option id="frontend" maxOccurs="1">
-                <annotation>Specify the frontend name</annotation>
+                <annotation>Specifies the front end. (default use jaxws)</annotation>
                 <switch>fe</switch>
                 <switch>frontend</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>name of the front end (default use jaxws)</annotation>
+                    <annotation>front-end-name</annotation>
                 </associatedArgument>
             </option>
 
             <option id="databinding" maxOccurs="1">
-                <annotation>Specify the databinding name</annotation>
+                <annotation>Specify the databinding name.  (default use jaxb)</annotation>
                 <switch>db</switch>
                 <switch>databinding</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>name of the data binding (default use jaxb)</annotation>
+                    <annotation>data-binding-name</annotation>
                 </associatedArgument>
             </option>
 
             <option id="packagename" maxOccurs="unbounded">
                 <annotation>
-                    The java package name to use for the generated code.
-                    Also, optionally specify the wsdl namespace mapping
-                    to a particular java packagename.
+                    Specifies the java package name to use for the generated code.
+                    Optionally  specify a WSDL namespace to Java package name
+                    mapping.
                 </annotation>
                 <switch>p</switch>
                 <associatedArgument placement="afterSpace">
                     <valuetype>NamingSpacePackageString</valuetype>
-                    <annotation>[wsdl namespace =]Package Name</annotation>
+                    <annotation>[wsdl-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
 
@@ -78,7 +78,7 @@ under the License.
             -->
 
             <option id="outputdir" maxOccurs="1">
-                <annotation>The directory in which the code is placed</annotation>
+                <annotation>Specify the directory into which the code is placed.</annotation>
                 <switch>d</switch>
                 <associatedArgument placement="afterSpace">
                     <annotation>output-directory</annotation>
@@ -86,12 +86,12 @@ under the License.
             </option>
 
             <option id="compile" maxOccurs="1">
-                <annotation>Compile the generated file</annotation>
+                <annotation>Specifies that the generated code is compiled by the tool.</annotation>
                 <switch>compile</switch>
             </option>
 
             <option id="classdir" maxOccurs="1">
-                <annotation>Specify where to place generated class files</annotation>
+                <annotation>Specifies the directory into which compiled class files are placed.</annotation>
                 <switch>classdir</switch>
                 <associatedArgument placement="afterSpace">
                     <annotation>compile-classes-directory</annotation>
@@ -135,62 +135,59 @@ under the License.
 
             <option id="nexclude" maxOccurs="unbounded">
                 <annotation>
-                    The wsdl namespace to exclude when generating code. This
-                    option can be specified multiple times. Also, optionally
-                    specify the java package name to use for this wsdl namespace.
+                    Specifies a WSDL namespace to exclude when generating code. This
+                    option can be specified multiple times. Optionally
+                    specify the Java package name to use for the WSDL namespace.
                 </annotation>
                 <switch>nexclude</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>schema namespace [= java packagename]</annotation>
+                    <annotation>schema-namespace [= java-package-name]</annotation>
                 </associatedArgument>
             </option>
 
             <option id="exsoapheader" maxOccurs="1">
-                <annotation>To enable processing of extended soap header message binding
+                <annotation>Enables the processing of extended SOAP header message binding.
                 </annotation>
                 <switch>exsh</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>enable extended soap header message binding (true, false)</annotation>
+                    <annotation>(true, false)</annotation>
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
 
             <option id="defaultns" maxOccurs="1">
-                <annotation>To enable loading the default namespace package name mapping
+                <annotation>Enables loading the default namespace package name mapping. The default is true.
                 </annotation>
                 <switch>dns</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>Default value is true</annotation>
+                    <annotation>(true, false)</annotation>
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
 
             <option id="defaultex" maxOccurs="1">
-                <annotation>To enable loading the default excludes namespace mapping</annotation>
+                <annotation> Enable loading the default excludes namespace mapping. The default is true.</annotation>
                 <switch>dex</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>Default value is true</annotation>
+                    <annotation>(true, false)</annotation>
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
 
             <option id="validate" maxOccurs="1">
                 <annotation>
-                    To valiate the wsdl before generate the code. We highly sugguest
-                    you to run the tool called schema validator before generating
-                    the code.
+                    Specifies that the WSDL is validated before generating the code. Using 
+                    this option is highly recommended.
                 </annotation>
                 <switch>validate</switch>
             </option>
 
             <option id="wsdlLocation" maxOccurs="1">
                 <annotation>
-                    The wsdlLocation that is injected into code.  This location could be the location
-                    of the wsdl once the app is deployed which could be different than at
-                    code generation time.
+                    Specifies the value of the @WebServiceClient annotation's wsdlLocation property.
                 </annotation>
                 <associatedArgument placement="afterSpace">
-                    <annotation>wsdlLocation attribute</annotation>
+                    <annotation>wsdlLocation</annotation>
                 </associatedArgument>
             </option>
 
@@ -222,7 +219,7 @@ under the License.
 
         </optionGroup>
         <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
-            <annotation>WSDL URL</annotation>
+            <annotation>wsdl-url</annotation>
         </argument>
     </usage>
 </toolspec>

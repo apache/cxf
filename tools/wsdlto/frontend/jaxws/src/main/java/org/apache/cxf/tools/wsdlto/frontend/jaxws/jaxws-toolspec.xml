@@ -35,53 +35,53 @@ Examples:
         <optionGroup id="options">
             <option id="frontend" maxOccurs="unbounded">
                 <annotation>
-                    Specify the frontend (defaults to JAXWS)
+                    Specifies the front end. (defaults to JAXWS)
                 </annotation>
                 <switch>fe</switch>
                 <switch>frontend</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>frontend name</annotation>
+                    <annotation>front-end-name</annotation>
                 </associatedArgument>
             </option>
 
             <option id="databinding" maxOccurs="unbounded">
                 <annotation>
-                    Specify the data binding (defaults to JAXB)
+                    Specifies the data binding. (defaults to JAXB)
                 </annotation>
                 <switch>db</switch>
                 <switch>databinding</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>data binding name</annotation>
+                    <annotation>data-binding-name</annotation>
                 </associatedArgument>
             </option>
 
             <option id="wsdlversion" maxOccurs="unbounded">
                 <annotation>
-                    WSDL version, default is WSDL1.1
+                    Specifies the WSDL version. (default is WSDL1.1)
                 </annotation>
                 <switch>wv</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>[wsdl version]</annotation>
+                    <annotation>wsdl-version</annotation>
                 </associatedArgument>
             </option>
 
             <option id="packagename" maxOccurs="unbounded">
                 <annotation>
-                    The java package name to use for the generated code.
-                    Also, optionally specify the wsdl namespace mapping
-                    to a particular java packagename.
+                    Specifies the java package name to use for the generated code.
+                    Optionally  specify a WSDL namespace to Java package name
+                    mapping.
                 </annotation>
                 <switch>p</switch>
                 <associatedArgument placement="afterSpace">
                     <valuetype>NamingSpacePackageString</valuetype>
-                    <annotation>[wsdl namespace =]Package Name</annotation>
+                    <annotation>[wsdl-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
 
             <option id="servicename">
                 <annotation>
-                    The wsdl service name name to use for the generated code.
-                    Also, optionally specify the wsdl namespace.
+                    Specify he WSDL service name to use for the generated code.
+                    Also, optionally specify the WSDL namespace.
                 </annotation>
                 <switch>sn</switch>
                 <associatedArgument placement="afterSpace">
@@ -91,18 +91,18 @@ Examples:
 
             <option id="binding" maxOccurs="unbounded">
                 <annotation>
-                    Specify external jaxws or jaxb binding files, (Each
-                    file must have its own -b)
+                    Specify an external jaxws or jaxb binding files. Use one
+                    -b flag for each binding file.
                 </annotation>
                 <switch>b</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>binding-name</annotation>
+                    <annotation>binding-file-name</annotation>
                 </associatedArgument>
             </option>
 
             <option id="catalog" maxOccurs="1">
                 <annotation>
-                    Specify catalog file to map the imported wsdl/schema
+                    Specify catalog file to map the imported wsdl/schema.
                 </annotation>
                 <switch>catalog</switch>
                 <associatedArgument placement="afterSpace">
@@ -112,7 +112,8 @@ Examples:
 
             <option id="outputdir" maxOccurs="1">
                 <annotation>
-                    The directory in which the code is placed</annotation>
+                    Specify the directory into which the code is placed.
+                </annotation>
                 <switch>d</switch>
                 <associatedArgument placement="afterSpace">
                     <annotation>output-directory</annotation>
@@ -121,13 +122,13 @@ Examples:
 
             <option id="compile" maxOccurs="1">
                 <annotation>
-                    Compile the generated file</annotation>
+                    Specifies that the generated code is compiled by the tool.</annotation>
                 <switch>compile</switch>
             </option>
 
             <option id="classdir" maxOccurs="1">
                 <annotation>
-                    Specify where to place generated class files</annotation>
+                    Specifies the directory into which compiled class files are placed.</annotation>
                 <switch>classdir</switch>
                 <associatedArgument placement="afterSpace">
                     <annotation>compile-classes-directory</annotation>
@@ -136,85 +137,86 @@ Examples:
 
             <option id="impl" maxOccurs="1">
                 <annotation>
-                    Generate the dummy service implementation.</annotation>
+                    Specifies that a dummy service implementation is generated.
+                </annotation>
                 <switch>impl</switch>
             </option>
 
             <option id="server" maxOccurs="1">
                 <annotation>
-                    Generates the server code</annotation>
+                    Specifies that server code is generated.
+                </annotation>
                 <switch>server</switch>
             </option>
 
             <option id="client" maxOccurs="1">
                 <annotation>
-                    Generates the client code.</annotation>
+                    Specifies that client code is generated.
+                </annotation>
                 <switch>client</switch>
             </option>
 
             <option id="all" maxOccurs="1">
                 <annotation>
-                    Generates interfaces,types,service,server,impl,client
-                    and ant script.
+                    Specifies that interfaces, types , service, server , dummy impl, client
+                    and ant script are generated.
                 </annotation>
                 <switch>all</switch>
             </option>
             
             <option id="autoNameResolution" maxOccurs="1">
                 <annotation>
-                    If there are conflicts in the generated classnames, try to auto-generate new
-                    classnames instead of forcing the use of binding customizations.
+                    Specifies that the tool will attempt to resolve class naming conflicts 
+                    without requiring the use of binding customizations.
                 </annotation>
                 <switch>autoNameResolution</switch>
             </option>
 
 	        <option id="defaultValues" maxOccurs="1">
                 <annotation>
-                    Generate default values in the impl and client.  Ignored if impl or client
-                    is not being generated.
-                    
-                    Optionally specify the name of the class to provide the default vaules.
-                    (default is a RandomValueProvider)
+                    Specifies that default values are generated for the dummy implementation and client. 
+                    You can specify the name of the class to provide the default values. The default is 
+                    RandomValueProvider.
                 </annotation>
                 <switch>defaultValues</switch>
                 <associatedArgument placement="immediate">
-                    <annotation>=class name for DefaultValueProvider</annotation>
+                    <annotation>=class-name-for-DefaultValueProvider</annotation>
                 </associatedArgument>
             </option>
 
             <option id="ant" maxOccurs="1">
                 <annotation>
-                    ant script generation.
+                    Specifies that an ant build script is generated for the project.
                 </annotation>
                 <switch>ant</switch>
             </option>
 
             <option id="nexclude" maxOccurs="unbounded">
                 <annotation>
-                    The wsdl namespace to exclude when generating code. This
-                    option can be specified multiple times. Also, optionally
-                    specify the java package name to use for this wsdl namespace.
+                    Specifies a WSDL namespace to exclude when generating code. This
+                    option can be specified multiple times. Optionally
+                    specify the Java package name to use for the WSDL namespace.
                 </annotation>
                 <switch>nexclude</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>schema namespace [= java packagename]</annotation>
+                    <annotation>schema-namespace [= java-package-name]</annotation>
                 </associatedArgument>
             </option>
 
             <option id="exsoapheader" maxOccurs="1">
                 <annotation>
-                    To enable processing of extended soap header message binding
+                    Enables the processing of extended SOAP header message binding.
                 </annotation>
                 <switch>exsh</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>enable extended soap header message binding (true, false)</annotation>
+                    <annotation>(true, false)</annotation>
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
 
             <option id="defaultns" maxOccurs="1">
                 <annotation>
-                    To enable loading the default namespace package name mapping
+                    Enables loading the default namespace package name mapping. The default is true.
                 </annotation>
                 <switch>dns</switch>
                 <associatedArgument placement="afterSpace">
@@ -225,17 +227,17 @@ Examples:
 
             <option id="defaultex" maxOccurs="1">
                 <annotation>
-                    To enable loading the default excludes namespace mapping</annotation>
+                    Enable loading the default excludes namespace mapping. The default is true.</annotation>
                 <switch>dex</switch>
                 <associatedArgument placement="afterSpace">
-                    <annotation>Default value is true</annotation>
+                    <annotation>(true, false)</annotation>
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
 
             <option id="validate" maxOccurs="1">
                 <annotation>
-                    To validate the wsdl before generating the code.  Usage of 
+                    Specifies that the WSDL is validated before generating the code. Using 
                     this option is highly recommended.
                 </annotation>
                 <switch>validate</switch>
@@ -243,45 +245,41 @@ Examples:
 
             <option id="newonly" maxOccurs="1">
                 <annotation>
-                    Don't overwrite any preexisting files, NOTE: You will have to solve any resulting compilation problems by yourself
+                    Specifies that existing code will not be over written. NOTE: You will have to solve any resulting compilation problems by yourself
                 </annotation>
                 <switch>keep</switch>
             </option>
 
             <option id="wsdlLocation" maxOccurs="1">
                 <annotation>
-                    The wsdlLocation that is injected into code.  This location could be the location
-                    of the wsdl once the app is deployed which could be different than at
-                    code generation time.
+                    Specifies the value of the @WebServiceClient annotation's wsdlLocation property.
                 </annotation>
                 <associatedArgument placement="afterSpace">
-                    <annotation>wsdlLocation attribute</annotation>
+                    <annotation>wsdlLocation</annotation>
                 </associatedArgument>
                 <switch>wsdlLocation</switch>
             </option>
 
             <option id="xjc" maxOccurs="1">
                 <annotation>
-                    Comma separated arguments that are passed directly to XJC when the
-                    default databinding of JAXB is used. Using this option, it is possible
-                    to cause XJC to load additional plugins that can augment code generation.
-                    For example to load the toString(ts) plugin that will add a toString() 
+                    Specifies a comma separated list of arguments that are passed directly to XJC when the
+                    JAXB data binding  is used. This option causes XJC to load additional plugins that 
+                    augment code generation. For example to load the toString(ts) plugin that will add a toString() 
                     method to all generated types the following &lt;xjc arguments&gt; would 
                     be used:
                           -xjc-Xts
-                    A list of available XJC plugins can be obtained by pasing -X as the 
-                    &lt;xjc arguments&gt;.                     
+                    A list of available XJC plugins can be obtained by using -xjc-X.                     
                 </annotation>
                 <associatedArgument placement="immediate">
-                    <annotation>xjc arguments</annotation>
+                    <annotation>xjc-arguments</annotation>
                 </associatedArgument>
                 <switch>xjc</switch>
             </option>
             
            <option id="noAddressBinding" maxOccurs="1">
                 <annotation>
-                    Do not use address jaxb binding file to map wsa:EndpointReferenceType 
-                    or wsa:EndpointReference to javax.xml.ws.wsaddressing.W3CEndpointReference
+                    Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType 
+                    or wsa:EndpointReference to javax.xml.ws.wsaddressing.W3CEndpointReference.
                 </annotation>
                 <switch>noAddressBinding</switch>
             </option>
@@ -290,7 +288,8 @@ Examples:
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
                 <annotation>
-                    Display detailed information for options.</annotation>
+                    Display detailed information for options.
+                </annotation>
                 <switch>h</switch>
                 <switch>?</switch>
                 <switch>help</switch>
@@ -304,14 +303,14 @@ Examples:
 
             <option id="verbose">
                 <annotation>
-                    Verbose mode</annotation>
+                    Specifies that the generator runs in verbose mode.</annotation>
                 <switch>verbose</switch>
                 <switch>V</switch>
             </option>
 
             <option id="quiet">
                 <annotation>
-                    Quiet mode</annotation>
+                    Specifies that the generator runs in quiet mode.</annotation>
                 <switch>quiet</switch>
                 <switch>q</switch>
             </option>
@@ -319,7 +318,7 @@ Examples:
         </optionGroup>
         <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
             <annotation>
-                WSDL URL</annotation>
+                wsdl-url</annotation>
         </argument>
     </usage>
 </toolspec>
