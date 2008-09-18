@@ -212,7 +212,9 @@ public final class JMSUtils {
             props.add(prop);
 
             protHeaders.put(name, Collections.singletonList(val));
-            if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE) && val != null) {
+            if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE)
+                || name.equals(JMSConstants.JMS_CONTENT_TYPE) 
+                && val != null) {
                 inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, val);
             }
 
@@ -237,7 +239,13 @@ public final class JMSUtils {
                 value.append(s);
                 first = false;
             }
-            message.setStringProperty(entry.getKey(), value.toString());
+            //Incase if the Content-Type header key is Content-Type replace with JMS_Content_Type
+            if (entry.getKey().equals(org.apache.cxf.message.Message.CONTENT_TYPE)) {
+                message.setStringProperty(JMSConstants.JMS_CONTENT_TYPE, value.toString());
+            } else {
+                message.setStringProperty(entry.getKey(), value.toString());    
+            }
+            
         }
     }
 
@@ -255,14 +263,17 @@ public final class JMSUtils {
         String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
 
         Map<String, List<String>> headers = JMSUtils.getSetProtocolHeaders(message);
-        if (headers.get(org.apache.cxf.message.Message.CONTENT_TYPE) == null) {
-            List<String> ct = new ArrayList<String>();
-            ct.add(contentType);
-            headers.put(org.apache.cxf.message.Message.CONTENT_TYPE, ct);
+        List<String> ct;
+        if (headers.get(JMSConstants.JMS_CONTENT_TYPE) != null) {
+            ct = headers.get(JMSConstants.JMS_CONTENT_TYPE);
+        } else if (headers.get(org.apache.cxf.message.Message.CONTENT_TYPE) != null) {
+            ct = headers.get(org.apache.cxf.message.Message.CONTENT_TYPE);
         } else {
-            List<String> ct = headers.get(org.apache.cxf.message.Message.CONTENT_TYPE);
-            ct.add(contentType);
+            ct = new ArrayList<String>();
+            headers.put(JMSConstants.JMS_CONTENT_TYPE, ct);
         }
+        
+        ct.add(contentType);
     }
 
     public static boolean isDestinationStyleQueue(AddressType address) {

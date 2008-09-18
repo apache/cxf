@@ -389,8 +389,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         assertTrue("property has been excluded, only CONTENT_TYPE should be here",
                 inHeader.getProperty().size() == 1);
-        assertTrue("property has been excluded, only CONTENT_TYPE should be here",
-                inHeader.getProperty().get(0).getName().equals(Message.CONTENT_TYPE));
+        assertTrue("property has been excluded, only " + JMSConstants.JMS_CONTENT_TYPE + "should be here",
+                inHeader.getProperty().get(0).getName().equals(JMSConstants.JMS_CONTENT_TYPE));
         // wait for a while for the jms session recycling
         Thread.sleep(1000);
         destination.shutdown();
