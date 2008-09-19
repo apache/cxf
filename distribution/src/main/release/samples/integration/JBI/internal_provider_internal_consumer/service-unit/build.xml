@@ -34,12 +34,14 @@
   </condition> 
   <path id="build.classpath">
     <pathelement location="${build.classes.dir}"/>
-    <pathelement location="${env.SERVICEMIX_HOME}/lib/servicemix-jbi-3.2.1.jar"/>
+    <fileset dir="${env.SERVICEMIX_HOME}/lib">
+      <include name="servicemix-jbi-*.jar"/>
+    </fileset>
     <fileset dir="${env.CXF_HOME}/lib">
       <include name="cxf-manifest.jar"/>
     </fileset>
     <fileset dir="${integration.jar.dir}">
-      <include name="cxf-integration-jbi-${cxf.version}.jar"/>
+      <include name="cxf-integration-jbi-*.jar"/>
     </fileset>
   </path>
   
