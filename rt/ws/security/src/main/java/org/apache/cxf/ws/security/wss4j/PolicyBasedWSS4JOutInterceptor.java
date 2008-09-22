@@ -33,7 +33,11 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
+import org.apache.cxf.ws.security.policy.model.Binding;
+import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
+import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.ws.security.message.WSSecHeader;
 
@@ -82,18 +86,40 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                TransportBinding transport = null;
+                Binding transport = null;
                 ais = aim.get(SP12Constants.TRANSPORT_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
-                        transport = (TransportBinding)ai.getAssertion();
+                        transport = (Binding)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }                    
+                }
+                ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        transport = (Binding)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }                    
+                }
+                ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        transport = (Binding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
                 
                 
                 if (transport != null) {
-                    new TransportBindingHandler(transport, saaj, secHeader, aim, message).handleBinding();
+                    if (transport instanceof TransportBinding) {
+                        new TransportBindingHandler((TransportBinding)transport, saaj,
+                                                    secHeader, aim, message).handleBinding();
+                    } else if (transport instanceof SymmetricBinding) {
+                        //TODO
+                    } else {
+                        new AsymmetricBindingHandler((AsymmetricBinding)transport, saaj,
+                                                     secHeader, aim, message).handleBinding();
+                    }
                 }
                 
                 ais = aim.get(SP12Constants.WSS10);

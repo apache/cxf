@@ -167,6 +167,10 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
     public void setToken(Token tok) {
         this.addToken(tok);
     }
+    public Token getToken() {
+        return null;
+    }
+
 
     public QName getRealName() {
         QName ret = null;

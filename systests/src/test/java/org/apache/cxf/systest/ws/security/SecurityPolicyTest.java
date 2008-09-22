@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
 import org.apache.cxf.policytest.doubleit.DoubleItService;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -44,6 +45,7 @@ import org.junit.Test;
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String POLICY_ADDRESS = "http://localhost:9010/SecPolTest";
     public static final String POLICY_HTTPS_ADDRESS = "https://localhost:9009/SecPolTest";
+    public static final String POLICY_ENC_ADDRESS = "http://localhost:9010/SecPolTestEncrypt";
 
     
     public static class ServerPasswordCallback implements CallbackHandler {
@@ -73,6 +75,20 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                                    new ServerPasswordCallback());
         Endpoint.publish(POLICY_ADDRESS,
                          new DoubleItImpl());
+        
+        ep = (EndpointImpl)Endpoint.publish(POLICY_ENC_ADDRESS,
+                                            new DoubleItImplEncrypt());
+        
+        EndpointInfo ei = ep.getServer().getEndpoint().getEndpointInfo(); 
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new ServerPasswordCallback());
+        
+        ei.setProperty(SecurityConstants.USERNAME, "alice");
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_USERNAME, "bob");
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("bob.properties").toString());
     }
     
     @Test
@@ -80,6 +96,17 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleItService service = new DoubleItService();
         DoubleItPortType pt;
 
+        pt = service.getDoubleItPortEncrypt();
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("alice.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "Bob");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                                      getClass().getResource("bob.properties"));
+        pt.doubleIt(BigInteger.valueOf(5));
+        
         pt = service.getDoubleItPortHttps();
         try {
             pt.doubleIt(BigInteger.valueOf(25));
@@ -126,6 +153,17 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
     public static class DoubleItImplHttps implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortEncrypt",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
+    public static class DoubleItImplEncrypt implements DoubleItPortType {
         /** {@inheritDoc}*/
         public BigInteger doubleIt(BigInteger numberToDouble) {
             return numberToDouble.multiply(new BigInteger("2"));

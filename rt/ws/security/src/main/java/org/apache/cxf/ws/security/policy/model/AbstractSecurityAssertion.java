@@ -74,7 +74,7 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     public boolean isAsserted(AssertionInfoMap aim) {
         Collection<AssertionInfo> ail = aim.getAssertionInfo(getName());
         for (AssertionInfo ai : ail) {
-            if (ai.isAsserted() && ai.getAssertion().equal(this)) {
+            if (ai.isAsserted() && ai.getAssertion() == this) {
                 return true;
             }
         }

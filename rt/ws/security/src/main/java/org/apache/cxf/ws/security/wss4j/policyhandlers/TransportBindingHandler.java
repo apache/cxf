@@ -27,8 +27,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.ws.security.message.WSSecHeader;
@@ -51,36 +49,9 @@ public class TransportBindingHandler extends BindingBuilder {
     
     public void handleBinding() {
         Collection<AssertionInfo> ais;
-        WSSecTimestamp timestamp = null;
-        ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                timestamp = new WSSecTimestamp();
-                timestamp.prepare(saaj.getSOAPPart());
-                ai.setAsserted(true);
-            }                    
-        }
-        ais = aim.get(SP12Constants.LAYOUT);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                Layout layout = (Layout)ai.getAssertion();
-                if (SPConstants.Layout.LaxTimestampLast == layout.getValue()) {
-                    if (timestamp == null) {
-                        ai.setAsserted(false);
-                    } else {
-                        ai.setAsserted(true);
-                        //get the timestamp into the header first before anything else
-                        timestamp.prependToHeader(secHeader);
-                        timestamp = null;
-                    }
-                } else if (SPConstants.Layout.Strict == layout.getValue()) {
-                    //FIXME - don't have strict writing working yet
-                    ai.setAsserted(false);
-                } else {
-                    ai.setAsserted(true);                            
-                }
-            }                    
-        }
+        WSSecTimestamp timestamp = createTimestamp();
+        timestamp = handleLayout(timestamp);
+        
         ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         if (ais != null) {
             SupportingToken sgndSuppTokens = null;

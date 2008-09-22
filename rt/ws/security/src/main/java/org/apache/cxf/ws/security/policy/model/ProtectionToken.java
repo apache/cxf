@@ -40,6 +40,9 @@ public class ProtectionToken extends AbstractSecurityAssertion implements TokenW
     public Token getProtectionToken() {
         return protectionToken;
     }
+    public Token getToken() {
+        return protectionToken;
+    }
 
     /**
      * @param protectionToken The protectionToken to set.

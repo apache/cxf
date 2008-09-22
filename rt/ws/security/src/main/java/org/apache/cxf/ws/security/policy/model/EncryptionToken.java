@@ -39,6 +39,10 @@ public class EncryptionToken extends AbstractSecurityAssertion implements TokenW
     public Token getEncryptionToken() {
         return encryptionToken;
     }
+    public Token getToken() {
+        return encryptionToken;
+    }
+
 
     /**
      * @param encryptionToken The encryptionToken to set.

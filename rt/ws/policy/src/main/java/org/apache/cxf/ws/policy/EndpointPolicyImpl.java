@@ -36,6 +36,8 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.Destination;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 
@@ -48,6 +50,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     
     private Policy policy;
     private Collection<PolicyAssertion> chosenAlternative;
+    
     private Collection<PolicyAssertion> vocabulary;
     private Collection<PolicyAssertion> faultVocabulary;
     private List<Interceptor> interceptors;
@@ -76,6 +79,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return policy;        
     }
     
+    public Assertor getAssertor() {
+        return assertor;
+    }
+    
     public EndpointPolicy updatePolicy(Policy p) {
         EndpointPolicyImpl epi = createEndpointPolicy();
         Policy np = (Policy)p.normalize(true);
@@ -89,19 +96,31 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return chosenAlternative;
     }
     
-    public Collection<PolicyAssertion> getVocabulary() {
+    public synchronized Collection<PolicyAssertion> getVocabulary() {
+        if (vocabulary == null) {
+            initializeVocabulary();
+        }
         return vocabulary;
     }
     
-    public Collection<PolicyAssertion> getFaultVocabulary() {
+    public synchronized Collection<PolicyAssertion> getFaultVocabulary() {
+        if (vocabulary == null) {
+            initializeVocabulary();
+        }
         return faultVocabulary;
     }    
     
-    public List<Interceptor> getInterceptors() {
+    public synchronized List<Interceptor> getInterceptors() {
+        if (interceptors == null) {
+            initializeInterceptors();
+        }
         return interceptors;
     }
     
-    public List<Interceptor> getFaultInterceptors() {
+    public synchronized List<Interceptor> getFaultInterceptors() {
+        if (interceptors == null) {
+            initializeInterceptors();
+        }
         return faultInterceptors;
     }
     
@@ -113,8 +132,6 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     
     void finalizeConfig() {
         chooseAlternative();
-        initializeVocabulary();
-        initializeInterceptors(); 
     }
    
     void initializePolicy() {
@@ -157,7 +174,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
        
         // vocabulary of alternative chosen for endpoint
-        
+        if (getChosenAlternative() == null) { 
+            return;
+        }
         for (PolicyAssertion a : getChosenAlternative()) {
             if (a.isOptional()) {
                 continue;
@@ -170,25 +189,49 @@ public class EndpointPolicyImpl implements EndpointPolicy {
    
         // add assertions for specific inbound (in case of a server endpoint) or outbound 
         // (in case of a client endpoint) messages
-        
         for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
-            Policy p = engine.getAggregatedOperationPolicy(boi);
-            Collection<PolicyAssertion> c = engine.getAssertions(p, false);
-            vocabulary.addAll(c);
-            if (null != faultVocabulary) {
-                faultVocabulary.addAll(c);
+            EffectivePolicy p = null;
+            if (this.requestor) {
+                p = engine.getEffectiveClientRequestPolicy(ei, boi, 
+                                                           (Conduit)assertor);
+            } else {
+                p = engine.getEffectiveServerRequestPolicy(ei, boi);
             }
- 
-            if (!requestor) {
-                p = engine.getAggregatedMessagePolicy(boi.getInput());
-                vocabulary.addAll(engine.getAssertions(p, false));
-            } else if (null != boi.getOutput()) {
-                p = engine.getAggregatedMessagePolicy(boi.getOutput());
-                vocabulary.addAll(engine.getAssertions(p, false));
-                
-                for (BindingFaultInfo bfi : boi.getFaults()) { 
-                    p = engine.getAggregatedFaultPolicy(bfi);
-                    faultVocabulary.addAll(engine.getAssertions(p, false));
+            Collection<PolicyAssertion> c = engine.getAssertions(p, false);
+            if (c != null) {
+                vocabulary.addAll(c);
+                if (null != faultVocabulary) {
+                    faultVocabulary.addAll(c);
+                }
+            }
+            if (this.requestor) {
+                p = engine.getEffectiveClientResponsePolicy(ei, boi);
+            } else {
+                p = engine.getEffectiveServerResponsePolicy(ei, boi, 
+                                                            (Destination)assertor);
+            }
+            c = engine.getAssertions(p, false);
+            if (c != null) {
+                vocabulary.addAll(c);
+                if (null != faultVocabulary) {
+                    faultVocabulary.addAll(c);
+                }
+            }
+            if (boi.getFaults() != null) {
+                for (BindingFaultInfo bfi : boi.getFaults()) {
+                    if (this.requestor) {
+                        p = engine.getEffectiveClientFaultPolicy(ei, bfi);
+                    } else {
+                        p = engine.getEffectiveServerFaultPolicy(ei, bfi, 
+                                                                 (Destination)assertor);
+                    }
+                    c = engine.getAssertions(p, false);
+                    if (c != null) {
+                        vocabulary.addAll(c);
+                        if (null != faultVocabulary) {
+                            faultVocabulary.addAll(c);
+                        }
+                    }
                 }
             }
         }
@@ -223,6 +266,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     void initializeInterceptors() {
+        if (engine == null || engine.getBus() == null
+            || engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class) == null) {
+            return;
+        }
         PolicyInterceptorProviderRegistry reg 
             = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
         

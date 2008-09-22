@@ -39,6 +39,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -76,6 +77,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                                                                  WSS4JInInterceptor.class.getName()
                                                                      + "-Time");
     private SAAJInInterceptor saajIn = new SAAJInInterceptor();
+    private boolean ignoreActions;
 
     /**
      *
@@ -88,6 +90,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         setPhase(Phase.PRE_PROTOCOL);
         getAfter().add(SAAJInInterceptor.class.getName());
     }
+    public WSS4JInInterceptor(boolean ignore) {
+        this();
+        ignoreActions = ignore;
+    }
 
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
@@ -99,6 +105,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
+    public void setIgnoreActions(boolean i) {
+        ignoreActions = i;
+    }
     private SOAPMessage getSOAPMessage(SoapMessage msg) {
         SOAPMessage doc = msg.getContent(SOAPMessage.class);
         if (doc == null) {
@@ -234,7 +243,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             /*
              * now check the security actions: do they match, in right order?
              */
-            if (!checkReceiverResults(wsResult, actions)) {
+            if (!ignoreActions && !checkReceiverResults(wsResult, actions)) {
                 LOG.warning("Security processing failed (actions mismatch)");
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
             }
@@ -334,9 +343,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         CallbackHandler cbHandler = null;
         if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-            cbHandler 
-                = (CallbackHandler)((SoapMessage)reqData.getMsgContext())
-                    .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+            Object o = ((SoapMessage)reqData.getMsgContext())
+                .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+            if (o instanceof String) {
+                try {
+                    o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
+                } catch (Exception e) {
+                    throw new WSSecurityException(e.getMessage(), e);
+                }
+            }            
+            if (o instanceof CallbackHandler) {
+                cbHandler = (CallbackHandler)o;
+            }
             if (cbHandler == null) {
                 cbHandler = getPasswordCB(reqData);
             }

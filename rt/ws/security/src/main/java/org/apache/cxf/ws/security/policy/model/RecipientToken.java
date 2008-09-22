@@ -27,7 +27,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class RecipientToken extends AbstractSecurityAssertion implements TokenWrapper {
 
-    private Token receipientToken;
+    private Token recipientToken;
 
     public RecipientToken(SPConstants version) {
         super(version);
@@ -36,15 +36,18 @@ public class RecipientToken extends AbstractSecurityAssertion implements TokenWr
     /**
      * @return Returns the receipientToken.
      */
-    public Token getReceipientToken() {
-        return receipientToken;
+    public Token getRecipientToken() {
+        return recipientToken;
+    }
+    public Token getToken() {
+        return recipientToken;
     }
 
     /**
      * @param receipientToken The receipientToken to set.
      */
-    public void setReceipientToken(Token receipientToken) {
-        this.receipientToken = receipientToken;
+    public void setRecipientToken(Token recipientToken) {
+        this.recipientToken = recipientToken;
     }
 
     /*
@@ -52,7 +55,7 @@ public class RecipientToken extends AbstractSecurityAssertion implements TokenWr
      * @see org.apache.ws.security.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
      */
     public void setToken(Token tok) {
-        this.setReceipientToken(tok);
+        this.setRecipientToken(tok);
     }
 
     public QName getRealName() {
@@ -85,7 +88,7 @@ public class RecipientToken extends AbstractSecurityAssertion implements TokenWr
         writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
-        Token token = getReceipientToken();
+        Token token = getRecipientToken();
         if (token == null) {
             throw new RuntimeException("RecipientToken doesn't contain any token assertions");
         }

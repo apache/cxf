@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
@@ -75,38 +76,47 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         return SP12Constants.INSTANCE.getAsymmetricBinding();
     }
     public PolicyComponent normalize() {
-
-        if (isNormalized()) {
-            return this;
-        }
-
-        AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-
-        Policy policy = new Policy();
-        ExactlyOne exactlyOne = new ExactlyOne();
-
-        policy.addPolicyComponent(exactlyOne);
-
-
-        All wrapper = new All();
-        AsymmetricBinding asymmetricBinding = new AsymmetricBinding(constants);
-
+        return this;
+    }
+    public Policy getPolicy() {
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        
+        /*
         asymmetricBinding.setAlgorithmSuite(algorithmSuite);
-        asymmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-        asymmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-        asymmetricBinding.setInitiatorToken(getInitiatorToken());
-        asymmetricBinding.setLayout(getLayout());
         asymmetricBinding.setProtectionOrder(getProtectionOrder());
-        asymmetricBinding.setRecipientToken(getRecipientToken());
         asymmetricBinding.setSignatureProtection(isSignatureProtection());
         asymmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
         asymmetricBinding.setTokenProtection(isTokenProtection());
-
-        asymmetricBinding.setNormalized(true);
-        wrapper.addPolicyComponent(wrapper);
-
-        return policy;
-
+        */
+        if (getInitiatorToken() != null) {
+            all.addPolicyComponent(getInitiatorToken());
+        }
+        if (getRecipientToken() != null) {
+            all.addPolicyComponent(getRecipientToken());
+        }
+        /*
+        if (isEntireHeadersAndBodySignatures()) {
+            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
+        }
+        */
+        if (isIncludeTimestamp()) {
+            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+        }
+        if (getLayout() != null) {
+            all.addPolicyComponent(getLayout());
+        }
+        ea.addPolicyComponent(all);
+        PolicyComponent pc = p.normalize(true);
+        if (pc instanceof Policy) {
+            return (Policy)pc;
+        } else {
+            p = new Policy();
+            p.addPolicyComponent(pc);
+            return p;
+        }
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
@@ -173,9 +183,10 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
             // </sp:IncludeTimestamp>
         }
 
-        if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(getProtectionOrder())) {
+        if (SPConstants.ProtectionOrder.EncryptBeforeSigning.equals(getProtectionOrder())) {
             // <sp:EncryptBeforeSign />
-            writer.writeStartElement(prefix, SPConstants.ENCRYPT_BEFORE_SIGNING, namespaceURI);
+            writer.writeStartElement(prefix, SPConstants.ProtectionOrder.EncryptBeforeSigning.toString(),
+                                     namespaceURI);
             writer.writeEndElement();
         }
 

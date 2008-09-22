@@ -50,7 +50,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             putAssertionInfo(a);
         }
     }
-    
+
     private void putAssertionInfo(PolicyAssertion a) {
         Policy p = a.getPolicy();
         if (p != null) {

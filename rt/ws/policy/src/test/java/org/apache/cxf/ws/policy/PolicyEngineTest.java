@@ -38,6 +38,7 @@ import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
@@ -72,7 +73,8 @@ public class PolicyEngineTest extends Assert {
         return ei;
     }
     private BindingOperationInfo createMockBindingOperationInfo() throws Exception {
-        BindingOperationInfo boi = new BindingOperationInfo() {
+        OperationInfo info = new OperationInfo();
+        BindingOperationInfo boi = new BindingOperationInfo(null, info) {
             public boolean isUnwrapped() {
                 return false;
             }
@@ -206,7 +208,7 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialisePolicy(ei, boi, engine, false);
+        epi.initialise(ei, boi, engine, false);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveServerRequestPolicy(ei, boi));
@@ -235,7 +237,7 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialisePolicy(ei, boi, engine, true);
+        epi.initialise(ei, boi, engine, true);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi));

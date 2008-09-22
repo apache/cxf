@@ -50,11 +50,15 @@ public abstract class SPConstants {
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    
+    public enum ProtectionOrder {
+        EncryptBeforeSigning,
+        SignBeforeEncrypting
+    };
     /**
      * Protection Order : EncryptBeforeSigning
      */
     public static final String ENCRYPT_BEFORE_SIGNING = "EncryptBeforeSigning";
-
     /**
      * Protection Order : SignBeforeEncrypting
      */

@@ -82,12 +82,6 @@ public final class SP12Constants extends SPConstants {
     public static final QName INCLUDE_TIMESTAMP = new QName(SP12Constants.SP_NS,
             SPConstants.INCLUDE_TIMESTAMP, SP12Constants.SP_PREFIX);
     
-    public static final QName ENCRYPT_BEFORE_SIGNING = new QName(SP12Constants.SP_NS, 
-            SPConstants.ENCRYPT_BEFORE_SIGNING, SP12Constants.SP_PREFIX);
-    
-    public static final QName SIGN_BEFORE_ENCRYPTING = new QName(SP12Constants.SP_NS,
-            SPConstants.SIGN_BEFORE_ENCRYPTING, SP12Constants.SP_PREFIX);
-    
     public static final QName ONLY_SIGN_ENTIRE_HEADERS_AND_BODY = new QName(SP12Constants.SP_NS,
             SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, SP12Constants.SP_PREFIX);
 

@@ -18,25 +18,34 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -154,6 +163,55 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             org.apache.cxf.message.Message.REQUESTOR_ROLE));
     }  
     
+    protected void policyAsserted(AssertionInfoMap aim, PolicyAssertion assertion) {
+        Collection<AssertionInfo> ais;
+        ais = aim.get(assertion.getName());
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == assertion) {
+                    ai.setAsserted(true);
+                }
+            }
+        }
+    }
+    protected void policyAsserted(AssertionInfoMap aim, QName qn) {
+        Collection<AssertionInfo> ais;
+        ais = aim.get(qn);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
+        }
+    }
+    private static Properties getProps(Object o, SoapMessage message) {
+        Properties properties = null;
+        if (o instanceof Properties) {
+            properties = (Properties)o;
+        } else if (o instanceof String) {
+            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+            URL url = rm.resolveResource((String)o, URL.class);
+            try {
+                if (url == null) {
+                    url = ClassLoaderUtils.getResource((String)o, AbstractWSS4JInterceptor.class);
+                }
+                if (url != null) {
+                    properties = new Properties();
+                    properties.load(url.openStream());
+                }
+            } catch (IOException e) {
+                properties = null;
+            }
+        } else if (o instanceof URL) {
+            properties = new Properties();
+            try {
+                properties.load(((URL)o).openStream());
+            } catch (IOException e) {
+                properties = null;
+            }            
+        }
+        
+        return properties;
+    }
     
     protected void checkPolicies(SoapMessage message, RequestData data) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
@@ -187,6 +245,37 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
                 }                    
+            }
+            ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    AsymmetricBinding abinding = (AsymmetricBinding)ai.getAssertion();
+                    if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
+                        action = "Encrypt Signature " + action;
+                    } else {
+                        action = "Signature Encrypt " + action;                      
+                    }
+                    Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+                    Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+                    if (isRequestor(message)) {
+                        message.put("SignaturePropRefId", "SigRefId");
+                        message.put("SigRefId", getProps(e, message));
+                        message.put("decryptionPropRefId", "DecRefId");
+                        message.put("DecRefId", getProps(s, message));
+                    } else {
+                        message.put("SignaturePropRefId", "SigRefId");
+                        message.put("SigRefId", getProps(s, message));
+                        message.put("decryptionPropRefId", "DecRefId");
+                        message.put("DecRefId", getProps(e, message));                        
+                    }
+                    ai.setAsserted(true);
+                    policyAsserted(aim, abinding.getInitiatorToken());
+                    policyAsserted(aim, abinding.getRecipientToken());
+                    policyAsserted(aim, abinding.getInitiatorToken().getToken());
+                    policyAsserted(aim, abinding.getRecipientToken().getToken());
+                    policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
+                    policyAsserted(aim, SP12Constants.SIGNED_PARTS);
+                }
             }
             ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
             if (ais != null) {

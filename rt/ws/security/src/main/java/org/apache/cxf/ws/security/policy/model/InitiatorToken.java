@@ -39,6 +39,10 @@ public class InitiatorToken extends AbstractSecurityAssertion implements TokenWr
     public Token getInitiatorToken() {
         return initiatorToken;
     }
+    public Token getToken() {
+        return initiatorToken;
+    }
+
 
     /**
      * @param initiatorToken The initiatorToken to set.

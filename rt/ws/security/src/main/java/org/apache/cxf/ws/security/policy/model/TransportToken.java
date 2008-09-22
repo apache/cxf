@@ -40,6 +40,9 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
     public Token getTransportToken() {
         return transportToken;
     }
+    public Token getToken() {
+        return transportToken;
+    }
 
     public QName getRealName() {
         return constants.getTransportToken();

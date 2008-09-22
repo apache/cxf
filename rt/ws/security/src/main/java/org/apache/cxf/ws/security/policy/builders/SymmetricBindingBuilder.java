@@ -101,10 +101,10 @@ public class SymmetricBindingBuilder implements AssertionBuilder {
                 symmetricBinding.setProtectionToken((ProtectionToken)assertion);
 
             } else if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(name.getLocalPart())) {
-                symmetricBinding.setProtectionOrder(SPConstants.ENCRYPT_BEFORE_SIGNING);
+                symmetricBinding.setProtectionOrder(SPConstants.ProtectionOrder.EncryptBeforeSigning);
 
             } else if (SPConstants.SIGN_BEFORE_ENCRYPTING.equals(name.getLocalPart())) {
-                symmetricBinding.setProtectionOrder(SPConstants.SIGN_BEFORE_ENCRYPTING);
+                symmetricBinding.setProtectionOrder(SPConstants.ProtectionOrder.SignBeforeEncrypting);
 
             } else if (SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY.equals(name.getLocalPart())) {
                 symmetricBinding.setEntireHeadersAndBodySignatures(true);

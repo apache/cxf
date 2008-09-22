@@ -226,11 +226,12 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         ei.setProperty(POLICY_INFO_ENDPOINT_SERVER, ep);
     }
 
-    public EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi) {
+    public EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, 
+                                                           BindingOperationInfo boi) {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialisePolicy(ei, boi, this, false);
+            epi.initialise(ei, boi, this, false);
             boi.setProperty(POLICY_INFO_REQUEST_SERVER, epi);
             effectivePolicy = epi;
         }
@@ -246,7 +247,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialisePolicy(ei, boi, this, true);        
+            epi.initialise(ei, boi, this, true);        
             boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
             effectivePolicy = epi;
         }
@@ -415,6 +416,23 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             }
         } else {   
             addAssertions(pc, includeOptional, assertions);
+        }
+        return assertions;
+    }
+    Collection<PolicyAssertion> getAssertions(EffectivePolicy pc, boolean includeOptional) {
+        if (pc == null || pc.getChosenAlternative() == null) {
+            return null;
+        }
+        Collection<PolicyAssertion> assertions = new ArrayList<PolicyAssertion>();
+        for (PolicyAssertion assertion : pc.getChosenAlternative()) {
+            if (Constants.TYPE_ASSERTION == assertion.getType()) {
+                PolicyAssertion a = assertion;
+                if (includeOptional || !a.isOptional()) {
+                    assertions.add(a);
+                }
+            } else {   
+                addAssertions(assertion, includeOptional, assertions);
+            }
         }
         return assertions;
     }

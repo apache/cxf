@@ -21,7 +21,6 @@ package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -31,6 +30,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 
@@ -66,27 +66,38 @@ public class ClientPolicyInInterceptor extends AbstractPolicyInterceptor {
             return;
         }
         
-        Conduit conduit = exchange.getConduit(msg);
+        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
         
-        // We do not know the underlying message type yet - so we pre-emptively add interceptors 
-        // that can deal with any resposes or faults returned to this client endpoint.
+        if (boi == null) {
+            Conduit conduit = exchange.getConduit(msg);
         
-        EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
-        
-        List<Interceptor> interceptors = ep.getInterceptors();
-        for (Interceptor i : interceptors) {
-            msg.getInterceptorChain().add(i);
-            LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());            
+            EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
+            
+            List<Interceptor> interceptors = ep.getInterceptors();
+            for (Interceptor i : interceptors) {
+                msg.getInterceptorChain().add(i);
+            }
+            
+            // insert assertions of endpoint's vocabulary into message
+            
+            Collection<PolicyAssertion> assertions = ep.getVocabulary();
+            if (null != assertions) {
+                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
+            }
+        } else {
+            // We do not know the underlying message type yet - so we pre-emptively add interceptors 
+            // that can deal with any resposes or faults returned to this client endpoint.
+            
+            EffectivePolicy ep = pe.getEffectiveClientResponsePolicy(ei, boi);
+    
+            List<Interceptor> interceptors = ep.getInterceptors();
+            for (Interceptor i : interceptors) {
+                msg.getInterceptorChain().add(i);
+            }
+            // insert assertions of endpoint's vocabulary into message
+            if (ep.getPolicy() != null) {
+                msg.put(AssertionInfoMap.class, new AssertionInfoMap(ep.getPolicy()));
+            }
         }
-        
-        // insert assertions of endpoint's vocabulary into message
-        
-        Collection<PolicyAssertion> assertions = ep.getVocabulary();
-        if (null != assertions) {
-            msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-        }
-        
-        // if the conduit implements the Assertor interface, 
-        
     }
 }

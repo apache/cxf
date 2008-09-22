@@ -18,7 +18,12 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
-public interface TokenWrapper {
+
+import org.apache.cxf.ws.policy.PolicyAssertion;
+
+public interface TokenWrapper extends PolicyAssertion {
 
     void setToken(Token tok);
+    Token getToken();
+    
 }

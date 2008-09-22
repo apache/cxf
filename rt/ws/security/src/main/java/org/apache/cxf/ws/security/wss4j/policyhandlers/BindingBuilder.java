@@ -19,35 +19,99 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.io.IOException;
+import java.net.URL;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Binding;
+import org.apache.cxf.ws.security.policy.model.Header;
+import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
+import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
+import org.apache.cxf.ws.security.policy.model.Wss10;
+import org.apache.cxf.ws.security.policy.model.Wss11;
+import org.apache.cxf.ws.security.policy.model.X509Token;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.velocity.util.ClassUtils;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.WSSecBase;
+import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
 
 /**
  * 
  */
 public class BindingBuilder {
-    SOAPMessage saaj;
-    WSSecHeader secHeader;
-    AssertionInfoMap aim;
-    Binding binding;
-    SoapMessage message;
+    private static final Logger LOG = LogUtils.getL7dLogger(BindingBuilder.class); 
+    
+    protected SOAPMessage saaj;
+    protected WSSecHeader secHeader;
+    protected AssertionInfoMap aim;
+    protected Binding binding;
+    protected SoapMessage message;
+    protected WSSecTimestamp timestampEl;
+    protected String mainSigId;
+    
+    protected Set<String> encryptedTokensIdList = new HashSet<String>();
+
+
     
     public BindingBuilder(Binding binding,
                            SOAPMessage saaj,
@@ -62,25 +126,156 @@ public class BindingBuilder {
     }
 
     
-    private boolean isRequestor() {
+    protected boolean isRequestor() {
         return Boolean.TRUE.equals(message.containsKey(
             org.apache.cxf.message.Message.REQUESTOR_ROLE));
     }  
+    protected void policyNotAsserted(PolicyAssertion assertion, Exception reason) {
+        LOG.log(Level.INFO, "Not asserting " + assertion.getName(), reason);
+        Collection<AssertionInfo> ais;
+        ais = aim.get(assertion.getName());
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == assertion) {
+                    ai.setNotAsserted(reason.getMessage());
+                }
+            }
+        }
+    }
+    protected void policyNotAsserted(PolicyAssertion assertion, String reason) {
+        Collection<AssertionInfo> ais;
+        ais = aim.get(assertion.getName());
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == assertion) {
+                    ai.setNotAsserted(reason);
+                }
+            }
+        }
+    }
+    protected void policyAsserted(PolicyAssertion assertion) {
+        Collection<AssertionInfo> ais;
+        ais = aim.get(assertion.getName());
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == assertion) {
+                    ai.setAsserted(true);
+                }
+            }
+        }
+    }
     
+    protected PolicyAssertion findPolicy(QName n) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
+        if (ais != null && !ais.isEmpty()) {
+            return ais.iterator().next().getAssertion();
+        }
+        return null;
+    }
+        
+    protected WSSecTimestamp createTimestamp() {
+        Collection<AssertionInfo> ais;
+        ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                timestampEl = new WSSecTimestamp();
+                timestampEl.prepare(saaj.getSOAPPart());
+                ai.setAsserted(true);
+            }                    
+        }
+        return timestampEl;
+    }
     
-    protected void handleSupportingTokens(SupportingToken suppTokens) {
+    protected WSSecTimestamp handleLayout(WSSecTimestamp timestamp) {
+        Collection<AssertionInfo> ais;
+        ais = aim.get(SP12Constants.LAYOUT);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                Layout layout = (Layout)ai.getAssertion();
+                if (SPConstants.Layout.LaxTimestampLast == layout.getValue()) {
+                    if (timestamp == null) {
+                        ai.setNotAsserted(SPConstants.Layout.LaxTimestampLast + " requires a timestamp");
+                    } else {
+                        ai.setAsserted(true);
+                        //get the timestamp into the header first before anything else
+                        timestamp.prependToHeader(secHeader);
+                        timestamp = null;
+                    }
+                } else if (SPConstants.Layout.Strict == layout.getValue()) {
+                    //FIXME - don't have strict writing working yet
+                    ai.setAsserted(false);
+                } else if (SPConstants.Layout.Lax == layout.getValue()) {
+                    ai.setAsserted(true);                            
+                    //go ahead and put the timestamp in
+                    timestamp.prependToHeader(secHeader);
+                    timestamp = null;
+                } else {
+                    ai.setAsserted(true);                            
+                }
+            }                    
+        }
+        return timestamp;
+    }
+    
+    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens) {
+        Map<Token, WSSecBase> ret = new HashMap<Token, WSSecBase>();
+        if (suppTokens == null) {
+            return ret;
+        }
         for (Token token : suppTokens.getTokens()) {
             if (token instanceof UsernameToken) {
                 WSSecUsernameToken utBuilder = addUsernameToken((UsernameToken)token);
                 if (utBuilder != null) {
                     utBuilder.prepare(saaj.getSOAPPart());
                     utBuilder.appendToHeader(secHeader);
+                    ret.put(token, utBuilder);
+                    encryptedTokensIdList.add(utBuilder.getId());
                 }
+            } else if (token instanceof IssuedToken && isRequestor()) {
+                //ws-trust stuff.......
+                //REVISIT
+                policyNotAsserted(token, "Issued token not yet supported");
+            } else if (token instanceof X509Token) {
+
+                //We have to use a cert
+                //Prepare X509 signature
+                WSSecSignature sig = getSignatureBuider(suppTokens, token);
+                Element bstElem = sig.getBinarySecurityTokenElement();
+                if (bstElem != null) {
+                    sig.appendBSTElementToHeader(secHeader);
+                }
+                if (suppTokens.isEncryptedToken()) {
+                    encryptedTokensIdList.add(sig.getBSTTokenId());
+                }
+                ret.put(token, sig);
+            }         
+            
+        }
+        return ret;
+    }
+    
+    protected void addSignatureParts(Map<Token, WSSecBase> tokenMap,
+                                                         List<WSEncryptionPart> sigParts) {
+        
+        for (Map.Entry<Token, WSSecBase> entry : tokenMap.entrySet()) {
+            
+            Object tempTok =  entry.getValue();
+            WSEncryptionPart part = null;
+            
+            if (tempTok instanceof WSSecSignature) {
+                WSSecSignature tempSig = (WSSecSignature) tempTok;
+                if (tempSig.getBSTTokenId() != null) {
+                    part = new WSEncryptionPart(tempSig.getBSTTokenId());
+                }
+            } else {
+                policyNotAsserted(entry.getKey(), "UnsupportedTokenInSupportingToken");  
+            }
+            if (part != null) {
+                sigParts.add(part);
             }
         }
     }
-    
-    
+
     
     protected WSSecUsernameToken addUsernameToken(UsernameToken token) {
         
@@ -110,35 +305,7 @@ public class BindingBuilder {
             
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                
-                //Then try to get the password from the given callback handler
-                Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-            
-                CallbackHandler handler = null;
-                if (o instanceof CallbackHandler) {
-                    handler = (CallbackHandler)o;
-                } else if (o instanceof String) {
-                    try {
-                        handler = (CallbackHandler)ClassUtils.getNewInstance(o.toString());
-                    } catch (Exception e) {
-                        handler = null;
-                    }
-                }
-                if (handler == null) {
-                    info.setNotAsserted("No callback handler and not password available");
-                    return null;
-                }
-                
-                WSPasswordCallback[] cb = {new WSPasswordCallback(userName,
-                                                                  WSPasswordCallback.USERNAME_TOKEN)};
-                try {
-                    handler.handle(cb);
-                } catch (Exception e) {
-                    //REVISIT - Exception?
-                }
-                
-                //get the password
-                password = cb[0].getPassword();
+                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
             }
             
             if (!StringUtils.isEmpty(password)) {
@@ -160,6 +327,529 @@ public class BindingBuilder {
             info.setNotAsserted("No username available");
         }
         return null;
+    }
+    public String getPassword(String userName, PolicyAssertion info, int type) {
+      //Then try to get the password from the given callback handler
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+    
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassUtils.getNewInstance(o.toString());
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        if (handler == null) {
+            policyNotAsserted(info, "No callback handler and no password available");
+            return null;
+        }
+        
+        WSPasswordCallback[] cb = {new WSPasswordCallback(userName,
+                                                          type)};
+        try {
+            handler.handle(cb);
+        } catch (Exception e) {
+            policyNotAsserted(info, e);
+        }
+        
+        //get the password
+        return cb[0].getPassword();
+    }
+
+    public String addWsuIdToElement(Element elem) {
+        String id;
+        
+        //first try to get the Id attr
+        Attr idAttr = elem.getAttributeNode("Id");
+        if (idAttr == null) {
+            //then try the wsu:Id value
+            idAttr = elem.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
+        }
+        
+        if (idAttr != null) {
+            id = idAttr.getValue();
+        } else {
+            //Add an id
+            id = "Id-" + elem.hashCode();
+            String pfx = elem.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
+            boolean found = !StringUtils.isEmpty(pfx);
+            int cnt = 0;
+            while (StringUtils.isEmpty(pfx)) {
+                pfx = "wsu" + (cnt == 0 ? "" : cnt);
+                if (!StringUtils.isEmpty(elem.lookupNamespaceURI(pfx))) {
+                    pfx = null;
+                    cnt++;
+                }
+            }
+            if (!found) {
+                idAttr = elem.getOwnerDocument().createAttributeNS(WSDLConstants.NS_XMLNS, "xmlns:" + pfx);
+                idAttr.setValue(PolicyConstants.WSU_NAMESPACE_URI);
+                elem.setAttributeNodeNS(idAttr);
+            }
+            idAttr = elem.getOwnerDocument().createAttributeNS(PolicyConstants.WSU_NAMESPACE_URI, 
+                                                               pfx + ":Id");
+            idAttr.setValue(id);
+            elem.setAttributeNodeNS(idAttr);
+        }
+        
+        return id;
+    }
+
+    public Vector<WSEncryptionPart> getEncryptedParts() 
+        throws SOAPException {
+        
+        boolean isBody = false;
+        
+        SignedEncryptedParts parts = null;
+        SignedEncryptedElements elements = null;
+        
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.ENCRYPTED_PARTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                parts = (SignedEncryptedParts)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        ais = aim.getAssertionInfo(SP12Constants.ENCRYPTED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                elements = (SignedEncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        
+        List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
+        if (parts != null) {
+            isBody = parts.isBody();
+            for (Header head : parts.getHeaders()) {
+                WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
+                                                            head.getNamespace(),
+                                                            "Content");
+                signedParts.add(wep);
+            }
+        }
+    
+        
+        return getPartsAndElements(false, 
+                                   isBody,
+                                   signedParts,
+                                   elements == null ? null : elements.getXPathExpressions(),
+                                   elements == null ? null : elements.getDeclaredNamespaces());
+    }    
+    
+    public Vector<WSEncryptionPart> getSignedParts() 
+        throws SOAPException {
+        
+        boolean isSignBody = false;
+        
+        SignedEncryptedParts parts = null;
+        SignedEncryptedElements elements = null;
+        
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SIGNED_PARTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                parts = (SignedEncryptedParts)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        ais = aim.getAssertionInfo(SP12Constants.SIGNED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                elements = (SignedEncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        
+        List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
+        if (parts != null) {
+            isSignBody = parts.isBody();
+            for (Header head : parts.getHeaders()) {
+                WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
+                                                            head.getNamespace(),
+                                                            "Content");
+                signedParts.add(wep);
+            }
+        }
+
+        
+        return getPartsAndElements(true, 
+                                   isSignBody,
+                                   signedParts,
+                                   elements == null ? null : elements.getXPathExpressions(),
+                                   elements == null ? null : elements.getDeclaredNamespaces());
+    }
+    public Vector<WSEncryptionPart> getPartsAndElements(boolean sign, 
+                                                    boolean includeBody,
+                                                    List<WSEncryptionPart> parts,
+                                                    List<String> xpaths, 
+                                                    Map<String, String> namespaces) 
+        throws SOAPException {
+        
+        Vector<WSEncryptionPart> result = new Vector<WSEncryptionPart>();
+        List<Element> found = new ArrayList<Element>();
+        if (includeBody) {
+            if (sign) {
+                result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody())));
+            } else {
+                result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody()),
+                                                "Content", WSConstants.PART_TYPE_BODY));
+            }
+            found.add(saaj.getSOAPBody());
+        }
+        SOAPHeader header = saaj.getSOAPHeader();
+        for (WSEncryptionPart part : parts) {
+            if (StringUtils.isEmpty(part.getName())) {
+                //an entire namespace
+                Element el = DOMUtils.getFirstElement(header);
+                while (el != null) {
+                    if (part.getNamespace().equals(el.getNamespaceURI())
+                        && !found.contains(el)) {
+                        found.add(el);
+                        
+                        if (sign) {
+                            result.add(new WSEncryptionPart(el.getLocalName(), 
+                                                            part.getNamespace(),
+                                                            "Content"));
+                        } else {
+                            WSEncryptionPart encryptedHeader 
+                                = new WSEncryptionPart(el.getLocalName(),
+                                                       part.getNamespace(), 
+                                                       "Element",
+                                                       WSConstants.PART_TYPE_HEADER);
+                            String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
+                            
+                            if (!StringUtils.isEmpty(wsuId)) {
+                                encryptedHeader.setEncId(wsuId);
+                            }
+                            result.add(encryptedHeader);
+                        }
+                    }
+                }
+                el = DOMUtils.getNextElement(el);
+            } else {
+                Element el = DOMUtils.getFirstElement(header);
+                while (el != null) {
+                    if (part.getName().equals(el.getLocalName())
+                        && part.getNamespace().equals(el.getNamespaceURI())
+                        && !found.contains(el)) {
+                        found.add(el);          
+                        part.setType(WSConstants.PART_TYPE_HEADER);
+                        String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
+                        
+                        if (!StringUtils.isEmpty(wsuId)) {
+                            part.setEncId(wsuId);
+                        }
+                        
+                        result.add(part);
+                    }
+                    el = DOMUtils.getNextElement(el);
+                }
+            }
+        }
+        if (xpaths != null && !xpaths.isEmpty()) {
+            XPathFactory factory = XPathFactory.newInstance();
+            for (String expression : xpaths) {
+                XPath xpath = factory.newXPath();
+                if (namespaces != null) {
+                    xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+                }
+                try {
+                    NodeList list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
+                                                   XPathConstants.NODESET);
+                    for (int x = 0; x < list.getLength(); x++) {
+                        Element el = (Element)list.item(x);
+                        if (sign) {
+                            result.add(new WSEncryptionPart(el.getLocalName(),
+                                                            el.getNamespaceURI(), 
+                                                            "Content"));
+                        } else {
+                            WSEncryptionPart encryptedElem = new WSEncryptionPart(el.getLocalName(),
+                                                                                  el.getNamespaceURI(),
+                                                                                  "Element");
+                            String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
+                            
+                            if (!StringUtils.isEmpty(wsuId)) {
+                                encryptedElem.setEncId(wsuId);
+                            }
+                            result.add(encryptedElem);
+                        }
+                    }
+                } catch (XPathExpressionException e) {
+                    //REVISIT!!!!
+                }
+            }
+        }
+        return result;
+    }
+    
+    
+    protected WSSecEncryptedKey getEncryptedKeyBuilder(TokenWrapper wrapper, 
+                                                       Token token) throws WSSecurityException {
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        
+        setKeyIdentifierType(encrKey, wrapper, token);
+        setEncryptionUser(encrKey, token, false);
+        encrKey.setKeySize(binding.getAlgorithmSuite().getMaximumSymmetricKeyLength());
+        encrKey.setKeyEncAlgo(binding.getAlgorithmSuite().getAsymmetricKeyWrap());
+        
+        encrKey.prepare(saaj.getSOAPPart(), getEncryptionCrypto(wrapper));
+        
+        return encrKey;
+    }
+    public Crypto getSignatureCrypto(TokenWrapper wrapper) {
+        return getCrypto(wrapper, true);
+    }
+    public Crypto getEncryptionCrypto(TokenWrapper wrapper) {
+        return getCrypto(wrapper, false);
+    }
+    public Crypto getCrypto(TokenWrapper wrapper, boolean sign) {
+        Object o = message.getContextualProperty(sign 
+                                                 ? SecurityConstants.SIGNATURE_PROPERTIES 
+                                                 : SecurityConstants.ENCRYPT_PROPERTIES);
+        Properties properties = null;
+        if (o instanceof Properties) {
+            properties = (Properties)o;
+        } else if (o instanceof String) {
+            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+            URL url = rm.resolveResource((String)o, URL.class);
+            try {
+                if (url == null) {
+                    url = ClassLoaderUtils.getResource((String)o, this.getClass());
+                }
+                if (url != null) {
+                    properties = new Properties();
+                    properties.load(url.openStream());
+                } else {
+                    policyNotAsserted(wrapper, "Could not find properties file " + o);
+                }
+            } catch (IOException e) {
+                policyNotAsserted(wrapper, e);
+            }
+        } else if (o instanceof URL) {
+            properties = new Properties();
+            try {
+                properties.load(((URL)o).openStream());
+            } catch (IOException e) {
+                policyNotAsserted(wrapper, e);
+            }            
+        }
+        
+        if (properties != null) {
+            return CryptoFactory.getInstance(properties);
+        }
+        return null;
+    }
+    
+    public void setKeyIdentifierType(WSSecBase secBase, TokenWrapper wrapper, Token token) {
+        
+        if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER) {
+            boolean tokenTypeSet = false;
+            
+            if (token instanceof X509Token) {
+                X509Token x509Token = (X509Token)token;
+                if (x509Token.isRequireIssuerSerialReference()) {
+                    secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+                    tokenTypeSet = true;
+                } else if (x509Token.isRequireKeyIdentifierReference()) {
+                    secBase.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+                    tokenTypeSet = true;
+                } else if (x509Token.isRequireThumbprintReference()) {
+                    secBase.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+                    tokenTypeSet = true;
+                }
+            } 
+            
+            if (!tokenTypeSet) {
+                policyAsserted(token);
+                policyAsserted(wrapper);
+                
+                Wss10 wss = getWss10();
+                policyAsserted(wss);
+                if (wss.isMustSupportRefKeyIdentifier()) {
+                    secBase.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+                } else if (wss.isMustSupportRefIssuerSerial()) {
+                    secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+                } else if (wss instanceof Wss11
+                                && ((Wss11) wss).isMustSupportRefThumbprint()) {
+                    secBase.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+                }
+            }
+            
+        } else {
+            policyAsserted(token);
+            policyAsserted(wrapper);
+            secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        }
+    }
+    public void setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, Token token, boolean sign) {
+        String encrUser = (String)message.getContextualProperty(sign 
+                                                                ? SecurityConstants.USERNAME
+                                                                : SecurityConstants.ENCRYPT_USERNAME);
+        if (encrUser == null || "".equals(encrUser)) {
+            policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " username found.");
+        }
+        if (encrUser.equals(WSHandlerConstants.USE_REQ_SIG_CERT)) {
+            Object resultsObj = message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS);
+            if (resultsObj != null) {
+                encrKeyBuilder.setUseThisCert(getReqSigCert((Vector)resultsObj));
+                 
+                //TODO This is a hack, this should not come under USE_REQ_SIG_CERT
+                if (encrKeyBuilder.isCertSet()) {
+                    encrKeyBuilder.setUserInfo(getUsername((Vector)resultsObj));
+                }
+            } else {
+                policyNotAsserted(token, "No security results in incoming message");
+            }
+        } else {
+            encrKeyBuilder.setUserInfo(encrUser);
+        }
+    }
+    private static X509Certificate getReqSigCert(Vector results) {
+        /*
+        * Scan the results for a matching actor. Use results only if the
+        * receiving Actor and the sending Actor match.
+        */
+        for (int i = 0; i < results.size(); i++) {
+            WSHandlerResult rResult =
+                    (WSHandlerResult) results.get(i);
+
+            Vector wsSecEngineResults = rResult.getResults();
+            /*
+            * Scan the results for the first Signature action. Use the
+            * certificate of this Signature to set the certificate for the
+            * encryption action :-).
+            */
+            for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                WSSecurityEngineResult wser =
+                        (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                if (actInt.intValue() == WSConstants.SIGN) {
+                    return (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Scan through <code>WSHandlerResult<code> vector for a Username token and return
+     * the username if a Username Token found 
+     * @param results
+     * @return
+     */
+    
+    public static String getUsername(Vector results) {
+        /*
+         * Scan the results for a matching actor. Use results only if the
+         * receiving Actor and the sending Actor match.
+         */
+        for (int i = 0; i < results.size(); i++) {
+            WSHandlerResult rResult =
+                     (WSHandlerResult) results.get(i);
+
+            Vector wsSecEngineResults = rResult.getResults();
+            /*
+             * Scan the results for a username token. Use the username
+             * of this token to set the alias for the encryption user
+             */
+            for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                WSSecurityEngineResult wser =
+                         (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                if (actInt.intValue() == WSConstants.UT) {
+                    WSUsernameTokenPrincipal principal 
+                        = (WSUsernameTokenPrincipal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                    return principal.getName();
+                }
+            }
+        }
+         
+        return null;
+    }
+    protected Wss10 getWss10() {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.WSS10);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                return (Wss10)ai.getAssertion();
+            }            
+        }        
+        ais = aim.getAssertionInfo(SP12Constants.WSS11);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                return (Wss10)ai.getAssertion();
+            }            
+        }   
+        return null;
+    }
+
+    private void checkForX509PkiPath(WSSecSignature sig, Token token) {
+        if (token instanceof X509Token) {
+            X509Token x509Token = (X509Token) token;
+            if (x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10)
+                    || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11)) {
+                sig.setUseSingleCertificate(false);
+            }
+        }
+    }
+    protected WSSecSignature getSignatureBuider(TokenWrapper wrapper, Token token) {
+        WSSecSignature sig = new WSSecSignature();
+        checkForX509PkiPath(sig, token);
+        
+        setKeyIdentifierType(sig, wrapper, token);
+        
+        String user = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+        if (StringUtils.isEmpty(user)) {
+            policyNotAsserted(token, "No signature username found.");
+        }
+
+        String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
+        if (StringUtils.isEmpty(password)) {
+            policyNotAsserted(token, "No password found.");
+        }
+
+        sig.setUserInfo(user, password);
+        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+        sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
+        
+        try {
+            sig.prepare(saaj.getSOAPPart(),
+                        getSignatureCrypto(wrapper), 
+                        secHeader);
+        } catch (WSSecurityException e) {
+            policyNotAsserted(token, e);
+        }
+        
+        return sig;
+    }
+
+    protected void doEndorsedSignatures(Map<Token, WSSecBase> tokenMap,
+                                          boolean isTokenProtection) {
+        
+        for (Map.Entry<Token, WSSecBase> ent : tokenMap.entrySet()) {
+            WSSecBase tempTok = ent.getValue();
+            
+            Vector<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
+            sigParts.add(new WSEncryptionPart(mainSigId));
+            
+            if (tempTok instanceof WSSecSignature) {
+                WSSecSignature sig = (WSSecSignature)tempTok;
+                if (isTokenProtection && sig.getBSTTokenId() != null) {
+                    sigParts.add(new WSEncryptionPart(sig.getBSTTokenId()));
+                }
+                try {
+                    sig.addReferencesToSign(sigParts, secHeader);
+                    sig.computeSignature();
+                    sig.appendToHeader(secHeader);
+                } catch (WSSecurityException e) {
+                    policyNotAsserted(ent.getKey(), e);
+                }
+                
+            }
+        } 
     }
 
 }

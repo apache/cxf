@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
@@ -109,19 +110,17 @@ public class PolicyInterceptorsTest extends Assert {
         doTestBasics(interceptor, true, false);
         
         control.reset();
-        setupMessage(true, true, false, false, true, true);        
-        EndpointPolicy endpointPolicy = control.createMock(EndpointPolicy.class);
-        EasyMock.expect(pe.getClientEndpointPolicy(ei, conduit)).andReturn(endpointPolicy);
+        setupMessage(true, true, true, true, true, true);
+        EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
+        EasyMock.expect(pe.getEffectiveClientResponsePolicy(ei, boi)).andReturn(effectivePolicy);
+        EasyMock.expect(effectivePolicy.getPolicy()).andReturn(new Policy()).times(2);
         Interceptor i = control.createMock(Interceptor.class);
-        EasyMock.expect(endpointPolicy.getInterceptors())
+        EasyMock.expect(effectivePolicy.getInterceptors())
             .andReturn(CastUtils.cast(Collections.singletonList(i), Interceptor.class));
         InterceptorChain ic = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(ic);
         ic.add(i);
         EasyMock.expectLastCall();
-        Collection<PolicyAssertion> assertions = 
-            CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
-        EasyMock.expect(endpointPolicy.getVocabulary()).andReturn(assertions);
         message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
         EasyMock.expectLastCall();
         control.replay();
@@ -360,7 +359,7 @@ public class PolicyInterceptorsTest extends Assert {
             
         if (isClient) {
             conduit = control.createMock(Conduit.class);
-            EasyMock.expect(exchange.getConduit(message)).andReturn(conduit);
+            EasyMock.expect(exchange.getConduit(message)).andReturn(conduit).anyTimes();
         } else {
             destination = control.createMock(Destination.class);
             EasyMock.expect(exchange.getDestination()).andReturn(destination);

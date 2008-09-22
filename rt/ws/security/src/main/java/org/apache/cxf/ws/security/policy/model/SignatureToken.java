@@ -39,6 +39,9 @@ public class SignatureToken extends AbstractSecurityAssertion implements TokenWr
     public Token getSignatureToken() {
         return signatureToken;
     }
+    public Token getToken() {
+        return signatureToken;
+    }
 
     /**
      * @param signatureToken The signatureToken to set.
