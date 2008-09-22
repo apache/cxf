@@ -110,13 +110,6 @@ public class XML2FastInfosetCompilerMojo extends AbstractMojo {
                 continue;
             }
 
-            // this part is required in case the user specified "../something"
-            // as destination
-            // see MNG-1345
-            if (!outputDirectory.exists() && !outputDirectory.mkdirs()) {
-                throw new MojoExecutionException("Cannot create resource output directory: "
-                                                 + outputDirectory);
-            }
 
             DirectoryScanner scanner = new DirectoryScanner();
 
@@ -140,6 +133,16 @@ public class XML2FastInfosetCompilerMojo extends AbstractMojo {
                               + (includedFiles.size() > 1 ? "s" : "")
                               + (targetPath == null ? "" : " to " + targetPath));
 
+            if (includedFiles.size() > 0) {
+                // this part is required in case the user specified "../something"
+                // as destination
+                // see MNG-1345
+                if (!outputDirectory.exists() && !outputDirectory.mkdirs()) {
+                    throw new MojoExecutionException("Cannot create resource output directory: "
+                                                     + outputDirectory);
+                }
+            }
+            
             for (Iterator j = includedFiles.iterator(); j.hasNext();) {
                 String name = (String)j.next();
 
