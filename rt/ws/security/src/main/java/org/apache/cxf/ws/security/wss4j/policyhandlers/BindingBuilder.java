@@ -614,6 +614,14 @@ public class BindingBuilder {
         return getCrypto(wrapper, false);
     }
     public Crypto getCrypto(TokenWrapper wrapper, boolean sign) {
+        Crypto crypto = (Crypto)message.getContextualProperty(sign 
+                                                      ? SecurityConstants.SIGNATURE_CRYPTO 
+                                                      : SecurityConstants.ENCRYPT_CRYPTO);
+        if (crypto != null) {
+            return crypto;
+        }
+        
+        
         Object o = message.getContextualProperty(sign 
                                                  ? SecurityConstants.SIGNATURE_PROPERTIES 
                                                  : SecurityConstants.ENCRYPT_PROPERTIES);

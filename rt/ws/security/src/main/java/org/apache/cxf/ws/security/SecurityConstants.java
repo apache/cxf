@@ -31,6 +31,9 @@ public final class SecurityConstants {
     public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
     public static final String ENCRYPT_PROPERTIES = "ws-security.encryption.properties";
     
+    public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
+    public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
+    
     private SecurityConstants() {
         //utility class
     }
