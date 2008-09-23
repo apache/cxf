@@ -171,6 +171,14 @@ public class BindingBuilder {
             return ais.iterator().next().getAssertion();
         }
         return null;
+    } 
+    
+    protected void insertAfter(Element child, Element parent, Element sib) {
+        if (sib.getNextSibling() == null) {
+            parent.appendChild(child);
+        } else {
+            parent.insertBefore(child, sib.getNextSibling());
+        }
     }
         
     protected WSSecTimestamp createTimestamp() {

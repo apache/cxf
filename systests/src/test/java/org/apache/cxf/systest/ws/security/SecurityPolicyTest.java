@@ -45,7 +45,8 @@ import org.junit.Test;
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String POLICY_ADDRESS = "http://localhost:9010/SecPolTest";
     public static final String POLICY_HTTPS_ADDRESS = "https://localhost:9009/SecPolTest";
-    public static final String POLICY_ENC_ADDRESS = "http://localhost:9010/SecPolTestEncrypt";
+    public static final String POLICY_ENCSIGN_ADDRESS = "http://localhost:9010/SecPolTestEncryptThenSign";
+    public static final String POLICY_SIGNENC_ADDRESS = "http://localhost:9010/SecPolTestSignThenEncrypt";
 
     
     public static class ServerPasswordCallback implements CallbackHandler {
@@ -76,12 +77,24 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         Endpoint.publish(POLICY_ADDRESS,
                          new DoubleItImpl());
         
-        ep = (EndpointImpl)Endpoint.publish(POLICY_ENC_ADDRESS,
-                                            new DoubleItImplEncrypt());
+        ep = (EndpointImpl)Endpoint.publish(POLICY_ENCSIGN_ADDRESS,
+                                            new DoubleItImplEncryptThenSign());
         
         EndpointInfo ei = ep.getServer().getEndpoint().getEndpointInfo(); 
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new ServerPasswordCallback());
+        ei.setProperty(SecurityConstants.USERNAME, "alice");
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_USERNAME, "bob");
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("bob.properties").toString());
+
+        ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNENC_ADDRESS,
+                                            new DoubleItImplSignThenEncrypt());
         
+        ei = ep.getServer().getEndpoint().getEndpointInfo(); 
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new ServerPasswordCallback());
         ei.setProperty(SecurityConstants.USERNAME, "alice");
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
@@ -96,7 +109,19 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleItService service = new DoubleItService();
         DoubleItPortType pt;
 
-        pt = service.getDoubleItPortEncrypt();
+        pt = service.getDoubleItPortEncryptThenSign();
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("alice.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "Bob");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                                      getClass().getResource("bob.properties"));
+        pt.doubleIt(BigInteger.valueOf(5));
+        
+        
+        pt = service.getDoubleItPortSignThenEncrypt();
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "alice");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
@@ -159,11 +184,22 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         }
     }
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
-                portName = "DoubleItPortEncrypt",
+                portName = "DoubleItPortEncryptThenSign",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
-    public static class DoubleItImplEncrypt implements DoubleItPortType {
+    public static class DoubleItImplEncryptThenSign implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortSignThenEncrypt",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl")
+    public static class DoubleItImplSignThenEncrypt implements DoubleItPortType {
         /** {@inheritDoc}*/
         public BigInteger doubleIt(BigInteger numberToDouble) {
             return numberToDouble.multiply(new BigInteger("2"));

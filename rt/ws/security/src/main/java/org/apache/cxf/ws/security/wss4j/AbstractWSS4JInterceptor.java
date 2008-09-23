@@ -213,6 +213,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return properties;
     }
     
+    String addToAction(String action, String val, boolean pre) {
+        if (action.contains(val)) {
+            return action;
+        }
+        if (pre) {
+            return val + " " + action; 
+        } 
+        return action + " " + val;
+    }
+    
     protected void checkPolicies(SoapMessage message, RequestData data) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
@@ -225,7 +235,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             if (ais != null) {
                 for (AssertionInfo ai : ais) {
                     if (!action.contains(WSHandlerConstants.TIMESTAMP)) {
-                        action = WSHandlerConstants.TIMESTAMP + " " + action;
+                        action = addToAction(action, WSHandlerConstants.TIMESTAMP, true);
                     }
                     ai.setAsserted(true);
                 }                    
@@ -251,9 +261,11 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 for (AssertionInfo ai : ais) {
                     AsymmetricBinding abinding = (AsymmetricBinding)ai.getAssertion();
                     if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-                        action = "Encrypt Signature " + action;
+                        action = addToAction(action, "Signature", true);
+                        action = addToAction(action, "Encrypt", true);
                     } else {
-                        action = "Signature Encrypt " + action;                      
+                        action = addToAction(action, "Encrypt", true);
+                        action = addToAction(action, "Signature", true);
                     }
                     Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                     Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);

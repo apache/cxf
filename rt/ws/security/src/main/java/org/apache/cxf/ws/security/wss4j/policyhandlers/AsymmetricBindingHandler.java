@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
@@ -68,13 +69,10 @@ public class AsymmetricBindingHandler extends BindingBuilder {
     private String encryptedKeyId;
     private byte[] encryptedKeyValue;
     
-    private Map<Token, WSSecBase> sigSuppTokMap;
-    private Map<Token, WSSecBase> sgndEndSuppTokMap;
-    private Map<Token, WSSecBase> sgndEncSuppTokMap;
-    private Map<Token, WSSecBase> sgndEndEncSuppTokMap;
-    private Map<Token, WSSecBase> endSuppTokMap;
     private Map<Token, WSSecBase> endEncSuppTokMap;
-
+    private Map<Token, WSSecBase> endSuppTokMap;
+    private Map<Token, WSSecBase> sgndEndEncSuppTokMap;
+    private Map<Token, WSSecBase> sgndEndSuppTokMap;
     
     public AsymmetricBindingHandler(AsymmetricBinding binding,
                                     SOAPMessage saaj,
@@ -101,67 +99,88 @@ public class AsymmetricBindingHandler extends BindingBuilder {
     }
 
 
+    private void addSupportingTokens(Vector<WSEncryptionPart> sigs) {
+        
+        SupportingToken sgndSuppTokens = 
+            (SupportingToken)findPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+        
+        Map<Token, WSSecBase> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens);           
+        
+        SupportingToken endSuppTokens = 
+            (SupportingToken)findPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        
+        endSuppTokMap = this.handleSupportingTokens(endSuppTokens);
+        
+        SupportingToken sgndEndSuppTokens 
+            = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens);
+        
+        SupportingToken sgndEncryptedSuppTokens 
+            = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        Map<Token, WSSecBase> sgndEncSuppTokMap 
+            = this.handleSupportingTokens(sgndEncryptedSuppTokens);
+        
+        SupportingToken endorsingEncryptedSuppTokens 
+            = (SupportingToken)findPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        endEncSuppTokMap 
+            = this.handleSupportingTokens(endorsingEncryptedSuppTokens);
+        
+        SupportingToken sgndEndEncSuppTokens 
+            = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        sgndEndEncSuppTokMap 
+            = this.handleSupportingTokens(sgndEndEncSuppTokens);
+        
+        SupportingToken supportingToks 
+            = (SupportingToken)findPolicy(SP12Constants.SUPPORTING_TOKENS);
+        this.handleSupportingTokens(supportingToks);
+        
+        SupportingToken encryptedSupportingToks 
+            = (SupportingToken)findPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+        this.handleSupportingTokens(encryptedSupportingToks);
+    
+        //Setup signature parts
+        addSignatureParts(sigSuppTokMap, sigs);
+        addSignatureParts(sgndEncSuppTokMap, sigs);
+        addSignatureParts(sgndEndSuppTokMap, sigs);
+        addSignatureParts(sgndEndEncSuppTokMap, sigs);
+
+        //Add timestamp
+        if (timestampEl != null) {
+            Element el = timestampEl.getElement();
+            sigs.add(new WSEncryptionPart(addWsuIdToElement(el)));
+        }
+    }
     private void doSignBeforeEncrypt() {
         try {
             Vector<WSEncryptionPart> sigs = getSignedParts();
             if (isRequestor()) {
-                SupportingToken sgndSuppTokens = 
-                    (SupportingToken)findPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-                
-                sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens);           
-                
-                SupportingToken endSuppTokens = 
-                    (SupportingToken)findPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-                
-                endSuppTokMap = this.handleSupportingTokens(endSuppTokens);
-                
-                SupportingToken sgndEndSuppTokens 
-                    = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-                sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens);
-                
-                SupportingToken sgndEncryptedSuppTokens 
-                    = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
-                sgndEncSuppTokMap = this.handleSupportingTokens(sgndEncryptedSuppTokens);
-                
-                SupportingToken endorsingEncryptedSuppTokens 
-                    = (SupportingToken)findPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-                endEncSuppTokMap = this.handleSupportingTokens(endorsingEncryptedSuppTokens);
-                
-                SupportingToken sgndEndEncSuppTokens 
-                    = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-                sgndEndEncSuppTokMap = this.handleSupportingTokens(sgndEndEncSuppTokens);
-                
-                SupportingToken supportingToks 
-                    = (SupportingToken)findPolicy(SP12Constants.SUPPORTING_TOKENS);
-                this.handleSupportingTokens(supportingToks);
-                
-                SupportingToken encryptedSupportingToks 
-                    = (SupportingToken)findPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
-                this.handleSupportingTokens(encryptedSupportingToks);
-            
-                //Setup signature parts
-                addSignatureParts(sigSuppTokMap, sigs);
-                addSignatureParts(sgndEncSuppTokMap, sigs);
-                addSignatureParts(sgndEndSuppTokMap, sigs);
-                addSignatureParts(sgndEndEncSuppTokMap, sigs);
-
-                
-                //Add timestamp
-                if (timestampEl != null) {
-                    Element el = timestampEl.getElement();
-                    sigs.add(new WSEncryptionPart(addWsuIdToElement(el)));
-                }
-                doSignature(sigs);
+                addSupportingTokens(sigs);
+                doSignature(sigs, null);
                 doEndorse();
-                
             } else {
                 //confirm sig
                 addSignatureConfirmation(sigs);
-                doSignature(sigs);
+                doSignature(sigs, null);
             }
 
             Vector<WSEncryptionPart> enc = getEncryptedParts();
-            doEncyption(enc);
+            
+            //Check for signature protection
+            if (abinding.isSignatureProtection() && mainSigId != null) {
+                enc.add(new WSEncryptionPart(mainSigId, "Element"));
+            }
+            
+            if (isRequestor()) {
+                for (String id : encryptedTokensIdList) {
+                    enc.add(new WSEncryptionPart(id, "Element"));
+                }
+            }
+
+            //Do encryption
+            RecipientToken recToken = abinding.getRecipientToken();
+
+            
+            doEncryption(recToken, enc, false);
         } catch (Exception e) {
             e.printStackTrace();
             //REVISIT!!
@@ -169,10 +188,143 @@ public class AsymmetricBindingHandler extends BindingBuilder {
     }
 
     private void doEncryptBeforeSign() {
-        // REVISIT 
+        TokenWrapper wrapper;
+        Token encryptionToken = null;
+        if (isRequestor()) {
+            wrapper = abinding.getRecipientToken();
+        } else {
+            wrapper = abinding.getInitiatorToken();
+        }
+        encryptionToken = wrapper.getToken();
+        Vector<WSEncryptionPart> encrParts = null;
+        Vector<WSEncryptionPart> sigParts = null;
+        try {
+            encrParts = getEncryptedParts();
+            //Signed parts are determined before encryption because encrypted signed  headers
+            //will not be included otherwise
+            sigParts = getSignedParts();
+        } catch (SOAPException e1) {
+            //REVISIT - exception
+            e1.printStackTrace();
+        }
         
+        
+        if (encryptionToken == null && encrParts.size() > 0) {
+            //REVISIT - no token to encrypt with  
+        }
+        
+        
+        if (encryptionToken != null && encrParts.size() > 0) {
+            WSSecBase encrBase = doEncryption(wrapper, encrParts, true);
+            handleEncryptedSignedHeaders(encrParts, sigParts);
+            
+            
+            if (timestampEl != null) {
+                sigParts.add(new WSEncryptionPart(addWsuIdToElement(timestampEl.getElement())));
+            }
+            
+            if (isRequestor()) {
+                addSupportingTokens(sigParts);
+            } else {
+                addSignatureConfirmation(sigParts);
+            }
+            
+            if ((sigParts.size() > 0 
+                    && isRequestor()
+                    && abinding.getInitiatorToken() != null) 
+                || (!isRequestor() && abinding.getRecipientToken() != null)) {
+                try {
+                    Element appendEl = null;
+                    if (encryptionToken.isDerivedKeys()) {
+                        appendEl = ((WSSecDKEncrypt)encrBase).getdktElement();
+                    } else {
+                        appendEl = ((WSSecEncrypt)encrBase).getEncryptedKeyElement();
+                    }
+                    doSignature(sigParts, appendEl);
+                } catch (WSSecurityException e) {
+                    //REVISIT - exception
+                    e.printStackTrace();
+                }
+            }
+
+            if (isRequestor()) {
+                doEndorse();
+            }
+            
+            // Check for signature protection
+            if (abinding.isSignatureProtection() && mainSigId != null) {
+                Vector<WSEncryptionPart> secondEncrParts = new Vector<WSEncryptionPart>();
+
+                // Now encrypt the signature using the above token
+                secondEncrParts.add(new WSEncryptionPart(mainSigId, "Element"));
+                
+                if (isRequestor()) {
+                    for (String id : encryptedTokensIdList) {
+                        secondEncrParts.add(new WSEncryptionPart(id, "Element"));
+                    }
+                }
+
+                if (encryptionToken.isDerivedKeys()) {
+                    try {
+                        Element secondRefList 
+                            = ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
+                        ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
+
+                    } catch (WSSecurityException e) {
+                        //REVISIT - exception
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        // Encrypt, get hold of the ref list and add it
+                        Element secondRefList 
+                            = ((WSSecEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
+                        insertAfter(secondRefList, secHeader.getSecurityHeader(), 
+                                    ((WSSecEncrypt)encrBase).getEncryptedKeyElement());
+                        
+                    } catch (WSSecurityException e) {
+                        //REVISIT - exception
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
     
+    public void handleEncryptedSignedHeaders(Vector<WSEncryptionPart> encryptedParts, 
+                                              Vector<WSEncryptionPart> signedParts) {
+        
+        for (WSEncryptionPart signedPart : signedParts) {
+            if (signedPart.getNamespace() == null || signedPart.getName() == null) {
+                continue;
+            }
+             
+            for (WSEncryptionPart encryptedPart : encryptedParts) {
+                if (encryptedPart.getNamespace() == null 
+                    || encryptedPart.getName() == null) {
+                    continue;
+                }
+                
+                if (signedPart.getName().equals(encryptedPart.getName()) 
+                    && signedPart.getNamespace().equals(encryptedPart.getNamespace())) {
+                    
+                    String encDataID =  encryptedPart.getEncId();                    
+                    Element encDataElem = WSSecurityUtil
+                        .findElementById(saaj.getSOAPPart().getDocumentElement(),
+                                         encDataID, null);
+                    
+                    if (encDataElem != null) {
+                        Element encHeader = (Element)encDataElem.getParentNode();
+                        String encHeaderId = encHeader.getAttributeNS(WSConstants.WSU_NS, "Id");
+                        
+                        signedParts.remove(signedPart);
+                        WSEncryptionPart encHeaderToSign = new WSEncryptionPart(encHeaderId);
+                        signedParts.add(encHeaderToSign);
+                    }
+                }
+            }
+        }
+    }
     
     protected void addSignatureConfirmation(Vector<WSEncryptionPart> sigParts) {
         Wss10 wss10 = getWss10();
@@ -225,7 +377,6 @@ public class AsymmetricBindingHandler extends BindingBuilder {
         }
     }
 
-    
     private void doEndorse() {
         // Adding the endorsing encrypted supporting tokens to endorsing supporting tokens
         endSuppTokMap.putAll(endEncSuppTokMap);
@@ -238,25 +389,14 @@ public class AsymmetricBindingHandler extends BindingBuilder {
         doEndorsedSignatures(sgndEndSuppTokMap, abinding.isTokenProtection());
     }    
     
-    private void doEncyption(Vector<WSEncryptionPart> encrParts) {
-        //Check for signature protection
-        if (abinding.isSignatureProtection() && mainSigId != null) {
-            encrParts.add(new WSEncryptionPart(mainSigId, "Element"));
-        }
-        
-        if (isRequestor()) {
-            for (String id : encryptedTokensIdList) {
-                encrParts.add(new WSEncryptionPart(id, "Element"));
-            }
-        }
-
+    private WSSecBase doEncryption(TokenWrapper recToken,
+                                    Vector<WSEncryptionPart> encrParts,
+                                    boolean externalRef) {
         //Do encryption
-        RecipientToken recToken = abinding.getRecipientToken();
-        if (recToken != null && recToken.getRecipientToken() != null && encrParts.size() > 0) {
-            Token encrToken = recToken.getRecipientToken();
+        if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
+            Token encrToken = recToken.getToken();
             policyAsserted(recToken);
             policyAsserted(encrToken);
-            Element refList = null;
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             if (encrToken.isDerivedKeys()) {
                 try {
@@ -267,6 +407,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     }
                     
                     dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
+                    dkEncr.setParts(encrParts);
                     dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                             + WSConstants.ENC_KEY_VALUE_TYPE);
                     dkEncr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
@@ -274,8 +415,9 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     dkEncr.prepare(saaj.getSOAPPart());
                     
                     dkEncr.prependDKElementToHeader(secHeader);
-                    refList = dkEncr.encryptForExternalRef(null, encrParts);
-                    
+                    Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+                    dkEncr.addExternalRefElement(refList, secHeader);
+                    return dkEncr;
                 } catch (Exception e) {
                     policyNotAsserted(recToken, e);
                 }
@@ -301,18 +443,23 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     Element encryptedKeyElement = encr.getEncryptedKeyElement();
                                        
                     //Encrypt, get hold of the ref list and add it
-                    refList = encr.encryptForInternalRef(null, encrParts);
+                    if (externalRef) {
+                        Element refList = encr.encryptForExternalRef(null, encrParts);
+                        secHeader.getSecurityHeader().appendChild(refList);
+                    } else {
+                        Element refList = encr.encryptForInternalRef(null, encrParts);
                     
-                    //Add internal refs
-                    encryptedKeyElement.appendChild(refList);
-                    
+                        // Add internal refs
+                        encryptedKeyElement.appendChild(refList);
+                    }
                     encr.prependToHeader(secHeader);
-
+                    return encr;
                 } catch (WSSecurityException e) {
                     policyNotAsserted(recToken, e.getMessage());
                 }    
             }
         }
+        return null;
     }    
     
     private void assertUnusedTokens(TokenWrapper wrapper) {
@@ -329,7 +476,8 @@ public class AsymmetricBindingHandler extends BindingBuilder {
             }
         }
     }
-    private void doSignature(Vector<WSEncryptionPart> sigParts) throws WSSecurityException {
+    private void doSignature(Vector<WSEncryptionPart> sigParts,
+                             Element appendAfter) throws WSSecurityException {
         Token sigToken = null;
         TokenWrapper wrapper = null;
         if (isRequestor()) {
@@ -390,7 +538,13 @@ public class AsymmetricBindingHandler extends BindingBuilder {
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();
 
-            sig.prependToHeader(secHeader);
+            if (appendAfter != null) {
+                insertAfter(sig.getSignatureElement(),
+                            secHeader.getSecurityHeader(),
+                            appendAfter);
+            } else {
+                sig.prependToHeader(secHeader);
+            }
 
             mainSigId = addWsuIdToElement(sig.getSignatureElement());
         }
