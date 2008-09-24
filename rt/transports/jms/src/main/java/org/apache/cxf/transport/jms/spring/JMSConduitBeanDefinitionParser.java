@@ -42,7 +42,7 @@ public class JMSConduitBeanDefinitionParser extends AbstractBeanDefinitionParser
                                  ClientConfig.class);
         mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "runtimePolicy"), "runtimePolicy", 
                                  ClientBehaviorPolicyType.class);
-        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "address"), "JMSAddress", 
+        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "address"), "address", 
                                  AddressType.class);
         mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "sessionPool"), "sessionPool", 
                                  SessionPoolType.class);

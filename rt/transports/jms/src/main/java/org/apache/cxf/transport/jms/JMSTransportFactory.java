@@ -35,8 +35,8 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-public class JMSTransportFactory extends AbstractTransportFactory
-    implements ConduitInitiator, DestinationFactory  {
+public class JMSTransportFactory extends AbstractTransportFactory implements ConduitInitiator,
+    DestinationFactory {
 
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
     static {
@@ -44,6 +44,7 @@ public class JMSTransportFactory extends AbstractTransportFactory
     }
 
     private Bus bus;
+    private JMSConfiguration jmsConfig;
 
     @Resource(name = "cxf")
     public void setBus(Bus b) {
@@ -59,8 +60,11 @@ public class JMSTransportFactory extends AbstractTransportFactory
     }
 
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target) throws IOException {
-        JMSConduit conduit =
-            target == null ? new JMSConduit(bus, endpointInfo) : new JMSConduit(bus, endpointInfo, target);
+        JMSConduit conduit = target == null
+            ? new JMSConduit(bus, endpointInfo) : new JMSConduit(bus, endpointInfo, target);
+        JMSOldConfigHolder old = new JMSOldConfigHolder();
+        JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo);
+        conduit.setJmsConfig(jmsConf);
         return conduit;
     }
 
@@ -72,8 +76,16 @@ public class JMSTransportFactory extends AbstractTransportFactory
         }
         return destination;
     }
-
+    
     public Set<String> getUriPrefixes() {
         return URI_PREFIXES;
+    }
+
+    public JMSConfiguration getJmsConfig() {
+        return jmsConfig;
+    }
+
+    public void setJmsConfig(JMSConfiguration jmsConfig) {
+        this.jmsConfig = jmsConfig;
     }
 }

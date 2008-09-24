@@ -19,10 +19,6 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Calendar;
-
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -83,19 +79,7 @@ public class PooledSession {
         return theProducer;
     }
 
-    private String generateUniqueSelector() {
-        String host = "localhost";
 
-        try {
-            InetAddress addr = InetAddress.getLocalHost();
-            host = addr.getHostName();
-        } catch (UnknownHostException ukex) {
-            // Default to localhost.
-        }
-
-        long time = Calendar.getInstance().getTimeInMillis();
-        return host + "_" + System.getProperty("user.name") + "_" + this + time;
-    }
     
     MessageConsumer consumer() {
         return theConsumer;
@@ -113,7 +97,7 @@ public class PooledSession {
                 String selector = null;
                 if (null != destination) {
                     replyDestination = destination;
-                    selector = "JMSCorrelationID = '" + generateUniqueSelector() + "'";
+                    selector = "JMSCorrelationID = '" + JMSUtils.generateUniqueSelector() + "'";
                 } else {
                     replyDestination = theSession.createTemporaryQueue();
                 }

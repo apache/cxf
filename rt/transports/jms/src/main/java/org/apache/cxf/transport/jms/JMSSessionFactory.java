@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +33,7 @@ import javax.jms.Session;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -152,7 +154,8 @@ public class JMSSessionFactory {
                                                ServerConfig serverConfig) throws JMSException,
         NamingException {
 
-        Context context = JMSUtils.getInitialContext(addrDetails);
+        Properties env = JMSUtils.getInitialContextEnv(addrDetails);
+        Context context = new InitialContext(env);
         ConnectionFactory connectionFactory;
         Connection connection = null;
 
