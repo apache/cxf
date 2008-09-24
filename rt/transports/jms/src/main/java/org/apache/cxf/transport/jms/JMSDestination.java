@@ -124,8 +124,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
         Executor executor = SynchronousExecutor.getInstance();
         if (wqm != null) {
             if (name != null) {
-                executor = wqm.getNamedWorkQueue("{" + name.getNamespaceURI() + "}"
-                                                 + name.getLocalPart());
+                executor = wqm.getNamedWorkQueue("{" + name.getNamespaceURI() + "}" + name.getLocalPart());
             }
             if (executor == null) {
                 executor = wqm.getNamedWorkQueue("jms");
@@ -199,19 +198,24 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
         }
     }
 
-    public void setReplyCorrelationID(javax.jms.Message request, javax.jms.Message reply)
-        throws JMSException {
-
+    /**
+     * Decides what correlationId to use for the reply by looking at the request headers. If the request has a
+     * correlationId set this is taken. Else if the useMessageIDAsCorrelationID is true then the messageId
+     * from the request message is used as correlation Id
+     * 
+     * @param request
+     * @return
+     * @throws JMSException
+     */
+    public String determineCorrelationID(javax.jms.Message request) throws JMSException {
         String correlationID = request.getJMSCorrelationID();
-
-        if (correlationID == null || "".equals(correlationID)
-            && getRuntimePolicy().isUseMessageIDAsCorrelationID()) {
+        if ("".equals(correlationID)) {
+            correlationID = null;
+        }
+        if (correlationID == null && getRuntimePolicy().isUseMessageIDAsCorrelationID()) {
             correlationID = request.getJMSMessageID();
         }
-
-        if (correlationID != null && !"".equals(correlationID)) {
-            reply.setJMSCorrelationID(correlationID);
-        }
+        return correlationID;
     }
 
     /**
@@ -241,8 +245,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
-        } catch (JMSException e) {
-            throw new RuntimeException("Error handling JMS message", e);
         } finally {
             BusFactory.setThreadDefaultBus(null);
         }
@@ -276,12 +278,12 @@ public class JMSDestination extends AbstractMultiplexDestination implements Conf
             javax.jms.Message reply = JMSUtils
                 .createAndSetPayload(replyObj, replySession.session(), msgType);
 
-            setReplyCorrelationID(request, reply);
+            reply.setJMSCorrelationID(determineCorrelationID(request));
             JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
                 .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
             JMSUtils.setMessageProperties(headers, reply);
             // ensure that the contentType is set to the out jms message header
-            JMSUtils.setContentToProtocolHeader(outMessage);
+            JMSUtils.addContentTypeToProtocolHeader(outMessage);
             Map<String, List<String>> protHeaders = CastUtils.cast((Map<?, ?>)outMessage
                 .get(Message.PROTOCOL_HEADERS));
             JMSUtils.addProtocolHeaders(reply, protHeaders);

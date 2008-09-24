@@ -39,6 +39,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSDestinationTest extends AbstractJMSTester {
+    private static final int MAX_RECEIVE_TIME = 3;
     private Message destMessage;
 
     @BeforeClass
@@ -48,15 +49,16 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
     private void waitForReceiveInMessage() {
         int waitTime = 0;
-        while (inMessage == null && waitTime < 3000) {
+        while (inMessage == null && waitTime < MAX_RECEIVE_TIME) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // do nothing here
             }
-            waitTime = waitTime + 1000;
+            waitTime++;
         }
-        assertTrue("Can't receive the Conduit Message in 3 seconds", inMessage != null);
+        assertTrue("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds",
+                   inMessage != null);
     }
 
     private void waitForReceiveDestMessage() {
@@ -71,8 +73,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
         }
         assertTrue("Can't receive the Destination message in 3 seconds", destMessage != null);
     }
-
-
 
     public JMSDestination setupJMSDestination(boolean send) throws IOException {
         ConduitInitiator conduitInitiator = EasyMock.createMock(ConduitInitiator.class);
@@ -98,29 +98,21 @@ public class JMSDestinationTest extends AbstractJMSTester {
         BusFactory.setDefaultBus(null);
         bus = bf.createBus("/jms_test_config.xml");
         BusFactory.setDefaultBus(bus);
-        setupServiceInfo("http://cxf.apache.org/jms_conf_test",
-                         "/wsdl/others/jms_test_no_addr.wsdl",
-                         "HelloWorldQueueBinMsgService",
-                         "HelloWorldQueueBinMsgPort");
+        setupServiceInfo("http://cxf.apache.org/jms_conf_test", "/wsdl/others/jms_test_no_addr.wsdl",
+                         "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         JMSDestination destination = setupJMSDestination(false);
-        assertEquals("Can't get the right ServerConfig's MessageTimeToLive ",
-                     500L,
-                     destination.getServerConfig().getMessageTimeToLive());
-        assertEquals("Can't get the right Server's MessageSelector",
-                     "cxf_message_selector",
-                     destination.getRuntimePolicy().getMessageSelector());
-        assertEquals("Can't get the right SessionPoolConfig's LowWaterMark",
-                     10,
-                     destination.getSessionPool().getLowWaterMark());
-        assertEquals("Can't get the right AddressPolicy's ConnectionPassword",
-                     "testPassword",
-                     destination.getJMSAddress().getConnectionPassword());
-        assertEquals("Can't get the right DurableSubscriberName",
-                     "cxf_subscriber",
-                     destination.getRuntimePolicy().getDurableSubscriberName());
-        assertEquals("Can't get the right MessageSelectorName",
-                     "cxf_message_selector",
-                     destination.getRuntimePolicy().getMessageSelector());
+        assertEquals("Can't get the right ServerConfig's MessageTimeToLive ", 500L, destination
+            .getServerConfig().getMessageTimeToLive());
+        assertEquals("Can't get the right Server's MessageSelector", "cxf_message_selector", destination
+            .getRuntimePolicy().getMessageSelector());
+        assertEquals("Can't get the right SessionPoolConfig's LowWaterMark", 10, destination
+            .getSessionPool().getLowWaterMark());
+        assertEquals("Can't get the right AddressPolicy's ConnectionPassword", "testPassword", destination
+            .getJMSAddress().getConnectionPassword());
+        assertEquals("Can't get the right DurableSubscriberName", "cxf_subscriber", destination
+            .getRuntimePolicy().getDurableSubscriberName());
+        assertEquals("Can't get the right MessageSelectorName", "cxf_message_selector", destination
+            .getRuntimePolicy().getMessageSelector());
         BusFactory.setDefaultBus(null);
 
     }
@@ -131,20 +123,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         BusFactory.setDefaultBus(null);
         bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms",
-                         "/wsdl/jms_test.wsdl",
-                         "HelloWorldQueueBinMsgService",
-                         "HelloWorldQueueBinMsgPort");
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
 
         JMSDestination destination = setupJMSDestination(false);
 
-        assertEquals("Can't get the right DurableSubscriberName",
-                     "CXF_subscriber",
-                     destination.getRuntimePolicy().getDurableSubscriberName());
+        assertEquals("Can't get the right DurableSubscriberName", "CXF_subscriber", destination
+            .getRuntimePolicy().getDurableSubscriberName());
 
         assertEquals("Can't get the right AddressPolicy's ConnectionPassword",
-                     "dynamicQueues/test.jmstransport.binary",
-                     destination.getJMSAddress().getJndiDestinationName());
+                     "dynamicQueues/test.jmstransport.binary", destination.getJMSAddress()
+                         .getJndiDestinationName());
 
         BusFactory.setDefaultBus(null);
 
@@ -154,25 +143,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
     public void testDurableSubscriber() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         BusFactory.setDefaultBus(null);
-        bus = bf.createBus("/wsdl/jms_test_config.xml");
+        bus = bf.createBus("jms_test_config.xml");
         BusFactory.setDefaultBus(bus);
         destMessage = null;
         inMessage = null;
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms",
-                         "/wsdl/jms_test.wsdl",
-                         "HelloWorldPubSubService",
-                         "HelloWorldPubSubPort");
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldPubSubService", "HelloWorldPubSubPort");
         JMSConduit conduit = setupJMSConduit(true, false);
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
-        JMSDestination destination = null;
-        try {
-            destination = setupJMSDestination(true);
-            destination.activate();
-        } catch (IOException e) {
-            assertFalse("The JMSDestination activate should not through exception ", false);
-            e.printStackTrace();
-        }
+        JMSDestination destination = setupJMSDestination(true);
+        // destination.activate();
         sendoutMessage(conduit, outMessage, true);
         // wait for the message to be get from the destination
         waitForReceiveDestMessage();
@@ -187,10 +168,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     public void testOneWayDestination() throws Exception {
         destMessage = null;
         inMessage = null;
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms",
-                         "/wsdl/jms_test.wsdl",
-                         "HWStaticReplyQBinMsgService",
-                         "HWStaticReplyQBinMsgPort");
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
         JMSConduit conduit = setupJMSConduit(true, false);
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
@@ -222,8 +201,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     private void verifyReceivedMessage(Message inMessage) {
-        ByteArrayInputStream bis =
-            (ByteArrayInputStream) inMessage.getContent(InputStream.class);
+        ByteArrayInputStream bis = (ByteArrayInputStream)inMessage.getContent(InputStream.class);
         byte bytes[] = new byte[bis.available()];
         try {
             bis.read(bytes);
@@ -236,54 +214,49 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     private void verifyRequestResponseHeaders(Message inMessage, Message outMessage) {
-        JMSMessageHeadersType outHeader =
-            (JMSMessageHeadersType)outMessage.get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+        JMSMessageHeadersType outHeader = (JMSMessageHeadersType)outMessage
+            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
 
-        JMSMessageHeadersType inHeader =
-            (JMSMessageHeadersType)inMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
+            .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
 
         verifyJmsHeaderEquality(outHeader, inHeader);
 
     }
 
     private void verifyHeaders(Message inMessage, Message outMessage) {
-        JMSMessageHeadersType outHeader =
-            (JMSMessageHeadersType)outMessage.get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+        JMSMessageHeadersType outHeader = (JMSMessageHeadersType)outMessage
+            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
 
-        JMSMessageHeadersType inHeader =
-            (JMSMessageHeadersType)inMessage.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
+            .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
 
         verifyJmsHeaderEquality(outHeader, inHeader);
 
     }
 
     private void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
-        assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals",
-                     outHeader.getJMSCorrelationID(), inHeader.getJMSCorrelationID());
-        assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals",
-                     outHeader.getJMSPriority(), inHeader.getJMSPriority());
-        assertEquals("The inMessage and outMessage JMS Header's JMSType should be equals",
-                     outHeader.getJMSType(), inHeader.getJMSType());
-
+        assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals", outHeader
+            .getJMSCorrelationID(), inHeader.getJMSCorrelationID());
+        assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
+            .getJMSPriority(), inHeader.getJMSPriority());
+        assertEquals("The inMessage and outMessage JMS Header's JMSType should be equals", outHeader
+            .getJMSType(), inHeader.getJMSType());
     }
-
-
 
     @Test
     public void testRoundTripDestination() throws Exception {
 
         inMessage = null;
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms",
-                         "/wsdl/jms_test.wsdl",
-                         "HelloWorldService",
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl", "HelloWorldService",
                          "HelloWorldPort");
-        //set up the conduit send to be true
+        // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduit(true, false);
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
         final JMSDestination destination = setupJMSDestination(true);
 
-        //set up MessageObserver for handling the conduit message
+        // set up MessageObserver for handling the conduit message
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
                 Exchange exchange = new ExchangeImpl();
@@ -291,23 +264,22 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 m.setExchange(exchange);
                 verifyReceivedMessage(m);
                 verifyHeaders(m, outMessage);
-                //setup the message for
+                // setup the message for
                 Conduit backConduit;
                 try {
                     backConduit = destination.getBackChannel(m, null, null);
-                    //wait for the message to be got from the conduit
+                    // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
                     sendoutMessage(backConduit, replyMessage, true);
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         };
         destination.setMessageObserver(observer);
-        //set is oneway false for get response from destination
+        // set is oneway false for get response from destination
         sendoutMessage(conduit, outMessage, false);
-        //wait for the message to be got from the destination,
+        // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
         waitForReceiveInMessage();
@@ -331,11 +303,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
             "THIS_PROPERTY_WILL_NOT_BE_AUTO_COPIED";
 
         inMessage = null;
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms",
-                         "/wsdl/jms_test.wsdl",
-                         "HelloWorldService",
-                         "HelloWorldPort");
-        //set up the conduit send to be true
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldService", "HelloWorldPort");
+        // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduit(true, false);
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
@@ -344,14 +314,13 @@ public class JMSDestinationTest extends AbstractJMSTester {
         excludeProp.setName(customPropertyName);
         excludeProp.setValue(customPropertyName);
 
-        JMSMessageHeadersType headers = (JMSMessageHeadersType)
-            outMessage.get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+        JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
+            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
         headers.getProperty().add(excludeProp);
-
 
         final JMSDestination destination = setupJMSDestination(true);
 
-        //set up MessageObserver for handling the conduit message
+        // set up MessageObserver for handling the conduit message
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
                 Exchange exchange = new ExchangeImpl();
@@ -359,38 +328,36 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 m.setExchange(exchange);
                 verifyReceivedMessage(m);
                 verifyHeaders(m, outMessage);
-                //setup the message for
+                // setup the message for
                 Conduit backConduit;
                 try {
                     backConduit = destination.getBackChannel(m, null, null);
-                    //wait for the message to be got from the conduit
+                    // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
                     sendoutMessage(backConduit, replyMessage, true);
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         };
         destination.setMessageObserver(observer);
-        //set is oneway false for get response from destination
+        // set is oneway false for get response from destination
         sendoutMessage(conduit, outMessage, false);
-        //wait for the message to be got from the destination,
+        // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
         waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
-
         verifyRequestResponseHeaders(inMessage, outMessage);
 
-        JMSMessageHeadersType inHeader =
-            (JMSMessageHeadersType)inMessage.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
+            .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
 
-        assertTrue("property has been excluded, only CONTENT_TYPE should be here",
-                inHeader.getProperty().size() == 1);
+        assertTrue("property has been excluded, only CONTENT_TYPE should be here", inHeader.getProperty()
+            .size() == 1);
         assertTrue("property has been excluded, only " + JMSConstants.JMS_CONTENT_TYPE + "should be here",
-                inHeader.getProperty().get(0).getName().equals(JMSConstants.JMS_CONTENT_TYPE));
+                   inHeader.getProperty().get(0).getName().equals(JMSConstants.JMS_CONTENT_TYPE));
         // wait for a while for the jms session recycling
         Thread.sleep(1000);
         destination.shutdown();
@@ -399,10 +366,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     @Test
     public void testIsMultiplexCapable() throws Exception {
         inMessage = null;
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms",
-                         "/wsdl/jms_test.wsdl",
-                         "HelloWorldService",
-                         "HelloWorldPort");
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldService", "HelloWorldPort");
         final JMSDestination destination = setupJMSDestination(true);
         assertTrue("is multiplex", destination instanceof MultiplexDestination);
     }

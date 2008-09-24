@@ -43,32 +43,32 @@ import org.junit.Before;
 
 public abstract class AbstractJMSTester extends Assert {
     private static JMSBrokerSetup broker;
-    
+
     protected Bus bus;
     protected EndpointInfo endpointInfo;
     protected EndpointReferenceType target;
     protected MessageObserver observer;
     protected Message inMessage;
-    
+
     public static void startBroker(JMSBrokerSetup b) throws Exception {
         assertNotNull(b);
         broker = b;
         broker.start();
     }
-    
-    @AfterClass 
+
+    @AfterClass
     public static void stopBroker() throws Exception {
         broker.stop();
         broker = null;
     }
-    
+
     @Before
     public void setUp() {
         BusFactory bf = BusFactory.newInstance();
         bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
     }
-    
+
     @After
     public void tearDown() {
         bus.shutdown(true);
@@ -76,19 +76,19 @@ public abstract class AbstractJMSTester extends Assert {
             System.clearProperty("cxf.config.file");
         }
     }
-    
-    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {        
+
+    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
         assertNotNull(wsdlUrl);
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlUrl, new QName(ns, serviceName));
 
-        Service service = factory.create();        
+        Service service = factory.create();
         endpointInfo = service.getEndpointInfo(new QName(ns, portName));
-   
+
     }
-    
+
     protected void sendoutMessage(Conduit conduit, Message message, Boolean isOneWay) throws IOException {
-        
+
         Exchange exchange = new ExchangeImpl();
         exchange.setOneWay(isOneWay);
         message.setExchange(exchange);
@@ -97,37 +97,36 @@ public abstract class AbstractJMSTester extends Assert {
             conduit.prepare(message);
         } catch (IOException ex) {
             assertFalse("JMSConduit can't perpare to send out message", false);
-            ex.printStackTrace();            
+            ex.printStackTrace();
         }
         OutputStream os = message.getContent(OutputStream.class);
         assertTrue("The OutputStream should not be null ", os != null);
-        os.write("HelloWorld".getBytes());
-        os.close();            
+        os.write("HelloWorld".getBytes()); // TODO encoding
+        os.close();
     }
-    
+
     protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) {
         if (decoupled) {
             // setup the reference type
         } else {
             target = EasyMock.createMock(EndpointReferenceType.class);
-        }    
-        
+        }
+
         JMSConduit jmsConduit = new JMSConduit(bus, endpointInfo, target);
-        
+        JMSConfiguration jmsConfig = new JMSOldConfigHolder()
+            .createJMSConfigurationFromEndpointInfo(bus, endpointInfo);
+        jmsConduit.setJmsConfig(jmsConfig);
         if (send) {
             // setMessageObserver
             observer = new MessageObserver() {
-                public void onMessage(Message m) {                    
+                public void onMessage(Message m) {
                     inMessage = m;
                 }
             };
             jmsConduit.setMessageObserver(observer);
         }
-        
-        return jmsConduit;        
+
+        return jmsConduit;
     }
-    
-       
-   
-   
+
 }
