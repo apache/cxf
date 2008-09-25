@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
@@ -32,9 +33,7 @@ import org.apache.neethi.PolicyComponent;
 public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
 
     private EncryptionToken encryptionToken;
-
     private SignatureToken signatureToken;
-
     private ProtectionToken protectionToken;
 
     public SymmetricBinding(SPConstants version) {
@@ -103,40 +102,43 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         return SP12Constants.INSTANCE.getSymmetricBinding();
     }
     public PolicyComponent normalize() {
-        if (isNormalized()) {
-            return this;
-        }
-
-        AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-
-        Policy policy = new Policy();
-        ExactlyOne exactlyOne = new ExactlyOne();
-
-        All wrapper = new All();
-        SymmetricBinding symmetricBinding = new SymmetricBinding(constants);
-
-        symmetricBinding.setAlgorithmSuite(algorithmSuite);
-
-        symmetricBinding.setEncryptionToken(getEncryptionToken());
-        symmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-        symmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-        symmetricBinding.setLayout(getLayout());
-        symmetricBinding.setProtectionOrder(getProtectionOrder());
-        symmetricBinding.setProtectionToken(getProtectionToken());
-        symmetricBinding.setSignatureProtection(isSignatureProtection());
-        symmetricBinding.setSignatureToken(getSignatureToken());
-        symmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-        symmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
-        symmetricBinding.setTokenProtection(isTokenProtection());
-
-        symmetricBinding.setNormalized(true);
-        wrapper.addPolicyComponent(symmetricBinding);
-        exactlyOne.addPolicyComponent(wrapper);
-
-        policy.addPolicyComponent(exactlyOne);
-        return policy;
+        return this;
     }
 
+    public Policy getPolicy() {
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        
+        if (this.getProtectionToken() != null) {
+            all.addPolicyComponent(this.getProtectionToken());
+        }
+        if (this.getSignatureToken() != null) {
+            all.addPolicyComponent(this.getSignatureToken());
+        }
+        if (this.getEncryptionToken() != null) {
+            all.addPolicyComponent(this.getEncryptionToken());
+        }
+        if (isIncludeTimestamp()) {
+            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+        }
+        if (getLayout() != null) {
+            all.addPolicyComponent(getLayout());
+        }
+
+        
+        ea.addPolicyComponent(all);
+        PolicyComponent pc = p.normalize(true);
+        if (pc instanceof Policy) {
+            return (Policy)pc;
+        } else {
+            p = new Policy();
+            p.addPolicyComponent(pc);
+            return p;
+        }
+    }
+    
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
         String localname = getRealName().getLocalPart();

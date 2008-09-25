@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
+import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.ws.security.message.WSSecHeader;
 
@@ -115,7 +116,8 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         new TransportBindingHandler((TransportBinding)transport, saaj,
                                                     secHeader, aim, message).handleBinding();
                     } else if (transport instanceof SymmetricBinding) {
-                        //TODO
+                        new SymmetricBindingHandler((SymmetricBinding)transport, saaj,
+                                                     secHeader, aim, message).handleBinding();
                     } else {
                         new AsymmetricBindingHandler((AsymmetricBinding)transport, saaj,
                                                      secHeader, aim, message).handleBinding();

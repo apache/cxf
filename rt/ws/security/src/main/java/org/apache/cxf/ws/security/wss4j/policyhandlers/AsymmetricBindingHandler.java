@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.soap.SOAPException;
@@ -32,16 +31,12 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.RecipientToken;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
-import org.apache.cxf.ws.security.policy.model.Wss10;
-import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -55,7 +50,6 @@ import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -69,11 +63,6 @@ public class AsymmetricBindingHandler extends BindingBuilder {
     private String encryptedKeyId;
     private byte[] encryptedKeyValue;
     
-    private Map<Token, WSSecBase> endEncSuppTokMap;
-    private Map<Token, WSSecBase> endSuppTokMap;
-    private Map<Token, WSSecBase> sgndEndEncSuppTokMap;
-    private Map<Token, WSSecBase> sgndEndSuppTokMap;
-    
     public AsymmetricBindingHandler(AsymmetricBinding binding,
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
@@ -85,80 +74,38 @@ public class AsymmetricBindingHandler extends BindingBuilder {
     
     public void handleBinding() {
         WSSecTimestamp timestamp = createTimestamp();
-        timestamp = handleLayout(timestamp);
         
         if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
         } else {
             doSignBeforeEncrypt();
         }
-
-        if (timestamp != null) {
-            timestamp.prependToHeader(secHeader);
-        }
+        handleLayout(timestamp);
     }
 
 
-    private void addSupportingTokens(Vector<WSEncryptionPart> sigs) {
-        
-        SupportingToken sgndSuppTokens = 
-            (SupportingToken)findPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        
-        Map<Token, WSSecBase> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens);           
-        
-        SupportingToken endSuppTokens = 
-            (SupportingToken)findPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-        
-        endSuppTokMap = this.handleSupportingTokens(endSuppTokens);
-        
-        SupportingToken sgndEndSuppTokens 
-            = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens);
-        
-        SupportingToken sgndEncryptedSuppTokens 
-            = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
-        Map<Token, WSSecBase> sgndEncSuppTokMap 
-            = this.handleSupportingTokens(sgndEncryptedSuppTokens);
-        
-        SupportingToken endorsingEncryptedSuppTokens 
-            = (SupportingToken)findPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        endEncSuppTokMap 
-            = this.handleSupportingTokens(endorsingEncryptedSuppTokens);
-        
-        SupportingToken sgndEndEncSuppTokens 
-            = (SupportingToken)findPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        sgndEndEncSuppTokMap 
-            = this.handleSupportingTokens(sgndEndEncSuppTokens);
-        
-        SupportingToken supportingToks 
-            = (SupportingToken)findPolicy(SP12Constants.SUPPORTING_TOKENS);
-        this.handleSupportingTokens(supportingToks);
-        
-        SupportingToken encryptedSupportingToks 
-            = (SupportingToken)findPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
-        this.handleSupportingTokens(encryptedSupportingToks);
-    
-        //Setup signature parts
-        addSignatureParts(sigSuppTokMap, sigs);
-        addSignatureParts(sgndEncSuppTokMap, sigs);
-        addSignatureParts(sgndEndSuppTokMap, sigs);
-        addSignatureParts(sgndEndEncSuppTokMap, sigs);
 
-        //Add timestamp
-        if (timestampEl != null) {
-            Element el = timestampEl.getElement();
-            sigs.add(new WSEncryptionPart(addWsuIdToElement(el)));
-        }
-    }
     private void doSignBeforeEncrypt() {
         try {
             Vector<WSEncryptionPart> sigs = getSignedParts();
             if (isRequestor()) {
+                //Add timestamp
+                if (timestampEl != null) {
+                    Element el = timestampEl.getElement();
+                    sigs.add(new WSEncryptionPart(addWsuIdToElement(el)));
+                }
+
                 addSupportingTokens(sigs);
                 doSignature(sigs, null);
                 doEndorse();
             } else {
                 //confirm sig
+                //Add timestamp
+                if (timestampEl != null) {
+                    Element el = timestampEl.getElement();
+                    sigs.add(new WSEncryptionPart(addWsuIdToElement(el)));
+                }
+
                 addSignatureConfirmation(sigs);
                 doSignature(sigs, null);
             }
@@ -326,68 +273,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
         }
     }
     
-    protected void addSignatureConfirmation(Vector<WSEncryptionPart> sigParts) {
-        Wss10 wss10 = getWss10();
-        
-        if (!(wss10 instanceof Wss11) 
-            || !((Wss11)wss10).isRequireSignatureConfirmation()) {
-            //If we don't require sig confirmation simply go back :-)
-            return;
-        }
-        
-        Vector results = (Vector)message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS);
-        /*
-         * loop over all results gathered by all handlers in the chain. For each
-         * handler result get the various actions. After that loop we have all
-         * signature results in the signatureActions vector
-         */
-        Vector signatureActions = new Vector();
-        for (int i = 0; i < results.size(); i++) {
-            WSHandlerResult wshResult = (WSHandlerResult) results.get(i);
-
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.SIGN, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.ST_SIGNED, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.UT_SIGN, signatureActions);
-        }
-        
-        // prepare a SignatureConfirmation token
-        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
-        if (signatureActions.size() > 0) {
-            for (int i = 0; i < signatureActions.size(); i++) {
-                WSSecurityEngineResult wsr = (WSSecurityEngineResult) signatureActions
-                        .get(i);
-                byte[] sigVal = (byte[]) wsr.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
-                wsc.setSignatureValue(sigVal);
-                wsc.prepare(saaj.getSOAPPart());
-                wsc.prependToHeader(secHeader);
-                if (sigParts != null) {
-                    sigParts.add(new WSEncryptionPart(wsc.getId()));
-                }
-            }
-        } else {
-            //No Sig value
-            wsc.prepare(saaj.getSOAPPart());
-            wsc.prependToHeader(secHeader);
-            if (sigParts != null) {
-                sigParts.add(new WSEncryptionPart(wsc.getId()));
-            }
-        }
-    }
-
-    private void doEndorse() {
-        // Adding the endorsing encrypted supporting tokens to endorsing supporting tokens
-        endSuppTokMap.putAll(endEncSuppTokMap);
-        // Do endorsed signatures
-        doEndorsedSignatures(endSuppTokMap, abinding.isTokenProtection());
-
-        //Adding the signed endorsed encrypted tokens to signed endorsed supporting tokens
-        sgndEndSuppTokMap.putAll(sgndEndEncSuppTokMap);
-        // Do signed endorsing signatures
-        doEndorsedSignatures(sgndEndSuppTokMap, abinding.isTokenProtection());
-    }    
+   
     
     private WSSecBase doEncryption(TokenWrapper recToken,
                                     Vector<WSEncryptionPart> encrParts,
@@ -428,7 +314,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     setKeyIdentifierType(encr, recToken, encrToken);
                     
                     encr.setDocument(saaj.getSOAPPart());
-                    setEncryptionUser(encr, encrToken, false);
+                    setEncryptionUser(encr, recToken, false);
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
                     encr.setKeyEncAlgo(algorithmSuite.getAsymmetricKeyWrap());
                     

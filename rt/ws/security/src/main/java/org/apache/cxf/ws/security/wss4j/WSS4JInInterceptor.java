@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -25,7 +26,10 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
@@ -42,13 +46,17 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -335,6 +343,31 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         return action;
     }
+    
+    private class TokenStoreCallbackHandler implements CallbackHandler {
+        private CallbackHandler internal;
+        private TokenStore store;
+        public TokenStoreCallbackHandler(CallbackHandler in,
+                                         TokenStore st) {
+            internal = in;
+            store = st;
+        }
+        
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (int i = 0; i < callbacks.length; i++) {
+                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+                String id = pc.getIdentifer();
+                for (SecurityToken token : store.getValidTokens()) {
+                    if (id.equals(token.getSHA1())) {
+                        pc.setKey(token.getSecret());
+                        return;
+                    }
+                }
+            }
+            internal.handle(callbacks);
+        }
+        
+    }
 
     private CallbackHandler getCallback(RequestData reqData, int doAction) throws WSSecurityException {
         /*
@@ -357,6 +390,15 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             if (cbHandler == null) {
                 cbHandler = getPasswordCB(reqData);
+            }
+        }
+        if (cbHandler != null) {
+            Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
+            if (ep != null && ep.getEndpointInfo() != null) {
+                TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
+                if (store != null) {
+                    return new TokenStoreCallbackHandler(cbHandler, store);
+                }
             }
         }
         return cbHandler;

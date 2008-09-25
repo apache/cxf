@@ -50,7 +50,6 @@ public class TransportBindingHandler extends BindingBuilder {
     public void handleBinding() {
         Collection<AssertionInfo> ais;
         WSSecTimestamp timestamp = createTimestamp();
-        timestamp = handleLayout(timestamp);
         
         ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         if (ais != null) {
@@ -65,9 +64,7 @@ public class TransportBindingHandler extends BindingBuilder {
             }
         }
 
-        if (timestamp != null) {
-            timestamp.prependToHeader(secHeader);
-        }
+        handleLayout(timestamp);
     }
 
 }

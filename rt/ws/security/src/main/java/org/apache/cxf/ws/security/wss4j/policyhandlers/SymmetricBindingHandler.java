@@ -1,0 +1,609 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.cxf.ws.security.wss4j.policyhandlers;
+
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Vector;
+
+import javax.xml.soap.SOAPMessage;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.SP11Constants;
+import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
+import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
+import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
+import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.TokenWrapper;
+import org.apache.cxf.ws.security.policy.model.X509Token;
+import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.WSSecBase;
+import org.apache.ws.security.message.WSSecDKEncrypt;
+import org.apache.ws.security.message.WSSecDKSign;
+import org.apache.ws.security.message.WSSecEncrypt;
+import org.apache.ws.security.message.WSSecEncryptedKey;
+import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.message.WSSecTimestamp;
+import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.Base64;
+
+/**
+ * 
+ */
+public class SymmetricBindingHandler extends BindingBuilder {
+    SymmetricBinding sbinding;
+    TokenStore tokenStore;
+    
+    public SymmetricBindingHandler(SymmetricBinding binding,
+                                    SOAPMessage saaj,
+                                    WSSecHeader secHeader,
+                                    AssertionInfoMap aim,
+                                    SoapMessage message) {
+        super(binding, saaj, secHeader, aim, message);
+        this.sbinding = binding;
+        tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+        if (tokenStore == null) {
+            tokenStore = new MemoryTokenStore();
+            message.getExchange().get(Endpoint.class).getEndpointInfo()
+                .setProperty(TokenStore.class.getName(), tokenStore);
+        }
+    }
+    
+    private TokenWrapper getSignatureToken() {
+        if (sbinding.getProtectionToken() != null) {
+            return sbinding.getProtectionToken();
+        }
+        return sbinding.getSignatureToken();
+    }
+    private TokenWrapper getEncryptionToken() {
+        if (sbinding.getProtectionToken() != null) {
+            return sbinding.getProtectionToken();
+        }
+        return sbinding.getEncryptionToken();
+    }
+    
+    public void handleBinding() {
+        WSSecTimestamp timestamp = createTimestamp();
+        
+        if (isRequestor()) {
+            //Setup required tokens
+            initializeTokens();
+        }
+        
+        if (sbinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
+//            doEncryptBeforeSign();
+            System.err.println("encrypt before sign, not yet");
+        } else {
+            doSignBeforeEncrypt();
+        }
+
+        handleLayout(timestamp);
+    }
+    
+    
+    private void initializeTokens()  {
+        //Setting up encryption token and signature token
+        Token sigTok = getSignatureToken().getToken();
+        //Token encrTok = getEncryptionToken().getToken();
+        
+        if (sigTok instanceof IssuedToken) {
+            //IssuedToken issuedToken = (IssuedToken)sigTok;
+            
+            //REVISIT - WS-Trust STS token retrieval
+        } else if (sigTok instanceof SecureConversationToken) {
+            //REVISIT - SecureConversation token retrieval
+        }
+    }
+    
+    
+
+    private void doSignBeforeEncrypt() {
+        TokenWrapper sigTokenWrapper = getSignatureToken();
+        Token sigToken = sigTokenWrapper.getToken();
+        
+        
+        String sigTokId = null;
+        Element sigTokElem = null;
+        
+        try {
+            if (sigToken != null) {
+                if (sigToken instanceof SecureConversationToken) {
+                    //sigTokId = getSecConvTokenId();
+                } else if (sigToken instanceof IssuedToken) {
+                    //sigTokId = getIssuedSignatureTokenId();
+                } else if (sigToken instanceof X509Token) {
+                    if (isRequestor()) {
+                        sigTokId = setupEncryptedKey(sigTokenWrapper, sigToken);
+                    } else {
+                        sigTokId = getEncryptedKey();
+                    }
+                }
+            } else {
+                policyNotAsserted(sbinding, "No signature token");
+                return;
+            }
+            
+            if (StringUtils.isEmpty(sigTokId)) {
+                policyNotAsserted(sigTokenWrapper, "No signature token id");
+                return;
+            } else {
+                policyAsserted(sigTokenWrapper);
+            }
+            
+            SecurityToken sigTok = tokenStore.getToken(sigTokId);
+            if (sigTok == null) {
+                //REVISIT - no token?
+            }
+            if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == sigToken.getInclusion()
+                || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == sigToken.getInclusion()
+                || (isRequestor() 
+                    && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                        == sigToken.getInclusion())) {
+                sigTokElem = appendChildToSecHeader(sigTok.getToken());
+            } else if (isRequestor() && sigToken instanceof X509Token) {
+                sigTokElem = appendChildToSecHeader(sigTok.getToken());
+            }
+        
+        
+            Vector<WSEncryptionPart> sigs = getSignedParts();
+            //Add timestamp
+            if (timestampEl != null) {
+                Element el = timestampEl.getElement();
+                sigs.add(new WSEncryptionPart(addWsuIdToElement(el)));
+            }
+
+            if (isRequestor()) {
+                addSupportingTokens(sigs);
+                signatures.add(doSignature(sigs, sigTokenWrapper, sigToken, sigTok, sigTokElem));
+                doEndorse();
+            } else {
+                //confirm sig
+                addSignatureConfirmation(sigs);
+                doSignature(sigs, sigTokenWrapper, sigToken, sigTok, null);
+            }
+
+            //REVIST - what to do with these policies?
+            policyAsserted(SP11Constants.TRUST_10);
+            policyAsserted(SP12Constants.TRUST_13);
+            
+            
+            //Encryption
+            TokenWrapper encrTokenWrapper = getEncryptionToken();
+            Token encrToken = encrTokenWrapper.getToken();
+            SecurityToken encrTok = null;
+            Element encrElem = null;
+            if (sigToken.equals(encrToken)) {
+                //Use the same token
+                encrTok = sigTok;
+                encrElem = sigTokElem;
+            } else {
+                String encrTokId = null;
+                //REVISIT - issued token from trust? 
+                encrTok = tokenStore.getToken(encrTokId);
+                
+                if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == encrToken.getInclusion()
+                    || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == encrToken.getInclusion()
+                    || (isRequestor() 
+                            && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                            == encrToken.getInclusion())) {
+                    Element encrTokElem = (Element)encrTok.getToken();
+                    
+                    //Add the encrToken element before the sigToken element
+                    secHeader.getSecurityHeader().insertBefore(encrTokElem, sigTokElem);
+                }
+            }
+            
+            Vector<WSEncryptionPart> enc = getEncryptedParts();
+            
+            //Check for signature protection
+            if (sbinding.isSignatureProtection() && mainSigId != null) {
+                enc.add(new WSEncryptionPart(mainSigId, "Element"));
+            }
+            
+            if (isRequestor()) {
+                for (String id : encryptedTokensIdList) {
+                    enc.add(new WSEncryptionPart(id, "Element"));
+                }
+            }
+            doEncryption(encrTokenWrapper,
+                         encrTok,
+                         encrElem,
+                         enc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //REVISIT!!
+        }
+    }
+    private WSSecBase doEncryption(TokenWrapper recToken,
+                                   SecurityToken encrTok,
+                                   Element encrElem,
+                                   Vector<WSEncryptionPart> encrParts) {
+        //Do encryption
+        if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
+            Token encrToken = recToken.getToken();
+            policyAsserted(recToken);
+            policyAsserted(encrToken);
+            AlgorithmSuite algorithmSuite = sbinding.getAlgorithmSuite();
+            if (encrToken.isDerivedKeys()) {
+                try {
+                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+                    
+                    if (encrElem != null && encrTok.getAttachedReference() != null) {
+                        dkEncr.setExternalKey(encrTok.getSecret(),
+                                              (Element)saaj.getSOAPPart()
+                                                  .importNode((Element) encrTok.getAttachedReference(),
+                                        true));
+                    } else if (encrTok.getUnattachedReference() != null) {
+                        dkEncr.setExternalKey(encrTok.getSecret(), (Element)saaj.getSOAPPart()
+                                .importNode((Element) encrTok.getUnattachedReference(),
+                                        true));
+                    } else if (!isRequestor() && encrToken.isDerivedKeys()) { 
+                        // If the Encrypted key used to create the derived key is not
+                        // attached use key identifier as defined in WSS1.1 section
+                        // 7.7 Encrypted Key reference
+                        SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
+                        if (encrTok.getSHA1() != null) {
+                            tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
+                        }
+                        dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
+                    } else {
+                        dkEncr.setExternalKey(encrTok.getSecret(), encrTok.getId());
+                    }
+                    
+                    if (encrTok.getSHA1() != null) {
+                        dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
+                                + WSConstants.ENC_KEY_VALUE_TYPE);
+                    }
+                    
+                    dkEncr.setSymmetricEncAlgorithm(sbinding.getAlgorithmSuite().getEncryption());
+                    dkEncr.setDerivedKeyLength(sbinding.getAlgorithmSuite()
+                                                   .getEncryptionDerivedKeyLength() / 8);
+                    dkEncr.prepare(saaj.getSOAPPart());
+                    Element encrDKTokenElem = null;
+                    encrDKTokenElem = dkEncr.getdktElement();
+                    if (encrElem != null) {
+                        insertAfter(encrDKTokenElem, secHeader.getSecurityHeader(), encrElem);
+                    } else if (timestampEl != null) {
+                        insertAfter(encrDKTokenElem, secHeader.getSecurityHeader(), timestampEl.getElement());
+                    } else {
+                        dkEncr.prependDKElementToHeader(secHeader);
+                    }
+                    
+                    Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+                    insertAfter(refList, secHeader.getSecurityHeader(), encrDKTokenElem);
+                    return dkEncr;
+                } catch (Exception e) {
+                    policyNotAsserted(recToken, e);
+                }
+            } else {
+                try {
+                    WSSecEncrypt encr = new WSSecEncrypt();
+                    String encrTokId = encrTok.getId();
+                    if (encrTokId.startsWith("#")) {
+                        encrTokId = encrTokId.substring(1);
+                    }
+                    encr.setEncKeyId(encrTokId);
+                    encr.setEphemeralKey(encrTok.getSecret());
+                    setEncryptionUser(encr, recToken, false);
+                   
+                    encr.setDocument(saaj.getSOAPPart());
+                    encr.setEncryptSymmKey(false);
+                    encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
+                    
+                    if (!isRequestor()) {
+                        encr.setUseKeyIdentifier(true);
+                        encr.setCustomReferenceValue(encrTok.getSHA1());
+                        encr.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+                    }
+
+                    
+                    encr.prepare(saaj.getSOAPPart(),
+                                 getEncryptionCrypto(recToken));
+                   
+                    if (encr.getBSTTokenId() != null) {
+                        encr.appendBSTElementToHeader(secHeader);
+                    }
+                   
+                   
+                    Element refList = encr.encryptForExternalRef(null, encrParts);
+                    insertAfter(refList, secHeader.getSecurityHeader(), encrElem);
+
+                    return encr;
+                } catch (WSSecurityException e) {
+                    policyNotAsserted(recToken, e.getMessage());
+                }    
+            }
+        }
+        return null;
+    }    
+    
+    private byte[] doSignatureDK(Vector<WSEncryptionPart> sigs,
+                               TokenWrapper policyTokenWrapper, 
+                               Token policyToken, 
+                               SecurityToken tok,
+                               Element appendAfter) throws WSSecurityException {
+        Document doc = saaj.getSOAPPart();
+        WSSecDKSign dkSign = new WSSecDKSign();
+        
+        //Check for whether the token is attached in the message or not
+        boolean attached = false;
+        
+        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == policyToken.getInclusion()
+            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == policyToken.getInclusion()
+            || (isRequestor() && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                    == policyToken.getInclusion())) {
+            attached = true;
+        }
+        
+        // Setting the AttachedReference or the UnattachedReference according to the flag
+        Element ref;
+        if (attached) {
+            ref = tok.getAttachedReference();
+        } else {
+            ref = tok.getUnattachedReference();
+        }
+        
+        if (ref != null) {
+            dkSign.setExternalKey(tok.getSecret(), 
+                                  (Element)saaj.getSOAPPart().importNode(ref, true));
+        } else if (!isRequestor() && policyToken.isDerivedKeys()) { 
+            // If the Encrypted key used to create the derived key is not
+            // attached use key identifier as defined in WSS1.1 section
+            // 7.7 Encrypted Key reference
+            SecurityTokenReference tokenRef = new SecurityTokenReference(doc);
+            if (tok.getSHA1() != null) {
+                tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
+            }
+            dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
+        } else {
+            dkSign.setExternalKey(tok.getSecret(), tok.getId());
+        }
+
+        //Set the algo info
+        dkSign.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
+        dkSign.setDerivedKeyLength(sbinding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
+        if (tok.getSHA1() != null) {
+            //Set the value type of the reference
+            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
+                + WSConstants.ENC_KEY_VALUE_TYPE);
+        }
+        
+        try {
+            dkSign.prepare(doc, secHeader);
+        } catch (ConversationException e) {
+            throw new WSSecurityException(e.getMessage(), e);
+        }
+        
+        if (sbinding.isTokenProtection()) {
+            String sigTokId = tok.getId();
+            if (sigTokId.startsWith("#")) {
+                sigTokId = sigTokId.substring(1);
+            }
+            sigs.add(new WSEncryptionPart(sigTokId));
+        }
+        
+        dkSign.setParts(sigs);
+        dkSign.addReferencesToSign(sigs, secHeader);
+        
+        //Do signature
+        dkSign.computeSignature();
+
+        //Add elements to header
+        Element el = dkSign.getdktElement();
+        if (appendAfter != null) {
+            insertAfter(el,
+                        secHeader.getSecurityHeader(),
+                        appendAfter);                    
+        } else {
+            dkSign.prependSigToHeader(secHeader);
+        }
+        insertAfter(dkSign.getSignatureElement(),
+                    secHeader.getSecurityHeader(),
+                    el);                    
+        this.mainSigId = addWsuIdToElement(dkSign.getSignatureElement());
+
+        return dkSign.getSignatureValue();        
+    }
+    private byte[] doSignature(Vector<WSEncryptionPart> sigs,
+                             TokenWrapper policyTokenWrapper, 
+                             Token policyToken, 
+                             SecurityToken tok,
+                             Element appendAfter) throws WSSecurityException {
+        if (policyToken.isDerivedKeys()) {
+            return doSignatureDK(sigs, policyTokenWrapper, policyToken, tok, appendAfter);
+        } else {
+            WSSecSignature sig = new WSSecSignature();
+            // If a EncryptedKeyToken is used, set the correct value type to
+            // be used in the wsse:Reference in ds:KeyInfo
+            if (policyToken instanceof X509Token) {
+                if (isRequestor()) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                          + WSConstants.ENC_KEY_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+                } else {
+                    //the tok has to be an EncryptedKey token
+                    sig.setEncrKeySha1value(tok.getSHA1());
+                    sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+                }
+            } else {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                      + WSConstants.SAML_ASSERTION_ID);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+            }
+            
+            String sigTokId; 
+            
+            if (policyToken instanceof SecureConversationToken) {
+                Element ref = tok.getAttachedReference();
+                if (ref == null) {
+                    ref = tok.getUnattachedReference();
+                }
+                
+                if (ref != null) {
+                    sigTokId = MemoryTokenStore.getIdFromSTR(ref);
+                } else {
+                    sigTokId = tok.getId();
+                }
+            } else {
+                sigTokId = tok.getId();
+            }
+                           
+            if (sigTokId.startsWith("#")) {
+                sigTokId = sigTokId.substring(1);
+            }
+            
+            sig.setCustomTokenId(sigTokId);
+            sig.setSecretKey(tok.getSecret());
+            sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getAsymmetricSignature());
+            sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
+            sig.prepare(saaj.getSOAPPart(), getSignatureCrypto(policyTokenWrapper),
+                        secHeader);
+
+            sig.setParts(sigs);
+            sig.addReferencesToSign(sigs, secHeader);
+
+            //Do signature
+            sig.computeSignature();
+
+            if (appendAfter != null) {
+                insertAfter(sig.getSignatureElement(),
+                            secHeader.getSecurityHeader(),
+                            appendAfter);                    
+            } else {
+                sig.appendToHeader(secHeader);
+            }
+
+            this.mainSigId = addWsuIdToElement(sig.getSignatureElement());
+            return sig.getSignatureValue();
+        }
+    }
+
+    private String setupEncryptedKey(TokenWrapper wrapper, Token sigToken) throws WSSecurityException {
+        WSSecEncryptedKey encrKey = this.getEncryptedKeyBuilder(wrapper, sigToken);
+        String id = encrKey.getId();
+        byte[] secret = encrKey.getEphemeralKey();
+
+        Calendar created = Calendar.getInstance();
+        Calendar expires = Calendar.getInstance();
+        expires.setTimeInMillis(System.currentTimeMillis() + 300000);
+        SecurityToken tempTok = new SecurityToken(
+                        id, 
+                        encrKey.getEncryptedKeyElement(),
+                        created, 
+                        expires);
+        
+        
+        tempTok.setSecret(secret);
+        
+        // Set the SHA1 value of the encrypted key, this is used when the encrypted
+        // key is referenced via a key identifier of type EncryptedKeySHA1
+        tempTok.setSHA1(getSHA1(encrKey.getEncryptedEphemeralKey()));
+        
+        tokenStore.add(tempTok);
+        
+        String bstTokenId = encrKey.getBSTTokenId();
+        //If direct ref is used to refer to the cert
+        //then add the cert to the sec header now
+        if (bstTokenId != null && bstTokenId.length() > 0) {
+            encrKey.appendBSTElementToHeader(secHeader);
+        }
+        return id;
+    }
+    
+    private String getEncryptedKey() {
+        
+        Vector results = (Vector)message.getExchange().getInMessage()
+            .get(WSHandlerConstants.RECV_RESULTS);
+        
+        for (int i = 0; i < results.size(); i++) {
+            WSHandlerResult rResult =
+                    (WSHandlerResult) results.get(i);
+
+            Vector wsSecEngineResults = rResult.getResults();
+            
+            for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                WSSecurityEngineResult wser =
+                        (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                if (actInt.intValue() == WSConstants.ENCR
+                    && wser.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_ID) != null
+                    && ((String)wser.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_ID)).length() != 0) {
+                        
+                    String encryptedKeyID = (String)wser.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_ID);
+                            
+                    Calendar created = Calendar.getInstance();
+                    Calendar expires = Calendar.getInstance();
+                    expires.setTimeInMillis(System.currentTimeMillis() + 300000);
+                    SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
+                    tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY));
+                    tempTok.setSHA1(getSHA1((byte[])wser
+                                            .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
+                    tokenStore.add(tempTok);
+                    
+                    return encryptedKeyID;
+                }
+            }
+        }
+        return null;
+    }
+    
+    private String getSHA1(byte[] input) {
+        MessageDigest sha;
+        try {
+            sha = MessageDigest.getInstance("SHA-1");
+            sha.reset();
+            sha.update(input);
+            byte[] data = sha.digest();
+            return Base64.encode(data);
+        } catch (NoSuchAlgorithmException e) {
+            //REVISIT
+        }
+        return null;
+    }
+    public Element appendChildToSecHeader(Element elem) {
+        Element secHeaderElem = secHeader.getSecurityHeader();
+        Node node = secHeaderElem.getOwnerDocument()
+            .importNode(elem, true);
+        return (Element)secHeaderElem.appendChild(node);
+    }
+
+}

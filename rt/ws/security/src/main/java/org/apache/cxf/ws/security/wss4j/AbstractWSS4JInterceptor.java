@@ -43,11 +43,12 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
+import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.ws.security.WSConstants;
@@ -164,6 +165,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }  
     
     protected void policyAsserted(AssertionInfoMap aim, PolicyAssertion assertion) {
+        if (assertion == null) {
+            return;
+        }
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
         if (ais != null) {
@@ -222,7 +226,89 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         } 
         return action + " " + val;
     }
-    
+    boolean assertPolicy(AssertionInfoMap aim, QName q) {
+        Collection<AssertionInfo> ais = aim.get(q);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    String assertAsymetricBinding(AssertionInfoMap aim, String action, SoapMessage message) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                AsymmetricBinding abinding = (AsymmetricBinding)ai.getAssertion();
+                if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
+                    action = addToAction(action, "Signature", true);
+                    action = addToAction(action, "Encrypt", true);
+                } else {
+                    action = addToAction(action, "Encrypt", true);
+                    action = addToAction(action, "Signature", true);
+                }
+                Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+                Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+                if (isRequestor(message)) {
+                    message.put("SignaturePropRefId", "SigRefId");
+                    message.put("SigRefId", getProps(e, message));
+                    message.put("decryptionPropRefId", "DecRefId");
+                    message.put("DecRefId", getProps(s, message));
+                } else {
+                    message.put("SignaturePropRefId", "SigRefId");
+                    message.put("SigRefId", getProps(s, message));
+                    message.put("decryptionPropRefId", "DecRefId");
+                    message.put("DecRefId", getProps(e, message));                        
+                }
+                ai.setAsserted(true);
+                policyAsserted(aim, abinding.getInitiatorToken());
+                policyAsserted(aim, abinding.getRecipientToken());
+                policyAsserted(aim, abinding.getInitiatorToken().getToken());
+                policyAsserted(aim, abinding.getRecipientToken().getToken());
+                policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
+                policyAsserted(aim, SP12Constants.SIGNED_PARTS);
+            }
+        }
+     
+        return action;
+    }
+    String assertSymetricBinding(AssertionInfoMap aim, String action, SoapMessage message) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                SymmetricBinding abinding = (SymmetricBinding)ai.getAssertion();
+                if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
+                    action = addToAction(action, "Signature", true);
+                    action = addToAction(action, "Encrypt", true);
+                } else {
+                    action = addToAction(action, "Encrypt", true);
+                    action = addToAction(action, "Signature", true);
+                }
+                Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+                Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+                if (isRequestor(message)) {
+                    message.put("SignaturePropRefId", "SigRefId");
+                    message.put("SigRefId", getProps(e, message));
+                    message.put("decryptionPropRefId", "DecRefId");
+                    message.put("DecRefId", getProps(s, message));
+                } else {
+                    message.put("SignaturePropRefId", "SigRefId");
+                    message.put("SigRefId", getProps(s, message));
+                    message.put("decryptionPropRefId", "DecRefId");
+                    message.put("DecRefId", getProps(e, message));                        
+                }
+                ai.setAsserted(true);
+                policyAsserted(aim, abinding.getEncryptionToken());
+                policyAsserted(aim, abinding.getSignatureToken());
+                policyAsserted(aim, abinding.getProtectionToken());
+                policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
+                policyAsserted(aim, SP12Constants.SIGNED_PARTS);
+            }
+        }
+        return action;
+    }
+
     protected void checkPolicies(SoapMessage message, RequestData data) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
@@ -231,65 +317,14 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             action = "";
         }
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    if (!action.contains(WSHandlerConstants.TIMESTAMP)) {
-                        action = addToAction(action, WSHandlerConstants.TIMESTAMP, true);
-                    }
-                    ai.setAsserted(true);
-                }                    
+            if (assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP)) {
+                action = addToAction(action, WSHandlerConstants.TIMESTAMP, true);
             }
-            ais = aim.get(SP12Constants.LAYOUT);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    Layout lay = (Layout)ai.getAssertion();
-                    //wss4j can only do "Lax"
-                    if (SPConstants.Layout.Lax == lay.getValue()) {
-                        ai.setAsserted(true);
-                    }
-                }                    
-            }
-            ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    ai.setAsserted(true);
-                }                    
-            }
-            ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    AsymmetricBinding abinding = (AsymmetricBinding)ai.getAssertion();
-                    if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-                        action = addToAction(action, "Signature", true);
-                        action = addToAction(action, "Encrypt", true);
-                    } else {
-                        action = addToAction(action, "Encrypt", true);
-                        action = addToAction(action, "Signature", true);
-                    }
-                    Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
-                    Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
-                    if (isRequestor(message)) {
-                        message.put("SignaturePropRefId", "SigRefId");
-                        message.put("SigRefId", getProps(e, message));
-                        message.put("decryptionPropRefId", "DecRefId");
-                        message.put("DecRefId", getProps(s, message));
-                    } else {
-                        message.put("SignaturePropRefId", "SigRefId");
-                        message.put("SigRefId", getProps(s, message));
-                        message.put("decryptionPropRefId", "DecRefId");
-                        message.put("DecRefId", getProps(e, message));                        
-                    }
-                    ai.setAsserted(true);
-                    policyAsserted(aim, abinding.getInitiatorToken());
-                    policyAsserted(aim, abinding.getRecipientToken());
-                    policyAsserted(aim, abinding.getInitiatorToken().getToken());
-                    policyAsserted(aim, abinding.getRecipientToken().getToken());
-                    policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
-                    policyAsserted(aim, SP12Constants.SIGNED_PARTS);
-                }
-            }
-            ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            assertPolicy(aim, SP12Constants.LAYOUT);
+            assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
+            action = assertAsymetricBinding(aim, action, message);
+            action = assertSymetricBinding(aim, action, message);
+            Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
             if (ais != null) {
                 for (AssertionInfo ai : ais) {
                     SupportingToken sp = (SupportingToken)ai.getAssertion();
@@ -297,18 +332,10 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     ai.setAsserted(true);
                 }                    
             }
-            ais = aim.get(SP12Constants.WSS10);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    ai.setAsserted(true);
-                }                    
-            }
-            ais = aim.get(SP12Constants.WSS11);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    ai.setAsserted(true);
-                }                    
-            }
+            assertPolicy(aim, SP12Constants.WSS10);
+            assertPolicy(aim, SP12Constants.WSS11);
+            assertPolicy(aim, SP12Constants.TRUST_13);
+            assertPolicy(aim, SP11Constants.TRUST_10);
             message.put(WSHandlerConstants.ACTION, action.trim());
         }
     }

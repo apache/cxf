@@ -84,7 +84,8 @@ public class SymmetricBindingBuilder implements AssertionBuilder {
             assertion = (Assertion)iterator.next();
             name = assertion.getName();
 
-            if (!consts.getNamespace().equals(name.getNamespaceURI())) {
+            if (!consts.getNamespace().equals(name.getNamespaceURI())
+                && !SP12Constants.INSTANCE.getNamespace().equals(name.getNamespaceURI())) {
                 continue;
             }
 
