@@ -29,7 +29,6 @@ import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
@@ -103,6 +102,7 @@ public class SymmetricBindingHandler extends BindingBuilder {
     
     public void handleBinding() {
         WSSecTimestamp timestamp = createTimestamp();
+        handleLayout(timestamp);
         
         if (isRequestor()) {
             //Setup required tokens
@@ -116,7 +116,6 @@ public class SymmetricBindingHandler extends BindingBuilder {
             doSignBeforeEncrypt();
         }
 
-        handleLayout(timestamp);
     }
     
     
@@ -178,9 +177,16 @@ public class SymmetricBindingHandler extends BindingBuilder {
                 || (isRequestor() 
                     && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
                         == sigToken.getInclusion())) {
-                sigTokElem = appendChildToSecHeader(sigTok.getToken());
+                
+                Element el = sigTok.getToken();
+                sigTokElem = (Element)secHeader.getSecurityHeader().getOwnerDocument()
+                        .importNode(el, true);
+                this.addEncyptedKeyElement((Element)sigTokElem);
             } else if (isRequestor() && sigToken instanceof X509Token) {
-                sigTokElem = appendChildToSecHeader(sigTok.getToken());
+                Element el = sigTok.getToken();
+                sigTokElem = (Element)secHeader.getSecurityHeader().getOwnerDocument()
+                        .importNode(el, true);
+                this.addEncyptedKeyElement((Element)sigTokElem);
             }
         
         
@@ -193,12 +199,13 @@ public class SymmetricBindingHandler extends BindingBuilder {
 
             if (isRequestor()) {
                 addSupportingTokens(sigs);
-                signatures.add(doSignature(sigs, sigTokenWrapper, sigToken, sigTok, sigTokElem));
+                signatures.add(doSignature(sigs, sigTokenWrapper, sigToken, sigTok));
                 doEndorse();
             } else {
                 //confirm sig
+                assertSupportingTokens(sigs);
                 addSignatureConfirmation(sigs);
-                doSignature(sigs, sigTokenWrapper, sigToken, sigTok, null);
+                doSignature(sigs, sigTokenWrapper, sigToken, sigTok);
             }
 
             //REVIST - what to do with these policies?
@@ -276,7 +283,7 @@ public class SymmetricBindingHandler extends BindingBuilder {
                         dkEncr.setExternalKey(encrTok.getSecret(), (Element)saaj.getSOAPPart()
                                 .importNode((Element) encrTok.getUnattachedReference(),
                                         true));
-                    } else if (!isRequestor() && encrToken.isDerivedKeys()) { 
+                    } else if (!isRequestor()) { 
                         // If the Encrypted key used to create the derived key is not
                         // attached use key identifier as defined in WSS1.1 section
                         // 7.7 Encrypted Key reference
@@ -300,16 +307,9 @@ public class SymmetricBindingHandler extends BindingBuilder {
                     dkEncr.prepare(saaj.getSOAPPart());
                     Element encrDKTokenElem = null;
                     encrDKTokenElem = dkEncr.getdktElement();
-                    if (encrElem != null) {
-                        insertAfter(encrDKTokenElem, secHeader.getSecurityHeader(), encrElem);
-                    } else if (timestampEl != null) {
-                        insertAfter(encrDKTokenElem, secHeader.getSecurityHeader(), timestampEl.getElement());
-                    } else {
-                        dkEncr.prependDKElementToHeader(secHeader);
-                    }
-                    
+                    addDerivedKeyElement(encrDKTokenElem);
                     Element refList = dkEncr.encryptForExternalRef(null, encrParts);
-                    insertAfter(refList, secHeader.getSecurityHeader(), encrDKTokenElem);
+                    this.addDerivedKeyElement(refList);
                     return dkEncr;
                 } catch (Exception e) {
                     policyNotAsserted(recToken, e);
@@ -340,12 +340,12 @@ public class SymmetricBindingHandler extends BindingBuilder {
                                  getEncryptionCrypto(recToken));
                    
                     if (encr.getBSTTokenId() != null) {
-                        encr.appendBSTElementToHeader(secHeader);
+                        encr.prependBSTElementToHeader(secHeader);
                     }
                    
                    
                     Element refList = encr.encryptForExternalRef(null, encrParts);
-                    insertAfter(refList, secHeader.getSecurityHeader(), encrElem);
+                    this.addDerivedKeyElement(refList);
 
                     return encr;
                 } catch (WSSecurityException e) {
@@ -359,8 +359,7 @@ public class SymmetricBindingHandler extends BindingBuilder {
     private byte[] doSignatureDK(Vector<WSEncryptionPart> sigs,
                                TokenWrapper policyTokenWrapper, 
                                Token policyToken, 
-                               SecurityToken tok,
-                               Element appendAfter) throws WSSecurityException {
+                               SecurityToken tok) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign();
         
@@ -429,16 +428,8 @@ public class SymmetricBindingHandler extends BindingBuilder {
 
         //Add elements to header
         Element el = dkSign.getdktElement();
-        if (appendAfter != null) {
-            insertAfter(el,
-                        secHeader.getSecurityHeader(),
-                        appendAfter);                    
-        } else {
-            dkSign.prependSigToHeader(secHeader);
-        }
-        insertAfter(dkSign.getSignatureElement(),
-                    secHeader.getSecurityHeader(),
-                    el);                    
+        addDerivedKeyElement(el);  
+        insertBeforeBottomUp(dkSign.getSignatureElement());
         this.mainSigId = addWsuIdToElement(dkSign.getSignatureElement());
 
         return dkSign.getSignatureValue();        
@@ -446,10 +437,9 @@ public class SymmetricBindingHandler extends BindingBuilder {
     private byte[] doSignature(Vector<WSEncryptionPart> sigs,
                              TokenWrapper policyTokenWrapper, 
                              Token policyToken, 
-                             SecurityToken tok,
-                             Element appendAfter) throws WSSecurityException {
+                             SecurityToken tok) throws WSSecurityException {
         if (policyToken.isDerivedKeys()) {
-            return doSignatureDK(sigs, policyTokenWrapper, policyToken, tok, appendAfter);
+            return doSignatureDK(sigs, policyTokenWrapper, policyToken, tok);
         } else {
             WSSecSignature sig = new WSSecSignature();
             // If a EncryptedKeyToken is used, set the correct value type to
@@ -495,8 +485,13 @@ public class SymmetricBindingHandler extends BindingBuilder {
             sig.setSecretKey(tok.getSecret());
             sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getAsymmetricSignature());
             sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
-            sig.prepare(saaj.getSOAPPart(), getSignatureCrypto(policyTokenWrapper),
+            if (sbinding.getProtectionToken() != null) {
+                sig.prepare(saaj.getSOAPPart(), getEncryptionCrypto(sbinding.getProtectionToken()),
                         secHeader);
+            } else {
+                sig.prepare(saaj.getSOAPPart(), getSignatureCrypto(policyTokenWrapper),
+                            secHeader);
+            }
 
             sig.setParts(sigs);
             sig.addReferencesToSign(sigs, secHeader);
@@ -504,15 +499,9 @@ public class SymmetricBindingHandler extends BindingBuilder {
             //Do signature
             sig.computeSignature();
 
-            if (appendAfter != null) {
-                insertAfter(sig.getSignatureElement(),
-                            secHeader.getSecurityHeader(),
-                            appendAfter);                    
-            } else {
-                sig.appendToHeader(secHeader);
-            }
-
-            this.mainSigId = addWsuIdToElement(sig.getSignatureElement());
+            Element mainSigElement = sig.getSignatureElement();
+            insertBeforeBottomUp(mainSigElement);
+            mainSigId = addWsuIdToElement(mainSigElement);
             return sig.getSignatureValue();
         }
     }
@@ -544,7 +533,7 @@ public class SymmetricBindingHandler extends BindingBuilder {
         //If direct ref is used to refer to the cert
         //then add the cert to the sec header now
         if (bstTokenId != null && bstTokenId.length() > 0) {
-            encrKey.appendBSTElementToHeader(secHeader);
+            encrKey.prependBSTElementToHeader(secHeader);
         }
         return id;
     }
@@ -598,12 +587,6 @@ public class SymmetricBindingHandler extends BindingBuilder {
             //REVISIT
         }
         return null;
-    }
-    public Element appendChildToSecHeader(Element elem) {
-        Element secHeaderElem = secHeader.getSecurityHeader();
-        Node node = secHeaderElem.getOwnerDocument()
-            .importNode(elem, true);
-        return (Element)secHeaderElem.appendChild(node);
     }
 
 }

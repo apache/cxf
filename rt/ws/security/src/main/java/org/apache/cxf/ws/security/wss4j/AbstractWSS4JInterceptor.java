@@ -51,6 +51,7 @@ import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
+import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
@@ -287,6 +288,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 }
                 Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                 Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+                if (abinding.getProtectionToken() != null) {
+                    s = e;
+                }
                 if (isRequestor(message)) {
                     message.put("SignaturePropRefId", "SigRefId");
                     message.put("SigRefId", getProps(e, message));
@@ -308,7 +312,39 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         }
         return action;
     }
-
+    void assertWSS11(AssertionInfoMap aim, SoapMessage message) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.WSS11);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+                Wss11 wss11 = (Wss11)ai.getAssertion();
+                if (isRequestor(message)) {
+                    message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, 
+                                wss11.isRequireSignatureConfirmation() ? "true" : "false");
+                }
+            }
+        }
+    }
+    
+    protected PolicyAssertion findAndAssertPolicy(AssertionInfoMap aim, QName n) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
+        if (ais != null && !ais.isEmpty()) {
+            AssertionInfo ai = ais.iterator().next();
+            ai.setAsserted(true);
+            return ai.getAssertion();
+        }
+        return null;
+    }
+    protected String assertSupportingTokens(AssertionInfoMap aim,
+                                          SoapMessage message, 
+                                          String action,
+                                          QName n) {
+        SupportingToken sp = (SupportingToken)findAndAssertPolicy(aim, n);
+        if (sp != null) {
+            action = doTokens(sp.getTokens(), action, aim, message);
+        }
+        return action;
+    }
     protected void checkPolicies(SoapMessage message, RequestData data) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
@@ -324,16 +360,26 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
             action = assertAsymetricBinding(aim, action, message);
             action = assertSymetricBinding(aim, action, message);
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    SupportingToken sp = (SupportingToken)ai.getAssertion();
-                    action = doTokens(sp.getTokens(), action, aim, message);
-                    ai.setAsserted(true);
-                }                    
-            }
+            
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, 
+                                            SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.SUPPORTING_TOKENS);
+            action = assertSupportingTokens(aim, message, 
+                                            action, SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+            assertWSS11(aim, message);
             assertPolicy(aim, SP12Constants.WSS10);
-            assertPolicy(aim, SP12Constants.WSS11);
             assertPolicy(aim, SP12Constants.TRUST_13);
             assertPolicy(aim, SP11Constants.TRUST_10);
             message.put(WSHandlerConstants.ACTION, action.trim());
@@ -351,6 +397,15 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     action = WSHandlerConstants.USERNAME_TOKEN + " " + action;
                 }
                 Collection<AssertionInfo> ais2 = aim.get(SP12Constants.USERNAME_TOKEN);
+                if (ais2 != null && !ais2.isEmpty()) {
+                    for (AssertionInfo ai2 : ais2) {
+                        if (ai2.getAssertion() == token) {
+                            ai2.setAsserted(true);
+                        }
+                    }                    
+                }
+            } else {
+                Collection<AssertionInfo> ais2 = aim.get(token.getName());
                 if (ais2 != null && !ais2.isEmpty()) {
                     for (AssertionInfo ai2 : ais2) {
                         if (ai2.getAssertion() == token) {

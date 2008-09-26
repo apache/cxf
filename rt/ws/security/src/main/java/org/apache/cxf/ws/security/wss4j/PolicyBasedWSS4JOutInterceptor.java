@@ -22,7 +22,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -81,8 +84,14 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             String actor = null;
             
             WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
-            secHeader.insertSecurityHeader(saaj.getSOAPPart());
-
+            Element el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
+            try {
+                //move to end
+                saaj.getSOAPHeader().removeChild(el);
+                saaj.getSOAPHeader().appendChild(el);
+            } catch (SOAPException e) {
+                //ignore
+            }
             
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information

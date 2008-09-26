@@ -304,8 +304,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     
     protected void buildServiceFromWSDL(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Creating Service " + getServiceQName() + " from WSDL: " + url);
+        if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("Creating Service " + getServiceQName() + " from WSDL: " + url);
         }
         populateFromClass = false;
         WSDLServiceFactory factory = new WSDLServiceFactory(getBus(), url, getServiceQName());
@@ -325,8 +325,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected void buildServiceFromClass() {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Creating Service " + getServiceQName() + " from class " + getServiceClass().getName());
+        if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("Creating Service " + getServiceQName() + " from class " + getServiceClass().getName());
         }
         populateFromClass = true;
 

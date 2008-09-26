@@ -182,6 +182,9 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
 
     @Override
     public Map<String, Object> getProperties() {
+        if (server != null) {
+            return server.getEndpoint();
+        }
         return properties;
     }
 

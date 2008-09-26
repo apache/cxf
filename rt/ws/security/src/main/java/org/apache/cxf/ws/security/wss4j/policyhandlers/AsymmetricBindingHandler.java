@@ -74,13 +74,13 @@ public class AsymmetricBindingHandler extends BindingBuilder {
     
     public void handleBinding() {
         WSSecTimestamp timestamp = createTimestamp();
+        handleLayout(timestamp);
         
         if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
         } else {
             doSignBeforeEncrypt();
         }
-        handleLayout(timestamp);
     }
 
 
@@ -96,10 +96,13 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                 }
 
                 addSupportingTokens(sigs);
-                doSignature(sigs, null);
+                doSignature(sigs);
                 doEndorse();
             } else {
                 //confirm sig
+                assertSupportingTokens(sigs);
+                
+                
                 //Add timestamp
                 if (timestampEl != null) {
                     Element el = timestampEl.getElement();
@@ -107,7 +110,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                 }
 
                 addSignatureConfirmation(sigs);
-                doSignature(sigs, null);
+                doSignature(sigs);
             }
 
             Vector<WSEncryptionPart> enc = getEncryptedParts();
@@ -181,13 +184,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     && abinding.getInitiatorToken() != null) 
                 || (!isRequestor() && abinding.getRecipientToken() != null)) {
                 try {
-                    Element appendEl = null;
-                    if (encryptionToken.isDerivedKeys()) {
-                        appendEl = ((WSSecDKEncrypt)encrBase).getdktElement();
-                    } else {
-                        appendEl = ((WSSecEncrypt)encrBase).getEncryptedKeyElement();
-                    }
-                    doSignature(sigParts, appendEl);
+                    doSignature(sigParts);
                 } catch (WSSecurityException e) {
                     //REVISIT - exception
                     e.printStackTrace();
@@ -224,10 +221,11 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                 } else {
                     try {
                         // Encrypt, get hold of the ref list and add it
-                        Element secondRefList 
-                            = ((WSSecEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
-                        insertAfter(secondRefList, secHeader.getSecurityHeader(), 
-                                    ((WSSecEncrypt)encrBase).getEncryptedKeyElement());
+                        Element secondRefList = saaj.getSOAPPart()
+                            .createElementNS(WSConstants.ENC_NS,
+                                             WSConstants.ENC_PREFIX + ":ReferenceList");
+                        this.insertBeforeBottomUp(secondRefList);
+                        ((WSSecEncrypt)encrBase).encryptForExternalRef(secondRefList, secondEncrParts);
                         
                     } catch (WSSecurityException e) {
                         //REVISIT - exception
@@ -300,9 +298,9 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     dkEncr.setDerivedKeyLength(algorithmSuite.getEncryptionDerivedKeyLength() / 8);
                     dkEncr.prepare(saaj.getSOAPPart());
                     
-                    dkEncr.prependDKElementToHeader(secHeader);
+                    addDerivedKeyElement(dkEncr.getdktElement());
                     Element refList = dkEncr.encryptForExternalRef(null, encrParts);
-                    dkEncr.addExternalRefElement(refList, secHeader);
+                    insertBeforeBottomUp(refList);
                     return dkEncr;
                 } catch (Exception e) {
                     policyNotAsserted(recToken, e);
@@ -322,7 +320,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                                  getEncryptionCrypto(recToken));
                     
                     if (encr.getBSTTokenId() != null) {
-                        encr.appendBSTElementToHeader(secHeader);
+                        encr.prependBSTElementToHeader(secHeader);
                     }
                     
                     
@@ -331,14 +329,14 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                     //Encrypt, get hold of the ref list and add it
                     if (externalRef) {
                         Element refList = encr.encryptForExternalRef(null, encrParts);
-                        secHeader.getSecurityHeader().appendChild(refList);
+                        insertBeforeBottomUp(refList);
                     } else {
                         Element refList = encr.encryptForInternalRef(null, encrParts);
                     
                         // Add internal refs
                         encryptedKeyElement.appendChild(refList);
                     }
-                    encr.prependToHeader(secHeader);
+                    this.addEncyptedKeyElement(encryptedKeyElement);
                     return encr;
                 } catch (WSSecurityException e) {
                     policyNotAsserted(recToken, e.getMessage());
@@ -362,8 +360,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
             }
         }
     }
-    private void doSignature(Vector<WSEncryptionPart> sigParts,
-                             Element appendAfter) throws WSSecurityException {
+    private void doSignature(Vector<WSEncryptionPart> sigParts) throws WSSecurityException {
         Token sigToken = null;
         TokenWrapper wrapper = null;
         if (isRequestor()) {
@@ -404,9 +401,8 @@ public class AsymmetricBindingHandler extends BindingBuilder {
                 dkSign.computeSignature();
 
                 // Add elements to header
-                dkSign.appendDKElementToHeader(secHeader);
-                dkSign.appendSigToHeader(secHeader);
-                
+                addDerivedKeyElement(dkSign.getdktElement());
+                insertBeforeBottomUp(dkSign.getSignatureElement());                
                 mainSigId = addWsuIdToElement(dkSign.getSignatureElement());
             } catch (Exception e) {
                 //REVISIT
@@ -424,14 +420,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();
 
-            if (appendAfter != null) {
-                insertAfter(sig.getSignatureElement(),
-                            secHeader.getSecurityHeader(),
-                            appendAfter);
-            } else {
-                sig.prependToHeader(secHeader);
-            }
-
+            insertBeforeBottomUp(sig.getSignatureElement());            
             mainSigId = addWsuIdToElement(sig.getSignatureElement());
         }
     }
@@ -529,7 +518,7 @@ public class AsymmetricBindingHandler extends BindingBuilder {
         }
         
         // Add the EncryptedKey
-        encrKey.prependToHeader(secHeader);
+        this.addEncyptedKeyElement(encrKey.getEncryptedKeyElement());
         encryptedKeyValue = encrKey.getEphemeralKey();
         encryptedKeyId = encrKey.getId();
         
