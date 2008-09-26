@@ -347,9 +347,9 @@ public class BindingBuilder {
                     utBuilder.prepare(saaj.getSOAPPart());
                     addSupportingElement(utBuilder.getUsernameTokenElement());
                     ret.put(token, utBuilder);
-                    if (suppTokens.isEncryptedToken()) {
-                        encryptedTokensIdList.add(utBuilder.getId());
-                    }
+                    //WebLogic and WCF always encrypt these
+                    //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
+                    encryptedTokensIdList.add(utBuilder.getId());
                 }
             } else if (token instanceof IssuedToken && isRequestor()) {
                 //ws-trust stuff.......
