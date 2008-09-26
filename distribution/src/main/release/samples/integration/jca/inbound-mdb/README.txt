@@ -157,9 +157,10 @@ Here are basic instructions to deploy the CXF JCA connector in WebSphere 6.1.
 3. On the Resource adapters page, click the "Install RAR" button.
 
 4. On the Install RAR File page, select the "Local path" radio button if this 
-   sample is located in the same machine as the WebSphere server.  Otherwise, 
-   select the "Server path" radio button.  Specify or browse to the path
-   build/lib/cxf.rar file of this sample.  Then, click the "Next" button.
+   sample is located in the same machine that you are running the web browser.
+   Otherwise, select the "Server path" radio button.  Specify or browse to 
+   the path build/lib/cxf.rar file of this sample.  Then, click the "Next" 
+   button.
 
 5. On the next page, click the "OK" button to install the Resource Adapter.
 
@@ -209,11 +210,11 @@ basic instructions to deploy the MDB in WebSphere 6.1.
 
 2. Navigate to tree menu: Applications -> Install new Applications
 
-3. On the "Preparing for the application installation" page, select the "Local 
-   path" radio button if this sample is located in the same machine as the 
-   WebSphere server.  Otherwise, select the "Server path" radio button.  
-   Specify or browse to the path j2ee-archives/greeterejb.jar file in this 
-   sample.  Then, click the "Next" button.
+3. On the "Preparing for the application installation" page, select the 
+   "Local path" radio button if this sample is located in the same machine 
+   that you are running the web browser.  Otherwise, select the "Server path" 
+   radio button.  Specify or browse to the path j2ee-archives/greeterejb.jar 
+   file in this sample.  Then, click the "Next" button.
 
 4. Click the "Next" button on the "Step 1: Select installation options" page.
 
