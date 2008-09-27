@@ -30,6 +30,7 @@ import javax.resource.spi.LocalTransaction;
 import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
@@ -191,12 +192,12 @@ public class ManagedConnectionImpl
     private Object createConnectionProxy(Object obj, CXFConnectionRequestInfo cri, Subject subject)
         throws ResourceException {
 
-        Class classes[] = {Connection.class, cri.getInterface()};
+        Class classes[] = {Connection.class, BindingProvider.class, cri.getInterface()};
 
         return Proxy.newProxyInstance(cri.getInterface().getClassLoader(), classes, 
                                       createInvocationHandler(obj, subject));
     }
-
+       
     private InvocationHandler createInvocationHandler(Object obj, Subject subject) throws ResourceException {
 
         return getHandlerFactory().createHandlers(obj, subject);
