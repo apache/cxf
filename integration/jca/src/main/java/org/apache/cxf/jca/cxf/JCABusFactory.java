@@ -62,16 +62,6 @@ public class JCABusFactory {
     public JCABusFactory(ManagedConnectionFactoryImpl aMcf) {
         this.mcf = aMcf;
     }
-
-    protected String[] getBusArgs() throws ResourceException {
-        //There is only setting up the BUSID        
-        String busId = mcf.getConfigurationScope();
-
-        String busArgs[] = new String[2];
-        busArgs[0] = "-BUSid";
-        busArgs[1] = busId;
-        return busArgs;
-    }   
     
     protected synchronized void init() throws ResourceException {
         

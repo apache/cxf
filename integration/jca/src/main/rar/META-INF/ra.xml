@@ -39,20 +39,13 @@ http://java/sun.com/xml/ns/j2ee/connector_1_5.xsd" version="1.5">
       <connection-definition>
         <managedconnectionfactory-class>org.apache.cxf.jca.cxf.AssociatedManagedConnectionFactoryImpl</managedconnectionfactory-class>
         <config-property>
+          <!-- 
+              LogLevel deprecated.  Please use log management provided by application server. 
+          -->
           <config-property-name>LogLevel</config-property-name> 
           <config-property-type>java.lang.String</config-property-type> 
           <config-property-value>INFO</config-property-value> 
         </config-property> 
-        <config-property>
-          <config-property-name>ConfigurationDomain</config-property-name> 
-          <config-property-type>java.lang.String</config-property-type> 
-          <config-property-value>DEFAULT</config-property-value> 
-        </config-property>
-        <config-property>
-          <config-property-name>ConfigurationScope</config-property-name> 
-          <config-property-type>java.lang.String</config-property-type> 
-          <config-property-value>DEFAULT</config-property-value> 
-        </config-property>
         <config-property>
           <config-property-name>EJBServicePropertiesURL</config-property-name> 
           <config-property-type>java.lang.String</config-property-type> 
@@ -87,4 +80,5 @@ http://java/sun.com/xml/ns/j2ee/connector_1_5.xsd" version="1.5">
     </outbound-resourceadapter>
   </resourceadapter>
 </connector>
+
 

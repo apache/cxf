@@ -43,22 +43,6 @@ public class JCABusFactoryTest extends AbstractCXFTest {
         assertSame("Checking appserverClassLoader.", loader, bf.getAppserverClassLoader());
     } 
 
-     
-    @Test
-    public void testModifiedBusArguments() throws Exception {
-        ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl();
-        mcf.setConfigurationScope("a.b.c");
-
-        JCABusFactory jcaBusFactory = new JCABusFactory(mcf);
-        String[] args = jcaBusFactory.getBusArgs();
-
-        assertTrue("Wrong arguments length: " + args.length, args.length == 2);
-        assertEquals("Wrong Argument. ", args[0], "-BUSid");
-        assertEquals("Wrong Argument. ", args[1],  "a.b.c");        
-    }
-
-
-
     @Test
     public void testLoadNonexistentProperties() throws Exception {
         ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl();
