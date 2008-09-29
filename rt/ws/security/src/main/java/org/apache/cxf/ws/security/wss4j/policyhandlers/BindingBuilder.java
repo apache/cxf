@@ -821,7 +821,7 @@ public class BindingBuilder {
         if (encrUser == null || "".equals(encrUser)) {
             policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " username found.");
         }
-        if (encrUser.equals(WSHandlerConstants.USE_REQ_SIG_CERT)) {
+        if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(encrUser)) {
             Object resultsObj = message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS);
             if (resultsObj != null) {
                 encrKeyBuilder.setUseThisCert(getReqSigCert((Vector)resultsObj));
@@ -1119,4 +1119,42 @@ public class BindingBuilder {
             }
         }
     }
+    
+    
+    public void handleEncryptedSignedHeaders(Vector<WSEncryptionPart> encryptedParts, 
+                                             Vector<WSEncryptionPart> signedParts) {
+       
+        for (WSEncryptionPart signedPart : signedParts) {
+            if (signedPart.getNamespace() == null || signedPart.getName() == null) {
+                continue;
+            }
+            
+            for (WSEncryptionPart encryptedPart : encryptedParts) {
+                if (encryptedPart.getNamespace() == null 
+                    || encryptedPart.getName() == null) {
+                    continue;
+                }
+               
+                if (signedPart.getName().equals(encryptedPart.getName()) 
+                    && signedPart.getNamespace().equals(encryptedPart.getNamespace())) {
+                   
+                    String encDataID =  encryptedPart.getEncId();                    
+                    Element encDataElem = WSSecurityUtil
+                           .findElementById(saaj.getSOAPPart().getDocumentElement(),
+                                            encDataID, null);
+                   
+                    if (encDataElem != null) {
+                        Element encHeader = (Element)encDataElem.getParentNode();
+                        String encHeaderId = encHeader.getAttributeNS(WSConstants.WSU_NS, "Id");
+                        
+                        signedParts.remove(signedPart);
+                        WSEncryptionPart encHeaderToSign = new WSEncryptionPart(encHeaderId);
+                        signedParts.add(encHeaderToSign);
+                    }
+                }
+            }
+        }
+    }
+   
+  
 }

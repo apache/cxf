@@ -51,7 +51,6 @@ import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * 
@@ -236,42 +235,6 @@ public class AsymmetricBindingHandler extends BindingBuilder {
         }
     }
     
-    public void handleEncryptedSignedHeaders(Vector<WSEncryptionPart> encryptedParts, 
-                                              Vector<WSEncryptionPart> signedParts) {
-        
-        for (WSEncryptionPart signedPart : signedParts) {
-            if (signedPart.getNamespace() == null || signedPart.getName() == null) {
-                continue;
-            }
-             
-            for (WSEncryptionPart encryptedPart : encryptedParts) {
-                if (encryptedPart.getNamespace() == null 
-                    || encryptedPart.getName() == null) {
-                    continue;
-                }
-                
-                if (signedPart.getName().equals(encryptedPart.getName()) 
-                    && signedPart.getNamespace().equals(encryptedPart.getNamespace())) {
-                    
-                    String encDataID =  encryptedPart.getEncId();                    
-                    Element encDataElem = WSSecurityUtil
-                        .findElementById(saaj.getSOAPPart().getDocumentElement(),
-                                         encDataID, null);
-                    
-                    if (encDataElem != null) {
-                        Element encHeader = (Element)encDataElem.getParentNode();
-                        String encHeaderId = encHeader.getAttributeNS(WSConstants.WSU_NS, "Id");
-                        
-                        signedParts.remove(signedPart);
-                        WSEncryptionPart encHeaderToSign = new WSEncryptionPart(encHeaderId);
-                        signedParts.add(encHeaderToSign);
-                    }
-                }
-            }
-        }
-    }
-    
-   
     
     private WSSecBase doEncryption(TokenWrapper recToken,
                                     Vector<WSEncryptionPart> encrParts,
