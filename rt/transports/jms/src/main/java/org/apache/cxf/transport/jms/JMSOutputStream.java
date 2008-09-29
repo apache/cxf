@@ -20,7 +20,9 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 
@@ -28,6 +30,8 @@ import org.apache.cxf.message.Exchange;
  * Outputstream that sends a message when the exchange is closed
  */
 class JMSOutputStream extends CachedOutputStream {
+    static final Logger LOG = LogUtils.getL7dLogger(JMSOutputStream.class);
+    
     private final JMSExchangeSender sender;
     private Exchange exchange;
     private boolean isTextPayload;
@@ -71,8 +75,8 @@ class JMSOutputStream extends CachedOutputStream {
         } catch (IOException ex) {
             throw new IOException("Error creating request Object from Message content, exception " + ex);
         }
-        if (JMSConduit.LOG.isLoggable(Level.FINE)) {
-            JMSConduit.LOG.log(Level.FINE, "Payload to be sent out is :[" + request + "]");
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Payload to be sent out is :[" + request + "]");
         }
         return request;
     }
