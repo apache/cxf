@@ -23,8 +23,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ct="http://cxf.apache.org/configuration/types"
     xmlns:jms="http://cxf.apache.org/transports/jms"
+    xmlns:p="http://www.springframework.org/schema/p"
     xsi:schemaLocation="
 http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <jms:conduit name="{http://cxf.apache.org/jms_conf_test}HelloWorldQueueBinMsgPort.jms-conduit">
@@ -40,7 +42,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
           connectionPassword="testPassword">
           <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
           <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-      </jms:address> 
+      </jms:address>
+      <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
     
     <jms:destination name="{http://cxf.apache.org/jms_conf_test}HelloWorldQueueBinMsgPort.jms-destination">
@@ -57,12 +60,12 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
           highWaterMark="5000"/>
       <jms:address
           destinationStyle="queue"
-          jndiConnectionFactoryName="MockConnectionFactory"
+          jndiConnectionFactoryName="ConnectionFactory"
           jndiDestinationName="myOwnDestination"
           jndiReplyDestinationName="myOwnReplyDestination"
           connectionUserName="testUser"
           connectionPassword="testPassword">
-          <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.cxf.transport.jms.MockInitialContextFactory"/>
+          <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
           <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
       </jms:address>   
   </jms:destination> 
@@ -78,7 +81,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
           highWaterMark="5000"/>      
   </jms:destination>  
   
-  <!-- 
   <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
   </bean>
   <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
@@ -88,11 +90,11 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   />
   
   <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration"
-  	p:jmsTemplate-ref="jmsTemplate"
+  	p:connectionFactory-ref="connectionFactory"
   	p:targetDestination="queue:test"
   	p:pubSubDomain="false"
   />
-
+<!--
   <bean class="org.apache.cxf.transport.jms.JMSTransportFactory"
 	  id="org.apache.cxf.transport.jms.JMSTransportFactory"
 	  lazy-init="true">

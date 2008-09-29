@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.jms.wsdl11;
 
 import java.util.Map;
+
 import javax.wsdl.Port;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;

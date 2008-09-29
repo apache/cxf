@@ -33,19 +33,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
-import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.QueueSender;
 import javax.jms.Session;
-import javax.jms.Topic;
-import javax.jms.TopicPublisher;
-import javax.naming.Context;
-import javax.naming.NamingException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -63,37 +55,26 @@ public final class JMSUtils {
 
     public static Properties getInitialContextEnv(AddressType addrType) {
         Properties env = new Properties();
-        populateContextEnvironment(addrType, env);
-
+        java.util.ListIterator listIter = addrType.getJMSNamingProperty().listIterator();
+        while (listIter.hasNext()) {
+            JMSNamingPropertyType propertyPair = (JMSNamingPropertyType)listIter.next();
+            if (null != propertyPair.getValue()) {
+                env.setProperty(propertyPair.getName(), propertyPair.getValue());
+            }
+        }
         if (LOG.isLoggable(Level.FINE)) {
             Enumeration props = env.propertyNames();
-
             while (props.hasMoreElements()) {
                 String name = (String)props.nextElement();
                 String value = env.getProperty(name);
                 LOG.log(Level.FINE, "Context property: " + name + " | " + value);
             }
         }
-
         return env;
-    }
-
-    protected static void populateContextEnvironment(AddressType addrType, Properties env) {
-
-        java.util.ListIterator listIter = addrType.getJMSNamingProperty().listIterator();
-
-        while (listIter.hasNext()) {
-            JMSNamingPropertyType propertyPair = (JMSNamingPropertyType)listIter.next();
-
-            if (null != propertyPair.getValue()) {
-                env.setProperty(propertyPair.getName(), propertyPair.getValue());
-            }
-        }
     }
 
     public static int getJMSDeliveryMode(JMSMessageHeadersType headers) {
         int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
-
         if (headers != null && headers.isSetJMSDeliveryMode()) {
             deliveryMode = headers.getJMSDeliveryMode();
         }
@@ -101,11 +82,8 @@ public final class JMSUtils {
     }
 
     public static int getJMSPriority(JMSMessageHeadersType headers) {
-        int priority = Message.DEFAULT_PRIORITY;
-        if (headers != null && headers.isSetJMSPriority()) {
-            priority = headers.getJMSPriority();
-        }
-        return priority;
+        return (headers != null && headers.isSetJMSPriority())
+            ? headers.getJMSPriority() : Message.DEFAULT_PRIORITY;
     }
 
     public static long getTimeToLive(JMSMessageHeadersType headers) {
@@ -118,7 +96,6 @@ public final class JMSUtils {
 
     public static void setMessageProperties(JMSMessageHeadersType headers, Message message)
         throws JMSException {
-
         if (headers != null && headers.isSetProperty()) {
             List<JMSPropertyType> props = headers.getProperty();
             for (int x = 0; x < props.size(); x++) {
@@ -139,7 +116,6 @@ public final class JMSUtils {
     public static Message createAndSetPayload(Object payload, Session session, String messageType)
         throws JMSException {
         Message message = null;
-
         if (JMSConstants.TEXT_MESSAGE_TYPE.equals(messageType)) {
             message = session.createTextMessage((String)payload);
         } else if (JMSConstants.BYTE_MESSAGE_TYPE.equals(messageType)) {
@@ -149,7 +125,6 @@ public final class JMSUtils {
             message = session.createObjectMessage();
             ((ObjectMessage)message).setObject((byte[])payload);
         }
-
         return message;
     }
 
@@ -177,9 +152,8 @@ public final class JMSUtils {
         }
     }
 
-    public static JMSMessageHeadersType populateIncomingContext(javax.jms.Message message,
-                                                                org.apache.cxf.message.Message inMessage,
-                                                                String headerType) {
+    public static void populateIncomingContext(javax.jms.Message message,
+                                               org.apache.cxf.message.Message inMessage, String headerType) {
         try {
             JMSMessageHeadersType headers = null;
             headers = (JMSMessageHeadersType)inMessage.get(headerType);
@@ -220,7 +194,6 @@ public final class JMSUtils {
                 }
             }
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
-            return headers;
         } catch (JMSException ex) {
             throw JmsUtils.convertJmsAccessException(ex);
         }
@@ -242,7 +215,7 @@ public final class JMSUtils {
                 value.append(s);
                 first = false;
             }
-            // Incase if the Content-Type header key is Content-Type replace with JMS_Content_Type
+            // If the Content-Type header key is Content-Type replace with JMS_Content_Type
             if (entry.getKey().equals(org.apache.cxf.message.Message.CONTENT_TYPE)) {
                 message.setStringProperty(JMSConstants.JMS_CONTENT_TYPE, value.toString());
             } else {
@@ -252,20 +225,18 @@ public final class JMSUtils {
         }
     }
 
-    public static Map<String, List<String>> getSetProtocolHeaders(org.apache.cxf.message.Message message) {
+    public static void addContentTypeToProtocolHeader(org.apache.cxf.message.Message message) {
+        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+
+        // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (null == headers) {
             headers = new HashMap<String, List<String>>();
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
-        return headers;
-    }
-
-    public static void addContentTypeToProtocolHeader(org.apache.cxf.message.Message message) {
-        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
-
-        Map<String, List<String>> headers = JMSUtils.getSetProtocolHeaders(message);
+        
+        // Add content type to the protocol headers
         List<String> ct;
         if (headers.get(JMSConstants.JMS_CONTENT_TYPE) != null) {
             ct = headers.get(JMSConstants.JMS_CONTENT_TYPE);
@@ -275,12 +246,7 @@ public final class JMSUtils {
             ct = new ArrayList<String>();
             headers.put(JMSConstants.JMS_CONTENT_TYPE, ct);
         }
-
         ct.add(contentType);
-    }
-
-    public static boolean isDestinationStyleQueue(AddressType address) {
-        return JMSConstants.JMS_QUEUE.equals(address.getDestinationStyle().value());
     }
 
     public static Message buildJMSMessageFromCXFMessage(org.apache.cxf.message.Message outMessage,
@@ -312,76 +278,19 @@ public final class JMSUtils {
         return jmsMessage;
     }
 
-    public static void sendMessage(MessageProducer producer, Destination destination, Message jmsMessage,
-                                   long timeToLive, int deliveryMode, int priority) throws JMSException {
-        /*
-         * Can this be changed to producer.send(destination, jmsMessage, deliveryMode, priority, timeToLive);
-         */
-
-        if (destination instanceof Queue) {
-            QueueSender sender = (QueueSender)producer;
-            sender.setTimeToLive(timeToLive);
-            sender.send((Queue)destination, jmsMessage, deliveryMode, priority, timeToLive);
-        } else {
-            TopicPublisher publisher = (TopicPublisher)producer;
-            publisher.setTimeToLive(timeToLive);
-            publisher.publish((Topic)destination, jmsMessage, deliveryMode, priority, timeToLive);
-        }
-    }
-
-    public static Destination resolveRequestDestination(Context context, Connection connection,
-                                                        AddressType addrDetails) throws JMSException,
-        NamingException {
-        Destination requestDestination = null;
-        // see if jndiDestination is set
-        if (addrDetails.getJndiDestinationName() != null) {
-            requestDestination = (Destination)context.lookup(addrDetails.getJndiDestinationName());
-        }
-
-        // if no jndiDestination or it fails see if jmsDestination is set
-        // and try to create it.
-        if (requestDestination == null && addrDetails.getJmsDestinationName() != null) {
-            if (JMSUtils.isDestinationStyleQueue(addrDetails)) {
-                requestDestination = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
-                    .createQueue(addrDetails.getJmsDestinationName());
-            } else {
-                requestDestination = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
-                    .createTopic(addrDetails.getJmsDestinationName());
-            }
-        }
-        return requestDestination;
-    }
-
-    public static Queue resolveReplyDestination(Context context, Connection connection,
-                                                AddressType addrDetails) throws NamingException,
-        JMSException {
-        Queue replyDestination = null;
-
-        // Reply Destination is used (if present) only if the session is
-        // point-to-point session
-        if (JMSUtils.isDestinationStyleQueue(addrDetails)) {
-            if (addrDetails.getJndiReplyDestinationName() != null) {
-                replyDestination = (Queue)context.lookup(addrDetails.getJndiReplyDestinationName());
-            }
-            if (replyDestination == null && addrDetails.getJmsReplyDestinationName() != null) {
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                replyDestination = session.createQueue(addrDetails.getJmsReplyDestinationName());
-                session.close();
-            }
-        }
-        return replyDestination;
-    }
-
-    public static String generateUniqueSelector() {
+    /**
+     * Create a unique correlation Id from
+     * <host>_<user.name>_<currentThread><time>
+     * @return correlationId
+     */
+    public static String generateCorrelationId() {
         String host = "localhost";
-
         try {
             InetAddress addr = InetAddress.getLocalHost();
             host = addr.getHostName();
         } catch (UnknownHostException ukex) {
-            // Default to localhost.
+            // Default to localhost
         }
-
         long time = Calendar.getInstance().getTimeInMillis();
         return host + "_" + System.getProperty("user.name") + "_" + Thread.currentThread() + time;
     }

@@ -111,11 +111,14 @@ public abstract class AbstractJMSTester extends Assert {
         } else {
             target = EasyMock.createMock(EndpointReferenceType.class);
         }
-
-        JMSConduit jmsConduit = new JMSConduit(bus, endpointInfo, target);
+        
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
-            .createJMSConfigurationFromEndpointInfo(bus, endpointInfo);
-        jmsConduit.setJmsConfig(jmsConfig);
+            .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, true);
+        jmsConfig.setDeliveryMode(3);
+        jmsConfig.setPriority(1);
+        jmsConfig.setTimeToLive(1000);
+        JMSConduit jmsConduit = new JMSConduit(target, jmsConfig);
+        jmsConduit.afterPropertiesSet();
         if (send) {
             // setMessageObserver
             observer = new MessageObserver() {

@@ -25,7 +25,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 
 /**
- *
+ * Outputstream that sends a message when the exchange is closed
  */
 class JMSOutputStream extends CachedOutputStream {
     private final JMSExchangeSender sender;
@@ -44,6 +44,9 @@ class JMSOutputStream extends CachedOutputStream {
     }
 
     @Override
+    /**
+     * Close the stream and send the message out
+     */
     protected void doClose() throws IOException {
         Object payload = retrieveRequestFromStream(isTextPayload);
         this.sender.sendExchange(exchange, payload);

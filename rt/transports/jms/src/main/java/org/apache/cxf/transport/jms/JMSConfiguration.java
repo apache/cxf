@@ -19,52 +19,139 @@
 package org.apache.cxf.transport.jms;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.Message;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.listener.AbstractJmsListeningContainer;
+import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.transaction.PlatformTransactionManager;
 
 public class JMSConfiguration implements InitializingBean {
     private ConnectionFactory connectionFactory;
-    private JmsTemplate jmsTemplate;
-    private AbstractJmsListeningContainer jmsListener;
+    private DestinationResolver destinationResolver;
+    private PlatformTransactionManager transactionManager;
+    private boolean useJms11 = true;
+    private boolean useJndi;
+    private boolean messageIdEnabled = true;
+    private boolean messageTimestampEnabled = true;
+    private boolean pubSubNoLocal;
+    private long receiveTimeout = JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT;
+    private boolean explicitQosEnabled;
+    private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
+    private int priority = Message.DEFAULT_PRIORITY;
+    private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
+    private boolean sessionTransacted;
+
+    private volatile String messageSelector;
+    private boolean subscriptionDurable;
+    private String durableSubscriptionName;
+
     private String targetDestination;
     private String replyDestination;
-    private String messageType;
+    private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
 
-    public JMSConfiguration() {
-        targetDestination = null;
-        replyDestination = null;
-        messageType = JMSConstants.TEXT_MESSAGE_TYPE;
-        pubSubDomain = false;
+    public boolean isUseJndi() {
+        return useJndi;
+    }
+
+    public void setUseJndi(boolean useJndi) {
+        this.useJndi = useJndi;
+    }
+
+    public boolean isMessageIdEnabled() {
+        return messageIdEnabled;
+    }
+
+    public void setMessageIdEnabled(boolean messageIdEnabled) {
+        this.messageIdEnabled = messageIdEnabled;
+    }
+
+    public boolean isMessageTimestampEnabled() {
+        return messageTimestampEnabled;
+    }
+
+    public void setMessageTimestampEnabled(boolean messageTimestampEnabled) {
+        this.messageTimestampEnabled = messageTimestampEnabled;
+    }
+
+    public boolean isPubSubNoLocal() {
+        return pubSubNoLocal;
+    }
+
+    public void setPubSubNoLocal(boolean pubSubNoLocal) {
+        this.pubSubNoLocal = pubSubNoLocal;
+    }
+
+    public long getReceiveTimeout() {
+        return receiveTimeout;
+    }
+
+    public void setReceiveTimeout(long receiveTimeout) {
+        this.receiveTimeout = receiveTimeout;
+    }
+
+    public boolean isExplicitQosEnabled() {
+        return explicitQosEnabled;
+    }
+
+    public void setExplicitQosEnabled(boolean explicitQosEnabled) {
+        this.explicitQosEnabled = explicitQosEnabled;
+    }
+
+    public int getDeliveryMode() {
+        return deliveryMode;
+    }
+
+    public void setDeliveryMode(int deliveryMode) {
+        this.deliveryMode = deliveryMode;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public long getTimeToLive() {
+        return timeToLive;
+    }
+
+    public void setTimeToLive(long timeToLive) {
+        this.timeToLive = timeToLive;
+    }
+
+    public String getMessageSelector() {
+        return messageSelector;
+    }
+
+    public void setMessageSelector(String messageSelector) {
+        this.messageSelector = messageSelector;
+    }
+
+    public boolean isSubscriptionDurable() {
+        return subscriptionDurable;
+    }
+
+    public void setSubscriptionDurable(boolean subscriptionDurable) {
+        this.subscriptionDurable = subscriptionDurable;
+    }
+
+    public String getDurableSubscriptionName() {
+        return durableSubscriptionName;
+    }
+
+    public void setDurableSubscriptionName(String durableSubscriptionName) {
+        this.durableSubscriptionName = durableSubscriptionName;
     }
 
     public void afterPropertiesSet() throws Exception {
-        /*
-         * if (connectionFactory == null) { throw new RuntimeException("Required property connectionfactory
-         * was not set"); } jmsTemplate.setConnectionFactory(connectionFactory);
-         * jmsListener.setConnectionFactory(connectionFactory);
-         */
-    }
-
-    public JmsTemplate getJmsTemplate() {
-        return jmsTemplate;
-    }
-
-    @Required
-    public void setJmsTemplate(JmsTemplate jmsTemplate) {
-        this.jmsTemplate = jmsTemplate;
-    }
-
-    public AbstractJmsListeningContainer getJmsListener() {
-        return jmsListener;
-    }
-
-    @Required
-    public void setJmsListener(AbstractJmsListeningContainer jmsListener) {
-        this.jmsListener = jmsListener;
+        if (connectionFactory == null) {
+            throw new RuntimeException("Required property connectionfactory was not set");
+        }
     }
 
     public ConnectionFactory getConnectionFactory() {
@@ -106,6 +193,38 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setPubSubDomain(boolean pubSubDomain) {
         this.pubSubDomain = pubSubDomain;
+    }
+
+    public boolean isUseJms11() {
+        return useJms11;
+    }
+
+    public void setUseJms11(boolean useJms11) {
+        this.useJms11 = useJms11;
+    }
+
+    public DestinationResolver getDestinationResolver() {
+        return destinationResolver;
+    }
+
+    public void setDestinationResolver(DestinationResolver destinationResolver) {
+        this.destinationResolver = destinationResolver;
+    }
+
+    public boolean isSessionTransacted() {
+        return sessionTransacted;
+    }
+
+    public void setSessionTransacted(boolean sessionTransacted) {
+        this.sessionTransacted = sessionTransacted;
+    }
+
+    public PlatformTransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
     }
 
 }

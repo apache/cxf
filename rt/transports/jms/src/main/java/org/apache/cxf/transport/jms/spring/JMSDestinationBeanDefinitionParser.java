@@ -38,13 +38,13 @@ public class JMSDestinationBeanDefinitionParser extends AbstractBeanDefinitionPa
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         bean.setAbstract(true);
-        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "serverConfig"), "serverConfig", 
+        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "serverConfig"), "serverConfig",
                                  ServerConfig.class);
-        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "runtimePolicy"), "runtimePolicy", 
+        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "runtimePolicy"), "serverBehavior",
                                  ServerBehaviorPolicyType.class);
-        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "address"), "JMSAddress",
+        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "address"), "address",
                                  AddressType.class);
-        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "sessionPool"), "sessionPool", 
+        mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "sessionPool"), "sessionPool",
                                  SessionPoolType.class);
     }
 

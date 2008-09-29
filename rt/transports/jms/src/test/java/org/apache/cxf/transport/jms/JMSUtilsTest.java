@@ -28,9 +28,6 @@ import org.junit.Test;
 
 public class JMSUtilsTest extends Assert {
 
-    
-    // This is just a place holder for now it will be chaning in next task 
-    // when the new JMS address policies and configurations are introdced.
     @Test
     public void testpopulateIncomingContextNonNull() throws Exception {
         AddressType addrType =  new AddressType();
@@ -40,14 +37,12 @@ public class JMSUtilsTest extends Assert {
         prop.setValue("testValue");
         addrType.getJMSNamingProperty().add(prop);      
         
-        prop.setName(Context.BATCHSIZE);
-        prop.setValue("12");
-        addrType.getJMSNamingProperty().add(prop);
+        JMSNamingPropertyType prop2 = new JMSNamingPropertyType();
+        prop2.setName(Context.BATCHSIZE);
+        prop2.setValue("12");
+        addrType.getJMSNamingProperty().add(prop2);
         
-        
-        Properties env = new Properties();
-        assertTrue(env.size() <= 0);
-        JMSUtils.populateContextEnvironment(addrType, env);
+        Properties env = JMSUtils.getInitialContextEnv(addrType);
         assertTrue("Environment should not be empty", env.size() > 0);
         assertTrue("Environemnt should contain NamingBatchSize property", env.get(Context.BATCHSIZE) != null);
     }
