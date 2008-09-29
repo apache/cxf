@@ -122,7 +122,7 @@ public class JMSConduitTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduit(true, false);
         Message msg = new MessageImpl();
         conduit.prepare(msg);
-        final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset()); // TODO encoding
+        final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset().name()); // TODO encoding
         JMSConfiguration jmsConfig = conduit.getJmsConfig();
         JmsTemplate jmsTemplate = new JmsTemplate();
         jmsTemplate.setConnectionFactory(jmsConfig.getConnectionFactory());

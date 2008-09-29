@@ -73,6 +73,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
                                               new QName("fooPort3"));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testSetConfigurationDomain() throws Exception {
         final String domainName = "SomeDomain";
@@ -84,6 +85,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         assertEquals(domainName, mcf.getConfigurationDomain());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testGetConfigurationDomainReturnsDefaultValue() throws Exception {
         Properties p = new Properties();
@@ -91,6 +93,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         assertEquals(ManagedConnectionFactoryImpl.CONFIG_DOMAIN, mcf.getConfigurationDomain());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testSetConfigurationScope() throws Exception {
         final String name = "a.b.c";
@@ -102,6 +105,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         assertEquals(name, mcf.getConfigurationScope());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testGetConfigurationScopeReturnsDefaultValue() throws Exception {
         Properties p = new Properties();
