@@ -60,7 +60,7 @@
                     	<xs:element name="address"
                     		type="jms:AddressType" minOccurs="0" />
                     	<xs:element name="jmsConfig-ref"
-                    		type="xs:string">
+                    		type="xs:string" maxOccurs="1" minOccurs="0">
                     	</xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
