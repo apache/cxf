@@ -191,10 +191,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 }
                 correlationMap.remove(correlationId);
             }
+            exchange.setInMessage(inMessage);
             if (incomingObserver != null) {
                 incomingObserver.onMessage(inMessage);
-            }
-            exchange.setInMessage(inMessage);
+            }      
         }
     }
 
