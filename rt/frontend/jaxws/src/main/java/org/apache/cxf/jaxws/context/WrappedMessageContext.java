@@ -122,8 +122,10 @@ public class WrappedMessageContext implements MessageContext {
         
         if (scopes == null && reqMessage != null) {
             scopes = CastUtils.cast((Map<?, ?>)reqMessage.get(SCOPES));
-            m.put(SCOPES, scopes);
-            copyScoped(reqMessage);
+            if (scopes != null) {
+                m.put(SCOPES, scopes);
+                copyScoped(reqMessage);
+            }
         }
         if (scopes == null) {
             scopes = new HashMap<String, Scope>();
