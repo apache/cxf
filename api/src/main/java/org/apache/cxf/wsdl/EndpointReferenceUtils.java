@@ -125,7 +125,7 @@ public final class EndpointReferenceUtils {
                                        String systemId, String baseURI) {
 
             String newId = systemId;
-            if (baseURI != null) {
+            if (baseURI != null && systemId != null) {  //add additional systemId null check
                 try {
                     URI uri = new URI(baseURI);
                     uri = uri.resolve(systemId);
