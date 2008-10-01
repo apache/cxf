@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.jws.WebMethod;
 import javax.jws.WebParam;
 
 public interface CollectionServiceInterface {
@@ -37,5 +38,7 @@ public interface CollectionServiceInterface {
     void takeDoubleList(List<Double> doublesList);
 
     String takeSortedStrings(@WebParam(name = "strings")SortedSet<String> strings);
-
+    
+    @WebMethod
+    void method1(@WebParam(name = "headers1") List<String> headers1);
 }

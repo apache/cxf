@@ -211,6 +211,20 @@ public class CollectionTest extends AbstractAegisTest {
         
     }
     
+    /**
+     * CXF-1833 complained of a bizarre schema when @@WebParaming a parameter of List<String>. This regression
+     * test captures the fact that we don't, in fact, have this problem with correct us of JAX-WS.
+     * @throws Exception
+     */
+    @Test
+    public void webMethodOnListParam() throws Exception {
+        createJaxwsService(CollectionService.class, new CollectionService(), null, null);
+        Document doc = getWSDLDocument("CollectionServiceService");
+        // what we do not want is <xsd:schema targetNamespace="http://util.java" ... />
+        assertInvalid("//xsd:schema[@targetNamespace='http://util.java']",
+                      doc);
+    }
+    
     @Test
     public void testSortedSet() throws Exception {
         createService(CollectionService.class, new CollectionService(), null);
@@ -259,6 +273,10 @@ public class CollectionTest extends AbstractAegisTest {
         /** {@inheritDoc}*/
         public String takeSortedStrings(SortedSet<String> strings) {
             return strings.first();
+        }
+
+        public void method1(List<String> headers1) {
+            // do nothing, this is purely for schema issues.
         }
     }
 }
