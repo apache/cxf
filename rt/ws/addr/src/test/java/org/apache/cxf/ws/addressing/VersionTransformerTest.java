@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.addressing;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,6 +32,7 @@ import javax.xml.ws.EndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -54,6 +56,18 @@ public class VersionTransformerTest extends Assert {
         assertEquals("http://localhost:8080/test", ert.getAddress().getValue());
         assertEquals(new QName("http://apache.org/hello_world_soap_http", "SOAPService"), 
                                EndpointReferenceUtils.getServiceName(ert, null));
+        
+        // VersionTransformer.convertToInternal produces metadata extensions of type 
+        // DOM Element hence we're testing the relevant EndpointReferenceUtils.setPortName
+        // code path here
+        
+        List<Object> metadata = ert.getMetadata().getAny();
+        assertEquals("Single metadata extension expected", 1, metadata.size());
+        assertTrue("Metadata extension of type DOM Element expected", 
+                   metadata.get(0) instanceof Element);
+        assertNull("No portName has been set yet", EndpointReferenceUtils.getPortName(ert));
+        EndpointReferenceUtils.setPortName(ert, "Greeter");
+        assertEquals("No portName has been set", "Greeter", EndpointReferenceUtils.getPortName(ert));
     }
     
     private EndpointReference readEndpointReference(Source eprInfoset) {

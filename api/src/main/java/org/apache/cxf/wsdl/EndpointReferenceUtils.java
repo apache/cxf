@@ -177,6 +177,7 @@ public final class EndpointReferenceUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(EndpointReferenceUtils.class);
 
+    private static final String NS_WSAW_2005 = "http://www.w3.org/2005/02/addressing/wsdl";
     private static final String WSDL_INSTANCE_NAMESPACE = 
         "http://www.w3.org/2006/01/wsdl-instance";
     
@@ -268,7 +269,8 @@ public final class EndpointReferenceUtils {
         for (Object obj : metadata.getAny()) {
             if (obj instanceof Element) {
                 Node node = (Element)obj;
-                if (node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAW) 
+                if ((node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAW)
+                    || node.getNamespaceURI().equals(NS_WSAW_2005))
                     && node.getLocalName().equals("ServiceName")) {
                     String content = node.getTextContent();
                     String namespaceURI = node.getFirstChild().getNamespaceURI();
@@ -309,9 +311,11 @@ public final class EndpointReferenceUtils {
             for (Object obj : metadata.getAny()) {
                 if (obj instanceof Element) {
                     Node node = (Element)obj;
-                    if (node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAW)
+                    if ((node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAW)
+                        || node.getNamespaceURI().equals(NS_WSAW_2005))
                         && node.getNodeName().contains("ServiceName")) {
-                        return node.getAttributes().getNamedItem("EndpointName").getTextContent();
+                        Node item = node.getAttributes().getNamedItem("EndpointName");
+                        return item != null ? item.getTextContent() : null;
                     }
                 } else if (obj instanceof JAXBElement) {
                     Object val = ((JAXBElement)obj).getValue();
@@ -335,7 +339,14 @@ public final class EndpointReferenceUtils {
         MetadataType metadata = ref.getMetadata();
         if (metadata != null) {
             for (Object obj : metadata.getAny()) {
-                if (obj instanceof JAXBElement) {
+                if (obj instanceof Element) {
+                    Element node = (Element)obj;
+                    if (node.getNodeName().contains("ServiceName")
+                        && (node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAW)
+                        || node.getNamespaceURI().equals(NS_WSAW_2005))) {
+                        node.setAttribute(JAXWSAConstants.WSAW_ENDPOINT_NAME, portName);
+                    }
+                } else if (obj instanceof JAXBElement) {
                     Object val = ((JAXBElement)obj).getValue();
                     if (val instanceof ServiceNameType) {
                         ((ServiceNameType)val).setEndpointName(portName);
