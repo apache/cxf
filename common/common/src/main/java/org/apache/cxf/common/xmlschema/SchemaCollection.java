@@ -31,8 +31,10 @@ import org.xml.sax.InputSource;
 
 import org.apache.ws.commons.schema.ValidationEventHandler;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaObjectTable;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.extensions.ExtensionRegistry;
@@ -83,6 +85,20 @@ public class SchemaCollection {
 
     public XmlSchemaElement getElementByQName(QName qname) {
         return schemaCollection.getElementByQName(qname);
+    }
+
+    public XmlSchemaAttribute getAttributeByQName(QName qname) {
+        String uri = qname.getNamespaceURI();
+        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+            if (uri.equals(schema.getTargetNamespace())) {
+                XmlSchemaObjectTable attributes = schema.getAttributes();
+                XmlSchemaAttribute attribute = (XmlSchemaAttribute)attributes.getItem(qname);
+                if (attribute != null) {
+                    return attribute;
+                }
+            }
+        }
+        return null;
     }
 
     public ExtensionRegistry getExtReg() {
