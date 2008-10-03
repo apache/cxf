@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MultivaluedMap;
@@ -87,7 +88,7 @@ public class RequestImplTest extends Assert {
     @Test
     public void testBeforeDate() throws Exception {
         metadata.putSingle("If-Modified-Since", "Sat, 29 Oct 1994 19:43:31 GMT");
-        Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
+        Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
             .parse("Sun, 29 Oct 1994 19:43:31 GMT");
         
         ResponseBuilder rb = 
@@ -99,7 +100,7 @@ public class RequestImplTest extends Assert {
     @Ignore
     public void testAfterDate() throws Exception {
         metadata.putSingle("If-Modified-Since", "Sat, 29 Oct 1994 19:43:31 GMT");
-        Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
+        Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
             .parse("Fri, 28 Oct 1994 19:43:31 GMT");
         
         
