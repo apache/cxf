@@ -28,8 +28,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
@@ -47,43 +45,10 @@ import org.springframework.jms.support.converter.SimpleMessageConverter102;
 
 public final class JMSUtils {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(JMSUtils.class);
+    static final Logger LOG = LogUtils.getL7dLogger(JMSUtils.class);
 
     private JMSUtils() {
 
-    }
-
-    public static Properties getInitialContextEnv(AddressType addrType) {
-        Properties env = new Properties();
-        java.util.ListIterator listIter = addrType.getJMSNamingProperty().listIterator();
-        while (listIter.hasNext()) {
-            JMSNamingPropertyType propertyPair = (JMSNamingPropertyType)listIter.next();
-            if (null != propertyPair.getValue()) {
-                env.setProperty(propertyPair.getName(), propertyPair.getValue());
-            }
-        }
-        if (LOG.isLoggable(Level.FINE)) {
-            Enumeration props = env.propertyNames();
-            while (props.hasMoreElements()) {
-                String name = (String)props.nextElement();
-                String value = env.getProperty(name);
-                LOG.log(Level.FINE, "Context property: " + name + " | " + value);
-            }
-        }
-        return env;
-    }
-
-    public static int getJMSDeliveryMode(JMSMessageHeadersType headers) {
-        int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
-        if (headers != null && headers.isSetJMSDeliveryMode()) {
-            deliveryMode = headers.getJMSDeliveryMode();
-        }
-        return deliveryMode;
-    }
-
-    public static int getJMSPriority(JMSMessageHeadersType headers) {
-        return (headers != null && headers.isSetJMSPriority())
-            ? headers.getJMSPriority() : Message.DEFAULT_PRIORITY;
     }
 
     public static long getTimeToLive(JMSMessageHeadersType headers) {
@@ -264,7 +229,6 @@ public final class JMSUtils {
 
         if (headers == null) {
             headers = new JMSMessageHeadersType();
-            // throw new RuntimeException("No JMS_CLIENT_REQUEST_HEADERS set in message");
         }
 
         JMSUtils.setMessageProperties(headers, jmsMessage);
@@ -274,7 +238,6 @@ public final class JMSUtils {
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         JMSUtils.addProtocolHeaders(jmsMessage, protHeaders);
         jmsMessage.setJMSCorrelationID(correlationId);
-        jmsMessage.setJMSPriority(JMSUtils.getJMSPriority(headers));
         return jmsMessage;
     }
 

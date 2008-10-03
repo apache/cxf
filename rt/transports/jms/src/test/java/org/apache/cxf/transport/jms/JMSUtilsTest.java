@@ -42,7 +42,7 @@ public class JMSUtilsTest extends Assert {
         prop2.setValue("12");
         addrType.getJMSNamingProperty().add(prop2);
         
-        Properties env = JMSUtils.getInitialContextEnv(addrType);
+        Properties env = JMSOldConfigHolder.getInitialContextEnv(addrType);
         assertTrue("Environment should not be empty", env.size() > 0);
         assertTrue("Environemnt should contain NamingBatchSize property", env.get(Context.BATCHSIZE) != null);
     }

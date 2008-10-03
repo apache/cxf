@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -31,15 +32,19 @@ import javax.jms.Session;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 
 public class JMSConduitTest extends AbstractJMSTester {
+
+    static final Logger LOG = LogUtils.getL7dLogger(JMSConduitTest.class);
 
     @BeforeClass
     public static void createAndStartBroker() throws Exception {
@@ -60,7 +65,7 @@ public class JMSConduitTest extends AbstractJMSTester {
             .getReceiveTimeout());
         bus.shutdown(false);
         BusFactory.setDefaultBus(null);
-
+        conduit.close();
     }
 
     @Test
@@ -78,7 +83,7 @@ public class JMSConduitTest extends AbstractJMSTester {
         verifySentMessage(false, message);
     }
 
-    public void verifySentMessage(boolean send, Message message) {
+    private void verifySentMessage(boolean send, Message message) {
         OutputStream os = message.getContent(OutputStream.class);
         assertTrue("OutputStream should not be null", os != null);
     }
@@ -87,16 +92,50 @@ public class JMSConduitTest extends AbstractJMSTester {
     public void testSendOut() throws Exception {
         setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HelloWorldServiceLoop", "HelloWorldPortLoop");
-
         JMSConduit conduit = setupJMSConduit(true, false);
-        Message message = new MessageImpl();
-        // set the isOneWay to false
-        sendoutMessage(conduit, message, false);
-        verifyReceivedMessage(message);
+        conduit.getJmsConfig().setReceiveTimeout(1000);
+
+        try {
+            for (int c = 0; c < 100; c++) {
+                LOG.info("Sending message " + c);
+                Message message = new MessageImpl();
+                sendoutMessage(conduit, message, false);
+                verifyReceivedMessage(message);
+            }
+        } finally {
+            conduit.close();
+        }
     }
 
-    public void verifyReceivedMessage(Message message) {
+    /**
+     * Sends several messages and verfies the results. The service sends the message to itself. So it should
+     * always receive the result
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testTimeoutOnReceive() throws Exception {
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldServiceLoop", "HelloWorldPortLoop");
+
+        JMSConduit conduit = setupJMSConduit(true, false);
+        // TODO IF the system is extremely fast. The message could still get through
+        conduit.getJmsConfig().setReceiveTimeout(1);
+        Message message = new MessageImpl();
+        try {
+            sendoutMessage(conduit, message, false);
+            verifyReceivedMessage(message);
+            throw new RuntimeException("Expected a timeout here");
+        } catch (RuntimeException e) {
+            LOG.info("Received exception. This is expected");
+        } finally {
+            conduit.close();
+        }
+    }
+
+    private void verifyReceivedMessage(Message message) {
         ByteArrayInputStream bis = (ByteArrayInputStream)inMessage.getContent(InputStream.class);
+        Assert.assertNotNull("The received message input stream should not be null", bis);
         byte bytes[] = new byte[bis.available()];
         try {
             bis.read(bytes);

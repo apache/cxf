@@ -18,10 +18,16 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jms.ConnectionFactory;
 import javax.naming.NamingException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.connection.SingleConnectionFactory;
@@ -30,6 +36,7 @@ import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
 public class JMSOldConfigHolder {
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSOldConfigHolder.class);
     private ClientConfig clientConfig;
     private ClientBehaviorPolicyType runtimePolicy;
 
@@ -83,7 +90,7 @@ public class JMSOldConfigHolder {
         }
 
         JndiTemplate jt = new JndiTemplate();
-        jt.setEnvironment(JMSUtils.getInitialContextEnv(address));
+        jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(address));
         ConnectionFactory cf = getConnectionFactoryFromJndi(address.getJndiConnectionFactoryName(), address
             .getConnectionUserName(), address.getConnectionPassword(), jt);
 
@@ -194,5 +201,25 @@ public class JMSOldConfigHolder {
 
     public void setServerBehavior(ServerBehaviorPolicyType serverBehavior) {
         this.serverBehavior = serverBehavior;
+    }
+
+    public static Properties getInitialContextEnv(AddressType addrType) {
+        Properties env = new Properties();
+        java.util.ListIterator listIter = addrType.getJMSNamingProperty().listIterator();
+        while (listIter.hasNext()) {
+            JMSNamingPropertyType propertyPair = (JMSNamingPropertyType)listIter.next();
+            if (null != propertyPair.getValue()) {
+                env.setProperty(propertyPair.getName(), propertyPair.getValue());
+            }
+        }
+        if (LOG.isLoggable(Level.FINE)) {
+            Enumeration props = env.propertyNames();
+            while (props.hasMoreElements()) {
+                String name = (String)props.nextElement();
+                String value = env.getProperty(name);
+                LOG.log(Level.FINE, "Context property: " + name + " | " + value);
+            }
+        }
+        return env;
     }
 }
