@@ -23,7 +23,6 @@ import javax.jms.Message;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -36,7 +35,8 @@ public class JMSConfiguration implements InitializingBean {
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
-    private long receiveTimeout = JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT;
+    private long receiveTimeout;
+    // Repalce the JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT with 0 to support the Spring 2.0.x 
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
     private int priority = Message.DEFAULT_PRIORITY;

@@ -114,11 +114,7 @@ public abstract class AbstractJMSTester extends Assert {
         
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, true);
-        jmsConfig.setDeliveryMode(3);
-        jmsConfig.setPriority(1);
-        jmsConfig.setTimeToLive(1000);
         JMSConduit jmsConduit = new JMSConduit(target, jmsConfig);
-        jmsConduit.afterPropertiesSet();
         if (send) {
             // setMessageObserver
             observer = new MessageObserver() {

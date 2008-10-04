@@ -54,7 +54,6 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.JmsTemplate102;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
@@ -69,7 +68,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSConfiguration jmsConfig;
     private Bus bus;
     private DefaultMessageListenerContainer jmsListener;
-    private JmsTemplate jmsTemplate;
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
@@ -91,41 +89,14 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      */
     public void activate() {
         getLogger().log(Level.INFO, "JMSDestination activate().... ");
-
-        jmsTemplate = jmsConfig.isUseJms11() ? new JmsTemplate() : new JmsTemplate102();
-        jmsTemplate.setDefaultDestinationName(jmsConfig.getReplyDestination());
-        jmsTemplate.setConnectionFactory(jmsConfig.getConnectionFactory());
-        jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
-        jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
-        jmsTemplate.setTimeToLive(jmsConfig.getTimeToLive());
-        jmsTemplate.setPriority(jmsConfig.getPriority());
-        jmsTemplate.setDeliveryMode(jmsConfig.getDeliveryMode());
-        jmsTemplate.setExplicitQosEnabled(true);
-        jmsTemplate.setSessionTransacted(jmsConfig.isSessionTransacted());
-
-        jmsListener = new DefaultMessageListenerContainer();
-        jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
-        jmsListener.setAutoStartup(true);
-        jmsListener.setConnectionFactory(jmsConfig.getConnectionFactory());
-        jmsListener.setMessageSelector(jmsConfig.getMessageSelector());
-        jmsListener.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
-        jmsListener.setDestinationName(jmsConfig.getTargetDestination());
-        jmsListener.setMessageListener(this);
-        jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
-        jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
-
-        if (jmsConfig.getDestinationResolver() != null) {
-            jmsTemplate.setDestinationResolver(jmsConfig.getDestinationResolver());
-            jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
-        }
-
-        if (!jmsListener.isRunning()) {
-            jmsListener.initialize();
-        }
+        jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination());
+        jmsConfig.getTargetDestination();
     }
 
     public void deactivate() {
-        jmsListener.shutdown();
+        if (jmsListener != null) {
+            jmsListener.shutdown();
+        }
     }
 
     public void shutdown() {
@@ -133,7 +104,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         this.deactivate();
     }
 
-    private Destination resolveDestinationName(final String name) {
+    private Destination resolveDestinationName(final JmsTemplate jmsTemplate, final String name) {
         return (Destination)jmsTemplate.execute(new SessionCallback() {
             public Object doInJms(Session session) throws JMSException {
                 DestinationResolver resolv = jmsTemplate.getDestinationResolver();
@@ -142,12 +113,12 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         });
     }
 
-    public Destination getReplyToDestination(Message inMessage) throws JMSException {
+    public Destination getReplyToDestination(JmsTemplate jmsTemplate, Message inMessage) throws JMSException {
         javax.jms.Message message = (javax.jms.Message)inMessage.get(JMSConstants.JMS_REQUEST_MESSAGE);
         // If WS-Addressing had set the replyTo header.
         final String replyToName = (String)inMessage.get(JMSConstants.JMS_REBASED_REPLY_TO);
         if (replyToName != null) {
-            return resolveDestinationName(replyToName);
+            return resolveDestinationName(jmsTemplate, replyToName);
         } else if (message.getJMSReplyTo() != null) {
             return message.getJMSReplyTo();
         } else {
@@ -216,6 +187,12 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             return;
         }
         try {
+            final JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
+                .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
+            JMSMessageHeadersType inHeaders = (JMSMessageHeadersType)inMessage
+                .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+            JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, inHeaders);
+
             // setup the reply message
             final javax.jms.Message request = (javax.jms.Message)inMessage
                 .get(JMSConstants.JMS_REQUEST_MESSAGE);
@@ -228,11 +205,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 msgType = JMSConstants.BINARY_MESSAGE_TYPE;
             }
 
-            Destination replyTo = getReplyToDestination(inMessage);
-            final JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
-                .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-            JMSMessageHeadersType inHeaders = (JMSMessageHeadersType)inMessage
-                .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+            Destination replyTo = getReplyToDestination(jmsTemplate, inMessage);
 
             if (request.getJMSExpiration() > 0) {
                 TimeZone tz = new SimpleTimeZone(0, "GMT");
@@ -245,11 +218,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 }
             }
 
-            int deliveryMode = JMSUtils.getJMSDeliveryMode(inHeaders);
-            int priority = JMSUtils.getJMSPriority(inHeaders);
-
-            jmsTemplate.setDeliveryMode(deliveryMode);
-            jmsTemplate.setPriority(priority);
             getLogger().log(Level.FINE, "send out the message!");
             jmsTemplate.send(replyTo, new MessageCreator() {
                 public javax.jms.Message createMessage(Session session) throws JMSException {
@@ -276,6 +244,14 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
     protected Logger getLogger() {
         return LOG;
+    }
+
+    public JMSConfiguration getJmsConfig() {
+        return jmsConfig;
+    }
+
+    public void setJmsConfig(JMSConfiguration jmsConfig) {
+        this.jmsConfig = jmsConfig;
     }
 
     /**
@@ -328,14 +304,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         protected Logger getLogger() {
             return LOG;
         }
-    }
-
-    public JMSConfiguration getJmsConfig() {
-        return jmsConfig;
-    }
-
-    public void setJmsConfig(JMSConfiguration jmsConfig) {
-        this.jmsConfig = jmsConfig;
     }
 
 }
