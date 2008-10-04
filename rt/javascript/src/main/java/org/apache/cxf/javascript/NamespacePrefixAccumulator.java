@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class NamespacePrefixAccumulator {
@@ -88,6 +89,24 @@ public class NamespacePrefixAccumulator {
             return prefix + ":" + element.getName();
         }
         return element.getName(); // use the non-qualified name.
+    }
+    
+    /**
+     * Obtain a suitable name for use in Javascript for an attribute. This function
+     * is purely a tribute to the awful modularity of XmlSchema.
+     * @param attribute
+     * @param qualified
+     * @return
+     */
+    public String xmlAttributeString(XmlSchemaAttribute attribute, boolean qualified) {
+        if (qualified) {
+            // What if there were a prefix in the element's qname? This is not apparently 
+            // something that happens in this environment.
+            String prefix = getPrefix(attribute.getQName().getNamespaceURI());
+            collect(prefix, attribute.getQName().getNamespaceURI());
+            return prefix + ":" + attribute.getName();
+        }
+        return attribute.getName(); // use the non-qualified name.
     }
     
     public String xmlElementString(QName name) { // used with part concrete names

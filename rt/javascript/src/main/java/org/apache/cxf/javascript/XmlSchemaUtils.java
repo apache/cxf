@@ -28,7 +28,10 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
+import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
+import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
@@ -196,6 +199,19 @@ public final class XmlSchemaUtils {
         return schema.getElementFormDefault().equals(QUALIFIED);
     }
     
+    public static boolean isAttributeNameQualified(XmlSchemaAttribute attribute, XmlSchema schema) {
+        if (attribute.getRefName() != null) {
+            throw new RuntimeException("isElementNameQualified on element with ref=");
+        }
+        if (attribute.getForm().equals(QUALIFIED)) {
+            return true;
+        }
+        if (attribute.getForm().equals(UNQUALIFIED)) {
+            return false;
+        }
+        return schema.getAttributeFormDefault().equals(QUALIFIED);
+    }
+    
     /**
      * due to a bug, feature, or just plain oddity of JAXB, it isn't good enough
      * to just check the form of an element and of its schema. If schema 'a'
@@ -234,7 +250,45 @@ public final class XmlSchemaUtils {
             return isElementNameQualified(element, elementSchema);
         }
     }
-    
+    /**
+     * due to a bug, feature, or just plain oddity of JAXB, it isn't good enough
+     * to just check the form of an element and of its schema. If schema 'a'
+     * (default unqualified) has a complex type with an element with a ref= to
+     * schema (b) (default unqualified), JAXB seems to expect to see a
+     * qualifier, anyway. <br/> So, if the element is local to a complex type,
+     * all we care about is the default element form of the schema and the local
+     * form of the element. <br/> If, on the other hand, the element is global,
+     * we might need to compare namespaces. <br/>
+     * 
+     * @param attribute the attribute
+     * @param global if this element is a global element (complex type ref= to
+     *                it, or in a part)
+     * @param localSchema the schema of the complex type containing the
+     *                reference, only used for the 'odd case'.
+     * @param elementSchema the schema for the element.
+     * @return if the element needs to be qualified.
+     */
+    public static boolean isAttributeQualified(XmlSchemaAttribute attribute,
+                                             boolean global,
+                                             XmlSchema localSchema,
+                                             XmlSchema attributeSchema) {
+        if (attribute.getQName() == null) {
+            throw new RuntimeException("getSchemaQualifier on anonymous element.");
+        }
+        if (attribute.getRefName() != null) {
+            throw new RuntimeException("getSchemaQualified on the 'from' side of ref=.");
+        }
+            
+
+        if (global) {
+            return isAttributeNameQualified(attribute, attributeSchema)
+                || (localSchema != null 
+                    && !(attribute.getQName().getNamespaceURI().equals(localSchema.getTargetNamespace())));
+        } else {
+            return isAttributeNameQualified(attribute, attributeSchema);
+        }
+    }
+
     /**
      * If the object is an element or an any, return the particle. If it's not a particle, or it's a group,
      * throw. We're not ready for groups yet.
@@ -256,6 +310,30 @@ public final class XmlSchemaUtils {
         }
         
         return (XmlSchemaParticle) object;
+    }
+    
+    /**
+     * If the object is an attribute or an anyAttribute, 
+     * return the 'Annotated'. If it's not one of those, or it's a group,
+     * throw. We're not ready for groups yet.
+     * @param object
+     * @return
+     */
+    public static XmlSchemaAnnotated getObjectAnnotated(XmlSchemaObject object, QName contextName) {
+        
+        if (!(object instanceof XmlSchemaAnnotated)) {
+            XmlSchemaUtils.unsupportedConstruct("NON_ANNOTATED_ATTRIBUTE", 
+                                                object.getClass().getSimpleName(), 
+                                                contextName, object);
+        }
+        if (!(object instanceof XmlSchemaAttribute)
+            && !(object instanceof XmlSchemaAnyAttribute)) {
+            XmlSchemaUtils.unsupportedConstruct("EXOTIC_ATTRIBUTE", 
+                                                object.getClass().getSimpleName(), contextName,
+                                                object);
+        }
+        
+        return (XmlSchemaAnnotated) object;
     }
     
     public static boolean isParticleArray(XmlSchemaParticle particle) {
