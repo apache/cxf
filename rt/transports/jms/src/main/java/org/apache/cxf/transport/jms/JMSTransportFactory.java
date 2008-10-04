@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractTransportFactory;
 import org.apache.cxf.transport.Conduit;
@@ -44,7 +43,6 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     }
 
     private Bus bus;
-    private JMSConfiguration jmsConfig;
 
     @Resource(name = "cxf")
     public void setBus(Bus b) {
@@ -55,37 +53,32 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
         return bus;
     }
 
-    public Conduit getConduit(EndpointInfo targetInfo) throws IOException {
-        return getConduit(targetInfo, targetInfo.getTarget());
+    public Conduit getConduit(EndpointInfo endpointInfo) throws IOException {
+        return getConduit(endpointInfo, endpointInfo.getTarget());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target) throws IOException {
-        JMSConduit conduit = target == null
-            ? new JMSConduit(bus, endpointInfo) : new JMSConduit(bus, endpointInfo, target);
         JMSOldConfigHolder old = new JMSOldConfigHolder();
-        JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo);
-        conduit.setJmsConfig(jmsConf);
-        return conduit;
+        JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo, true);
+        JMSConduit jmsConduit = new JMSConduit(target, jmsConf);
+        jmsConduit.afterPropertiesSet();
+        return jmsConduit;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
-        JMSDestination destination = new JMSDestination(bus, this, endpointInfo);
-        Configurer configurer = bus.getExtension(Configurer.class);
-        if (null != configurer) {
-            configurer.configureBean(destination);
-        }
-        return destination;
+        JMSOldConfigHolder old = new JMSOldConfigHolder();
+        JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo, false);
+        return new JMSDestination(bus, endpointInfo, jmsConf);
     }
     
     public Set<String> getUriPrefixes() {
         return URI_PREFIXES;
     }
 
-    public JMSConfiguration getJmsConfig() {
-        return jmsConfig;
-    }
-
-    public void setJmsConfig(JMSConfiguration jmsConfig) {
-        this.jmsConfig = jmsConfig;
-    }
 }

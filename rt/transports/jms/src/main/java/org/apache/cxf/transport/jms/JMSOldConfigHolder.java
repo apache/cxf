@@ -19,7 +19,6 @@
 package org.apache.cxf.transport.jms;
 
 import javax.jms.ConnectionFactory;
-import javax.jms.Message;
 import javax.naming.NamingException;
 
 import org.apache.cxf.Bus;
@@ -27,15 +26,18 @@ import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
 public class JMSOldConfigHolder {
-    protected ClientConfig clientConfig;
-    protected ClientBehaviorPolicyType runtimePolicy;
-    protected AddressType address;
-    protected SessionPoolType sessionPool;
+    private ClientConfig clientConfig;
+    private ClientBehaviorPolicyType runtimePolicy;
+
+    private AddressType address;
+    private SessionPoolType sessionPool;
+    private JMSConfiguration jmsConfig;
+    private ServerConfig serverConfig;
+    private ServerBehaviorPolicyType serverBehavior;
 
     private ConnectionFactory getConnectionFactoryFromJndi(String connectionFactoryName, String userName,
                                                            String password, JndiTemplate jt) {
@@ -43,7 +45,6 @@ public class JMSOldConfigHolder {
             return null;
         }
         try {
-
             ConnectionFactory connectionFactory = (ConnectionFactory)jt.lookup(connectionFactoryName);
             UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
             uccf.setUsername(userName);
@@ -58,20 +59,26 @@ public class JMSOldConfigHolder {
         }
     }
 
-    public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus, EndpointInfo endpointInfo) {
-        JMSConfiguration jmsConf = new JMSConfiguration();
+    public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus, EndpointInfo endpointInfo,
+                                                                   boolean isConduit) {
+        jmsConfig = new JMSConfiguration();
 
-        // Retrieve configuration information that was extracted from the wsdl
+        // Retrieve configuration information that was extracted from the WSDL
         address = endpointInfo.getTraversedExtensor(new AddressType(), AddressType.class);
         clientConfig = endpointInfo.getTraversedExtensor(new ClientConfig(), ClientConfig.class);
         runtimePolicy = endpointInfo.getTraversedExtensor(new ClientBehaviorPolicyType(),
                                                           ClientBehaviorPolicyType.class);
+        serverConfig = endpointInfo.getTraversedExtensor(new ServerConfig(), ServerConfig.class);
+        sessionPool = endpointInfo.getTraversedExtensor(new SessionPoolType(), SessionPoolType.class);
+        serverBehavior = endpointInfo.getTraversedExtensor(new ServerBehaviorPolicyType(),
+                                                           ServerBehaviorPolicyType.class);
+        String name = endpointInfo.getName().toString() + (isConduit ? ".jms-conduit" : ".jms-destination");
 
         // Try to retrieve configuration information from the spring
-        // config. Search for a tag <jms:conduit> with name=endpoint name + ".jms-conduit"
+        // config. Search for a conduit or destination with name=endpoint name + ".jms-conduit"
+        // or ".jms-destination"
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
-            String name = endpointInfo.getName().toString() + ".jms-conduit";
             configurer.configureBean(name, this);
         }
 
@@ -80,38 +87,57 @@ public class JMSOldConfigHolder {
         ConnectionFactory cf = getConnectionFactoryFromJndi(address.getJndiConnectionFactoryName(), address
             .getConnectionUserName(), address.getConnectionPassword(), jt);
 
-        // TODO Use JmsTemplate102 in case JMS 1.1 is not available
-        JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setConnectionFactory(cf);
         boolean pubSubDomain = false;
         if (address.isSetDestinationStyle()) {
             pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
         }
-        jmsTemplate.setPubSubDomain(pubSubDomain);
-        jmsTemplate.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
-        jmsTemplate.setTimeToLive(clientConfig.getMessageTimeToLive());
-        jmsTemplate.setPriority(Message.DEFAULT_PRIORITY);
-        jmsTemplate.setDeliveryMode(Message.DEFAULT_DELIVERY_MODE);
-        jmsTemplate.setExplicitQosEnabled(true);
+        jmsConfig.setConnectionFactory(cf);
+        jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
+        jmsConfig.setExplicitQosEnabled(true);
+        // jmsConfig.setMessageIdEnabled(messageIdEnabled);
+        jmsConfig.setMessageSelector(serverBehavior.getMessageSelector());
+        // jmsConfig.setMessageTimestampEnabled(messageTimestampEnabled);
+        if (runtimePolicy.isSetMessageType()) {
+            jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
+        }
+        // jmsConfig.setOneWay(oneWay);
+        // jmsConfig.setPriority(priority);
+        jmsConfig.setPubSubDomain(pubSubDomain);
+        jmsConfig.setPubSubNoLocal(true);
+        jmsConfig.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
+        jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());
+        long timeToLive = isConduit ? clientConfig.getMessageTimeToLive() : serverConfig
+            .getMessageTimeToLive();
+        jmsConfig.setTimeToLive(timeToLive);
+        jmsConfig.setUseJms11(true);
+        boolean useJndi = address.isSetJndiDestinationName();
+        jmsConfig.setUseJndi(useJndi);
+        jmsConfig.setSessionTransacted(serverBehavior.isSetTransactional());
 
-        if (address.isSetJndiDestinationName()) {
+        if (useJndi) {
             // Setup Destination jndi destination resolver
             final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();
             jndiDestinationResolver.setJndiTemplate(jt);
-            jmsTemplate.setDestinationResolver(jndiDestinationResolver);
-            jmsConf.setTargetDestination(address.getJndiDestinationName());
-            jmsConf.setReplyDestination(address.getJndiReplyDestinationName());
+            jmsConfig.setDestinationResolver(jndiDestinationResolver);
+            jmsConfig.setTargetDestination(address.getJndiDestinationName());
+            jmsConfig.setReplyDestination(address.getJndiReplyDestinationName());
         } else {
             // Use the default dynamic destination resolver
-            jmsConf.setTargetDestination(address.getJmsDestinationName());
-            jmsConf.setReplyDestination(address.getJmsReplyDestinationName());
-        }
-        if (runtimePolicy.isSetMessageType()) {
-            jmsConf.setMessageType(runtimePolicy.getMessageType().value());
+            jmsConfig.setTargetDestination(address.getJmsDestinationName());
+            jmsConfig.setReplyDestination(address.getJmsReplyDestinationName());
         }
 
-        jmsConf.setJmsTemplate(jmsTemplate);
-        return jmsConf;
+        jmsConfig.setConnectionFactory(cf);
+
+        if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
+            throw new RuntimeException("Insufficient configuration for "
+                                       + (isConduit ? "Conduit" : "Destination") + ". "
+                                       + "Did you configure a <jms:"
+                                       + (isConduit ? "conduit" : "destination") + " name=\"" + name
+                                       + "\"> and set the jndiConnectionFactoryName ?");
+        }
+
+        return jmsConfig;
     }
 
     public ClientConfig getClientConfig() {
@@ -144,5 +170,29 @@ public class JMSOldConfigHolder {
 
     public void setSessionPool(SessionPoolType sessionPool) {
         this.sessionPool = sessionPool;
+    }
+
+    public JMSConfiguration getJmsConfig() {
+        return jmsConfig;
+    }
+
+    public void setJmsConfig(JMSConfiguration jmsConfig) {
+        this.jmsConfig = jmsConfig;
+    }
+
+    public ServerConfig getServerConfig() {
+        return serverConfig;
+    }
+
+    public void setServerConfig(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
+    }
+
+    public ServerBehaviorPolicyType getServerBehavior() {
+        return serverBehavior;
+    }
+
+    public void setServerBehavior(ServerBehaviorPolicyType serverBehavior) {
+        this.serverBehavior = serverBehavior;
     }
 }

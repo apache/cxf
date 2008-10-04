@@ -51,10 +51,17 @@
             <xs:complexContent>
                 <xs:extension base="beans:identifiedType">
                     <xs:sequence>
-                        <xs:element name="clientConfig" type="jms:ClientConfig" minOccurs="0"/>
-                        <xs:element name="runtimePolicy" type="jms:ClientBehaviorPolicyType" minOccurs="0"/>
-                        <xs:element name="sessionPool" type="jms:SessionPoolType" minOccurs="0"/>
-                        <xs:element name="address" type="jms:AddressType" minOccurs="0"/>
+                    	<xs:element name="clientConfig"
+                    		type="jms:ClientConfig" minOccurs="0" />
+                    	<xs:element name="runtimePolicy"
+                    		type="jms:ClientBehaviorPolicyType" minOccurs="0" />
+                    	<xs:element name="sessionPool"
+                    		type="jms:SessionPoolType" minOccurs="0" />
+                    	<xs:element name="address"
+                    		type="jms:AddressType" minOccurs="0" />
+                    	<xs:element name="jmsConfig-ref"
+                    		type="xs:string">
+                    	</xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
                 </xs:extension>

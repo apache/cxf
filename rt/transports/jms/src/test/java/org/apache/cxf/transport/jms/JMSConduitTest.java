@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -56,7 +57,7 @@ public class JMSConduitTest extends AbstractJMSTester {
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         JMSConduit conduit = setupJMSConduit(false, false);
         assertEquals("Can't get the right ClientReceiveTimeout", 500L, conduit.getJmsConfig()
-            .getJmsTemplate().getReceiveTimeout());
+            .getReceiveTimeout());
         bus.shutdown(false);
         BusFactory.setDefaultBus(null);
 
@@ -121,21 +122,16 @@ public class JMSConduitTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduit(true, false);
         Message msg = new MessageImpl();
         conduit.prepare(msg);
-        final byte[] b = testMsg.getBytes(); // TODO encoding
-        JmsTemplate jmsTemplate = conduit.getJmsConfig().getJmsTemplate();
+        final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset()); // TODO encoding
+        JMSConfiguration jmsConfig = conduit.getJmsConfig();
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setConnectionFactory(jmsConfig.getConnectionFactory());
         javax.jms.Message message = (javax.jms.Message)jmsTemplate.execute(new SessionCallback() {
-
             public Object doInJms(Session session) throws JMSException {
-                return JMSUtils.createAndSetPayload(b, session, JMSConstants.BYTE_MESSAGE_TYPE);
+                return JMSUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             }
-
         });
-
         assertTrue("Message should have been of type BytesMessage ", message instanceof BytesMessage);
-        // byte[] returnBytes = new byte[(int)((BytesMessage) message).getBodyLength()];
-        // ((BytesMessage) message).readBytes(returnBytes);
-        // assertTrue("Message marshalled was incorrect",
-        // testMsg.equals(new String(returnBytes)));
     }
 
 }
