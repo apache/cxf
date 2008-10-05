@@ -20,12 +20,14 @@ package org.apache.cxf.transport.jms;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.Destination;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Allows to configure the JMSConfiguration directly at the Client or Endpoint. Simply add this class to the
+ * Allows to configure the JMSConfiguration directly at the Client or Server. Simply add this class to the
  * Features and reference a JMSConfiguration. The configuration inside this class takes precedence over a
  * configuration that is generated from the old configuration style.
  */
@@ -42,6 +44,16 @@ public class JMSConfigFeature extends AbstractFeature {
         super.initialize(client, bus);
     }
 
+    @Override
+    public void initialize(Server server, Bus bus) {
+        Destination destination = server.getDestination();
+        if (destination instanceof JMSDestination && jmsConfig != null) {
+            JMSDestination jmsConduit = (JMSDestination)destination;
+            jmsConduit.setJmsConfig(jmsConfig);
+        }
+        super.initialize(server, bus);
+    }
+    
     public JMSConfiguration getJmsConfig() {
         return jmsConfig;
     }
