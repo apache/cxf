@@ -82,9 +82,12 @@ public abstract class AbstractDataBinding implements DataBinding {
             d.getDocumentElement().setAttribute("targetNamespace", ns);
         }
         
-        if (col.getSchemaByTargetNamespace(ns) != null) {
-            return col.getSchemaByTargetNamespace(ns);
+        SchemaInfo schemaInfo = serviceInfo.getSchema(ns);
+        if (schemaInfo != null && (systemId == null && schemaInfo.getSystemId() == null 
+            || systemId != null && schemaInfo.getSystemId().equalsIgnoreCase(systemId))) {
+            return schemaInfo.getSchema();
         }
+        
         
         if (hackAroundEmptyNamespaceIssue) {
             d = doEmptyNamespaceHack(d);            
