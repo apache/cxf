@@ -999,7 +999,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
             if (mpi.isElement()) {
                 XmlSchemaElement oldEl = (XmlSchemaElement)mpi.getXmlSchema();
-                if (!oldEl.getQName().equals(qname)) {
+                if (null != oldEl && !oldEl.getQName().equals(qname)) {
                     el.setSchemaTypeName(oldEl.getSchemaTypeName());
                     el.setSchemaType(oldEl.getSchemaType());
                     if (oldEl.getSchemaTypeName() != null) {
