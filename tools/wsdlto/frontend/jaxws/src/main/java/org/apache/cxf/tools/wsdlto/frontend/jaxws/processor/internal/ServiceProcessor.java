@@ -329,6 +329,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     String soapAction = prop.get(soapOPAction) == null ? "" : (String)prop.get(soapOPAction);
                     String soapStyle = prop.get(soapOPStyle) == null ? "" : (String)prop.get(soapOPStyle);
                     jm.setSoapAction(soapAction);
+
                     if (SOAPBindingUtil.getSoapStyle(soapStyle) == null && this.bindingObj == null) {
                         org.apache.cxf.common.i18n.Message msg =
                             new  org.apache.cxf.common.i18n.Message("BINDING_STYLE_NOT_DEFINED",
@@ -613,11 +614,8 @@ public class ServiceProcessor extends AbstractProcessor {
                 bindingObj = (HTTPBinding)ext;
                 return BindingType.HTTPBinding;
             }
-            // TBD XMLBinding
-            return BindingType.XMLBinding;
-
         }
-        return null;
+        return BindingType.XMLBinding;
     }
 
     private int isNonWrappable(BindingOperationInfo bop) {
