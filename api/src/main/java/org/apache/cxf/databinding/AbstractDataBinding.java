@@ -69,6 +69,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, SchemaCollection col, Document d,
                                           String systemId) {
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
+        
         if (StringUtils.isEmpty(ns)) {
             if (DOMUtils.getFirstElement(d.getDocumentElement()) == null) {
                 hackAroundEmptyNamespaceIssue = true;
@@ -80,6 +81,11 @@ public abstract class AbstractDataBinding implements DataBinding {
             ns = serviceInfo.getInterface().getName().getNamespaceURI();
             d.getDocumentElement().setAttribute("targetNamespace", ns);
         }
+        
+        if (col.getSchemaByTargetNamespace(ns) != null) {
+            return col.getSchemaByTargetNamespace(ns);
+        }
+        
         if (hackAroundEmptyNamespaceIssue) {
             d = doEmptyNamespaceHack(d);            
         }
@@ -95,6 +101,7 @@ public abstract class AbstractDataBinding implements DataBinding {
             }
             n = n.getNextSibling();
         }
+        
         SchemaInfo schema = new SchemaInfo(ns);
         schema.setSystemId(systemId);
         XmlSchema xmlSchema;
