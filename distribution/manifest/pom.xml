@@ -214,12 +214,6 @@
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${pom.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk14</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>

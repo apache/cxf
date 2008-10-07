@@ -58,8 +58,9 @@ For Aegis support:
 - stax-utils.jar
 
 For WS-Security support:
-- bcprov-jdk14.jar
-- xalan.jar (version 2.7.1 preferred)
+- bcprov-jdk15.jar
+- xalan.jar
+- serializer.jar
 - wss4j.jar
 - xmlsec.jar
 

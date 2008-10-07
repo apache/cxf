@@ -80,14 +80,14 @@
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk15</artifactId>
                 </exclusion>
-		<exclusion>
-		    <groupId>bouncycastle</groupId>
-		    <artifactId>bcprov-jdk13</artifactId>
-		</exclusion>
-		<exclusion>
-		    <groupId>bouncycastle</groupId>
-		    <artifactId>bcprov-jdk14</artifactId>
-		</exclusion>
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk13</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk14</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
@@ -98,24 +98,24 @@
                 </exclusion>
             </exclusions>
         </dependency>
-	<dependency>
-	    <groupId>commons-logging</groupId>
-	    <artifactId>commons-logging</artifactId>
-	</dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
+            <version>2.7.1</version>
             <exclusions>
-              <exclusion>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis</artifactId>
-              </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>bouncycastle</groupId>
-            <artifactId>bcprov-jdk14</artifactId>
+            <artifactId>bcprov-jdk15</artifactId>
             <scope>runtime</scope>
         </dependency>
 

@@ -42,25 +42,6 @@ After installing Apache Ant, add the <AntInstallDir>/bin directory to your PATH.
 For more details, see the Installation Guide.
 
 
-2.3 Bouncy Castle/JCE and Xalan requirement for WS-Security
-
-To use the WS-Security features of CXF, you need to obtain a JCE crypto provider
-that implements the algorithms that you plan to use. One option is to download 
-the Bouncy Castle jar from:
-http://bouncycastle.org/download/bcprov-jdk14-136.jar 
-and add that to the lib directory or classpath. 
-
-You also need to have xalan available as the xmlsec code has direct 
-dependencies on xalan.  However, all recent versions of xalan (2.5.0 - 2.7.1) 
-have bugs in them that prevent the JAX-WS TCK from passing if it's on the
-classpath.  Specifically, reading an EndpointReference via 
-EndpointReference.readFrom(Source) may not result in an EndpointReference that
-is completely usable as namespace declarations may be lost.
-
-The latest version of the WSS4J library that is used to implement WS-Security 
-requires the opensaml jar to be on the classpath.  This is different than previous
-versions that only required it if doing SAML assertions.  When upgrading
-to CXF 2.1.2, you will need to add the opensaml jar to your application.   
 
 3. Building the Samples
 
