@@ -92,7 +92,7 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
             if (ctxObject instanceof ApplicationContext) {
                 ctx = (ApplicationContext) ctxObject;
             } else if (ctxObject != null) {
-                // it should be the runtime exception                
+                // it should be a runtime exception                
                 Exception ex = (Exception) ctxObject;
                 throw new ServletException(ex);
             }                   
@@ -105,8 +105,13 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
         }
     }
     private void updateContext(ServletConfig servletConfig, ApplicationContext ctx) {
-     // This constructor works whether there is a context or not
-        // If the ctx is null, we just start up the default bus
+        /* If ctx is null, normally no ContextLoaderListener 
+         * was defined in web.xml.  Default bus with all extensions
+         * will be created in this case.
+         * 
+         * If ctx not null, was already created by ContextLoaderListener.
+         * Bus with only those extensions defined in the ctx will be created. 
+         */
         if (ctx == null) {            
             LOG.info("LOAD_BUS_WITHOUT_APPLICATION_CONTEXT");
             bus = new SpringBusFactory().createBus();
