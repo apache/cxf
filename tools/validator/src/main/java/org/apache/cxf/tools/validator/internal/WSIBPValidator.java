@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.extensions.soap.SoapBody;
@@ -358,7 +359,6 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
     }
 
     // TODO: Should also check SoapHeader/SoapHeaderFault
-    @SuppressWarnings("unchecked")
     public boolean checkR2205() {
         for (Iterator ite = def.getBindings().values().iterator(); ite.hasNext();) {
             Binding binding = (Binding)ite.next();
@@ -371,14 +371,14 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
             for (Iterator ite2 = binding.getPortType().getOperations().iterator(); ite2.hasNext();) {
                 Operation operation = (Operation)ite2.next();
-                Collection<Fault> faults = operation.getFaults().values();
+                Collection<Fault> faults = CastUtils.cast(operation.getFaults().values());
                 if (CollectionUtils.isEmpty(faults)) {
                     continue;
                 }
 
                 for (Fault fault : faults) {
                     Message message = fault.getMessage();
-                    Collection<Part> parts = message.getParts().values();
+                    Collection<Part> parts = CastUtils.cast(message.getParts().values());
                     for (Part part : parts) {
                         if (part.getElementName() == null) {
                             addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2205") + "In Message " 

@@ -270,7 +270,7 @@ public class AnnotationReader {
         return false;
     }
 
-    private static Object getAnnotationValue(String name,
+    static Object getAnnotationValue(String name,
             AnnotatedElement element,
             Object ignoredValue,
             Class<? extends Annotation>... annotations) {

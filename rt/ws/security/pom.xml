@@ -159,4 +159,24 @@
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/ws/security</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/ws/security</developerConnection>
     </scm>
+
+    <profiles>
+        <profile>
+            <id>ibmjdk</id>
+            <activation>
+                <property>
+                    <name>java.vendor</name>
+                    <value>IBM Corporation</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.xml.parsers</groupId>
+                    <artifactId>jaxp-ri</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
 </project>

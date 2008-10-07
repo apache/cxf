@@ -30,7 +30,8 @@ public class Option {
      * this horrid inital value to tell if it has been 
      * configured or not yet.
      */
-    private static final String DEFAULT_WSDL_LOCATION = "@£$%^&*()DEFAULTWSDLLOCATION";
+    private static final String DEFAULT_WSDL_LOCATION = "DEFAULTWSDLLOCATION - WORKAROUND";
+
     protected List<String> packagenames;
     protected List<String> extraargs = new ArrayList<String>();
     protected File outputDir;
