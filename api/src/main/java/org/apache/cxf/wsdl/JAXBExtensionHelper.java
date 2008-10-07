@@ -87,7 +87,18 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 .asSubclass(TExtensibilityElementImpl.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, null);
     }
-    
+    public static void addExtensions(ExtensionRegistry registry,
+                                     String parentType, 
+                                     String elementType,
+                                     String namespace)
+        throws JAXBException, ClassNotFoundException {
+        Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
+
+        Class<? extends TExtensibilityElementImpl> elementTypeClass = 
+            ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
+                .asSubclass(TExtensibilityElementImpl.class);
+        addExtensions(registry, parentTypeClass, elementTypeClass, namespace);
+    }
     public static void addExtensions(ExtensionRegistry registry,
                                      Class<?> parentType,
                                      Class<? extends TExtensibilityElementImpl> cls)
@@ -224,6 +235,10 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 }
                                 
                 public String getPrefix(String arg) {
+                    if (arg.equals(jaxbNamespace)) {
+                        arg = namespace;
+                    }
+                    
                     for (Object ent : wsdl.getNamespaces().entrySet()) {
                         Map.Entry entry = (Map.Entry)ent;
                         if (arg.equals(entry.getValue())) {
@@ -234,6 +249,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 }
                 
                 public Iterator getPrefixes(String arg) {
+                    if (arg.equals(jaxbNamespace)) {
+                        arg = namespace;
+                    }
                     return wsdl.getNamespaces().keySet().iterator();
                 }
             });
