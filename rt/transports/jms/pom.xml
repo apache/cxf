@@ -72,12 +72,6 @@
         </dependency>
 
         <dependency>
-            <groupId>${saaj.impl.groupId}</groupId>
-            <artifactId>${saaj.impl.artifactId}</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
             <scope>test</scope>

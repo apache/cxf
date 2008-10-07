@@ -392,13 +392,13 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         vResults.addWarning(warningMsg);
     }
 
-    @SuppressWarnings("unchecked")
     private void collectValidationPoints() throws Exception {
         if (services.size() == 0) {
             LOG.log(Level.WARNING, "WSDL document " 
                     + this.definition.getDocumentBaseURI() + " does not define any services");
             //addWarning("WSDL document does not define any services");
-            portTypeRefNames.addAll(this.definition.getAllPortTypes().keySet());
+            Collection<QName> ports = CastUtils.cast(this.definition.getAllPortTypes().keySet());
+            portTypeRefNames.addAll(ports);
         } else {
             collectValidationPointsForBindings();
         }
