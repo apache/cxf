@@ -180,6 +180,23 @@
   </supplement>
     <supplement>
     <project>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <name>Jakarta-ORO</name>
+      <organization>
+        <name>The Apache Software Foundation</name>
+        <url>http://www.apache.org</url>
+      </organization>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+    <supplement>
+    <project>
       <groupId>opensaml</groupId>
       <artifactId>opensaml</artifactId>
       <name>OpenSAML</name>
