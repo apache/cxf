@@ -33,9 +33,11 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.jms.core.JmsTemplate;
@@ -52,14 +54,15 @@ import org.springframework.jms.support.JmsUtils;
 public class JMSConduit extends AbstractConduit implements JMSExchangeSender, MessageListener {
     static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
 
+    private EndpointInfo endpointInfo;
     private JMSConfiguration jmsConfig;
     private Map<String, Message> correlationMap;
-
     private DefaultMessageListenerContainer jmsListener;
 
-    public JMSConduit(EndpointReferenceType target, JMSConfiguration jmsConfig) {
+    public JMSConduit(EndpointInfo endpointInfo, EndpointReferenceType target, JMSConfiguration jmsConfig) {
         super(target);
         this.jmsConfig = jmsConfig;
+        this.endpointInfo = endpointInfo;
         correlationMap = new ConcurrentHashMap<String, Message>();
     }
 
@@ -70,10 +73,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      */
     public void prepare(Message message) throws IOException {
         if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
-            String name =  ".jms-conduit";
-            throw new RuntimeException("Insufficient configuration for Conduit. "
-                                       + "Did you configure a <jms:conduit name=\"" + name
-                                       + "\"> and set the jndiConnectionFactoryName ?");
+            String name =  endpointInfo.getName().toString() + ".jms-conduit";
+            throw new ConfigurationException(
+                new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_CONDUIT", LOG, name));
         }
         boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
         JMSOutputStream out = new JMSOutputStream(this, message.getExchange(), isTextPayload);
