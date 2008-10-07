@@ -49,6 +49,9 @@ public final class AttachmentUtil {
     }
 
     public static Attachment getAttachment(String id, Collection<Attachment> attachments) {
+        if (id == null) {
+            throw new DatabindingException("Cannot get attachment: null id");
+        }
         int i = id.indexOf("cid:");
         if (i != -1) {
             id = id.substring(4).trim();
