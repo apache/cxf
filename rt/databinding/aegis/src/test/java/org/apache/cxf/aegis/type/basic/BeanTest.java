@@ -53,6 +53,7 @@ public class BeanTest extends AbstractAegisTest {
         super.setUp();
     
         addNamespace("b", "urn:Bean");
+        addNamespace("bz", "urn:beanz");
         addNamespace("a", "urn:anotherns");
         addNamespace("xsi", SOAPConstants.XSI_NS);
 
@@ -364,6 +365,66 @@ public class BeanTest extends AbstractAegisTest {
     }
     
     @Test
+    public void testByteMappings() throws Exception {
+        context = new AegisContext();
+        context.initialize();
+        mapping = context.getTypeMapping();
+
+        BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
+        type.setTypeClass(SimpleBean.class);
+        type.setTypeMapping(mapping);
+
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
+
+        new Document(types);
+
+        type.writeSchema(schema);
+
+        NodeList typeAttrNode = 
+            assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence/xsd:element[@name='littleByte']"
+                       + "/@type", 
+                       schema); 
+        assertEquals(1, typeAttrNode.getLength());
+        Attr typeAttr = (Attr)typeAttrNode.item(0);
+        String typeQnameString = typeAttr.getValue();
+        String[] pieces = typeQnameString.split(":");
+        assertEquals("xsd", pieces[0]);
+        assertEquals("byte", pieces[1]);
+        
+        typeAttrNode = 
+            assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence/xsd:element[@name='bigByte']"
+                       + "/@type", 
+                       schema); 
+        assertEquals(1, typeAttrNode.getLength());
+        typeAttr = (Attr)typeAttrNode.item(0);
+        typeQnameString = typeAttr.getValue();
+        pieces = typeQnameString.split(":");
+        assertEquals("xsd", pieces[0]);
+        assertEquals("byte", pieces[1]);
+        
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        SimpleBean bean = new SimpleBean();
+        bean.setBigByte(new Byte((byte)0xfe));
+        bean.setLittleByte((byte)0xfd);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Byte bb = new Byte((byte)0xfe);
+        String bbs = bb.toString();
+        assertValid("/b:root/bz:bigByte[text()='" + bbs + "']", element);
+        
+        // Test reading
+        ElementReader reader = new ElementReader(getResourceAsStream("byteBeans.xml"));
+        bean = (SimpleBean)type.readObject(reader, getContext());
+        assertEquals(-5, bean.getLittleByte());
+        assertEquals(25, bean.getBigByte().byteValue());
+
+        reader.getXMLStreamReader().close();
+
+    }
+    
+    @Test
     public void testNullNonNillableWithDate() throws Exception {
         BeanTypeInfo info = new BeanTypeInfo(DateBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
@@ -397,7 +458,7 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         PropertyDescriptor[] pds = info.getPropertyDescriptors();
-        assertEquals(6, pds.length);
+        assertEquals(8, pds.length);
 
         ExtendedBean bean = new ExtendedBean();
         bean.setHowdy("howdy");

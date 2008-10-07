@@ -43,6 +43,7 @@ import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.type.basic.BigDecimalType;
 import org.apache.cxf.aegis.type.basic.BigIntegerType;
 import org.apache.cxf.aegis.type.basic.BooleanType;
+import org.apache.cxf.aegis.type.basic.ByteType;
 import org.apache.cxf.aegis.type.basic.CalendarType;
 import org.apache.cxf.aegis.type.basic.CharacterAsStringType;
 import org.apache.cxf.aegis.type.basic.CharacterType;
@@ -241,6 +242,7 @@ public class DefaultTypeMapping implements TypeMapping {
         defaultRegister(tm, defaultNillable, Integer.class, XMLSchemaQNames.XSD_INT, new IntType());
         defaultRegister(tm, defaultNillable, Long.class, XMLSchemaQNames.XSD_LONG, new LongType());
         defaultRegister(tm, defaultNillable, Object.class, XMLSchemaQNames.XSD_ANY, new ObjectType());
+        defaultRegister(tm, defaultNillable, Byte.class, XMLSchemaQNames.XSD_BYTE, new ByteType());
         defaultRegister(tm, defaultNillable, Short.class, XMLSchemaQNames.XSD_SHORT, new ShortType());
         defaultRegister(tm, defaultNillable, Source.class, XMLSchemaQNames.XSD_ANY, new SourceType());
         defaultRegister(tm, defaultNillable, String.class, XMLSchemaQNames.XSD_STRING, new StringType());
@@ -258,6 +260,7 @@ public class DefaultTypeMapping implements TypeMapping {
         defaultRegister(tm, defaultNillable, float.class, XMLSchemaQNames.XSD_FLOAT, new FloatType());
         defaultRegister(tm, defaultNillable, int.class, XMLSchemaQNames.XSD_INT, new IntType());
         defaultRegister(tm, defaultNillable, short.class, XMLSchemaQNames.XSD_SHORT, new ShortType());
+        defaultRegister(tm, defaultNillable, byte.class, XMLSchemaQNames.XSD_BYTE, new ByteType());
         defaultRegister(tm, defaultNillable, long.class, XMLSchemaQNames.XSD_LONG, new LongType());
 
         defaultRegister(tm, defaultNillable, java.sql.Date.class, XMLSchemaQNames.XSD_DATETIME,

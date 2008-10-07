@@ -39,6 +39,8 @@ public interface MessageWriter {
     void writeValueAsFloat(Float f);
 
     void writeValueAsShort(Short short1);
+    
+    void writeValueAsByte(Byte b);
 
     void writeValueAsBoolean(boolean b);
 
