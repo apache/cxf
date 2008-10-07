@@ -79,24 +79,30 @@ public final class JMSFactory {
     public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
                                                                     String destinationName) {
-        DefaultMessageListenerContainer jmsListener2 = jmsConfig.isUseJms11()
+        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
             ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
-        jmsListener2.setPubSubDomain(jmsConfig.isPubSubDomain());
-        jmsListener2.setAutoStartup(true);
-        jmsListener2.setConnectionFactory(jmsConfig.getConnectionFactory());
-        jmsListener2.setMessageSelector(jmsConfig.getMessageSelector());
-        jmsListener2.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
-        jmsListener2.setSessionTransacted(jmsConfig.isSessionTransacted());
-        jmsListener2.setTransactionManager(jmsConfig.getTransactionManager());
-        jmsListener2.setMessageListener(listenerHandler);
+        jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
+        jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
+        jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
+        jmsListener.setAutoStartup(true);
+        jmsListener.setConnectionFactory(jmsConfig.getConnectionFactory());
+        jmsListener.setMessageSelector(jmsConfig.getMessageSelector());
+        jmsListener.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
+        jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
+        jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
+        jmsListener.setMessageListener(listenerHandler);
         if (jmsConfig.getDestinationResolver() != null) {
-            jmsListener2.setDestinationResolver(jmsConfig.getDestinationResolver());
+            jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
+        }
+        if (jmsConfig.getTaskExecutor() != null) {
+            jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
         }
         JmsTemplate jmsTemplate = createJmsTemplate(jmsConfig, null);
-        jmsListener2.setDestination(JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName,
-                                                                          jmsConfig.isPubSubDomain()));
-        jmsListener2.initialize();
-        return jmsListener2;
+        Destination dest = JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName, jmsConfig
+            .isPubSubDomain());
+        jmsListener.setDestination(dest);
+        jmsListener.initialize();
+        return jmsListener;
     }
 
     /**

@@ -23,6 +23,8 @@ import javax.jms.Message;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -30,6 +32,7 @@ public class JMSConfiguration implements InitializingBean {
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
     private PlatformTransactionManager transactionManager;
+    private TaskExecutor taskExecutor;
     private boolean useJms11 = true;
     private boolean useJndi;
     private boolean messageIdEnabled = true;
@@ -42,6 +45,9 @@ public class JMSConfiguration implements InitializingBean {
     private int priority = Message.DEFAULT_PRIORITY;
     private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
     private boolean sessionTransacted;
+    
+    private int concurrentConsumers = 1;
+    private int maxConcurrentConsumers = 1;
 
     private volatile String messageSelector;
     private boolean subscriptionDurable;
@@ -225,6 +231,30 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    public int getConcurrentConsumers() {
+        return concurrentConsumers;
+    }
+
+    public void setConcurrentConsumers(int concurrentConsumers) {
+        this.concurrentConsumers = concurrentConsumers;
+    }
+
+    public int getMaxConcurrentConsumers() {
+        return maxConcurrentConsumers;
+    }
+
+    public void setMaxConcurrentConsumers(int maxConcurrentConsumers) {
+        this.maxConcurrentConsumers = maxConcurrentConsumers;
+    }
+
+    public TaskExecutor getTaskExecutor() {
+        return taskExecutor;
+    }
+
+    public void setTaskExecutor(TaskExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
     }
 
 }

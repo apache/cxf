@@ -89,6 +89,12 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      */
     public void activate() {
         getLogger().log(Level.INFO, "JMSDestination activate().... ");
+        String name = endpointInfo.getName().toString() + ".jms-destination";
+        if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
+            throw new RuntimeException("Insufficient configuration for Destination. "
+                                       + "Did you configure a <jms:destination name=\"" + name
+                                       + "\"> and set the jndiConnectionFactoryName ?");
+        }
         jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination());
         jmsConfig.getTargetDestination();
     }

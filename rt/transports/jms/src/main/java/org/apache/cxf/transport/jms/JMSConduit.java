@@ -69,6 +69,12 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      * JMSOutputStream will then call back the sendExchange method of this class. {@inheritDoc}
      */
     public void prepare(Message message) throws IOException {
+        if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
+            String name =  ".jms-conduit";
+            throw new RuntimeException("Insufficient configuration for Conduit. "
+                                       + "Did you configure a <jms:conduit name=\"" + name
+                                       + "\"> and set the jndiConnectionFactoryName ?");
+        }
         boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
         JMSOutputStream out = new JMSOutputStream(this, message.getExchange(), isTextPayload);
         message.setContent(OutputStream.class, out);

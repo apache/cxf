@@ -136,14 +136,6 @@ public class JMSOldConfigHolder {
 
         jmsConfig.setConnectionFactory(cf);
 
-        if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
-            throw new RuntimeException("Insufficient configuration for "
-                                       + (isConduit ? "Conduit" : "Destination") + ". "
-                                       + "Did you configure a <jms:"
-                                       + (isConduit ? "conduit" : "destination") + " name=\"" + name
-                                       + "\"> and set the jndiConnectionFactoryName ?");
-        }
-
         return jmsConfig;
     }
 
