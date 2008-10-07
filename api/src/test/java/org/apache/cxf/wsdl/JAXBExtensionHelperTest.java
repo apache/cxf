@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.wsdl.Definition;
@@ -32,6 +33,8 @@ import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+
+import org.xml.sax.InputSource;
 
 import org.apache.cxf.abc.test.AnotherPolicyType;
 import org.apache.cxf.abc.test.NewServiceType;
@@ -79,28 +82,7 @@ public class JAXBExtensionHelperTest extends Assert {
         wsdlReader.setExtensionRegistry(registry);
 
         wsdlDefinition = wsdlReader.readWSDL(file);
-        Service s = wsdlDefinition.getService(new QName("http://cxf.apache.org/test/hello_world",
-                        "HelloWorldService"));
-        Port p = s.getPort("HelloWorldPort");
-        List extPortList = p.getExtensibilityElements();
-
-        TestPolicyType tp = null;
-        AnotherPolicyType ap = null;
-        for (Object ext : extPortList) {
-            if (ext instanceof TestPolicyType) {
-                tp = (TestPolicyType) ext;
-            }
-            if (ext instanceof AnotherPolicyType) {
-                ap = (AnotherPolicyType) ext;
-            }
-        }
-        assertNotNull("Could not find extension element TestPolicyType", tp);
-        assertNotNull("Could not find extension element AnotherPolicyType", ap);
-
-        assertEquals("Unexpected value for TestPolicyType intAttr", 30, tp.getIntAttr());
-        assertEquals("Unexpected value for TestPolicyType stringAttr", "hello", tp.getStringAttr());
-        assertTrue("Unexpected value for AnotherPolicyType floatAttr",
-            Math.abs(0.1F - ap.getFloatAttr()) < 0.5E-5);
+        checkTestExt();
     }
 
     @Test
@@ -148,6 +130,57 @@ public class JAXBExtensionHelperTest extends Assert {
             checkSpaces(actual, spaces);
             actual = reader.readLine();
         }
+    }
+    
+    @Test
+    public void testMappedNamespace() throws Exception {
+        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
+            "org.apache.cxf.abc.test.TestPolicyType",
+            "http://cxf.apache.org/abc/test/remapped");
+
+        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
+            "org.apache.cxf.abc.test.AnotherPolicyType",
+            "http://cxf.apache.org/abc/test/remapped");
+
+        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Definition",
+            "org.apache.cxf.abc.test.NewServiceType",
+            "http://cxf.apache.org/abc/test/remapped");
+
+        String file = this.getClass().getResource("/wsdl/test_ext_remapped.wsdl").toURI().toString();
+        wsdlReader.setExtensionRegistry(registry);
+
+        wsdlDefinition = wsdlReader.readWSDL(file);
+        checkTestExt();
+        StringWriter out = new StringWriter();
+        wsdlFactory.newWSDLWriter().writeWSDL(wsdlDefinition, out);
+        wsdlDefinition = wsdlReader.readWSDL(null,
+                                             new InputSource(new StringReader(out.toString())));
+        checkTestExt();
+    }
+    
+    private void checkTestExt() throws Exception {
+        Service s = wsdlDefinition.getService(new QName("http://cxf.apache.org/test/hello_world",
+            "HelloWorldService"));
+        Port p = s.getPort("HelloWorldPort");
+        List extPortList = p.getExtensibilityElements();
+    
+        TestPolicyType tp = null;
+        AnotherPolicyType ap = null;
+        for (Object ext : extPortList) {
+            if (ext instanceof TestPolicyType) {
+                tp = (TestPolicyType) ext;
+            }
+            if (ext instanceof AnotherPolicyType) {
+                ap = (AnotherPolicyType) ext;
+            }
+        }
+        assertNotNull("Could not find extension element TestPolicyType", tp);
+        assertNotNull("Could not find extension element AnotherPolicyType", ap);
+    
+        assertEquals("Unexpected value for TestPolicyType intAttr", 30, tp.getIntAttr());
+        assertEquals("Unexpected value for TestPolicyType stringAttr", "hello", tp.getStringAttr());
+        assertTrue("Unexpected value for AnotherPolicyType floatAttr",
+                   Math.abs(0.1F - ap.getFloatAttr()) < 0.5E-5);        
     }
 
     private void checkSpaces(String actual, int spaces) {
