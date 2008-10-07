@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<project name="JCA Outbound WAS 6.1 Sample" default="build" basedir=".">
+
+    <property environment="env"/>
+    <condition property="cxf.home" value="${env.CXF_HOME}">
+        <isset property="env.CXF_HOME"/>
+    </condition>
+
+    <fail message="this sample need to use CXF_HOME enviroment, please setup CXF_HOME in your environment" unless="cxf.home"/>
+
+    <property name="wsdl.dir" value="${basedir}/etc/wsdl"/>
+    <property name="wsdl.location" value="${wsdl.dir}/hello_world.wsdl"/>
+    <property name="war.name" value="helloworld.war"/>
+    <property name="j2ee.resources.dir" location="${basedir}/../common/resources"/>
+
+    <property environment="env"/>
+    <condition property="module.jar.dir" value="${env.CXF_HOME}/modules" else="${env.CXF_HOME}/lib">
+        <available file="${env.CXF_HOME}/modules" type="dir"/>
+    </condition>
+    <condition property="integration.jar.dir" value="${env.CXF_HOME}/modules/integration" else="${env.CXF_HOME}/lib">
+        <available file="${env.CXF_HOME}/modules/integration" type="dir"/>
+    </condition>
+    
+    <import file="../../../common_build.xml"/>
+ 
+    <path id="thirdParth.classpath">
+        <pathelement location="${basedir}/../common/common.jar"/>
+    </path>
+
+    <path id="other.classpath">
+        <pathelement location="${cxf.home}/lib/geronimo-servlet_2.5_spec-1.2-M1.jar"/>
+        <pathelement location="${cxf.home}/lib/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
+        <pathelement location="${basedir}/../common/common.jar"/>
+        <fileset dir="${integration.jar.dir}" >  
+             <include name="cxf-integration-jca-*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="init">
+        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${build.src.dir}"/> 
+        <mkdir dir="${build.classes.dir}/lib"/>
+    </target>
+
+
+    <target name="generate.rar" depends="init">
+        <copy file="${basedir}/etc/ra.xml" todir="${build.classes.dir}/cxf-rar/META-INF"/>
+
+        <copy todir="${build.classes.dir}/cxf-rar" failonerror="no">
+            <fileset dir="${cxf.home}/lib">
+                <include name="*.jar"/>
+                <exclude name="*manifest*.jar"/>
+                <exclude name="*-jbi-*.jar"/>
+            </fileset>
+            <fileset dir="${module.jar.dir}">
+                <include name="cxf*.jar"/>
+                <exclude name="*manifest*.jar"/>
+                <exclude name="*-jbi-*.jar"/>
+            </fileset>
+            <fileset dir="${integration.jar.dir}">
+                <include name="*-jca-*.jar"/>
+                <exclude name="*-jbi-*.jar"/>
+            </fileset>
+        </copy>
+        <jar destfile="${build.classes.dir}/lib/cxf.rar"
+         basedir="${build.classes.dir}/cxf-rar"/>
+    </target>
+  
+    <target name="j2ee.compile" depends="maybe.generate.code">
+        <javac destdir="${build.classes.dir}" debug="true">
+            <src path="${build.src.dir}"/>
+            <src path="${basedir}/src"/>
+            <classpath>
+                <path refid="cxf.classpath"/>
+                <path refid="other.classpath"/>
+            </classpath>
+        </javac>
+
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${build.src.dir}" includes="**/*.xml" />
+            <fileset dir="${build.src.dir}" includes="**/*.wsdl" />
+        </copy>
+    </target>
+
+    <target name="build" description="compile the code" depends="init,j2ee.compile,build-war"/>
+
+    <target name="generate.code">
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java file="hello_world.wsdl"/>
+    </target>
+
+     <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="build-war">
+        <copy file="${wsdl.location}" todir="${basedir}/src" />
+
+        <mkdir dir="./build/lib"/>
+        <mkdir dir="./build/classes/wsdl"/>
+        <mkdir dir="./build/classes/etc"/>
+        <copy file="${wsdl.location}" todir="${basedir}/build/classes/wsdl"/>
+        <copy file="${basedir}/etc/cxf_client.xml" todir="${basedir}/build/classes/etc"/>
+        <war destfile="build/lib/${war.name}" webxml="${basedir}/etc/web.xml">
+            <lib dir="../common/">
+                <include name="common.jar"/>
+            </lib>
+
+            <classes dir="${build.classes.dir}">
+                <include name="**/servlet/*.class"/>
+                <include name="**/hello_world_soap_http/*.class"/>
+                <include name="**/hello_world_soap_http/types/*.class"/>
+                <include name="**/*.wsdl"/>
+                <include name="**/cxf_client.xml"/>
+            </classes>
+
+            <zipfileset dir="${j2ee.resources.dir}/images" prefix="images">
+                <include name="*.gif" />
+            </zipfileset>
+
+            <zipfileset dir="${j2ee.resources.dir}">
+                <include name="*.css" />
+            </zipfileset>
+
+        </war>
+    </target>
+
+    <target name="client" description="run demo client" depends="build">
+        <property name="param" value=""/>
+        <cxfrun classname="demo.client.Client" param1="${op}"/>
+    </target>
+
+
+
+</project>
