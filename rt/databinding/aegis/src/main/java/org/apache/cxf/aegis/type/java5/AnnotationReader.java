@@ -76,13 +76,22 @@ public class AnnotationReader {
 
     @SuppressWarnings("unchecked")
     public Class getType(AnnotatedElement element) {
-        return (Class) getAnnotationValue("type",
+        Class value = (Class) getAnnotationValue("type",
                 element,
                 Type.class,
                 XmlAttribute.class,
                 XmlElement.class,
                 org.codehaus.xfire.aegis.type.java5.XmlAttribute.class,
                 org.codehaus.xfire.aegis.type.java5.XmlElement.class);
+        // jaxb uses a different default value
+        if (value == null) {
+            value = (Class) getAnnotationValue("type",
+                    element,
+                    javax.xml.bind.annotation.XmlElement.DEFAULT.class,
+                    XML_ELEMENT);
+        }
+
+        return value;
     }
 
     @SuppressWarnings("unchecked")

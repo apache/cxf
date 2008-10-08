@@ -143,7 +143,7 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
     public void putDestination(String epName, JBIDestination destination) throws JBIException {
         if (destinationMap.containsKey(epName)) {
             throw new JBIException("JBIDestination for Endpoint "
-                                   + epName + " already be created");
+                                   + epName + " has already been created");
         } else {
             destinationMap.put(epName, destination);
         }

@@ -385,12 +385,21 @@ public class WSDLToCorbaBindingTest extends Assert {
             assertEquals(bindingOperation.getBindingOutput().getName(), "review_dataResponse");
             
             Iterator f = bindingOperation.getBindingFaults().values().iterator();
+            boolean hasBadRecord = false;
+            boolean hasMyException = false;
             while (f.hasNext()) {
                 BindingFault bindingFault = (BindingFault)f.next();
-                assertEquals(bindingFault.getName(), "TestException.BadRecord");
-                bindingFault = (BindingFault)f.next();
-                assertEquals(bindingFault.getName(), "MyException");                
-            }                       
+                if ("TestException.BadRecord".equals(bindingFault.getName())) {
+                    hasBadRecord = true;
+                } else if ("MyException".equals(bindingFault.getName())) {
+                    hasMyException = true;
+                } else {
+                    fail("Unexpected BindingFault: " + bindingFault.getName());
+                }
+            }
+            assertTrue("Did not get expected TestException.BadRecord", hasBadRecord);
+            assertTrue("Did not get expected MyException", hasMyException);
+            
             Iterator bOp = bindingOperation.getExtensibilityElements().iterator();
             while (bOp.hasNext()) {     
                 ExtensibilityElement extElement = (ExtensibilityElement)bOp.next();
@@ -398,10 +407,21 @@ public class WSDLToCorbaBindingTest extends Assert {
                     OperationType corbaOpType = (OperationType)extElement;                 
                     assertEquals(corbaOpType.getName(), "review_data");
                     assertEquals(1, corbaOpType.getParam().size());
-                    assertEquals(corbaOpType.getRaises().get(0).getException().getLocalPart(), 
-                                 "TestException.BadRecord");
-                    assertEquals(corbaOpType.getRaises().get(1).getException().getLocalPart(), 
-                                 "MyExceptionType");                          
+                    assertEquals(2, corbaOpType.getRaises().size());
+                    hasBadRecord = false;
+                    hasMyException = false;
+                    for (int k = 0; k < corbaOpType.getRaises().size(); k++) {
+                        String localPart = corbaOpType.getRaises().get(k).getException().getLocalPart();
+                        if ("TestException.BadRecord".equals(localPart)) {
+                            hasBadRecord = true;
+                        } else if ("MyExceptionType".equals(localPart)) {
+                            hasMyException = true;
+                        } else {
+                            fail("Unexpected Raises: " + localPart); 
+                        }
+                    }
+                    assertTrue("Did not find expected TestException.BadRecord", hasBadRecord);
+                    assertTrue("Did not find expected MyException", hasMyException);
                 }
             }
         }            

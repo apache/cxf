@@ -247,8 +247,14 @@ public class ElementReader extends AbstractMessageReader implements MessageReade
     }
 
     public MessageReader getAttributeReader(QName qName) {
-        return new AttributeReader(qName, root.getAttributeValue(qName.getNamespaceURI(), qName
-            .getLocalPart()));
+        String attribute = root.getAttributeValue(qName.getNamespaceURI(), qName.getLocalPart());
+        if (attribute == null && "".equals(qName.getNamespaceURI())) {
+            // The qName namespaceURI of the attribute seems to be null
+            // rather than "" when using the ibmjdk.
+            // The MtomTest systest fails unless we do this.
+            attribute = root.getAttributeValue(null, qName.getLocalPart());
+        }
+        return new AttributeReader(qName, attribute);
     }
 
     public MessageReader getNextAttributeReader() {

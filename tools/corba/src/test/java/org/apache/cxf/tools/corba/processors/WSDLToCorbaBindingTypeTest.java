@@ -430,32 +430,58 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             idlgen.setOutputFile("atype.idl");
             idlgen.generateIDL(model);
 
-            Anonstring str = (Anonstring)mapType.getStructOrExceptionOrUnion().get(2);
-            assertEquals("Name is incorrect for Array Type", "X._1_S", 
+            List<CorbaTypeImpl> types = mapType.getStructOrExceptionOrUnion();
+            for (int i = 0; i < types.size(); i++) {
+                CorbaTypeImpl type = types.get(i);
+                if (type instanceof Anonstring) {
+                    Anonstring str = (Anonstring)type;
+                    assertEquals("Name is incorrect for Array Type", "X._1_S", 
                          str.getName());
-            assertEquals("Type is incorrect for AnonString Type", "string", 
+                    assertEquals("Type is incorrect for AnonString Type", "string", 
                          str.getType().getLocalPart());
             
-            Anonfixed fx = (Anonfixed)mapType.getStructOrExceptionOrUnion().get(3);
-            assertEquals("Name is incorrect for Anon Array Type", "X._2_S", 
+                } else if (type instanceof Anonfixed) {
+                    Anonfixed fx = (Anonfixed)type;
+                    assertEquals("Name is incorrect for Anon Array Type", "X._2_S", 
                          fx.getName());
-            assertEquals("Type is incorrect for AnonFixed Type", "decimal", 
+                    assertEquals("Type is incorrect for AnonFixed Type", "decimal", 
                          fx.getType().getLocalPart());
             
-            Struct struct = (Struct)mapType.getStructOrExceptionOrUnion().get(1);
-            assertEquals("Name is incorrect for Anon Array Type", "X.S", 
-                         struct.getName());            
-            assertEquals("Type is incorrect for Struct Type", "X.S", 
-                         struct.getType().getLocalPart());
-            assertEquals("Name for first Struct Member Type is incorrect", "str", 
-                         struct.getMember().get(0).getName());
-            assertEquals("Idltype for first Struct Member Type is incorrect", "X._1_S", 
-                         struct.getMember().get(0).getIdltype().getLocalPart());            
-            assertEquals("Name for second Struct Member Type is incorrect", "fx", 
-                         struct.getMember().get(1).getName());
-            assertEquals("Idltype for second Struct Member Type is incorrect", "X._2_S", 
-                         struct.getMember().get(1).getIdltype().getLocalPart());
-            
+                } else if (type instanceof Struct) {
+                    Struct struct = (Struct)type;
+                    String[] testResult;
+                    if ("X.op_a".equals(struct.getName())) {
+                        testResult = new String[]{"X.op_a", "X.op_a", "p1",
+                            "X.S", "p2", "X.S"};
+                    } else if ("X.op_aResult".equals(struct.getName())) {
+                        testResult = new String[]{"X.op_aResult",
+                            "X.op_aResult", "return", "X.S", "p2", "X.S"};
+                    } else {
+                        testResult = new String[]{"X.S", "X.S", "str", 
+                            "X._1_S", "fx", "X._2_S"};
+                    }
+                    assertEquals("Name is incorrect for Anon Array Type",
+                        testResult[0],
+                        struct.getName());            
+                    assertEquals("Type is incorrect for Struct Type", 
+                        testResult[1],
+                        struct.getType().getLocalPart());
+                    assertEquals("Name for first Struct Member Type is incorrect", 
+                        testResult[2],
+                        struct.getMember().get(0).getName());
+                    assertEquals("Idltype for first Struct Member Type is incorrect", 
+                        testResult[3],
+                        struct.getMember().get(0).getIdltype().getLocalPart());            
+                    assertEquals("Name for second Struct Member Type is incorrect", 
+                        testResult[4],
+                        struct.getMember().get(1).getName());
+                    assertEquals("Idltype for second Struct Member Type is incorrect", 
+                        testResult[5],
+                        struct.getMember().get(1).getIdltype().getLocalPart());
+                } else {
+                    //System.err.println("Type: " + i + " " + type.getClass().getName());
+                }
+            }    
             File f = new File("atype.idl");
             assertTrue("atype.idl should be generated", f.exists());
         } finally {

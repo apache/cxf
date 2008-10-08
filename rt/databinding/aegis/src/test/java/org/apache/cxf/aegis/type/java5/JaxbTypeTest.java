@@ -46,7 +46,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-
+ 
         Server s = createService(JaxbService.class);
         service = s.getEndpoint().getService();
         databinding = (AegisDatabinding) service.getDataBinding();
@@ -86,7 +86,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
         if ("bogusProperty".equals(element.getLocalPart())) {
             assertTrue(custom instanceof StringType);
         } else if ("elementProperty".equals(element.getLocalPart())) {
-            assertTrue(custom instanceof StringType);
+            assertTrue(custom instanceof CustomStringType);
         } else {
             fail("Unexpected element name: " + element.getLocalPart());
         }
