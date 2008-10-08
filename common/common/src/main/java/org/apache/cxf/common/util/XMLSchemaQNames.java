@@ -31,6 +31,7 @@ public final class XMLSchemaQNames {
     public static final QName XSD_DOUBLE = new QName(SOAPConstants.XSD, "double", SOAPConstants.XSD_PREFIX);
     public static final QName XSD_INT = new QName(SOAPConstants.XSD, "int", SOAPConstants.XSD_PREFIX);
     public static final QName XSD_SHORT = new QName(SOAPConstants.XSD, "short", SOAPConstants.XSD_PREFIX);
+    public static final QName XSD_BYTE = new QName(SOAPConstants.XSD, "byte", SOAPConstants.XSD_PREFIX);
     public static final QName XSD_BOOLEAN = new QName(SOAPConstants.XSD,
                                                          "boolean", SOAPConstants.XSD_PREFIX);
     public static final QName XSD_DATETIME = new QName(SOAPConstants.XSD, "dateTime",

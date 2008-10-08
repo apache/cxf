@@ -68,6 +68,10 @@ public abstract class AbstractMessageWriter implements MessageWriter {
     public void writeValueAsInt(Integer i) {
         writeValue(i.toString());
     }
+    
+    public void writeValueAsByte(Byte b) {
+        writeValue(b.toString());
+    }
 
     /**
      * @see org.apache.cxf.aegis.xml.MessageWriter#writeValueAsDouble(java.lang.Double)

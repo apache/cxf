@@ -32,6 +32,8 @@ public class SimpleBean {
     
     private Character character;
     private char primitiveCharacter;
+    private byte littleByte;
+    private Byte bigByte;
 
     public int[] getNumbers() {
         return numbers;
@@ -81,5 +83,21 @@ public class SimpleBean {
 
     public void setPrimitiveChar(char pchar) {
         this.primitiveCharacter = pchar;
+    }
+
+    public byte getLittleByte() {
+        return littleByte;
+    }
+
+    public void setLittleByte(byte littleByte) {
+        this.littleByte = littleByte;
+    }
+
+    public Byte getBigByte() {
+        return bigByte;
+    }
+
+    public void setBigByte(Byte bigByte) {
+        this.bigByte = bigByte;
     }
 }
