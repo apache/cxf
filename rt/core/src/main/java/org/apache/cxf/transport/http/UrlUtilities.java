@@ -61,11 +61,11 @@ public final class UrlUtilities {
      */
     public static String getStem(String baseURI) {
         URI uri = URI.create(baseURI);
-        baseURI = uri.getPath();
+        baseURI = uri.getRawPath();
         int idx = baseURI.lastIndexOf('/');
         if (idx != -1) {
             baseURI = baseURI.substring(0, idx);
         }
-        return baseURI;
+        return URI.create(baseURI).getPath();
     }
 }
