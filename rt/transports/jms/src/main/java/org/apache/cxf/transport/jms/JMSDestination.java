@@ -42,6 +42,7 @@ import javax.jms.TextMessage;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -91,12 +92,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         getLogger().log(Level.INFO, "JMSDestination activate().... ");
         String name = endpointInfo.getName().toString() + ".jms-destination";
         if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
-            throw new RuntimeException("Insufficient configuration for Destination. "
-                                       + "Did you configure a <jms:destination name=\"" + name
-                                       + "\"> and set the jndiConnectionFactoryName ?");
+            throw new ConfigurationException(
+                new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name));
         }
         jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination());
-        jmsConfig.getTargetDestination();
     }
 
     public void deactivate() {

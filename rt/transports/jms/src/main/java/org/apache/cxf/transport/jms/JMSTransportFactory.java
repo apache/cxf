@@ -63,7 +63,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target) throws IOException {
         JMSOldConfigHolder old = new JMSOldConfigHolder();
         JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo, true);
-        return new JMSConduit(target, jmsConf);
+        return new JMSConduit(endpointInfo, target, jmsConf);
     }
 
     /**
