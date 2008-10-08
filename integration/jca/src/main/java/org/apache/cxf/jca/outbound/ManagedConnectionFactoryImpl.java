@@ -137,7 +137,6 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         LoggerHelper.initializeLoggingOnWriter(printWriter);
     }
     
-    @SuppressWarnings("unchecked")
     public ManagedConnection matchManagedConnections(Set mcs, Subject subject, 
             ConnectionRequestInfo reqInfo) throws ResourceException {
 
