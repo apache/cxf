@@ -88,7 +88,7 @@ public class CorbaConduit implements Conduit {
         return orbConfig;
     }
     
-    protected synchronized void prepareOrb() {
+    public synchronized void prepareOrb() {
         if (orb == null) {
             orb = CorbaBindingHelper.getDefaultORB(orbConfig);
         }

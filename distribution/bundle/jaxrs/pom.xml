@@ -118,6 +118,7 @@
                             javax.jms*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
                             repackage;resolution:=optional,
+                            javax.resource.spi*;resolution:=optional,
                             javax.xml.soap,
                             junit.framework*;resolution:=optional,
                             org.apache.abdera*;resolution:=optional,
