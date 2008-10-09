@@ -567,6 +567,10 @@
                         <groupId>javax.activation</groupId>
                         <artifactId>activation</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>activation</groupId>
+                        <artifactId>activation</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -599,6 +603,10 @@
                 <exclusions>
                     <exclusion>
                         <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>activation</groupId>
                         <artifactId>activation</artifactId>
                     </exclusion>
                 </exclusions>
