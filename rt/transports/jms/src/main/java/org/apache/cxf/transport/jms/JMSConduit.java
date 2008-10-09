@@ -109,13 +109,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
         final String correlationId = (headers != null && headers.isSetJMSCorrelationID()) ? headers
             .getJMSCorrelationID() : JMSUtils.generateCorrelationId();
-        // String selector = "JMSCorrelationID = '" + correlationId + "'";
-        Message inMessage = null;
-        if (!exchange.isOneWay()) {
-            inMessage = new MessageImpl();
-            correlationMap.put(correlationId, inMessage);
-        }
-        jmsTemplate.send(jmsConfig.getTargetDestination(), new MessageCreator() {
+            
+        MessageCreator messageCreator = new MessageCreator() {
             public javax.jms.Message createMessage(Session session) throws JMSException {
                 String messageType = jmsConfig.getMessageType();
                 final javax.jms.Message jmsMessage;
@@ -125,7 +120,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 LOG.log(Level.FINE, "client sending request: ", jmsMessage);
                 return jmsMessage;
             }
-        });
+        };
 
         /**
          * If the message is not oneWay we will expect to receive a reply on the listener. To receive this
@@ -133,10 +128,14 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
          * fill to Message and notify this thread
          */
         if (!exchange.isOneWay()) {
+            Message inMessage = new MessageImpl();
             synchronized (inMessage) {
+                correlationMap.put(correlationId, inMessage);
+                jmsTemplate.send(jmsConfig.getTargetDestination(), messageCreator);
                 try {
                     inMessage.wait(jmsTemplate.getReceiveTimeout());
                 } catch (InterruptedException e) {
+                    correlationMap.remove(correlationId);
                     throw new RuntimeException(e);
                 }
                 correlationMap.remove(correlationId);
@@ -149,6 +148,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             if (incomingObserver != null) {
                 incomingObserver.onMessage(inMessage);
             }
+        } else {
+            jmsTemplate.send(jmsConfig.getTargetDestination(), messageCreator);
         }
     }
 
