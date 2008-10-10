@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -528,5 +529,23 @@ public final class ProviderFactory {
         userExceptionMappers.clear();
         requestHandlers.clear();
         responseHandlers.clear();
+    }
+    
+    public void setSchemaLocations(List<String> schemas) {
+        setSchemasOnProviders(userMessageReaders, schemas);
+        setSchemasOnProviders(defaultMessageReaders, schemas);
+    }
+    
+    private void setSchemasOnProviders(List<ProviderInfo<MessageBodyReader>> providers,
+                                       List<String> schemas) {
+        for (ProviderInfo<MessageBodyReader> r : providers) {
+            try {
+                Method m = r.getProvider().getClass().getMethod("setSchemas", 
+                                                     new Class[]{List.class});
+                m.invoke(r.getProvider(), new Object[]{schemas});
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
     }
 }

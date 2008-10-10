@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -62,10 +63,8 @@ public final class FormEncodingReaderProvider implements MessageBodyReader<Objec
 
             return params;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new WebApplicationException(e);
         }
-
-        return null;
     }
 
     public static void copy(final InputStream input, final OutputStream output, final int bufferSize)

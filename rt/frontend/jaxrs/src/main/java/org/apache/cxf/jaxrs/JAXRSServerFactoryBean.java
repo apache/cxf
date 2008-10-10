@@ -67,6 +67,7 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     private List<?> entityProviders;
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
+    private List<String> schemaLocations;
 
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -76,6 +77,10 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
         this.serviceFactory = sf;
         doInit = true;
         setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
+    }
+    
+    public void setSchemaLocations(List<String> schemas) {
+        this.schemaLocations = schemas;    
     }
     
     public Server create() {
@@ -96,7 +101,9 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
             }
             ProviderFactory.getInstance().setRequestPreporcessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
-            
+            if (schemaLocations != null) {
+                ProviderFactory.getInstance().setSchemaLocations(schemaLocations);
+            }
             
             if (start) {
                 server.start();
