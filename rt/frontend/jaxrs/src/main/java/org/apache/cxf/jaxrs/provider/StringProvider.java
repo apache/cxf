@@ -53,21 +53,12 @@ public final class StringProvider
     public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, MediaType m, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException  {
-        try {
-            return IOUtils.toString(is);
-        } catch (IOException e) {
-            // TODO: better exception handling
-        }
-        return null;
+        return IOUtils.toString(is);
     }
 
     public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
-        try {
-            os.write(obj.getBytes());
-        } catch (IOException e) {
-            //TODO: better exception handling
-        }
+        os.write(obj.getBytes());
     }
 
 }

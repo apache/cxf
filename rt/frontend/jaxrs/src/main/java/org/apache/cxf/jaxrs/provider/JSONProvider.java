@@ -26,10 +26,12 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -52,6 +54,10 @@ import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
 public final class JSONProvider extends AbstractJAXBProvider  {
     
     private Map<String, String> namespaceMap = new HashMap<String, String>();
+    
+    public void setSchemas(List<String> locations) {
+        super.setSchemas(locations);
+    }
     
     public void setNamespaceMap(Map<String, String> namespaceMap) {
         this.namespaceMap = namespaceMap;
@@ -77,12 +83,10 @@ public final class JSONProvider extends AbstractJAXBProvider  {
             return response;
             
         } catch (JAXBException e) {
-            e.printStackTrace();         
+            throw new WebApplicationException(e);         
         } catch (XMLStreamException e) {
-            e.printStackTrace();
+            throw new WebApplicationException(e);
         } 
-
-        return null;
     }
 
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
@@ -103,9 +107,9 @@ public final class JSONProvider extends AbstractJAXBProvider  {
             xsw.close();
             
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new WebApplicationException(e);
         } catch (XMLStreamException e) {
-            e.printStackTrace();
+            throw new WebApplicationException(e);
         }
     }
 

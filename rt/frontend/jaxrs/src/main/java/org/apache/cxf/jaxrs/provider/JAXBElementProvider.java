@@ -25,11 +25,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -39,15 +40,23 @@ import javax.xml.transform.stream.StreamSource;
 @Provider
 public final class JAXBElementProvider extends AbstractJAXBProvider  {
     
+    private String jaxbSchemaLocation;
+    
+    public void setSchemas(List<String> locations) {
+        super.setSchemas(locations);
+    }
+    
+    public void setSchemaLocation(String schemaLocation) {
+        jaxbSchemaLocation = schemaLocation;
+    }
     
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
             Class<?> theType = getActualType(type, genericType);
-            JAXBContext context = getJAXBContext(theType, genericType);
+            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
-            Unmarshaller unmarshaller = context.createUnmarshaller();
             if (JAXBElement.class.isAssignableFrom(type)) {
                 return unmarshaller.unmarshal(new StreamSource(is), theType);
             } else {
@@ -55,10 +64,8 @@ public final class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             
         } catch (JAXBException e) {
-            e.printStackTrace();         
+            throw new WebApplicationException(e);        
         }
-
-        return null;
     }
 
     
@@ -72,11 +79,13 @@ public final class JAXBElementProvider extends AbstractJAXBProvider  {
                 genericType = actualClass;
             }
             Marshaller ms = createMarshaller(actualObject, actualClass, genericType, m);
+            if (jaxbSchemaLocation != null) {
+                ms.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, jaxbSchemaLocation);
+            }
             ms.marshal(actualObject, os);
             
         } catch (JAXBException e) {
-            //TODO: better exception handling
-            e.printStackTrace();
+            throw new WebApplicationException(e);
         }
     }
 

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.validation.Schema;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -276,6 +278,19 @@ public class ProviderFactoryTest extends Assert {
             //Dummy
         }
 
+    }
+    
+    @Test
+    public void testSetSchemasFromClasspath() {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(provider);
+        
+        List<String> locations = new ArrayList<String>();
+        locations.add("classpath:/test.xsd");
+        pf.setSchemaLocations(locations);
+        Schema s = provider.getSchema();
+        assertNotNull("schema can not be read from classpath", s);
     }
     
 }

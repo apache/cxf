@@ -19,8 +19,16 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
@@ -30,13 +38,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -49,11 +63,13 @@ public abstract class AbstractJAXBProvider
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
 
     private static final String CHARSET_PARAMETER = "charset"; 
-
+    private static final String CLASSPATH_PREFIX = "classpath:";
+        
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
     
     @Context protected ContextResolver<JAXBContext> resolver;
+    private Schema schema;
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns) {
         return isSupported(type, genericType, anns)
@@ -64,6 +80,10 @@ public abstract class AbstractJAXBProvider
         return isSupported(type, genericType, annotations);
     }
 
+    public void setSchemas(List<String> locations) {
+        schema = createSchema(locations);    
+    }
+    
     public long getSize(Object o) {
         return -1;
     }
@@ -97,7 +117,7 @@ public abstract class AbstractJAXBProvider
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
-                context = JAXBContext.newInstance(type);
+                context = JAXBContext.newInstance(new Class[]{type});
                 classContexts.put(type, context);
             }
             return context;
@@ -148,6 +168,17 @@ public abstract class AbstractJAXBProvider
         return objectFactoryForClass(InjectionUtils.getActualType(genericType));
     }
     
+    @SuppressWarnings("deprecation")
+    protected Unmarshaller createUnmarshaller(Class<?> cls, Type genericType) 
+        throws JAXBException {
+        JAXBContext context = getJAXBContext(cls, genericType);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        if (schema != null) {
+            unmarshaller.setSchema(schema);
+        }
+        return unmarshaller;        
+    }
+    
     protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, MediaType m)
         throws JAXBException {
         
@@ -186,5 +217,45 @@ public abstract class AbstractJAXBProvider
             }
         }
         return obj;
+    }
+    
+    private Schema createSchema(List<String> locations) {
+        
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema s = null;
+        try {
+            List<Source> sources = new ArrayList<Source>();
+            for (String loc : locations) {
+                InputStream is = null;
+                if (loc.startsWith(CLASSPATH_PREFIX)) {
+                    String path = loc.substring(CLASSPATH_PREFIX.length() + 1);
+                    is = getClass().getClassLoader().getResourceAsStream(path);
+                    if (is == null) {
+                        LOG.warning("No schema resource " + loc + " is available on classpath");
+                        return null;
+                    }
+                } else {
+                    File f = new File(loc);
+                    if (!f.exists()) {
+                        LOG.warning("No schema resource " + loc + " is available on local disk");
+                        return null;
+                    }
+                    is = new FileInputStream(f);
+                }
+                                
+                Reader r = new BufferedReader(
+                               new InputStreamReader(is, "UTF-8"));
+                sources.add(new StreamSource(r));
+            }
+            s = factory.newSchema(sources.toArray(new Source[]{}));
+        } catch (Exception ex) {
+            LOG.warning("Validation will be disabled, failed to create schema : " + ex.getMessage());
+        }
+        return s;
+        
+    }
+    
+    protected Schema getSchema() {
+        return schema;
     }
 }
