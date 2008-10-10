@@ -27,12 +27,22 @@
             param1="${basedir}/wsdl/hello_world.wsdl" 
             param2="${op}" 
             param3="${param}"/>
-    </target> 
+    </target>
+    
+    <target name="spring.client" description="run demo client which is created from the spring context" depends="build">
+        <property name="param" value=""/>
+        <cxfrun classname="demo.hw.client.SpringClient"/>
+    </target>     
         
     <target name="server" description="run demo server" depends="build">
         <cxfrun classname="demo.hw.server.Server" 
             param1="${basedir}/wsdl/hello_world.wsdl"/>
     </target>
+
+    <target name="spring.server" description="run demo server which is created from the spring context" depends="build">
+        <cxfrun classname="demo.hw.server.SpringServer"/>
+    </target>
+
 
     <target name="client.get" description="run demo client through HTTP GET" depends="build">
         <property name="param" value=""/>
