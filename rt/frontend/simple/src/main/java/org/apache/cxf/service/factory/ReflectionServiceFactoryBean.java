@@ -2048,6 +2048,35 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     public void setServiceClass(Class<?> serviceClass) {
         this.serviceClass = serviceClass;
+        checkServiceClassAnnotations(serviceClass);
+    }
+    protected void checkServiceClassAnnotations(Class<?> sc) {
+        Annotation anns[] = serviceClass.getAnnotations();
+        if (anns != null) {
+            for (Annotation ann : anns) {
+                String pkg = ann.annotationType().getPackage().getName(); 
+                if ("javax.xml.ws".equals(pkg)
+                    || "javax.jws".equals(pkg)) {
+                    
+                    LOG.log(Level.WARNING, "JAXWS_ANNOTATION_FOUND", serviceClass.getName());
+                    return;
+                }
+            }
+        }
+        for (Method m : serviceClass.getMethods()) {
+            anns = m.getAnnotations();
+            if (anns != null) {
+                for (Annotation ann : anns) {
+                    String pkg = ann.annotationType().getPackage().getName(); 
+                    if ("javax.xml.ws".equals(pkg)
+                        || "javax.jws".equals(pkg)) {
+                        
+                        LOG.log(Level.WARNING, "JAXWS_ANNOTATION_FOUND", serviceClass.getName());
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     public String getWsdlURL() {
