@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.resource.ResourceManager;
@@ -42,7 +45,14 @@ public class Jsr250BeanPostProcessor
     
     private ApplicationContext context;
 
+    private Bus bus;
+    
     Jsr250BeanPostProcessor() {
+    }
+    
+    @Resource
+    public void setBus(Bus b) {
+        bus = b;
     }
     
     public void setApplicationContext(ApplicationContext arg0) throws BeansException {
@@ -54,6 +64,9 @@ public class Jsr250BeanPostProcessor
     }
         
     public Object postProcessAfterInitialization(Object bean, String beanId) throws BeansException {
+        if (bus != null) {
+            return bean;
+        }
         if (bean != null) {
             new ResourceInjector(resourceManager, resolvers).construct(bean);
         }
@@ -69,6 +82,9 @@ public class Jsr250BeanPostProcessor
     }
 
     public Object postProcessBeforeInitialization(Object bean, String beanId) throws BeansException {
+        if (bus != null) {
+            return bean;
+        }
         if (bean != null) {
             new ResourceInjector(resourceManager, resolvers).inject(bean);
         }
@@ -76,6 +92,9 @@ public class Jsr250BeanPostProcessor
     }
 
     public void postProcessBeforeDestruction(Object bean, String beanId) {
+        if (bus != null) {
+            return;
+        }
         if (bean != null) {
             new ResourceInjector(resourceManager, resolvers).destroy(bean);
         }
