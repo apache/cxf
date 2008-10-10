@@ -52,7 +52,11 @@ Using either UNIX or Windows:
 
   ant server  (from one command line window)
   ant client  (from a second command line window)
-    
+  
+  You can also publish or consumer the demo webservice from spring
+  
+  ant spring.server  (from one command line window)
+  ant spring.client  (from a second command line window)
 
 To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
@@ -69,7 +73,6 @@ Using either UNIX or Windows:
   mvn install   (builds the demo)
   mvn -Pserver  (from one command line window)
   mvn -Pclient  (from a second command line window)
-
 
 To remove the code generated from the WSDL file and the .class
 files, run "mvn clean".
