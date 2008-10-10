@@ -457,9 +457,10 @@ public class JettyHTTPServerEngine
 
     protected void retrieveListenerFactory() {
         if (tlsServerParameters != null) {
-            if (null != connector && !(connector instanceof SslSocketConnector)) {                         
-                throw new RuntimeException("Connector " + connector + " for JettyServerEngine Port " 
-                        + port + " does not support SSL connections.");                
+            if (null != connector && !(connector instanceof SslSocketConnector)) {
+                LOG.warning("Connector " + connector + " for JettyServerEngine Port " 
+                        + port + " does not support SSL connections.");
+                return;
             }
             connectorFactory = 
                 getHTTPSConnectorFactory(tlsServerParameters);            
