@@ -116,7 +116,9 @@ public class JMSOldConfigHolder {
         long timeToLive = isConduit ? clientConfig.getMessageTimeToLive() : serverConfig
             .getMessageTimeToLive();
         jmsConfig.setTimeToLive(timeToLive);
-        jmsConfig.setUseJms11(true);
+        if (address.isSetUseJms11()) {
+            jmsConfig.setUseJms11(address.isUseJms11());
+        }
         boolean useJndi = address.isSetJndiDestinationName();
         jmsConfig.setUseJndi(useJndi);
         jmsConfig.setSessionTransacted(serverBehavior.isSetTransactional());

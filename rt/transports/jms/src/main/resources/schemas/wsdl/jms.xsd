@@ -133,76 +133,93 @@
     </xs:simpleType>
     
     <xs:complexType name="AddressType">
-        <xs:complexContent>
-            <xs:extension base="wsdl:tExtensibilityElement">
-                <xs:sequence>
-                    <xs:element name="JMSNamingProperty" type="jms:JMSNamingPropertyType" minOccurs="0" maxOccurs="unbounded" />
-                </xs:sequence>
-                <xs:attribute name="destinationStyle" type="jms:DestinationStyleType" default="queue">
-                    <xs:annotation>
-                        <xs:documentation>
-                          JMS Destination style queue or topic.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                
-                <xs:attribute name="jndiConnectionFactoryName" type="xs:string" use="required">
-                    <xs:annotation>
-                        <xs:documentation>
-                          Type of the JNDI Connection factory queueConnectionFactory or topicConnectionFactory.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="jndiDestinationName" type="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
-                          Name of the JNDI Destination queue or topic.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                
-                <xs:attribute name="jmsDestinationName" type="xs:string">
-                	<xs:annotation>
-                		<xs:documentation>
-                			JMS destination queue name or topic name.
-                		</xs:documentation>
-                	</xs:annotation>
-                </xs:attribute>
-                
-                <xs:attribute name="jndiReplyDestinationName" type="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
-                          JMS Message Replyto destination when static queues are used for reply.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                
-                <xs:attribute name="jmsReplyDestinationName" type="xs:string">
-                	<xs:annotation>
-                		<xs:documentation>
-                			JMS Replyto destination queue name when using static queues for reply.
-                		</xs:documentation>
-                	</xs:annotation>
-                </xs:attribute>
-                
-                <xs:attribute name="connectionUserName" type="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
-                            UserName to use while creating JMS queue/topic connection.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="connectionPassword" type="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Password to use while creating JMS queue/topic connection.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+    	<xs:complexContent>
+    		<xs:extension base="wsdl:tExtensibilityElement">
+    			<xs:sequence>
+    				<xs:element name="JMSNamingProperty"
+    					type="jms:JMSNamingPropertyType" minOccurs="0"
+    					maxOccurs="unbounded" />
+    			</xs:sequence>
+    			<xs:attribute name="destinationStyle"
+    				type="jms:DestinationStyleType" default="queue">
+    				<xs:annotation>
+    					<xs:documentation>
+    						JMS Destination style queue or topic.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="jndiConnectionFactoryName"
+    				type="xs:string" use="required">
+    				<xs:annotation>
+    					<xs:documentation>
+    						Type of the JNDI Connection factory
+    						queueConnectionFactory or
+    						topicConnectionFactory.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+    			<xs:attribute name="jndiDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						Name of the JNDI Destination queue or topic.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="jmsDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						JMS destination queue name or topic name.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="jndiReplyDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						JMS Message Replyto destination when static
+    						queues are used for reply.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="jmsReplyDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						JMS Replyto destination queue name when
+    						using static queues for reply.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="connectionUserName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						UserName to use while creating JMS
+    						queue/topic connection.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+    			<xs:attribute name="connectionPassword"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						Password to use while creating JMS
+    						queue/topic connection.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+    			<xs:attribute name="useJms11" type="xs:boolean" use="optional"></xs:attribute>
+    		</xs:extension>
+    	</xs:complexContent>
     </xs:complexType>
-    
+
     <xs:complexType name="ClientBehaviorPolicyType">
         <xs:complexContent>
             <xs:extension base="wsdl:tExtensibilityElement">

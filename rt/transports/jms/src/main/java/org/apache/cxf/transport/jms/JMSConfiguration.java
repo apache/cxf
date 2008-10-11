@@ -33,7 +33,7 @@ public class JMSConfiguration implements InitializingBean {
     private DestinationResolver destinationResolver;
     private PlatformTransactionManager transactionManager;
     private TaskExecutor taskExecutor;
-    private boolean useJms11 = true;
+    private boolean useJms11;
     private boolean useJndi;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
