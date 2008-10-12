@@ -110,7 +110,8 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             if (invoker != null) {
                 getServiceFactory().setInvoker(invoker);
             } else if (serviceBean != null) {
-                getServiceFactory().setInvoker(createInvoker());
+                invoker = createInvoker();
+                getServiceFactory().setInvoker(invoker);
             }
 
             Endpoint ep = createEndpoint();
@@ -236,9 +237,9 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     /**
-     * Specifies if the Server should be started upon creation. The 
-     * default is for Servers to be started upon creation. Passing 
-     * <code>false</code> tells the factory that the Server will be 
+     * Specifies if the Server should be started upon creation. The
+     * default is for Servers to be started upon creation. Passing
+     * <code>false</code> tells the factory that the Server will be
      * started manually using the start method.
      *
      * @param start <code>false</code> specifies that the Server will not be started upon creation
@@ -260,7 +261,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     /**
-     * Sets the bean implementing the service. If this is set a 
+     * Sets the bean implementing the service. If this is set a
      * <code>BeanInvoker</code> is created for the provided bean.
      *
      * @param serviceBean an instantiated implementaiton object
@@ -286,12 +287,12 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     /**
-     * Specifies the location of the WSDL defining the service interface 
-     * used by the factory to create services. Typically, the WSDL 
+     * Specifies the location of the WSDL defining the service interface
+     * used by the factory to create services. Typically, the WSDL
      * location is specified as a URL.
-     * 
+     *
      * @param locaiton the URL of the WSDL defining the service interface
-     */          
+     */
     public void setWsdlLocation(String location) {
         setWsdlURL(location);
     }
