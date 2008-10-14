@@ -168,7 +168,6 @@ public abstract class AbstractJAXBProvider
         return objectFactoryForClass(InjectionUtils.getActualType(genericType));
     }
     
-    @SuppressWarnings("deprecation")
     protected Unmarshaller createUnmarshaller(Class<?> cls, Type genericType) 
         throws JAXBException {
         JAXBContext context = getJAXBContext(cls, genericType);
