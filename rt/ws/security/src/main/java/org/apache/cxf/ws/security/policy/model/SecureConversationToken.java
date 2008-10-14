@@ -139,7 +139,7 @@ public class SecureConversationToken extends SecurityContextToken {
 
             if (isRequireExternalUriRef()) {
                 // <sp:RequireExternalUriReference />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_EXTERNAL_URI_REFERNCE, namespaceURI);
+                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE, namespaceURI);
             }
 
             if (isSc10SecurityContextToken()) {

@@ -153,7 +153,7 @@ public class X509Token extends Token {
 
         if (isRequireKeyIdentifierReference()) {
             // <sp:RequireKeyIdentifierReference />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_KEY_IDENTIFIRE_REFERENCE, namespaceURI);
+            writer.writeStartElement(prefix, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE, namespaceURI);
             writer.writeEndElement();
         }
 

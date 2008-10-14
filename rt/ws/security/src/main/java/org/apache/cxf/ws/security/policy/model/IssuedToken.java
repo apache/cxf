@@ -177,12 +177,12 @@ public class IssuedToken extends Token {
 
             if (isRequireExternalReference()) {
                 // <sp:RequireExternalReference />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_EXTERNAL_REFERNCE, namespaceURI);
+                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_EXTERNAL_REFERENCE, namespaceURI);
             }
 
             if (isRequireInternalReference()) {
                 // <sp:RequireInternalReference />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_INTERNAL_REFERNCE, namespaceURI);
+                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_INTERNAL_REFERENCE, namespaceURI);
             }
 
             if (this.isDerivedKeys()) {

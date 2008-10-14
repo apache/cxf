@@ -65,7 +65,7 @@ public final class SoapEncodingUtil {
     }
 
     /**
-     * Reads the SOAP 1.2 or SOAP 1.1 refernce attribute.
+     * Reads the SOAP 1.2 or SOAP 1.1 reference attribute.
      *
      * @param reader the stream to read; must not be null
      * @return the reference id or null of neither attribute was present

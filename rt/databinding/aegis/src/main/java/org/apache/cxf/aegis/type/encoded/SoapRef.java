@@ -58,7 +58,7 @@ public class SoapRef {
      * Registers an action to invoke when the instance is set.  If the instance, has already been set, the
      * onSet method will immedately be invoked.
      *
-     * @return the action to invoke when this refernce is resolved; not null
+     * @return the action to invoke when this reference is resolved; not null
      */
     public void setAction(Action action) {
         if (action == null) {
