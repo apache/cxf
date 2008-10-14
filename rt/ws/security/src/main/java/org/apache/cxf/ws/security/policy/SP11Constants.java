@@ -40,10 +40,10 @@ public final class SP11Constants extends SPConstants {
         + SPConstants.INCLUDE_TOKEN_ONCE_SUFFIX;
 
     public static final String INCLUDE_ALWAYS_TO_RECIPIENT = SP11Constants.SP_NS
-        + SPConstants.INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT_SUFFIX;
+        + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX;
 
     public static final String INCLUDE_ALWAYS = SP11Constants.SP_NS
-        + SPConstants.INCLUDE_TOEKN_ALWAYS_SUFFIX;
+        + SPConstants.INCLUDE_TOKEN_ALWAYS_SUFFIX;
     
     // /////////////////////////////////////////////////////////////////////
 
@@ -185,8 +185,8 @@ public final class SP11Constants extends SPConstants {
     public static final QName PROTECT_TOKENS = new QName(SP11Constants.SP_NS,
             SPConstants.PROTECT_TOKENS, SP11Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_KEY_IDENTIFIRE_REFERENCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_KEY_IDENTIFIRE_REFERENCE ,
+    public static final QName REQUIRE_KEY_IDENTIFIER_REFERENCE = new QName(
+            SP11Constants.SP_NS, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE ,
             SP11Constants.SP_PREFIX);
 
     public static final QName REQUIRE_ISSUER_SERIAL_REFERENCE = new QName(
@@ -254,14 +254,14 @@ public final class SP11Constants extends SPConstants {
     public static final QName REQUIRE_DERIVED_KEYS = new QName(SP11Constants.SP_NS,
             SPConstants.REQUIRE_DERIVED_KEYS, SP11Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_EXTERNAL_URI_REFERNCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_URI_REFERNCE, SP11Constants.SP_PREFIX);
+    public static final QName REQUIRE_EXTERNAL_URI_REFERENCE = new QName(
+            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE, SP11Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_EXTERNAL_REFERNCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERNCE , SP11Constants.SP_PREFIX);
+    public static final QName REQUIRE_EXTERNAL_REFERENCE = new QName(
+            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERENCE , SP11Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_INTERNAL_REFERNCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERNCE , SP11Constants.SP_PREFIX);
+    public static final QName REQUIRE_INTERNAL_REFERENCE = new QName(
+            SP11Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERENCE , SP11Constants.SP_PREFIX);
 
     public static final QName REQUEST_SECURITY_TOKEN_TEMPLATE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE,

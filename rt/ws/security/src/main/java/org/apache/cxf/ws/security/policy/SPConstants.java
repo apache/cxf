@@ -307,9 +307,9 @@ public abstract class SPConstants {
     public static final String ATTR_INCLUDE_TOKEN = "IncludeToken";
     public static final String INCLUDE_TOKEN_NEVER_SUFFIX = "/IncludeToken/Never";
     public static final String INCLUDE_TOKEN_ONCE_SUFFIX = "/IncludeToken/Once";
-    public static final String INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT_SUFFIX = "/IncludeToken/AlwaysToRecipient";
-    public static final String INCLUDE_TOEKN_ALWAYS_TO_INITIATOR_SUFFIX = "/IncludeToken/AlwaysToInitiator";
-    public static final String INCLUDE_TOEKN_ALWAYS_SUFFIX = "/IncludeToken/Always";
+    public static final String INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX = "/IncludeToken/AlwaysToRecipient";
+    public static final String INCLUDE_TOKEN_ALWAYS_TO_INITIATOR_SUFFIX = "/IncludeToken/AlwaysToInitiator";
+    public static final String INCLUDE_TOKEN_ALWAYS_SUFFIX = "/IncludeToken/Always";
     
     
     public enum IncludeTokenType {
@@ -329,7 +329,7 @@ public abstract class SPConstants {
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public static final String REQUIRE_KEY_IDENTIFIRE_REFERENCE = "RequireKeyIdentifireReference";
+    public static final String REQUIRE_KEY_IDENTIFIER_REFERENCE = "RequireKeyIdentifierReference";
     public static final String REQUIRE_ISSUER_SERIAL_REFERENCE = "RequireIssuerSerialReference";
     public static final String REQUIRE_EMBEDDED_TOKEN_REFERENCE = "RequireEmbeddedTokenReference";
     public static final String REQUIRE_THUMBPRINT_REFERENCE = "RequireThumbprintReference";
@@ -384,11 +384,11 @@ public abstract class SPConstants {
     
     public static final String REQUIRE_EXPLICIT_DERIVED_KEYS = "RequireExplicitDerivedKeys";
     
-    public static final String REQUIRE_EXTERNAL_URI_REFERNCE = "RequireExternalUriReference";
+    public static final String REQUIRE_EXTERNAL_URI_REFERENCE = "RequireExternalUriReference";
     
-    public static final String REQUIRE_EXTERNAL_REFERNCE = "RequireExternalReference";
+    public static final String REQUIRE_EXTERNAL_REFERENCE = "RequireExternalReference";
     
-    public static final String REQUIRE_INTERNAL_REFERNCE = "RequireInternalReference";
+    public static final String REQUIRE_INTERNAL_REFERENCE = "RequireInternalReference";
     
     public static final String REQUEST_SECURITY_TOKEN_TEMPLATE = "RequestSecurityTokenTemplate";
     

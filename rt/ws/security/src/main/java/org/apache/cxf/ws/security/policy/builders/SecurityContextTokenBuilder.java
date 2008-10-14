@@ -68,7 +68,7 @@ public class SecurityContextTokenBuilder implements AssertionBuilder {
 
             if (DOMUtils.getFirstChildWithName(element, 
                                                consts.getNamespace(),
-                                               SPConstants.REQUIRE_EXTERNAL_URI_REFERNCE) != null) {
+                                               SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE) != null) {
                 contextToken.setRequireExternalUriRef(true);
             }
 

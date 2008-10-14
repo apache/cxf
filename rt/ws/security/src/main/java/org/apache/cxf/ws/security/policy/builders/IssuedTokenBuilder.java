@@ -139,9 +139,9 @@ public class IssuedTokenBuilder implements AssertionBuilder {
 
             if (SP11Constants.REQUIRE_DERIVED_KEYS.equals(name)) {
                 parent.setDerivedKeys(true);
-            } else if (SP11Constants.REQUIRE_EXTERNAL_REFERNCE.equals(name)) {
+            } else if (SP11Constants.REQUIRE_EXTERNAL_REFERENCE.equals(name)) {
                 parent.setRequireExternalReference(true);
-            } else if (SP11Constants.REQUIRE_INTERNAL_REFERNCE.equals(name)) {
+            } else if (SP11Constants.REQUIRE_INTERNAL_REFERENCE.equals(name)) {
                 parent.setRequireInternalReference(true);
             }
         }

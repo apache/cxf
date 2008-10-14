@@ -105,7 +105,7 @@ public class X509TokenBuilder implements AssertionBuilder {
                 continue;
             }
 
-            if (SPConstants.REQUIRE_KEY_IDENTIFIRE_REFERENCE.equals(name.getLocalPart())) {
+            if (SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE.equals(name.getLocalPart())) {
                 parent.setRequireKeyIdentifierReference(true);
 
             } else if (SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE.equals(name.getLocalPart())) {
