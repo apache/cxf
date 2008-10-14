@@ -65,7 +65,7 @@
                     The default is "false".
                     Setting this to "true" does the following: Changes the internal name of the
                     bean by appending either ".jaxws-client" or ".jaxws-endpoint" to the bean's
-                    id. Make the bean abstract.
+                    id. Makes the bean abstract.
                     See documentation for attribute abstract in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>

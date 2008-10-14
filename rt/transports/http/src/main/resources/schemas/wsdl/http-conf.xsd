@@ -38,9 +38,7 @@
     
     <xs:complexType name="HTTPServerPolicy">
         <xs:annotation>
-            <xs:documentation>HTTP Server configuration properties.
-            Used for configuring a HTTP server port.
-            </xs:documentation>
+            <xs:documentation>Properties used for configuring a server-side HTTP prort</xs:documentation>
         </xs:annotation>
 
         <xs:complexContent>
@@ -59,7 +57,7 @@
                         <xs:documentation>
                         When set to no, exceptions will be thrown when an error is encountered 
                         receiving a request from the client.  When set to yes these errors will 
-                        be suppressed.
+                        be suppressed. The default is false.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -67,9 +65,9 @@
                 <xs:attribute name="SuppressClientReceiveErrors" type="xs:boolean" use="optional" default="false">
                     <xs:annotation>
                         <xs:documentation>
-                        When set to No, exceptions will be thrown when an error is encountered 
-                        sending a reply from to client.  When set to Yes these errors will be 
-                        suppressed.                     
+                        When set to false, exceptions will be thrown when an error is encountered 
+                        sending a reply from to client.  When set to true these errors will be 
+                        suppressed. The default is false.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -77,13 +75,13 @@
                 <xs:attribute name="HonorKeepAlive" type="xs:boolean" use="optional" default="true">
                     <xs:annotation>
                         <xs:documentation>
-                        When set to Yes, the request socket will remain open after the reply is 
+                        When set to true, the request socket will remain open after the reply is 
                         sent to the client, if the client has requested keep-alive and is using 
-                        at least version 1.1 of HTTP.  If set to No, the socket will be closed 
+                        at least version 1.1 of HTTP.  If set to false, the socket will be closed 
                         after each reply is sent, even if the client requests the server to keep 
                         the connection alive.  Keep-Alive improves performance for the client 
                         requesting such behavior, but can limit overall scalability of the server 
-                        for handling many clients.
+                        for handling many clients. The Default is false.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -91,7 +89,7 @@
                 <xs:attribute name="RedirectURL" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        to redirect the client to another url (if the ReplyCode and ReplyDescription 
+                        A URL to which clients are redirected (if the ReplyCode and ReplyDescription 
                         are not set, ReplyCode will be set to 302, and  ReplyDescription will be set 
                         to 'Object Moved').
                         </xs:documentation>
@@ -102,7 +100,7 @@
                     <xs:annotation>
                         <xs:documentation>
                         Most commonly used to specify no-cache, however the standard supports a 
-                        dozen or so caching related directives for responses 
+                        dozen or so caching related directives for responses. 
                         </xs:documentation>
                     </xs:annotation>      
 
@@ -111,8 +109,7 @@
                 <xs:attribute name="ContentLocation" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        to let the client know what the final url was for handling the 
-                        request (e.g., to inform that default.htm document was used.)
+                        Specifies the URL representing the resource used to satisfy the request(e.g., to inform that default.htm document was used.)
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -120,7 +117,7 @@
                 <xs:attribute name="ContentType" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        what MIME type this reply is.  Default is set by the binding.
+                        Specifies the MIME type used for responses.  The default is set by the binding.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -128,7 +125,7 @@
                 <xs:attribute name="ContentEncoding" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        how this is encoded, if applicable
+                        Specifies any additional encoding applied to the response. Values are specified using IANA labels.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -136,7 +133,7 @@
                 <xs:attribute name="ServerType" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        used to send a ServerType header to the client, if desired
+                        Specifies an optional value for the HTTP ServerType property.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -146,9 +143,7 @@
 
     <xs:complexType name="HTTPClientPolicy">
         <xs:annotation>
-            <xs:documentation>HTTP client configuration properties.
-            Used for configuring a HTTP client port.
-            </xs:documentation>
+            <xs:documentation>Properties used to configure a client-side HTTP port</xs:documentation>
         </xs:annotation>
 
         <xs:complexContent>
@@ -157,7 +152,7 @@
                 <xs:attribute name="ConnectionTimeout" type="xs:unsignedInt" use="optional" default="30000">
                     <xs:annotation>
                         <xs:documentation>
-                        Send timeout in milliseconds, 0 is infinite
+                        Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. 0 is infinite.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -165,7 +160,7 @@
                 <xs:attribute name="ReceiveTimeout" type="xs:unsignedInt" use="optional" default="60000">
                     <xs:annotation>
                         <xs:documentation>
-                        Receive timeout in milliseconds, 0 is infinite
+                        Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. 0 is infinite.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -173,8 +168,7 @@
                 <xs:attribute name="AutoRedirect" type="xs:boolean" use="optional" default="false">
                     <xs:annotation>
                         <xs:documentation>
-                        Whether to automatically follow up when the server issues a redirection reply.  
-                        Default is No, so calling flow would handle this condition. 
+                       Specifies if the consumer will automatically follow a server issued redirection.
                         (name is not part of standard)
                         </xs:documentation>
                     </xs:annotation>      
@@ -183,7 +177,7 @@
                 <xs:attribute name="MaxRetransmits" type="xs:int" use="optional" default="-1">
                     <xs:annotation>
                         <xs:documentation>
-                        This attribute governs the amount of retransmits that 
+                        Specifies the amount of retransmits that 
                         are allowed for redirects along with retransmits for 
                         authorization. Each redirect may cause another 
                         retransmit for a UNAUTHORIZED response code, ie. 401. 
@@ -199,7 +193,7 @@
                     <xs:annotation>
                         <xs:documentation>
                         If true, the client is free to use chunking streams if it wants to, but not 
-                        required.  Regular non-chunked requests are OK too.    If false, the client 
+                        required to.  Regular non-chunked requests are OK too. If false, the client 
                         must use regular, non-chunked requests in all cases.
                         </xs:documentation>
                     </xs:annotation>      
@@ -207,8 +201,8 @@
                 <xs:attribute name="ChunkingThreshold" type="xs:int" use="optional" default="4096">
                     <xs:annotation>
                         <xs:documentation>
-                        If AllowChunking is true, this sets the threshold at which mesages start
-                        getting chunked.   Messages under this limit do not get chunked.
+                        If AllowChunking is true, this sets the threshold at which messages start
+                        getting chunked. Messages under this limit do not get chunked.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -216,7 +210,7 @@
                 <xs:attribute name="Accept" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        What MIME types the client is prepared to handle (e.g., HTML, JPEG, GIF, etc.)
+                        Specifies the MIME types the client is prepared to handle (e.g., HTML, JPEG, GIF, etc.)
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -224,7 +218,7 @@
                 <xs:attribute name="AcceptLanguage" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        What language the client desires (e.g., English, French, etc.)
+                        Specifies the language the client desires (e.g., English, French, etc.)
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -232,7 +226,7 @@
                 <xs:attribute name="AcceptEncoding" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        What encoding the client is prepared to handle (e.g., gzip)
+                        Specifies the encoding the client is prepared to handle (e.g., gzip)
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -240,7 +234,7 @@
                 <xs:attribute name="ContentType" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        The content type of the stream being sent in a post request 
+                        Specifies the content type of the stream being sent in a post request. 
                         (this should be text/xml for web services, or can be set to 
                         application/x-www-form-urlencoded if the client is sending form data).
                         </xs:documentation>
