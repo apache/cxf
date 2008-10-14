@@ -154,4 +154,27 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         assertEquals(Soap12.getInstance().getReceiver(), sf.getFaultCode());
         
     }
+    
+    
+    @Test
+    public void testCXF1864() throws Exception {
+
+        SoapMessage m = new SoapMessage(new MessageImpl());
+        m.setVersion(Soap12.getInstance());        
+
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
+                                                                 .getResourceAsStream("cxf1864.xml"));
+        m.setContent(XMLStreamReader.class, reader);
+
+        reader.nextTag();
+
+        Soap12FaultInInterceptor inInterceptor = new Soap12FaultInInterceptor();
+        inInterceptor.handleMessage(m);
+
+        SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
+        assertNotNull(fault2);
+        assertEquals(Soap12.getInstance().getReceiver(), fault2.getFaultCode());
+    }
+
 }

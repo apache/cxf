@@ -34,7 +34,6 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.ClientFaultConverter;
@@ -65,17 +64,18 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         
         try {
             Document fault = StaxUtils.read(new FragmentStreamReader(reader));
-            String faultCodeString = (String) xu.getValue("//s:Fault/s:Code/s:Value/text()", 
-                                                        fault, 
-                                                        XPathConstants.STRING);
+            Element el = (Element)xu.getValue("//s:Fault/s:Code/s:Value", 
+                                      fault, 
+                                      XPathConstants.NODE);
+            if (el != null) {
+                faultCode = XMLUtils.getQName(el.getTextContent(), el);
+            }
             
-            faultCode = XMLUtils.getQName(faultCodeString, fault);
-            
-            String subCodeString = (String) xu.getValue("//s:Fault/s:Code/s:Subcode/s:Value/text()", 
-                                                        fault,
-                                                        XPathConstants.STRING);
-            if (StringUtils.isEmpty(subCodeString)) {
-                subCode = XMLUtils.getQName(subCodeString, fault);
+            el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode/s:Value", 
+                                      fault, 
+                                      XPathConstants.NODE);
+            if (el != null) {
+                subCode = XMLUtils.getQName(el.getTextContent(), el);
             }
             
             exMessage = (String) xu.getValue("//s:Fault/s:Reason/s:Text/text()", 

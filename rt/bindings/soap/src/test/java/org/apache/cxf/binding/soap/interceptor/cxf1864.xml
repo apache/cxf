@@ -1,0 +1,6 @@
+<env:Fault xmlns:env='http://www.w3.org/2003/05/soap-envelope'>
+<env:Code xmlns:env='http://www.w3.org/2003/05/soap-envelope'>
+	<env:Value xmlns:codeNS='http://www.w3.org/2003/05/soap-envelope'
+		 xmlns:env='http://www.w3.org/2003/05/soap-envelope'>codeNS:Receiver</env:Value>
+</env:Code>
+<env:Reason xmlns:env='http://www.w3.org/2003/05/soap-envelope'><env:Text xml:lang='en-US' xmlns:env='http://www.w3.org/2003/05/soap-envelope'>Some Reason</env:Text></env:Reason><env:Detail xmlns:env='http://www.w3.org/2003/05/soap-envelope'><Error><ErrorType>General</ErrorType><ErrorCode>201</ErrorCode><ErrorMessage>Person with that pid already exists!</ErrorMessage><ErrorSource>Create</ErrorSource></Error></env:Detail></env:Fault>
