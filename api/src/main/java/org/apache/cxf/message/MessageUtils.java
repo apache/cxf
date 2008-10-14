@@ -101,12 +101,16 @@ public final class MessageUtils {
     }
     
     /**
-     * Returns true if a value is either the String "true" or Boolean.TRUE.
+     * Returns true if a value is either the String "true" (regardless of case)  or Boolean.TRUE.
      * @param value
      * @return true iff value is either the String "true" or Boolean.TRUE
      */
     public static boolean isTrue(Object value) {
-        if (Boolean.TRUE.equals(value) || "true".equals(value)) {
+        if (value == null) {
+            return false;
+        }
+
+        if (Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString())) {
             return true;
         }
         
