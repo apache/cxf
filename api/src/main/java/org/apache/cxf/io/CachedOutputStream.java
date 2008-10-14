@@ -302,7 +302,8 @@ public class CachedOutputStream extends OutputStream {
         flush();
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
-                out.append(((ByteArrayOutputStream)currentStream).toString());
+                byte[] bytes = ((ByteArrayOutputStream)currentStream).toByteArray();
+                out.append(IOUtils.newStringFromBytes(bytes));
             } else {
                 throw new IOException("Unknown format of currentStream");
             }
