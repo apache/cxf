@@ -19,6 +19,7 @@
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -130,7 +131,6 @@ public class JAXBDataBinding implements DataBindingProfile {
         SchemaCompilerImpl schemaCompiler = (SchemaCompilerImpl)XJC.createSchemaCompiler();
         ClassCollector classCollector = context.get(ClassCollector.class);
         
-        
         ClassNameAllocatorImpl allocator 
             = new ClassNameAllocatorImpl(classCollector,
                                          c.optionSet(ToolConstants.CFG_AUTORESOLVE));
@@ -143,22 +143,14 @@ public class JAXBDataBinding implements DataBindingProfile {
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
         Map<String, Element> schemaLists = CastUtils.cast((Map<?, ?>)context.get(ToolConstants.SCHEMA_MAP));
 
-        for (String key : schemaLists.keySet()) {
-            Element ele = schemaLists.get(key);
-            ele = removeImportElement(ele);
-            String tns = ele.getAttribute("targetNamespace");
-            if (StringUtils.isEmpty(tns)) {
-                continue;
-            }
-            if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                validateSchema(ele);
-            }           
-            schemaCompiler.parseSchema(key, ele);
+        
+        Options opts = null;
+        opts = getOptions(schemaCompiler);
 
-        }
+        addSchemas(opts, schemaCompiler, schemaLists);
 
         for (InputSource binding : jaxbBindings) {
-            schemaCompiler.parseSchema(binding);
+            opts.addBindFile(binding);
         }
 
                        
@@ -176,8 +168,6 @@ public class JAXBDataBinding implements DataBindingProfile {
             schemaCompiler.setDefaultPackageName(context.getPackageName());
         }  
         
-        Options opts = null;
-        opts = getOptions(schemaCompiler);
         
         Vector<String> args = new Vector<String>();
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
@@ -185,7 +175,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             args.add("-extension");
             URL bindingFileUrl = getClass().getResource("W3CEPRJaxbBinding.xml");
             InputSource ins = new InputSource(bindingFileUrl.toString());
-            schemaCompiler.parseSchema(ins);
+            opts.addBindFile(ins);
         }
         
         if (context.get(ToolConstants.CFG_XJC_ARGS) != null) {
@@ -200,7 +190,6 @@ public class JAXBDataBinding implements DataBindingProfile {
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null
             || context.get(ToolConstants.CFG_XJC_ARGS) != null) {
             try {
-
                 // keep parseArguments happy, supply dummy required command-line
                 // opts
                 opts.addGrammar(new InputSource("null"));
@@ -248,6 +237,25 @@ public class JAXBDataBinding implements DataBindingProfile {
         initialized = true;
     }
 
+    private void addSchemas(Options opts, SchemaCompilerImpl schemaCompiler,
+                            Map<String, Element> schemaLists) {
+        for (String key : schemaLists.keySet()) {
+            Element ele = schemaLists.get(key);
+            ele = removeImportElement(ele);
+            String tns = ele.getAttribute("targetNamespace");
+            if (StringUtils.isEmpty(tns)) {
+                continue;
+            }
+            if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
+                validateSchema(ele);
+            }           
+            InputSource is = new InputSource((InputStream)null);
+            is.setSystemId(key);
+            is.setPublicId(key);
+            opts.addGrammar(is);
+            schemaCompiler.parseSchema(key, ele);
+        }
+    }
     private String getPluginUsageString(Options opts) {
         StringBuffer buf = new StringBuffer();
         buf.append("\navaliable plugin options:\n");

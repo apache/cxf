@@ -614,7 +614,8 @@ public class BindingBuilder {
         List<Element> found = new ArrayList<Element>();
         if (includeBody) {
             if (sign) {
-                result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody())));
+                result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody()),
+                                                null, WSConstants.PART_TYPE_BODY));
             } else {
                 result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody()),
                                                 "Content", WSConstants.PART_TYPE_BODY));
@@ -634,7 +635,8 @@ public class BindingBuilder {
                         if (sign) {
                             result.add(new WSEncryptionPart(el.getLocalName(), 
                                                             part.getNamespace(),
-                                                            "Content"));
+                                                            "Content",
+                                                            WSConstants.PART_TYPE_HEADER));
                         } else {
                             WSEncryptionPart encryptedHeader 
                                 = new WSEncryptionPart(el.getLocalName(),
@@ -686,11 +688,14 @@ public class BindingBuilder {
                         if (sign) {
                             result.add(new WSEncryptionPart(el.getLocalName(),
                                                             el.getNamespaceURI(), 
-                                                            "Content"));
+                                                            "Content",
+                                                            WSConstants.PART_TYPE_ELEMENT));
                         } else {
                             WSEncryptionPart encryptedElem = new WSEncryptionPart(el.getLocalName(),
                                                                                   el.getNamespaceURI(),
-                                                                                  "Element");
+                                                                                  "Element",
+                                                                                  WSConstants
+                                                                                      .PART_TYPE_ELEMENT);
                             String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
                             
                             if (!StringUtils.isEmpty(wsuId)) {

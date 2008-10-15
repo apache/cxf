@@ -280,7 +280,8 @@ public class CodeGenBugTest extends ProcessorTestBase {
 
     @Test
     public void testDefaultLoadNSMappingOFF() throws Exception {
-        String[] args = new String[] {"-dns", "false", "-d", output.getCanonicalPath(), "-noAddressBinding",
+        String[] args = new String[] {"-dns", "false",
+                                      "-d", output.getCanonicalPath(), "-noAddressBinding",
                                       getLocation("/wsdl2java_wsdl/basic_callback.wsdl")};
 
         WSDLToJava.main(args);

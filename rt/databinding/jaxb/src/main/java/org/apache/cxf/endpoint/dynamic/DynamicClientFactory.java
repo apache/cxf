@@ -21,6 +21,7 @@ package org.apache.cxf.endpoint.dynamic;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -321,11 +322,18 @@ public class DynamicClientFactory {
         
     }
 
+    @SuppressWarnings("deprecation")
     private void addSchemas(String wsdlUrl, Collection<SchemaInfo> schemas, SchemaCompiler compiler) {
         int num = 1;
         for (SchemaInfo schema : schemas) {
             Element el = schema.getElement();
-            
+
+            //For JAXB 2.1.8
+            InputSource is = new InputSource((InputStream)null);
+            is.setSystemId(wsdlUrl + "#types" + num);
+            is.setPublicId(wsdlUrl + "#types" + num);
+            compiler.getOptions().addGrammar(is);
+
             compiler.parseSchema(wsdlUrl + "#types" + num, el);
             num++;
         }
