@@ -68,27 +68,13 @@ public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor 
         // on the outbound-server side of a response
         try {
             aim.checkEffectivePolicy(policy.getPolicy());
-        } catch (final PolicyException e) {
-            if (isOutboundServer(message)) {
-                LOG.fine("An exception was thrown when verifying that the effective policy for "
-                         + "this request was satisfied.  However, this exception will not result in "
-                         + "a fault.  The exception raised is: "
-                         + e.toString());
-                return;
-            } else {
-                throw e;
-            }
+        } catch (PolicyException e) {
+            LOG.fine("An exception was thrown when verifying that the effective policy for "
+                     + "this request was satisfied.  However, this exception will not result in "
+                     + "a fault.  The exception raised is: "
+                     + e.toString());
+            return;
         }
         LOG.fine("Verified policies for outbound message.");
-    }
-    
-    private boolean isOutboundServer(final Message message) {
-        final Object role = message.get(Message.REQUESTOR_ROLE);
-        final boolean isClient =
-            role != null ? Boolean.TRUE.equals(role) : false;
-        final boolean isOutbound =
-            message == message.getExchange().getOutMessage()
-            || message == message.getExchange().getOutFaultMessage();
-        return !isClient && isOutbound;
     }
 }

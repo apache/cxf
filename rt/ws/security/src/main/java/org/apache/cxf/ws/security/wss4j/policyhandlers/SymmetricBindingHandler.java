@@ -69,7 +69,7 @@ import org.apache.ws.security.util.Base64;
 /**
  * 
  */
-public class SymmetricBindingHandler extends BindingBuilder {
+public class SymmetricBindingHandler extends AbstractBindingBuilder {
     SymmetricBinding sbinding;
     TokenStore tokenStore;
     

@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.ResourceBundle;
+
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -27,16 +30,24 @@ import org.apache.cxf.common.i18n.UncheckedException;
  * by the policy framework.
  */
 public class PolicyException extends UncheckedException {
+    private static final ResourceBundle BUNDLE 
+        = BundleUtils.getBundle(PolicyException.class, "APIMessages");
+
+    
     public PolicyException(Message msg, Throwable t) {
         super(msg, t);
     }
 
-    public PolicyException(Message msg) {
-        super(msg);
+    public PolicyException(Message message) {
+        super(message);
     }
 
     public PolicyException(Throwable cause) {
         super(cause);
     }
 
+    public PolicyException(AssertionInfo info) {
+        super(new Message("ASSERTION_NOT_ASSERTED", BUNDLE,
+                          info.getAssertion().getName(), info.getErrorMessage()));
+    }
 }

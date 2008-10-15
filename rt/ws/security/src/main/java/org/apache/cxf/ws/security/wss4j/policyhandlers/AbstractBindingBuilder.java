@@ -51,6 +51,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -60,6 +61,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -102,8 +104,8 @@ import org.apache.ws.security.util.WSSecurityUtil;
 /**
  * 
  */
-public class BindingBuilder {
-    private static final Logger LOG = LogUtils.getL7dLogger(BindingBuilder.class); 
+public abstract class AbstractBindingBuilder {
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractBindingBuilder.class); 
     
     protected SOAPMessage saaj;
     protected WSSecHeader secHeader;
@@ -128,7 +130,7 @@ public class BindingBuilder {
     Element bottomUpElement;
     Element topDownElement;
     
-    public BindingBuilder(Binding binding,
+    public AbstractBindingBuilder(Binding binding,
                            SOAPMessage saaj,
                            WSSecHeader secHeader,
                            AssertionInfoMap aim,
@@ -230,6 +232,7 @@ public class BindingBuilder {
                 }
             }
         }
+        throw new PolicyException(reason);
     }
     protected void policyNotAsserted(PolicyAssertion assertion, String reason) {
         LOG.log(Level.INFO, "Not asserting " + assertion.getName() + ": " + reason);
@@ -242,6 +245,7 @@ public class BindingBuilder {
                 }
             }
         }
+        throw new PolicyException(new Message(reason, LOG));
     }
     protected void policyAsserted(PolicyAssertion assertion) {
         LOG.log(Level.INFO, "Asserting " + assertion.getName());

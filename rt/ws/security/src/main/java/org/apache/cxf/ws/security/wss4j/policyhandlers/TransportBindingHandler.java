@@ -35,7 +35,7 @@ import org.apache.ws.security.message.WSSecTimestamp;
 /**
  * 
  */
-public class TransportBindingHandler extends BindingBuilder {
+public class TransportBindingHandler extends AbstractBindingBuilder {
     TransportBinding tbinding;
     
     public TransportBindingHandler(TransportBinding binding,

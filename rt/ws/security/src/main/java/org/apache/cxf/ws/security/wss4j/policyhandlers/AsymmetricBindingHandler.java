@@ -55,7 +55,7 @@ import org.apache.ws.security.message.WSSecTimestamp;
 /**
  * 
  */
-public class AsymmetricBindingHandler extends BindingBuilder {
+public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     AsymmetricBinding abinding;
     
     private WSSecEncryptedKey encrKey;

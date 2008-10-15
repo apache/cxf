@@ -37,6 +37,7 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.HttpsToken;
@@ -117,6 +118,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     }
                 } else {
                     ai.setNotAsserted("HttpURLConnection is not a HttpsURLConnection");
+                }
+                if (!ai.isAsserted()) {
+                    throw new PolicyException(ai);
                 }
             }            
         }
