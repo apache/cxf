@@ -29,7 +29,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.Test;
@@ -60,7 +62,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
             public void run() {
                 try {
                     final String protocol = "http-" + Thread.currentThread().getId();
-                    for (int i = 0; i < 70; i++) {
+                    for (int i = 0; i < 10; i++) {
                         String threadSpecificaddress = protocol + "://localhost:80/" + i;
                         Map<String, Object> requestContext = ((BindingProvider)handler)
                                     .getRequestContext();
@@ -110,7 +112,8 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
 
         // get the latest values
-        ((JaxWsClientProxy.EchoContext)requestContext).reload();
+        
+        ((ClientImpl.EchoContext)((WrappedMessageContext)requestContext).getWrappedMap()).reload();
         assertTrue("address is different", !address.equals(requestContext
             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
         // verify value reflects what other threads were doing

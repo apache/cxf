@@ -26,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Logger;
 
@@ -60,47 +59,10 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implements
     InvocationHandler, BindingProvider {
- 
-    /*
-     * modification are echoed back to the shared map
-     */
-    public static class EchoContext extends HashMap<String, Object> {
-        final Map<String, Object> shared; 
-        public EchoContext(Map<String, Object> sharedMap) {
-            super(sharedMap);
-            shared = sharedMap;
-        }
-
-        public Object put(String key, Object value) {
-            shared.put(key, value);
-            return super.put(key, value);
-        }
-
-        public void putAll(Map<? extends String, ? extends Object> t) {
-            shared.putAll(t);
-            super.putAll(t);
-        }
-        
-        public Object remove(Object key) {
-            shared.remove(key);
-            return super.remove(key);
-        }
-        
-        public void reload() {
-            super.clear();
-            super.putAll(shared);
-        }
-    }
 
     public static final String THREAD_LOCAL_REQUEST_CONTEXT = "thread.local.request.context";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(JaxWsClientProxy.class);
-
-    protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>();
-    protected ThreadLocal <EchoContext> requestContext =
-        new ThreadLocal<EchoContext>();
-
-    protected ThreadLocal <Map<String, Object>> responseContext =
-            new ThreadLocal<Map<String, Object>>();
 
     private final Binding binding;
     private final EndpointReferenceBuilder builder;
@@ -115,7 +77,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     private void setupEndpointAddressContext(Endpoint endpoint) {
         // NOTE for jms transport the address would be null
         if (null != endpoint && null != endpoint.getEndpointInfo().getAddress()) {
-            currentRequestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+            getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
                                       endpoint.getEndpointInfo().getAddress());
         }
     }
@@ -149,29 +111,15 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             throw new WebServiceException(msg.toString());
         }
 
-        Map<String, Object> reqContext = this.getRequestContextCopy();        
-        Map<String, Object> respContext = this.getResponseContext();
-        
-        // Clear the response context's hold information
-        // Not call the clear Context is to avoid the error 
-        // that getResponseContext() could be called by Client code first
-        respContext.clear();
-        
-        Map<String, Object> context = new HashMap<String, Object>();
-
-        context.put(Client.REQUEST_CONTEXT, reqContext);
-        context.put(Client.RESPONSE_CONTEXT, respContext);
-       
-        reqContext.put(Method.class.getName(), method);
-        reqContext.put(Client.REQUEST_METHOD, method);
+        client.getRequestContext().put(Method.class.getName(), method);
         boolean isAsync = method.getName().endsWith("Async");
 
         Object result = null;
         try {
             if (isAsync) {
-                result = invokeAsync(method, oi, params, context);
+                result = invokeAsync(method, oi, params);
             } else {
-                result = invokeSync(method, oi, params, context);
+                result = invokeSync(method, oi, params);
             }
         } catch (WebServiceException wex) {
             throw wex.fillInStackTrace();
@@ -204,6 +152,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
         }
         
+        Map<String, Object> respContext = client.getResponseContext();
         Map<String, Scope> scopes = CastUtils.cast((Map<?, ?>)respContext.get(WrappedMessageContext.SCOPES));
         if (scopes != null) {
             for (Map.Entry<String, Scope> scope : scopes.entrySet()) {
@@ -267,9 +216,9 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                  || address.equals(getClient().getEndpoint().getEndpointInfo().getAddress()));
     }
 
-    private Object invokeAsync(Method method, BindingOperationInfo oi, Object[] params,
-                               Map<String, Object> context) {
+    private Object invokeAsync(Method method, BindingOperationInfo oi, Object[] params) {
 
+        Map<String, Object> context = new HashMap<String, Object>(client.getRequestContext());
         FutureTask<Object> f = new FutureTask<Object>(new JAXWSAsyncCallable(this, method, oi, params,
                                                                              context));
 
@@ -287,57 +236,16 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         }
     }
 
-    public boolean isThreadLocalRequestContext() {
-        if (currentRequestContext.containsKey(THREAD_LOCAL_REQUEST_CONTEXT)) {
-            Object o = currentRequestContext.get(THREAD_LOCAL_REQUEST_CONTEXT);
-            boolean local = false;
-            if (o instanceof Boolean) {
-                local = ((Boolean)o).booleanValue();
-            } else {
-                local = Boolean.parseBoolean(o.toString());
-            }
-            return local;
-        }
-        return false;
-    }
-    public void setThreadLocalRequestContext(boolean b) {
-        currentRequestContext.put(THREAD_LOCAL_REQUEST_CONTEXT, b);
-    }
-
     
-    private Map<String, Object> getRequestContextCopy() {
-        Map<String, Object> realMap = new HashMap<String, Object>();
-        WrappedMessageContext ctx = new WrappedMessageContext(realMap,
-                                                              null,
-                                                              Scope.APPLICATION);
-        // thread local contexts reflect currentRequestContext as of 
-        // last call to getRequestContext()
-        if (isThreadLocalRequestContext()
-            && null != requestContext.get()) {
-            ctx.putAll(requestContext.get());
-        } else {
-            ctx.putAll(currentRequestContext);
-        }
-        return realMap;
-    }
-
     public Map<String, Object> getRequestContext() {
-        if (isThreadLocalRequestContext()) {
-            if (null == requestContext.get()) {
-                requestContext.set(new EchoContext(currentRequestContext));
-            }
-            return requestContext.get();
-        }
-        return currentRequestContext;
+        return new WrappedMessageContext(this.getClient().getRequestContext(),
+                                         null,
+                                         Scope.APPLICATION);
     }
-
     public Map<String, Object> getResponseContext() {
-        if (null == responseContext.get()) {
-            responseContext.set(new WrappedMessageContext(new HashMap<String, Object>(),
+        return new WrappedMessageContext(this.getClient().getResponseContext(),
                                                           null,
-                                                          Scope.APPLICATION));
-        }        
-        return responseContext.get();
+                                                          Scope.APPLICATION);
     }
 
     public Binding getBinding() {
