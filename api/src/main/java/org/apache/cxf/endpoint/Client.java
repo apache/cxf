@@ -31,7 +31,7 @@ import org.apache.cxf.transport.MessageObserver;
 public interface Client extends InterceptorProvider, MessageObserver {
     String REQUEST_CONTEXT = "RequestContext";
     String RESPONSE_CONTEXT = "ResponseContext";
-    String REQUEST_METHOD = "RequestMethod";
+
     /**
      * Invokes an operation syncronously
      * @param operationName The name of the operation to be invoked. The service namespace will be used
@@ -94,6 +94,34 @@ public interface Client extends InterceptorProvider, MessageObserver {
     Object[] invoke(BindingOperationInfo oi,
                     Object[] params,
                     Map<String, Object> context) throws Exception;
+    
+    
+    /**
+     * Gets the request context used for future invocations
+     * @return context The context
+     */
+    Map<String, Object> getRequestContext();
+    /**
+     * Gets the response context from the last invocation on this thread
+     * @return context The context
+     */
+    Map<String, Object> getResponseContext();
+    
+    /**
+     * Sets whether the request context is thread local or global to this client.  By 
+     * default, the request context is "global" in that any values set in the context
+     * are seen by all threads using this client.  If set to true, the context is changed 
+     * to be a ThreadLocal and values set are not seen by other threads.
+     * @param b
+     */
+    void setThreadLocalRequestContext(boolean b);
+    
+    /**
+     * Checks if the Request context is thread local or global.
+     * @return
+     */
+    boolean isThreadLocalRequestContext();
+
 
     Endpoint getEndpoint();
 

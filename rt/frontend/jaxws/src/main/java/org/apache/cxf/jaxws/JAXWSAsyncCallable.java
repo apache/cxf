@@ -47,7 +47,8 @@ public class JAXWSAsyncCallable implements Callable<Object> {
     }
     
     public Object call() throws Exception {
-        return endPointInvocationHandler.invokeSync(method, oi, params, context);
+        endPointInvocationHandler.getRequestContext().putAll(context);
+        return endPointInvocationHandler.invokeSync(method, oi, params);
     }
 
 }

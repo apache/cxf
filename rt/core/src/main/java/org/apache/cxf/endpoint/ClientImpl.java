@@ -22,8 +22,10 @@ package org.apache.cxf.endpoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +68,9 @@ public class ClientImpl
     extends AbstractBasicInterceptorProvider
     implements Client, Retryable, MessageObserver {
     
+    public static final String THREAD_LOCAL_REQUEST_CONTEXT = "thread.local.request.context";
+
+    
     public static final String FINISHED = "exchange.finished";
     
     private static final Logger LOG = LogUtils.getL7dLogger(ClientImpl.class);
@@ -77,6 +82,14 @@ public class ClientImpl
     
     protected PhaseChainCache outboundChainCache = new PhaseChainCache();
     protected PhaseChainCache inboundChainCache = new PhaseChainCache();
+    
+    protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>();
+    protected ThreadLocal <EchoContext> requestContext =
+        new ThreadLocal<EchoContext>();
+
+    protected ThreadLocal <Map<String, Object>> responseContext =
+            new ThreadLocal<Map<String, Object>>();
+
 
     public ClientImpl(Bus b, Endpoint e) {
         this(b, e, (ConduitSelector)null);
@@ -196,6 +209,41 @@ public class ClientImpl
         return getConduitSelector().getEndpoint();
     }
 
+    
+    public Map<String, Object> getRequestContext() {
+        if (isThreadLocalRequestContext()) {
+            if (null == requestContext.get()) {
+                requestContext.set(new EchoContext(currentRequestContext));
+            }
+            return requestContext.get();
+        }
+        return currentRequestContext;
+    }
+    public Map<String, Object> getResponseContext() {
+        if (null == responseContext.get()) {
+            responseContext.set(new HashMap<String, Object>());
+        }        
+        return responseContext.get();
+
+    }
+    public boolean isThreadLocalRequestContext() {
+        if (currentRequestContext.containsKey(THREAD_LOCAL_REQUEST_CONTEXT)) {
+            Object o = currentRequestContext.get(THREAD_LOCAL_REQUEST_CONTEXT);
+            boolean local = false;
+            if (o instanceof Boolean) {
+                local = ((Boolean)o).booleanValue();
+            } else {
+                local = Boolean.parseBoolean(o.toString());
+            }
+            return local;
+        }
+        return false;
+    }
+    public void setThreadLocalRequestContext(boolean b) {
+        currentRequestContext.put(THREAD_LOCAL_REQUEST_CONTEXT, b);
+    }
+
+    
     public Object[] invoke(BindingOperationInfo oi, Object... params) throws Exception {
         return invoke(oi, params, null);
     }
@@ -235,44 +283,64 @@ public class ClientImpl
         return invoke(op, params);
     }
 
-    
-    
-    public Object[] invoke(BindingOperationInfo oi, Object[] params, 
+    public Object[] invoke(BindingOperationInfo oi,
+                           Object[] params, 
+                           Exchange exchange) throws Exception {
+        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> resp = getResponseContext();
+        resp.clear();
+        Map<String, Object> req = new HashMap<String, Object>(getRequestContext());
+        context.put(RESPONSE_CONTEXT, resp);
+        context.put(REQUEST_CONTEXT, req);
+        try {
+            return invoke(oi, params, context, exchange);
+        } finally {
+            responseContext.set(resp);
+        }
+    }
+    public Object[] invoke(BindingOperationInfo oi,
+                           Object[] params, 
                            Map<String, Object> context) throws Exception {
-        return invoke(oi, params, context, null);
-    }        
-    
+        try {
+            return invoke(oi, params, context, (Exchange)null);
+        } finally {
+            if (context != null) {
+                Map<String, Object> resp = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
+                if (resp != null) {
+                    responseContext.set(resp);
+                }
+            }
+        }
+    }
     public Object[] invoke(BindingOperationInfo oi,
                            Object[] params, 
                            Map<String, Object> context,
                            Exchange exchange) throws Exception {
-                
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         try {
-        
             if (exchange == null) {
                 exchange = new ExchangeImpl();
             }
             Endpoint endpoint = getEndpoint();
-    
-            Map<String, Object> requestContext = null;
-            Map<String, Object> responseContext = null;
+            
+            Map<String, Object> reqContext = null;
+            Map<String, Object> resContext = null;
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Invoke, operation info: " + oi + ", params: " + params);
             }
             Message message = endpoint.getBinding().createMessage();
             if (null != context) {
-                requestContext = CastUtils.cast((Map)context.get(REQUEST_CONTEXT));
-                responseContext = CastUtils.cast((Map)context.get(RESPONSE_CONTEXT));
+                reqContext = CastUtils.cast((Map)context.get(REQUEST_CONTEXT));
+                resContext = CastUtils.cast((Map)context.get(RESPONSE_CONTEXT));
                 message.put(Message.INVOCATION_CONTEXT, context);
             }    
             //setup the message context
-            setContext(requestContext, message);
+            setContext(reqContext, message);
             setParameters(params, message);
     
-            if (null != requestContext) {
-                exchange.putAll(requestContext);
+            if (null != reqContext) {
+                exchange.putAll(reqContext);
             }
             exchange.setOneWay(oi.getOutput() == null);
     
@@ -286,7 +354,7 @@ public class ClientImpl
             PhaseInterceptorChain chain = setupInterceptorChain(endpoint);
             message.setInterceptorChain(chain);
             
-            modifyChain(chain, requestContext);
+            modifyChain(chain, reqContext);
             chain.setFaultObserver(outFaultObserver);
             
             // setup conduit selector
@@ -326,8 +394,8 @@ public class ClientImpl
             List resList = null;
             Message inMsg = exchange.getInMessage();
             if (inMsg != null) {
-                if (null != responseContext) {                   
-                    responseContext.putAll(inMsg);
+                if (null != resContext) {                   
+                    resContext.putAll(inMsg);
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("set responseContext to be" + responseContext);
                     }
@@ -590,5 +658,37 @@ public class ClientImpl
 
     private boolean isPartialResponse(Message in) {
         return Boolean.TRUE.equals(in.get(Message.PARTIAL_RESPONSE_MESSAGE));
+    }
+    
+    
+    /*
+     * modification are echoed back to the shared map
+     */
+    public static class EchoContext extends HashMap<String, Object> {
+        final Map<String, Object> shared; 
+        public EchoContext(Map<String, Object> sharedMap) {
+            super(sharedMap);
+            shared = sharedMap;
+        }
+
+        public Object put(String key, Object value) {
+            shared.put(key, value);
+            return super.put(key, value);
+        }
+
+        public void putAll(Map<? extends String, ? extends Object> t) {
+            shared.putAll(t);
+            super.putAll(t);
+        }
+        
+        public Object remove(Object key) {
+            shared.remove(key);
+            return super.remove(key);
+        }
+        
+        public void reload() {
+            super.clear();
+            super.putAll(shared);
+        }
     }
 }

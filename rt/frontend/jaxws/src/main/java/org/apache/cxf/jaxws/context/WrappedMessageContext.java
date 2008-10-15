@@ -173,6 +173,9 @@ public class WrappedMessageContext implements MessageContext {
     public final Message getWrappedMessage() {
         return message instanceof Message ? (Message)message : null;
     }
+    public final Map<String, Object> getWrappedMap() {
+        return message;
+    }
     
     public void clear() {
         //just clear the JAXWS things....
@@ -403,6 +406,10 @@ public class WrappedMessageContext implements MessageContext {
     public final Object remove(Object key) {
         key = mapKey((String)key);
         scopes.remove(key);
+        if (BindingProvider.PASSWORD_PROPERTY.equals(key) 
+            || BindingProvider.USERNAME_PROPERTY.equals(key)) {
+            message.remove(AuthorizationPolicy.class.getName());
+        }
         return message.remove(key);
     }
 

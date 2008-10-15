@@ -36,9 +36,9 @@ public class ClientProxy implements InvocationHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClientProxy.class);
 
+    protected Client client;
     private Endpoint endpoint;
 
-    private Client client;
 
     public ClientProxy(Client c) {
         endpoint = c.getEndpoint();
@@ -65,18 +65,24 @@ public class ClientProxy implements InvocationHandler {
             params = new Object[0];
         }
 
-        return invokeSync(method, oi, params, null);
+        return invokeSync(method, oi, params);
     }
 
-    public Object invokeSync(Method method, BindingOperationInfo oi, Object[] params,
-                             Map<String, Object> context) throws Exception {
-        Object rawRet[] = client.invoke(oi, params, context);
+    public Object invokeSync(Method method, BindingOperationInfo oi, Object[] params)
+        throws Exception {
+        Object rawRet[] = client.invoke(oi, params);
 
         if (rawRet != null && rawRet.length > 0) {
             return rawRet[0];
         } else {
             return null;
         }
+    }
+    public Map<String, Object> getRequestContext() {
+        return client.getRequestContext();
+    }
+    public Map<String, Object> getResponseContext() {
+        return client.getResponseContext();
     }
 
     public Client getClient() {

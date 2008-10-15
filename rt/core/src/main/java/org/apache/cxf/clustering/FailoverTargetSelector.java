@@ -134,7 +134,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                         retry.invoke(invocation.getBindingOperationInfo(),
                                      invocation.getParams(),
                                      invocation.getContext(),
-                                      exchange);
+                                     exchange);
                     } catch (Exception e) {
                         if (exchange.get(Exception.class) != null) {
                             exchange.put(Exception.class, prevExchangeFault);
