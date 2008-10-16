@@ -39,6 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -58,6 +59,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageBodyWorkers;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.message.Message;
@@ -292,6 +294,8 @@ public final class InjectionUtils {
             proxy = new ThreadLocalMessageBodyWorkers();
         } else if (HttpServletRequest.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletRequest();
+        } else if (ServletContext.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalServletContext();
         }
         return proxy;
     }
