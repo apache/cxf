@@ -76,6 +76,7 @@ public class Customer {
     @Context private HttpServletRequest servletRequest2;
     @Context private HttpServletResponse servletResponse2;
     @Context private ServletContext servletContext2;
+    private ServletContext servletContext3;
     
     @Context private UriInfo uriInfo2;
     private String queryParam;
@@ -104,6 +105,15 @@ public class Customer {
     @Context
     public void setUriInfo(UriInfo ui) {
         uriInfo = ui;
+    }
+
+    @Context
+    public void setServletContext(ServletContext sc) {
+        servletContext3 = sc;
+    }
+    
+    public ServletContext getThreadLocalServletContext() {
+        return servletContext3;
     }
     
     @QueryParam("a")
