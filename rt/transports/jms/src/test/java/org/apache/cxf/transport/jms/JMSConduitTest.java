@@ -93,11 +93,12 @@ public class JMSConduitTest extends AbstractJMSTester {
         setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HelloWorldServiceLoop", "HelloWorldPortLoop");
         JMSConduit conduit = setupJMSConduit(true, false);
-        conduit.getJmsConfig().setReceiveTimeout(1000);
+        conduit.getJmsConfig().setReceiveTimeout(10000);
 
         try {
-            for (int c = 0; c < 100; c++) {
+            for (int c = 0; c < 10; c++) {
                 LOG.info("Sending message " + c);
+                inMessage = null;
                 Message message = new MessageImpl();
                 sendoutMessage(conduit, message, false);
                 verifyReceivedMessage(message);
@@ -133,7 +134,14 @@ public class JMSConduitTest extends AbstractJMSTester {
         }
     }
 
-    private void verifyReceivedMessage(Message message) {
+    private void verifyReceivedMessage(Message message) throws InterruptedException {
+        while (inMessage == null) {
+            //the send has completed, but the response might not be back yet.
+            //wait for it.
+            synchronized (this) {
+                wait(10);
+            }
+        }
         ByteArrayInputStream bis = (ByteArrayInputStream)inMessage.getContent(InputStream.class);
         Assert.assertNotNull("The received message input stream should not be null", bis);
         byte bytes[] = new byte[bis.available()];
@@ -142,8 +150,8 @@ public class JMSConduitTest extends AbstractJMSTester {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        String reponse = IOUtils.newStringFromBytes(bytes);
-        assertEquals("The reponse date should be equals", reponse, "HelloWorld");
+        String response = IOUtils.newStringFromBytes(bytes);
+        assertEquals("The response data should be equal", "HelloWorld", response);
 
         JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);

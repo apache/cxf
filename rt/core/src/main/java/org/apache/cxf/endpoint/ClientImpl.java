@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,6 +90,8 @@ public class ClientImpl
 
     protected ThreadLocal <Map<String, Object>> responseContext =
             new ThreadLocal<Map<String, Object>>();
+    
+    protected Executor executor;
 
 
     public ClientImpl(Bus b, Endpoint e) {
@@ -312,6 +315,104 @@ public class ClientImpl
             }
         }
     }
+    
+    public void invoke(ClientCallback callback, 
+                       String operationName, 
+                       Object... params) throws Exception {
+        QName q = new QName(getEndpoint().getService().getName().getNamespaceURI(), operationName);
+        invoke(callback, q, params);        
+    }
+
+    public void invoke(ClientCallback callback, 
+                       QName operationName, 
+                       Object... params) throws Exception {
+        BindingOperationInfo op = getEndpoint().getEndpointInfo().getBinding().getOperation(operationName);
+        if (op == null) {
+            throw new UncheckedException(
+                new org.apache.cxf.common.i18n.Message("NO_OPERATION", LOG, operationName));
+        }
+        
+        if (op.isUnwrappedCapable()) {
+            op = op.getUnwrappedOperation();
+        }
+        
+        invoke(callback, op, params);
+    }
+
+
+    public void invokeWrapped(ClientCallback callback, 
+                              String operationName, 
+                              Object... params)
+        throws Exception {
+        QName q = new QName(getEndpoint().getService().getName().getNamespaceURI(), operationName);
+        invokeWrapped(callback, q, params);        
+    }
+
+    public void invokeWrapped(ClientCallback callback, 
+                              QName operationName, 
+                              Object... params)
+        throws Exception {
+        BindingOperationInfo op = getEndpoint().getEndpointInfo().getBinding().getOperation(operationName);
+        if (op == null) {
+            throw new UncheckedException(
+                new org.apache.cxf.common.i18n.Message("NO_OPERATION", LOG, operationName));
+        }
+        invoke(callback, op, params);
+    }
+
+    
+    public void invoke(ClientCallback callback, 
+                       BindingOperationInfo oi, 
+                       Object... params) throws Exception {
+        Bus origBus = BusFactory.getThreadDefaultBus(false);
+        BusFactory.setThreadDefaultBus(bus);
+        try {
+            Exchange exchange = new ExchangeImpl();
+            exchange.setSynchronous(false);
+            Endpoint endpoint = getEndpoint();
+            Map<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> resp = getResponseContext();
+            resp.clear();
+            Map<String, Object> reqContext = new HashMap<String, Object>(getRequestContext());
+            context.put(RESPONSE_CONTEXT, resp);
+            context.put(REQUEST_CONTEXT, reqContext);
+
+            Message message = endpoint.getBinding().createMessage();
+            message.put(Message.INVOCATION_CONTEXT, context);
+            
+            //setup the message context
+            setContext(reqContext, message);
+            setParameters(params, message);
+    
+            if (null != reqContext) {
+                exchange.putAll(reqContext);
+            }
+            exchange.setOneWay(oi.getOutput() == null);
+            exchange.setOutMessage(message);
+            exchange.put(ClientCallback.class, callback);
+            
+            setOutMessageProperties(message, oi);
+            setExchangeProperties(exchange, endpoint, oi);
+            
+            // setup chain
+    
+            PhaseInterceptorChain chain = setupInterceptorChain(endpoint);
+            message.setInterceptorChain(chain);
+            
+            modifyChain(chain, reqContext);
+            chain.setFaultObserver(outFaultObserver);
+            
+            // setup conduit selector
+            prepareConduitSelector(message);
+            
+            // execute chain        
+            chain.doIntercept(message);
+
+        } finally {
+            BusFactory.setThreadDefaultBus(origBus);
+        }       
+    }
+    
     public Object[] invoke(BindingOperationInfo oi,
                            Object[] params, 
                            Map<String, Object> context,
@@ -322,6 +423,7 @@ public class ClientImpl
             if (exchange == null) {
                 exchange = new ExchangeImpl();
             }
+            exchange.setSynchronous(true);
             Endpoint endpoint = getEndpoint();
             
             Map<String, Object> reqContext = null;
@@ -363,62 +465,68 @@ public class ClientImpl
             // execute chain        
             chain.doIntercept(message);
     
+            return processResult(message, exchange, oi, resContext);
             
-            // Check to see if there is a Fault from the outgoing chain
-            Exception ex = message.getContent(Exception.class);
-            boolean mepCompleteCalled = false;
-            if (ex != null) {
-                getConduitSelector().complete(exchange);
-                mepCompleteCalled = true;
-                if (message.getContent(Exception.class) != null) {
-                    throw ex;
-                }
-            }
-            ex = message.getExchange().get(Exception.class);
-            if (ex != null) {
-                if (!mepCompleteCalled) {
-                    getConduitSelector().complete(exchange);
-                }
-                throw ex;
-            }
-            
-            // Wait for a response if we need to
-            if (!oi.getOperationInfo().isOneWay()) {
-                synchronized (exchange) {
-                    waitResponse(exchange);
-                }
-            }
-            getConduitSelector().complete(exchange);
-    
-            // Grab the response objects if there are any
-            List resList = null;
-            Message inMsg = exchange.getInMessage();
-            if (inMsg != null) {
-                if (null != resContext) {                   
-                    resContext.putAll(inMsg);
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.fine("set responseContext to be" + responseContext);
-                    }
-                }
-                resList = inMsg.getContent(List.class);
-            }
-            
-            // check for an incoming fault
-            ex = getException(exchange);
-            
-            if (ex != null) {
-                throw ex;
-            }
-            
-            if (resList != null) {
-                return resList.toArray();
-            }
-            return null;
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
         }
     }
 
+    private Object[] processResult(Message message, 
+                                   Exchange exchange,
+                                   BindingOperationInfo oi,
+                                   Map<String, Object> resContext) throws Exception {
+     // Check to see if there is a Fault from the outgoing chain
+        Exception ex = message.getContent(Exception.class);
+        boolean mepCompleteCalled = false;
+        if (ex != null) {
+            getConduitSelector().complete(exchange);
+            mepCompleteCalled = true;
+            if (message.getContent(Exception.class) != null) {
+                throw ex;
+            }
+        }
+        ex = message.getExchange().get(Exception.class);
+        if (ex != null) {
+            if (!mepCompleteCalled) {
+                getConduitSelector().complete(exchange);
+            }
+            throw ex;
+        }
+        
+        // Wait for a response if we need to
+        if (oi != null && !oi.getOperationInfo().isOneWay()) {
+            synchronized (exchange) {
+                waitResponse(exchange);
+            }
+        }
+        getConduitSelector().complete(exchange);
+
+        // Grab the response objects if there are any
+        List resList = null;
+        Message inMsg = exchange.getInMessage();
+        if (inMsg != null) {
+            if (null != resContext) {                   
+                resContext.putAll(inMsg);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("set responseContext to be" + responseContext);
+                }
+            }
+            resList = inMsg.getContent(List.class);
+        }
+        
+        // check for an incoming fault
+        ex = getException(exchange);
+        
+        if (ex != null) {
+            throw ex;
+        }
+        
+        if (resList != null) {
+            return resList.toArray();
+        }
+        return null;
+    }
     protected Exception getException(Exchange exchange) {
         if (exchange.getInFaultMessage() != null) {
             return exchange.getInFaultMessage().getContent(Exception.class);
@@ -461,7 +569,9 @@ public class ClientImpl
     }
     
     public void onMessage(Message message) {
+        ClientCallback callback = message.getExchange().get(ClientCallback.class);
         Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        message.getExchange().setInMessage(message);
         if (endpoint == null) {
             // in this case correlation will occur outside the transport,
             // however there's a possibility that the endpoint may have been 
@@ -475,8 +585,6 @@ public class ClientImpl
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         PhaseManager pm = bus.getExtension(PhaseManager.class);
-        
-        
         
         List<Interceptor> i1 = bus.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
@@ -498,13 +606,20 @@ public class ClientImpl
         PhaseInterceptorChain chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4); 
         message.setInterceptorChain(chain);
         
-        
         chain.setFaultObserver(outFaultObserver);
         
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         // execute chain
         try {
+            if (callback != null) {
+                if (callback.isCancelled()) {
+                    getConduitSelector().complete(message.getExchange());
+                    return;
+                }
+                callback.start(message);
+            }
+            
             String startingAfterInterceptorID = (String) message.get(
                 PhaseInterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
             String startingInterceptorID = (String) message.get(
@@ -515,6 +630,22 @@ public class ClientImpl
                 chain.doInterceptStartingAt(message, startingInterceptorID);
             } else {
                 chain.doIntercept(message);
+            }
+            
+            if (callback != null) {
+                Map<String, Object> resCtx = CastUtils.cast((Map<?, ?>)message
+                                                                .getExchange()
+                                                                .getOutMessage()
+                                                                .get(Message.INVOCATION_CONTEXT));
+                resCtx = CastUtils.cast((Map<?, ?>)resCtx.get(RESPONSE_CONTEXT));
+                
+                try {
+                    Object obj[] = processResult(message, message.getExchange(),
+                                                 null, resCtx);
+                    callback.handleResponse(resCtx, obj);
+                } catch (Exception ex) {
+                    callback.handleException(resCtx, ex);
+                }
             }
         } finally {
             synchronized (message.getExchange()) {
@@ -566,7 +697,19 @@ public class ClientImpl
             exchange.put(OperationInfo.class, boi.getOperationInfo());
         }
                 
-        exchange.put(MessageObserver.class, this);
+        if (exchange.isSynchronous() || executor == null) {
+            exchange.put(MessageObserver.class, this);
+        } else {
+            exchange.put(MessageObserver.class, new MessageObserver() {
+                public void onMessage(final Message message) {
+                    executor.execute(new Runnable() {
+                        public void run() {
+                            ClientImpl.this.onMessage(message);
+                        }
+                    });
+                }
+            });            
+        }
         exchange.put(Retryable.class, this);
         exchange.put(Client.class, this);
         exchange.put(Bus.class, bus);
@@ -691,4 +834,11 @@ public class ClientImpl
             super.putAll(shared);
         }
     }
+
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
+
 }
