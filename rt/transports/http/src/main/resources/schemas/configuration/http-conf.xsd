@@ -59,16 +59,16 @@
                 <xs:element ref="http-conf:client" minOccurs="0">
                    <xs:annotation>
                      <xs:documentation>
-                       This element holds the parameters that configure
-                       the client side of an Http connection.
+                       Holds the parameters that configure
+                       a client-side HTTP connection.
                      </xs:documentation>
                    </xs:annotation>
                 </xs:element>
                 <xs:element ref="http-conf:authorization" minOccurs="0">
                    <xs:annotation>
                      <xs:documentation>
-                       This element holds the parameters that configure
-                       the Basic Authentication that will be premptively
+                       Holds the parameters that configure
+                       the Basic Authentication that will be preemptively
                        used. Note, supplying a Basic Auth Supplier object
                        is the preferred approach.
                      </xs:documentation>
@@ -77,8 +77,8 @@
                 <xs:element ref="http-conf:proxyAuthorization" minOccurs="0">
                    <xs:annotation>
                      <xs:documentation>
-                       This element holds the parameters that configure
-                       the Basic Authentication for an outgoing Http
+                       Holds the parameters that configure
+                       the Basic Authentication for an outgoing HTTP
                        Proxy Server.
                      </xs:documentation>
                    </xs:annotation>
@@ -86,9 +86,9 @@
                 <xs:element ref="http-conf:tlsClientParameters" minOccurs="0">
                    <xs:annotation>
                      <xs:documentation>
-                       This element holds the parameters that configure
-                       the underlying SSL/TLS JSSE client side 
-                       of an Https connection.
+                       Holds the parameters that configure
+                       the underlying SSL/TLS JSSE client-side 
+                       of an HTTPS connection.
                      </xs:documentation>
                    </xs:annotation>
                 </xs:element>
@@ -96,9 +96,9 @@
                 			minOccurs="0" maxOccurs="1">
                    <xs:annotation>
                      <xs:documentation>
-                       This element holds the bean reference or class name
+                       Holds the bean reference or class name
                        of an object that supplies Basic Auth information
-                       both prememptively and in response to a 401 Http
+                       both preemptively and in response to a 401 HTTP
                        Challenge. This class must extend the abstract class 
                        org.apache.cxf.transport.http.BasicAuthSupplier.
                      </xs:documentation>
@@ -108,10 +108,10 @@
                 			minOccurs="0" maxOccurs="1">
                    <xs:annotation>
                      <xs:documentation>
-                       This element holds the bean reference or class name
+                       Holds the bean reference or class name
                        of an object that checks the Http(s)URLConnection
                        that will establish trust for a connection with an
-                       Http(s) server, before any information is sent to the
+                       HTTP(S) server, before any information is sent to the
                        server, namely Basic Auth information. This class
                        must extend the abstract class
                        org.apache.cxf.transport.http.MessageTrustDecider. 
@@ -133,24 +133,24 @@
 	            <xs:element ref="http-conf:server" minOccurs="0">
 	               <xs:annotation>
 	                 <xs:documentation>
-	                   This element holds the parameters that configure
-	                   the server side of an Http connection.
+	                   Holds the parameters that configure
+	                   a server-side HTTP connection.
 	                 </xs:documentation>
 	               </xs:annotation>
 	            </xs:element>
 	            <xs:element ref="http-conf:contextMatchStrategy" minOccurs="0">
 	               <xs:annotation>
 	                 <xs:documentation>
-	                   This element holds the parameters that configure
-	                   the context match strategy for processing an Http request.
+	                   Holds the parameters that configure
+	                   the context match strategy for processing an HTTP request.
 	                 </xs:documentation>
 	               </xs:annotation>
 	            </xs:element>
 	            <xs:element ref="http-conf:fixedParameterOrder" minOccurs="0">
 	               <xs:annotation>
 	                 <xs:documentation>
-	                   This element signifies whether the parameter order of
-	                   an Http request handled by this destination is fixed.
+	                   Signifies whether the parameter order of
+	                   an HTTP request handled by this destination is fixed.
 	                 </xs:documentation>
 	               </xs:annotation>
 	            </xs:element>

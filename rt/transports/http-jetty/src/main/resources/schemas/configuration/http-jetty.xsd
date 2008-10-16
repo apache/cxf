@@ -40,22 +40,46 @@
     
     <!-- Is this really supposed to be supperceeded by http-conf:HTTPListenerPolicy? -->
     <xs:complexType name="ThreadingParametersType">
-       <xs:attribute name="minThreads" type="xs:unsignedShort"/>
-       <xs:attribute name="maxThreads" type="xs:unsignedShort"/>
+       <xs:attribute name="minThreads" type="xs:unsignedShort">
+          <xs:annotation>
+             <xs:documentation>Specifies the minimum number of threads available to the Jetty instance for processing requests.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="maxThreads" type="xs:unsignedShort">
+                    <xs:annotation>
+             <xs:documentation>Specifies the maximum number of threads available to the Jetty instance for processing requests.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="ThreadingParametersIdentifiedType">
        <xs:sequence>
-         <xs:element name="threadingParameters" type="tns:ThreadingParametersType"/>
+         <xs:element name="threadingParameters" type="tns:ThreadingParametersType">
+            <xs:annotation>
+               <xs:documentation>Specifies the thread pool properties for the parameter set.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
        </xs:sequence>
-         <xs:attribute name="id" type="xs:string"/>
+         <xs:attribute name="id" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>Specifies a unique identifier by which the property set can be referred.</xs:documentation>
+             </xs:annotation>
+         </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="TLSServerParametersIdentifiedType">
        <xs:sequence>
-          <xs:element name="tlsServerParameters" type="sec:TLSServerParametersType"/>
+          <xs:element name="tlsServerParameters" type="sec:TLSServerParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies the properties for the parameter set.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
        </xs:sequence>
-          <xs:attribute name="id" type="xs:string"/>
+          <xs:attribute name="id" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>Specifies a unique identifier by which the property set can be referred.</xs:documentation>
+             </xs:annotation>
+          </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="ParametersRefType">
@@ -66,40 +90,79 @@
        <xs:sequence>
          <xs:choice minOccurs="0" maxOccurs="1">
           <xs:element name="tlsServerParameters" 
-                      type="sec:TLSServerParametersType"/>
+                      type="sec:TLSServerParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies an instance of the security parameters for the Jetty instance.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
           <xs:element name="tlsServerParametersRef"
-                      type="tns:ParametersRefType"/>
+                      type="tns:ParametersRefType">
+             <xs:annotation>
+                <xs:documentation>Specifies a reference to a reusable set of security parameters.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
          </xs:choice>
          <xs:choice minOccurs="0" maxOccurs="1">
           <xs:element name="threadingParameters" 
-                      type="tns:ThreadingParametersType"/>
+                      type="tns:ThreadingParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies an instance of the threading configuration use for the Jetty engine.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
           <xs:element name="threadingParametersRef"
-                      type="tns:ParametersRefType"/>
+                      type="tns:ParametersRefType">
+             <xs:annotation>
+                <xs:documentation>Specifies a reference to a reusable set of threading parameters.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
          </xs:choice>         
          <xs:element name="connector" type="xsd:anyType" minOccurs="0"/>
          <xs:element name="handlers" type="xsd:anyType" minOccurs="0"/>
          <xs:element name="sessionSupport" type="xsd:boolean" minOccurs="0"/>
          <xs:element name="reuseAddress" type="xsd:boolean" minOccurs="0" />          
        </xs:sequence>
-          <xs:attribute name="port" type="xs:int" use="required"/>
+          <xs:attribute name="port" type="xs:int" use="required">
+             <xs:annotation>
+                <xs:documentation>Specifies the port used by the Jetty instance.
+                You can specify a value of 0 for the port attribute. Any threading 
+                properties specified in an engine element with its port attribute
+                set to 0 are used as the configuration for all Jetty listeners that are not explicitly configured.</xs:documentation>
+             </xs:annotation>
+          </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="JettyHTTPServerEngineFactoryConfigType">
        <xs:sequence>
            <xs:element name="identifiedTLSServerParameters" 
                        type="tns:TLSServerParametersIdentifiedType"
-                       minOccurs="0" maxOccurs="unbounded"/>
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies a reusable set of properties for securing an HTTP service provider.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
            <xs:element name="identifiedThreadingParameters"
                        type="tns:ThreadingParametersIdentifiedType"
-                       minOccurs="0" maxOccurs="unbounded"/>
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies a reusable set of properties for controlling a Jetty instance's thread pool.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
            <xs:element name="engine" 
                        type="tns:JettyHTTPServerEngineConfigType" 
-                       minOccurs="0" maxOccurs="unbounded"/>
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies the configuration for a particular Jetty runtime instance.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
        </xs:sequence>
        <xs:attribute name="bus" type="xs:string" default="cxf"/>
        <xs:attribute name="id" type="xs:ID" use="optional"/>
     </xs:complexType>
     
     <xs:element name="engine-factory" 
-                type="tns:JettyHTTPServerEngineFactoryConfigType"/>
+                type="tns:JettyHTTPServerEngineFactoryConfigType">
+       <xs:annotation>
+          <xs:documentation>Contains the configuration for a Jetty instance.</xs:documentation>
+       </xs:annotation>
+    </xs:element>
  </xs:schema>

@@ -32,7 +32,11 @@
 			<xs:extension base="wsdl:tExtensibilityElement">
 				<xs:sequence />
 				<xs:attribute name="rootNode" type="xs:QName"
-					use="optional" />
+					use="optional">
+					<xs:annotation>
+						<xs:documentation>The QName of the root element used to wrap the message passed across the wire</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -46,7 +50,15 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name="body" type="xformat:XMLBindingMessageFormat" />
-	<xs:element name="binding" type="xformat:XMLFormatBinding"/>
+	<xs:element name="body" type="xformat:XMLBindingMessageFormat">
+		<xs:annotation>
+			<xs:documentation>Specifies how the message body is mapped to an XML document.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="binding" type="xformat:XMLFormatBinding">
+		<xs:annotation>
+			<xs:documentation>Specifies that the messages are mapped to XML documents</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 
 </xs:schema>
