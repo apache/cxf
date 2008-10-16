@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.no_body_parts.types.Operation1;
@@ -70,6 +71,12 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         parameters.setTargetType("tar-get");
         Object[] rparts = client.invoke("operation1", parameters, bucketOfBytes);
         Operation1Response r = (Operation1Response)rparts[0];
+        assertEquals(md5(bucketOfBytes), r.getStatus());
+        
+        ClientCallback callback = new ClientCallback();
+        client.invoke(callback, "operation1", parameters, bucketOfBytes);
+        rparts = callback.get();
+        r = (Operation1Response)rparts[0];
         assertEquals(md5(bucketOfBytes), r.getStatus());
     }
 

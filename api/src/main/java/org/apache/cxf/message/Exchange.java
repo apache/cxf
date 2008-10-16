@@ -63,6 +63,14 @@ public interface Exchange extends StringMap {
      * @return true if the exchange is known to be a one-way exchange
      */
     boolean isOneWay();
+    
+    /**
+     * @return true if the frontend will be wait for the response.   Transports
+     * can then optimize themselves to process the response immediately instead 
+     * of using a background thread or similar.
+     */
+    boolean isSynchronous();
+    void setSynchronous(boolean b);
 
     /**
      * 

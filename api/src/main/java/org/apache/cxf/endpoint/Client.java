@@ -20,6 +20,7 @@
 package org.apache.cxf.endpoint;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import javax.xml.namespace.QName;
 
@@ -97,6 +98,69 @@ public interface Client extends InterceptorProvider, MessageObserver {
     
     
     /**
+     * Invokes an operation asyncronously
+     * @param callback The callback that is called when the response is ready
+     * @param operationName The name of the operation to be invoked. The service namespace will be used
+     * when looking up the BindingOperationInfo.
+     * @param params  The params that matches the parts of the input message of the operation.  If the 
+     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
+     * params are in the wrapped form, use invokeWrapped
+     * @return The return values that matche the parts of the output message of the operation
+     */
+    void invoke(ClientCallback callback,
+                    String operationName,
+                    Object... params) throws Exception;
+    
+    /**
+     * Invokes an operation asyncronously
+     * @param callback The callback that is called when the response is ready
+     * @param operationName The name of the operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation.  If the 
+     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
+     * params are in the wrapped form, use invokeWrapped
+     * @return The return values that matche the parts of the output message of the operation
+     */
+    void invoke(ClientCallback callback,
+                    QName operationName,
+                    Object... params) throws Exception;
+
+
+    /**
+     * Invokes an operation asyncronously
+     * @param callback The callback that is called when the response is ready
+     * @param operationName The name of the operation to be invoked. The service namespace will be used
+     * when looking up the BindingOperationInfo.
+     * @param params  The params that matches the parts of the input message of the operation
+     * @return The return values that matche the parts of the output message of the operation
+     */
+    void invokeWrapped(ClientCallback callback,
+                           String operationName,
+                    Object... params) throws Exception;
+    
+    /**
+     * Invokes an operation asyncronously
+     * @param callback The callback that is called when the response is ready
+     * @param operationName The name of the operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation
+     * @return The return values that matche the parts of the output message of the operation
+     */
+    void invokeWrapped(ClientCallback callback,
+                           QName operationName,
+                    Object... params) throws Exception;    
+    
+    /**
+     * Invokes an operation asyncronously
+     * @param callback The callback that is called when the response is ready
+     * @param oi  The operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation
+     * @return The return values that matche the parts of the output message of the operation
+     */
+    void invoke(ClientCallback callback,
+                BindingOperationInfo oi,
+                Object... params) throws Exception;    
+    
+    
+    /**
      * Gets the request context used for future invocations
      * @return context The context
      */
@@ -151,4 +215,11 @@ public interface Client extends InterceptorProvider, MessageObserver {
      *
      */
     void destroy();
+    
+    /**
+     * Sets the executor which is used to process Asynchronous responses.  The default
+     * is to use the threads provided by the transport.  (example: the JMS listener threads) 
+     * @param executor
+     */
+    void setExecutor(Executor executor);
 }

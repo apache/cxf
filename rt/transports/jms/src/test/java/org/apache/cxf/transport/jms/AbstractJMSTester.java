@@ -91,6 +91,7 @@ public abstract class AbstractJMSTester extends Assert {
 
         Exchange exchange = new ExchangeImpl();
         exchange.setOneWay(isOneWay);
+        exchange.setSynchronous(true);
         message.setExchange(exchange);
         exchange.setOutMessage(message);
         try {
