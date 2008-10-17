@@ -23,10 +23,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -50,6 +51,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
@@ -216,25 +218,62 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                  || address.equals(getClient().getEndpoint().getEndpointInfo().getAddress()));
     }
 
-    private Object invokeAsync(Method method, BindingOperationInfo oi, Object[] params) {
+    @SuppressWarnings("unchecked")
+    private Object invokeAsync(Method method, BindingOperationInfo oi, Object[] params) throws Exception {
 
-        Map<String, Object> context = new HashMap<String, Object>(client.getRequestContext());
-        FutureTask<Object> f = new FutureTask<Object>(new JAXWSAsyncCallable(this, method, oi, params,
-                                                                             context));
-
-        Endpoint endpoint = getClient().getEndpoint();
-        endpoint.getExecutor().execute(f);
-        Response<?> r = new AsyncResponse<Object>(f, Object.class);
+        client.setExecutor(getClient().getEndpoint().getExecutor());
+        
+        final AsyncHandler<Object> handler;
         if (params.length > 0 && params[params.length - 1] instanceof AsyncHandler) {
-            // callback style
-            AsyncCallbackFuture callback = 
-                new AsyncCallbackFuture(r, (AsyncHandler)params[params.length - 1]);
-            endpoint.getExecutor().execute(callback);
-            return callback;
+            handler = (AsyncHandler)params[params.length - 1];
         } else {
-            return r;
+            handler = null;
         }
+        
+        final ClientCallback callback = new ClientCallback() {
+            public void handleResponse(Map<String, Object> ctx, Object[] res) {
+                super.handleResponse(ctx, res);
+                if (handler != null) {
+                    handler.handleResponse(new ResponseCallback(this));
+                }
+            }
+        };
+        
+        Response<Object> ret = new ResponseCallback(callback);
+        client.invoke(callback, oi, params);
+        return ret;
     }
+
+    static class ResponseCallback implements Response<Object> {
+        ClientCallback callback;
+        public ResponseCallback(ClientCallback cb) {
+            callback = cb;
+        }
+        
+        public Map<String, Object> getContext() {
+            try {
+                return callback.getResponseContext();
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return callback.cancel(mayInterruptIfRunning);
+        }
+        public Object get() throws InterruptedException, ExecutionException {
+            return callback.get()[0];
+        }
+        public Object get(long timeout, TimeUnit unit) throws InterruptedException,
+            ExecutionException, TimeoutException {
+            return callback.get(timeout, unit)[0];
+        }
+        public boolean isCancelled() {
+            return callback.isCancelled();
+        }
+        public boolean isDone() {
+            return callback.isDone();
+        }
+    };
 
     
     public Map<String, Object> getRequestContext() {

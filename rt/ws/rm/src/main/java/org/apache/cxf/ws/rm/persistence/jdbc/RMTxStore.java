@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
 import org.apache.cxf.ws.rm.Identifier;
@@ -494,7 +496,11 @@ public class RMTxStore implements RMStore {
         stmt.setBigDecimal(i++, new BigDecimal(nr));
         stmt.setString(i++, to); 
         byte[] bytes = msg.getContent();    
-        stmt.setBinaryStream(i++, new ByteArrayInputStream(bytes), bytes.length);
+        stmt.setBinaryStream(i++, new ByteArrayInputStream(bytes) {
+            public String toString() {
+                return IOUtils.newStringFromBytes(buf, 0, count);
+            }
+        }, bytes.length);
         stmt.execute();
         LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
                 new Object[] {outbound ? "outbound" : "inbound", nr, id});
