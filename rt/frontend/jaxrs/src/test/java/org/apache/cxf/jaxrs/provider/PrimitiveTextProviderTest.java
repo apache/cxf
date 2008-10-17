@@ -54,13 +54,13 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testReadByte() throws Exception {
         MessageBodyReader p = new PrimitiveTextProvider();
         
-        byte valueRead = (Byte)p.readFrom((Class)byte.class, 
+        Byte valueRead = (Byte)p.readFrom(byte.class, 
                                           null, 
                                           null, 
                                           null, 
                                           null, 
                                           new ByteArrayInputStream("1".getBytes()));
-        assertEquals(1, valueRead);
+        assertEquals(1, valueRead.byteValue());
         
     }
     
@@ -69,7 +69,7 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testReadBoolean() throws Exception {
         MessageBodyReader p = new PrimitiveTextProvider();
         
-        boolean valueRead = (Boolean)p.readFrom((Class)boolean.class, 
+        boolean valueRead = (Boolean)p.readFrom(boolean.class, 
                                           null, 
                                           null, 
                                           null, 
