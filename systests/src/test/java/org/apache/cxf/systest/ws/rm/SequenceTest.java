@@ -91,30 +91,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     private OutMessageRecorder outRecorder;
     private InMessageRecorder inRecorder;
 
-    private boolean testAll = true;
-    private boolean doTestOnewayAnonymousAcks = testAll;
-    private boolean doTestOnewayDeferredAnonymousAcks = testAll;
-    private boolean doTestOnewayDeferredNonAnonymousAcks = testAll;
-    private boolean doTestOnewayAnonymousAcksSequenceLength1 = testAll;
-    private boolean doTestOnewayAnonymousAcksSuppressed = testAll;
-    private boolean doTestOnewayAnonymousAcksSuppressedAsyncExecutor = testAll;
-    private boolean doTestTwowayNonAnonymous = testAll;
-    private boolean doTestTwowayNonAnonymousEndpointSpecific = testAll;
-    private boolean doTestTwowayNonAnonymousDeferred = testAll;
-    private boolean doTestTwowayNonAnonymousMaximumSequenceLength2 = testAll;
-    private boolean doTestTwowayAtMostOnce = testAll;
-    private boolean doTestUnknownSequence = testAll;
-    private boolean doTestInactivityTimeout = testAll;
-    private boolean doTestOnewayMessageLoss = testAll;
-    private boolean doTestOnewayMessageLossAsyncExecutor = testAll;
-    private boolean doTestTwowayMessageLoss = testAll;
-    private boolean doTestTwowayMessageLossAsyncExecutor = testAll;
-    private boolean doTestTwowayNonAnonymousNoOffer = testAll;
-    private boolean doTestConcurrency = testAll;
-    private boolean doTestMultiClientOneway = testAll;
-    private boolean doTestMultiClientTwoway = testAll;
-    private boolean doTestServerSideMessageLoss = testAll;
-    private boolean doTestTerminateOnShutdown = testAll;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -129,13 +105,14 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             
     
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         try {
             stopGreeter();
             stopControl();
         } catch (Throwable t) {
             //ignore
         }
+        Thread.sleep(100);
     }
 
     /** 
@@ -186,9 +163,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testOnewayAnonymousAcks() throws Exception {
-        if (!doTestOnewayAnonymousAcks) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
 
         greeter.greetMeOneWay("once");
@@ -221,9 +195,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testOnewayDeferredAnonymousAcks() throws Exception {
-        if (!doTestOnewayDeferredAnonymousAcks) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/deferred.xml");
 
         greeter.greetMeOneWay("once");
@@ -261,9 +232,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testOnewayDeferredNonAnonymousAcks() throws Exception {
-        if (!doTestOnewayDeferredNonAnonymousAcks) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/deferred.xml", true);
 
         greeter.greetMeOneWay("once");
@@ -315,9 +283,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testOnewayAnonymousAcksSequenceLength1() throws Exception {
-        if (!doTestOnewayAnonymousAcksSequenceLength1) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/seqlength1.xml");
 
         greeter.greetMeOneWay("once");
@@ -358,17 +323,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
    
     @Test
     public void testOnewayAnonymousAcksSuppressed() throws Exception {
-        if (!doTestOnewayAnonymousAcksSuppressed) {
-            return;
-        }
         testOnewayAnonymousAcksSuppressed(null);
     }
 
     @Test
     public void testOnewayAnonymousAcksSuppressedAsyncExecutor() throws Exception {
-        if (!doTestOnewayAnonymousAcksSuppressedAsyncExecutor) {
-            return;
-        }
         testOnewayAnonymousAcksSuppressed(Executors.newSingleThreadExecutor());
     }
 
@@ -418,14 +377,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testTwowayNonAnonymous() throws Exception {
-        if (!doTestTwowayNonAnonymous) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
 
-        greeter.greetMe("one");
-        greeter.greetMe("two");
-        greeter.greetMe("three");
+        assertEquals("ONE", greeter.greetMe("one"));
+        assertEquals("TWO", greeter.greetMe("two"));
+        assertEquals("THREE", greeter.greetMe("three"));
 
         // CreateSequence and three greetMe messages
         // TODO there should be partial responses to the decoupled responses!
@@ -468,9 +424,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testTwowayNonAnonymousEndpointSpecific() throws Exception {
-        if (!doTestTwowayNonAnonymousEndpointSpecific) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/twoway-endpoint-specific.xml", true);
 
 
@@ -517,9 +470,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testTwowayNonAnonymousDeferred() throws Exception {
-        if (!doTestTwowayNonAnonymousDeferred) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/deferred.xml", true);
 
         greeter.greetMe("one");
@@ -582,10 +532,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
      */
     @Test
     public void testTwowayNonAnonymousMaximumSequenceLength2() throws Exception {
-
-        if (!doTestTwowayNonAnonymousMaximumSequenceLength2) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/seqlength10.xml", true);
         
         RMManager manager = greeterBus.getExtension(RMManager.class);
@@ -642,10 +588,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testTwowayAtMostOnce() throws Exception {
-        if (!doTestTwowayAtMostOnce) {
-            return;
-        }
-        
         init("org/apache/cxf/systest/ws/rm/atmostonce.xml");
         
         class MessageNumberInterceptor extends AbstractPhaseInterceptor {
@@ -712,10 +654,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testUnknownSequence() throws Exception {
-        if (!doTestUnknownSequence) {
-            return;
-        }
-        
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
         
         class SequenceIdInterceptor extends AbstractPhaseInterceptor {
@@ -751,10 +689,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testInactivityTimeout() throws Exception {
-        if (!doTestInactivityTimeout) {
-            return;
-        }
-        
         init("org/apache/cxf/systest/ws/rm/inactivity-timeout.xml");
        
         greeter.greetMe("one");
@@ -815,9 +749,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @Test    
     public void testOnewayMessageLoss() throws Exception {
-        if (!doTestOnewayMessageLoss) {
-            return;
-        }
         // waite a while for the last bus shutdown
         Thread.sleep(5000);
         testOnewayMessageLoss(null);
@@ -825,9 +756,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test    
     public void testOnewayMessageLossAsyncExecutor() throws Exception {
-        if (!doTestOnewayMessageLossAsyncExecutor) {
-            return;
-        }
         testOnewayMessageLoss(Executors.newSingleThreadExecutor());
     } 
 
@@ -883,17 +811,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testTwowayMessageLoss() throws Exception {
-        if (!doTestTwowayMessageLoss) {
-            return;
-        }
         testTwowayMessageLoss(null);
     }
 
     @Test
     public void testTwowayMessageLossAsyncExecutor() throws Exception {
-        if (!doTestTwowayMessageLossAsyncExecutor) {
-            return;
-        }
         testTwowayMessageLoss(Executors.newSingleThreadExecutor());
     }
     
@@ -953,9 +875,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testTwowayNonAnonymousNoOffer() throws Exception {
-        if (!doTestTwowayNonAnonymousNoOffer) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/no-offer.xml", true);        
         
         greeter.greetMe("one");
@@ -989,23 +908,21 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testConcurrency() throws Exception {
-        if (!doTestConcurrency) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
 
-        for (int i = 0; i < 5; i++) {
+        int max = 5;
+        for (int i = 0; i < max; i++) {
             greeter.greetMeAsync(Integer.toString(i));
         }
 
         // CreateSequence and five greetMe messages
         // full and partial responses to each
 
-        awaitMessages(6, 12, 7500);
+        awaitMessages(max + 1, (max * 2) + 1, 7500);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
         
-        mf.verifyMessages(6, true);
-        String[] expectedActions = new String[6];
+        mf.verifyMessages(max + 1, true);
+        String[] expectedActions = new String[max + 1];
         expectedActions[0] = RMConstants.getCreateSequenceAction();
         for (int i = 1; i < expectedActions.length; i++) {
             expectedActions[i] = GREETME_ACTION;
@@ -1015,9 +932,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
   
     @Test
     public void testMultiClientOneway() throws Exception {
-        if (!doTestMultiClientOneway) {
-            return;
-        }
         
         SpringBusFactory bf = new SpringBusFactory();
         String cfgResource = "org/apache/cxf/systest/ws/rm/rminterceptors.xml";            
@@ -1098,10 +1012,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testMultiClientTwoway() throws Exception {
-        if (!doTestMultiClientTwoway) {
-            return;
-        }
-        
         SpringBusFactory bf = new SpringBusFactory();
         String cfgResource = "org/apache/cxf/systest/ws/rm/rminterceptors.xml";            
         initControl(bf, cfgResource);
@@ -1191,9 +1101,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testServerSideMessageLoss() throws Exception {
-        if (!doTestServerSideMessageLoss) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/message-loss-server.xml", true);
         
         // avoid client side message loss
@@ -1247,9 +1154,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
      
     @Test
     public void testTerminateOnShutdown() throws Exception {
-        if (!doTestTerminateOnShutdown) {
-            return;
-        }
         init("org/apache/cxf/systest/ws/rm/terminate-on-shutdown.xml", true);
         
         greeter.greetMeOneWay("neutrophil");

@@ -88,7 +88,6 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
 
     private Bus bus;
     private InterceptorProvider iProvider;
-
     private Class<T> cl;
     private Executor executor;
     private JAXBContext context;
@@ -360,6 +359,7 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
     }
 
     public Future<?> invokeAsync(T obj, AsyncHandler<T> asyncHandler) {
+        
         Response<?> r = invokeAsync(obj);
         AsyncCallbackFuture callback = new AsyncCallbackFuture(r, asyncHandler);
 

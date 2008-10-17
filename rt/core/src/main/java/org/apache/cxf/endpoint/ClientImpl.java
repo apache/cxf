@@ -525,6 +525,7 @@ public class ClientImpl
         if (resList != null) {
             return resList.toArray();
         }
+        
         return null;
     }
     protected Exception getException(Exchange exchange) {
@@ -569,9 +570,8 @@ public class ClientImpl
     }
     
     public void onMessage(Message message) {
-        ClientCallback callback = message.getExchange().get(ClientCallback.class);
+
         Endpoint endpoint = message.getExchange().get(Endpoint.class);
-        message.getExchange().setInMessage(message);
         if (endpoint == null) {
             // in this case correlation will occur outside the transport,
             // however there's a possibility that the endpoint may have been 
@@ -611,6 +611,7 @@ public class ClientImpl
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         // execute chain
+        ClientCallback callback = message.getExchange().get(ClientCallback.class);
         try {
             if (callback != null) {
                 if (callback.isCancelled()) {
@@ -632,7 +633,10 @@ public class ClientImpl
                 chain.doIntercept(message);
             }
             
-            if (callback != null) {
+            callback = message.getExchange().get(ClientCallback.class);
+            
+            if (callback != null && !isPartialResponse(message)) {
+                message.getExchange().setInMessage(message);
                 Map<String, Object> resCtx = CastUtils.cast((Map<?, ?>)message
                                                                 .getExchange()
                                                                 .getOutMessage()
@@ -642,17 +646,18 @@ public class ClientImpl
                 try {
                     Object obj[] = processResult(message, message.getExchange(),
                                                  null, resCtx);
+                                        
                     callback.handleResponse(resCtx, obj);
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     callback.handleException(resCtx, ex);
                 }
             }
         } finally {
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message)) {
+                if (!isPartialResponse(message) && callback == null) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
                     message.getExchange().setInMessage(message);
-                    message.getExchange().notifyAll();
+                    message.getExchange().notifyAll();                   
                 }
             }
             BusFactory.setThreadDefaultBus(origBus);

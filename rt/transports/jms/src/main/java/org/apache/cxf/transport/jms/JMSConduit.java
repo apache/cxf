@@ -53,7 +53,7 @@ import org.springframework.jms.support.JmsUtils;
  */
 public class JMSConduit extends AbstractConduit implements JMSExchangeSender, MessageListener {
     static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
-
+    private static final String CORRELATED = JMSConduit.class.getName() + ".correlated";
     private EndpointInfo endpointInfo;
     private JMSConfiguration jmsConfig;
     private Map<String, Exchange> correlationMap;
@@ -140,8 +140,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                         throw new RuntimeException(e);
                     }
                     correlationMap.remove(correlationId);
-                    if (exchange.getInMessage() == null
-                        && exchange.getInFaultMessage() == null) {
+                    if (exchange.get(CORRELATED) == null) {
                         throw new RuntimeException("Timeout receiving message with correlationId "
                                                    + correlationId);
                     }
@@ -182,6 +181,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
         if (exchange.isSynchronous()) {
             synchronized (exchange) {
+                exchange.put(CORRELATED, Boolean.TRUE);
                 exchange.notifyAll();
             }
         }

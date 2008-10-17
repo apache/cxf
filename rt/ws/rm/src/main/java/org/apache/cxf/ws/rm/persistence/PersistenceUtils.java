@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.rm.persistence;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
@@ -30,6 +28,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 
 /**
@@ -71,13 +70,13 @@ public final class PersistenceUtils {
     }
     
     public InputStream serialiseAcknowledgment(SequenceAcknowledgement ack) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream(); 
         try {
             getMarshaller().marshal(ack, bos);
         } catch (JAXBException ex) {
             throw new RMStoreException(ex);
         }
-        return new ByteArrayInputStream(bos.toByteArray());
+        return bos.createInputStream();
     }
     
     private JAXBContext getContext() throws JAXBException {

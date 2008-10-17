@@ -44,7 +44,11 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
     }
     
     public ByteArrayInputStream createInputStream() {
-        return new ByteArrayInputStream(buf, 0, count);
+        return new ByteArrayInputStream(buf, 0, count) {
+            public String toString() {
+                return IOUtils.newStringFromBytes(buf, 0, count);
+            }
+        };
     }
     
     public byte[] toByteArray() {

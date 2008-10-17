@@ -265,6 +265,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
         if (state == State.EXECUTING) {
             state = State.COMPLETE;
+            pausedMessage = null;
         }
         return state == State.COMPLETE;
     }
