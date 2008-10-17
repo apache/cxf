@@ -34,6 +34,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -41,7 +42,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -50,6 +51,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "This is a WebApplicationException",
                       "application/xml", 500);
     }
+    
+    @Test
+    @Ignore
+    public void testGetBookByURL() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
     
     @Test
     public void testNoRootResourceException() throws Exception {
@@ -136,6 +146,34 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
+        }
+    }
+    
+    @Test
+    public void testBookExists() throws Exception {
+        checkBook("http://localhost:9080/bookstore/books/check/123", true);
+        checkBook("http://localhost:9080/bookstore/books/check/124", false);  
+        
+    }
+    
+    private void checkBook(String address, boolean expected) throws Exception {
+        GetMethod get = new GetMethod(address);
+        get.setRequestHeader("Accept", "text/plain");
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(get);
+            assertEquals(200, result);
+            if (expected) {
+                assertEquals("Book must be available",
+                             "true", get.getResponseBodyAsString());
+            } else {
+                assertEquals("Book must not be available",
+                             "false", get.getResponseBodyAsString());
+            }
+        } finally {
+            // Release current connection to the connection pool once you are done
+            get.releaseConnection();
         }
     }
     

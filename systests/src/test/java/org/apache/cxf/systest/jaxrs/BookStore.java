@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 
+import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -70,12 +71,27 @@ public class BookStore {
         throw new WebApplicationException(response);
     }
     
+    @GET
+    @Path("books/check/{id}")
+    @ProduceMime("text/plain")
+    public boolean checkBook(@PathParam("id") Long id) {
+        return books.containsKey(id);
+    }
+    
     
     @GET
     @Path("timetable")
     public Calendar getTimetable() {
         return new GregorianCalendar();
     }
+    
+    @GET
+    @Path("/bookurl/{URL}/")
+    public Book getBookByURL(@PathParam("URL") String urlValue) throws Exception {
+        String url2 = new URL(urlValue).toString();
+        int index = url2.lastIndexOf('/');
+        return doGetBook(url2.substring(index + 1));
+    } 
 
     @GET
     @Path("/books/{bookId}/")
