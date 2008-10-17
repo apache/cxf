@@ -64,7 +64,8 @@ public class PrimitiveTextProvider
     }
 
     public void writeTo(Object obj, Class<?> type, Type genType, Annotation[] anns, 
-                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
+                        MediaType mt, MultivaluedMap<String, Object> headers,
+                        OutputStream os) throws IOException {
         os.write(obj.toString().getBytes("UTF-8"));
     }
 

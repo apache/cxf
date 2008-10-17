@@ -206,6 +206,7 @@ public class OperationProcessor  extends AbstractProcessor {
         asyncHandlerAnnotation.addElement(new JAnnotationElement("targetNamespace", ""));
         asyncHandler.addAnnotation("WebParam", asyncHandlerAnnotation);                
 
+        method.getInterface().addImport("javax.jws.WebParam");
         method.getInterface().addMethod(callbackMethod);
     }
 
