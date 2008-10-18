@@ -1,9 +1,9 @@
-Apache CXF 2.1.2 Release Notes
+Apache CXF 2.1.3 Release Notes
 
 1. Overview
 
-Apache CXF 2.1.2 delivers the latest set of patches and bug fixes for Apache
-CXF.   This release fixes 67 JIRA issues that have been reported by users.
+Apache CXF 2.1.3 delivers the latest set of patches and bug fixes for Apache
+CXF.   This release fixes 52 JIRA issues that have been reported by users.
 
 2. Installation Prerequisites 
 
@@ -73,81 +73,68 @@ the specification.
 
 7. Specific issues, features, and improvements fixed in this version 
 
-Release Notes - CXF - Version 2.1.2
+Release Notes - CXF - Version 2.1.3
 
-** Sub-task
-    * [CXF-1016] - Context injection - Preconditions
-    * [CXF-1018] - Transfer encoding
 
 ** Bug
-    * [CXF-1406] - CXF JAX-RS implementation creates a new JAXBContext for each top level type.
-    * [CXF-1572] - @Path is not mapping to required methods
-    * [CXF-1578] - Json marshall/unmarshall error
-    * [CXF-1617] - Basic Authentication failure
-    * [CXF-1620] - wsdl2java ignores jaxb2 xjc globalBindings with namespace xjc
-    * [CXF-1652] - CXF Decoupled Endpoints are not getting cleaned up properly even after bus.Shutdown() in org.apache.cxf.systest.ws.rm.SequenceTest.
-    * [CXF-1653] - Deviation from spec: unnecessary check for @ProduceMime of sub-resource locators
-    * [CXF-1655] - NPE when no sub-resource method found that matches to the request
-    * [CXF-1657] - CheckFaultInterceptor causes XMLStreamReader to throw IllegalState at doc end
-    * [CXF-1658] - The jbi transport should honor the sendSync flag so that xa transactions are handled correctly in smx3
-    * [CXF-1659] - Eclipse plugin has ${cxf.version} in directory name
-    * [CXF-1660] - Nested namespace defined spring beans aren't properly unique
-    * [CXF-1661] - style="rpc" in soapBinging configuration is not honored
-    * [CXF-1663] - Attempting to use a Spring configured HTTPConduit causing compatability problems with Spring 2.5.4 testing framework
-    * [CXF-1665] - org.apache.cxf.jaxws.interceptors.SwAOutInterceptor:197 | Unreachable Code
-    * [CXF-1667] - WsdlLocation can't not be set from <simple:server> or <jaxws:server>
-    * [CXF-1669] - MTOM does not work when add WSS4J interceptors(UsernameToken and Timestamp)
-    * [CXF-1674] - JAXB unmarshalling cannot be configured to use the ObjectFactory
-    * [CXF-1675] - @QueryParam is not following reference javadoc for primitive types
-    * [CXF-1676] - oneway request followed by two-way request fails while using JMS Transport. 
-    * [CXF-1678] - wsdl2java does not generate impl stubs when only logical wsdl is present
-    * [CXF-1681] - Base URL caching in ServletController avoids needed updateDests() call on republishing endpoints
-    * [CXF-1682] - Generated Web service Client fails for http://demo.aws.air-worldwide.com/aws/passporttogo.asmx?wsdl
-    * [CXF-1683] - ExtendedURIResolver returns relative paths after resolving a URI relative to another one.
-    * [CXF-1687] - Lots of NPE when parsing documents at start time
-    * [CXF-1689] - CXF assumes class.getPackage() is never null
-    * [CXF-1691] - Potential for NPE in AbstractResourceInfo.clearProxies
-    * [CXF-1696] - wsdl2java issues with implicit headers
-    * [CXF-1699] - Content type not set on http response
-    * [CXF-1700] - XMLBeans - XmlBeansSchemaInitializer (Lline #177) can't handle xs:include 
-    * [CXF-1707] - Security Exception when using java2ws via the cxf-java2ws-plugin in Netbeans
-    * [CXF-1709] - "No service was found." after refresh of Spring's ApplicationContext 
-    * [CXF-1711] - Server failed to start and receieved IllegalAnnotationExceptions 
-    * [CXF-1712] - ObjectFactory cache doesn't take classloaders into accout
-    * [CXF-1713] - Generated Javascript does not handle simultaneous soap requests correctly
-    * [CXF-1716] - Wrong namespace for faultcode
-    * [CXF-1719] - RPC/Lit not honoring namespace in soap:body wsdl extensor
-    * [CXF-1720] - RPC/Lit soap 1.2 not processing the soap-rpc:result element
-    * [CXF-1721] - Generated WS-Addressing action uses wrong separator for urns
-    * [CXF-1722] - CXF does not write out PIs at the root of the WSDL file
-    * [CXF-1723] - wsdl2java generates errorneous code
-    * [CXF-1724] - Nullpointer error in DOMUtils
-    * [CXF-1726] - Upgrade from CXF 2.1 to CXF 2.1.1 results in two BouncyCastle JARs being used
-    * [CXF-1727] - I guess there is an error in the ProviderFactory of jaxrs component.
-    * [CXF-1728] - wsdl2java does not generate properly formatted javadoc when jaxws:javadoc tags are used
-    * [CXF-1733] - SoapPreProtocolOutInterceptor overrides SoapActionOutInterceptor 
-    * [CXF-1736] - Error in finding the DestinationFactory when using Soap/JMS with configuration
-    * [CXF-1737] - NPE in ClientProxyFactoryBean on void methods 
-    * [CXF-1741] - NPE is thrown when publish the code first service  in NoSpringServlet
-    * [CXF-1742] - JMS Conduit Pooled Session Recycling
-    * [CXF-1743] - Temporary files are not deleted
+    * [CXF-1048] - wsdl2java generate wrong portName in impl class
+    * [CXF-1076] - Wsdl2Java out of memory if the wsdl has tons of imports
+    * [CXF-1194] - Schema Validation & MTOM fails
+    * [CXF-1624] - XmlSchemaException: Schema name conflict in collection.
+    * [CXF-1732] - RFSB NPE for some sort of confusion on a return type caused by Aegis, maybe
+    * [CXF-1735] - Invalid namespace qualification in Java to WSDL mapping
+    * [CXF-1745] - idl2wsdl tool fails to add Any type to schema
+    * [CXF-1751] - idl2wsdl fails to generate wsdl for IDL files with complex object reference usage
+    * [CXF-1752] - JavaToWs generates wrong types for arrays and generic types in wrapper classes
+    * [CXF-1753] - cxf-codegen:wsdl2java java.util.zip.ZipException: The system cannot find the path specified
+    * [CXF-1756] - wsdl2java @WebService annotation on Impl class should be on Interface class JSR181 3.1
+    * [CXF-1769] - Nillable schema elements in WSDL cause XmlSchemaException
+    * [CXF-1778] - Memory leak occurs in specific cases when WS-Addressing feature is enabled
+    * [CXF-1779] - exclude non-serializable property to JBI NormalizedMessage
+    * [CXF-1780] - float's and double's negative infinity is incorrectly marshalled/unmarshalled as positive infinity
+    * [CXF-1781] - Unprocessed soap headers with mustUnderstand=1 and no actor not throwing exceptions
+    * [CXF-1788] - Problem with Calendar
+    * [CXF-1792] - JMX ONs for performance counters should not use qnames for port and operation
+    * [CXF-1793] - WSDL2Java reports Non unique body parts if first part in message are soap headers.
+    * [CXF-1794] - codegen plugin not merging autodetected options with the options in the poms correctly...
+    * [CXF-1797] - Trouble with services having multiple methods/operations 
+    * [CXF-1804] - CorbaBindingFactory does not register with DestinationFactoryManager and ConduitIniatorManager
+    * [CXF-1805] - Use of Content-Type in JMS Header not in line with JMS specification
+    * [CXF-1809] - Annotated @PostConstruct methods called twice on single Spring bean 
+    * [CXF-1821] - UrlUtilities.getStem is parsing a decoded URL
+    * [CXF-1823] - JCA inbund connector samples (inbound-mdb*) READMEs need correction
+    * [CXF-1831] - org.apache.cxf.wsdl.EndpointReferenceUtils.resolveResource() changes cause failure in schema import resolution
+    * [CXF-1834] - The corba prefix is not present in the physical part of the wsdl when a yoko corba namespace is used.
+    * [CXF-1841] - Some issues with outbound jca connector
+    * [CXF-1843] - wsdl2java: failed to create "action" attribute under annotation @WebMethod
+    * [CXF-1849] - PolicyVerificationOutInterceptor writes faults at wrong phase when processing response
+    * [CXF-1856] - LoggingOutInterceptor has encoding problem and the  solution
+    * [CXF-1864] - CXF client failes to parse SOAP 1.2 FaultCode
 
 ** Improvement
-    * [CXF-341] - Display user supplied wsdl in HTTP transports
-    * [CXF-1634] - Add XMLBean data provider to JAX-RS front end
-    * [CXF-1671] - Add a setter to JSONProvider to set the XML Namespace to Jettison prefix map
-    * [CXF-1677] - Support Unmarshaller.Listener and Marshaller.Listener
-    * [CXF-1680] - Map ws-security principals into WebServiceContext.getUserPrincipal() call
-    * [CXF-1684] - URIResolver cannot resolve relative paths with with zip: scheme
-    * [CXF-1685] - Not possible to pass empty parameter to the maven-codegen-plugin
-    * [CXF-1686] - maven-codegen-plugin: Add ability to specify a default set of options for all wsdls in a project.
-    * [CXF-1688] - Make the JBI binding and transport OSGi bundles
-    * [CXF-1692] - cfx-codegen-plugin: Should be possible to configure using named parameters.
-    * [CXF-1705] - Servlet 2.3 compliance
-    * [CXF-1734] - AutomaticWorkQueue not configurable
-    * [CXF-1738] - AbstractWSDLBasedEndpointFactory should setTransportId for local and camel transport according to the publish address 
+    * [CXF-932] - dynamic client needs to handle more complex wsdl 
+    * [CXF-1654] - Promote request/response contexts from JAX-WS  up to ClientImpl base class
+    * [CXF-1656] - PolicyEngineImpl Memory Improvement
+    * [CXF-1747] - Adding WS-Addressing http://schemas.xmlsoap.org/ws/2004/03/addressing support to WS-* Component
+    * [CXF-1748] - Add more tests to increase coverage of idl2wsdl and wsdl2idl tools
+    * [CXF-1773] - Refactor JMS transport for readability and simplicity (patch included)
+    * [CXF-1774] - JMS Transport: Remove JNDI lookups for ConnectionFactory, targetDestination and replyDestination
+    * [CXF-1775] - Transport JMS: Remove unused class JMSConduit.DecoupledDestination
+    * [CXF-1782] - ServletController.generateServiceList is private - cannot extend/change the way a service list is built
+    * [CXF-1783] - Refactor JMS transport second step (patch included)  
+    * [CXF-1796] - ServletController - change constructor arguments to set ServletContext & Bus
+    * [CXF-1806] - Use Spring JMSTemplate in JMSConduit instead of direct JMS
+    * [CXF-1812] - refactor the pause/resume mechanism in PhaseInterceptorChain
+    * [CXF-1825] - Allow request/response contexts access when using JCA outbound connector
+    * [CXF-1826] - ConfigurationDomain and ConfigurationScope are unused properties in JCA ra.xml
+    * [CXF-1832] - Third step of Refactoring JMS Transport
+    * [CXF-1857] - ServiceFactoryBean should not call createInvoker() twice if its invoker does not be set
 
 ** New Feature
-    * [CXF-1387] - Support for GZIP compression of HTTP payloads
+    * [CXF-1801] - JCA inbound connector does not support WebSphere 6.1
 
 
+
+
+** Task
+    * [CXF-1842] - Add an example to show how to publish the WSDL first endpoints from spring
