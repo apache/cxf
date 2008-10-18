@@ -40,15 +40,17 @@ public class PrimitiveTextProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
 
     private static boolean isSupported(Class<?> type) { 
-        return type.isPrimitive() || Number.class.isAssignableFrom(type);
+        return type.isPrimitive() 
+            || Number.class.isAssignableFrom(type)
+            || Boolean.class.isAssignableFrom(type);
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isSupported(type);
     }
 
-    public Object readFrom(Class type, Type genType, Annotation[] anns, MediaType mt, 
-                           MultivaluedMap headers, InputStream is) throws IOException {
+    public Object readFrom(Class<Object> type, Type genType, Annotation[] anns, MediaType mt, 
+                           MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         return InjectionUtils.handleParameter(
                     IOUtils.readStringFromStream(is).toString(), type);
     }
@@ -57,12 +59,13 @@ public class PrimitiveTextProvider
         return -1;
     }
 
-    public boolean isWriteable(Class type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isSupported(type);
     }
 
-    public void writeTo(Object obj, Class type, Type genType, Annotation[] anns, 
-                        MediaType mt, MultivaluedMap headers, OutputStream os) throws IOException {
+    public void writeTo(Object obj, Class<?> type, Type genType, Annotation[] anns, 
+                        MediaType mt, MultivaluedMap<String, Object> headers,
+                        OutputStream os) throws IOException {
         os.write(obj.toString().getBytes("UTF-8"));
     }
 

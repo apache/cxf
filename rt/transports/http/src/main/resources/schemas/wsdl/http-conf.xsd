@@ -55,8 +55,8 @@
                 <xs:attribute name="SuppressClientSendErrors" type="xs:boolean" use="optional" default="false">
                     <xs:annotation>
                         <xs:documentation>
-                        When set to no, exceptions will be thrown when an error is encountered 
-                        receiving a request from the client.  When set to yes these errors will 
+                        When set to false, exceptions will be thrown when an error is encountered 
+                        receiving a request from the client.  When set to true these errors will 
                         be suppressed. The default is false.
                         </xs:documentation>
                     </xs:annotation>      
@@ -177,9 +177,8 @@
                 <xs:attribute name="MaxRetransmits" type="xs:int" use="optional" default="-1">
                     <xs:annotation>
                         <xs:documentation>
-                        Specifies the amount of retransmits that 
-                        are allowed for redirects along with retransmits for 
-                        authorization. Each redirect may cause another 
+                        Specifies the maximum amount of retransmits that are allowed for redirects. Retransmits for 
+                        authorization is included in the retransmit count. Each redirect may cause another 
                         retransmit for a UNAUTHORIZED response code, ie. 401. 
                         Any negative number indicates unlimited retransmits,
                         although, loop protection is provided. 
@@ -192,8 +191,8 @@
                 <xs:attribute name="AllowChunking" type="xs:boolean" use="optional" default="true">
                     <xs:annotation>
                         <xs:documentation>
-                        If true, the client is free to use chunking streams if it wants to, but not 
-                        required to.  Regular non-chunked requests are OK too. If false, the client 
+                        If true, the client is free to use chunking streams if it wants, but it is not 
+                        required to use chunking streams. If false, the client 
                         must use regular, non-chunked requests in all cases.
                         </xs:documentation>
                     </xs:annotation>      
@@ -244,10 +243,10 @@
                 <xs:attribute name="Host" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        what host the client intends (for virtual servers mapping to same IP)
-                        This is sent by default based upon the URL.  Certain DNS scenarios or
+                        Specifies the Internet host and port number of the resource on which the request is being invoked.
+                        This is sent by default based upon the URL. Certain DNS scenarios or
                         application designs may request you to set this, but typically it is
-                        not required).
+                        not required.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -255,13 +254,10 @@
                 <xs:attribute name="Connection" type="http-conf:connectionType" use="optional" default="Keep-Alive">
                     <xs:annotation>
                         <xs:documentation>
-                        The connection disposition.  If close the connection to the server is closed 
-                        after each request/response dialog; if Keep-Alive, the client requests the server 
+                        The connection disposition. If close the connection to the server is closed 
+                        after each request/response dialog. If Keep-Alive the client requests the server 
                         to keep the connection open, and if the server honors the keep alive request, 
-                        the connection is reused.  Many servers and proxies do not honor these requests.  
-                        Default is close.
-
-                        The server may choose not honor the keep alive request.
+                        the connection is reused. Many servers and proxies do not honor keep-alive requests.
                         </xs:documentation>
                     </xs:annotation>      
 
@@ -280,12 +276,10 @@
                 <xs:attribute name="Cookie" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        The cookie to send to the server
-                        
-                        some stateful session designs will use cookies to identify a session.
-                        If the cookie is static, you can supply it here.  If it is dynamic,
+                        Specifies a cookie to send to the server. Some stateful session designs will use cookies to identify a session.
+                        If the cookie is static, you can supply it here. If it is dynamic,
                         it will need to be set by the server on first access, and can be handled
-                        automatically by the runtime
+                        automatically by the runtime.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -294,12 +288,9 @@
                     <xs:annotation>
                         <xs:documentation>
                         aka User-Agent
-                        
-                        some servers will optimize based upon the client sending the request.
-
-                        What to tell the server about what kind of browser we are (usually only 
+                        Specifies the type of browser is sending the request. This is usually only 
                         needed when sites have HTML customized to Netscape vs IE, etc, but can
-                        also be used to optimize for different SOAP stacks.)
+                        also be used to optimize for different SOAP stacks.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -307,8 +298,7 @@
                 <xs:attribute name="Referer" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        What URL referred us to this URL
-                        
+                        Specifies the URL that referred us to this URL. This is 
                         sent automatically with auto redirect.
 
                         May allow the server to optimize processing based upon
@@ -321,8 +311,7 @@
                 <xs:attribute name="DecoupledEndpoint" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        Decoupled endpoint to accept incoming
-			asynchronous responses.
+                        Specifies the URL of a decoupled endpoint for the receipt of responses over a separate provider-&gt;consumer connection.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -331,23 +320,21 @@
                 <xs:attribute name="ProxyServer" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        Address of proxy server, if used 
-                        (proxy servers are a special kind of firewall)
-                             proxy.mycompany.com
+                        Specifies the address of proxy server if one is used.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
                 <xs:attribute name="ProxyServerPort" type="xs:int" use="optional">
                     <xs:annotation>
                         <xs:documentation>
-                        Port number of proxy server.
+                        Specifies the port number used by the proxy server.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
                 <xs:attribute name="ProxyServerType" type="http-conf:proxyServerType" use="optional" default="HTTP">
                     <xs:annotation>
                         <xs:documentation>
-                        Type of number of proxy server.
+                        Specifies the ype of the proxy server. Can be either HTTP or SOCKS.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>

@@ -28,8 +28,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 
 /**
@@ -43,6 +46,8 @@ import org.apache.cxf.common.util.Base64Utility;
  * @author Dan Diephouse
  */
 public class URIResolver {
+    private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
+    
     private File file;
     private URI uri;
     private URL url;
@@ -240,8 +245,10 @@ public class URIResolver {
     }
     
     private void tryClasspath(String uriStr) throws IOException {
+        boolean isClasspathURL = false;
         if (uriStr.startsWith("classpath:")) {
             uriStr = uriStr.substring(10);
+            isClasspathURL = true;
         }
         url = ClassLoaderUtils.getResource(uriStr, calling);
         if (url == null) {
@@ -265,6 +272,9 @@ public class URIResolver {
                 
             }
             is = url.openStream();
+        }
+        if (is == null && isClasspathURL) {
+            LOG.log(Level.WARNING, "NOT_ON_CLASSPATH", uriStr);
         }
     }
 

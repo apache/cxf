@@ -66,6 +66,8 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.workqueue.AutomaticWorkQueue;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
@@ -1934,6 +1936,30 @@ public class HTTPConduit
             // Process retransmits until we fall out.
             handleRetransmits();
             
+            if (outMessage == null 
+                || outMessage.getExchange() == null
+                || outMessage.getExchange().isSynchronous()) {
+                handleResponseInternal();
+            } else {
+                Runnable runnable = new Runnable() {
+                    public void run() {
+                        try {
+                            handleResponseInternal();
+                        } catch (IOException e) {
+                            LOG.log(Level.WARNING, e.getMessage(), e);
+                        }
+                    }
+                };
+                WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
+                    .getExtension(WorkQueueManager.class);
+                AutomaticWorkQueue queue = mgr.getNamedWorkQueue("http-conduit");
+                if (queue == null) {
+                    queue = mgr.getAutomaticWorkQueue();
+                }
+                queue.execute(runnable);
+            }
+        }
+        protected void handleResponseInternal() throws IOException {
             int responseCode = connection.getResponseCode();
             
             if (LOG.isLoggable(Level.FINE)) {

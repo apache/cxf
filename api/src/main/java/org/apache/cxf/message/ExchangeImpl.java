@@ -30,6 +30,7 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
 
     private Destination destination;
     private boolean oneWay;
+    private boolean synchronous = true;
     
     private Message inMessage;
     private Message outMessage;
@@ -103,6 +104,14 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
 
     public void setOneWay(boolean b) {
         oneWay = b;
+    }
+    
+    public boolean isSynchronous() {
+        return synchronous;
+    }
+
+    public void setSynchronous(boolean b) {
+        synchronous = b;
     }
 
     public Session getSession() {

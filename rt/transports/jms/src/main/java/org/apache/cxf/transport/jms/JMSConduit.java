@@ -53,17 +53,17 @@ import org.springframework.jms.support.JmsUtils;
  */
 public class JMSConduit extends AbstractConduit implements JMSExchangeSender, MessageListener {
     static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
-
+    private static final String CORRELATED = JMSConduit.class.getName() + ".correlated";
     private EndpointInfo endpointInfo;
     private JMSConfiguration jmsConfig;
-    private Map<String, Message> correlationMap;
+    private Map<String, Exchange> correlationMap;
     private DefaultMessageListenerContainer jmsListener;
 
     public JMSConduit(EndpointInfo endpointInfo, EndpointReferenceType target, JMSConfiguration jmsConfig) {
         super(target);
         this.jmsConfig = jmsConfig;
         this.endpointInfo = endpointInfo;
-        correlationMap = new ConcurrentHashMap<String, Message>();
+        correlationMap = new ConcurrentHashMap<String, Exchange>();
     }
 
     /**
@@ -128,25 +128,25 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
          * fill to Message and notify this thread
          */
         if (!exchange.isOneWay()) {
-            Message inMessage = new MessageImpl();
-            synchronized (inMessage) {
-                correlationMap.put(correlationId, inMessage);
+            synchronized (exchange) {
+                correlationMap.put(correlationId, exchange);
                 jmsTemplate.send(jmsConfig.getTargetDestination(), messageCreator);
-                try {
-                    inMessage.wait(jmsTemplate.getReceiveTimeout());
-                } catch (InterruptedException e) {
+                
+                if (exchange.isSynchronous()) {
+                    try {
+                        exchange.wait(jmsTemplate.getReceiveTimeout());
+                    } catch (InterruptedException e) {
+                        correlationMap.remove(correlationId);
+                        throw new RuntimeException(e);
+                    }
                     correlationMap.remove(correlationId);
-                    throw new RuntimeException(e);
+                    if (exchange.get(CORRELATED) == null) {
+                        throw new RuntimeException("Timeout receiving message with correlationId "
+                                                   + correlationId);
+                    }
+                    
+                    
                 }
-                correlationMap.remove(correlationId);
-                if (inMessage.getContent(InputStream.class) == null) {
-                    throw new RuntimeException("Timeout receiving message with correlationId "
-                                               + correlationId);
-                }
-            }
-            exchange.setInMessage(inMessage);
-            if (incomingObserver != null) {
-                incomingObserver.onMessage(inMessage);
             }
         } else {
             jmsTemplate.send(jmsConfig.getTargetDestination(), messageCreator);
@@ -165,20 +165,31 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         } catch (JMSException e) {
             throw JmsUtils.convertJmsAccessException(e);
         }
-        Message inMessage = correlationMap.get(correlationId);
-        if (inMessage == null) {
+
+        Exchange exchange = correlationMap.remove(correlationId);
+        if (exchange == null) {
             LOG.log(Level.WARNING, "Could not correlate message with correlationId " + correlationId);
+            return;
         }
+        Message inMessage = new MessageImpl();
+        exchange.setInMessage(inMessage);
         LOG.log(Level.FINE, "client received reply: ", jmsMessage);
         JMSUtils.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         byte[] response = JMSUtils.retrievePayload(jmsMessage);
         LOG.log(Level.FINE, "The Response Message payload is : [" + response + "]");
         inMessage.setContent(InputStream.class, new ByteArrayInputStream(response));
 
-        synchronized (inMessage) {
-            inMessage.notifyAll();
+        if (exchange.isSynchronous()) {
+            synchronized (exchange) {
+                exchange.put(CORRELATED, Boolean.TRUE);
+                exchange.notifyAll();
+            }
         }
-
+        
+        //REVISIT: put on a workqueue?
+        if (incomingObserver != null) {
+            incomingObserver.onMessage(exchange.getInMessage());
+        }
     }
 
     public void close() {

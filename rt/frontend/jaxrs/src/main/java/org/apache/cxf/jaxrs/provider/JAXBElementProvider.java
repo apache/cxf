@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -38,16 +40,20 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 @Provider
-public final class JAXBElementProvider extends AbstractJAXBProvider  {
+public class JAXBElementProvider extends AbstractJAXBProvider  {
     
-    private String jaxbSchemaLocation;
+    private Map<String, Object> mProperties = new HashMap<String, Object>();
     
     public void setSchemas(List<String> locations) {
         super.setSchemas(locations);
     }
     
+    public void setMarshallerProperties(Map<String, Object> marshallProperties) {
+        mProperties = marshallProperties;
+    }
+    
     public void setSchemaLocation(String schemaLocation) {
-        jaxbSchemaLocation = schemaLocation;
+        mProperties.put(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
     }
     
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
@@ -79,8 +85,8 @@ public final class JAXBElementProvider extends AbstractJAXBProvider  {
                 genericType = actualClass;
             }
             Marshaller ms = createMarshaller(actualObject, actualClass, genericType, m);
-            if (jaxbSchemaLocation != null) {
-                ms.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, jaxbSchemaLocation);
+            for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
+                ms.setProperty(entry.getKey(), entry.getValue());
             }
             ms.marshal(actualObject, os);
             

@@ -28,7 +28,9 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -74,6 +76,7 @@ import org.apache.hello_world_soap_http.SOAPServiceDocLitBare;
 import org.apache.hello_world_soap_http.SOAPServiceMultiPortTypeTest;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
+import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -499,16 +502,17 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         
         
         assertEquals(((TestExecutor)executor).getCount(), 0);
-        try {
-            Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
-            for (int i = 0; i < 5; i++) {
-                greeter.greetMeAsync("asyn call" + i);
-            }
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+        Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
+        List<Response<GreetMeResponse>> responses = new ArrayList<Response<GreetMeResponse>>();
+        for (int i = 0; i < 5; i++) {
+            responses.add(greeter.greetMeAsync("asyn call" + i));
         }
-        
-        assertEquals(((TestExecutor)executor).getCount(), 5);
+        //wait for all the responses
+        for (Response<GreetMeResponse> resp : responses) {
+            resp.get();
+        }
+            
+        assertEquals(5, ((TestExecutor)executor).getCount());
     }
 
     

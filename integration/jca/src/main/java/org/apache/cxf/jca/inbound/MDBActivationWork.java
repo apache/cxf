@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.jca.inbound;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.resource.spi.UnavailableException;
@@ -29,10 +31,13 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.Work;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
@@ -108,12 +113,48 @@ public class MDBActivationWork implements Work {
             } 
         }
         
+        Bus bus = null;
+        if (spec.getBusConfigLocation() != null) {
+            URL url = classLoader.getResource(spec.getBusConfigLocation());
+            if (url == null) {
+                LOG.warning("Unable to get bus configuration from " 
+                        + spec.getBusConfigLocation());
+            } else {    
+                bus = new SpringBusFactory().createBus(url);
+            }
+        }
+        
+        if (bus == null) {
+            bus = BusFactory.getDefaultBus();
+        }
+
+        MDBInvoker invoker = createInvoker(endpoint);
+        Server server = createServer(bus, serviceClass, invoker);
+        
+        if (server == null) {
+            LOG.severe("Failed to create CXF facade service endpoint.");
+            return;
+        }
+        
+        server.start();
+        
+        // save the server for clean up later
+        endpoints.put(spec.getDisplayName(), new InboundEndpoint(server, invoker));
+    }
+
+
+    private Server createServer(Bus bus, Class<?> serviceClass, MDBInvoker invoker) {
+
         // create server bean factory
         ServerFactoryBean factory = null;
         if (serviceClass != null && EndpointUtils.hasWebServiceAnnotation(serviceClass)) {
             factory = new JaxWsServerFactoryBean();
         } else {
             factory = new ServerFactoryBean();
+        }
+        
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Creating a server using " + factory.getClass().getName());
         }
         
         if (serviceClass != null) {
@@ -127,12 +168,9 @@ public class MDBActivationWork implements Work {
         if (spec.getAddress() != null) {
             factory.setAddress(spec.getAddress());
         }
-        
-        if (spec.getBusConfigLocation() != null) {
-            factory.setBus(new SpringBusFactory().createBus(classLoader
-                    .getResource(spec.getBusConfigLocation())));
-        }
-        
+         
+        factory.setBus(bus);
+       
         if (spec.getEndpointName() != null) {
             factory.setEndpointName(QName.valueOf(spec.getEndpointName()));
         }
@@ -145,18 +183,37 @@ public class MDBActivationWork implements Work {
             factory.setServiceName(QName.valueOf(spec.getServiceName()));
         }
               
-        MDBInvoker invoker = createInvoker(endpoint);
         factory.setInvoker(invoker);
 
-
-        // create and start the server
-        factory.setStart(true);
-        Server server = factory.create();
-
-        // save the server for clean up later
-        endpoints.put(spec.getDisplayName(), new InboundEndpoint(server, invoker));
+        // Don't start the server yet
+        factory.setStart(false);
+        
+        Server retval = null;
+        if (factory instanceof JaxWsServerFactoryBean) {
+            retval = createServerFromJaxwsEndpoint((JaxWsServerFactoryBean)factory);
+        } else {
+            retval = factory.create();
+        }
+        
+        return retval;
     }
 
+    /*
+     * Creates a server from EndpointImpl so that jaxws-endpoint config can be injected.
+     */
+    private Server createServerFromJaxwsEndpoint(JaxWsServerFactoryBean factory) {
+        
+        EndpointImpl endpoint = new EndpointImpl(factory.getBus(), null, factory);
+        
+        endpoint.setWsdlLocation(factory.getWsdlURL());
+        endpoint.setImplementorClass(factory.getServiceClass());
+        endpoint.setEndpointName(factory.getEndpointName());
+        endpoint.setServiceName(factory.getServiceName());
+        endpoint.setInvoker(factory.getInvoker());
+        endpoint.setSchemaLocations(factory.getSchemaLocations());
+        
+        return endpoint.getServer(factory.getAddress());
+    }
 
     /**
      * @param str
