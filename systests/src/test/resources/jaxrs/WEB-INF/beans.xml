@@ -40,7 +40,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <jaxrs:server id="bookservice"
 		        address="/">
     <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.BookStore" />
+      <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" />
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
 

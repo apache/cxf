@@ -91,6 +91,14 @@ public class BookStore {
         String url2 = new URL(urlValue).toString();
         int index = url2.lastIndexOf('/');
         return doGetBook(url2.substring(index + 1));
+    }
+    
+    @GET
+    @Path("/bookquery")
+    public Book getBookByURLQuery(@QueryParam("urlid") String urlValue) throws Exception {
+        String url2 = new URL(urlValue).toString();
+        int index = url2.lastIndexOf('/');
+        return doGetBook(url2.substring(index + 1));
     } 
 
     @GET

@@ -83,9 +83,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
-        if (!path.endsWith("/")) {
-            path = path + "/";
-        }
         return path;
     }
     
@@ -96,8 +93,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             rp.preprocess(message, new UriInfoImpl(message, null));
         }
         
-        String path = (String)message.get(Message.PATH_INFO);
+        String path = (String)message.get(Message.REQUEST_URI);
         String address = (String)message.get(Message.BASE_PATH);
+        
         String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {

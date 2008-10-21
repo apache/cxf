@@ -423,7 +423,7 @@ public final class JAXRSUtils {
                                              String defaultValue,
                                              boolean decode) {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(
-                                      (String)m.get(Message.PATH_INFO), decode);
+                                      (String)m.get(Message.REQUEST_URI), decode);
         if (segments.size() > 0) {
             MultivaluedMap<String, String> params = 
                 segments.get(segments.size() - 1).getMatrixParameters();

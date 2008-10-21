@@ -528,7 +528,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testMatrixParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         
-        messageImpl.put(Message.PATH_INFO, "/foo/bar;p1=1;p2");
+        messageImpl.put(Message.REQUEST_URI, "/foo/bar;p1=1;p2");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
                                                            null, messageImpl);
         assertEquals("2 Matrix params should've been identified", 2, params.size());

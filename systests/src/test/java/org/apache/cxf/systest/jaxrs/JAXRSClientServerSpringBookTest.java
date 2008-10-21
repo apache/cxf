@@ -40,6 +40,17 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testGetBook123() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/books/123"; 
+        getBook(endpointAddress); 
+    }
+    
+    @Test
+    public void testGetDefaultBook() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstore"; 
+        getBook(endpointAddress); 
+    }
+
+    private void getBook(String endpointAddress) throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
@@ -48,16 +59,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123json.txt");
 
-        //System.out.println("---" + getStringFromInputStream(in));
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
     }
-
+    
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
         IOUtils.copy(in, bos);
         in.close();
         bos.close();
-        //System.out.println(bos.getOut().toString());        
         return bos.getOut().toString();        
     }
 

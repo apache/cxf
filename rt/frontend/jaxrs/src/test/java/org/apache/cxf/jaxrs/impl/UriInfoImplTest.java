@@ -181,7 +181,7 @@ public class UriInfoImplTest extends Assert {
         epr.getAddress().setValue(baseAddress);
         d.getAddress();
         EasyMock.expectLastCall().andReturn(epr);
-        m.get(Message.PATH_INFO);
+        m.get(Message.REQUEST_URI);
         EasyMock.expectLastCall().andReturn(pathInfo);
         m.get(Message.QUERY_STRING);
         EasyMock.expectLastCall().andReturn(query);

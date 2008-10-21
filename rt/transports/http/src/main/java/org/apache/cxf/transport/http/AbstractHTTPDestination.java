@@ -251,6 +251,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         inMessage.put(HTTP_RESPONSE, resp);
         inMessage.put(HTTP_CONTEXT, context);
         inMessage.put(Message.HTTP_REQUEST_METHOD, req.getMethod());
+        inMessage.put(Message.REQUEST_URI, req.getRequestURI());
         String contextPath = req.getContextPath();
         if (contextPath == null) {
             contextPath = "";
