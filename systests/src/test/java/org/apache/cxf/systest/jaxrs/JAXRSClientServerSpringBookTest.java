@@ -33,13 +33,27 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(BookServerSpring.class));
+        assertTrue("server did not launch correctly", launchServer(BookServerSpring.class, true));
     }
     
     @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/books/123"; 
+        getBook(endpointAddress); 
+    }
+    
+    @Test
+    public void testGetBookWithEncodedQueryValue() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstore/booksquery?id=12%2B3"; 
+        getBook(endpointAddress); 
+    }
+    
+    @Test
+    public void testGetBookWithEncodedPathValue() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstore/id=12%2B3"; 
         getBook(endpointAddress); 
     }
     
