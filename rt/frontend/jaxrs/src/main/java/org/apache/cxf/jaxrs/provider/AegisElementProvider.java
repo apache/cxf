@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisReader;
 import org.apache.cxf.aegis.AegisWriter;
+import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
@@ -58,12 +59,17 @@ public final class AegisElementProvider extends AbstractAegisProvider  {
     public void writeTo(Object obj, Class<?> type, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
+        if (type == null) {
+            type = obj.getClass();
+        }
         AegisContext context = getAegisContext(type, genericType);
+        org.apache.cxf.aegis.type.Type aegisType = TypeUtil.getWriteTypeStandalone(context, obj, null);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
         XMLStreamWriter xmlStreamWriter = StaxUtils.createXMLStreamWriter(os);
         try {
-            aegisWriter.write(obj, null, false, xmlStreamWriter, null);
-            
+            // use type qname as element qname?
+            aegisWriter.write(obj, aegisType.getSchemaType(), false, xmlStreamWriter, aegisType);
+            xmlStreamWriter.close();
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
