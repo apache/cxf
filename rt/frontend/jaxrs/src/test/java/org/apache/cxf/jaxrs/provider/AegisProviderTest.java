@@ -49,12 +49,13 @@ public class AegisProviderTest extends Assert {
         assertTrue(p.isReadable(AegisTestBean.class, null, null));
     }
     
-    @org.junit.Ignore
+    
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFrom() throws Exception {
         MessageBodyReader<Object> p = new AegisElementProvider();
         byte[] simpleBytes = SIMPLE_BEAN_XML.getBytes("utf-8");
-        Object beanObject = p.readFrom(Object.class, null, null, 
+        Object beanObject = p.readFrom((Class)AegisTestBean.class, null, null, 
                                           null, null, new ByteArrayInputStream(simpleBytes));
         AegisTestBean bean = (AegisTestBean) beanObject;
         assertEquals("hovercraft", bean.getStrValue());
