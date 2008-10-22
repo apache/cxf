@@ -21,7 +21,9 @@ package org.apache.cxf.jaxrs;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ContextResolver;
 
 public interface CustomerInfo {
-    void setUriInfoContext(@Context UriInfo uriInfo); 
+    void setUriInfoContext(@Context UriInfo uriInfo);
+    ContextResolver getContextResolver();
 }

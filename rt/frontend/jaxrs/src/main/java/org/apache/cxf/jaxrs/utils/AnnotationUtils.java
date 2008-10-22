@@ -153,6 +153,12 @@ public final class AnnotationUtils {
     }
     
     public static Method getAnnotatedMethod(Method m) {
+        Method annotatedMethod = doGetAnnotatedMethod(m);
+        return annotatedMethod == null ? m : annotatedMethod;
+    }
+    
+    private static Method doGetAnnotatedMethod(Method m) {
+        
         if (m == null) {
             return m;
         }
@@ -162,15 +168,16 @@ public final class AnnotationUtils {
                 return m;
             }        
         }
-        
-        if (isMethodParamAnnotations(m.getAnnotations())) {
-            return m;
+        for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
+            if (isMethodParamAnnotations(paramAnnotations)) {
+                return m;
+            }
         }
         
         Class<?> superC = m.getDeclaringClass().getSuperclass();
-        if (superC != null) {
+        if (superC != null && Object.class != superC) {
             try {
-                Method method = getAnnotatedMethod(superC.getMethod(m.getName(), m.getParameterTypes()));
+                Method method = doGetAnnotatedMethod(superC.getMethod(m.getName(), m.getParameterTypes()));
                 if (method != null) {
                     return method;
                 }
@@ -180,7 +187,7 @@ public final class AnnotationUtils {
         }
         for (Class<?> i : m.getDeclaringClass().getInterfaces()) {
             try {
-                Method method = getAnnotatedMethod(i.getMethod(m.getName(), m.getParameterTypes()));
+                Method method = doGetAnnotatedMethod(i.getMethod(m.getName(), m.getParameterTypes()));
                 if (method != null) {
                     return method;
                 }
@@ -188,7 +195,8 @@ public final class AnnotationUtils {
                 // ignore
             }
         }
-        return m;
+        
+        return null;
     }
     
    

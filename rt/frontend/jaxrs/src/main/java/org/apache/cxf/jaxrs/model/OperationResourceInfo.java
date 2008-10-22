@@ -84,8 +84,10 @@ public class OperationResourceInfo {
     }
     
     public void setAnnotatedMethod(Method m) {
-        annotatedMethod = m;
-        checkMediaTypes();
+        if (m != null) {
+            annotatedMethod = m;
+            checkMediaTypes();
+        }
     }
     
     public Method getAnnotatedMethod() {
