@@ -38,6 +38,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
@@ -104,6 +105,20 @@ public final class AnnotationUtils {
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass);
     }
     
+    public static boolean isMethodParamAnnotationClass(Class<?> annotationClass) { 
+        return PARAM_ANNOTATION_CLASSES.contains(annotationClass)
+               || Context.class == annotationClass;
+    }
+    
+    public static boolean isMethodParamAnnotations(Annotation[] paramAnnotations) {
+        for (Annotation a : paramAnnotations) {
+            if (AnnotationUtils.isMethodParamAnnotationClass(a.annotationType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public static boolean isMethodAnnotation(Annotation a) { 
         return METHOD_ANNOTATION_CLASSES.contains(a.annotationType())
                || a.annotationType() == HttpMethod.class;
@@ -141,19 +156,16 @@ public final class AnnotationUtils {
         if (m == null) {
             return m;
         }
+        
         for (Annotation a : m.getAnnotations()) {
             if (AnnotationUtils.isMethodAnnotation(a)) {
                 return m;
             }        
         }
-        for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
-            for (Annotation a : paramAnnotations) {
-                if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
-                    return m;
-                } 
-            }
-        }
         
+        if (isMethodParamAnnotations(m.getAnnotations())) {
+            return m;
+        }
         
         Class<?> superC = m.getDeclaringClass().getSuperclass();
         if (superC != null) {

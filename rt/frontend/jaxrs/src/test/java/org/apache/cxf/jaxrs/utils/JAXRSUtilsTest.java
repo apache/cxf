@@ -612,6 +612,27 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testHttpContextParametersFromInterface() throws Exception {
+        
+        ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
+        Method methodToInvoke = 
+            Customer.class.getMethod("setUriInfoContext", 
+                                     new Class[]{UriInfo.class});
+        OperationResourceInfo ori = 
+            new OperationResourceInfo(methodToInvoke, cri);
+        ori.setHttpMethod("GET");
+        ori.setAnnotatedMethod(AnnotationUtils.getAnnotatedMethod(methodToInvoke));
+        
+        
+        Message m = new MessageImpl();
+        
+        List<Object> params = 
+            JAXRSUtils.processParameters(ori, new MetadataMap<String, String>(), m);
+        assertEquals("1 parameters expected", 1, params.size());
+        assertSame(UriInfoImpl.class, params.get(0).getClass());
+    }
+    
+    @Test
     public void testServletContextParameters() throws Exception {
         
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);

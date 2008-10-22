@@ -36,7 +36,13 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     public Book getBook(Long id) {
         return books.get(id);
     }
-
+    
+    public Book addBook(Book book) {
+        book.setId(124);
+        books.put(book.getId(), book);
+        return books.get(book.getId());
+    }
+    
     private void init() {
         Book book = new Book();
         book.setId(new Long(123));

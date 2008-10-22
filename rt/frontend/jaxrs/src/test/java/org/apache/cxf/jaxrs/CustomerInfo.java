@@ -17,29 +17,11 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.jaxrs;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
-@WebService
-@Path("/bookstore")
-public interface BookStoreJaxrsJaxws {
-    
-    @WebMethod
-    @GET
-    @Path("/{id}")
-    Book getBook(@PathParam("id") @WebParam(name = "id") Long id);
-
-    @WebMethod
-    @POST
-    @Path("/books")
-    @ProduceMime("application/xml")
-    Book addBook(@WebParam(name = "book") Book book);
+public interface CustomerInfo {
+    void setUriInfoContext(@Context UriInfo uriInfo); 
 }
