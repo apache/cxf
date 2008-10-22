@@ -345,8 +345,8 @@ public final class JAXRSUtils {
 
         String path = (String)message.get(JAXRSInInterceptor.RELATIVE_PATH);
         
-        if (parameterAnns == null || parameterAnns.length == 0) {
-            // we can't really limit it to just PUT and POST
+        if (parameterAnns == null 
+            || !AnnotationUtils.isMethodParamAnnotations(parameterAnns)) {
             
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 

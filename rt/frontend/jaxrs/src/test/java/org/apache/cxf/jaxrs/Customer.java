@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
-public class Customer {
+public class Customer implements CustomerInfo {
     
     @XmlRootElement(name = "CustomerBean")
     public static class CustomerBean {
@@ -107,6 +107,9 @@ public class Customer {
         uriInfo = ui;
     }
 
+    public void setUriInfoContext(UriInfo ui) {
+    }
+    
     @Context
     public void setServletContext(ServletContext sc) {
         servletContext3 = sc;
