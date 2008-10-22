@@ -89,7 +89,7 @@ public class RequestPreprocessor {
     
     private void updatePath(Message m, String path, String suffix) {
         String newPath = path.substring(0, path.length() - (suffix.length() + 1));
-        m.put(Message.PATH_INFO, newPath);
+        m.put(Message.REQUEST_URI, newPath);
     }
     
 }

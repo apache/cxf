@@ -34,7 +34,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -53,9 +52,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
     public void testGetBookByURL() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBookByEncodedQuery() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/bookquery?"
+                               + "urlid=http%3A%2F%2Ftest.com%2Frss%2F123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
     }
@@ -74,7 +80,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         // TODO : more specific message is needed
         String msg = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\"><ns1:faultstring"
             + " xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">.No operation matching request path "
-            + "/bookstore/booknames/123/ is found, ContentType : */*, Accept : foo/bar.</ns1:faultstring>"
+            + "/bookstore/booknames/123 is found, ContentType : */*, Accept : foo/bar.</ns1:faultstring>"
             + "</ns1:XMLFault>";
         
         getAndCompare("http://localhost:9080/bookstore/booknames/123",
@@ -128,7 +134,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         // TODO : more specific message is needed
         String msg = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\"><ns1:faultstring"
             + " xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">.No operation matching request path "
-            + "/bookstore/books/ is found, ContentType : application/bar, Accept : text/xml."
+            + "/bookstore/books is found, ContentType : application/bar, Accept : text/xml."
             + "</ns1:faultstring></ns1:XMLFault>";
         
         String endpointAddress =

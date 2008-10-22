@@ -69,7 +69,7 @@ public class UriInfoImpl implements UriInfo {
 
     public String getPath(boolean decode) {
         
-        String path = (String)message.get(Message.PATH_INFO);
+        String path = (String)message.get(Message.REQUEST_URI);
         return decode ? JAXRSUtils.uriDecode(path) : path;
     }
 
@@ -95,7 +95,7 @@ public class UriInfoImpl implements UriInfo {
     public URI getRequestUri() {
         String queries = (String)message.get(Message.QUERY_STRING);
         return URI.create(getEndpointAddress() 
-                          + message.get(Message.PATH_INFO)
+                          + message.get(Message.REQUEST_URI)
                           + (queries == null ? "" : "?" + queries));
     }
 
