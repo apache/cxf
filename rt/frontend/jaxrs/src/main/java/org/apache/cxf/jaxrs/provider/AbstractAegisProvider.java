@@ -94,7 +94,10 @@ public abstract class AbstractAegisProvider
             AegisContext context = classContexts.get(type);
             if (context == null) {
                 context = new AegisContext();
+                context.setWriteXsiTypes(true); // needed, since we know no element/type maps.
+                context.setReadXsiTypes(true);
                 Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+                rootClasses.add(type);
                 context.setRootClasses(rootClasses);
                 context.initialize();
                 classContexts.put(type, context);
