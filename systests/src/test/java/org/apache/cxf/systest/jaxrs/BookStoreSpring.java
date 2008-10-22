@@ -27,6 +27,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.QueryParam;
 
 @Path("/bookstore")
 @ProduceMime("application/json")
@@ -45,7 +46,27 @@ public class BookStoreSpring {
     public Book getBookById(@PathParam("id") Long id) {
         return books.get(id);
     }
+    
+    @GET
+    @Path("/booksquery")
+    public Book getBookByQuery(@QueryParam("id") String id) {
+        
+        String[] values = id.split("\\+");
+        StringBuilder b = new StringBuilder();
+        b.append(values[0]).append(values[1]);        
+        return books.get(Long.valueOf(b.toString()));
+    }
      
+    @GET
+    @Path("id={id}")
+    public Book getBookByEncodedId(@PathParam("id") String id) {
+        String[] values = id.split("\\+");
+        StringBuilder b = new StringBuilder();
+        b.append(values[0]).append(values[1]);        
+        return books.get(Long.valueOf(b.toString()));
+    }
+    
+    
     @GET
     public Book getDefaultBook() {
         return books.get(mainId);
