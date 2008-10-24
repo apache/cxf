@@ -23,12 +23,12 @@ import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -36,7 +36,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyWorkers;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -68,7 +68,7 @@ public class Customer implements CustomerInfo {
     @Context private HttpHeaders headers;
     @Context private Request request;
     @Context private SecurityContext sContext;
-    @Context private MessageBodyWorkers bodyWorkers;
+    @Context private Providers bodyWorkers;
     
     @Resource private HttpServletRequest servletRequest;
     @Resource private HttpServletResponse servletResponse;
@@ -136,7 +136,7 @@ public class Customer implements CustomerInfo {
         return request;
     }
     
-    public MessageBodyWorkers getBodyWorkers() {
+    public Providers getBodyWorkers() {
         return bodyWorkers;
     }
     
@@ -172,28 +172,28 @@ public class Customer implements CustomerInfo {
         return cr;
     }
 
-    @ProduceMime("text/xml")
-    @ConsumeMime("text/xml")
+    @Produces("text/xml")
+    @Consumes("text/xml")
     public void test() {
         // complete
     }
     
-    @ProduceMime("text/xml")   
+    @Produces("text/xml")   
     public void getItAsXML() {
         // complete
     }
-    @ProduceMime("text/plain")   
+    @Produces("text/plain")   
     public void getItPlain() {
         // complete
     }
     
-    @ProduceMime("text/xml")   
+    @Produces("text/xml")   
     public void testQuery(@QueryParam("query") String queryString, 
                           @QueryParam("query") int queryInt) {
         // complete
     }
     
-    @ProduceMime("text/xml")   
+    @Produces("text/xml")   
     public void testMultipleQuery(@QueryParam("query")  String queryString, 
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
@@ -202,7 +202,7 @@ public class Customer implements CustomerInfo {
         // complete
     }
     
-    @ProduceMime("text/xml")   
+    @Produces("text/xml")   
     public void testMatrixParam(@MatrixParam("p1")  String queryString, 
                                 @MatrixParam("p2") String queryString2) {
         // complete
@@ -212,7 +212,7 @@ public class Customer implements CustomerInfo {
                            @Context HttpHeaders hs,
                            @Context Request r,
                            @Context SecurityContext s,
-                           @Context MessageBodyWorkers workers,
+                           @Context Providers workers,
                            @HeaderParam("Foo") String h) {
         // complete
     }

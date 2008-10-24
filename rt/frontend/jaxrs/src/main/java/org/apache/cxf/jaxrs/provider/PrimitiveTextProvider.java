@@ -24,8 +24,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -34,8 +34,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-@ProduceMime("text/plain")
-@ConsumeMime("text/plain")
+@Produces("text/plain")
+@Consumes("text/plain")
 public class PrimitiveTextProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
 
@@ -45,7 +45,7 @@ public class PrimitiveTextProvider
             || Boolean.class.isAssignableFrom(type);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type);
     }
 
@@ -55,11 +55,11 @@ public class PrimitiveTextProvider
                     IOUtils.readStringFromStream(is).toString(), type);
     }
 
-    public long getSize(Object t) {
+    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type);
     }
 

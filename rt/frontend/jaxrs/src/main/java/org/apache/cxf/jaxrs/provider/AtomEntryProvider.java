@@ -25,8 +25,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -38,8 +38,8 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.writer.Writer;
 
-@ProduceMime({"application/atom+xml", "application/atom+xml;type=entry", "application/json" })
-@ConsumeMime({"application/atom+xml", "application/atom+xml;type=entry" })
+@Produces({"application/atom+xml", "application/atom+xml;type=entry", "application/json" })
+@Consumes({"application/atom+xml", "application/atom+xml;type=entry" })
 @Provider
 public class AtomEntryProvider 
     implements MessageBodyReader<Entry>, MessageBodyWriter<Entry> {
@@ -47,11 +47,12 @@ public class AtomEntryProvider
     private static final Abdera ATOM_ENGINE = new Abdera();
     private static final String JSON_TYPE = "application/json";
     
-    public long getSize(Entry feed) {
+    public long getSize(Entry feed,
+                        Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Entry.class.isAssignableFrom(type);
     }
 
@@ -67,7 +68,7 @@ public class AtomEntryProvider
         
     }
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Entry.class.isAssignableFrom(type);
     }
 

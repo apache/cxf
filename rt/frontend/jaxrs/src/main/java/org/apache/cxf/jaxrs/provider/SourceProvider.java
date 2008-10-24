@@ -47,11 +47,11 @@ import org.w3c.dom.Document;
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Source.class.isAssignableFrom(type);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Source.class.isAssignableFrom(type);
     }
     
@@ -94,7 +94,8 @@ public class SourceProvider implements
         }
     }
     
-    public long getSize(Source source) {
+    public long getSize(Source source, Class<?> type, Type genericType, Annotation[] annotations, 
+                        MediaType mt) {
         return -1;
     }
 }

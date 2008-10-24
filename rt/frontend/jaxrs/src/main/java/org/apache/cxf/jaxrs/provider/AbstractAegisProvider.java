@@ -36,6 +36,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -60,11 +61,11 @@ public abstract class AbstractAegisProvider
     @Context protected ContextResolver<AegisContext> resolver;
     private Schema schema;
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         return isSupported(type, genericType, anns);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, genericType, annotations);
     }
 
@@ -72,7 +73,7 @@ public abstract class AbstractAegisProvider
         schema = createSchema(locations);    
     }
     
-    public long getSize(Object o) {
+    public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 

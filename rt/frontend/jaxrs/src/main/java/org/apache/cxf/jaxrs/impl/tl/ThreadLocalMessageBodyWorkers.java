@@ -23,12 +23,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
 
-public class ThreadLocalMessageBodyWorkers extends AbstractThreadLocalProxy<MessageBodyWorkers>
-       implements MessageBodyWorkers {
+public class ThreadLocalMessageBodyWorkers extends AbstractThreadLocalProxy<Providers>
+       implements Providers {
 
     public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, 
                                                          Type genericType, 
@@ -42,6 +44,14 @@ public class ThreadLocalMessageBodyWorkers extends AbstractThreadLocalProxy<Mess
                                                          Annotation[] annotations,
                                                          MediaType mediaType) {
         return get().getMessageBodyWriter(type, genericType, annotations, mediaType);
+    }
+
+    public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
+        return get().getContextResolver(contextType, mediaType);
+    }
+
+    public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
+        return get().getExceptionMapper(type);
     }
 
 }

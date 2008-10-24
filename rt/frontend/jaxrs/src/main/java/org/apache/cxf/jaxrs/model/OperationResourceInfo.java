@@ -22,10 +22,10 @@ package org.apache.cxf.jaxrs.model;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -110,8 +110,8 @@ public class OperationResourceInfo {
     }
     
     private void checkMediaTypes() {
-        ConsumeMime cm = 
-            (ConsumeMime)AnnotationUtils.getMethodAnnotation(annotatedMethod, ConsumeMime.class);
+        Consumes cm = 
+            (Consumes)AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
         if (cm != null) {
             consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()));
         } else if (classResourceInfo != null) {
@@ -119,8 +119,8 @@ public class OperationResourceInfo {
                                JAXRSUtils.getConsumeTypes(classResourceInfo.getConsumeMime()));
         }
         
-        ProduceMime pm = 
-            (ProduceMime)AnnotationUtils.getMethodAnnotation(annotatedMethod, ProduceMime.class);
+        Produces pm = 
+            (Produces)AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
         if (pm != null) {
             produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()));
         } else if (classResourceInfo != null) {

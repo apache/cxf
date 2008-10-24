@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -33,7 +34,7 @@ import javax.ws.rs.core.Variant.VariantListBuilder;
 public class VariantListBuilderImpl extends VariantListBuilder {
     
     private Set<String> encodings = new HashSet<String>();
-    private Set<String> languages = new HashSet<String>();
+    private Set<Locale> languages = new HashSet<Locale>();
     private Set<MediaType> mediaTypes = new HashSet<MediaType>();
     private List<Variant> variants = new ArrayList<Variant>();
     
@@ -58,12 +59,6 @@ public class VariantListBuilderImpl extends VariantListBuilder {
     @Override
     public VariantListBuilder encodings(String... encs) {
         encodings.addAll(Arrays.asList(encs));
-        return this;
-    }
-
-    @Override
-    public VariantListBuilder languages(String... ls) {
-        languages.addAll(Arrays.asList(ls));
         return this;
     }
 
@@ -111,7 +106,7 @@ public class VariantListBuilderImpl extends VariantListBuilder {
     }
     
     private void handleLanguages(MediaType type) {
-        for (String lang : languages) {
+        for (Locale lang : languages) {
             if (encodings.size() > 0) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, lang, enc));
@@ -121,5 +116,10 @@ public class VariantListBuilderImpl extends VariantListBuilder {
             }
         }
     }
-    
+
+    @Override
+    public VariantListBuilder languages(Locale... ls) {
+        languages.addAll(Arrays.asList(ls));
+        return this;
+    }
 }

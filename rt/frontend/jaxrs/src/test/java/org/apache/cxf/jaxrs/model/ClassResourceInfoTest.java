@@ -28,9 +28,9 @@ import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
@@ -41,8 +41,8 @@ import org.junit.Test;
 public class ClassResourceInfoTest extends Assert {
     
     @Path("/bar")
-    @ProduceMime("test/bar")
-    @ConsumeMime("test/foo")
+    @Produces("test/bar")
+    @Consumes("test/foo")
     private static class TestClass {
         @Context UriInfo u;
         @Context HttpHeaders h;

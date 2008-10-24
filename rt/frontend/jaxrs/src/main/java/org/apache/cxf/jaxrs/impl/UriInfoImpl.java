@@ -128,28 +128,20 @@ public class UriInfoImpl implements UriInfo {
         return value;
     }
 
-    public List<String> getAncestorResourceURIs() {
+    public List<Object> getMatchedResources() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public List<Object> getAncestorResources() {
+    public List<String> getMatchedURIs() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public List<String> getAncestorResourceURIs(boolean arg0) {
+    public List<String> getMatchedURIs(boolean decode) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public String getPathExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public UriBuilder getPlatonicRequestUriBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    
 }

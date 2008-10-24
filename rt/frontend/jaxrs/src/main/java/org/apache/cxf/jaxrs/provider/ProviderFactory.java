@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -93,7 +93,17 @@ public final class ProviderFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> ContextResolver<T> createContextResolver(Type contextType, Message m) {
+    public <T> ContextResolver<T> createContextResolver(Type contextType, 
+                                                        Message m) {
+        // TODO : get media type from message  
+        return createContextResolver(contextType, m, null);
+        
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> ContextResolver<T> createContextResolver(Type contextType, 
+                                                        Message m,
+                                                        MediaType type) {
         for (ProviderInfo<ContextResolver> cr : userContextResolvers) {
             Type[] types = cr.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
@@ -115,7 +125,7 @@ public final class ProviderFactory {
     }
     
     @SuppressWarnings("unchecked")
-    public <T> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, Message m) {
+    public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, Message m) {
         for (ProviderInfo<ExceptionMapper> em : userExceptionMappers) {
             Type[] types = em.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
@@ -302,12 +312,12 @@ public final class ProviderFactory {
                                                Type genericType,
                                                Annotation[] annotations,
                                                MediaType mediaType) {
-        if (!ep.isReadable(type, genericType, annotations)) {
+        if (!ep.isReadable(type, genericType, annotations, mediaType)) {
             return false;
         }
         
         List<MediaType> supportedMediaTypes =
-            JAXRSUtils.getConsumeTypes(ep.getClass().getAnnotation(ConsumeMime.class));
+            JAXRSUtils.getConsumeTypes(ep.getClass().getAnnotation(Consumes.class));
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
@@ -352,12 +362,12 @@ public final class ProviderFactory {
                                                Type genericType,
                                                Annotation[] annotations,
                                                MediaType mediaType) {
-        if (!ep.isWriteable(type, genericType, annotations)) {
+        if (!ep.isWriteable(type, genericType, annotations, mediaType)) {
             return false;
         }
         
         List<MediaType> supportedMediaTypes =
-            JAXRSUtils.getProduceTypes(ep.getClass().getAnnotation(ProduceMime.class));
+            JAXRSUtils.getProduceTypes(ep.getClass().getAnnotation(Produces.class));
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
@@ -432,13 +442,13 @@ public final class ProviderFactory {
             MessageBodyReader e1 = p1.getProvider();
             MessageBodyReader e2 = p2.getProvider();
             
-            ConsumeMime c = e1.getClass().getAnnotation(ConsumeMime.class);
+            Consumes c = e1.getClass().getAnnotation(Consumes.class);
             String[] mimeType1 = {"*/*"};
             if (c != null) {
                 mimeType1 = c.value();               
             }
             
-            ConsumeMime c2 = e2.getClass().getAnnotation(ConsumeMime.class);
+            Consumes c2 = e2.getClass().getAnnotation(Consumes.class);
             String[] mimeType2 = {"*/*"};
             if (c2 != null) {
                 mimeType2 = c2.value();               
@@ -467,13 +477,13 @@ public final class ProviderFactory {
             MessageBodyWriter e1 = p1.getProvider();
             MessageBodyWriter e2 = p2.getProvider();
             
-            ProduceMime c = e1.getClass().getAnnotation(ProduceMime.class);
+            Produces c = e1.getClass().getAnnotation(Produces.class);
             String[] mimeType1 = {"*/*"};
             if (c != null) {
                 mimeType1 = c.value();               
             }
             
-            ProduceMime c2 = e2.getClass().getAnnotation(ProduceMime.class);
+            Produces c2 = e2.getClass().getAnnotation(Produces.class);
             String[] mimeType2 = {"*/*"};
             if (c2 != null) {
                 mimeType2 = c2.value();               

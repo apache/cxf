@@ -21,8 +21,8 @@ package org.apache.cxf.jaxrs.model;
 
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Assert;
@@ -30,14 +30,14 @@ import org.junit.Test;
 
 public class OperationResourceInfoTest extends Assert {
     
-    @ProduceMime("text/xml")
-    @ConsumeMime("application/xml")
+    @Produces("text/xml")
+    @Consumes("application/xml")
     static class TestClass {
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public void doIt() {
             // empty
         };
-        @ConsumeMime("application/atom+xml")
+        @Consumes("application/atom+xml")
         public void doThat() {
             // empty
         };

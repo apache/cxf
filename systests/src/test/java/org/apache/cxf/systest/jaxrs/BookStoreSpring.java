@@ -26,11 +26,11 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 @Path("/bookstore")
-@ProduceMime("application/json")
+@Produces("application/json")
 public class BookStoreSpring {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();

@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.Assert;
@@ -65,12 +65,12 @@ public class FormEncodingReaderProviderTest extends Assert {
 
     @Test
     public void testReadable() {
-        assertTrue(ferp.isReadable(MultivaluedMap.class, null, null));
+        assertTrue(ferp.isReadable(MultivaluedMap.class, null, null, null));
     }
 
     @Test
     public void testAnnotations() {
-        assertEquals("application/x-www-form-urlencoded", ferp.getClass().getAnnotation(ConsumeMime.class)
+        assertEquals("application/x-www-form-urlencoded", ferp.getClass().getAnnotation(Consumes.class)
                      .value()[0]);
     }
 

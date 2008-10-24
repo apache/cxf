@@ -46,4 +46,8 @@ public class ThreadLocalRequest extends AbstractThreadLocalProxy<Request>
         return get().selectVariant(vars);
     }
 
+    public String getMethod() {
+        return get().getMethod();
+    }
+
 }

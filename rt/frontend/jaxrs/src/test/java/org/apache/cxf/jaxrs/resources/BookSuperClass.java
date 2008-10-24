@@ -19,19 +19,19 @@
 
 package org.apache.cxf.jaxrs.resources;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 
 public abstract class BookSuperClass {
 
     @GET
     @Path("/path")
-    @ProduceMime("text/bar")
-    @ConsumeMime("text/foo")
+    @Produces("text/bar")
+    @Consumes("text/foo")
     public abstract String getDescription();
     
     @Path("/books/{bookId}/{new}")

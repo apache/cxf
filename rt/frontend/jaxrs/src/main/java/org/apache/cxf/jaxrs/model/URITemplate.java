@@ -164,6 +164,6 @@ public final class URITemplate {
             pathValue = "/" + pathValue;
         }
         
-        return new URITemplate(pathValue, path.limited());
+        return new URITemplate(pathValue);
     }
 }

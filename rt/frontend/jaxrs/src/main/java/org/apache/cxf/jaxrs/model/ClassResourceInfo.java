@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -134,12 +134,12 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         resourceProvider = rp;
     }
     
-    public ProduceMime getProduceMime() {
-        return (ProduceMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ProduceMime.class);
+    public Produces getProduceMime() {
+        return (Produces)AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class);
     }
     
-    public ConsumeMime getConsumeMime() {
-        return (ConsumeMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ConsumeMime.class);
+    public Consumes getConsumeMime() {
+        return (Consumes)AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class);
     }
     
     public Path getPath() {

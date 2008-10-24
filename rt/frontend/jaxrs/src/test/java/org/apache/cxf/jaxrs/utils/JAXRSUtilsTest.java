@@ -36,7 +36,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyWorkers;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 
 import org.apache.cxf.jaxrs.Customer;
@@ -413,11 +413,14 @@ public class JAXRSUtilsTest extends Assert {
                    JAXRSUtils.compareMediaTypes(m2, JAXRSUtils.ALL_TYPES) < 0);
         
         MediaType m3 = MediaType.valueOf("text/xml;q=0.2");
-        assertTrue("text/xml should be more preferred than than text/xml;q=0.2", 
+        assertTrue("text/xml should be more preferred than text/xml;q=0.2", 
                    JAXRSUtils.compareMediaTypes(m1, m3) < 0);
         MediaType m4 = MediaType.valueOf("text/xml;q=.3");
-        assertTrue("text/xml;q=.3 should be more preferred than than text/xml;q=0.2", 
+        assertTrue("text/xml;q=.3 should be more preferred than text/xml;q=0.2", 
                    JAXRSUtils.compareMediaTypes(m4, m3) < 0);
+        
+        assertTrue("text/xml;q=.3 should be more preferred than than text/xml;q=0.2", 
+                  JAXRSUtils.compareMediaTypes(m3, m4) > 0);
     }
     
     @Test
@@ -588,7 +591,7 @@ public class JAXRSUtilsTest extends Assert {
                                                      HttpHeaders.class, 
                                                      Request.class,
                                                      SecurityContext.class,
-                                                     MessageBodyWorkers.class,
+                                                     Providers.class,
                                                      String.class}), 
                 cri);
         ori.setHttpMethod("GET");

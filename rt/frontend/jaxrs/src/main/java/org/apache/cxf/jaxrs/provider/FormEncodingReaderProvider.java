@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -38,12 +38,12 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
-@ConsumeMime("application/x-www-form-urlencoded")
+@Consumes("application/x-www-form-urlencoded")
 @Provider
 public final class FormEncodingReaderProvider implements MessageBodyReader<Object> {
 
     public boolean isReadable(Class<?> type, Type genericType, 
-                              Annotation[] annotations) {
+                              Annotation[] annotations, MediaType mt) {
         return type.isAssignableFrom(MultivaluedMap.class);
     }
 

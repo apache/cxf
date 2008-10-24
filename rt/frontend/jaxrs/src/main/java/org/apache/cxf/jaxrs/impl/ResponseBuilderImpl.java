@@ -22,16 +22,17 @@ package org.apache.cxf.jaxrs.impl;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
-
 
 public final class ResponseBuilderImpl extends ResponseBuilder {
     private int status = 200;
@@ -97,29 +98,42 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder tag(String tag) {
-        metadata.putSingle("ETag", tag.toString());
+        metadata.putSingle(HttpHeaders.ETAG, tag.toString());
         return this;
     }
 
     public ResponseBuilder lastModified(Date lastModified) {
-        metadata.putSingle("Last-Modified", lastModified.toString());
+        metadata.putSingle(HttpHeaders.LAST_MODIFIED, lastModified.toString());
         return this;
     }
 
     public ResponseBuilder cacheControl(CacheControl cacheControl) {
-        metadata.putSingle("Cache-Control", cacheControl.toString());
+        metadata.putSingle(HttpHeaders.CACHE_CONTROL, 
+                           cacheControl.toString());
         return this;
     }
 
     public ResponseBuilder cookie(NewCookie cookie) {
-        metadata.putSingle("Set-Cookie", cookie.toString());
+        metadata.putSingle(HttpHeaders.SET_COOKIE, cookie.toString());
         return this;
+    }
+
+    @Override
+    public ResponseBuilder expires(Date expires) {
+        metadata.putSingle(HttpHeaders.EXPIRES, expires.toString());
+        return null;
+    }
+
+    @Override
+    public ResponseBuilder language(Locale language) {
+        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, language.toString());
+        return null;
     }
     
     @Override
     public ResponseBuilder cookie(NewCookie... cookies) {
         for (NewCookie cookie : cookies) {
-            metadata.add("Set-Cookie", cookie.toString());
+            metadata.add(HttpHeaders.SET_COOKIE, cookie.toString());
         }
         return this;
     }
@@ -139,7 +153,8 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
             language(variant.getLanguage());
         }
         if (variant.getEncoding() != null) {
-            metadata.putSingle("Content-Encoding", variant.getEncoding());
+            metadata.putSingle(HttpHeaders.CONTENT_ENCODING, 
+                               variant.getEncoding());
         }
         return this;
     }
@@ -163,6 +178,5 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
         entity = null;
         status = 200;
     }
-
     
 }

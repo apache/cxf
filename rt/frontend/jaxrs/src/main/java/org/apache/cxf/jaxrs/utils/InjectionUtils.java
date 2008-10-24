@@ -47,7 +47,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyWorkers;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -290,7 +290,7 @@ public final class InjectionUtils {
             proxy = new ThreadLocalContextResolver();
         } else if (Request.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalRequest();
-        }  else if (MessageBodyWorkers.class.isAssignableFrom(type)) {
+        }  else if (Providers.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalMessageBodyWorkers();
         } else if (HttpServletRequest.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletRequest();

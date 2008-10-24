@@ -27,16 +27,17 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -44,7 +45,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyWorkers;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 
@@ -70,7 +71,7 @@ public final class AnnotationUtils {
         classes.add(SecurityContext.class);
         classes.add(HttpHeaders.class);
         classes.add(ContextResolver.class);
-        classes.add(MessageBodyWorkers.class);
+        classes.add(Providers.class);
         classes.add(Request.class);
         classes.add(HttpServletRequest.class);
         classes.add(HttpServletResponse.class);
@@ -85,6 +86,7 @@ public final class AnnotationUtils {
         classes.add(MatrixParam.class);
         classes.add(HeaderParam.class);
         classes.add(CookieParam.class);
+        classes.add(FormParam.class);
         return classes;
     }
     
@@ -92,8 +94,8 @@ public final class AnnotationUtils {
         Set<Class> classes = new HashSet<Class>();
         classes.add(HttpMethod.class);
         classes.add(Path.class);
-        classes.add(ProduceMime.class);
-        classes.add(ConsumeMime.class);
+        classes.add(Produces.class);
+        classes.add(Consumes.class);
         return classes;
     }
     
@@ -125,18 +127,21 @@ public final class AnnotationUtils {
     }
     
     public static String getAnnotationValue(Annotation a) {
+        String value = null;
         if (a.annotationType() == PathParam.class) {
-            return ((PathParam)a).value();
+            value = ((PathParam)a).value();
         } else if (a.annotationType() == QueryParam.class) {
-            return ((QueryParam)a).value();
+            value = ((QueryParam)a).value();
         } else if (a.annotationType() == MatrixParam.class) {
-            return ((MatrixParam)a).value();
+            value = ((MatrixParam)a).value();
         } else if (a.annotationType() == HeaderParam.class) {
-            return ((HeaderParam)a).value();
+            value = ((HeaderParam)a).value();
         } else if (a.annotationType() == CookieParam.class) {
-            return ((CookieParam)a).value();
+            value = ((CookieParam)a).value();
+        } else if (a.annotationType() == FormParam.class) {
+            value = ((FormParam)a).value();
         }
-        return null;
+        return value;
     }
     
     @SuppressWarnings("unchecked")

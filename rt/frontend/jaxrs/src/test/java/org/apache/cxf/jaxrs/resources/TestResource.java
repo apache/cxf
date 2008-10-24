@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 @Path("/{a}/{b}/{c}/d")
 public class TestResource {
@@ -34,14 +34,14 @@ public class TestResource {
     
     @GET
     @Path("/")
-    @ProduceMime("application/xml")
+    @Produces("application/xml")
     public String listMethod() {
         return "This is a list method";
     }
     
     @GET
     @Path("/{e}")
-    @ProduceMime("application/xml")
+    @Produces("application/xml")
     public String readMethod() {
         return "This is a list method";
     }
@@ -53,15 +53,15 @@ public class TestResource {
     }
     
     @GET
-    @Path(value = "/{e}", limited = false)
-    @ProduceMime("application/json")
+    @Path(value = "/{e}")
+    @Produces("application/json")
     public String unlimitedPath() {
         return "This is a list method";
     }
     
     @GET
     @Path("/{e}/bar/baz/baz")
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public String readMethod2() {
         return "This is a list method";
     }

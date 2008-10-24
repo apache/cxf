@@ -26,12 +26,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -69,7 +69,7 @@ public class AtomBookStore {
     
     @GET
     @Path("/books/jsonfeed")
-    @ProduceMime({"application/xml", "application/json", "text/html", "application/atom+xml" })
+    @Produces({"application/xml", "application/json", "text/html", "application/atom+xml" })
     public Feed getBooksAsJsonFeed(@Context UriInfo uParam) {
         return getBooksAsFeed(uParam);    
     }
@@ -77,7 +77,7 @@ public class AtomBookStore {
     
     @GET
     @Path("/books/feed")
-    @ProduceMime({"application/json", "application/atom+xml" })
+    @Produces({"application/json", "application/atom+xml" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
         
         MediaType mt = headers.getMediaType();
@@ -108,7 +108,7 @@ public class AtomBookStore {
     
     @POST
     @Path("/books/feed")
-    @ConsumeMime("application/atom+xml")
+    @Consumes("application/atom+xml")
     public Response addBookAsEntry(Entry e) {
         try {
             String text = e.getContentElement().getValue();
@@ -120,8 +120,8 @@ public class AtomBookStore {
             // this code is broken as Response does not
             
             URI uri = 
-                uField.getBaseUriBuilder().path("bookstore", "books", "entries", 
-                                                Long.toString(b.getId())).build();
+                uField.getBaseUriBuilder().path("bookstore").path("books").path("entries") 
+                                                .path(Long.toString(b.getId())).build();
             return Response.created(uri).entity(e).build();
         } catch (Exception ex) {
             return Response.serverError().build();
@@ -130,7 +130,7 @@ public class AtomBookStore {
     
     @GET
     @Path("/books/entries/{bookId}/")
-    @ProduceMime({"application/atom+xml", "application/json" })
+    @Produces({"application/atom+xml", "application/json" })
     public Entry getBookAsEntry(@PathParam("bookId") String id) throws BookNotFoundFault {
         System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));

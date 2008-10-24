@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -62,7 +62,7 @@ public class Book {
     
     @GET
     @Path("chapters/{chapterid}/")    
-    @ProduceMime("application/xml;charset=ISO-8859-1")
+    @Produces("application/xml;charset=ISO-8859-1")
     public Chapter getChapter(@PathParam("chapterid")int chapterid) {
         System.out.println("----invoking getChapter with chapterid: " + chapterid);
 

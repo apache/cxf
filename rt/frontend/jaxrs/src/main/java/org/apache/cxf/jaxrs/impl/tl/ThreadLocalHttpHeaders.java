@@ -21,6 +21,7 @@
 package org.apache.cxf.jaxrs.impl.tl;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.Cookie;
@@ -39,7 +40,7 @@ public class ThreadLocalHttpHeaders extends AbstractThreadLocalProxy<HttpHeaders
         return get().getCookies();
     }
 
-    public String getLanguage() {
+    public Locale getLanguage() {
         return get().getLanguage();
     }
 
@@ -51,7 +52,7 @@ public class ThreadLocalHttpHeaders extends AbstractThreadLocalProxy<HttpHeaders
         return get().getRequestHeaders();
     }
 
-    public List<String> getAcceptableLanguages() {
+    public List<Locale> getAcceptableLanguages() {
         return get().getAcceptableLanguages();
     }
 

@@ -40,10 +40,9 @@ public class UriBuilderImpl extends UriBuilder {
     private String userInfo;
     private int port;
     private String host;
-    private List<PathSegment> paths;
-    private MultivaluedMap<String, String> matrix;
+    private List<PathSegment> paths = new ArrayList<PathSegment>();
     private String fragment;
-    private MultivaluedMap<String, String> query;
+    private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
     
        
     public UriBuilderImpl() {
@@ -53,9 +52,9 @@ public class UriBuilderImpl extends UriBuilder {
         setUriParts(uri);
     }
 
+    
     @Override
-    public URI build() throws UriBuilderException {
-        
+    public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
         try {
             return new URI(scheme, 
                            userInfo, 
@@ -67,19 +66,6 @@ public class UriBuilderImpl extends UriBuilder {
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
-        
-    }
-
-    @Override
-    public URI build(Map<String, Object> parts) throws IllegalArgumentException, UriBuilderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 //CHECKSTYLE:OFF
@@ -89,12 +75,6 @@ public class UriBuilderImpl extends UriBuilder {
     }
 //CHECKSTYLE:ON
     
-    @Override
-    public UriBuilder encode(boolean enable) {
-        //this.encode = enable;
-        return this;
-    }
-
     @Override
     public UriBuilder fragment(String theFragment) throws IllegalArgumentException {
         this.fragment = theFragment;
@@ -108,30 +88,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public UriBuilder matrixParam(String name, String value) throws IllegalArgumentException {
-        matrix.putSingle(name, value);
-        return this;
-    }
-
-    @Override
-    public UriBuilder path(String... segments) throws IllegalArgumentException {
-        if (paths == null) {
-            paths = new ArrayList<PathSegment>();
-        }
-        for (String segment : segments) {
-            paths.add(new PathSegmentImpl(segment, false));
-        }
-        return this;
-    }
-
-    @Override
     public UriBuilder path(Class resource) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public UriBuilder path(Method... methods) throws IllegalArgumentException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -145,27 +102,6 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder port(int thePort) throws IllegalArgumentException {
         this.port = thePort;
-        return this;
-    }
-
-    @Override
-    public UriBuilder queryParam(String name, String value) throws IllegalArgumentException {
-        if (query == null) {
-            query = new MetadataMap<String, String>();
-        }
-        query.add(name, value);
-        return this;
-    }
-
-    @Override
-    public UriBuilder replaceMatrixParams(String m) throws IllegalArgumentException {
-        matrix = JAXRSUtils.getStructuredParams(m, ";", true);
-        return this;
-    }
-
-    @Override
-    public UriBuilder replaceQueryParams(String q) throws IllegalArgumentException {
-        this.query = JAXRSUtils.getStructuredParams(q, "&", true);
         return this;
     }
 
@@ -229,19 +165,95 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public boolean isEncode() {
-        // TODO Auto-generated method stub
-        return false;
+    public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
+        try {
+            return new URI(scheme, 
+                           userInfo, 
+                           host, 
+                           port, 
+                           buildPath(), 
+                           buildQuery(), 
+                           fragment);
+        } catch (URISyntaxException ex) {
+            throw new UriBuilderException("URI can not be built", ex);
+        }
     }
 
     @Override
-    public UriBuilder replacePath(String... segments) throws IllegalArgumentException {
+    public URI buildFromEncodedMap(Map<String, ? extends Object> arg0) 
+        throws IllegalArgumentException, UriBuilderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public UriBuilder extension(String arg0) {
+    public URI buildFromMap(Map<String, ? extends Object> arg0) 
+        throws IllegalArgumentException, UriBuilderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder matrixParam(String name, Object... values) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder path(String path) throws IllegalArgumentException {
+        List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false);
+        paths.addAll(segments);
+        return this;
+    }
+
+    @Override
+    public UriBuilder path(Method method) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder queryParam(String name, Object... values) throws IllegalArgumentException {
+        List<String> queryList = new ArrayList<String>();
+        for (Object value : values) {
+            queryList.add(value.toString());
+        }
+        query.put(name, queryList);
+        return this;
+    }
+
+    @Override
+    public UriBuilder replaceMatrix(String matrix) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder replaceMatrixParam(String name, Object... values) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder replacePath(String path) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder segment(String... segments) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public UriBuilder replaceQueryParam(String name, Object... values) throws IllegalArgumentException {
         // TODO Auto-generated method stub
         return null;
     }

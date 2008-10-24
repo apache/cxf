@@ -26,7 +26,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,7 +34,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -73,7 +73,7 @@ public class BookStore {
     
     @GET
     @Path("books/check/{id}")
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public boolean checkBook(@PathParam("id") Long id) {
         return books.containsKey(id);
     }
@@ -152,7 +152,7 @@ public class BookStore {
     
     @GET
     @Path("/books/{bookId}/")
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public Book getBookAsJSON() throws BookNotFoundFault {
         return doGetBook(currentBookId);
     }
@@ -184,7 +184,7 @@ public class BookStore {
     
     @GET
     @Path("/booknames/{bookId}/")
-    @ProduceMime("text/*")
+    @Produces("text/*")
     public String getBookName(@PathParam("bookId") int id) throws BookNotFoundFault {
         System.out.println("----invoking getBookName with id: " + id);
         Book book = books.get(new Long(id));
@@ -199,8 +199,8 @@ public class BookStore {
 
     @POST
     @Path("/books")
-    @ProduceMime("text/xml")
-    @ConsumeMime("application/xml")
+    @Produces("text/xml")
+    @Consumes("application/xml")
     public Response addBook(Book book) {
         System.out.println("----invoking addBook, book name is: " + book.getName());
         book.setId(++bookId);
@@ -211,8 +211,8 @@ public class BookStore {
 
     @POST
     @Path("/binarybooks")
-    @ProduceMime("text/xml")
-    @ConsumeMime("application/octet-stream")
+    @Produces("text/xml")
+    @Consumes("application/octet-stream")
     public Response addBinaryBook(long[] book) {
         return Response.ok(book).build();
     }
@@ -244,7 +244,7 @@ public class BookStore {
     
     @PUT
     @Path("/bookswithjson/")
-    @ConsumeMime("application/json")
+    @Consumes("application/json")
     public Response updateBookJSON(Book book) {
         System.out.println("----invoking updateBook, book name is: " + book.getName());
         Book b = books.get(book.getId());
@@ -278,8 +278,8 @@ public class BookStore {
 
     @POST
     @Path("/booksplain")
-    @ConsumeMime("text/plain")
-    @ProduceMime("text/plain")
+    @Consumes("text/plain")
+    @Produces("text/plain")
     public Long echoBookId(long theBookId) {
         return new Long(theBookId);
     }
@@ -295,7 +295,7 @@ public class BookStore {
 
     @GET
     @Path("/cdwithmultitypes/{CDId}/")
-    @ProduceMime({"application/xml", "application/json" }) 
+    @Produces({"application/xml", "application/json" }) 
     public CD getCDWithMultiContentTypes(@PathParam("CDId") String id) {
         System.out.println("----invoking getCDWithMultiContentTypes with cdId: " + id);
         CD cd = cds.get(Long.parseLong(id));

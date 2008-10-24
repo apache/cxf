@@ -71,12 +71,12 @@ public abstract class AbstractJAXBProvider
     @Context protected ContextResolver<JAXBContext> resolver;
     private Schema schema;
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         return isSupported(type, genericType, anns)
                || AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class) != null;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, genericType, annotations);
     }
 
@@ -84,7 +84,7 @@ public abstract class AbstractJAXBProvider
         schema = createSchema(locations);    
     }
     
-    public long getSize(Object o) {
+    public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 

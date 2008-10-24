@@ -45,12 +45,12 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -66,7 +66,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWorkers;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -256,23 +256,24 @@ public final class JAXRSUtils {
 
     
     
-    public static List<MediaType> getConsumeTypes(ConsumeMime cm) {
+    public static List<MediaType> getConsumeTypes(Consumes cm) {
         return cm == null ? Collections.singletonList(ALL_TYPES)
                           : getMediaTypes(cm.value());
     }
     
-    public static List<MediaType> getProduceTypes(ProduceMime pm) {
+    public static List<MediaType> getProduceTypes(Produces pm) {
         return pm == null ? Collections.singletonList(ALL_TYPES)
                           : getMediaTypes(pm.value());
     }
     
     public static int compareMediaTypes(MediaType mt1, MediaType mt2) {
         
-        if (mt1.equals(mt2)) {
+        if (mt1.getType().equals(mt2.getType())
+            && mt1.getSubtype().equals(mt2.getSubtype())) {
             float q1 = getMediaTypeQualityFactor(mt1.getParameters().get("q"));
             float q2 = getMediaTypeQualityFactor(mt2.getParameters().get("q"));
             int result = Float.compare(q1, q2);
-            return result == 0 ? result : ~result;
+            return result == 0 ? result : result * -1;
         }
         
         if (mt1.isWildcardType() && !mt2.isWildcardType()) {
@@ -490,7 +491,7 @@ public final class JAXRSUtils {
             o = new RequestImpl(m);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
             o = new SecurityContextImpl(m);
-        } else if (MessageBodyWorkers.class.isAssignableFrom(clazz)) {
+        } else if (Providers.class.isAssignableFrom(clazz)) {
             o = new MessageBodyWorkersImpl(m);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
             o = createContextResolver(genericType, m);

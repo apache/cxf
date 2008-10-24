@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
@@ -181,20 +181,23 @@ public class ProviderFactoryTest extends Assert {
         return index;
     }
     
-    @ConsumeMime("text/html")
-    @ProduceMime("text/html")
+    @Consumes("text/html")
+    @Produces("text/html")
     private final class TestStringProvider 
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
+                                  MediaType m) {
             return type == String.class;
         }
         
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                                   MediaType m) {
             return type == String.class;
         }
         
-        public long getSize(String s) {
+        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations, 
+                            MediaType m) {
             return s.length();
         }
 
@@ -219,20 +222,23 @@ public class ProviderFactoryTest extends Assert {
 
     }
     
-    @ConsumeMime("application/json")
-    @ProduceMime("application/json")
+    @Consumes("application/json")
+    @Produces("application/json")
     private final class CustomJSONProvider 
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
+                                  MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                                   MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public long getSize(String s) {
+        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType m) {
             return s.length();
         }
 
@@ -249,20 +255,23 @@ public class ProviderFactoryTest extends Assert {
 
     }
     
-    @ConsumeMime("application/widget")
-    @ProduceMime("application/widget")
+    @Consumes("application/widget")
+    @Produces("application/widget")
     private final class CustomWidgetProvider
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
+                                  MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                                   MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public long getSize(String s) {
+        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType m) {
             return s.length();
         }
 

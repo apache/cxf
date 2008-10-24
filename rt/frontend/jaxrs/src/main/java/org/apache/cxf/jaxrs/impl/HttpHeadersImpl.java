@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.Cookie;
@@ -61,9 +62,9 @@ public class HttpHeadersImpl implements HttpHeaders {
         return cl;
     }
 
-    public String getLanguage() {
+    public Locale getLanguage() {
         String l = headers.getFirst(HttpHeaders.CONTENT_LANGUAGE);
-        return l == null ? "UTF-8" : l;
+        return l == null || l.length() == 0 ? null : new Locale(l);
     }
 
     public MediaType getMediaType() {
@@ -77,31 +78,35 @@ public class HttpHeadersImpl implements HttpHeaders {
         return map;
     }
 
-    public List<String> getAcceptableLanguages() {
+    public List<Locale> getAcceptableLanguages() {
         List<String> values = getRequestHeader(HttpHeaders.ACCEPT_LANGUAGE);
         if (values == null || values.isEmpty()) {
             return Collections.emptyList();
         }
-        List<String> newLs = new ArrayList<String>(); 
+        List<Locale> newLs = new ArrayList<Locale>(); 
         String[] ls =  values.get(0).split(",");
-        Map<String, Float> prefs = new HashMap<String, Float>();
+        Map<Locale, Float> prefs = new HashMap<Locale, Float>();
         for (String l : ls) {
-            String[] pair = l.split(";"); 
-            newLs.add(pair[0]);
+            String[] pair = l.split(";");
+            
+            Locale locale = new Locale(pair[0].trim());
+            
+            newLs.add(locale);
             if (pair.length > 1) {
                 String[] pair2 = pair[1].split("=");
                 if (pair2.length > 1) {
-                    prefs.put(pair[0], JAXRSUtils.getMediaTypeQualityFactor(pair2[1]));
+                    prefs.put(locale, JAXRSUtils.getMediaTypeQualityFactor(pair2[1].trim()));
                 } else {
-                    prefs.put(pair[0], 1F);
+                    prefs.put(locale, 1F);
                 }
             } else {
-                prefs.put(pair[0], 1F);
+                prefs.put(locale, 1F);
             }
         }
         if (newLs.size() == 1) {
             return newLs;
         }
+        
         Collections.sort(newLs, new AcceptLanguageComparator(prefs));
         return newLs;
         
@@ -111,18 +116,18 @@ public class HttpHeadersImpl implements HttpHeaders {
         return headers.get(name);
     }
 
-    private static class AcceptLanguageComparator implements Comparator<String> {
-        private Map<String, Float> prefs;
+    private static class AcceptLanguageComparator implements Comparator<Locale> {
+        private Map<Locale, Float> prefs;
         
-        public AcceptLanguageComparator(Map<String, Float> prefs) {
+        public AcceptLanguageComparator(Map<Locale, Float> prefs) {
             this.prefs = prefs;
         }
 
-        public int compare(String lang1, String lang2) {
+        public int compare(Locale lang1, Locale lang2) {
             float p1 = prefs.get(lang1);
             float p2 = prefs.get(lang2);
             int result = Float.compare(p1, p2);
-            return result == 0 ? result : ~result;
+            return result == 0 ? result : result * -1;
         }
     }
 }

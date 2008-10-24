@@ -38,15 +38,15 @@ import org.apache.cxf.helpers.IOUtils;
 public final class StringProvider 
     implements MessageBodyWriter<String>, MessageBodyReader<String>  {
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return type == String.class;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return type == String.class;
     }
     
-    public long getSize(String s) {
+    public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return s.length();
     }
 

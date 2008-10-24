@@ -40,13 +40,13 @@ public class AegisProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         MessageBodyWriter<Object> p = new AegisElementProvider();
-        assertTrue(p.isWriteable(AegisTestBean.class, null, null));
+        assertTrue(p.isWriteable(AegisTestBean.class, null, null, null));
     }
     
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new AegisElementProvider();
-        assertTrue(p.isReadable(AegisTestBean.class, null, null));
+        assertTrue(p.isReadable(AegisTestBean.class, null, null, null));
     }
     
     

@@ -19,11 +19,15 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -54,7 +58,7 @@ public class RequestImpl implements Request {
 
 
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
-        String ifMatch = getHeaderValue("If-Match");
+        String ifMatch = getHeaderValue(HttpHeaders.IF_MATCH);
         
         if (ifMatch == null || ifMatch.equals("*")) {
             return null;
@@ -69,14 +73,35 @@ public class RequestImpl implements Request {
             // ignore
         }
         
-        return Response.status(412).tag(eTag);
+        return Response.status(Response.Status.PRECONDITION_FAILED).tag(eTag);
     }
 
 
 
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
-        // TODO : these dates wreck my head
-        return null;
+        String ifModifiedSince = getHeaderValue(HttpHeaders.IF_MODIFIED_SINCE);
+        
+        if (ifModifiedSince == null) {
+            return null;
+        }
+        
+        SimpleDateFormat dateFormat = 
+            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+        dateFormat.setLenient(false);
+        Date dateSince = null;
+        try {
+            dateSince = dateFormat.parse(ifModifiedSince);
+        } catch (ParseException ex) {
+            // invalid header value, request should continue
+            return null;
+        }
+        
+        if (dateSince.before(lastModified)) {
+            // request should continue
+            return null;
+        }
+        
+        return Response.status(Response.Status.NOT_MODIFIED);
     }
 
 
@@ -102,6 +127,12 @@ public class RequestImpl implements Request {
             return null;
         }
         return values.get(0);
+    }
+
+
+
+    public String getMethod() {
+        return m.get(Message.HTTP_REQUEST_METHOD).toString();
     }
 
 }

@@ -19,8 +19,10 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -55,21 +57,75 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
-    public void testGetLanguage() throws Exception {
+    public void testGetNullLanguage() throws Exception {
         
         Message m = control.createMock(Message.class);
         m.get(Message.PROTOCOL_HEADERS);
         EasyMock.expectLastCall().andReturn(createHeaders());
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
-        assertEquals("UTF-8", h.getLanguage());
+        assertNull(h.getLanguage());
+    }
+    
+    @Test
+    public void testGetLanguage() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = createHeaders();
+        headers.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        assertEquals(new Locale("en"), h.getLanguage());
+    }
+    
+    @Test
+    public void testSingleAcceptableLanguages() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = createHeaders();
+        headers.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<Locale> languages = h.getAcceptableLanguages();
+        assertEquals(1, languages.size());
+        assertEquals(new Locale("en"), languages.get(0));
+    }
+    
+    @Test
+    public void testMultipleAcceptableLanguages() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = 
+            createHeader(HttpHeaders.ACCEPT_LANGUAGE, 
+                         "en;q=0.7, en-gb;q=0.8, da");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<Locale> languages = h.getAcceptableLanguages();
+        assertEquals(3, languages.size());
+        assertEquals(new Locale("da"), languages.get(0));
+        assertEquals(new Locale("en-gb"), languages.get(1));
+        assertEquals(new Locale("en"), languages.get(2));
     }
     
         
-    private Map<String, List<String>> createHeaders() {
+    private MetadataMap<String, String> createHeaders() {
         MetadataMap<String, String> hs = new MetadataMap<String, String>();
         hs.putSingle("Accept", "text/*");
         hs.putSingle("Content-Type", "*/*");
+        return hs;
+    }
+    
+    private MetadataMap<String, String> createHeader(String name, String... values) {
+        MetadataMap<String, String> hs = new MetadataMap<String, String>();
+        List<String> list = new ArrayList<String>();
+        list.addAll(Arrays.asList(values));
+        hs.put(name, list);
         return hs;
     }
 }

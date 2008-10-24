@@ -33,16 +33,18 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", newUri, uri);
     }
     
+    
     @Test
     public void testAddPath() throws Exception {
         URI uri = new URI("http://foo/bar");
         URI newUri = new UriBuilderImpl().uri(uri).path("baz").build();
         assertEquals("URI is not built correctly", newUri, 
                      new URI("http://foo/bar/baz"));
-        newUri = new UriBuilderImpl().uri(uri).path("baz", "/1", "/2").build();
+        newUri = new UriBuilderImpl().uri(uri).path("baz").path("1").path("2").build();
         assertEquals("URI is not built correctly", newUri, 
                      new URI("http://foo/bar/baz/1/2"));
     }
+    
     
     @Test
     public void testSchemeHostPortQueryFragment() throws Exception {

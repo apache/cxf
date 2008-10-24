@@ -33,7 +33,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class RequestImplTest extends Assert {
@@ -46,6 +45,7 @@ public class RequestImplTest extends Assert {
         m = new MessageImpl();
         metadata = new MetadataMap<String, String>();
         m.put(Message.PROTOCOL_HEADERS, metadata);
+        m.put(Message.HTTP_REQUEST_METHOD, "GET");
     }
     
     @After
@@ -68,6 +68,14 @@ public class RequestImplTest extends Assert {
     }
     
     @Test
+    public void testGetMethod() {
+        assertEquals("Wrong method", 
+                   "GET", new RequestImpl(m).getMethod());
+        
+    }
+    
+    
+    @Test
     public void testStrictEtags() {
         metadata.putSingle("If-Match", new EntityTag("123").toString());
         
@@ -87,9 +95,9 @@ public class RequestImplTest extends Assert {
     
     @Test
     public void testBeforeDate() throws Exception {
-        metadata.putSingle("If-Modified-Since", "Sat, 29 Oct 1994 19:43:31 GMT");
+        metadata.putSingle("If-Modified-Since", "Tue, 21 Oct 2008 14:00:00 GMT");
         Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
-            .parse("Sun, 29 Oct 1994 19:43:31 GMT");
+            .parse("Tue, 21 Oct 2008 17:00:00 GMT");
         
         ResponseBuilder rb = 
             new RequestImpl(m).evaluatePreconditions(serverDate);
@@ -97,18 +105,18 @@ public class RequestImplTest extends Assert {
     }
     
     @Test
-    @Ignore
     public void testAfterDate() throws Exception {
-        metadata.putSingle("If-Modified-Since", "Sat, 29 Oct 1994 19:43:31 GMT");
-        Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
-            .parse("Fri, 28 Oct 1994 19:43:31 GMT");
+        metadata.putSingle("If-Modified-Since", "Tue, 21 Oct 2008 14:00:00 GMT");
+        Date lastModified = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
+            .parse("Mon, 20 Oct 2008 14:00:00 GMT");
         
         
         ResponseBuilder rb = 
-            new RequestImpl(m).evaluatePreconditions(serverDate);
+            new RequestImpl(m).evaluatePreconditions(lastModified);
         assertNotNull("Precondition is not met", rb);
         
         Response r = rb.build();
         assertEquals("If-Modified-Since precondition was not met", 304, r.getStatus());
     }
+   
 }
