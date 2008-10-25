@@ -37,6 +37,7 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     private TestBean1[] lastBean1Array;
     private SpecificGenericClass lastSpecificGeneric;
     private GenericGenericClass<Double> lastGenericGeneric;
+    private InheritanceTestDerived lastInheritanceTestDerived;
 
     /** {@inheritDoc}*/
     public int basicTypeFunctionReturnInt(String s, int i, long l, float f, double d) {
@@ -119,6 +120,10 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
         lastSpecificGeneric = sgc;
         lastGenericGeneric = ggc;
     }
+    
+    public void inheritanceTestFunction(InheritanceTestDerived d) {
+        lastInheritanceTestDerived = d;
+    }
 
     public SpecificGenericClass getLastSpecificGeneric() {
         return lastSpecificGeneric;
@@ -127,4 +132,9 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     public GenericGenericClass<Double> getLastGenericGeneric() {
         return lastGenericGeneric;
     }
+
+    public InheritanceTestDerived getLastInheritanceTestDerived() {
+        return lastInheritanceTestDerived;
+    }
+
 }

@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.aegis.type.java5.map;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -73,6 +76,35 @@ public class StudentTest extends AbstractAegisTest {
         assertEquals("valuestring", wildMap.get("keystring"));
     }
 
+    @Test 
+    public void testMapMap() throws Exception {
+
+        ServerFactoryBean sf = new ServerFactoryBean();
+        sf.setServiceClass(StudentServiceDocLiteral.class);
+        sf.setServiceBean(new StudentServiceDocLiteralImpl());
+        sf.setAddress("local://StudentServiceDocLiteral");
+        setupAegis(sf);
+        Server server = sf.create();
+        server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        server.start();
+        
+        ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
+        proxyFac.setAddress("local://StudentServiceDocLiteral");
+        proxyFac.setServiceClass(StudentServiceDocLiteral.class);
+        proxyFac.setBus(getBus());
+        setupAegis(proxyFac.getClientFactoryBean());
+        //CHECKSTYLE:OFF
+        HashMap<String, Student> mss = new HashMap<String, Student>();
+        mss.put("Alice", new Student());
+        HashMap<String, HashMap<String, Student>> mmss = new HashMap<String, HashMap<String, Student>>();
+        mmss.put("Bob", mss);
+        
+        StudentServiceDocLiteral clientInterface = (StudentServiceDocLiteral)proxyFac.create();
+        clientInterface.takeMapMap(mmss);
+        //CHECKSTYLE:ON
+    }
+    
     @Test 
     public void testReturnMapDocLiteral() throws Exception {
 
