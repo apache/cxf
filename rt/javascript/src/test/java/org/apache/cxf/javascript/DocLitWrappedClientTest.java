@@ -237,6 +237,12 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
 
             public Void run(Context context) {
+                Notifier notifier = testUtilities.rhinoCallConvert("testInheritance", Notifier.class,
+                                                                   testUtilities.javaToJS(getAddress()));
+                boolean notified = notifier.waitForJavascript(1000 * 10);
+                assertTrue(notified);
+                SimpleDocLitWrappedImpl impl = (SimpleDocLitWrappedImpl)rawImplementor;
+                assertEquals("less", impl.getLastInheritanceTestDerived().getName());
                 return null;
             }
             
