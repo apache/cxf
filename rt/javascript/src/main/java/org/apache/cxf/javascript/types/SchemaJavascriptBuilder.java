@@ -179,7 +179,7 @@ public class SchemaJavascriptBuilder {
     public void complexTypeConstructorAndAccessors(QName name, XmlSchemaComplexType type) {
         accessors = new StringBuilder();
         utils = new JavascriptUtils(code);
-        XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(type);
+        List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
 
         final String elementPrefix = "this._";
 
@@ -190,16 +190,14 @@ public class SchemaJavascriptBuilder {
         code.append("function " + typeObjectName + " () {\n");
         // to assist in debugging we put a type property into every object.
         utils.appendLine("this.typeMarker = '" + typeObjectName + "';");
-        for (int i = 0; i < sequence.getItems().getCount(); i++) {
-            XmlSchemaObject thing = sequence.getItems().getItem(i);
-            constructOneElement(type, sequence, elementPrefix, typeObjectName, thing);
+        for (XmlSchemaObject thing : items) {
+            constructOneElement(type, elementPrefix, typeObjectName, thing);
         }
         code.append("}\n\n");
         code.append(accessors.toString());
     }
 
     private void constructOneElement(XmlSchemaComplexType type, 
-                                     XmlSchemaSequence sequence,
                                      final String elementPrefix, 
                                      String typeObjectName, 
                                      XmlSchemaObject thing) {
@@ -347,23 +345,8 @@ public class SchemaJavascriptBuilder {
      */
     protected void complexTypeSerializerBody(XmlSchemaComplexType type, String elementPrefix,
                                              JavascriptUtils bodyUtils) {
-        XmlSchemaSequence sequence = null;
-        // deal with type extension.
-        QName baseTypeName = XmlSchemaUtils.getBaseType(type);
-        if (baseTypeName !=  null) {
-            XmlSchemaType baseType = xmlSchemaCollection.getTypeByQName(baseTypeName);
-            XmlSchemaComplexType baseComplexType = (XmlSchemaComplexType) baseType;
-            // I think we can recurse ...?
-            complexTypeSerializerBody(baseComplexType, elementPrefix, bodyUtils);
-            sequence = XmlSchemaUtils.getContentSequence(type);
-        }
-
-        if (sequence == null) {
-            sequence = XmlSchemaUtils.getSequence(type);
-        }
-
-        for (int i = 0; i < sequence.getItems().getCount(); i++) {
-            XmlSchemaObject sequenceItem = (XmlSchemaObject)sequence.getItems().getItem(i);
+        List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
+        for (XmlSchemaObject sequenceItem : items) {
             ParticleInfo itemInfo = ParticleInfo.forLocalItem(sequenceItem, 
                                                               schemaInfo.getSchema(), 
                                                               xmlSchemaCollection, 
