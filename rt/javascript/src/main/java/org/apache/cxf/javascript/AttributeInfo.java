@@ -23,22 +23,23 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
+import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
-import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaType;
+import org.apache.ws.commons.schema.XmlSchemaUse;
+import org.apache.ws.commons.schema.constants.Constants.BlockConstants;
 
 /**
  * All the information needed to create the JavaScript for an Xml Schema attribute
  * or xs:anyAttribute.
  */
-public final class AttributeInfo {
+public final class AttributeInfo implements ItemInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(AttributeInfo.class);
     private XmlSchemaAnnotated annotated;
     private String javascriptName;
@@ -50,6 +51,7 @@ public final class AttributeInfo {
     private String defaultValue;
     private String fixedValue;
     private boolean global;
+    private XmlSchemaUse use;
 
     private AttributeInfo() {
     }
@@ -76,7 +78,7 @@ public final class AttributeInfo {
     }
 
     /**
-     * Fill in an ElementInfo for an element or xs:any from a sequence.
+     * Fill in an AttributeInfo for an attribute or anyAttribute from a sequence.
      * 
      * @param sequenceElement
      * @param currentSchema
@@ -90,38 +92,46 @@ public final class AttributeInfo {
                                             NamespacePrefixAccumulator prefixAccumulator, QName contextName) {
         XmlSchemaAnnotated annotated = XmlSchemaUtils.getObjectAnnotated(sequenceObject, contextName);
         AttributeInfo attributeInfo = new AttributeInfo();
-        XmlSchemaAnnotated realParticle = annotated;
+        XmlSchemaAnnotated realAnnotated = annotated;
 
         if (annotated instanceof XmlSchemaAttribute) {
             XmlSchemaAttribute attribute = (XmlSchemaAttribute)annotated;
-
+            attributeInfo.use = attribute.getUse();
+            
             if (attribute.getRefName() != null) {
-                XmlSchemaAttribute refElement = schemaCollection
+                XmlSchemaAttribute refAttribute = schemaCollection
                     .getAttributeByQName(attribute.getRefName());
-                if (refElement == null) {
-                    Message message = new Message("ATTRIBUTE_DANGLING_REFERENCE", LOG, attribute
-                        .getQName(), attribute.getRefName());
-                    throw new UnsupportedConstruct(message.toString());
+                if (refAttribute == null) {
+                    throw new UnsupportedConstruct(LOG, "ATTRIBUTE_DANGLING_REFERENCE", attribute
+                                                   .getQName(), attribute.getRefName()); 
                 }
-                realParticle = refElement;
+                realAnnotated = refAttribute;
                 attributeInfo.global = true;
             }
+        } else if (annotated instanceof XmlSchemaAnyAttribute) {
+            attributeInfo.any = true;
+            attributeInfo.xmlName = null; // unknown until runtime.
+            attributeInfo.javascriptName = "any";
+            attributeInfo.type = null; // runtime for any.
+            attributeInfo.use = new XmlSchemaUse(BlockConstants.OPTIONAL);
+        } else {
+            throw new UnsupportedConstruct(LOG, "UNSUPPORTED_ATTRIBUTE_ITEM", annotated, contextName);
         }
 
-        factoryCommon(realParticle, currentSchema, schemaCollection, prefixAccumulator, attributeInfo);
+        factoryCommon(realAnnotated, currentSchema, schemaCollection, prefixAccumulator, attributeInfo);
 
-        attributeInfo.annotated = realParticle;
+        attributeInfo.annotated = realAnnotated;
 
         return attributeInfo;
     }
 
-    private static void factoryCommon(XmlSchemaAnnotated particle, XmlSchema currentSchema,
+    private static void factoryCommon(XmlSchemaAnnotated annotated, XmlSchema currentSchema,
                                       SchemaCollection schemaCollection,
                                       NamespacePrefixAccumulator prefixAccumulator, 
                                       AttributeInfo attributeInfo) {
 
-        if (particle instanceof XmlSchemaAttribute) {
-            XmlSchemaAttribute attribute = (XmlSchemaAttribute)particle;
+        if (annotated instanceof XmlSchemaAttribute) {
+            XmlSchemaAttribute attribute = (XmlSchemaAttribute)annotated;
             String attributeNamespaceURI = attribute.getQName().getNamespaceURI();
             boolean attributeNoNamespace = "".equals(attributeNamespaceURI);
 
@@ -143,61 +153,36 @@ public final class AttributeInfo {
             attributeInfo.javascriptName = attribute.getQName().getLocalPart();
             attributeInfo.defaultValue = attribute.getDefaultValue();
             attributeInfo.fixedValue = attribute.getFixedValue();
+            attributeInfo.use = attribute.getUse();
             factorySetupType(attribute, schemaCollection, attributeInfo);
         } else { // any
             attributeInfo.any = true;
             attributeInfo.xmlName = null; // unknown until runtime.
-            // TODO: multiple 'any'
             attributeInfo.javascriptName = "any";
             attributeInfo.type = null; // runtime for any.
-
+            attributeInfo.use = new XmlSchemaUse(BlockConstants.OPTIONAL);
         }
     }
 
     private static void factorySetupType(XmlSchemaAttribute element, SchemaCollection schemaCollection,
-                                         AttributeInfo elementInfo) {
-        elementInfo.type = element.getSchemaType();
-        if (elementInfo.type == null) {
+                                         AttributeInfo attributeInfo) {
+        attributeInfo.type = element.getSchemaType();
+        if (attributeInfo.type == null) {
             if (element.getSchemaTypeName().equals(XmlSchemaConstants.ANY_TYPE_QNAME)) {
-                elementInfo.anyType = true;
+                attributeInfo.anyType = true;
             } else {
-                elementInfo.type = schemaCollection.getTypeByQName(element.getSchemaTypeName());
-                if (elementInfo.type == null 
+                attributeInfo.type = schemaCollection.getTypeByQName(element.getSchemaTypeName());
+                if (attributeInfo.type == null 
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
                     XmlSchemaUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
                             .toString(), element.getQName(), element);
                 }
             }
-        } else if (elementInfo.type.getQName() != null
-            && XmlSchemaConstants.ANY_TYPE_QNAME.equals(elementInfo.type.getQName())) {
-            elementInfo.anyType = true;
+        } else if (attributeInfo.type.getQName() != null
+            && XmlSchemaConstants.ANY_TYPE_QNAME.equals(attributeInfo.type.getQName())) {
+            attributeInfo.anyType = true;
         }
-    }
-
-    /**
-     * As a general rule, the JavaScript code is organized by types. The
-     * exception is global elements that have anonymous types. In those cases,
-     * the JavaScript code has its functions named according to the element.
-     * This method returns the QName for the type or element, accordingly. If a
-     * schema has a local element with an anonymous, complex, type, this will
-     * throw. This will need to be fixed.
-     * 
-     * @return the qname.
-     */
-    public QName getControllingName() {
-        if (type != null && type.getQName() != null) {
-            return type.getQName();
-        } else if (annotated instanceof XmlSchemaElement) {
-            XmlSchemaElement element = (XmlSchemaElement)annotated;
-            if (element.getQName() != null) {
-                return element.getQName();
-            }
-        }
-        Message message = new Message("IMPOSSIBLE_GLOBAL_ITEM", LOG, XmlSchemaUtils
-            .cleanedUpSchemaSource(annotated));
-        LOG.severe(message.toString());
-        throw new UnsupportedConstruct(message);
     }
 
     /**
@@ -254,14 +239,10 @@ public final class AttributeInfo {
      * @return Returns the defaultValue.
      */
     public String getDefaultValue() {
+        if (defaultValue == null && fixedValue != null) {
+            return fixedValue;
+        }
         return defaultValue;
-    }
-
-    /**
-     * @param defaultValue The defaultValue to set.
-     */
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 
     /**
@@ -279,5 +260,21 @@ public final class AttributeInfo {
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+    }
+
+    public boolean isArray() {
+        return false;
+    }
+
+    public boolean isNillable() {
+        return false;
+    }
+
+    public boolean isOptional() {
+        return !use.equals(new XmlSchemaUse(BlockConstants.REQUIRED));
+    }
+
+    public void setDefaultValue(String value) {
+        this.defaultValue = value;
     }
 }

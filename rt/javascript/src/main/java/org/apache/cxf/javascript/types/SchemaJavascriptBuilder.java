@@ -30,6 +30,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaTools;
+import org.apache.cxf.javascript.AttributeInfo;
+import org.apache.cxf.javascript.ItemInfo;
 import org.apache.cxf.javascript.JavascriptUtils;
 import org.apache.cxf.javascript.NameManager;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
@@ -38,6 +40,7 @@ import org.apache.cxf.javascript.UnsupportedConstruct;
 import org.apache.cxf.javascript.XmlSchemaUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -180,6 +183,7 @@ public class SchemaJavascriptBuilder {
         accessors = new StringBuilder();
         utils = new JavascriptUtils(code);
         List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
+        List<XmlSchemaAnnotated> attrs = XmlSchemaUtils.getContentAttributes(type, xmlSchemaCollection);
 
         final String elementPrefix = "this._";
 
@@ -191,22 +195,31 @@ public class SchemaJavascriptBuilder {
         // to assist in debugging we put a type property into every object.
         utils.appendLine("this.typeMarker = '" + typeObjectName + "';");
         for (XmlSchemaObject thing : items) {
-            constructOneElement(type, elementPrefix, typeObjectName, thing);
+            ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, 
+                                                              schemaInfo.getSchema(),
+                                                              xmlSchemaCollection, 
+                                                              prefixAccumulator, 
+                                                              type.getQName()); 
+            constructOneItem(type, elementPrefix, typeObjectName, itemInfo);
         }
+        
+        for (XmlSchemaAnnotated thing : attrs) {
+            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, schemaInfo.getSchema(),
+                                                                xmlSchemaCollection,
+                                                                prefixAccumulator,
+                                                                type.getQName());
+            constructOneItem(type, elementPrefix, typeObjectName, itemInfo);
+        }
+        
         code.append("}\n\n");
         code.append(accessors.toString());
     }
 
-    private void constructOneElement(XmlSchemaComplexType type, 
-                                     final String elementPrefix, 
-                                     String typeObjectName, 
-                                     XmlSchemaObject thing) {
+    private void constructOneItem(XmlSchemaComplexType type, 
+                                  final String elementPrefix, 
+                                  String typeObjectName, 
+                                  ItemInfo itemInfo) {
 
-        ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, 
-                                                          schemaInfo.getSchema(),
-                                                          xmlSchemaCollection, 
-                                                          prefixAccumulator, 
-                                                          type.getQName()); 
             
         String accessorSuffix = StringUtils.capitalize(itemInfo.getJavascriptName());
 
@@ -224,14 +237,14 @@ public class SchemaJavascriptBuilder {
             }
         }
 
-        if (XmlSchemaUtils.isParticleOptional(itemInfo.getParticle())) {
+        if (itemInfo.isOptional()) {
             accessors.append("// - optional element\n");
         } else {
             accessors.append("// - required element\n");
 
         }
 
-        if (XmlSchemaUtils.isParticleArray(itemInfo.getParticle())) {
+        if (itemInfo.isArray()) {
             accessors.append("// - array\n");
 
         }
@@ -253,10 +266,9 @@ public class SchemaJavascriptBuilder {
                          + " = value;}\n\n");
         accessors.append(setFunctionProperty + " = " + accessorName + ";\n");
 
-        if (XmlSchemaUtils.isParticleOptional(itemInfo.getParticle())
-            || (itemInfo.isNillable() && !XmlSchemaUtils.isParticleArray(itemInfo.getParticle()))) {
+        if (itemInfo.isOptional() || (itemInfo.isNillable() && !itemInfo.isArray())) {
             utils.appendLine("this._" + itemInfo.getJavascriptName() + " = null;");
-        } else if (XmlSchemaUtils.isParticleArray(itemInfo.getParticle())) {
+        } else if (itemInfo.isArray()) {
             utils.appendLine("this._" + itemInfo.getJavascriptName() + " = [];");
         } else if (itemInfo.isAny() || itemInfo.getType() instanceof XmlSchemaComplexType) {
             // even for required complex elements, we leave them null.

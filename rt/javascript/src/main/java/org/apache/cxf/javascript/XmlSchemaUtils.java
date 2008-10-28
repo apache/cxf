@@ -41,6 +41,7 @@ import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaType;
@@ -137,6 +138,24 @@ public final class XmlSchemaUtils {
         return sequence;
     }
     
+    public static XmlSchemaObjectCollection getContentAttributes(XmlSchemaComplexType type) {
+        XmlSchemaContentModel model = type.getContentModel();
+        if (model == null) {
+            return null;
+        }
+        XmlSchemaContent content = model.getContent();
+        if (content == null) {
+            return null;
+        }
+        if (!(content instanceof XmlSchemaComplexContentExtension)) {
+            return null;
+        }
+
+        //TODO: the anyAttribute case.
+        XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
+        return ext.getAttributes();
+    }
+    
     public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type, 
                                                            SchemaCollection collection) {
         List<XmlSchemaObject> results = new ArrayList<XmlSchemaObject>();
@@ -159,7 +178,30 @@ public final class XmlSchemaUtils {
             }
             return results;
         }
-
+    }
+    
+    public static List<XmlSchemaAnnotated> 
+    getContentAttributes(XmlSchemaComplexType type, SchemaCollection collection) {
+        List<XmlSchemaAnnotated> results = new ArrayList<XmlSchemaAnnotated>();
+        QName baseTypeName = getBaseType(type);
+        if (baseTypeName != null) {
+            XmlSchemaComplexType baseType = (XmlSchemaComplexType)collection.getTypeByQName(baseTypeName);
+            // recurse onto the base type ...
+            results.addAll(getContentAttributes(baseType, collection));
+            // and now process our sequence.
+            XmlSchemaObjectCollection extAttrs = getContentAttributes(type);
+            for (int i = 0; i < extAttrs.getCount(); i++) {
+                results.add((XmlSchemaAnnotated)extAttrs.getItem(i));
+            }
+            return results;
+        } else {
+            // no base type, the simple case.
+            XmlSchemaObjectCollection attrs = type.getAttributes();
+            for (int i = 0; i < attrs.getCount(); i++) {
+                results.add((XmlSchemaAnnotated)attrs.getItem(i));
+            }
+            return results;
+        } 
     }
     
     public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {
