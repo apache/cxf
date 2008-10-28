@@ -92,7 +92,6 @@ public final class ProviderFactory {
         return PF;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> ContextResolver<T> createContextResolver(Type contextType, 
                                                         Message m) {
         // TODO : get media type from message  

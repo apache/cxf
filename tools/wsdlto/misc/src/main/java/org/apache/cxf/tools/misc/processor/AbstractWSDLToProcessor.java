@@ -45,7 +45,7 @@ import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
-public class AbstractWSDLToProcessor implements Processor, com.sun.tools.xjc.api.ErrorListener {
+public class AbstractWSDLToProcessor implements Processor {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractWSDLToProcessor.class);
     protected static final String WSDL_FILE_NAME_EXT = ".wsdl";
 

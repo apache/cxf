@@ -51,21 +51,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.writer.FileCodeWriter;
-import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.api.ClassNameAllocator;
-import com.sun.tools.xjc.api.ErrorListener;
-import com.sun.tools.xjc.api.S2JJAXBModel;
-import com.sun.tools.xjc.api.SchemaCompiler;
-import com.sun.tools.xjc.api.XJC;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -73,6 +63,12 @@ import org.apache.cxf.endpoint.EndpointImplFactory;
 import org.apache.cxf.endpoint.SimpleEndpointImplFactory;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxb.JAXBUtils;
+import org.apache.cxf.jaxb.JAXBUtils.JCodeModel;
+import org.apache.cxf.jaxb.JAXBUtils.JDefinedClass;
+import org.apache.cxf.jaxb.JAXBUtils.JPackage;
+import org.apache.cxf.jaxb.JAXBUtils.S2JJAXBModel;
+import org.apache.cxf.jaxb.JAXBUtils.SchemaCompiler;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -200,12 +196,21 @@ public class DynamicClientFactory {
         //all SI's should have the same schemas
         Collection<SchemaInfo> schemas = svc.getServiceInfos().get(0).getSchemas();
 
-        SchemaCompiler compiler = XJC.createSchemaCompiler();
-        ErrorListener elForRun = new InnerErrorListener(wsdlUrl);
+        SchemaCompiler compiler;
+        try {
+            compiler = JAXBUtils.createSchemaCompiler();
+        } catch (JAXBException e1) {
+            throw new IllegalStateException("Unable to create schema compiler", e1);
+        }
+        Object elForRun = ReflectionInvokationHandler
+            .createProxyWrapper(new InnerErrorListener(wsdlUrl),
+                                JAXBUtils.getParamClass(compiler, "setErrorListener"));
+        
         compiler.setErrorListener(elForRun);
         
-        ClassNameAllocator allocator 
-            = new ClassNameAllocatorImpl();
+        Object allocator = ReflectionInvokationHandler
+            .createProxyWrapper(new ClassNameAllocatorImpl(),
+                                JAXBUtils.getParamClass(compiler, "setClassNameAllocator"));
 
         compiler.setClassNameAllocator(allocator);
 
@@ -239,9 +244,9 @@ public class DynamicClientFactory {
             throw new IllegalStateException("Unable to create working directory " + src.getPath());
         }
         try {
-            FileCodeWriter writer = new FileCodeWriter(src);
+            Object writer = JAXBUtils.createFileCodeWriter(src);
             codeModel.build(writer);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Unable to write generated Java files for schemas: "
                                             + e.getMessage(), e);
         }
@@ -303,7 +308,6 @@ public class DynamicClientFactory {
         return client;
     }
 
-    @SuppressWarnings("deprecation")
     private void addBindingFiles(List<String> bindingFiles, SchemaCompiler compiler) {
         if (bindingFiles != null) {
             for (String s : bindingFiles) {
@@ -366,7 +370,6 @@ public class DynamicClientFactory {
         
     }
 
-    @SuppressWarnings("deprecation")
     private void addSchemas(String wsdlUrl, Collection<SchemaInfo> schemas, SchemaCompiler compiler) {
         int num = 1;
         for (SchemaInfo schema : schemas) {
@@ -386,7 +389,7 @@ public class DynamicClientFactory {
             num++;
         }
         
-        if (simpleBindingEnabled && isJaxb21()) {
+        if (simpleBindingEnabled && isJaxb21(compiler)) {
             String id = "/org/apache/cxf/endpoint/dynamic/simple-binding.xjb";
             LOG.info("Loading the JAXB 2.1 simple binding for client.");
             InputSource source = new InputSource(getClass().getResourceAsStream(id));
@@ -395,8 +398,8 @@ public class DynamicClientFactory {
         }
     }
     
-    private boolean isJaxb21() {
-        String id = Options.getBuildID();
+    private boolean isJaxb21(SchemaCompiler sc) {
+        String id = sc.getOptions().getBuildID();
         StringTokenizer st = new StringTokenizer(id, ".");
         String minor = null;
         
@@ -537,7 +540,7 @@ public class DynamicClientFactory {
         }
     }
 
-    private class InnerErrorListener implements ErrorListener {
+    private class InnerErrorListener {
 
         private String url;
 
@@ -605,7 +608,7 @@ public class DynamicClientFactory {
     
     
     
-    private static class ClassNameAllocatorImpl implements ClassNameAllocator {
+    public static class ClassNameAllocatorImpl {
         private final Set<String> typesClassNames = new HashSet<String>();
 
         public ClassNameAllocatorImpl() {

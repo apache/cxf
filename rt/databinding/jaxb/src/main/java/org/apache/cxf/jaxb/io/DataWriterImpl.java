@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxb.io;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -34,8 +35,6 @@ import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.namespace.QName;
 
-import com.sun.xml.bind.api.TypeReference;
-
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataWriter;
@@ -43,6 +42,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
@@ -107,8 +107,11 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             if (databinding.getValidationEventHandler() != null) {
                 marshaller.setEventHandler(databinding.getValidationEventHandler());
             }
-            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
-                                   databinding.getNamespacePrefixMapper());
+            
+            final Map<String, String> nspref = databinding.getDeclaredNamespaceMappings();
+            if (nspref != null) {
+                JAXBUtils.setNamespaceWrapper(nspref, marshaller);
+            }
             if (databinding.getMarshallerProperties() != null) {
                 for (Map.Entry<String, Object> propEntry 
                     : databinding.getMarshallerProperties().entrySet()) {
@@ -169,9 +172,10 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                     //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
                     //TODO:Cache the JAXBRIContext
                     QName qname = new QName(null, part.getConcreteName().getLocalPart());
-                    TypeReference typeReference = new TypeReference(qname, part.getTypeClass(), anns);
                     
-                    JAXBEncoderDecoder.marshalWithBridge(typeReference, 
+                    JAXBEncoderDecoder.marshalWithBridge(qname,
+                                                         part.getTypeClass(),
+                                                         anns, 
                                                          databinding.getContextClasses(), 
                                                          obj, 
                                                          output, 

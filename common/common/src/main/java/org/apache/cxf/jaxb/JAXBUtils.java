@@ -19,22 +19,56 @@
 
 package org.apache.cxf.jaxb;
 
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.xml.ws.AsyncHandler;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.attachment.AttachmentMarshaller;
+import javax.xml.bind.attachment.AttachmentUnmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.Holder;
-import javax.xml.ws.Response;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import org.xml.sax.InputSource;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 import org.apache.cxf.helpers.JavaUtils;
+
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
 
 public final class JAXBUtils {
     
@@ -65,7 +99,8 @@ public final class JAXBUtils {
     
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class, "CommonUtilityMessages");
+
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<String, String>();        
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
@@ -223,23 +258,6 @@ public final class JAXBUtils {
             packageName.append(normalizePackageNamePart(token));
         }
         return packageName.toString();
-    }
-    
-    public static boolean isAsync(Method method) {
-        return method.getName().endsWith("Async") 
-            && (method.getReturnType().equals(Response.class) || method.getReturnType().equals(Future.class));
-    }
-    
-    public static boolean isAsyncPolling(Method method) {
-        return method.getName().endsWith("Async") 
-            && (method.getReturnType().equals(Response.class));   
-    }
-    
-    public static boolean isAsyncCallback(Method method) {
-        Class[] paramTypes = method.getParameterTypes();
-        return method.getName().endsWith("Async") 
-            && (method.getReturnType().equals(Future.class) 
-            && AsyncHandler.class.isAssignableFrom(paramTypes[paramTypes.length - 1]));
     }
     
     private static String normalizePackageNamePart(String name) {
@@ -476,4 +494,337 @@ public final class JAXBUtils {
         return cls;
     }
 
+    public static JAXBContext createRIContext(Class<?> clss[], String defaultNS) throws JAXBException {
+        try {
+            Class<?> cls;
+            Map<String, Object> map = new HashMap<String, Object>();
+            try {
+                cls = Class.forName("com.sun.xml.bind.v2.ContextFactory");
+                if (defaultNS != null) {
+                    map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNS);
+                }
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                cls = Class.forName("com.sun.xml.internal.bind.v2.ContextFactory");
+                if (defaultNS != null) {
+                    map.put("com.sun.xml.internal.bind.defaultNamespaceRemap", defaultNS);
+                }
+            }
+            Method meth = cls.getMethod("createContext", clss.getClass(), Map.class);
+            return (JAXBContext)meth.invoke(null, clss, map);
+        } catch (Exception e) {
+            throw new JAXBException(e);
+        }
+    }
+    public static void setNamespaceWrapper(final Map<String, String> nspref,
+                                           Marshaller marshaller) throws PropertyException {
+        Object mapper = null;
+        if (marshaller.getClass().getName().contains(".internal.")) {
+            mapper = createNamespaceWrapper(nspref);
+            if (mapper == null) {
+                LOG.log(Level.INFO, "Could not create namespace mapper for JDK internal"
+                        + " JAXB implementation.");
+            } else {
+                marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
+                                   mapper);
+            }
+        } else {
+            try {
+                Class<?> cls = Class.forName("org.apache.cxf.jaxb.NamespaceMapper");
+                mapper = cls.getConstructor(Map.class).newInstance(nspref);
+            } catch (Exception ex) {
+                LOG.log(Level.INFO, "Could not create NamespaceMapper", ex);
+            }
+            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+                                   mapper);
+        }
+    }
+    public static BridgeWrapper createBridge(Set<Class<?>> ctxClasses,
+                                      QName qname,
+                                      Class<?> refcls,
+                                      Annotation anns[]) throws JAXBException {
+        try {
+            Class<?> cls;
+            String pkg = "com.sun.xml.bind.";
+            try {
+                cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext");
+                pkg = "com.sun.xml.internal.bind.";
+            }
+            Class<?> refClass = Class.forName(pkg + "api.TypeReference");
+            Object ref = refClass.getConstructor(QName.class, 
+                                                 Type.class, 
+                                                 anns.getClass()).newInstance(qname, refcls, anns);
+            List<Object> typeRefs = new ArrayList<Object>();
+            typeRefs.add(ref);
+            List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
+            clses.add(refClass.getField("type").get(ref).getClass());
+            clses.add(refcls);
+            
+            Object ctx = null;
+            for (Method m : cls.getDeclaredMethods()) {
+                if (m.getName().equals("newInstance")
+                    && m.getParameterTypes().length == 6) {
+                    ctx = m.invoke(null, clses.toArray(new Class[clses.size()]),
+                                         typeRefs, null, null, true, null);
+                    
+                }
+            }
+            
+            Object bridge = ctx.getClass().getMethod("createBridge", refClass).invoke(ctx, ref);
+            return ReflectionInvokationHandler.createProxyWrapper(bridge,
+                                                                  BridgeWrapper.class);
+        } catch (Exception ex) {
+            throw new JAXBException(ex);
+        }
+    }
+    public static interface BridgeWrapper {
+
+        Object unmarshal(XMLStreamReader source, AttachmentUnmarshaller am) throws JAXBException;
+
+        Object unmarshal(InputStream source) throws JAXBException;
+
+        Object unmarshal(Node source, AttachmentUnmarshaller am) throws JAXBException;
+
+        void marshal(Object elValue, XMLStreamWriter source, AttachmentMarshaller m) throws JAXBException;
+
+        void marshal(Object elValue, StreamResult s1) throws JAXBException;
+
+        void marshal(Object elValue, Node source, AttachmentMarshaller am) throws JAXBException;
+    }
+    
+    
+    public static SchemaCompiler createSchemaCompiler() throws JAXBException {
+        try {
+            Class<?> cls;
+            Object sc = null;
+            try {
+                cls = Class.forName("com.sun.tools.xjc.api.XJC");
+                sc = cls.getMethod("createSchemaCompiler").invoke(null);
+            } catch (Throwable e) {
+                // TODO Auto-generated catch block
+                cls = Class.forName("com.sun.tools.internal.xjc.api.XJC");
+                sc = cls.getMethod("createSchemaCompiler").invoke(null);
+            }
+            
+            return ReflectionInvokationHandler.createProxyWrapper(sc,
+                                                                  SchemaCompiler.class);
+        } catch (Exception ex) {
+            throw new JAXBException(ex);
+        }
+    }
+    public static Object createFileCodeWriter(File f) throws JAXBException {
+        try {
+            Class<?> cls;
+            try {
+                cls = Class.forName("com.sun.codemodel.writer.FileCodeWriter");
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter");
+            }
+            return cls.getConstructor(File.class).newInstance(f);
+        } catch (Exception ex) {
+            throw new JAXBException(ex);
+        }
+    }
+    public static Class<?> getParamClass(SchemaCompiler sc, String method) {
+        Object o = ((ReflectionInvokationHandler)Proxy.getInvocationHandler(sc)).getTarget();
+        for (Method m : o.getClass().getMethods()) {
+            if (m.getName().equals(method) && m.getParameterTypes().length == 1) {
+                return m.getParameterTypes()[0];
+            }
+        }
+        return null;
+    }
+    public static interface SchemaCompiler {
+
+        void setErrorListener(Object elForRun);
+
+        void setClassNameAllocator(Object allocator);
+
+        @WrapReturn(S2JJAXBModel.class)
+        S2JJAXBModel bind();
+
+        void parseSchema(InputSource source);
+
+        void parseSchema(String key, Element el);
+
+        @WrapReturn(Options.class)
+        Options getOptions();
+    }
+    public static interface S2JJAXBModel {
+
+        @WrapReturn(JCodeModel.class)
+        JCodeModel generateCode(Object object, Object elForRun);
+        
+        @WrapReturn(Mapping.class)
+        Mapping get(QName qn);
+
+        @WrapReturn(TypeAndAnnotation.class)
+        TypeAndAnnotation getJavaType(QName typeQName);
+    }
+    public static interface Mapping {
+        @WrapReturn(TypeAndAnnotation.class)
+        TypeAndAnnotation getType();        
+    }
+    public static interface TypeAndAnnotation {
+        @WrapReturn(JType.class)
+        JType getTypeClass();
+    }
+    public static interface JType {
+        boolean isArray();
+
+        @WrapReturn(JType.class)
+        JType elementType();
+
+        boolean isPrimitive();
+
+        String binaryName();
+
+        String fullName();
+
+        String name();
+
+        @WrapReturn(value = JType.class, iterator = true)
+        Iterator<JType> classes();
+    }
+    public static interface Options {
+
+        void addGrammar(InputSource is);
+
+        void addBindFile(InputSource is);
+
+        String getBuildID();
+    }
+    public static interface JCodeModel {
+
+        void build(Object writer) throws IOException;
+
+        @WrapReturn(value = JPackage.class, iterator = true)
+        Iterator<JPackage> packages();
+    }
+    public static interface JPackage {
+
+        String name();
+
+        @WrapReturn(value = JDefinedClass.class, iterator = true)
+        Iterator<JDefinedClass> classes();
+    }
+    public static interface JDefinedClass {
+        String name();
+
+        String fullName();
+    }
+ 
+    private static synchronized Object createNamespaceWrapper(Map<String, String> map) {
+        ASMHelper helper = new ASMHelper();
+        String className = "org.apache.cxf.jaxb.NamespaceMapperInternal";
+        Class<?> cls = helper.findClass(className, JAXBUtils.class);
+        if (cls == null) {
+            ClassWriter cw = helper.createClassWriter();
+            if (cw == null) {
+                return null;
+            }
+            cls = createNamespaceWrapperInternal(helper, cw);
+        }
+        try {
+            return cls.getConstructor(Map.class).newInstance(map);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    private static Class<?> createNamespaceWrapperInternal(ASMHelper helper, ClassWriter cw) {
+        String className = "org.apache.cxf.jaxb.NamespaceMapperInternal";
+        FieldVisitor fv;
+        MethodVisitor mv;
+        cw.visit(Opcodes.V1_5, 
+                 Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL + Opcodes.ACC_SUPER,
+                 "org/apache/cxf/jaxb/NamespaceMapperInternal", null,
+                 "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", null);
+
+        cw.visitSource("NamespaceMapper.java", null);
+
+        fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL, 
+                           "nspref", "Ljava/util/Map;",
+                           "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;", null);
+        fv.visitEnd();
+        
+        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", 
+                            "(Ljava/util/Map;)V", 
+                            "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V", null);
+        mv.visitCode();
+        Label l0 = new Label();
+        mv.visitLabel(l0);
+        mv.visitLineNumber(30, l0);
+        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
+                           "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", "<init>", "()V");
+        Label l1 = new Label();
+        mv.visitLabel(l1);
+        mv.visitLineNumber(31, l1);
+        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
+        mv.visitFieldInsn(Opcodes.PUTFIELD, "org/apache/cxf/jaxb/NamespaceMapperInternal",
+                          "nspref", "Ljava/util/Map;");
+        Label l2 = new Label();
+        mv.visitLabel(l2);
+        mv.visitLineNumber(32, l2);
+        mv.visitInsn(Opcodes.RETURN);
+        Label l3 = new Label();
+        mv.visitLabel(l3);
+        mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapperInternal;", null, l0, l3, 0);
+        mv.visitLocalVariable("nspref", "Ljava/util/Map;",
+                              "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;", 
+                              l0, l3, 1);
+        mv.visitMaxs(2, 2);
+        mv.visitEnd();
+
+        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getPreferredPrefix",
+                            "(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;",
+                            null, null);
+        mv.visitCode();
+        l0 = new Label();
+        mv.visitLabel(l0);
+        mv.visitLineNumber(38, l0);
+        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitFieldInsn(Opcodes.GETFIELD, 
+                          "org/apache/cxf/jaxb/NamespaceMapperInternal", 
+                          "nspref", "Ljava/util/Map;");
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", 
+                           "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+        mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
+        mv.visitVarInsn(Opcodes.ASTORE, 4);
+        l1 = new Label();
+        mv.visitLabel(l1);
+        mv.visitLineNumber(39, l1);
+        mv.visitVarInsn(Opcodes.ALOAD, 4);
+        l2 = new Label();
+        mv.visitJumpInsn(Opcodes.IFNULL, l2);
+        l3 = new Label();
+        mv.visitLabel(l3);
+        mv.visitLineNumber(40, l3);
+        mv.visitVarInsn(Opcodes.ALOAD, 4);
+        mv.visitInsn(Opcodes.ARETURN);
+        mv.visitLabel(l2);
+        mv.visitLineNumber(42, l2);
+        mv.visitVarInsn(Opcodes.ALOAD, 2);
+        mv.visitInsn(Opcodes.ARETURN);
+        Label l4 = new Label();
+        mv.visitLabel(l4);
+        mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapperInternal;", null, l0, l4, 0);
+        mv.visitLocalVariable("namespaceUri", "Ljava/lang/String;", null, l0, l4, 1);
+        mv.visitLocalVariable("suggestion", "Ljava/lang/String;", null, l0, l4, 2);
+        mv.visitLocalVariable("requirePrefix", "Z", null, l0, l4, 3);
+        mv.visitLocalVariable("prefix", "Ljava/lang/String;", null, l1, l4, 4);
+        mv.visitMaxs(2, 5);
+        mv.visitEnd();
+        cw.visitEnd();
+
+        byte bts[] = cw.toByteArray();
+        return helper.loadClass(className,
+                                JAXBUtils.class, bts);
+    }
 }

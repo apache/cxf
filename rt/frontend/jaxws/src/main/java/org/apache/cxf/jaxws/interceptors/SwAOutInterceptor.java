@@ -30,7 +30,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
@@ -45,9 +47,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-import com.sun.xml.bind.v2.util.DataSourceSource;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -72,18 +71,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public class SwAOutInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(SwAOutInterceptor.class);
-    private static final boolean HAS_SWA_REF_METHOD;
-    static {
-        Class<?> cls = JAXBContextImpl.class;
-        Method m = null;
-        try {
-            m = cls.getMethod("hasSwaRef", new Class[0]);
-        } catch (Exception e) {
-            //ignore
-        }
-        HAS_SWA_REF_METHOD = m != null;
-    }
     
+    private static final Map<String, Method> SWA_REF_METHOD = new ConcurrentHashMap<String, Method>();
     
     AttachmentOutInterceptor attachOut = new AttachmentOutInterceptor();
     
@@ -91,6 +80,23 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         super(Phase.PRE_LOGICAL);
         addAfter(HolderOutInterceptor.class.getName());
         addBefore(WrapperClassOutInterceptor.class.getName());
+    }
+    
+    private boolean callSWARefMethod(JAXBContext ctx) {
+        Method m = SWA_REF_METHOD.get(ctx.getClass().getName());
+        if (m == null && !SWA_REF_METHOD.containsKey(ctx.getClass().getName())) {
+            try {
+                m = ctx.getClass().getMethod("hasSwaRef", new Class[0]);
+            } catch (Exception e) {
+                //ignore
+            }
+            SWA_REF_METHOD.put(ctx.getClass().getName(), m);
+        }
+        try {
+            return (Boolean)m.invoke(ctx);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
@@ -206,20 +212,13 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
     }
     private boolean hasSwaRef(JAXBDataBinding db) {
         JAXBContext context = db.getContext();
-        if (HAS_SWA_REF_METHOD
-            && context instanceof JAXBContextImpl) {
-            return ((JAXBContextImpl)context).hasSwaRef();
-        }
-        
-        return false;
+        return callSWARefMethod(context);
     }
 
     private DataSource createDataSource(Source o, String ct) {
         DataSource ds = null;
         
-        if (o instanceof DataSourceSource) {
-            ds = (DataSource) o;
-        } else if (o instanceof StreamSource) {
+        if (o instanceof StreamSource) {
             StreamSource src = (StreamSource)o;
             try {
                 if (src.getInputStream() != null) {

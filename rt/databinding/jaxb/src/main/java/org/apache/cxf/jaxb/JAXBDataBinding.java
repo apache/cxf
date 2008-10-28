@@ -58,10 +58,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.v2.ContextFactory;
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
@@ -182,27 +178,6 @@ public final class JAXBDataBinding extends AbstractDataBinding {
 
     public void setContext(JAXBContext ctx) {
         context = ctx;
-    }
-
-    public NamespacePrefixMapper getNamespacePrefixMapper() {
-        Map<String, String> mappings = getDeclaredNamespaceMappings();
-        if (mappings == null) {
-            mappings = Collections.emptyMap();
-        }
-
-        final Map<String, String> closedMappings = mappings;
-
-        NamespacePrefixMapper mapper = new NamespacePrefixMapper() {
-            @Override
-            public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                String prefix = closedMappings.get(namespaceUri);
-                if (prefix != null) {
-                    return prefix;
-                }
-                return suggestion;
-            }
-        };
-        return mapper;
     }
 
     @SuppressWarnings("unchecked")
@@ -344,14 +319,14 @@ public final class JAXBDataBinding extends AbstractDataBinding {
                                   r.getSystemId());
             }
 
-            JAXBContextImpl riContext;
-            if (context instanceof JAXBContextImpl) {
-                riContext = (JAXBContextImpl)context;
+            JAXBContext riContext;
+            if (context.getClass().getName().contains("com.sun.xml.")) {
+                riContext = context;
             } else {
                 // fall back if we're using another jaxb implementation
                 try {
-                    riContext = (JAXBContextImpl)ContextFactory.createContext(contextClasses
-                        .toArray(new Class[contextClasses.size()]), null);
+                    riContext = JAXBUtils.createRIContext(contextClasses
+                        .toArray(new Class[contextClasses.size()]), tns);
                 } catch (JAXBException e) {
                     throw new ServiceConstructionException(e);
                 }
@@ -424,7 +399,55 @@ public final class JAXBDataBinding extends AbstractDataBinding {
             }
         }
 
-        // try and read any jaxb.index files that are with the other classes.
+        scanPackages(classes);
+        addWsAddressingTypes(classes);
+
+        for (Class<?> clz : classes) {
+            if (clz.getName().endsWith("ObjectFactory")
+                && checkObjectFactoryNamespaces(clz)) {
+                // kind of a hack, but ObjectFactories may be created with empty
+                // namespaces
+                defaultNs = null;
+            }
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        if (defaultNs != null) {
+            map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNs);
+        }
+
+        if (contextProperties != null) {
+            // add any specified context properties into the properties map
+            map.putAll(contextProperties);
+        }
+
+        CachedContextAndSchemas cachedContextAndSchemas = null;
+        synchronized (JAXBCONTEXT_CACHE) {
+            cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
+        }
+        if (cachedContextAndSchemas == null) {
+            JAXBContext ctx;
+            try {
+                ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+            } catch (JAXBException ex) {
+                if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")) {
+                    map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
+                            map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
+                    ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+                } else {
+                    throw ex;
+                }
+            }
+            cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
+            synchronized (JAXBCONTEXT_CACHE) {
+                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
+            }
+        }
+
+        return cachedContextAndSchemas;
+    }
+    private void scanPackages(Set<Class<?>> classes) {
+     // try and read any jaxb.index files that are with the other classes.
         // This should
         // allow loading of extra classes (such as subclasses for inheritance
         // reasons)
@@ -503,40 +526,6 @@ public final class JAXBDataBinding extends AbstractDataBinding {
             }
         }
         classes.addAll(objectFactories);
-        addWsAddressingTypes(classes);
-
-        for (Class<?> clz : classes) {
-            if (clz.getName().endsWith("ObjectFactory")
-                && checkObjectFactoryNamespaces(clz)) {
-                // kind of a hack, but ObjectFactories may be created with empty
-                // namespaces
-                defaultNs = null;
-            }
-        }
-
-        Map<String, Object> map = new HashMap<String, Object>();
-        if (defaultNs != null) {
-            map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNs);
-        }
-
-        if (contextProperties != null) {
-            // add any specified context properties into the properties map
-            map.putAll(contextProperties);
-        }
-
-        CachedContextAndSchemas cachedContextAndSchemas = null;
-        synchronized (JAXBCONTEXT_CACHE) {
-            cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
-        }
-        if (cachedContextAndSchemas == null) {
-            JAXBContext ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-            cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
-            synchronized (JAXBCONTEXT_CACHE) {
-                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
-            }
-        }
-
-        return cachedContextAndSchemas;
     }
 
     private boolean checkObjectFactoryNamespaces(Class<?> clz) {

@@ -19,20 +19,19 @@
 package org.apache.cxf.endpoint.dynamic;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JType;
-import com.sun.tools.xjc.api.Mapping;
-import com.sun.tools.xjc.api.S2JJAXBModel;
-import com.sun.tools.xjc.api.TypeAndAnnotation;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.jaxb.JAXBUtils.JType;
+import org.apache.cxf.jaxb.JAXBUtils.Mapping;
+import org.apache.cxf.jaxb.JAXBUtils.S2JJAXBModel;
+import org.apache.cxf.jaxb.JAXBUtils.TypeAndAnnotation;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -92,21 +91,24 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                 mapping = model.get(op.getOutput().getMessagePart(0).getElementQName());
             }
             if (mapping != null) {
-                jType = mapping.getType().getTypeClass();  
-                if (jType instanceof JDefinedClass) {
-                    JDefinedClass jdType = (JDefinedClass)jType;
-                    for (JType jt : jdType.listClasses()) {
+                jType = mapping.getType().getTypeClass();
+                try {
+                    Iterator<JType> i = jType.classes();
+                    while (i.hasNext()) {
+                        JType jt = i.next();
                         if (jt.name().equalsIgnoreCase(part.getElementQName().getLocalPart())) {
                             jType = jt;
                         }
                     }
+                } catch (Throwable t) {
+                    //ignore, JType is a type that doesn't have a classes method
                 }
             }
             
         }
         
         if (jType == null) {
-            throw new ServiceConstructionException(new Message("NO_JAXB_CLASS", LOG, name));
+            throw new ServiceConstructionException(new Message("NO_JAXB_CLASSMapping", LOG, name));
         }
             
         Class cls;

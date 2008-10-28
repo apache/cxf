@@ -57,7 +57,7 @@
                         <xs:documentation>
                         When set to false, exceptions will be thrown when an error is encountered 
                         receiving a request from the client.  When set to true these errors will 
-                        be suppressed.
+                        be suppressed. The default is false.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -67,7 +67,7 @@
                         <xs:documentation>
                         When set to false, exceptions will be thrown when an error is encountered 
                         sending a reply from to client.  When set to true these errors will be 
-                        suppressed.
+                        suppressed. The default is false.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -81,7 +81,7 @@
                         after each reply is sent, even if the client requests the server to keep 
                         the connection alive.  Keep-Alive improves performance for the client 
                         requesting such behavior, but can limit overall scalability of the server 
-                        for handling many clients.
+                        for handling many clients. The Default is true.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
@@ -100,7 +100,7 @@
                     <xs:annotation>
                         <xs:documentation>
                         Most commonly used to specify no-cache, however the standard supports a 
-                        dozen or so caching related directives for responses 
+                        dozen or so caching related directives for responses. 
                         </xs:documentation>
                     </xs:annotation>      
 
