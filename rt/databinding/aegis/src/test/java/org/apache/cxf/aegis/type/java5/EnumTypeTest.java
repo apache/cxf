@@ -39,7 +39,13 @@ public class EnumTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
 
     private enum smallEnum {
-        VALUE1, VALUE2
+        VALUE1, VALUE2;
+
+        @Override
+        public String toString() {
+            return name() + "*";
+        }
+        
     };
 
     @Before
