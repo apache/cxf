@@ -64,6 +64,11 @@
             <artifactId>saaj-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
             <version>1.5.4</version>
@@ -71,6 +76,10 @@
                 <exclusion>
                     <groupId>axis</groupId>
                     <artifactId>axis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>opensaml</groupId>
+                    <artifactId>opensaml</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>axis</groupId>
