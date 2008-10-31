@@ -19,6 +19,8 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -45,6 +47,23 @@ public class JMSUtilsTest extends Assert {
         Properties env = JMSOldConfigHolder.getInitialContextEnv(addrType);
         assertTrue("Environment should not be empty", env.size() > 0);
         assertTrue("Environemnt should contain NamingBatchSize property", env.get(Context.BATCHSIZE) != null);
+    }
+    
+    @Test
+    public void testGetEncoding() throws IOException {                
+        assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml; charset=utf-8"), "UTF-8");
+        assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml"), "UTF-8");
+        assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml; charset=GBK"), "GBK");
+        try {
+            JMSUtils.getEncoding("text/xml; charset=asci");
+            fail("Expect the exception here");
+        } catch (Exception ex) {
+            assertTrue("we should get the UnsupportedEncodingException here",
+                       ex instanceof UnsupportedEncodingException);
+        }
+        
+        
+        
     }
 
 }

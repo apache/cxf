@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -158,14 +159,13 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     public void onMessage(javax.jms.Message message) {
         try {
             getLogger().log(Level.FINE, "server received request: ", message);
-
-            byte[] request = JMSUtils.retrievePayload(message);
-            getLogger().log(Level.FINE, "The Request Message is [ " + request + "]");
-
-            // Build CXF message from JMS message
-            MessageImpl inMessage = new MessageImpl();
-            inMessage.setContent(InputStream.class, new ByteArrayInputStream(request));
+             // Build CXF message from JMS message
+            MessageImpl inMessage = new MessageImpl();            
             JMSUtils.populateIncomingContext(message, inMessage, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+            
+            byte[] request = JMSUtils.retrievePayload(message, (String)inMessage.get(Message.ENCODING));
+            getLogger().log(Level.FINE, "The Request Message is [ " + request + "]");
+            inMessage.setContent(InputStream.class, new ByteArrayInputStream(request));
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             inMessage.setDestination(this);
@@ -174,6 +174,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
+        } catch (UnsupportedEncodingException ex) {
+            getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } finally {
             BusFactory.setThreadDefaultBus(null);
         }

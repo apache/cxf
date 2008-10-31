@@ -198,6 +198,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         header.setJMSPriority(1);
         header.setTimeToLive(1000);
         outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
+        outMessage.put(Message.ENCODING, "US-ASCII");
     }
 
     private void verifyReceivedMessage(Message inMessage) {
@@ -210,12 +211,16 @@ public class JMSDestinationTest extends AbstractJMSTester {
             ex.printStackTrace();
         }
         String reponse = IOUtils.newStringFromBytes(bytes);
-        assertEquals("The reponse date should be equals", reponse, "HelloWorld");
+        assertEquals("The reponse date should be equal", reponse, "HelloWorld");
     }
 
     private void verifyRequestResponseHeaders(Message inMessage, Message outMessage) {
         JMSMessageHeadersType outHeader = (JMSMessageHeadersType)outMessage
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+        String inEncoding = (String) inMessage.get(Message.ENCODING);
+        String outEncoding = (String) outMessage.get(Message.ENCODING);
+        
+        assertEquals("The message encoding should be equal", inEncoding, outEncoding);
 
         JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
@@ -336,6 +341,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
                     backConduit = destination.getBackChannel(m, null, null);
                     // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
+                    // copy the message encoding
+                    replyMessage.put(Message.ENCODING, m.get(Message.ENCODING));
                     sendoutMessage(backConduit, replyMessage, true);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
