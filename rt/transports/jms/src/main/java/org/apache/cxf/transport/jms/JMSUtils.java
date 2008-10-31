@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
@@ -39,6 +41,7 @@ import javax.jms.Session;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.SimpleMessageConverter102;
@@ -97,9 +100,12 @@ public final class JMSUtils {
      * Extract the payload of an incoming message.
      * 
      * @param message the incoming message
+     * @param encoding the message encoding
      * @return the message payload as byte[]
+     * @throws UnsupportedEncodingException 
      */
-    public static byte[] retrievePayload(Message message) {
+    public static byte[] retrievePayload(Message message, String encoding) 
+        throws UnsupportedEncodingException {
         Object converted;
         try {
             converted = new SimpleMessageConverter102().fromMessage(message);
@@ -109,7 +115,12 @@ public final class JMSUtils {
             throw JmsUtils.convertJmsAccessException(e);
         }
         if (converted instanceof String) {
-            return ((String)converted).getBytes(); // TODO encoding
+            if (encoding != null) {
+                return ((String)converted).getBytes(encoding); 
+            } else { 
+                // Using the UTF-8 encoding as default
+                return ((String)converted).getBytes("UTF-8");
+            }
         } else if (converted instanceof byte[]) {
             return (byte[])converted;
         } else {
@@ -118,7 +129,8 @@ public final class JMSUtils {
     }
 
     public static void populateIncomingContext(javax.jms.Message message,
-                                               org.apache.cxf.message.Message inMessage, String headerType) {
+                                               org.apache.cxf.message.Message inMessage, String headerType) 
+        throws UnsupportedEncodingException {
         try {
             JMSMessageHeadersType headers = null;
             headers = (JMSMessageHeadersType)inMessage.get(headerType);
@@ -150,18 +162,38 @@ public final class JMSUtils {
                 if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE)
                     || name.equals(JMSConstants.JMS_CONTENT_TYPE) && val != null) {
                     inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, val);
+                    // set the message encoding
+                    inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(val));
                 }
-
-                protHeaders.put(name, Collections.singletonList(val));
-                if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE)
-                    || name.equals(JMSConstants.JMS_CONTENT_TYPE) && val != null) {
-                    inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, val);
-                }
+                
             }
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
         } catch (JMSException ex) {
             throw JmsUtils.convertJmsAccessException(ex);
         }
+    }
+
+    static String getEncoding(String ct) throws UnsupportedEncodingException {
+        String contentType = ct.toLowerCase();
+        String enc = null;
+        
+        String[] tokens = contentType.split(";");
+        for (String token : tokens) {
+            int index = token.indexOf("charset=");
+            if (index >= 0) {
+                enc = token.substring(index + 8);                
+            }            
+        }
+        
+        String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
+        if (normalizedEncoding == null) {
+            String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
+                                                              LOG, new Object[] {enc}).toString();
+            LOG.log(Level.WARNING, m);
+            throw new UnsupportedEncodingException(m);   
+        }
+        
+        return normalizedEncoding;
     }
 
     protected static void addProtocolHeaders(Message message, Map<String, List<String>> headers)
@@ -191,7 +223,18 @@ public final class JMSUtils {
     }
 
     public static void addContentTypeToProtocolHeader(org.apache.cxf.message.Message message) {
-        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);        
+        String enc = (String) message.get(org.apache.cxf.message.Message.ENCODING);
+        // add the encoding information
+        if (null != contentType) {
+            if (enc != null && contentType.indexOf("charset=") == -1) {
+                contentType = contentType + "; charset=" + enc;
+            }
+        } else if (enc != null) {
+            contentType = "text/xml; charset=" + enc;
+        } else {
+            contentType = "text/xml";
+        }
 
         // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message

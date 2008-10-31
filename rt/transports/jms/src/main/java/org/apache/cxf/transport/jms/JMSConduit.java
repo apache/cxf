@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -174,21 +175,26 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         Message inMessage = new MessageImpl();
         exchange.setInMessage(inMessage);
         LOG.log(Level.FINE, "client received reply: ", jmsMessage);
-        JMSUtils.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-        byte[] response = JMSUtils.retrievePayload(jmsMessage);
-        LOG.log(Level.FINE, "The Response Message payload is : [" + response + "]");
-        inMessage.setContent(InputStream.class, new ByteArrayInputStream(response));
-
-        if (exchange.isSynchronous()) {
-            synchronized (exchange) {
-                exchange.put(CORRELATED, Boolean.TRUE);
-                exchange.notifyAll();
-            }
-        }
+        try {
+            JMSUtils.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         
-        //REVISIT: put on a workqueue?
-        if (incomingObserver != null) {
-            incomingObserver.onMessage(exchange.getInMessage());
+            byte[] response = JMSUtils.retrievePayload(jmsMessage, (String)inMessage.get(Message.ENCODING));
+            LOG.log(Level.FINE, "The Response Message payload is : [" + response + "]");
+            inMessage.setContent(InputStream.class, new ByteArrayInputStream(response));
+
+            if (exchange.isSynchronous()) {
+                synchronized (exchange) {
+                    exchange.put(CORRELATED, Boolean.TRUE);
+                    exchange.notifyAll();
+                }
+            }
+        
+            //REVISIT: put on a workqueue?
+            if (incomingObserver != null) {
+                incomingObserver.onMessage(exchange.getInMessage());
+            }
+        } catch (UnsupportedEncodingException ex) {
+            getLogger().log(Level.WARNING, "can't get the right encoding information " + ex);
         }
     }
 
