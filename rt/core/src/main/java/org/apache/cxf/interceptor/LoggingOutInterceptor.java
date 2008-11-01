@@ -77,6 +77,18 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
             newOut.registerCallback(new LoggingCallback(message, os));
         }
     }
+    
+    /**
+     * Transform the string before display. The implementation in this class 
+     * does nothing. Override this method if you want to change the contents of the 
+     * logged message before it is delivered to the output. 
+     * For example, you can use this to masking out sensitive information.
+     * @param originalLogString the raw log message.
+     * @return transformed data
+     */
+    protected String transform(String originalLogString) {
+        return originalLogString;
+    } 
 
     class LoggingCallback implements CachedOutputStreamCallback {
         
@@ -126,9 +138,9 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
             }
 
             if (writer != null) {
-                writer.println(buffer.toString());
+                writer.println(transform(buffer.toString()));
             } else if (LOG.isLoggable(Level.INFO)) {
-                LOG.info(buffer.toString());
+                LOG.info(transform(buffer.toString()));
             }
             try {
                 //empty out the cache
@@ -140,5 +152,6 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
             message.setContent(OutputStream.class, 
                                origStream);
         }
-    } 
+    }
+
 }
