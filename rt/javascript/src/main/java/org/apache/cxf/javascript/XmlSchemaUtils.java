@@ -107,8 +107,7 @@ public final class XmlSchemaUtils {
         }
 
         XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
-        QName baseTypeName = ext.getBaseTypeName();
-        return baseTypeName;
+        return ext.getBaseTypeName();        
     }
     
     public static XmlSchemaSequence getContentSequence(XmlSchemaComplexType type) {
