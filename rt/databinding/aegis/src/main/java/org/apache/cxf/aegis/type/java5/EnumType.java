@@ -39,7 +39,8 @@ public class EnumType extends Type {
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
-        writer.writeValue(((Enum)object).toString());
+        // match the reader. 
+        writer.writeValue(((Enum)object).name());
     }
 
     @Override
@@ -67,7 +68,7 @@ public class EnumType extends Type {
 
         for (Object constant : constants) {
             Element enumeration = new Element("enumeration", xsd);
-            enumeration.setAttribute(new Attribute("value", ((Enum)constant).toString()));
+            enumeration.setAttribute(new Attribute("value", ((Enum)constant).name()));
             restriction.addContent(enumeration);
         }
     }
