@@ -131,7 +131,7 @@ function testInheritance(url) {
 	derived.setId(33);
 	derived.setDerived("arrived");
 	derived.setName("less");
-	intf.inheritanceTestFunction(derived);
+	intf.inheritanceTestFunction(test1SuccessCallback, test1ErrorCallback, derived);
 
 	return globalNotifier;
 }
