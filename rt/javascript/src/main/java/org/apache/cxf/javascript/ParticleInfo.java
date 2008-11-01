@@ -37,7 +37,7 @@ import org.apache.ws.commons.schema.XmlSchemaType;
  * All the information needed to create the JavaScript for an Xml Schema element
  * or xs:any.
  */
-public final class ParticleInfo {
+public final class ParticleInfo implements ItemInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(ParticleInfo.class);
     private XmlSchemaParticle particle;
     private String javascriptName;

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.javascript;
 
+import java.util.logging.Logger;
+
 import org.apache.cxf.common.i18n.Message;
 
 /**
@@ -32,9 +34,18 @@ public class UnsupportedConstruct extends RuntimeException {
     public UnsupportedConstruct(String explanation) {
         super(explanation);
     }
+    
+    public UnsupportedConstruct(Logger logger, String messageKey, Object...args) {
+        super(new Message(messageKey, logger, args).toString());
+        
+    }
 
     public UnsupportedConstruct(Throwable cause) {
         super(cause);
+    }
+    
+    public UnsupportedConstruct(Throwable cause, Logger logger, String messageKey, Object...args) {
+        super(new Message(messageKey, logger, args).toString(), cause);
     }
 
     public UnsupportedConstruct(String explanation, Throwable cause) {
