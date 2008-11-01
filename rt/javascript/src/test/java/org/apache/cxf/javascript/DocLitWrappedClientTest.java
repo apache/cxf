@@ -242,7 +242,6 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
             
         });
     }
-
     
     @Test
     public void callTest2WithNullString() {

@@ -19,6 +19,8 @@
 
 package org.apache.cxf.javascript;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -134,6 +136,31 @@ public final class XmlSchemaUtils {
             unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
         }
         return sequence;
+    }
+    
+    public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type, 
+                                                           SchemaCollection collection) {
+        List<XmlSchemaObject> results = new ArrayList<XmlSchemaObject>();
+        QName baseTypeName = getBaseType(type);
+        if (baseTypeName != null) {
+            XmlSchemaComplexType baseType = (XmlSchemaComplexType)collection.getTypeByQName(baseTypeName);
+            // recurse onto the base type ...
+            results.addAll(getContentElements(baseType, collection));
+            // and now process our sequence.
+            XmlSchemaSequence extSequence = getContentSequence(type);
+            for (int i = 0; i < extSequence.getItems().getCount(); i++) {
+                results.add(extSequence.getItems().getItem(i));
+            }
+            return results;
+        } else {
+            // no base type, the simple case.
+            XmlSchemaSequence sequence = getSequence(type);
+            for (int i = 0; i < sequence.getItems().getCount(); i++) {
+                results.add(sequence.getItems().getItem(i));
+            }
+            return results;
+        }
+
     }
     
     public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {

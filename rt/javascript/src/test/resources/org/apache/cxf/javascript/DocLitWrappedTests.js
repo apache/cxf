@@ -116,3 +116,22 @@ function test4(url, wrap, beanArg, beansArg)
     // Return the notifier as a convenience to the Java code.
 	return globalNotifier;
 }
+
+function testInheritance(url) {
+	org_apache_cxf_trace.trace("inheritance test.");
+	resetGlobals();
+	globalNotifier = new org_apache_cxf_notifier();
+	
+	var intf;
+	
+    intf = new org_apache_cxf_javascript_fortest_SimpleDocLitWrapped();
+	intf.url = url;
+
+	var derived = new org_apache_cxf_javascript_testns_inheritanceTestDerived();
+	derived.setId(33);
+	derived.setDerived("arrived");
+	derived.setName("less");
+	intf.inheritanceTestFunction(derived);
+
+	return globalNotifier;
+}
