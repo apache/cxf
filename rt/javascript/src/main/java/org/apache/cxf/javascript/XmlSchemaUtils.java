@@ -32,7 +32,10 @@ import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
+import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
+import org.apache.ws.commons.schema.XmlSchemaContent;
+import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaObject;
@@ -85,6 +88,52 @@ public final class XmlSchemaUtils {
         LOG.severe(message.toString());
         throw new UnsupportedConstruct(message);
         
+    }
+    
+    public static QName getBaseType(XmlSchemaComplexType type) {
+        XmlSchemaContentModel model = type.getContentModel();
+        if (model == null) {
+            return null;
+        }
+        XmlSchemaContent content = model.getContent();
+        if (content == null) {
+            return null;
+        }
+        
+        if (!(content instanceof XmlSchemaComplexContentExtension)) {
+            return null;
+        }
+
+        XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
+        QName baseTypeName = ext.getBaseTypeName();
+        return baseTypeName;
+    }
+    
+    public static XmlSchemaSequence getContentSequence(XmlSchemaComplexType type) {
+        XmlSchemaContentModel model = type.getContentModel();
+        if (model == null) {
+            return null;
+        }
+        XmlSchemaContent content = model.getContent();
+        if (content == null) {
+            return null;
+        }
+        if (!(content instanceof XmlSchemaComplexContentExtension)) {
+            return null;
+        }
+
+        XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
+        XmlSchemaParticle particle = ext.getParticle();
+        if (particle == null) {
+            return null;
+        }
+        XmlSchemaSequence sequence = null;
+        try {
+            sequence = (XmlSchemaSequence) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
+        }
+        return sequence;
     }
     
     public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {

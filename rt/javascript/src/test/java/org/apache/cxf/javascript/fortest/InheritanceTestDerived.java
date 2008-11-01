@@ -16,28 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.aegis.type.java5.map;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package org.apache.cxf.javascript.fortest;
 
+//import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-import javax.jws.WebService;
+/**
+ * 
+ */
+//@XmlRootElement(name = "InheritanceTestDerived")
+@XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
+public class InheritanceTestDerived extends InheritanceTestBase {
+    private String derived;
 
-@WebService(targetNamespace = "uri:org.apache.cxf.aegis.test.map", 
-    name = "StudentService")
-public interface StudentServiceDocLiteral {
+    public String getDerived() {
+        return derived;
+    }
 
-    Student findStudent(Long id);
-
-    Map<Long, Student> getStudentsMap();
-
-    List<Student> getStudents(Map<String, String> filters);
-
-    List<Student> getStudentsByIds(List<String> ids);
-    
-    //CHECKSTYLE:OFF
-    void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData);
+    public void setDerived(String derived) {
+        this.derived = derived;
+    }
 
 }

@@ -86,7 +86,7 @@ public class SchemaCollection {
     public XmlSchemaElement getElementByQName(QName qname) {
         return schemaCollection.getElementByQName(qname);
     }
-
+    
     public XmlSchemaAttribute getAttributeByQName(QName qname) {
         String uri = qname.getNamespaceURI();
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {

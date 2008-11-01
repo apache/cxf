@@ -188,7 +188,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 }
                 // If the element uses a named type, we use the functions for the type.
                 XmlSchemaComplexType elementType = (XmlSchemaComplexType)element.getSchemaType();
-                if (elementType.getQName() != null) {
+                if (elementType != null && elementType.getQName() != null) {
                     name = elementType.getQName();
                 }
                 utils.appendLine("this.globalElementSerializers['" + name.toString() + "'] = "

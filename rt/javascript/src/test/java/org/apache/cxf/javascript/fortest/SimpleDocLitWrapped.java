@@ -70,4 +70,7 @@ public interface SimpleDocLitWrapped {
     @WebMethod
     void genericTestFunction(@WebParam(name = "g1") SpecificGenericClass sgc,
                              @WebParam(name = "g2") GenericGenericClass<Double> ggc);
+    
+    @WebMethod 
+    void inheritanceTestFunction(@WebParam(name = "d") InheritanceTestDerived d);
 }

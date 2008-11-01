@@ -233,6 +233,18 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     }
     
     @Test
+    public void inheritedProperties() {
+        testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
+
+            public Void run(Context context) {
+                return null;
+            }
+            
+        });
+    }
+
+    
+    @Test
     public void callTest2WithNullString() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
             public Void run(Context context) {
@@ -298,4 +310,5 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         testUtilities.rhinoCallMethod(rv, "setStringItem", beanTwoItem.stringItem);
         return rv;
     }
+    
 }

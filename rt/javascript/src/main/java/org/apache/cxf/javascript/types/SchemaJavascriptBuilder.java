@@ -53,8 +53,6 @@ import org.apache.ws.commons.schema.XmlSchemaType;
  * Generate Javascript for a schema, and provide information needed for the
  * service builder. As of this pass, there is no support for non-sequence types
  * or for attribute mappings.
- * 
- * @author bimargulies
  */
 public class SchemaJavascriptBuilder {
 
@@ -349,8 +347,20 @@ public class SchemaJavascriptBuilder {
      */
     protected void complexTypeSerializerBody(XmlSchemaComplexType type, String elementPrefix,
                                              JavascriptUtils bodyUtils) {
+        XmlSchemaSequence sequence = null;
+        // deal with type extension.
+        QName baseTypeName = XmlSchemaUtils.getBaseType(type);
+        if (baseTypeName !=  null) {
+            XmlSchemaType baseType = xmlSchemaCollection.getTypeByQName(baseTypeName);
+            XmlSchemaComplexType baseComplexType = (XmlSchemaComplexType) baseType;
+            // I think we can recurse ...?
+            complexTypeSerializerBody(baseComplexType, elementPrefix, bodyUtils);
+            sequence = XmlSchemaUtils.getContentSequence(type);
+        }
 
-        XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(type);
+        if (sequence == null) {
+            sequence = XmlSchemaUtils.getSequence(type);
+        }
 
         for (int i = 0; i < sequence.getItems().getCount(); i++) {
             XmlSchemaObject sequenceItem = (XmlSchemaObject)sequence.getItems().getItem(i);
