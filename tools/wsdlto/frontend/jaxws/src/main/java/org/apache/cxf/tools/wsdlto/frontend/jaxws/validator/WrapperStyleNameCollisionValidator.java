@@ -105,7 +105,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         if (input != null) {
             for (WrapperElement element : ProcessorUtil.getWrappedElement(context, input.getElementQName())) {
                 if (names.containsKey(element.getElementName())
-                    &&  names.get(element.getElementName()).equals(element.getSchemaTypeName())) {
+                    &&  (names.get(element.getElementName()) == element.getSchemaTypeName()
+                        || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
                     handleErrors(names.get(element.getElementName()), element);
                     return false;
                 } else {
@@ -118,7 +119,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
             for (WrapperElement element : ProcessorUtil.getWrappedElement(context, 
                                                                           output.getElementQName())) {
                 if (names.containsKey(element.getElementName())
-                    &&  !names.get(element.getElementName()).equals(element.getSchemaTypeName())) {
+                    &&  !(names.get(element.getElementName()) == element.getSchemaTypeName()
+                        || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
                     handleErrors(names.get(element.getElementName()), element);
                     return false;
                 } else {
