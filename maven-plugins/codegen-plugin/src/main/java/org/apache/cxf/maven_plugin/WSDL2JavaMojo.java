@@ -205,14 +205,19 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
         try {
             urlList.add(classesDir.toURI().toURL());
+            if (!useCompileClasspath) {
+                urlList.add(new File(project.getBuild().getOutputDirectory()).toURI().toURL());
+            }
         } catch (MalformedURLException e) {
             //ignore
         }
 
         buf.append(classesDir.getAbsolutePath());
         buf.append(File.pathSeparatorChar);
-
-
+        if (!useCompileClasspath) {
+            buf.append(project.getBuild().getOutputDirectory());
+            buf.append(File.pathSeparatorChar);
+        }
         List artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
         for (Artifact a : CastUtils.cast(artifacts, Artifact.class)) {
             try {
@@ -232,6 +237,8 @@ public class WSDL2JavaMojo extends AbstractMojo {
         URLClassLoader loader = new URLClassLoader(urlList.toArray(new URL[urlList.size()]),
                                                    origContext);
         String newCp = buf.toString();
+        
+        getLog().debug("Classpath: " + urlList.toString());
 
         //with some VM's, creating an XML parser (which we will do to parse wsdls)
         //will set some system properties that then interferes with mavens 
@@ -271,6 +278,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 }
             }
             System.getProperties().putAll(origProps);
+            org.apache.cxf.tools.wsdlto.core.PluginLoader.unload();
         }
         if (project != null && sourceRoot != null && sourceRoot.exists()) {
             project.addCompileSourceRoot(sourceRoot.getAbsolutePath());

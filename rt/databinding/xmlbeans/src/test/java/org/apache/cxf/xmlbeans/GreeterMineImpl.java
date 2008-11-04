@@ -22,7 +22,10 @@ package org.apache.cxf.xmlbeans;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-@WebService(endpointInterface = "org.apache.cxf.xmlbeans.GreeterMine",
+import org.apache.cxf.xmlbeans.wsdltest.GreeterMine;
+import org.apache.cxf.xmlbeans.wsdltest.StringListType;
+
+@WebService(endpointInterface = "org.apache.cxf.xmlbeans.wsdltest.GreeterMine",
             targetNamespace = "http://org.apache.cxf/xmlbeans",
             portName = "SoapPort",
             serviceName = "SOAPMineService",

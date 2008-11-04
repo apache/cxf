@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -79,7 +79,7 @@ public final class PluginLoader {
         try {
             JAXBContext jc = JAXBContext.newInstance("org.apache.cxf.tools.plugin");
             unmarshaller = jc.createUnmarshaller();
-            loadPlugins(this.classLoader.getResources(PLUGIN_FILE_NAME));
+            loadPlugins(ClassLoaderUtils.getResources(PLUGIN_FILE_NAME, getClass()));
         } catch (JAXBException e) {
             Message msg = new Message("JAXB_CONTEXT_INIT_FAIL", LOG);
             LOG.log(Level.SEVERE, msg.toString());
@@ -103,14 +103,14 @@ public final class PluginLoader {
         return this.classLoader;
     }
 
-    private void loadPlugins(Enumeration<URL> pluginFiles) throws IOException {
+    private void loadPlugins(List<URL> pluginFiles) throws IOException {
         if (pluginFiles == null) {
             LOG.log(Level.WARNING, "FOUND_NO_PLUGINS");
             return;
         }
 
-        while (pluginFiles.hasMoreElements()) {
-            loadPlugin(pluginFiles.nextElement());
+        for (URL url : pluginFiles) {
+            loadPlugin(url);
         }
     }
 
@@ -126,6 +126,10 @@ public final class PluginLoader {
             pluginLoader = new PluginLoader(cl);
         }
         return pluginLoader;
+    }
+
+    public static void unload() {
+        pluginLoader = null;
     }
 
     public void loadPlugin(URL url) throws IOException {
@@ -303,7 +307,7 @@ public final class PluginLoader {
     private Processor loadProcessor(String fullClzName) {
         Processor processor = null;
         try {
-            processor = (Processor) Class.forName(fullClzName).newInstance();
+            processor = (Processor) ClassLoaderUtils.loadClass(fullClzName, getClass()).newInstance();
         } catch (Exception e) {
             Message msg = new Message("LOAD_PROCESSOR_FAILED", LOG, fullClzName);
             LOG.log(Level.SEVERE, msg.toString());
@@ -315,7 +319,7 @@ public final class PluginLoader {
     private Class<? extends ToolContainer> loadContainerClass(String fullClzName) {
         Class<?> clz = null;
         try {
-            clz = Class.forName(fullClzName);
+            clz = ClassLoaderUtils.loadClass(fullClzName, getClass());
         } catch (Exception e) {
             Message msg = new Message("LOAD_CONTAINER_CLASS_FAILED", LOG, fullClzName);
             LOG.log(Level.SEVERE, msg.toString());
@@ -367,7 +371,8 @@ public final class PluginLoader {
     private AbstractWSDLBuilder<? extends Object> loadBuilder(String fullClzName) {
         AbstractWSDLBuilder<? extends Object> builder = null;
         try {
-            builder = (AbstractWSDLBuilder<? extends Object>) Class.forName(fullClzName).newInstance();
+            builder = (AbstractWSDLBuilder<? extends Object>) ClassLoaderUtils
+                .loadClass(fullClzName, getClass()).newInstance();
 
         } catch (Exception e) {
             Message msg = new Message("LOAD_PROCESSOR_FAILED", LOG, fullClzName);
@@ -420,7 +425,8 @@ public final class PluginLoader {
     private DataBindingProfile loadDataBindingProfile(String fullClzName) {
         DataBindingProfile profile = null;
         try {
-            profile = (DataBindingProfile) Class.forName(fullClzName).newInstance();
+            profile = (DataBindingProfile)ClassLoaderUtils.loadClass(fullClzName,
+                                                                     getClass()).newInstance();
         } catch (Exception e) {
             Message msg = new Message("DATABINDING_PROFILE_LOAD_FAIL", LOG, fullClzName);
             LOG.log(Level.SEVERE, msg.toString());

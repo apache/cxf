@@ -22,6 +22,9 @@ package org.apache.cxf.common.classloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * This class is extremely useful for loading resources and classes in a fault
@@ -81,6 +84,92 @@ public final class ClassLoaderUtils {
 
         return url;
     }
+    
+    /**
+     * Load a given resources. <p/> This method will try to load the resources
+     * using the following methods (in order):
+     * <ul>
+     * <li>From Thread.currentThread().getContextClassLoader()
+     * <li>From ClassLoaderUtil.class.getClassLoader()
+     * <li>callingClass.getClassLoader()
+     * </ul>
+     * 
+     * @param resourceName The name of the resource to load
+     * @param callingClass The Class object of the calling object
+     */
+    public static List<URL> getResources(String resourceName, Class callingClass) {
+        List<URL> ret = new ArrayList<URL>();
+        Enumeration<URL> urls = new Enumeration<URL>() {
+            public boolean hasMoreElements() {
+                return false;
+            }
+            public URL nextElement() {
+                return null;
+            }
+            
+        };
+        try {
+            urls = Thread.currentThread().getContextClassLoader()
+                .getResources(resourceName);
+        } catch (IOException e) {
+            //ignore
+        }
+        if (!urls.hasMoreElements() && resourceName.startsWith("/")) {
+            //certain classloaders need it without the leading /
+            try {
+                urls = Thread.currentThread().getContextClassLoader()
+                    .getResources(resourceName.substring(1));
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+
+        if (!urls.hasMoreElements()) {
+            try {
+                urls = ClassLoaderUtils.class.getClassLoader().getResources(resourceName);
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        if (!urls.hasMoreElements() && resourceName.startsWith("/")) {
+            //certain classloaders need it without the leading /
+            try {
+                urls = ClassLoaderUtils.class.getClassLoader()
+                    .getResources(resourceName.substring(1));
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+
+        if (!urls.hasMoreElements()) {
+            ClassLoader cl = callingClass.getClassLoader();
+
+            if (cl != null) {
+                try {
+                    urls = cl.getResources(resourceName);
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
+
+        if (!urls.hasMoreElements()) {
+            URL url = callingClass.getResource(resourceName);
+            if (url != null) {
+                ret.add(url);
+            }
+        }
+        while (urls.hasMoreElements()) {
+            ret.add(urls.nextElement());
+        }
+
+        
+        if (ret.isEmpty() && (resourceName != null) && (resourceName.charAt(0) != '/')) {
+            return getResources('/' + resourceName, callingClass);
+        }
+        return ret;
+    }
+
 
     /**
      * This is a convenience method to load a resource as a stream. <p/> The

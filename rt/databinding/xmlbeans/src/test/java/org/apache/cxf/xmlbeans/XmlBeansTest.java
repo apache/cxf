@@ -26,19 +26,19 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.test.AbstractCXFTest;
-
+import org.apache.cxf.xmlbeans.wsdltest.GreeterMine;
+import org.apache.cxf.xmlbeans.wsdltest.SOAPMineService;
+import org.apache.cxf.xmlbeans.wsdltest.StringListType;
 import org.junit.After;
 import org.junit.Before;
-//import org.junit.Ignore;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class XmlBeansTest extends AbstractCXFTest {
 
     private static final String CONFIG1 = "org/apache/cxf/xmlbeans/cxf.xml";
     private static final String CONFIG2 = "org/apache/cxf/xmlbeans/cxf2.xml";
-    private static final String ERROR_MSG = "Service class org.apache.cxf.xmlbeans.GreeterMine method " 
-        +    "sayHi2 part {http://cxf.apache.org/xmlbeans}in cannot be mapped to schema";   
-    private static final String ERROR_MSG2 = "Could not send Message";
+
     private SpringBusFactory bf;
 
     @Before
@@ -58,37 +58,30 @@ public class XmlBeansTest extends AbstractCXFTest {
     
     
     @Test
+    @Ignore
     public void testBusCreationFails() throws Exception {
-        try {
-            bf = new SpringBusFactory();
-            bus = bf.createBus(CONFIG1);
-            BusFactory.setDefaultBus(bus);
-        } catch (Exception ex) {       
-            assertTrue(ex.getMessage().contains(ERROR_MSG));
-        }
+        bf = new SpringBusFactory();
+        bus = bf.createBus(CONFIG1);
+        BusFactory.setDefaultBus(bus);
     }
 
     @Test
+    @Ignore
     public void testBasicFails() throws Exception {
-        
-        try {
-            bf = new SpringBusFactory();
-            bus = bf.createBus(CONFIG2);
-            BusFactory.setDefaultBus(bus);
-            URL wsdlURL = XmlBeansTest.class.getResource("xmlbeanstest.wsdl");
-            SOAPMineService ss =
-                new SOAPMineService(wsdlURL,
-                                    new QName("http://cxf.apache.org/xmlbeans", "SOAPMineService"));
-            GreeterMine port = ss.getSoapPort();
 
-            StringListType stringListType = new StringListType();
-            stringListType.setMyname("sean");
-            stringListType.setMyaddress("home");
-            port.sayHi2(stringListType);
-        } catch (Exception ex) {          
-            assertTrue(ex.getMessage().contains(ERROR_MSG2));
-            //ex.printStackTrace();
-        }
+        bf = new SpringBusFactory();
+        bus = bf.createBus(CONFIG2);
+        BusFactory.setDefaultBus(bus);
+        URL wsdlURL = XmlBeansTest.class.getResource("xmlbeanstest.wsdl");
+        SOAPMineService ss =
+            new SOAPMineService(wsdlURL,
+                                new QName("http://cxf.apache.org/xmlbeans", "SOAPMineService"));
+        GreeterMine port = ss.getSoapPort();
+
+        StringListType stringListType = StringListType.Factory.newInstance();
+        stringListType.setMyname("sean");
+        stringListType.setMyaddress("home");
+        port.sayHi2(stringListType);
     }
     
 

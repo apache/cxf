@@ -155,6 +155,34 @@
                     <javaSource>1.5</javaSource>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <sourceRoot>target/generated/src/test/java</sourceRoot>
+                            <testWsdlRoot>src/test/resources/wsdl</testWsdlRoot>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                  <wsdl>src/test/resources/wsdl/xmlbeanstest.wsdl</wsdl>
+                                  <dataBinding>xmlbeans</dataBinding>
+                                  <extraargs>
+                                    <arg>-classdir</arg>
+                                    <arg>${basedir}/target/generated/src/test/resources</arg>
+                                  </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
