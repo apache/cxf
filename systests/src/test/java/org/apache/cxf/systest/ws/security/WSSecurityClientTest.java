@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.ws.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -26,8 +29,11 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Binding;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPBinding;
 
@@ -99,6 +105,18 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             TIMESTAMP_SIGN_ENCRYPT_PORT_QNAME,
             Greeter.class
         );
+
+        // Add a No-Op JAX-WS SoapHandler to the dispatch chain to
+        // verify that the SoapHandlerInterceptor can peacefully co-exist
+        // with the explicitly configured SAAJOutInterceptor
+        //
+        List<Handler> handlerChain = new ArrayList<Handler>();
+        Binding binding = ((BindingProvider)greeter).getBinding();
+        Handler handler;
+        handler = new TestOutHandler();
+        handlerChain.add(handler);
+        binding.setHandlerChain(handlerChain);
+
         greeter.sayHi();
     }
 
