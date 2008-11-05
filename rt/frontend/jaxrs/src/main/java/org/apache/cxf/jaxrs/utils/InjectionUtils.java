@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
@@ -55,6 +56,7 @@ import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletResponse;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageBodyWorkers;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
@@ -296,6 +298,8 @@ public final class InjectionUtils {
             proxy = new ThreadLocalHttpServletRequest();
         } else if (ServletContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalServletContext();
+        } else if (HttpServletResponse.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalHttpServletResponse();
         }
         return proxy;
     }
@@ -312,6 +316,11 @@ public final class InjectionUtils {
         
         for (Field f : cri.getContextFields()) {
             ThreadLocalProxy proxy = cri.getContextFieldProxy(f);
+            InjectionUtils.injectFieldValue(f, instance, proxy);
+        }
+        
+        for (Field f : cri.getResourceFields()) {
+            ThreadLocalProxy proxy = cri.getResourceFieldProxy(f);
             InjectionUtils.injectFieldValue(f, instance, proxy);
         }
     }

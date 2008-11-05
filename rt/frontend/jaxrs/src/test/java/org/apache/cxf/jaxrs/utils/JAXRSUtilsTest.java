@@ -700,6 +700,10 @@ public class JAXRSUtilsTest extends Assert {
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
         ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
+        HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
+        m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
+        HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
+        m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
         InjectionUtils.injectContextFields(c, cri, m);
@@ -720,6 +724,37 @@ public class JAXRSUtilsTest extends Assert {
   
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy)c.getThreadLocalServletContext()).get());
+        assertSame(servletContextMock, 
+                   ((ThreadLocalProxy)c.getServletContext()).get());
+        
+        assertSame(httpRequest, 
+                   ((ThreadLocalProxy)c.getServletRequest()).get());
+        assertSame(httpResponse, 
+                   ((ThreadLocalProxy)c.getServletResponse()).get());
+    }
+    
+    @Test
+    public void testSingletonHttpResourceFields() throws Exception {
+        
+        ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
+        Customer c = new Customer();
+        cri.setResourceProvider(new SingletonResourceProvider(c));
+                
+        Message m = new MessageImpl();
+        ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
+        m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
+        HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
+        m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
+        HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
+        m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
+        InjectionUtils.injectResourceFields(c, cri, m);
+        assertSame(servletContextMock, 
+                   ((ThreadLocalProxy)c.getServletContextResource()).get());
+        assertSame(httpRequest, 
+                   ((ThreadLocalProxy)c.getServletRequestResource()).get());
+        assertSame(httpResponse, 
+                   ((ThreadLocalProxy)c.getServletResponseResource()).get());
     }
     
     @Test
