@@ -300,10 +300,10 @@ public final class WrapperClassGenerator extends ASMHelper {
             av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());            
         }
         if (factory.isWrapperPartNillable(mpi)) {
-            av0.visit("nillable", "true");
+            av0.visit("nillable", Boolean.TRUE);
         }
         if (factory.getWrapperPartMinOccurs(mpi) == 1) {
-            av0.visit("required", "true");
+            av0.visit("required", Boolean.TRUE);
         }
         av0.visitEnd();
 
