@@ -41,7 +41,7 @@
                 <xsd:documentation>
                     Specifies if the bean is an abstract bean. Abstract beans act as parents for 
                     concrete bean definitions and are not instantiated. The default is "false".
-                    Setting this to "true" instructs the bean factory not to instantiate the bean,
+                    Setting this to "true" instructs the bean factory not to instantiate the bean.
                     See documentation for attribute abstract in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>
@@ -50,7 +50,7 @@
         <xsd:attribute name="depends-on" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    A list of beans that the bean depends on being instantiated before the bean 
+                    A list of beans that the bean depends on being instantiated before it 
                     can be instantiated.
                     See documentation for attribute depends-on in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -65,7 +65,7 @@
                     The default is "false".
                     Setting this to "true" does the following: Changes the internal name of the
                     bean by appending either ".jaxws-client" or ".jaxws-endpoint" to the bean's
-                    id. Make the bean abstract.
+                    id. Makes the bean abstract.
                     See documentation for attribute abstract in attribute group beanAttributes
                     in http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                 </xsd:documentation>
