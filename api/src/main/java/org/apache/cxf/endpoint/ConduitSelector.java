@@ -25,7 +25,7 @@ import org.apache.cxf.transport.Conduit;
 
 
 /**
- * Strategy for retreival of a Conduit to mediate an outbound message.
+ * Strategy for retreiving a Conduit to mediate an outbound message.
  * A specific instance implementing a particular strategy may be injected
  * into the Client via config.
  */
@@ -65,7 +65,7 @@ public interface ConduitSelector {
     Endpoint getEndpoint();
 
     /**
-     * @param endpoint the endpoint to encapsulate
+     * @param endpoint the Endpoint to encapsulate
      */
     void setEndpoint(Endpoint endpoint);
 }

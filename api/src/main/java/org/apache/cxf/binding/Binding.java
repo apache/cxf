@@ -44,7 +44,8 @@ public interface Binding extends InterceptorProvider {
     Message createMessage(Message m);
     
     /**
-     * Get the BindingInfor
+     * Get the BindingInfo for this binding.
+     *
      * @return the BingdingInfo Object     
      */
     BindingInfo getBindingInfo();

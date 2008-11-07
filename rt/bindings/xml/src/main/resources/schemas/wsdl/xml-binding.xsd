@@ -34,7 +34,7 @@
 				<xs:attribute name="rootNode" type="xs:QName"
 					use="optional">
 					<xs:annotation>
-						<xs:documentation>The QName of the root element used to wrap the message passed across the wire</xs:documentation>
+						<xs:documentation>Specifies the QName of the root element used to wrap the message passed across the wire</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>
@@ -57,7 +57,7 @@
 	</xs:element>
 	<xs:element name="binding" type="xformat:XMLFormatBinding">
 		<xs:annotation>
-			<xs:documentation>Specifies that the messages are mapped to XML documents</xs:documentation>
+			<xs:documentation>Specifies that the messages are mapped to XML documents.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 
