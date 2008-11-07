@@ -29,17 +29,18 @@ import org.junit.Test;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 
-public class TestCrossSchemaImports extends AbstractDependencyInjectionSpringContextTests {
+public class CrossSchemaImportsTests extends AbstractDependencyInjectionSpringContextTests {
 
     private TestUtilities testUtilities;
 
-    public TestCrossSchemaImports() {
+    public CrossSchemaImportsTests() {
         setAutowireMode(AbstractDependencyInjectionSpringContextTests.AUTOWIRE_BY_NAME);
         testUtilities = new TestUtilities(getClass());
     }
 
     @Test
     public void testJaxbCrossSchemaImport() throws Exception {
+        System.out.println("TEst");
         testUtilities.setBus((Bus)applicationContext.getBean("cxf"));
         testUtilities.addDefaultNamespaces();
         Server s = testUtilities.getServerForService(new QName("http://apache.org/type_test/doc", 
@@ -48,6 +49,8 @@ public class TestCrossSchemaImports extends AbstractDependencyInjectionSpringCon
         testUtilities.
              assertValid("//xsd:schema[@targetNamespace='http://apache.org/type_test/doc']/"
                          + "xsd:import[@namespace='http://apache.org/type_test/types1']", wsdl);
+        
+        assertEquals(1, LifeCycleListenerTester.getInitCount());
     }
 
     /*

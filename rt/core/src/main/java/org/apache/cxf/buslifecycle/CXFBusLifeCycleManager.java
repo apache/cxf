@@ -31,6 +31,8 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
 
     private final List<BusLifeCycleListener> listeners;
     private Bus bus;
+    private boolean preShutdownCalled;
+    private boolean postShutdownCalled;
     
     public CXFBusLifeCycleManager() {
         listeners = new ArrayList<BusLifeCycleListener>();
@@ -66,6 +68,8 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     }
     
     public void initComplete() {
+        preShutdownCalled = false;
+        postShutdownCalled = false;
         for (BusLifeCycleListener listener : listeners) {
             listener.initComplete();
         }
@@ -73,15 +77,22 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     
     public void preShutdown() {
         // TODO inverse order of registration?
+        preShutdownCalled = true;
         for (BusLifeCycleListener listener : listeners) {
             listener.preShutdown();
         }
     }
     
     public void postShutdown() {
-        // TODO inverse order of registration?
-        for (BusLifeCycleListener listener : listeners) {
-            listener.postShutdown();
+        if (!preShutdownCalled) {
+            preShutdown();
+        }
+        if (!postShutdownCalled) {
+            postShutdownCalled = true;
+            // TODO inverse order of registration?
+            for (BusLifeCycleListener listener : listeners) {
+                listener.postShutdown();
+            }
         }
     }
         
