@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 
 public class CXFBusFactory extends BusFactory {
     
@@ -43,4 +44,12 @@ public class CXFBusFactory extends BusFactory {
         return bus;
     }
  
+    
+    protected void initializeBus(Bus bus) {
+        super.initializeBus(bus);
+        BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
+        if (null != lifeCycleManager) {
+            lifeCycleManager.initComplete();
+        }
+    }
 }

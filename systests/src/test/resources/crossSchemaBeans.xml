@@ -34,6 +34,8 @@ under the License.
 	<import resource="classpath:META-INF/cxf/cxf-extension-local.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 
+    <bean class="org.apache.cxf.systest.wsdl.LifeCycleListenerTester" id="listenerTest"/>
+
 	<!-- Services -->
 	<jaxws:server id="JaxbTestServer" 
                    serviceClass="org.apache.type_test.doc.TypeTestPortType" 

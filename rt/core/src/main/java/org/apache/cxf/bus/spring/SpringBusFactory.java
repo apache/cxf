@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
@@ -138,12 +137,6 @@ public class SpringBusFactory extends BusFactory {
             LogUtils.log(LOG, Level.WARNING, "APP_CONTEXT_CREATION_FAILED_MSG", ex, (Object[])null);
             throw new RuntimeException(ex);
         }
-    }
-     
-    @Override
-    protected void initializeBus(Bus bus) {        
-        ((CXFBusImpl)bus).initialize(); 
-        super.initializeBus(bus);
     }
 
     void registerApplicationContextLifeCycleListener(Bus bus, BusApplicationContext bac) {

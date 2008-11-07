@@ -230,6 +230,9 @@ public class SpringBusFactoryTest extends Assert {
      
     static class TestFeature extends AbstractFeature {
         boolean initialised;
+        public TestFeature() {
+            //nothing
+        }
 
         @Override
         public void initialize(Bus bus) {
