@@ -151,16 +151,16 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
             content = content.getNextSibling();
             --currentChild;
         }
-        
-        if (content instanceof Element) {
+        switch (content.getNodeType()) {
+        case Node.ELEMENT_NODE:
             return START_ELEMENT;
-        } else if (content instanceof CDATASection) {
-            return CDATA;
-        } else if (content instanceof Comment) {
-            return COMMENT;
-        } else if (content instanceof Text) {
+        case Node.TEXT_NODE:
             return CHARACTERS;
-        } else if (content instanceof EntityReference) {
+        case Node.COMMENT_NODE:
+            return COMMENT;
+        case Node.CDATA_SECTION_NODE:
+            return CDATA;
+        case Node.ENTITY_REFERENCE_NODE:
             return ENTITY_REFERENCE;
         }
 

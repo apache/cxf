@@ -582,22 +582,31 @@ public final class StaxUtils {
 
     public static void writeNode(Node n, XMLStreamWriter writer, boolean repairing) 
         throws XMLStreamException {
-        if (n instanceof Element) {
+        
+        switch (n.getNodeType()) {
+        case Node.ELEMENT_NODE:
             writeElement((Element)n, writer, repairing);
-        } else if (n instanceof CDATASection) {
-            writer.writeCData(((CDATASection)n).getData());
-        } else if (n instanceof Text) {
+            break;
+        case Node.TEXT_NODE:
             writer.writeCharacters(((Text)n).getNodeValue());
-        } else if (n instanceof Comment) {
+            break;
+        case Node.COMMENT_NODE:
             writer.writeComment(((Comment)n).getData());
-        } else if (n instanceof EntityReference) {
+            break;
+        case Node.CDATA_SECTION_NODE:
+            writer.writeCData(((CDATASection)n).getData());
+            break;
+        case Node.ENTITY_REFERENCE_NODE:
             writer.writeEntityRef(((EntityReference)n).getNodeValue());
-        } else if (n instanceof ProcessingInstruction) {
+            break;
+        case Node.PROCESSING_INSTRUCTION_NODE:
             ProcessingInstruction pi = (ProcessingInstruction)n;
             writer.writeProcessingInstruction(pi.getTarget(), pi.getData());
-        } else if (n instanceof Document) {
+            break;
+        case Node.DOCUMENT_NODE:
             writeDocument((Document)n, writer, repairing);
-        } 
+            break;
+        }        
     }
 
     public static Document read(XMLStreamReader reader) throws XMLStreamException {
