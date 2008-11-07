@@ -25,11 +25,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Comment;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.EntityReference;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -162,9 +160,9 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
             return CDATA;
         case Node.ENTITY_REFERENCE_NODE:
             return ENTITY_REFERENCE;
+        default:
+            throw new IllegalStateException("Found type: " + content.getClass().getName());
         }
-
-        throw new IllegalStateException("Found type: " + content.getClass().getName());
     }
 
     @Override

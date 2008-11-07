@@ -606,6 +606,8 @@ public final class StaxUtils {
         case Node.DOCUMENT_NODE:
             writeDocument((Document)n, writer, repairing);
             break;
+        default:
+            throw new IllegalStateException("Found type: " + n.getClass().getName());
         }        
     }
 
