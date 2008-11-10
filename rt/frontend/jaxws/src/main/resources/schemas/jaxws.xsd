@@ -30,6 +30,9 @@
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
 
   <xsd:element name="endpoint">
+    <xsd:annotation>
+      <xsd:documentation>Configures a JAX-WS server. This element is associated with the org.apache.cxf.jaxws.EndpointImpl object.</xsd:documentation>
+    </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
         <xsd:extension base="beans:identifiedType">
@@ -103,7 +106,7 @@
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
           <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
-              <xsd:documentation>Specifies the address of an HTTP endpoint. This value will override the value specified in the services 
+              <xsd:documentation>Specifies the HTTP address of the endpoint. This value will override the value specified in the services 
                 contract.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
@@ -160,6 +163,9 @@
   </xsd:element>
   
   <xsd:element name="server">
+    <xsd:annotation>
+      <xsd:documentation>Configures a JAX-WS server. The element is associated with the org.apache.cxf.jaxws.support.JaxWsServerFactoryBean object.</xsd:documentation>
+    </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
         <xsd:extension base="beans:identifiedType">
@@ -172,7 +178,8 @@
             </xsd:element>
             <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
-                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is
+                  org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
             <xsd:element name="executor" type="xsd:anyType" minOccurs="0">
@@ -233,7 +240,7 @@
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
           <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
-              <xsd:documentation>Specifies the address of an HTTP endpoint. This value will override the value specified in the services 
+              <xsd:documentation>Specifies the HTTP address of the endpoint. This value will override the value specified in the services 
                 contract.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
@@ -290,6 +297,9 @@
   </xsd:element>
 
   <xsd:element name="client">
+    <xsd:annotation>
+      <xsd:documentation>Configures a JAX-WS client.</xsd:documentation>
+    </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
         <xsd:extension base="beans:identifiedType">
@@ -340,12 +350,17 @@
                 <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="conduitSelector" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="conduitSelector" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a org.apache.cxf.endpoint.ConduitSelector implementation. ConduitSelector implementations override the 
+                  strategy used to select the Conduit used to process outgoing messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
           </xsd:all>
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
           <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
-              <xsd:documentation>Specifies the address of the HTTP endpoint on which the client makes requests. This value will override the value 
+              <xsd:documentation>Specifies the HTTP address of the endpoint on which the client makes requests. This value will override the value 
                 specified in the services contract.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
@@ -391,7 +406,7 @@
           <xsd:attribute name="wsdlLocation" type="xsd:string">
             <xsd:annotation>
               <xsd:documentation>Specifies the location of the endpoint's WSDL contract. The WSDL contract's location is relative to the folder 
-                from which the service is deployed.</xsd:documentation>
+                from which the client is deployed.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
         </xsd:extension>
