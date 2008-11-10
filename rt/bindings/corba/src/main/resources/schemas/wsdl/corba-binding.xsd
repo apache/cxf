@@ -40,8 +40,16 @@
             <jaxb:class implClass="org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl"/>                                
         </xs:appinfo>      
                 </xs:annotation>
-                <xs:attribute name="name" type="xs:string" use="required"/>
-                <xs:attribute name="type" type="xs:QName" use="required"/>
+                <xs:attribute name="name" type="xs:string" use="required">
+                  <xs:annotation>
+                    <xs:documentation>Specifies a name for the mapped type. Typically this name is derived from the XML Schema type being mapped.</xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:QName" use="required">
+                  <xs:annotation>
+                    <xs:documentation>Specifies the XML Schema type being mapped to the CORBA type.</xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
                 <xs:attribute name="qualified" type="xs:boolean" />
         </xs:complexType>
         <xs:complexType name="namedType">
@@ -50,7 +58,11 @@
                 </xs:annotation>
                 <xs:complexContent>
                         <xs:extension base="corba:corbaType">
-                                <xs:attribute name="repositoryID" type="xs:string" use="required"/>
+                                <xs:attribute name="repositoryID" type="xs:string" use="required">
+                                  <xs:annotation>
+                                    <xs:documentation>Specifies the fully qualified repository ID of the CORBA type being mapped.</xs:documentation>
+                                  </xs:annotation>
+                                </xs:attribute>
                         </xs:extension>
                 </xs:complexContent>
         </xs:complexType>
