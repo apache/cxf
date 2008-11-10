@@ -302,11 +302,13 @@ public class WSDL2JavaMojo extends AbstractMojo {
         if (doneFileName.startsWith(basedir.toString())) {
             doneFileName = doneFileName.substring(basedir.toString().length());
         }
+
+        // If URL to WSDL, replace ? and & since they're invalid chars for file names
+        // Not to mention slashes.
         
         doneFileName = doneFileName.replace('?', '_')
-            .replace('&', '_').replace('/', '_').replace('\\', '_');
+            .replace('&', '_').replace('/', '_').replace('\\', '_').replace(':', '_'); 
         
-        // If URL to WSDL, replace ? and & since they're invalid chars for file names
         File doneFile =
             new File(markerDirectory, "." + doneFileName + ".DONE");
         
