@@ -40,7 +40,11 @@
                   org.apache.cxf.binding.BindingFactory interface. The SOAP binding is configured using the soap:soapBinding bean.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="executor" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
                 <xsd:documentation>Configures a Java executor to handle the service.</xsd:documentation>
@@ -51,8 +55,16 @@
                 <xsd:documentation>Specifies a list of beans that configure advanced features like WS-RM.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="implementor" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of JAX-WS handlers to add to the endpoint's processing chain.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="implementor" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the bean implementing the service. If this child is used you should not use the implementor attribute.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
                 <xsd:documentation>Specifies a list of interceptors to process incoming requests.</xsd:documentation>
@@ -80,7 +92,11 @@
                 <xsd:documentation>Specifies a list of interceptors to process outgoing fault messages.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="properties" type="beans:mapType" minOccurs="0"/>
+            <xsd:element name="properties" type="beans:mapType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
             <xsd:element name="serviceFactory" type="xsd:anyType" minOccurs="0"/>
           </xsd:all>
@@ -154,7 +170,11 @@
                   org.apache.cxf.binding.BindingFactory interface. The SOAP binding is configured using the soap:soapBinding bean.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="executor" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
                 <xsd:documentation>Configures a Java executor to handle the service.</xsd:documentation>
@@ -165,7 +185,11 @@
                 <xsd:documentation>Specifies a list of beans that configure advanced features like WS-RM.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of JAX-WS handlers to add to the endpoint's processing chain.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
                 <xsd:documentation>Specifies a list of interceptors to process incoming requests.</xsd:documentation>
@@ -193,9 +217,17 @@
                 <xsd:documentation>Specifies a list of interceptors to process outgoing fault messages.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-            <xsd:element name="properties" type="beans:mapType" minOccurs="0"/>
+            <xsd:element name="properties" type="beans:mapType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
-            <xsd:element name="serviceBean" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="serviceBean" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the bean implementing the service. If this child is used you should not use the serviceBean attribute.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="serviceFactory" type="xsd:anyType" minOccurs="0"/>
           </xsd:all>
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
@@ -262,15 +294,52 @@
       <xsd:complexContent>
         <xsd:extension base="beans:identifiedType">
           <xsd:all>
-            <xsd:element name="binding" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="features" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="properties" type="beans:mapType" minOccurs="0"/>
+            <xsd:element name="binding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the message binding used by the endpoint. Message bindings are configured using implementations of the 
+                  org.apache.cxf.binding.BindingFactory interface. The SOAP binding is configured using the soap:soapBinding bean.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="features" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of beans that configure advanced features like WS-RM.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of JAX-WS handlers to add to the endpoint's processing chain.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming responses.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing requests.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="properties" type="beans:mapType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
             <xsd:element name="conduitSelector" type="xsd:anyType" minOccurs="0"/>
           </xsd:all>
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
