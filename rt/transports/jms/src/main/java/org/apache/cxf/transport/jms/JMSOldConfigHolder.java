@@ -31,6 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.connection.SingleConnectionFactory;
+import org.springframework.jms.connection.SingleConnectionFactory102;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
@@ -47,7 +48,8 @@ public class JMSOldConfigHolder {
     private ServerBehaviorPolicyType serverBehavior;
 
     private ConnectionFactory getConnectionFactoryFromJndi(String connectionFactoryName, String userName,
-                                                           String password, JndiTemplate jt) {
+                                                           String password, JndiTemplate jt,
+                                                           boolean use11) {
         if (connectionFactoryName == null) {
             return null;
         }
@@ -58,7 +60,12 @@ public class JMSOldConfigHolder {
             uccf.setPassword(password);
             uccf.setTargetConnectionFactory(connectionFactory);
 
-            SingleConnectionFactory scf = new SingleConnectionFactory();
+            SingleConnectionFactory scf = null;
+            if (use11) {
+                scf = new SingleConnectionFactory();
+            } else {
+                scf = new SingleConnectionFactory102();
+            }
             scf.setTargetConnectionFactory(uccf);
             return scf;
         } catch (NamingException e) {
@@ -92,7 +99,8 @@ public class JMSOldConfigHolder {
         JndiTemplate jt = new JndiTemplate();
         jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(address));
         ConnectionFactory cf = getConnectionFactoryFromJndi(address.getJndiConnectionFactoryName(), address
-            .getConnectionUserName(), address.getConnectionPassword(), jt);
+            .getConnectionUserName(), address.getConnectionPassword(), jt,
+            address.isSetUseJms11() ? address.isUseJms11() : JMSConfiguration.DEFAULT_USEJMS11);
 
         boolean pubSubDomain = false;
         if (address.isSetDestinationStyle()) {

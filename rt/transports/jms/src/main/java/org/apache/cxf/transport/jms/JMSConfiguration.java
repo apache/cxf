@@ -29,11 +29,13 @@ import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class JMSConfiguration implements InitializingBean {
+    static final boolean DEFAULT_USEJMS11 = true;
+    
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
     private PlatformTransactionManager transactionManager;
     private TaskExecutor taskExecutor;
-    private boolean useJms11;
+    private boolean useJms11 = DEFAULT_USEJMS11;
     private boolean useJndi;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
