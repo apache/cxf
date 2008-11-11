@@ -164,7 +164,7 @@
                         <id>generate-test-sources</id>
                         <phase>generate-test-sources</phase>
                         <configuration>
-                            <sourceRoot>target/generated/src/test/java</sourceRoot>
+                            <testSourceRoot>target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>src/test/resources/wsdl</testWsdlRoot>
                             <wsdlOptions>
                                 <wsdlOption>
