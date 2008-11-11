@@ -181,7 +181,8 @@ public final class JMSUtils {
         for (String token : tokens) {
             int index = token.indexOf("charset=");
             if (index >= 0) {
-                enc = token.substring(index + 8);                
+                enc = token.substring(index + 8);
+                break;
             }            
         }
         
