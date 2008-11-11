@@ -378,6 +378,7 @@
                         <quiet>true</quiet>
                         <bottom>Apache CXF</bottom>
                         <javadocVersion>1.5</javadocVersion>
+                        <encoding>UTF-8</encoding>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
