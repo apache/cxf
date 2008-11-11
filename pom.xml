@@ -374,8 +374,10 @@
                     <version>2.5</version>
                     <configuration>
                         <attach>true</attach>
+                        <source>1.5</source>
                         <quiet>true</quiet>
                         <bottom>Apache CXF</bottom>
+                        <javadocVersion>1.5</javadocVersion>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
