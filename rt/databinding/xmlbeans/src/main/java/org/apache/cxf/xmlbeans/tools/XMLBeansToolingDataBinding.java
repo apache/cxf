@@ -21,6 +21,7 @@ package org.apache.cxf.xmlbeans.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -169,6 +170,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
 
             FilerImpl filer = new FilerImpl(classesDir, srcDir,
                                             null, verbose, false) {
+
                 public Writer createSourceFile(String typename) throws IOException {
                     String tn = typename;
                     if (tn.contains("$")) {

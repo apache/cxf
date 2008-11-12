@@ -91,41 +91,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <configuration>
-                    <instrumentation>
-                        <ignores>
-                            <ignore>org.apache.cxf.ws.rm.manager.*</ignore>
-                        </ignores>
-                        <excludes>
-                            <exclude>org/apache/cxf/ws/rm/AcceptType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/AckRequestedType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/CreateSequenceResponseType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/CreateSequenceType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/Expires.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/Identifier.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/ObjectFactory.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/OfferType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/SequenceAcknowledgement.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/SequenceType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/SequenceFaultType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/TerminateSequenceType.class</exclude>
-                            <exclude>org/apache/cxf/ws/rm/manager/*</exclude>
-                            <exclude>org/apache/cxf/ws/rm/policy/*</exclude>
-                            <exclude>**/*Test.class</exclude>
-                        </excludes>
-                    </instrumentation>
-                </configuration>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>clean</goal>
-                    </goals>
-                  </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-common-xsd</artifactId>
                 <version>${project.version}</version>
