@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -169,11 +170,13 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
         mapClass(part, clazz);
     }
     private void mapClass(MessagePartInfo part, Class clazz) {
+        
         if (!XmlObject.class.isAssignableFrom(clazz)) {
             
             Class<? extends XmlAnySimpleType> type = CLASS_MAP.get(clazz);
             if (type == null) {
-                System.out.println(clazz);
+                LOG.log(Level.SEVERE, clazz.getName() + " was not found in class map");
+                return;
             }
             SchemaTypeSystem sts = BuiltinSchemaTypeSystem.get();
             SchemaType st2 = sts.typeForClassname(type.getName());
@@ -185,6 +188,7 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             part.setXmlSchema(xmlSchema);
             return;
         }
+        
         try {
             Field field = clazz.getField("type");
             SchemaType st = (SchemaType)field.get(null);

@@ -1,0 +1,37 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+    
+    <bean id="GreeterImpl"
+          class="org.apache.cxf.xmlbeans.GreeterMineImpl"
+          scope="prototype" />
+    
+    <!--bean id="xmlBeansBean"
+          class="org.apache.cxf.jaxb.JAXBDataBinding" 
+          scope="prototype" /-->
+          
+    <bean id="xmlBeansBean"
+	  class="org.apache.cxf.xmlbeans.XmlBeansDataBinding" 
+          scope="prototype"/>
+
+    <bean id="testServiceFactory"
+          class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean"
+          scope="singleton">
+      <property name="dataBinding" ref="xmlBeansBean" />
+    </bean>
+
+    <jaxws:endpoint id="greeterMineEndpoint"
+                    address="http://localhost:9000/SoapContext/SoapPort"
+                    wsdlLocation="src/test/java/org/apache/cxf/xmlbeans/xmlbeanstest.wsdl"
+                    implementor="org.apache.cxf.xmlbeans.GreeterMineImpl"
+                    serviceName="ns:SOAPMineService"
+                    xmlns:ns="http://cxf.apache.org/xmlbeans">
+        <jaxws:serviceFactory>
+            <ref bean="testServiceFactory"/>
+        </jaxws:serviceFactory>
+    </jaxws:endpoint>
+</beans>
