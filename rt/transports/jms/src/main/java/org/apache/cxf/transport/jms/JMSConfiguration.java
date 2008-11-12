@@ -29,7 +29,7 @@ import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class JMSConfiguration implements InitializingBean {
-    static final boolean DEFAULT_USEJMS11 = true;
+    static final boolean DEFAULT_USEJMS11 = false;
     
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
