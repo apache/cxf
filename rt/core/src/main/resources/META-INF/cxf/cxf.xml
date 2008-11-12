@@ -24,7 +24,7 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
-    <bean id="foo" class="org.apache.cxf.bus.spring.BusApplicationListener"/>
+    <bean id="org.apache.cxf.bus.spring.BusApplicationListener" class="org.apache.cxf.bus.spring.BusApplicationListener"/>
     <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
     <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
     <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
