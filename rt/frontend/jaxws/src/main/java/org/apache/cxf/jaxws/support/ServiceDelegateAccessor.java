@@ -39,6 +39,7 @@ public final class ServiceDelegateAccessor {
     private static final Logger LOG = LogUtils.getL7dLogger(ServiceDelegateAccessor.class);
 
     private static final String DELEGATE_FIELD_NAME = "delegate";
+    private static final String DELEGATE_FIELD_NAME2 = "_delegate";
 
     private ServiceDelegateAccessor() {        
     }
@@ -59,11 +60,18 @@ public final class ServiceDelegateAccessor {
             delegateField.setAccessible(true);
             delegate = (ServiceImpl)delegateField.get(service);
         } catch (Exception e) {
-            WebServiceException wse = new WebServiceException("Failed to access Field named "
-                                                              + DELEGATE_FIELD_NAME + " of Service instance "
-                                                              + service, e);
-            LOG.log(Level.SEVERE, e.getMessage(), e);
-            throw wse;
+            try {
+                Field delegateField = Service.class.getDeclaredField(DELEGATE_FIELD_NAME2);
+                delegateField.setAccessible(true);
+                delegate = (ServiceImpl)delegateField.get(service);
+            } catch (Exception e2) {
+                WebServiceException wse = new WebServiceException("Failed to access Field named "
+                                                                  + DELEGATE_FIELD_NAME 
+                                                                  + " of Service instance "
+                                                                  + service, e);
+                LOG.log(Level.SEVERE, e.getMessage(), e);
+                throw wse;                
+            }
         }
         return delegate;
     }

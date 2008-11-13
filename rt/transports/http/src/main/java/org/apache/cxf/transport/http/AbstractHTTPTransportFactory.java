@@ -158,9 +158,8 @@ public abstract class AbstractHTTPTransportFactory
         HTTPConduit conduit = target == null
             ? new HTTPConduit(bus, endpointInfo)
             : new HTTPConduit(bus, endpointInfo, target);
-        
         // Spring configure the conduit.  
-        configure(conduit);
+        configure(conduit, conduit.getAddress());
         conduit.finalizeConfig();
         return conduit;
     }
@@ -218,9 +217,15 @@ public abstract class AbstractHTTPTransportFactory
      * @param bean
      */
     protected void configure(Object bean) {
+        configure(bean, null);
+    }
+    protected void configure(Object bean, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
             configurer.configureBean(bean);
+            if (extraName != null) {
+                configurer.configureBean(extraName, bean);
+            }
         }
     }
 
