@@ -78,6 +78,11 @@ public class URIResolver {
         }
     }
 
+    public void unresolve() {
+        this.file = null;
+        this.uri = null;
+        this.is = null;
+    }
     
     public void resolve(String baseUriStr, String uriStr, Class callingCls) throws IOException {
         this.calling = (callingCls != null) ? callingCls : getClass();

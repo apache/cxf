@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -37,6 +38,7 @@ import org.apache.cxf.tools.fortest.classnoanno.docbare.Stock;
 import org.apache.cxf.tools.fortest.withannotation.doc.Hello;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.apache.cxf.tools.util.AnnotationUtil;
+import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.hello_world_rpclit.javato.GreeterRPCLit;
 import org.junit.After;
 import org.junit.Before;
@@ -54,6 +56,10 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         builder = new JaxwsServiceBuilder();
         builder.setBus(BusFactory.getDefaultBus());
         generator.setBus(builder.getBus());
+        
+        Bus b = builder.getBus();
+        assertNotNull(b.getExtension(DestinationFactoryManager.class)
+            .getDestinationFactory("http://schemas.xmlsoap.org/soap/http"));
     }
 
     @After

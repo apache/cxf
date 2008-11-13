@@ -38,7 +38,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
-import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -119,7 +118,7 @@ public final class SchemaUtil {
     
                         schemaCol.setBaseUri(def.getDocumentBaseURI());
                         CatalogXmlSchemaURIResolver schemaResolver =
-                            new CatalogXmlSchemaURIResolver(OASISCatalogManager.getCatalogManager(bus));
+                            new CatalogXmlSchemaURIResolver(bus);
                         schemaCol.setSchemaResolver(schemaResolver);
                         
                         XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);

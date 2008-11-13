@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.http;
 
+import java.net.URL;
+
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.BusFactory;
@@ -75,12 +77,19 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     //
     // tests
     //
-    
-    
-    public final void testSuccessfulCall(String configuration, String address) throws Exception {
+    public final void testSuccessfulCall(String configuration,
+                                         String address) throws Exception {
+        testSuccessfulCall(configuration, address, null);
+    }
+    public final void testSuccessfulCall(String configuration,
+                                         String address,
+                                         URL url) throws Exception {
         setTheConfiguration(configuration);
         startServers();
-        SOAPService service = new SOAPService();
+        if (url == null) {
+            url = SOAPService.WSDL_LOCATION;
+        }
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
         assertNotNull("Service is null", service);   
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
@@ -120,6 +129,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     @Test
     public final void testResourceKeySpecEndpointURL() throws Exception {
         testSuccessfulCall("resources/resource-key-spec-url.xml",
-                           "https://localhost:9005/SoapContext/HttpsPort");
+                           "https://localhost:9005/SoapContext/HttpsPort",
+                           new URL("https://localhost:9005/SoapContext/HttpsPort?wsdl"));
     }
 }

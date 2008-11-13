@@ -136,6 +136,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             
             if (!mp.containsKey("")) {
                 Definition def = new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
+
                 mp.put("", def);
                 updateDefinition(def, mp, smp, base, endpointInfo);
             }

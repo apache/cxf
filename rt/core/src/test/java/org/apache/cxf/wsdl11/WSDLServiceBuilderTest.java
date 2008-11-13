@@ -44,6 +44,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
@@ -111,7 +112,7 @@ public class WSDLServiceBuilderTest extends Assert {
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
         wsdlReader.setFeature("javax.wsdl.verbose", false);
         
-        def = wsdlReader.readWSDL(new WSDLLocatorImpl(wsdlUrl));
+        def = wsdlReader.readWSDL(new CatalogWSDLLocator(wsdlUrl));
 
         int seq = 0;
         for (Service serv : CastUtils.cast(def.getServices().values(), Service.class)) {

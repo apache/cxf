@@ -25,7 +25,9 @@ import javax.wsdl.xml.WSDLLocator;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.resource.ExtendedURIResolver;
+import org.apache.cxf.transport.TransportURIResolver;
 import org.apache.xml.resolver.Catalog;
 
 /**
@@ -38,15 +40,24 @@ public class CatalogWSDLLocator implements WSDLLocator {
     private Catalog catalogResolver;
     private String baseUri;
     
+    public CatalogWSDLLocator(String wsdlUrl) {
+        this.baseUri = wsdlUrl;
+        this.resolver = new ExtendedURIResolver();        
+    }
     public CatalogWSDLLocator(String wsdlUrl, OASISCatalogManager catalogManager) {
         this.baseUri = wsdlUrl;
         this.catalogResolver = catalogManager.getCatalog();
         this.resolver = new ExtendedURIResolver();
     }
+    public CatalogWSDLLocator(String wsdlUrl, Bus b) {
+        this.baseUri = wsdlUrl;
+        this.catalogResolver = OASISCatalogManager.getCatalogManager(b).getCatalog();
+        this.resolver = new TransportURIResolver(b);
+    }
 
     public InputSource getBaseInputSource() {
         InputSource result = resolver.resolve(baseUri, null);
-        if (result == null) {
+        if (result == null && catalogResolver != null) {
             try {
                 String s = catalogResolver.resolveSystem(baseUri);
                 if (s != null) {
@@ -88,17 +99,18 @@ public class CatalogWSDLLocator implements WSDLLocator {
         this.baseUri = parent;
 
         String resolvedImportLocation = null;
-        try {
-            resolvedImportLocation = this.catalogResolver.resolveSystem(importLocation);
-            if (resolvedImportLocation == null) {
-                resolvedImportLocation = catalogResolver.resolveURI(importLocation);
+        if (catalogResolver != null) {
+            try {
+                resolvedImportLocation = this.catalogResolver.resolveSystem(importLocation);
+                if (resolvedImportLocation == null) {
+                    resolvedImportLocation = catalogResolver.resolveURI(importLocation);
+                }
+                if (resolvedImportLocation == null) {
+                    resolvedImportLocation = catalogResolver.resolvePublic(importLocation, parent);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Catalog resolution failed", e);
             }
-            if (resolvedImportLocation == null) {
-                resolvedImportLocation = catalogResolver.resolvePublic(importLocation, parent);
-            }
-        
-        } catch (IOException e) {
-            throw new RuntimeException("Catalog resolution failed", e);
         }
 
         InputSource in = null;

@@ -409,6 +409,12 @@ public class ServiceWSDLBuilder {
         
         Map<QName, MessageInfo> messages = serviceInfo.getMessages();
         for (Map.Entry<QName, MessageInfo> mie : messages.entrySet()) {
+            if (!mie.getKey().getNamespaceURI().equals(definition.getTargetNamespace())) {
+                continue;
+            }
+            if (definition.getMessage(mie.getKey()) != null) {
+                continue;
+            }
             Message message = definition.createMessage();
             message.setUndefined(false);
             message.setQName(mie.getKey());

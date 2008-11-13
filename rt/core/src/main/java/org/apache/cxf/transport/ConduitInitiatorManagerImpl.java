@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.bus.extension.DeferredMap;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.configuration.spring.MapProvider;
@@ -119,7 +120,24 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
     }
 
     public ConduitInitiator getConduitInitiatorForUri(String uri) {
-        // TODO Auto-generated method stub
+        for (ConduitInitiator ci : conduitInitiators.values()) {
+            for (String prefix : ci.getUriPrefixes()) {
+                if (uri.startsWith(prefix)) {
+                    return ci;
+                }
+            }
+        }
+        //looks like we'll need to undefer everything so we can try again.
+        if (conduitInitiators instanceof DeferredMap) {
+            ((DeferredMap)conduitInitiators).undefer();
+            for (ConduitInitiator df : conduitInitiators.values()) {
+                for (String prefix : df.getUriPrefixes()) {
+                    if (uri.startsWith(prefix)) {
+                        return df;
+                    }
+                }
+            }
+        }
         return null;
     }
     
