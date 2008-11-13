@@ -101,9 +101,14 @@ public class WSDLServiceBuilder {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceBuilder.class);
     private Bus bus;
     private Map<String, Element> schemaList = new HashMap<String, Element>();
+    private boolean recordOriginal = true;
 
     public WSDLServiceBuilder(Bus bus) {
         this.bus = bus;
+    }
+    public WSDLServiceBuilder(Bus bus, boolean record) {
+        this.bus = bus;
+        recordOriginal = record;
     }
 
     private void copyExtensors(AbstractPropertiesHolder info, List<?> extList) {
@@ -126,7 +131,9 @@ public class WSDLServiceBuilder {
 
     public List<ServiceInfo> buildServices(Definition d) {
         DescriptionInfo description = new DescriptionInfo();
-        description.setProperty(WSDL_DEFINITION, d);
+        if (recordOriginal) {
+            description.setProperty(WSDL_DEFINITION, d);
+        }
         description.setName(d.getQName());
         description.setBaseURI(d.getDocumentBaseURI());
         copyExtensors(description, d.getExtensibilityElements());
@@ -178,7 +185,9 @@ public class WSDLServiceBuilder {
             if (def.getPortTypes().size() == 0) {
 
                 DescriptionInfo description = new DescriptionInfo();
-                description.setProperty(WSDL_DEFINITION, def);
+                if (recordOriginal) {
+                    description.setProperty(WSDL_DEFINITION, def);
+                }
                 description.setName(def.getQName());
                 description.setBaseURI(def.getDocumentBaseURI());
                 copyExtensors(description, def.getExtensibilityElements());
@@ -186,7 +195,9 @@ public class WSDLServiceBuilder {
 
                 ServiceInfo service = new ServiceInfo();
                 service.setDescription(description);
-                service.setProperty(WSDL_DEFINITION, def);
+                if (recordOriginal) {
+                    service.setProperty(WSDL_DEFINITION, def);
+                }
                 getSchemas(def, service);
 
                 service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
@@ -198,7 +209,9 @@ public class WSDLServiceBuilder {
 
     public ServiceInfo buildMockService(Definition def, PortType p) {
         DescriptionInfo description = new DescriptionInfo();
-        description.setProperty(WSDL_DEFINITION, def);
+        if (recordOriginal) {
+            description.setProperty(WSDL_DEFINITION, def);
+        }
         description.setName(def.getQName());
         description.setBaseURI(def.getDocumentBaseURI());
         copyExtensors(description, def.getExtensibilityElements());
@@ -206,7 +219,9 @@ public class WSDLServiceBuilder {
 
         ServiceInfo service = new ServiceInfo();
         service.setDescription(description);
-        service.setProperty(WSDL_DEFINITION, def);
+        if (recordOriginal) {
+            service.setProperty(WSDL_DEFINITION, def);
+        }
         getSchemas(def, service);
 
         service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
@@ -222,7 +237,9 @@ public class WSDLServiceBuilder {
         DescriptionInfo description = d;
         if (null == description) {
             description = new DescriptionInfo();
-            description.setProperty(WSDL_DEFINITION, def);
+            if (recordOriginal) {
+                description.setProperty(WSDL_DEFINITION, def);
+            }
             description.setName(def.getQName());
             description.setBaseURI(def.getDocumentBaseURI());
             copyExtensors(description, def.getExtensibilityElements());
@@ -242,8 +259,10 @@ public class WSDLServiceBuilder {
                 service = new ServiceInfo();
                 service.setDescription(description);
                 description.getDescribed().add(service);
-                service.setProperty(WSDL_DEFINITION, def);
-                service.setProperty(WSDL_SERVICE, serv);
+                if (recordOriginal) {
+                    service.setProperty(WSDL_DEFINITION, def);
+                    service.setProperty(WSDL_SERVICE, serv);
+                }
                 getSchemas(def, service);
 
                 service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
@@ -475,7 +494,9 @@ public class WSDLServiceBuilder {
         }
         this.copyExtensors(inf, p.getExtensibilityElements());
         this.copyExtensionAttributes(inf, p);
-        inf.setProperty(WSDL_PORTTYPE, p);
+        if (recordOriginal) {
+            inf.setProperty(WSDL_PORTTYPE, p);
+        }
         for (Operation op : cast(p.getOperations(), Operation.class)) {
             buildInterfaceOperation(inf, op);
         }
@@ -484,7 +505,9 @@ public class WSDLServiceBuilder {
 
     private void buildInterfaceOperation(InterfaceInfo inf, Operation op) {
         OperationInfo opInfo = inf.addOperation(new QName(inf.getName().getNamespaceURI(), op.getName()));
-        opInfo.setProperty(WSDL_OPERATION, op);
+        if (recordOriginal) {
+            opInfo.setProperty(WSDL_OPERATION, op);
+        }
         List<String> porderList = CastUtils.cast((List)op.getParameterOrdering());
         opInfo.setParameterOrdering(porderList);
         this.copyExtensors(opInfo, op.getExtensibilityElements());

@@ -28,9 +28,9 @@ import org.xml.sax.InputSource;
 
 public class ExtendedURIResolver {
 
-    private org.apache.cxf.resource.URIResolver currentResolver;
-    private String lastestImportUri;
-    private Stack<InputStream> resourceOpened = new Stack<InputStream>();
+    protected org.apache.cxf.resource.URIResolver currentResolver;
+    protected String lastestImportUri;
+    protected Stack<InputStream> resourceOpened = new Stack<InputStream>();
 
     public ExtendedURIResolver() {
         currentResolver = new org.apache.cxf.resource.URIResolver();        

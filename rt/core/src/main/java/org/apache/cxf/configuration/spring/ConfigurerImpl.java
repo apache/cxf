@@ -104,10 +104,13 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     }
 
     public void configureBean(Object beanInstance) {
-        configureBean(null, beanInstance);
+        configureBean(null, beanInstance, true);
     }
     
-    public synchronized void configureBean(String bn, Object beanInstance) {
+    public void configureBean(String bn, Object beanInstance) {
+        configureBean(bn, beanInstance, true);
+    }
+    public synchronized void configureBean(String bn, Object beanInstance, boolean checkWildcards) {
 
         if (null == appContexts) {
             return;
@@ -120,8 +123,9 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         if (null == bn) {
             return;
         }
-        
-        configureWithWildCard(bn, beanInstance);
+        if (checkWildcards) {
+            configureWithWildCard(bn, beanInstance);
+        }
         
         final String beanName = bn;
         setBeanWiringInfoResolver(new BeanWiringInfoResolver() {
@@ -155,7 +159,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     }
     
     private void configureWithWildCard(String bn, Object beanInstance) {
-        if (!wildCardBeanDefinitions.isEmpty() && !isWildcardBeanName(bn)) {
+        if (!wildCardBeanDefinitions.isEmpty()) {
             String className = beanInstance.getClass().getName();
             List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
             if (matchers != null) {
@@ -163,7 +167,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                     synchronized (m.matcher) {
                         m.matcher.reset(bn);
                         if (m.matcher.matches()) {
-                            configureBean(m.wildCardId, beanInstance);
+                            configureBean(m.wildCardId, beanInstance, false);
                             return;
                         }
                     }

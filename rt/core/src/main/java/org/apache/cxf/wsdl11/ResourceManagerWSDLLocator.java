@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.wsdl11;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -27,91 +26,39 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.CatalogWSDLLocator;
-import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.resource.ResourceManager;
 
 
-public class ResourceManagerWSDLLocator implements WSDLLocator {
-    WSDLLocator parent;
+public class ResourceManagerWSDLLocator extends AbstractWrapperWSDLLocator {
     Bus bus;
-    String wsdlUrl;
-    InputSource last;
-    String baseUri;
-    boolean fromParent;
     
     public ResourceManagerWSDLLocator(String wsdlUrl,
                                       WSDLLocator parent,
                                       Bus bus) {
-        this.wsdlUrl = wsdlUrl;
+        super(wsdlUrl, parent);
         this.bus = bus;
-        this.parent = parent;
     }
 
     public ResourceManagerWSDLLocator(String wsdlUrl,
                                       Bus bus) {
-        this.wsdlUrl = wsdlUrl;
+        super(wsdlUrl, new CatalogWSDLLocator(wsdlUrl, bus));
         this.bus = bus;
-        this.parent = new CatalogWSDLLocator(wsdlUrl, OASISCatalogManager.getCatalogManager(bus));
     }
 
 
-    public void close() {
-        if (!fromParent) {
-            try {
-                if (last.getByteStream() != null) {
-                    last.getByteStream().close();
-                }
-            } catch (IOException e) {
-                //ignore
-            }
-        }
-        parent.close();
-    }
+    public InputSource getInputSource() {
+        InputStream ins = bus.getExtension(ResourceManager.class).getResourceAsStream(wsdlUrl);
+        InputSource is = new InputSource(ins);
+        is.setSystemId(wsdlUrl);
+        is.setPublicId(wsdlUrl);
 
-    public InputSource getBaseInputSource() {
-        InputSource is = parent.getBaseInputSource();
-        fromParent = true;
-        if (is == null) {
-            InputStream ins = bus.getExtension(ResourceManager.class).getResourceAsStream(wsdlUrl);
-            is = new InputSource(ins);
-            is.setSystemId(wsdlUrl);
-            is.setPublicId(wsdlUrl);
-
-            URL url = bus.getExtension(ResourceManager.class).resolveResource(wsdlUrl, URL.class);
-            if (url != null) {
-                is.setSystemId(url.toString());
-                is.setPublicId(url.toString());
-            }
-            fromParent = false;
-            baseUri = is.getPublicId();
-        } else {
-            baseUri = is.getSystemId();
+        URL url = bus.getExtension(ResourceManager.class).resolveResource(wsdlUrl, URL.class);
+        if (url != null) {
+            is.setSystemId(url.toString());
+            is.setPublicId(url.toString());
         }
-        last = is;
-        
+        baseUri = is.getPublicId();
         return is;
     }
-
-    public String getBaseURI() {
-        if (last == null) {
-            getBaseInputSource();
-            try {
-                if (last.getByteStream() != null) {
-                    last.getByteStream().close();
-                }
-            } catch (IOException e) {
-                //ignore
-            }
-        }
-        return baseUri;
-    }
-
-    public InputSource getImportInputSource(String parentLocation, String importLocation) {
-        return parent.getImportInputSource(parentLocation, importLocation);
-    }
-
-    public String getLatestImportURI() {
-        return parent.getLatestImportURI();
-    }
-
+    
 }
