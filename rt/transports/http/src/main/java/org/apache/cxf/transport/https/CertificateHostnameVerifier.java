@@ -455,15 +455,14 @@ public interface CertificateHostnameVerifier extends javax.net.ssl.HostnameVerif
 
         public static boolean acceptableCountryWildcard(final String cn) {
             int cnLen = cn.length();
-            if (cnLen >= 7 && cnLen <= 9) {
+            if (cnLen >= 7 && cnLen <= 9
                 // Look for the '.' in the 3rd-last position:
-                if (cn.charAt(cnLen - 3) == '.') {
-                    // Trim off the [*.] and the [.XX].
-                    String s = cn.substring(2, cnLen - 3);
-                    // And test against the sorted array of bad 2lds:
-                    int x = Arrays.binarySearch(BAD_COUNTRY_2LDS, s);
-                    return x < 0;
-                }
+                && cn.charAt(cnLen - 3) == '.') {
+                // Trim off the [*.] and the [.XX].
+                String s = cn.substring(2, cnLen - 3);
+                // And test against the sorted array of bad 2lds:
+                int x = Arrays.binarySearch(BAD_COUNTRY_2LDS, s);
+                return x < 0;               
             }
             return true;
         }
