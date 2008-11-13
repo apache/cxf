@@ -23,6 +23,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -36,6 +37,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 public class JBIWrapperOutInterceptor extends AbstractOutDatabindingInterceptor {
@@ -62,6 +64,7 @@ public class JBIWrapperOutInterceptor extends AbstractOutDatabindingInterceptor 
             xmlWriter.writeNamespace("jbi", JBIConstants.NS_JBI_WRAPPER);
             setTypeAttr(xmlWriter, message);
             List<MessagePartInfo> parts = null;
+            
             if (!isRequestor(message)) {
                 parts = bop.getOutput().getMessageParts();
             } else {
@@ -79,7 +82,9 @@ public class JBIWrapperOutInterceptor extends AbstractOutDatabindingInterceptor 
                     if (part.getTypeClass() == String.class) {
                         xmlWriter.writeStartElement(JBIConstants.NS_JBI_WRAPPER, 
                                                     JBIConstants.JBI_WRAPPER_PART.getLocalPart());
+                        writeWrapper(message, bop, xmlWriter);
                         xmlWriter.writeCharacters(obj.toString());
+                        writeWrapperEnding(bop, xmlWriter);
                         xmlWriter.writeEndElement();
                     } else {
                         part = new MessagePartInfo(part.getName(), part.getMessageInfo());
@@ -90,14 +95,51 @@ public class JBIWrapperOutInterceptor extends AbstractOutDatabindingInterceptor 
                 } else {
                     xmlWriter.writeStartElement(JBIConstants.NS_JBI_WRAPPER, 
                                                 JBIConstants.JBI_WRAPPER_PART.getLocalPart());
-                    dataWriter.write(obj, part, xmlWriter);                    
+                    writeWrapper(message, bop, xmlWriter);
+                    dataWriter.write(obj, part, xmlWriter);
+                    writeWrapperEnding(bop, xmlWriter);
                     xmlWriter.writeEndElement();
                 }
             }
             xmlWriter.writeEndElement();
+            
         
         } catch (XMLStreamException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
+        }
+    }
+
+    private void writeWrapperEnding(BindingOperationInfo bop, XMLStreamWriter xmlWriter) 
+        throws XMLStreamException {
+        if (bop.isUnwrapped()) {
+            xmlWriter.writeEndElement();
+        }
+    }
+
+    private void writeWrapper(Message message, BindingOperationInfo bop, XMLStreamWriter xmlWriter) {
+        if (bop.isUnwrapped()) {
+            MessageInfo messageInfo;
+            if (isRequestor(message)) {
+                messageInfo = bop.getWrappedOperation().getOperationInfo().getInput();
+            } else {
+                messageInfo = bop.getWrappedOperation().getOperationInfo().getOutput();
+            }
+
+            MessagePartInfo outPart = messageInfo.getMessageParts().get(0);
+            QName name = outPart.getConcreteName();
+
+            try {
+                
+                int x = 1;
+                while (xmlWriter.getNamespaceContext().getNamespaceURI("ns" + x) != null) {
+                    x++;
+                }
+                xmlWriter.setPrefix("ns" + x, name.getNamespaceURI());
+                xmlWriter.writeStartElement("ns" + x, name.getLocalPart(), name.getNamespaceURI());
+                xmlWriter.writeNamespace("ns" + x, name.getNamespaceURI());
+            } catch (XMLStreamException e) {
+                throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
+            }
         }
     }
     
