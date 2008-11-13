@@ -831,6 +831,15 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         String realAddress = "http://localhost:9015/SoapContext/SoapPort";
         SOAPServiceBogusAddressTest service = new SOAPServiceBogusAddressTest();
         Greeter greeter = service.getSoapPort();
+        try {
+            greeter.greetMe("test");
+            fail("Should fail");
+        } catch (WebServiceException f) {
+            // expected
+        }
+
+        
+        
         BindingProvider bp = (BindingProvider)greeter;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    realAddress);

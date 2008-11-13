@@ -30,10 +30,8 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.imageio.IIOException;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -59,8 +57,6 @@ public final class HttpsURLConnectionFactory
     private static final long serialVersionUID = 1L;
     private static final Logger LOG =
         LogUtils.getL7dLogger(HttpsURLConnectionFactory.class);
-    
-    private static final HostnameVerifier DISABLE_HOSTNAME_VERIFIER = new AlwaysTrueHostnameVerifier();
     
     /*
      *  For development and testing only
@@ -151,25 +147,6 @@ public final class HttpsURLConnectionFactory
 
         return connection;
     }
-
-    /**
-     * This "accept all" hostname verifier is activated when the 
-     * disableCNCheck TLS client configuration parameter is set to 
-     * true (not recommended for production use).  The default of
-     * false makes sure the Common Name (CN) on the server 
-     * certificate equals that of the https:// URL provided by
-     * the SOAP client.
-     */
-    private static class AlwaysTrueHostnameVerifier implements HostnameVerifier {
-
-        public boolean verify(
-            String      hostname,
-            SSLSession  sslSession
-        ) {
-            return true;
-        }
-
-    }
     
     /**
      * This method assigns the various TLS parameters on the HttpsURLConnection
@@ -209,7 +186,9 @@ public final class HttpsURLConnectionFactory
                                                         tlsClientParameters.getSecureSocketProtocol());
         }
         if (tlsClientParameters.isDisableCNCheck()) {
-            connection.setHostnameVerifier(DISABLE_HOSTNAME_VERIFIER);
+            connection.setHostnameVerifier(CertificateHostnameVerifier.ALLOW_ALL);
+        } else {
+            connection.setHostnameVerifier(CertificateHostnameVerifier.DEFAULT);
         }
         connection.setSSLSocketFactory(socketFactory);
     }

@@ -679,8 +679,10 @@ public class HTTPConduit
         String pathInfo = (String)message.get(Message.PATH_INFO);
         String queryString = (String)message.get(Message.QUERY_STRING);
         if (result == null) {
+            if (pathInfo == null && queryString == null) {
+                return getURL();
+            }
             result = getURL().toString();
-            
         }
         
         // REVISIT: is this really correct?

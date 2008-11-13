@@ -82,7 +82,6 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         startServers();
         SOAPService service = new SOAPService();
         assertNotNull("Service is null", service);   
-        
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
         
@@ -117,5 +116,10 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     public final void testResourceKeySpecEndpoint() throws Exception {
         testSuccessfulCall("resources/resource-key-spec.xml",
                            "https://localhost:9004/SoapContext/HttpsPort");
+    }
+    @Test
+    public final void testResourceKeySpecEndpointURL() throws Exception {
+        testSuccessfulCall("resources/resource-key-spec-url.xml",
+                           "https://localhost:9005/SoapContext/HttpsPort");
     }
 }

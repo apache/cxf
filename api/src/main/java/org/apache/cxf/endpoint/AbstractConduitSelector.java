@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -32,6 +33,8 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 
 /**
@@ -70,7 +73,17 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
                     ConduitInitiator conduitInitiator =
                         conduitInitiatorMgr.getConduitInitiator(transportID);
                     if (conduitInitiator != null) {
-                        selectedConduit = conduitInitiator.getConduit(ei);
+                        String add = (String)message.get(Message.ENDPOINT_ADDRESS);
+                        if (StringUtils.isEmpty(add)
+                            || add.equals(ei.getAddress())) {
+                            selectedConduit = conduitInitiator.getConduit(ei);
+                        } else {
+                            EndpointReferenceType epr = new EndpointReferenceType();
+                            AttributedURIType ad = new AttributedURIType();
+                            ad.setValue(add);
+                            epr.setAddress(ad);
+                            selectedConduit = conduitInitiator.getConduit(ei, epr);
+                        }
                         MessageObserver observer = 
                             exchange.get(MessageObserver.class);
                         if (observer != null) {

@@ -20,12 +20,16 @@
 package org.apache.cxf.configuration.spring;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
@@ -47,7 +51,17 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
 
     private Set<ApplicationContext> appContexts;
-    private final Map<String, String> wildCardBeanDefinitions = new HashMap<String, String>();
+    private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
+        = new HashMap<String, List<MatcherHolder>>();
+    
+    static class MatcherHolder {
+        Matcher matcher;
+        String wildCardId;
+        public MatcherHolder(String orig, Matcher matcher) {
+            wildCardId = orig;
+            this.matcher = matcher;
+        }
+    }
     
     public ConfigurerImpl() {
         // complete
@@ -67,14 +81,19 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                         BeanDefinition bd = bdr.getBeanDefinition(n);
                         String className = bd.getBeanClassName();
                         if (null != className) {
-                            if (!wildCardBeanDefinitions.containsKey(className)) {
-                                wildCardBeanDefinitions.put(className, n);
-                            } else {
-                                LogUtils.log(LOG, Level.WARNING, "ONE_WILDCARD_BEAN_ID_PER_CLASS_MSG", 
-                                             new String[]{wildCardBeanDefinitions.get(className),
-                                                          className,
-                                                          n});   
+                            String orig = n;
+                            if (n.charAt(0) == '*') {
+                                //old wildcard
+                                n = "." + n.replaceAll("\\.", "\\."); 
                             }
+                            Matcher matcher = Pattern.compile(n).matcher("");
+                            List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
+                            if (m == null) {
+                                m = new ArrayList<MatcherHolder>();
+                                wildCardBeanDefinitions.put(className, m);
+                            }
+                            MatcherHolder holder = new MatcherHolder(orig, matcher);
+                            m.add(holder);
                         } else {
                             LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n); 
                         }
@@ -138,21 +157,24 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     private void configureWithWildCard(String bn, Object beanInstance) {
         if (!wildCardBeanDefinitions.isEmpty() && !isWildcardBeanName(bn)) {
             String className = beanInstance.getClass().getName();
-            if (wildCardBeanDefinitions.containsKey(className)) {
-                String wildCardBeanId = wildCardBeanDefinitions.get(className);
-                if (bn.endsWith(stripStar(wildCardBeanId))) {
-                    configureBean(wildCardBeanId, beanInstance);
-                }       
+            List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
+            if (matchers != null) {
+                for (MatcherHolder m : matchers) {
+                    synchronized (m.matcher) {
+                        m.matcher.reset(bn);
+                        if (m.matcher.matches()) {
+                            configureBean(m.wildCardId, beanInstance);
+                            return;
+                        }
+                    }
+                }
             }
         }
     }
 
     private boolean isWildcardBeanName(String bn) {
-        return bn.charAt(0) == '*';
-    }
-
-    private String stripStar(String wildCardBeanId) {
-        return wildCardBeanId.substring(1);
+        return bn.indexOf('*') != -1 || bn.indexOf('?') != -1
+            || (bn.indexOf('(') != -1 && bn.indexOf(')') != -1);
     }
 
     protected String getBeanName(Object beanInstance) {
