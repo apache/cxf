@@ -80,7 +80,7 @@ under the License.
     <!-- -->
     <!-- This test exercises the resource attribute in a keyStore and certStore element -->
     <!-- -->
-    <http:conduit name="https://localhost:9005/SoapContext/HttpsPort.*">
+    <http:conduit name="https://localhost:9005/SoapContext/HttpsPort">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                <sec:keyStore type="pkcs12" password="password" 

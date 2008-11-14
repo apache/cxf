@@ -49,7 +49,8 @@ public class JMSOldConfigHolder {
 
     private ConnectionFactory getConnectionFactoryFromJndi(String connectionFactoryName, String userName,
                                                            String password, JndiTemplate jt,
-                                                           boolean use11) {
+                                                           boolean use11,
+                                                           boolean pubSubDomain) {
         if (connectionFactoryName == null) {
             return null;
         }
@@ -60,14 +61,10 @@ public class JMSOldConfigHolder {
             uccf.setPassword(password);
             uccf.setTargetConnectionFactory(connectionFactory);
 
-            SingleConnectionFactory scf = null;
             if (use11) {
-                scf = new SingleConnectionFactory();
-            } else {
-                scf = new SingleConnectionFactory102();
+                return new SingleConnectionFactory(uccf);
             }
-            scf.setTargetConnectionFactory(uccf);
-            return scf;
+            return new SingleConnectionFactory102(uccf, pubSubDomain);
         } catch (NamingException e) {
             throw new RuntimeException(e);
         }
@@ -98,14 +95,15 @@ public class JMSOldConfigHolder {
 
         JndiTemplate jt = new JndiTemplate();
         jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(address));
-        ConnectionFactory cf = getConnectionFactoryFromJndi(address.getJndiConnectionFactoryName(), address
-            .getConnectionUserName(), address.getConnectionPassword(), jt,
-            address.isSetUseJms11() ? address.isUseJms11() : JMSConfiguration.DEFAULT_USEJMS11);
-
         boolean pubSubDomain = false;
         if (address.isSetDestinationStyle()) {
             pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
         }
+        ConnectionFactory cf = getConnectionFactoryFromJndi(address.getJndiConnectionFactoryName(), address
+            .getConnectionUserName(), address.getConnectionPassword(), jt,
+            address.isSetUseJms11() ? address.isUseJms11() : JMSConfiguration.DEFAULT_USEJMS11,
+                pubSubDomain);
+
         jmsConfig.setConnectionFactory(cf);
         jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
         jmsConfig.setExplicitQosEnabled(true);
