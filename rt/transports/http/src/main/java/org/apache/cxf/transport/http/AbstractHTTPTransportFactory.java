@@ -159,7 +159,11 @@ public abstract class AbstractHTTPTransportFactory
             ? new HTTPConduit(bus, endpointInfo)
             : new HTTPConduit(bus, endpointInfo, target);
         // Spring configure the conduit.  
-        configure(conduit, conduit.getAddress());
+        String address = conduit.getAddress();
+        if (address.indexOf('?') != -1) {
+            address = address.substring(0, address.indexOf('?'));
+        }
+        configure(conduit, conduit.getBeanName(), address);
         conduit.finalizeConfig();
         return conduit;
     }
@@ -217,12 +221,12 @@ public abstract class AbstractHTTPTransportFactory
      * @param bean
      */
     protected void configure(Object bean) {
-        configure(bean, null);
+        configure(bean, null, null);
     }
-    protected void configure(Object bean, String extraName) {
+    protected void configure(Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
-            configurer.configureBean(bean);
+            configurer.configureBean(name, bean);
             if (extraName != null) {
                 configurer.configureBean(extraName, bean);
             }
