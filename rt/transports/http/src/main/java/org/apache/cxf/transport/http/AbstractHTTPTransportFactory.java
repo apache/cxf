@@ -160,7 +160,7 @@ public abstract class AbstractHTTPTransportFactory
             : new HTTPConduit(bus, endpointInfo, target);
         // Spring configure the conduit.  
         String address = conduit.getAddress();
-        if (address.indexOf('?') != -1) {
+        if (address != null && address.indexOf('?') != -1) {
             address = address.substring(0, address.indexOf('?'));
         }
         configure(conduit, conduit.getBeanName(), address);
