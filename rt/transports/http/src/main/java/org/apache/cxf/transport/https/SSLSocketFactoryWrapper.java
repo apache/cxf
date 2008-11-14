@@ -24,6 +24,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,7 +101,10 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
             socket.setEnabledCipherSuites(ciphers);
         }
         if ((socket != null) && (protocol != null)) {
-            socket.setEnabledProtocols(new String[] {protocol});
+            String p[] = findProtocols(protocol, socket.getSupportedProtocols());
+            if (p != null) {
+                socket.setEnabledProtocols(p);
+            }
         }
         if (socket == null) {
             LogUtils.log(LOG, Level.SEVERE,
@@ -109,6 +114,21 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
 
         return socket;        
     }
+    private String[] findProtocols(String p, String[] options) {
+        List<String> list = new ArrayList<String>();
+        for (String s : options) {
+            if (s.equals(p)) {
+                return new String[] {p};
+            } else if (s.startsWith(p)) {
+                list.add(s);
+            }
+        }
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.toArray(new String[list.size()]);
+    }
+    
     /*
      * For testing only
      */
