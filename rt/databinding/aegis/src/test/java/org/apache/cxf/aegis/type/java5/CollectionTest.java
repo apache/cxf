@@ -295,7 +295,7 @@ public class CollectionTest extends AbstractAegisTest {
 
         //CHECKSTYLE:OFF
         public String takeUnsortedSet(HashSet<String> strings) {
-            return new Integer(strings.size()).toString();
+            return Integer.toString(strings.size());
         }
 
         public String takeArrayList(ArrayList<String> strings) {
