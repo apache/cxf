@@ -21,10 +21,13 @@ package org.apache.cxf.aegis.type.java5;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Stack;
 import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
@@ -226,7 +229,7 @@ public class CollectionTest extends AbstractAegisTest {
     }
     
     @Test
-    public void testSortedSet() throws Exception {
+    public void testListTypes() throws Exception {
         createService(CollectionService.class, new CollectionService(), null);
         
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
@@ -243,6 +246,13 @@ public class CollectionTest extends AbstractAegisTest {
         strings.add("Baker");
         String first = csi.takeSortedStrings(strings);
         assertEquals("Able", first);
+        
+        //CHECKSTYLE:OFF
+        HashSet<String> hashedSet = new HashSet<String>();
+        hashedSet.addAll(strings);
+        String countString = csi.takeUnsortedSet(hashedSet);
+        assertEquals("2", countString);
+        //CHECKSTYLE:ON
     }
 
     public class CollectionService implements CollectionServiceInterface {
@@ -278,5 +288,20 @@ public class CollectionTest extends AbstractAegisTest {
         public void method1(List<String> headers1) {
             // do nothing, this is purely for schema issues.
         }
+
+        public String takeStack(Stack<String> strings) {
+            return strings.firstElement();
+        }
+
+        //CHECKSTYLE:OFF
+        public String takeUnsortedSet(HashSet<String> strings) {
+            return new Integer(strings.size()).toString();
+        }
+
+        public String takeArrayList(ArrayList<String> strings) {
+            return strings.get(0);
+        }
+        //CHECKSTYLE:ON
+
     }
 }

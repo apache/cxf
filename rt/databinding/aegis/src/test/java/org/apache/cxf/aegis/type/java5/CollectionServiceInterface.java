@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
-
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
+import java.util.Stack;
 
 public interface CollectionServiceInterface {
 
@@ -37,8 +37,13 @@ public interface CollectionServiceInterface {
 
     void takeDoubleList(List<Double> doublesList);
 
-    String takeSortedStrings(@WebParam(name = "strings")SortedSet<String> strings);
+    String takeSortedStrings(SortedSet<String> strings);
     
-    @WebMethod
-    void method1(@WebParam(name = "headers1") List<String> headers1);
+    //CHECKSTYLE:OFF
+    String takeUnsortedSet(HashSet<String> strings);
+    String takeStack(Stack<String> strings);
+    String takeArrayList(ArrayList<String> strings);
+    //CHECKSTYLE:ON
+    
+    void method1(List<String> headers1);
 }
