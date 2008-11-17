@@ -436,7 +436,14 @@ public final class WSDLASTVisitor implements ASTVisitor {
         return def;
     }
     
+    /**
+     * Older versions of XmlSchema forgot to include anyType in the schema.
+     */
     private void addAnyType() {
+        if (schemas.getTypeByQName(Constants.XSD_ANYTYPE) != null) {
+            return;
+        }
+
         XmlSchema[] schemaList = schemas.getXmlSchemas();
         if (schemaList != null) {
             for (int i = 0; i < schemaList.length; i++) {
