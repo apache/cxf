@@ -30,7 +30,9 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Attachment;
 
 public final class AttachmentUtil {
-
+    private static volatile int counter;
+    private static final String ATT_UUID = UUID.randomUUID().toString();
+    
     private AttachmentUtil() {
 
     }
@@ -42,7 +44,8 @@ public final class AttachmentUtil {
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "http://cxf.apache.org/";
-        String name = UUID.randomUUID().toString();
+        //String name = UUID.randomUUID().toString();
+        String name = ATT_UUID + String.valueOf(++counter);
         if (ns != null && (ns.length() > 0)) {
             try {
                 URI uri = new URI(ns);

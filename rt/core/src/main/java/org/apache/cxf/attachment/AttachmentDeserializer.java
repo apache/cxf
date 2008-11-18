@@ -58,6 +58,7 @@ public class AttachmentDeserializer {
 
     private boolean lazyLoading = true;
 
+    private int pbAmount = 2048;
     private PushbackInputStream stream;
 
     private byte boundary[];
@@ -106,7 +107,7 @@ public class AttachmentDeserializer {
             boundary = boundaryString.getBytes("utf-8");
 
             stream = new PushbackInputStream(message.getContent(InputStream.class),
-                    boundary.length * 2);
+                                             pbAmount);
             if (!readTillFirstBoundary(stream, boundary)) {
                 throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
@@ -118,7 +119,7 @@ public class AttachmentDeserializer {
                 throw new RuntimeException(e);
             }
 
-            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary));
+            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount));
             message.setContent(InputStream.class, body);
         }
     }
@@ -286,7 +287,7 @@ public class AttachmentDeserializer {
      * @throws IOException
      */
     private void setupAttachment(AttachmentImpl att, InternetHeaders headers) throws IOException {
-        MimeBodyPartInputStream partStream = new MimeBodyPartInputStream(stream, boundary);
+        MimeBodyPartInputStream partStream = new MimeBodyPartInputStream(stream, boundary, pbAmount);
 
         final String ct = headers.getHeader("Content-Type", null);
         DataSource source = new AttachmentDataSource(ct, new DelegatingInputStream(partStream));
