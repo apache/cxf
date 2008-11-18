@@ -112,11 +112,9 @@ public class SOAPHandlerInterceptor extends
 
         if (getInvoker(message).isOutbound()) {
             if (!chainAlreadyContainsSAAJ(message)) {
-
                 SAAJ_OUT.handleMessage(message);
-
-                message.getInterceptorChain().add(ending);
             }
+            message.getInterceptorChain().add(ending);
         } else {
             boolean isFault = handleMessageInternal(message);
             SOAPMessage msg = message.getContent(SOAPMessage.class);

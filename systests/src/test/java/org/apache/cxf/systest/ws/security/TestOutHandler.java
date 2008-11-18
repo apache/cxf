@@ -27,6 +27,9 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 public class TestOutHandler implements SOAPHandler<SOAPMessageContext> {
+    boolean handleFaultCalledOutbound;
+    boolean handleMessageCalledOutbound;
+
     public Set<QName> getHeaders() {
         return null;
     }
@@ -35,11 +38,22 @@ public class TestOutHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
+        if (isOutbound(smc)) {
+            handleFaultCalledOutbound = true;
+        }
         return true;
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
+        if (isOutbound(smc)) {
+            handleMessageCalledOutbound = true;
+        }
         return true;
     }
 
+    private static boolean isOutbound(SOAPMessageContext smc) {
+        return smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY) != null 
+               && ((Boolean)smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY)).booleanValue();
+    }
+ 
 }
