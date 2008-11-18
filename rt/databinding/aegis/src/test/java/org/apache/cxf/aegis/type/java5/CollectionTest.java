@@ -185,17 +185,17 @@ public class CollectionTest extends AbstractAegisTest {
     @Test
     public void testCollectionServiceWSDL() throws Exception {
         
-        createService(CollectionService.class, new CollectionService(), null);
+        createService(CollectionServiceInterface.class, new CollectionService(), null);
 
-        Document wsdl = getWSDLDocument("CollectionService");
+        Document wsdl = getWSDLDocument("CollectionServiceInterface");
         assertValid("//xsd:element[@name='return'][@type='tns:ArrayOfString']", wsdl);
     }
 
     @Test
     public void testUnannotatedStrings() throws Exception {        
-        createService(CollectionService.class, new CollectionService(), null);
+        createService(CollectionServiceInterface.class, new CollectionService(), null);
 
-        Document doc = getWSDLDocument("CollectionService");
+        Document doc = getWSDLDocument("CollectionServiceInterface");
         // printNode(doc);
         assertValid(
                     "//xsd:complexType[@name='getUnannotatedStringsResponse']"
@@ -205,8 +205,8 @@ public class CollectionTest extends AbstractAegisTest {
     
     @Test
     public void testDoubleList() throws Exception {
-        createService(CollectionService.class, new CollectionService(), null);
-        Document doc = getWSDLDocument("CollectionService");
+        createService(CollectionServiceInterface.class, new CollectionService(), null);
+        Document doc = getWSDLDocument("CollectionServiceInterface");
         assertValid(
                     "//xsd:complexType[@name='ArrayOfDouble']"
                     + "/xsd:sequence/xsd:element[@type='xsd:double']",
@@ -216,14 +216,14 @@ public class CollectionTest extends AbstractAegisTest {
     
     @Test
     public void testListTypes() throws Exception {
-        createService(CollectionService.class, new CollectionService(), null);
+        createService(CollectionServiceInterface.class, new CollectionService(), null);
         
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.getServiceFactory().getServiceConfigurations().add(0, 
                                                               new XFireCompatibilityServiceConfiguration());
         proxyFac.setServiceClass(CollectionServiceInterface.class);
         proxyFac.setDataBinding(new AegisDatabinding());
-        proxyFac.setAddress("local://CollectionService");
+        proxyFac.setAddress("local://CollectionServiceInterface");
         proxyFac.setBus(getBus());
 
         CollectionServiceInterface csi = (CollectionServiceInterface)proxyFac.create();
