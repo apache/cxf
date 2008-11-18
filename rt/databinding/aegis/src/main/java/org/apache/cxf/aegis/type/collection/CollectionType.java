@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Stack;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -57,23 +59,34 @@ public class CollectionType extends ArrayType {
     @SuppressWarnings("unchecked")
     protected Collection<Object> createCollection() {
         Collection values = null;
-
-        if (getTypeClass().isAssignableFrom(List.class)) {
+        
+        /*
+         * getTypeClass returns the type of the object. These ifs asked if the proposed
+         * type can be assigned to the object, not the other way around. Thus List before
+         * Vector and Set before SortedSet.
+         */
+        
+        Class userTypeClass = getTypeClass();
+        if (userTypeClass.isAssignableFrom(List.class)) {
             values = new ArrayList();
-        } else if (getTypeClass().isAssignableFrom(SortedSet.class)) {
-            values = new TreeSet();
-        } else if (getTypeClass().isAssignableFrom(Set.class)) {
+        } else if (userTypeClass.isAssignableFrom(LinkedList.class)) {
+            values = new LinkedList();
+        } else if (userTypeClass.isAssignableFrom(Set.class)) {
             values = new HashSet();
-        } else if (getTypeClass().isAssignableFrom(Vector.class)) {
+        } else if (userTypeClass.isAssignableFrom(SortedSet.class)) {
+            values = new TreeSet();
+        } else if (userTypeClass.isAssignableFrom(Vector.class)) {
             values = new Vector();
-        } else if (getTypeClass().isInterface()) {
+        } else if (userTypeClass.isAssignableFrom(Stack.class)) {
+            values = new Stack();
+        } else if (userTypeClass.isInterface()) {
             values = new ArrayList();
         } else {
             try {
-                values = (Collection<Object>)getTypeClass().newInstance();
+                values = (Collection<Object>)userTypeClass.newInstance();
             } catch (Exception e) {
                 throw new DatabindingException("Could not create map implementation: "
-                                               + getTypeClass().getName(), e);
+                                               + userTypeClass.getName(), e);
             }
         }
 

@@ -9,5 +9,14 @@
         <method name="takeSortedStrings">
         	<parameter index="0" mappedName="strings"/>
         </method>
+        <method name="takeUnsortedSet">
+        	<parameter index="0" mappedName="strings"/>
+        </method>
+        <method name="takeStack">
+        	<parameter index="0" mappedName="strings"/>
+        </method>
+        <method name="takeArrayList">
+        	<parameter index="0" mappedName="strings"/>
+        </method>
 	</mapping>
 </mappings>
