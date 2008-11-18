@@ -29,8 +29,8 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.ContinuationWrapper;
 import org.apache.cxf.systest.http_jetty.continuations.HelloContinuation;
 
 
@@ -43,8 +43,8 @@ import org.apache.cxf.systest.http_jetty.continuations.HelloContinuation;
             wsdlLocation = "org/apache/cxf/systest/jms/continuations/test.wsdl")
 public class HelloWorldWithContinuationsJMS implements HelloContinuation {    
     
-    private Map<String, ContinuationWrapper> suspended = 
-        new HashMap<String, ContinuationWrapper>();
+    private Map<String, Continuation> suspended = 
+        new HashMap<String, Continuation>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
     
@@ -53,7 +53,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
     
     public String sayHi(String firstName, String secondName) {
         
-        ContinuationWrapper continuation = getContinuation(firstName);
+        Continuation continuation = getContinuation(firstName);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
@@ -97,7 +97,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
 
     public void resumeRequest(final String name) {
         
-        ContinuationWrapper suspendedCont = null;
+        Continuation suspendedCont = null;
         synchronized (suspended) {
             suspendedCont = suspended.get(name);
         }
@@ -109,7 +109,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
         }
     }
     
-    private void suspendInvocation(final String name, ContinuationWrapper cont) {
+    private void suspendInvocation(final String name, Continuation cont) {
         
         System.out.println("Suspending invocation for " + name);
         
@@ -132,12 +132,12 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
         }
     }
     
-    private ContinuationWrapper getContinuation(String name) {
+    private Continuation getContinuation(String name) {
         
         System.out.println("Getting continuation for " + name);
         
         synchronized (suspended) {
-            ContinuationWrapper suspendedCont = suspended.remove(name);
+            Continuation suspendedCont = suspended.remove(name);
             if (suspendedCont != null) {
                 return suspendedCont;
             }

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
-import org.apache.cxf.continuations.ContinuationWrapper;
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -45,19 +45,19 @@ public class JMSContinuationProviderTest extends Assert {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null);
-        ContinuationWrapper cw = provider.getContinuation(); 
+        Continuation cw = provider.getContinuation(); 
         assertTrue(cw.isNew());
-        assertSame(cw, m.get(JMSContinuationWrapper.class));
+        assertSame(cw, m.get(JMSContinuation.class));
     }
     
     @Test
     public void testGetExistingContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        JMSContinuationWrapper cw = new JMSContinuationWrapper(null, m, null, null);
-        m.put(JMSContinuationWrapper.class, cw);
+        JMSContinuation cw = new JMSContinuation(null, m, null, null);
+        m.put(JMSContinuation.class, cw);
         JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null);
         assertSame(cw, provider.getContinuation());
-        assertSame(cw, m.get(JMSContinuationWrapper.class));
+        assertSame(cw, m.get(JMSContinuation.class));
     }
 }

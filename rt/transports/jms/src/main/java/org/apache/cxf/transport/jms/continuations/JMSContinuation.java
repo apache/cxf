@@ -19,23 +19,23 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.continuations.ContinuationWrapper;
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 
-public class JMSContinuationWrapper implements ContinuationWrapper {
+public class JMSContinuation implements Continuation {
 
     private Bus bus;
     private Message inMessage;
     private MessageObserver incomingObserver;
-    private List<JMSContinuationWrapper> continuations;
+    private Collection<JMSContinuation> continuations;
     
     private Object userObject;
     
@@ -44,10 +44,10 @@ public class JMSContinuationWrapper implements ContinuationWrapper {
     private boolean isResumed;
     private Timer timer = new Timer();
     
-    public JMSContinuationWrapper(Bus b,
+    public JMSContinuation(Bus b,
                                   Message m, 
                                   MessageObserver observer,
-                                  List<JMSContinuationWrapper> cList) {
+                                  Collection<JMSContinuation> cList) {
         bus = b;
         inMessage = m;    
         incomingObserver = observer;
@@ -87,9 +87,7 @@ public class JMSContinuationWrapper implements ContinuationWrapper {
             return;
         }
         
-        synchronized (continuations) {
-            continuations.remove(this);
-        }
+        continuations.remove(this);
         
         isResumed = true;
         isPending = false;
@@ -113,9 +111,7 @@ public class JMSContinuationWrapper implements ContinuationWrapper {
             return false;
         }
         
-        synchronized (continuations) {
-            continuations.add(this);
-        }
+        continuations.add(this);
         
         isNew = false;
         isResumed = false;

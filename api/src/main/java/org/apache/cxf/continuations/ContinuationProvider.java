@@ -29,5 +29,5 @@ public interface ContinuationProvider {
      * Creates a new continuation or retrieves the existing one
      * @return transport-neutral ContinuationWrapper
      */
-    ContinuationWrapper getContinuation();
+    Continuation getContinuation();
 }

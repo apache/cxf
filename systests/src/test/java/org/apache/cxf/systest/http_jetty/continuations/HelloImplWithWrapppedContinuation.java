@@ -24,8 +24,8 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.ContinuationWrapper;
 
 
 @WebService(name = "HelloContinuation", 
@@ -36,8 +36,8 @@ import org.apache.cxf.continuations.ContinuationWrapper;
 public class HelloImplWithWrapppedContinuation implements HelloContinuation {
     
     
-    private Map<String, ContinuationWrapper> suspended = 
-        new HashMap<String, ContinuationWrapper>();
+    private Map<String, Continuation> suspended = 
+        new HashMap<String, Continuation>();
     
     
     @Resource
@@ -45,7 +45,7 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
     
     public String sayHi(String firstName, String secondName) {
         
-        ContinuationWrapper continuation = getContinuation(firstName);
+        Continuation continuation = getContinuation(firstName);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
@@ -87,7 +87,7 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
 
     public void resumeRequest(final String name) {
         
-        ContinuationWrapper suspendedCont = null;
+        Continuation suspendedCont = null;
         synchronized (suspended) {
             suspendedCont = suspended.get(name);
         }
@@ -99,7 +99,7 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
         }
     }
     
-    private void suspendInvocation(String name, ContinuationWrapper cont) {
+    private void suspendInvocation(String name, Continuation cont) {
         try {
             cont.suspend(20000);    
         } finally {
@@ -110,9 +110,9 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
         }
     }
     
-    private ContinuationWrapper getContinuation(String name) {
+    private Continuation getContinuation(String name) {
         synchronized (suspended) {
-            ContinuationWrapper suspendedCont = suspended.remove(name);
+            Continuation suspendedCont = suspended.remove(name);
             if (suspendedCont != null) {
                 return suspendedCont;
             }

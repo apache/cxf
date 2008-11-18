@@ -25,12 +25,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,8 +57,8 @@ import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.jms.continuations.JMSContinuation;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
-import org.apache.cxf.transport.jms.continuations.JMSContinuationWrapper;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.springframework.jms.core.JmsTemplate;
@@ -75,8 +76,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSConfiguration jmsConfig;
     private Bus bus;
     private DefaultMessageListenerContainer jmsListener;
-    private List<JMSContinuationWrapper> continuations = 
-        new LinkedList<JMSContinuationWrapper>();
+    private Collection<JMSContinuation> continuations = 
+        new ConcurrentLinkedQueue<JMSContinuation>();
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);

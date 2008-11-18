@@ -21,11 +21,9 @@ package org.apache.cxf.transport.http_jetty.continuations;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.ContinuationWrapper;
 import org.apache.cxf.message.Message;
-import org.mortbay.util.ajax.Continuation;
-import org.mortbay.util.ajax.ContinuationSupport;
 
 public class JettyContinuationProvider implements ContinuationProvider {
 
@@ -37,12 +35,11 @@ public class JettyContinuationProvider implements ContinuationProvider {
         this.inMessage = m;
     }
     
-    public ContinuationWrapper getContinuation() {
+    public Continuation getContinuation() {
         if (inMessage.getExchange().isOneWay()) {
             return null;
         }
-        Continuation cont = ContinuationSupport.getContinuation(request, null);
-        return new JettyContinuationWrapper(cont, inMessage);
+        return new JettyContinuationWrapper(request, inMessage);
     }
 
 }

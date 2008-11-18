@@ -19,6 +19,8 @@
 
 package org.apache.cxf.transport.http_jetty.continuations;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.cxf.continuations.ContinuationInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -35,6 +37,7 @@ public class JettyContinuationWrapperTest extends Assert {
         ContinuationInfo ci = new ContinuationInfo(m);
         Object userObject = new Object();
         
+               
         Continuation c = EasyMock.createMock(Continuation.class);
         c.isNew();
         EasyMock.expectLastCall().andReturn(true);
@@ -55,7 +58,12 @@ public class JettyContinuationWrapperTest extends Assert {
         EasyMock.expectLastCall().andReturn(true);
         EasyMock.replay(c);
         
-        JettyContinuationWrapper cw = new JettyContinuationWrapper(c, m);
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+        request.getAttribute("org.mortbay.jetty.ajax.Continuation");
+        EasyMock.expectLastCall().andReturn(c);
+        EasyMock.replay(request);
+        
+        JettyContinuationWrapper cw = new JettyContinuationWrapper(request, m);
         cw.isNew();
         cw.isPending();
         cw.isResumed();

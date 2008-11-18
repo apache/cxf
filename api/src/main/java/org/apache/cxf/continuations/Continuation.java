@@ -23,7 +23,7 @@ package org.apache.cxf.continuations;
  * Represents transport-neutral suspended invocation instances 
  * or continuations
  */
-public interface ContinuationWrapper {
+public interface Continuation {
     
     /** 
      * This method will suspend the request for the timeout or until resume is

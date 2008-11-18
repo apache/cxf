@@ -19,11 +19,11 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.ContinuationWrapper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 
@@ -32,29 +32,29 @@ public class JMSContinuationProvider implements ContinuationProvider {
     private Bus bus;
     private Message inMessage;
     private MessageObserver incomingObserver;
-    private List<JMSContinuationWrapper> continuations;
+    private Collection<JMSContinuation> continuations;
     
     public JMSContinuationProvider(Bus b,
                                    Message m, 
                                    MessageObserver observer,
-                                   List<JMSContinuationWrapper> cList) {
+                                   Collection<JMSContinuation> cList) {
         bus = b;
         inMessage = m;    
         incomingObserver = observer;
         continuations = cList;
     }
     
-    public ContinuationWrapper getContinuation() {
+    public Continuation getContinuation() {
         if (inMessage.getExchange().isOneWay()) {
             return null;
         }
-        JMSContinuationWrapper cw = inMessage.get(JMSContinuationWrapper.class);
+        JMSContinuation cw = inMessage.get(JMSContinuation.class);
         if (cw == null) {
-            cw = new JMSContinuationWrapper(bus,
+            cw = new JMSContinuation(bus,
                                            inMessage, 
                                            incomingObserver,
                                            continuations);
-            inMessage.put(JMSContinuationWrapper.class, cw);
+            inMessage.put(JMSContinuation.class, cw);
         }
         return cw;
         

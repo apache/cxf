@@ -19,21 +19,23 @@
 
 package org.apache.cxf.transport.http_jetty.continuations;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationInfo;
-import org.apache.cxf.continuations.ContinuationWrapper;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.mortbay.jetty.RetryRequest;
-import org.mortbay.util.ajax.Continuation;
+import org.mortbay.util.ajax.ContinuationSupport;
 
-public class JettyContinuationWrapper implements ContinuationWrapper {
+public class JettyContinuationWrapper implements Continuation {
 
-    private Continuation continuation;
+    private org.mortbay.util.ajax.Continuation continuation;
     private Message message;
     
     
-    public JettyContinuationWrapper(Continuation c, Message m) {
-        continuation = c; 
+    public JettyContinuationWrapper(HttpServletRequest request, Message m) {
+        continuation = ContinuationSupport.getContinuation(request, null); 
         message = m;
     }
 
@@ -95,7 +97,7 @@ public class JettyContinuationWrapper implements ContinuationWrapper {
         return message;
     }
     
-    protected Continuation getContinuation() {
+    protected org.mortbay.util.ajax.Continuation getContinuation() {
         return continuation;
     }
     

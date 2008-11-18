@@ -22,8 +22,8 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.ContinuationWrapper;
 
 
 
@@ -52,7 +52,7 @@ public class GreeterImplWithContinuationsJMS {
     
     public String greetMe(String name) {
         
-        ContinuationWrapper continuation = getContinuation(name);
+        Continuation continuation = getContinuation(name);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
@@ -84,7 +84,7 @@ public class GreeterImplWithContinuationsJMS {
         return null;        
     }
     
-    private ContinuationWrapper getContinuation(String name) {
+    private Continuation getContinuation(String name) {
         
         ContinuationProvider provider = 
             (ContinuationProvider)context.getMessageContext().get(ContinuationProvider.class.getName());

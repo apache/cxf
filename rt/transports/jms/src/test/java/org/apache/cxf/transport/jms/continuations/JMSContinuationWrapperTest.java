@@ -37,22 +37,22 @@ import org.junit.Test;
 public class JMSContinuationWrapperTest extends Assert {
 
     private Message m;
-    private List<JMSContinuationWrapper> continuations;
+    private List<JMSContinuation> continuations;
     private Bus b;
     private MessageObserver observer;
     
     @Before
     public void setUp() {
         m = new MessageImpl();
-        continuations = new LinkedList<JMSContinuationWrapper>();
+        continuations = new LinkedList<JMSContinuation>();
         b = BusFactory.getDefaultBus();
         observer = EasyMock.createMock(MessageObserver.class);
     }
     
     @Test
     public void testInitialStatus() {
-        JMSContinuationWrapper cw = 
-            new JMSContinuationWrapper(b, m, observer, continuations);
+        JMSContinuation cw = 
+            new JMSContinuation(b, m, observer, continuations);
         assertTrue(cw.isNew());
         assertFalse(cw.isPending());
         assertFalse(cw.isResumed());
@@ -97,15 +97,15 @@ public class JMSContinuationWrapperTest extends Assert {
     
     @Test
     public void testUserObject() {
-        JMSContinuationWrapper cw = 
-            new JMSContinuationWrapper(b, m, observer, continuations);
+        JMSContinuation cw = 
+            new JMSContinuation(b, m, observer, continuations);
         assertNull(cw.getObject());
         Object userObject = new Object();
         cw.setObject(userObject);
         assertSame(userObject, cw.getObject());
     }
     
-    private static class TestJMSContinuationWrapper extends JMSContinuationWrapper {
+    private static class TestJMSContinuationWrapper extends JMSContinuation {
         
         private boolean taskCreated;
         private boolean taskCancelled;
@@ -113,7 +113,7 @@ public class JMSContinuationWrapperTest extends Assert {
         public TestJMSContinuationWrapper(Bus b,
                                           Message m, 
                                           MessageObserver observer,
-                                          List<JMSContinuationWrapper> cList) {
+                                          List<JMSContinuation> cList) {
             super(b, m, observer, cList);
         }
         
