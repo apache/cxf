@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -38,6 +39,8 @@ import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.continuations.ContinuationInfo;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.endpoint.EndpointResolverRegistry;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
@@ -56,6 +59,7 @@ import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.easymock.classextension.EasyMock;
@@ -65,8 +69,7 @@ import org.junit.Test;
 import org.mortbay.jetty.HttpFields;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Response;
-
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
+import org.mortbay.util.ajax.Continuation;
 
 public class JettyHTTPDestinationTest extends Assert {
     protected static final String AUTH_HEADER = "Authorization";
@@ -172,6 +175,103 @@ public class JettyHTTPDestinationTest extends Assert {
         assertTrue("No random port has been allocated", 
                    url.getPort() > 0);
         
+    }
+    
+    @Test
+    public void testSuspendedException() throws Exception {
+        destination = setUpDestination(false, false);
+        setUpDoService(false);
+        final RuntimeException ex = new RuntimeException();
+        observer = new MessageObserver() {
+            public void onMessage(Message m) {
+                throw new SuspendedInvocationException(ex);
+            }
+        };
+        destination.setMessageObserver(observer);
+        try {
+            destination.doService(request, response);
+            fail("Suspended invocation swallowed");
+        } catch (RuntimeException runtimeEx) {
+            assertSame("Original exception is not preserved", ex, runtimeEx);
+        }
+    }
+    
+    @Test
+    public void testRetrieveFromContinuation() throws Exception {
+        
+        Continuation continuation = EasyMock.createMock(Continuation.class);
+        
+        Message m = new MessageImpl();
+        ContinuationInfo ci = new ContinuationInfo(m);
+        Object userObject = new Object();
+        ci.setUserObject(userObject);
+        continuation.getObject();
+        EasyMock.expectLastCall().andReturn(ci);
+        continuation.setObject(ci.getUserObject());
+        EasyMock.expectLastCall();
+        EasyMock.replay(continuation);
+        
+        HttpServletRequest httpRequest = EasyMock.createMock(HttpServletRequest.class);
+        httpRequest.getAttribute("org.mortbay.jetty.ajax.Continuation");
+        EasyMock.expectLastCall().andReturn(continuation);
+        EasyMock.replay(httpRequest);
+        
+        ServiceInfo serviceInfo = new ServiceInfo();
+        serviceInfo.setName(new QName("bla", "Service"));
+        EndpointInfo ei = new EndpointInfo(serviceInfo, "");
+        ei.setName(new QName("bla", "Port"));
+        
+        transportFactory = new JettyHTTPTransportFactory();
+        transportFactory.setBus(new CXFBusImpl());
+        
+        TestJettyDestination testDestination = 
+            new TestJettyDestination(transportFactory.getBus(), 
+                                     transportFactory, ei);
+        testDestination.finalizeConfig();
+        MessageImpl mi = testDestination.retrieveFromContinuation(httpRequest);
+        assertSame("Message is lost", m, mi);
+        EasyMock.verify(continuation);
+        EasyMock.reset(httpRequest);
+        httpRequest.getAttribute("org.mortbay.jetty.ajax.Continuation");
+        EasyMock.expectLastCall().andReturn(null);
+        mi = testDestination.retrieveFromContinuation(httpRequest);
+        assertNotSame("New message expected", m, mi);
+    }
+    
+    @Test
+    public void testContinuationsIgnored() throws Exception {
+        
+        Continuation continuation = EasyMock.createMock(Continuation.class);
+        HttpServletRequest httpRequest = EasyMock.createMock(HttpServletRequest.class);
+        httpRequest.getAttribute("org.mortbay.jetty.ajax.Continuation");
+        EasyMock.expectLastCall().andReturn(continuation);
+        EasyMock.replay(httpRequest);
+        
+        ServiceInfo serviceInfo = new ServiceInfo();
+        serviceInfo.setName(new QName("bla", "Service"));
+        EndpointInfo ei = new EndpointInfo(serviceInfo, "");
+        ei.setName(new QName("bla", "Port"));
+        
+        final JettyHTTPServerEngine httpEngine = new JettyHTTPServerEngine();
+        httpEngine.setContinuationsEnabled(false);
+        JettyHTTPServerEngineFactory factory = new JettyHTTPServerEngineFactory() {
+            @Override
+            public JettyHTTPServerEngine retrieveJettyHTTPServerEngine(int port) {
+                return httpEngine;
+            }
+        };
+        transportFactory = new JettyHTTPTransportFactory();
+        transportFactory.setBus(new CXFBusImpl());
+        transportFactory.getBus().setExtension(
+            factory, JettyHTTPServerEngineFactory.class);
+        
+        
+        TestJettyDestination testDestination = 
+            new TestJettyDestination(transportFactory.getBus(), 
+                                     transportFactory, ei);
+        testDestination.finalizeConfig();
+        MessageImpl mi = testDestination.retrieveFromContinuation(httpRequest);
+        assertNull("Continuations must be ignored", mi);
     }
     
     @Test
@@ -449,7 +549,7 @@ public class JettyHTTPDestinationTest extends Assert {
         maps.getToEndpointReference();
         EasyMock.expectLastCall().andReturn(refWithId);
         EasyMock.replay(maps);      
-        context.put(SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
+        context.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
         String result = destination.getId(context);
         assertNotNull(result);
         assertEquals("match our id", result, id);
@@ -495,7 +595,7 @@ public class JettyHTTPDestinationTest extends Assert {
             EasyMock.replay(bus);
         }
         
-        engine = EasyMock.createMock(JettyHTTPServerEngine.class);
+        engine = EasyMock.createNiceMock(JettyHTTPServerEngine.class);
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));        
         endpointInfo = new EndpointInfo(serviceInfo, "");
@@ -506,6 +606,8 @@ public class JettyHTTPDestinationTest extends Assert {
         engine.addServant(EasyMock.eq(new URL(NOWHERE + "bar/foo")),
                           EasyMock.isA(JettyHTTPHandler.class));
         EasyMock.expectLastCall();
+        engine.getContinuationsEnabled();
+        EasyMock.expectLastCall().andReturn(true);
         EasyMock.replay(engine);
         
         JettyHTTPDestination dest = new EasyMockJettyHTTPDestination(bus,
@@ -612,6 +714,7 @@ public class JettyHTTPDestinationTest extends Assert {
                 EasyMock.expect(request.getQueryString()).andReturn(query);    
                 EasyMock.expect(request.getHeader("Accept")).andReturn("*/*");  
                 EasyMock.expect(request.getContentType()).andReturn("text/xml charset=utf8");
+                EasyMock.expect(request.getAttribute("org.mortbay.jetty.ajax.Continuation")).andReturn(null);
                 
                 HttpFields httpFields = new HttpFields();
                 httpFields.add("content-type", "text/xml");
@@ -854,5 +957,20 @@ public class JettyHTTPDestinationTest extends Assert {
     
     static EndpointReferenceType getEPR(String s) {
         return EndpointReferenceUtils.getEndpointReference(NOWHERE + s);
+    }
+    
+    private static class TestJettyDestination extends JettyHTTPDestination {
+        public TestJettyDestination(Bus b,
+                                    JettyHTTPTransportFactory ci, 
+                                    EndpointInfo endpointInfo) throws IOException {
+            super(b, ci, endpointInfo);
+        }
+        
+        @Override
+        public MessageImpl retrieveFromContinuation(HttpServletRequest request) {
+            return super.retrieveFromContinuation(request);
+        }
+        
+        
     }
 }

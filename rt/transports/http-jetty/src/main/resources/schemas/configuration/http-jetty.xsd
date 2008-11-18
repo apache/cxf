@@ -121,14 +121,21 @@
          <xs:element name="sessionSupport" type="xsd:boolean" minOccurs="0"/>
          <xs:element name="reuseAddress" type="xsd:boolean" minOccurs="0" />          
        </xs:sequence>
-          <xs:attribute name="port" type="xs:int" use="required">
+       
+       <xs:attribute name="port" type="xs:int" use="required">
              <xs:annotation>
                 <xs:documentation>Specifies the port used by the Jetty instance.
                 You can specify a value of 0 for the port attribute. Any threading 
                 properties specified in an engine element with its port attribute
                 set to 0 are used as the configuration for all Jetty listeners that are not explicitly configured.</xs:documentation>
              </xs:annotation>
-          </xs:attribute>
+       </xs:attribute>
+       <xs:attribute name="continuationsEnabled" type="xs:boolean">
+           <xs:annotation>
+                <xs:documentation>Specifies if Jetty Continuations will be explicitly supported
+                by Jetty destinations. Continuations will be checked if this attribute is set to true or                            omitted, ignored otherwise</xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="JettyHTTPServerEngineFactoryConfigType">

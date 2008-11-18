@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
@@ -138,6 +139,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
     
+    // this method should really be on the InterceptorChain interface
+    public State getState() {
+        return state;
+    }
+    
     public PhaseInterceptorChain cloneChain() {
         return new PhaseInterceptorChain(this);
     }
@@ -218,6 +224,13 @@ public class PhaseInterceptorChain implements InterceptorChain {
                 }
                 //System.out.println("-----------" + currentInterceptor);
                 currentInterceptor.handleMessage(message);
+            } catch (SuspendedInvocationException ex) {
+                // we need to resume from the same interceptor the exception got originated from
+                if (iterator.hasPrevious()) {
+                    iterator.previous();
+                }
+                pause();
+                throw ex;
             } catch (RuntimeException ex) {
                 if (!faultOccurred) {
  

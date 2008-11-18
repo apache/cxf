@@ -57,6 +57,11 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         int port = Integer.valueOf(portStr);
         bean.addPropertyValue("port", port);
                
+        String continuationsStr = element.getAttribute("continuationsEnabled");
+        if (continuationsStr != null && continuationsStr.length() > 0) {
+            bean.addPropertyValue("continuationsEnabled", Boolean.parseBoolean(continuationsStr));
+        }
+        
         MutablePropertyValues engineFactoryProperties = ctx.getContainingBeanDefinition().getPropertyValues();
         PropertyValue busValue = engineFactoryProperties.getPropertyValue("bus");
               
