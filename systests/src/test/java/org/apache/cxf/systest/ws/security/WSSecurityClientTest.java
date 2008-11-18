@@ -112,12 +112,16 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         List<Handler> handlerChain = new ArrayList<Handler>();
         Binding binding = ((BindingProvider)greeter).getBinding();
-        Handler handler;
-        handler = new TestOutHandler();
+        TestOutHandler handler = new TestOutHandler();
         handlerChain.add(handler);
         binding.setHandlerChain(handlerChain);
 
         greeter.sayHi();
+
+        assertTrue("expected Handler.handleMessage() to be called", 
+                   handler.handleMessageCalledOutbound);
+        assertFalse("expected Handler.handleFault() not to be called", 
+                    handler.handleFaultCalledOutbound); 
     }
 
     @Test
