@@ -53,11 +53,13 @@ import javax.ws.rs.ext.MessageBodyWorkers;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletResponse;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageBodyWorkers;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
@@ -300,6 +302,8 @@ public final class InjectionUtils {
             proxy = new ThreadLocalServletContext();
         } else if (HttpServletResponse.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletResponse();
+        } else if (MessageContext.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalMessageContext();
         }
         return proxy;
     }
@@ -380,7 +384,7 @@ public final class InjectionUtils {
                                             Message m) {
         
         for (Field f : cri.getResourceFields()) {
-            Object value = JAXRSUtils.createResourceValue(m, f.getType());
+            Object value = JAXRSUtils.createResourceValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value, true);
         }
     }

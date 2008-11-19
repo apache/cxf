@@ -71,6 +71,8 @@ import javax.ws.rs.ext.MessageBodyWorkers;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.MessageBodyWorkersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -494,6 +496,8 @@ public final class JAXRSUtils {
             o = new MessageBodyWorkersImpl(m);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
             o = createContextResolver(genericType, m);
+        } else if (MessageContext.class.isAssignableFrom(clazz)) {
+            o = new MessageContextImpl(m);
         }
         
         return o == null ? createServletResourceValue(m, clazz) : o;
@@ -514,10 +518,10 @@ public final class JAXRSUtils {
         return null;
     }
 
-    public static Object createResourceValue(Message m, Class<?> clazz) {
+    public static Object createResourceValue(Message m, Type genericType, Class<?> clazz) {
                 
         // lets assume we're aware of servlet types only that can be @Resource-annotated
-        return createServletResourceValue(m, clazz);
+        return createContextValue(m, genericType, clazz);
     }
     
     private static Object createServletResourceValue(Message m, Class<?> clazz) {

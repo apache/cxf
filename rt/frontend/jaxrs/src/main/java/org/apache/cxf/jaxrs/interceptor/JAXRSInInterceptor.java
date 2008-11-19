@@ -87,6 +87,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private void processRequest(Message message) {
+        
+        if (message.getExchange().get(OperationResourceInfo.class) != null) {
+            // it's a suspended invocation;
+            return;
+        }
+        
         RequestPreprocessor rp = 
             ProviderFactory.getInstance().getRequestPreprocessor();
         if (rp != null) {
