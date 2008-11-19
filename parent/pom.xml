@@ -43,8 +43,8 @@
         <saaj.impl.artifactId>saaj-impl</saaj.impl.artifactId>
 
         <jaxb.version>2.1</jaxb.version>
-        <jaxb.impl.version>2.1.7</jaxb.impl.version>
-        <jaxb.xjc.version>2.1.7</jaxb.xjc.version>
+        <jaxb.impl.version>2.1.9</jaxb.impl.version>
+        <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
         <jetty.version>6.1.11</jetty.version>
         <saaj.version>1.3</saaj.version>
         <saaj.impl.version>1.3.2</saaj.impl.version>

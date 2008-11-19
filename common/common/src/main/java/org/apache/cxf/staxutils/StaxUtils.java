@@ -76,8 +76,16 @@ public final class StaxUtils {
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
     
     static {
-        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        XML_NS_AWARE_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+        try {
+            XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        } catch (Exception e) {
+            //ignore
+        }
+        try {
+            XML_NS_AWARE_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+        } catch (Exception ex) {
+            //ignore
+        }
     }
     
     private StaxUtils() {
