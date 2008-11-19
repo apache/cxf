@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -44,7 +45,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public abstract class AbstractInvoker implements Invoker {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractInvoker.class);
-    
     
     public Object invoke(Exchange exchange, Object o) {
 
@@ -87,11 +87,18 @@ public abstract class AbstractInvoker implements Invoker {
             
             return new MessageContentsList(res);
         } catch (InvocationTargetException e) {
+            
             Throwable t = e.getCause();
+            
             if (t == null) {
                 t = e;
             }
+            
+            checkSuspendedInvocation(exchange, serviceObject, m, params, t);
+            
             exchange.getInMessage().put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
+            
+            
             for (Class<?> cl : m.getExceptionTypes()) {
                 if (cl.isInstance(t)) {
                     exchange.getInMessage().put(FaultMode.class, 
@@ -105,16 +112,38 @@ public abstract class AbstractInvoker implements Invoker {
                 throw (Fault)t;
             }
             throw createFault(t, m, params, true);
+        } catch (SuspendedInvocationException suspendedEx) {
+            // to avoid duplicating the same log statement
+            checkSuspendedInvocation(exchange, serviceObject, m, params, suspendedEx);
+            // unreachable
+            throw suspendedEx;
         } catch (Fault f) {
             exchange.getInMessage().put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
             throw f;
         } catch (Exception e) {
+            checkSuspendedInvocation(exchange, serviceObject, m, params, e);
             exchange.getInMessage().put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
             throw createFault(e, m, params, false);
         }
     }
     
+    protected void checkSuspendedInvocation(Exchange exchange,
+                                            Object serviceObject, 
+                                            Method m, 
+                                            List<Object> params, 
+                                            Throwable t) {
+        if (t instanceof SuspendedInvocationException) {
+            
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "SUSPENDED_INVOCATION_EXCEPTION", 
+                        new Object[]{serviceObject, m.toString(), params});
+            }
+            throw (SuspendedInvocationException)t;
+        }
+    }
+    
     protected Fault createFault(Throwable ex, Method m, List<Object> params, boolean checked) {
+        
         if (checked) {
             return new Fault(ex);
         } else {

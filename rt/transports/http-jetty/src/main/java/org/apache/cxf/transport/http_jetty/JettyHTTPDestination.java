@@ -33,24 +33,29 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.continuations.ContinuationInfo;
+import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
+import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
+import org.mortbay.util.ajax.Continuation;
+import org.mortbay.util.ajax.ContinuationSupport;
 
 public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPDestination.class);
 
-    
     protected JettyHTTPServerEngine engine;
     protected JettyHTTPTransportFactory transportFactory;
     protected JettyHTTPServerEngineFactory serverEngineFactory;
@@ -78,6 +83,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             JettyHTTPTransportFactory ci, 
             EndpointInfo              endpointInfo
     ) throws IOException {
+        
         //Add the defualt port if the address is missing it
         super(b, ci, endpointInfo, true);
         this.transportFactory = ci;
@@ -261,24 +267,39 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         throws IOException {
         Request baseRequest = (req instanceof Request) 
             ? (Request)req : HttpConnection.getCurrentConnection().getRequest();
-        try {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Service http request on thread: " + Thread.currentThread());
+        
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Service http request on thread: " + Thread.currentThread());
+        }
+        MessageImpl inMessage = retrieveFromContinuation(req);
+        
+        
+        if (inMessage == null) {
+            
+            inMessage = new MessageImpl();
+            if (engine.getContinuationsEnabled()) {
+                inMessage.put(ContinuationProvider.class.getName(), 
+                          new JettyContinuationProvider(req, inMessage));
             }
-
-            MessageImpl inMessage = new MessageImpl();
+            
             setupMessage(inMessage, context, req, resp);
             
             inMessage.setDestination(this);
-
+    
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(inMessage);
             exchange.setSession(new HTTPSession(req));
-            
-            incomingObserver.onMessage(inMessage);
+        }
 
+        try {    
+            incomingObserver.onMessage(inMessage);
+            
             resp.flushBuffer();
             baseRequest.setHandled(true);
+        } catch (SuspendedInvocationException ex) {
+            throw ex.getRuntimeException();
+        } catch (RuntimeException ex) {
+            throw ex;
         } finally {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
@@ -286,6 +307,39 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
     }
 
+    protected MessageImpl retrieveFromContinuation(HttpServletRequest req) {
+        MessageImpl m = null;
+        
+        if (!engine.getContinuationsEnabled()) {
+            return null;
+        }
+        
+        Continuation cont = ContinuationSupport.getContinuation(req, null);
+        synchronized (cont) {
+            Object o = cont.getObject();
+            if (o instanceof ContinuationInfo) {
+                ContinuationInfo ci = (ContinuationInfo)o;
+                m = (MessageImpl)ci.getMessage();
+                
+                // now that we got the message we don't need ContinuationInfo
+                // as we don't know how continuation was suspended, by jetty wrapper
+                // or directly in which (latter) case we need to ensure that an original user object
+                // if any, need to be restored
+                cont.setObject(ci.getUserObject());
+            }
+            if (m == null && !cont.isNew()) {
+                String message = "No message for existing continuation, status : "
+                    + (cont.isPending() ? "Pending" : "Resumed");
+                if (!(o instanceof ContinuationInfo)) {
+                    message += ", ContinuationInfo object is unavailable";
+                }
+                LOG.warning(message);
+            }
+        }
+        
+        return m;
+    }
+    
     @Override
     public void shutdown() {
         transportFactory.removeDestination(endpointInfo);

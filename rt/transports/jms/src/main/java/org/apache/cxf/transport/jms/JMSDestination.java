@@ -25,11 +25,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +46,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfigurationException;
+import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -53,6 +57,8 @@ import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.jms.continuations.JMSContinuation;
+import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.springframework.jms.core.JmsTemplate;
@@ -70,6 +76,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSConfiguration jmsConfig;
     private Bus bus;
     private DefaultMessageListenerContainer jmsListener;
+    private Collection<JMSContinuation> continuations = 
+        new ConcurrentLinkedQueue<JMSContinuation>();
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
@@ -170,10 +178,18 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             inMessage.setDestination(this);
 
+            inMessage.put(ContinuationProvider.class.getName(), 
+                          new JMSContinuationProvider(bus,
+                                                      inMessage,
+                                                      incomingObserver,
+                                                      continuations));
+            
             BusFactory.setThreadDefaultBus(bus);
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
+        } catch (SuspendedInvocationException ex) {
+            System.out.println("Request message has been suspended");
         } catch (UnsupportedEncodingException ex) {
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } finally {

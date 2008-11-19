@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions name="HelloContinuationService" targetNamespace="http://cxf.apache.org/systest/jaxws" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/systest/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:message name="isRequestSuspended">
+    <wsdl:part name="arg0" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse">
+    <wsdl:part name="return" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHi">
+    <wsdl:part name="arg0" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="arg1" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="resumeRequestResponse">
+  </wsdl:message>
+  <wsdl:message name="isRequestSuspendedResponse">
+    <wsdl:part name="return" type="xsd:boolean">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="resumeRequest">
+    <wsdl:part name="arg0" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HelloContinuation">
+    <wsdl:operation name="isRequestSuspended">
+      <wsdl:input message="tns:isRequestSuspended" name="isRequestSuspended">
+    </wsdl:input>
+      <wsdl:output message="tns:isRequestSuspendedResponse" name="isRequestSuspendedResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resumeRequest">
+      <wsdl:input message="tns:resumeRequest" name="resumeRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:resumeRequestResponse" name="resumeRequestResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHi">
+      <wsdl:input message="tns:sayHi" name="sayHi">
+    </wsdl:input>
+      <wsdl:output message="tns:sayHiResponse" name="sayHiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HelloContinuationServiceSoapBinding" type="tns:HelloContinuation">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="isRequestSuspended">
+      <soap:operation soapAction="" style="rpc" />
+      <wsdl:input name="isRequestSuspended">
+        <soap:body namespace="http://cxf.apache.org/systest/jaxws" use="literal" />
+      </wsdl:input>
+      <wsdl:output name="isRequestSuspendedResponse">
+        <soap:body namespace="http://cxf.apache.org/systest/jaxws" use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resumeRequest">
+      <soap:operation soapAction="" style="rpc" />
+      <wsdl:input name="resumeRequest">
+        <soap:body namespace="http://cxf.apache.org/systest/jaxws" use="literal" />
+      </wsdl:input>
+      <wsdl:output name="resumeRequestResponse">
+        <soap:body namespace="http://cxf.apache.org/systest/jaxws" use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHi">
+      <soap:operation soapAction="" style="rpc" />
+      <wsdl:input name="sayHi">
+        <soap:body namespace="http://cxf.apache.org/systest/jaxws" use="literal" />
+      </wsdl:input>
+      <wsdl:output name="sayHiResponse">
+        <soap:body namespace="http://cxf.apache.org/systest/jaxws" use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HelloContinuationService">
+    <wsdl:port binding="tns:HelloContinuationServiceSoapBinding" name="HelloContinuationPort">
+      <soap:address location="https://localhost:9091/hellocontinuation" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

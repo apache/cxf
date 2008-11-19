@@ -92,12 +92,14 @@ public class JettyHTTPServerEngine
     
     private Boolean isSessionSupport = false;
     private Boolean isReuseAddress = true;
+    private Boolean continuationsEnabled = true;
     private int servantCount;
     private Server server;
     private Connector connector;
     private List<Handler> handlers;
     private JettyConnectorFactory connectorFactory;
     private ContextHandlerCollection contexts;
+    
     
     /**
      * This field holds the TLS ServerParameters that are programatically
@@ -116,7 +118,7 @@ public class JettyHTTPServerEngine
      * has been called.
      */
     private boolean configFinalized;
-    
+        
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.
      */
@@ -140,6 +142,15 @@ public class JettyHTTPServerEngine
     public void setPort(int p) {
         port = p;
     }
+    
+    public void setContinuationsEnabled(boolean enabled) {
+        continuationsEnabled = enabled;
+    }
+    
+    public boolean getContinuationsEnabled() {
+        return continuationsEnabled;
+    }
+    
     /**
      * The bus.
      */

@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -55,6 +56,16 @@ public class ChainInitiationObserver implements MessageObserver {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         try {
+            PhaseInterceptorChain phaseChain = null;
+            
+            if (m.getInterceptorChain() instanceof PhaseInterceptorChain) {
+                phaseChain = (PhaseInterceptorChain)m.getInterceptorChain();
+                if (phaseChain.getState() == InterceptorChain.State.PAUSED) {
+                    phaseChain.resume();
+                    return;
+                }
+            }
+            
             Message message = getBinding().createMessage(m);
             Exchange exchange = message.getExchange();
             if (exchange == null) {
@@ -64,18 +75,18 @@ public class ChainInitiationObserver implements MessageObserver {
             setExchangeProperties(exchange, message);
     
             // setup chain
-            PhaseInterceptorChain chain = chainCache.get(bus.getExtension(PhaseManager.class).getInPhases(),
+            phaseChain = chainCache.get(bus.getExtension(PhaseManager.class).getInPhases(),
                                                          bus.getInInterceptors(),
                                                          endpoint.getService().getInInterceptors(),
                                                          endpoint.getInInterceptors(),
                                                          getBinding().getInInterceptors());
             
             
-            message.setInterceptorChain(chain);
+            message.setInterceptorChain(phaseChain);
             
-            chain.setFaultObserver(endpoint.getOutFaultObserver());
+            phaseChain.setFaultObserver(endpoint.getOutFaultObserver());
            
-            chain.doIntercept(message);
+            phaseChain.doIntercept(message);
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
         }
