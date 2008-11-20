@@ -46,10 +46,12 @@ import javax.xml.ws.ResponseWrapper;
 import javax.xml.ws.WebFault;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxws.JaxWsConfigurationException;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -672,11 +674,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         SOAPBinding ann = m.getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            if (ann.style().equals(Style.RPC)) {        
-                throw new Fault(new RuntimeException("Method [" 
-                                                     + m.getName() 
-                                                     + "] processing error: " 
-                                                     + "SOAPBinding can not on method with RPC style"));
+            if (ann.style().equals(Style.RPC)) { 
+                Message message = new Message("SOAPBinding_MESSAGE_RPC", LOG, m.getName());
+                throw new Fault(new JaxWsConfigurationException(message));
             }
             return !(ann.parameterStyle().equals(ParameterStyle.BARE));
         }
