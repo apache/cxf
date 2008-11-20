@@ -164,7 +164,7 @@ public class JAXBDataBinding extends AbstractDataBinding {
     public JAXBDataBinding(Class<?>... classes) throws JAXBException {
         contextClasses = new LinkedHashSet<Class<?>>();
         contextClasses.addAll(Arrays.asList(classes));
-        setContext(createJAXBContext(contextClasses));
+        setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
     }
 
     public JAXBDataBinding(JAXBContext context) {
@@ -176,7 +176,7 @@ public class JAXBDataBinding extends AbstractDataBinding {
         return context;
     }
 
-    public void setContext(JAXBContext ctx) {
+    public final void setContext(JAXBContext ctx) {
         context = ctx;
     }
 
