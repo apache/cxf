@@ -317,16 +317,29 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                 bindingStyle = sbi.getStyle();
             }
 
+            boolean hasRPC = false;
+            boolean hasDoc = false;
+            
             // Operation wide style, what to do with the mixed style/use?
             for (BindingOperationInfo boi : sbi.getOperations()) {
-                if (sbi.getStyle(boi.getOperationInfo()) != null) {
-                    bindingStyle = sbi.getStyle(boi.getOperationInfo());
+                String st = sbi.getStyle(boi.getOperationInfo());
+                if (st != null) {
+                    bindingStyle = st;
+                    if (SoapBindingConstants.BINDING_STYLE_RPC.equalsIgnoreCase(st)) {
+                        hasRPC = true;
+                    } else {
+                        hasDoc = true;
+                    }
                 }
                 if (boi.getUnwrappedOperation() == null) {
                     parameterStyle = SoapBindingConstants.PARAMETER_STYLE_BARE;
                 } else {
                     hasWrapped = true;
                 }
+            }
+            if (hasRPC && hasDoc) {
+                throw new RuntimeException("WSI-BP prohibits RPC and Document style "
+                                           + "operations in same service.");
             }
         } else {
             throw new RuntimeException("Can not initialize SoapBinding, BindingInfo is not SoapBindingInfo");

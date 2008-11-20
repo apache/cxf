@@ -22,9 +22,10 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
-@SOAPBinding(style = SOAPBinding.Style.RPC, use = SOAPBinding.Use.LITERAL)
+@SOAPBinding(use = SOAPBinding.Use.LITERAL)
 @WebService(name = "Hello", targetNamespace = "http://cxf.apache.org/systest/jaxws/")
 public interface Hello {
+    @SOAPBinding(style = SOAPBinding.Style.RPC)
     @WebMethod(operationName = "sayHi", exclude = false)
     String sayHi(String value);
 }

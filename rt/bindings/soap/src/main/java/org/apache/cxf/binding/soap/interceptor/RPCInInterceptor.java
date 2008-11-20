@@ -90,7 +90,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     }
     public void handleMessage(Message message) {
         if (isGET(message)) {
-            LOG.info("RPCInInterceptor skipped in HTTP GET method");
+            LOG.fine("RPCInInterceptor skipped in HTTP GET method");
             return;
         }
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);

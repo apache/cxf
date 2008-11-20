@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.jaxws.binding.soap;
 
+import java.lang.reflect.Method;
+
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 import javax.jws.soap.SOAPBinding.Use;
 
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
+import org.apache.cxf.service.model.OperationInfo;
 
 /**
  * Introspects the SOAPBinding annotation to provide to construct
@@ -38,6 +41,14 @@ public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
     
     public void setJaxWsServiceFactoryBean(JaxWsServiceFactoryBean b) {
         serviceFactory = b;
+    }
+    
+    public String getStyle(OperationInfo op) {
+        Method m = op.getProperty("operation.method", Method.class);
+        if (m != null) {
+            return serviceFactory.isRPC(m) ? "rpc" : "document";
+        }
+        return getStyle();
     }
 
     @Override
