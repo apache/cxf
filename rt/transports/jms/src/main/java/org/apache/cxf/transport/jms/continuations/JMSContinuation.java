@@ -86,16 +86,15 @@ public class JMSContinuation implements Continuation {
         if (isResumed || !isPending) {
             return;
         }
-        
+
+        isResumed = true;
         continuations.remove(this);
         
         BusFactory.setThreadDefaultBus(bus);
         try {
             incomingObserver.onMessage(inMessage);
         } finally {
-            isResumed = true;
             isPending = false;
-            
             BusFactory.setThreadDefaultBus(null);
         }
     }
