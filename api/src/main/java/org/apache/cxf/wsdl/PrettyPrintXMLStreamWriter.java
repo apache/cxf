@@ -112,13 +112,13 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
 
     public void writeAttribute(java.lang.String localName, java.lang.String value)
         throws XMLStreamException {
-        writeAttribute(null, localName, value);
+        baseWriter.writeAttribute(localName, value);
     }
 
     public void writeAttribute(java.lang.String namespaceURI,
                         java.lang.String localName,
                         java.lang.String value) throws XMLStreamException {
-        writeAttribute(null, namespaceURI, localName, value);
+        baseWriter.writeAttribute(namespaceURI, localName, value);
     }
 
     public void writeAttribute(java.lang.String prefix,
@@ -158,7 +158,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
 
     public void writeEmptyElement(java.lang.String namespaceURI, java.lang.String localName)
         throws XMLStreamException {
-        writeEmptyElement(null, namespaceURI, localName);
+        baseWriter.writeEmptyElement(localName, namespaceURI);
     }
 
     public void writeEmptyElement(java.lang.String prefix,
@@ -238,7 +238,13 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
             CurrentElement elem = (CurrentElement) elems.peek();
             elem.setChildElements(true);
         }
-        baseWriter.writeStartElement(prefix, localName, namespaceURI);
+        if (prefix == null && namespaceURI == null) {
+            baseWriter.writeStartElement(localName);
+        } else if (prefix == null) {
+            baseWriter.writeStartElement(namespaceURI, localName);            
+        } else {
+            baseWriter.writeStartElement(prefix, localName, namespaceURI);
+        }
         elems.push(new CurrentElement(currElemName));
     }
 
