@@ -69,6 +69,9 @@ public class GreeterImplWithContinuationsJMS {
                 if (!suspended) {
                     throw new RuntimeException("Was not suspended yet");
                 }
+                if (continuation.isResumed()) {
+                    throw new RuntimeException("It must be a timeout");
+                }
                 StringBuilder sb = new StringBuilder();
                 sb.append(name);
                 

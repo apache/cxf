@@ -64,6 +64,9 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
                 continuation.setObject(userObject);
                 suspendInvocation(firstName, continuation);
             } else {
+                if (!continuation.isResumed()) {
+                    throw new RuntimeException("No timeout expected");
+                }
                 StringBuilder sb = new StringBuilder();
                 sb.append(firstName);
                 
