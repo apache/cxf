@@ -353,7 +353,9 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         
         return hasAnnotation;
     }
-
+    protected SoapBindingConfiguration createSoapBindingConfig() {
+        return new SoapBindingConfiguration();
+    }
     protected BindingInfo createBindingInfo() {
         BindingFactoryManager mgr = bus.getExtension(BindingFactoryManager.class);
         String binding = bindingId;
@@ -370,7 +372,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         try {
             if (binding.contains("/soap")) {
                 if (bindingConfig == null) {
-                    bindingConfig = new SoapBindingConfiguration();
+                    bindingConfig = createSoapBindingConfig();
                 }
                 if (bindingConfig instanceof SoapBindingConfiguration
                     && !((SoapBindingConfiguration)bindingConfig).isSetStyle()) {

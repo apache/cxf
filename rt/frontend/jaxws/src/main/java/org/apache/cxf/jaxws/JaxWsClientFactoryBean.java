@@ -22,6 +22,7 @@ package org.apache.cxf.jaxws;
 
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.jaxws.binding.soap.JaxWsSoapBindingConfiguration;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -36,6 +37,10 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
         super(new JaxWsServiceFactoryBean());
     }
     
+    protected SoapBindingConfiguration createSoapBindingConfig() {
+        return new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)getServiceFactory());
+    }
+
     @Override
     public void setBindingId(String bind) {
         super.setBindingId(bind);
