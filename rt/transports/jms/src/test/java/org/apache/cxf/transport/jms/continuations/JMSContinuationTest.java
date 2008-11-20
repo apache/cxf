@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class JMSContinuationWrapperTest extends Assert {
+public class JMSContinuationTest extends Assert {
 
     private Message m;
     private List<JMSContinuation> continuations;
