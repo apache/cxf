@@ -86,6 +86,8 @@ public final class JSONProvider extends AbstractJAXBProvider  {
             throw new WebApplicationException(e);         
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
         } 
     }
 

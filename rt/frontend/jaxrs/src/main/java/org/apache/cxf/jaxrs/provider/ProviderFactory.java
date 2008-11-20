@@ -60,6 +60,8 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<MessageBodyWriter>>();
     private List<ProviderInfo<ContextResolver>> userContextResolvers = 
         new ArrayList<ProviderInfo<ContextResolver>>();
+    private List<ProviderInfo<ExceptionMapper>> defaultExceptionMappers = 
+        new ArrayList<ProviderInfo<ExceptionMapper>>();
     private List<ProviderInfo<ExceptionMapper>> userExceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper>>();
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
@@ -76,7 +78,7 @@ public final class ProviderFactory {
                      userContextResolvers,
                      requestHandlers,
                      responseHandlers,
-                     userExceptionMappers,
+                     defaultExceptionMappers,
                      new JAXBElementProvider(),
                      new JSONProvider(),
                      new BinaryDataProvider(),
@@ -123,9 +125,25 @@ public final class ProviderFactory {
         return null;
     }
     
-    @SuppressWarnings("unchecked")
+    
     public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, Message m) {
-        for (ProviderInfo<ExceptionMapper> em : userExceptionMappers) {
+        
+        ExceptionMapper<T> mapper = doCreateExceptionMapper(userExceptionMappers,
+                                                            exceptionType,
+                                                            m);
+        if (mapper != null) {
+            return mapper;
+        }
+        
+        return doCreateExceptionMapper(defaultExceptionMappers,
+                                       exceptionType,
+                                       m);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> ExceptionMapper<T> doCreateExceptionMapper(
+        List<ProviderInfo<ExceptionMapper>> mappers, Class<?> exceptionType, Message m) {
+        for (ProviderInfo<ExceptionMapper> em : mappers) {
             Type[] types = em.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
                 if (t instanceof ParameterizedType) {

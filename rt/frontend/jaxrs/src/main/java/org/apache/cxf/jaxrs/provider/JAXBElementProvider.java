@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,9 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -39,6 +41,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+@Produces({"application/xml", "text/xml" })
+@Consumes({"application/xml", "text/xml" })
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     
@@ -70,6 +74,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             
         } catch (JAXBException e) {
+            // TODO : refactor it such that thsi caode can be used by across the board
+            String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
+                                 BUNDLE,
+                                 e.getLinkedException() != null 
+                                 ? e.getLinkedException().getMessage() : e.getMessage()).toString();
+            Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .type(MediaType.TEXT_PLAIN).entity(message).build();
+            throw new WebApplicationException(r);
+        } catch (Exception e) {
             throw new WebApplicationException(e);        
         }
     }

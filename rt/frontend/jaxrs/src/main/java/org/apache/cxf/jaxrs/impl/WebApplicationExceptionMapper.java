@@ -19,15 +19,47 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 
 public class WebApplicationExceptionMapper 
     implements ExceptionMapper<WebApplicationException> {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(WebApplicationExceptionMapper.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WebApplicationExceptionMapper.class);
+    
     public Response toResponse(WebApplicationException ex) {
-        return ex.getResponse();
+        if (LOG.isLoggable(Level.FINE)) {
+            org.apache.cxf.common.i18n.Message errorMsg = 
+                new org.apache.cxf.common.i18n.Message("WEB_APP_EXCEPTION", 
+                    BUNDLE, ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage());
+            LOG.fine(errorMsg.toString());
+        }
+         
+        Response r = ex.getResponse();
+        if (r == null) {
+            String message = null;
+            if (ex.getCause() == null) {
+                message = new org.apache.cxf.common.i18n.Message("DEFAULT_EXCEPTION_MESSAGE", 
+                                                                 BUNDLE).toString();
+            } else {
+                message = ex.getCause().getMessage();
+                if (message == null) {
+                    message = ex.getCause().getClass().getName();
+                }
+            }
+            r = Response.status(500).type(MediaType.TEXT_PLAIN).entity(message).build();
+        }
+        return r;
     }
 
 }

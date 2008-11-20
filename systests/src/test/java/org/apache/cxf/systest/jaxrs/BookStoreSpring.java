@@ -24,10 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore")
 @Produces("application/json")
@@ -35,7 +39,9 @@ public class BookStoreSpring {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private Long mainId = 123L;
-        
+    @Context
+    private UriInfo ui;    
+    
     public BookStoreSpring() {
         init();
         System.out.println("----books: " + books.size());
@@ -45,6 +51,14 @@ public class BookStoreSpring {
     @Path("/books/{id}")
     public Book getBookById(@PathParam("id") Long id) {
         return books.get(id);
+    }
+    
+    @GET
+    @Path("/bookinfo")
+    public Book getBookByUriInfo() throws Exception {
+        MultivaluedMap<String, String> params = ui.getQueryParameters();
+        String id = params.getFirst("param1") + params.getFirst("param2");
+        return books.get(Long.valueOf(id));
     }
     
     @GET
@@ -72,6 +86,16 @@ public class BookStoreSpring {
         return books.get(mainId);
     }  
 
+    @POST
+    @Path("books/convert")
+    @Produces("application/xml")
+    public Book convertBook(Book2 book) {
+        // how to have Book2 populated ?
+        Book b = new Book();
+        b.setId(book.getId());
+        b.setName(book.getName());
+        return b;
+    }
     
     final void init() {
         Book book = new Book();
