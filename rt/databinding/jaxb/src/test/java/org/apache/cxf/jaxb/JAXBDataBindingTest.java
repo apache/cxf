@@ -43,12 +43,10 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
-import com.sun.xml.bind.api.JAXBRIContext;
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.helpers.CastUtils;
@@ -183,17 +181,15 @@ public class JAXBDataBindingTest extends Assert {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(ObjectFactory.class);
         JAXBContext ctx = db.createJAXBContext(classes);
-        if (ctx instanceof JAXBContextImpl) {
-            JAXBContextImpl rictx = (JAXBContextImpl)ctx;
-            assertNotNull(rictx.getBeanInfo(TestJAXBClass.class));
-        }
+        JAXBContextProxy ctxp = ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
+        assertNotNull(JAXBSchemaInitializer.getBeanInfo(ctxp, TestJAXBClass.class));
     }
     
     @Test 
     public void testContextProperties() throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
         Map<String, Object> contextProperties = new HashMap<String, Object>();
-        contextProperties.put(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "uri:ultima:thule");
+        contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(UnqualifiedBean.class);
@@ -217,7 +213,7 @@ public class JAXBDataBindingTest extends Assert {
         nsMap.put("uri:ultima:thule", "greenland");
         db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<String, Object>();
-        contextProperties.put(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "uri:ultima:thule");
+        contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(QualifiedBean.class);

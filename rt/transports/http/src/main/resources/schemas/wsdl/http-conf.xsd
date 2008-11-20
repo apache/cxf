@@ -81,7 +81,7 @@
                         after each reply is sent, even if the client requests the server to keep 
                         the connection alive.  Keep-Alive improves performance for the client 
                         requesting such behavior, but can limit overall scalability of the server 
-                        for handling many clients. The Default is false.
+                        for handling many clients. The Default is true.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>

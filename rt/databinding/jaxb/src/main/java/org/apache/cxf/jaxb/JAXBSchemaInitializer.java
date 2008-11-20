@@ -27,17 +27,16 @@ import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-import com.sun.xml.bind.v2.runtime.JaxBeanInfo;
-
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaTools;
 import org.apache.cxf.interceptor.Fault;
@@ -62,19 +61,29 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getLogger(JAXBSchemaInitializer.class);
 
     private SchemaCollection schemas;
-    private JAXBContextImpl context;
+    private JAXBContextProxy context;
     private final boolean qualifiedSchemas;
     
     public JAXBSchemaInitializer(ServiceInfo serviceInfo, 
                                  SchemaCollection col, 
-                                 JAXBContextImpl context, 
+                                 JAXBContext context, 
                                  boolean q) {
         super(serviceInfo);
         schemas = col;
-        this.context = context;
+        this.context = ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
         this.qualifiedSchemas = q;
     }
 
+    public JAXBBeanInfo getBeanInfo(Class<?> cls) {
+        return getBeanInfo(context, cls);
+    }
+    public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
+        Object o = context.getBeanInfo(cls);
+        if (o == null) {
+            return null;
+        }
+        return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
+    }
     @Override
     public void begin(MessagePartInfo part) {
         // Check to see if the WSDL information has been filled in for us.
@@ -93,7 +102,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             clazz = clazz.getComponentType();
         }
 
-        JaxBeanInfo<?> beanInfo = context.getBeanInfo(clazz);
+        JAXBBeanInfo beanInfo = getBeanInfo(clazz);
         if (beanInfo == null) {
             Annotation[] anns = (Annotation[])part.getProperty("parameter.annotations");
             XmlJavaTypeAdapter jta = findFromTypeAdapter(clazz, anns);
@@ -159,7 +168,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     private XmlJavaTypeAdapter findFromTypeAdapter(Class<?> clazz, Annotation[] anns) {
-        JaxBeanInfo<?> ret = null;
+        JAXBBeanInfo ret = null;
         if (anns != null) {
             for (Annotation a : anns) {
                 if (XmlJavaTypeAdapter.class.isAssignableFrom(a.annotationType())) {
@@ -180,7 +189,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         return null;
     }
 
-    private JaxBeanInfo<?> findFromTypeAdapter(Class<? extends XmlAdapter> aclass) {
+    private JAXBBeanInfo findFromTypeAdapter(Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
         while (!XmlAdapter.class.equals(c2) && c2 != null) {
@@ -190,13 +199,13 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (sp instanceof ParameterizedType) {
             Type tp = ((ParameterizedType)sp).getActualTypeArguments()[0];
             if (tp instanceof Class) {
-                return context.getBeanInfo((Class<?>)tp);
+                return getBeanInfo((Class<?>)tp);
             }
         }
         return null;
     }
 
-    private QName getTypeName(JaxBeanInfo<?> beanInfo) {
+    private QName getTypeName(JAXBBeanInfo beanInfo) {
         Iterator<QName> itr = beanInfo.getTypeNames().iterator();
         if (!itr.hasNext()) {
             return null;
@@ -218,7 +227,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 if (isFromWrapper && clazz.isArray() && !Byte.TYPE.equals(clazz.getComponentType())) {
                     clazz = clazz.getComponentType();
                 }
-                JaxBeanInfo<?> beanInfo = context.getBeanInfo(clazz);
+                JAXBBeanInfo beanInfo = getBeanInfo(clazz);
                 if (beanInfo == null) {
                     if (Exception.class.isAssignableFrom(clazz)) {
                         QName name = (QName)part.getMessageInfo().getProperty("elementName");
@@ -290,7 +299,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (cls != cl2) {            
             QName name = (QName)fault.getProperty("elementName");
             part.setElementQName(name);           
-            JaxBeanInfo<?> beanInfo = context.getBeanInfo(cls);
+            JAXBBeanInfo beanInfo = getBeanInfo(cls);
             if (beanInfo == null) {
                 throw new Fault(new Message("NO_BEAN_INFO", LOG, cls.getName()));
             }
@@ -353,7 +362,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                         m.getDeclaringClass().getMethod("set" + m.getName().substring(beginIdx),
                                                         m.getReturnType());
                         
-                        JaxBeanInfo<?> beanInfo = context.getBeanInfo(m.getReturnType());
+                        JAXBBeanInfo beanInfo = getBeanInfo(m.getReturnType());
                         if (beanInfo != null) {
                             el = new XmlSchemaElement();
                             el.setName(m.getName().substring(beginIdx));
@@ -443,7 +452,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         for (Field f : cls.getDeclaredFields()) {
             if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                 //map field
-                JaxBeanInfo<?> beanInfo = context.getBeanInfo(f.getType());
+                JAXBBeanInfo beanInfo = getBeanInfo(f.getType());
                 if (beanInfo != null) {
                     addElement(seq, beanInfo, new QName(namespace, f.getName()));
                 }                
@@ -452,7 +461,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         for (Method m : cls.getMethods()) {
             if (JAXBContextInitializer.isMethodAccepted(m, accessType)) {
                 //map field
-                JaxBeanInfo<?> beanInfo = context.getBeanInfo(m.getReturnType());
+                JAXBBeanInfo beanInfo = getBeanInfo(m.getReturnType());
                 if (beanInfo != null) {
                     int idx = m.getName().startsWith("get") ? 3 : 2;
                     String name = m.getName().substring(idx);
@@ -464,7 +473,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
     
-    public void addElement(XmlSchemaSequence seq, JaxBeanInfo<?> beanInfo, QName name) {    
+    public void addElement(XmlSchemaSequence seq, JAXBBeanInfo beanInfo, QName name) {    
         XmlSchemaElement el = new XmlSchemaElement();
         el.setName(name.getLocalPart());
         XmlSchemaTools.setElementQName(el, name);

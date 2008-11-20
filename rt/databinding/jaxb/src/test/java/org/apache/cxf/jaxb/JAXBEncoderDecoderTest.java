@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -45,8 +47,6 @@ import javax.xml.ws.RequestWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -182,18 +182,9 @@ public class JAXBEncoderDecoderTest extends Assert {
     
     @Test
     public void testCustomNamespaces() throws Exception {
-        NamespacePrefixMapper mapper = new NamespacePrefixMapper() {
-
-            @Override
-            public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                if ("http://apache.org/hello_world_soap_http/types".equals(namespaceUri)) {
-                    return "Omnia";
-                } else if ("http://cxf.apache.org/jaxb_form".equals(namespaceUri)) {
-                    return "Gallia";
-                }
-                return suggestion;
-            } 
-        };
+        Map<String, String> mapper = new HashMap<String, String>();
+        mapper.put("http://apache.org/hello_world_soap_http/types", "Omnia");
+        mapper.put("http://cxf.apache.org/jaxb_form", "Gallia");
         ObjectWithQualifiedElementElement testObject = new ObjectWithQualifiedElementElement();
         testObject.setString1("twine");
         testObject.setString2("cord");
@@ -209,8 +200,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
         XMLEventWriter writer = opFactory.createXMLEventWriter(stringWriter);
         Marshaller m = context.createMarshaller();
-        m.setProperty("com.sun.xml.bind.namespacePrefixMapper", mapper);
-        
+        JAXBUtils.setNamespaceWrapper(mapper, m);
         JAXBEncoderDecoder.marshall(m, testObject, part, writer);
         writer.flush();
         writer.close();

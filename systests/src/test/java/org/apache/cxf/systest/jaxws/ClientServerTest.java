@@ -51,8 +51,6 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.sun.xml.bind.api.JAXBRIContext;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.bus.CXFBusFactory;
@@ -900,7 +898,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         // that would actually notice the difference. At least it ensures that 
         // specifying the property does not explode.
         Map<String, Object> jaxbContextProperties = new HashMap<String, Object>();
-        jaxbContextProperties.put(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "uri:ultima:thule");
+        jaxbContextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         dcf.setJaxbContextProperties(jaxbContextProperties);
         client = dcf.createClient(wsdlUrl, serviceName, portName);
         client.invoke("greetMe", "test");        

@@ -29,8 +29,6 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import com.sun.xml.bind.api.TypeReference;
-
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
@@ -98,8 +96,10 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
             //TODO:Cache the JAXBRIContext
             QName qname = new QName(null, part.getConcreteName().getLocalPart());
-            TypeReference typeReference = new TypeReference(qname, part.getTypeClass(), anns);
-            return JAXBEncoderDecoder.unmarshalWithBridge(typeReference, 
+
+            return JAXBEncoderDecoder.unmarshalWithBridge(qname,
+                                                          part.getTypeClass(),
+                                                          anns, 
                                                           databinding.getContextClasses(),
                                                           reader,
                                                           getAttachmentUnmarshaller());

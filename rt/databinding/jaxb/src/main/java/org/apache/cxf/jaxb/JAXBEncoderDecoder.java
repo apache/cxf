@@ -21,6 +21,7 @@ package org.apache.cxf.jaxb;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -57,10 +58,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import com.sun.xml.bind.api.Bridge;
-import com.sun.xml.bind.api.JAXBRIContext;
-import com.sun.xml.bind.api.TypeReference;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -180,22 +177,17 @@ public final class JAXBEncoderDecoder {
         }
     }
     //TODO: cache the JAXBRIContext
-    @SuppressWarnings("unchecked")
-    public static void marshalWithBridge(TypeReference ref,
+    public static void marshalWithBridge(QName qname,
+                                         Class<?> cls,
+                                         Annotation anns[],
                                          Set<Class<?>> ctxClasses,
                                          Object elValue,
                                          Object source, AttachmentMarshaller am) {
-        List<TypeReference> typeRefs = new ArrayList<TypeReference>();
-        typeRefs.add(ref);
-        List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
-        clses.add(ref.type.getClass());
         try {
-            JAXBRIContext riContext = JAXBRIContext.newInstance(clses.toArray(new Class[clses.size()]),
-                                                                    typeRefs, null, null, true, null);
-            Bridge bridge = riContext.createBridge(ref);
+            JAXBUtils.BridgeWrapper bridge = JAXBUtils.createBridge(ctxClasses, qname, cls, anns);
 
             if (source instanceof XMLStreamWriter) {
-                bridge.marshal(elValue, (XMLStreamWriter)source);
+                bridge.marshal(elValue, (XMLStreamWriter)source, am);
             } else if (source instanceof OutputStream) {
                 //the namespace is missing when marshal the xsd:QName type 
                 //to the OutputStream directly 
@@ -204,7 +196,7 @@ public final class JAXBEncoderDecoder {
                 bridge.marshal(elValue, s1);
                 ((OutputStream)source).write(sw.toString().getBytes());
             } else if (source instanceof Node) {
-                bridge.marshal(elValue, (Node)source);
+                bridge.marshal(elValue, (Node)source, am);
             } else {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
@@ -223,22 +215,19 @@ public final class JAXBEncoderDecoder {
     }
     
 //  TODO: cache the JAXBRIContext
-    public static Object unmarshalWithBridge(TypeReference ref,
+    public static Object unmarshalWithBridge(QName qname,
+                                             Class<?> cls,
+                                             Annotation anns[],
                                              Set<Class<?>> ctxClasses,
                                              Object source,
                                              AttachmentUnmarshaller am) {
-        List<TypeReference> typeRefs = new ArrayList<TypeReference>();
-        typeRefs.add(ref);
-        List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
-        clses.add(ref.type.getClass());
+        
         try {
-            JAXBRIContext riContext = JAXBRIContext.newInstance(clses.toArray(new Class[clses.size()]),
-                                                                    typeRefs, null, null, true, null);
-            Bridge bridge = riContext.createBridge(ref);
+            JAXBUtils.BridgeWrapper bridge = JAXBUtils.createBridge(ctxClasses, qname, cls, anns);
            
             if (source instanceof XMLStreamReader) {
                 //DOMUtils.writeXml(StaxUtils.read((XMLStreamReader)source), System.out);
-                return bridge.unmarshal((XMLStreamReader)source);               
+                return bridge.unmarshal((XMLStreamReader)source, am);               
             } else if (source instanceof InputStream) {
                 return bridge.unmarshal((InputStream)source);
             } else if (source instanceof Node) {

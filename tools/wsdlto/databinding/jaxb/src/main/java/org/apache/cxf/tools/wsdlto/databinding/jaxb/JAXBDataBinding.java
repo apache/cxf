@@ -62,9 +62,9 @@ import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.api.Mapping;
 import com.sun.tools.xjc.api.Property;
 import com.sun.tools.xjc.api.S2JJAXBModel;
+import com.sun.tools.xjc.api.SchemaCompiler;
 import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
-import com.sun.tools.xjc.api.impl.s2j.SchemaCompilerImpl;
 
 
 import org.apache.cxf.common.i18n.Message;
@@ -128,7 +128,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
         
-        SchemaCompilerImpl schemaCompiler = (SchemaCompilerImpl)XJC.createSchemaCompiler();
+        SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
         ClassCollector classCollector = context.get(ClassCollector.class);
         
         ClassNameAllocatorImpl allocator 
@@ -237,7 +237,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         initialized = true;
     }
 
-    private void addSchemas(Options opts, SchemaCompilerImpl schemaCompiler,
+    private void addSchemas(Options opts, SchemaCompiler schemaCompiler,
                             Map<String, Element> schemaLists) {
         for (String key : schemaLists.keySet()) {
             Element ele = schemaLists.get(key);
@@ -268,7 +268,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
     // TODO  this can be repaced with schemaCompiler.getOptions() once we
     // move to a version => 2.0.3 for jaxb-xjc
-    private Options getOptions(SchemaCompilerImpl schemaCompiler) throws ToolException {
+    private Options getOptions(SchemaCompiler schemaCompiler) throws ToolException {
         try {
             Field delegateField = schemaCompiler.getClass().getDeclaredField("opts");
             delegateField.setAccessible(true);

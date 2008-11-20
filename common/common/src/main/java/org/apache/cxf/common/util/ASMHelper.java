@@ -122,7 +122,12 @@ public class ASMHelper {
     public ClassWriter createClassWriter() {
         ClassWriter newCw = null;
         if (!oldASM) {
-            Class<ClassWriter> cls = ClassWriter.class;
+            Class<ClassWriter> cls;
+            try {
+                cls = ClassWriter.class;
+            } catch (NoClassDefFoundError error) {
+                return null;
+            }
             try {
                 // ASM 1.5.x/2.x
                 Constructor<ClassWriter> cons = cls.getConstructor(new Class<?>[] {Boolean.TYPE});
@@ -182,7 +187,7 @@ public class ASMHelper {
             super(parent);
         }
         public Class<?> lookupDefinedClass(String name) {
-            return defined.get(name);
+            return defined.get(name.replace('/', '.'));
         }
         
         public Class<?> defineClass(String name, byte bytes[]) {
@@ -201,7 +206,7 @@ public class ASMHelper {
             }
             
             Class<?> ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
-            defined.put(name, ret);
+            defined.put(name.replace('/', '.'), ret);
             return ret;
         }
     }

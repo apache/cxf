@@ -23,10 +23,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.DatatypeConverterInterface;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.namespace.QName;
-
-import com.sun.xml.bind.DatatypeConverterImpl;
 
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.configuration.Configurable;
@@ -38,7 +37,19 @@ import org.junit.Test;
 public class ConfigurerImplTest extends Assert {
     
     static {
-        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
+        Class<?> cls;
+        try {
+            try {
+                cls = Class.forName("com.sun.xml.bind.DatatypeConverterImpl");
+            } catch (ClassNotFoundException e) {
+                cls = Class.forName("com.sun.xml.internal.bind.DatatypeConverterImpl");
+            }
+            DatatypeConverterInterface convert = (DatatypeConverterInterface)cls.getField("theInstance")
+                                                                                .get(null);
+            DatatypeConverter.setDatatypeConverter(convert);
+        } catch (Exception ex) {
+            //ignore;
+        }
     }
     
     @Test
