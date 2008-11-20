@@ -26,6 +26,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
@@ -44,6 +46,7 @@ import javax.xml.ws.ResponseWrapper;
 import javax.xml.ws.WebFault;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -56,6 +59,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
+    private static final Logger LOG = LogUtils.getL7dLogger(JaxWsServiceConfiguration.class); 
 
     private JaxWsImplementorInfo implInfo;
     /**
@@ -553,6 +557,12 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 Class r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
                 responseMethodClassCache.put(clsName, r);
                 responseMethodClassCache.put(selected, r);
+                
+                if (r.equals(m.getReturnType())) {
+                    LOG.log(Level.WARNING, "INVALID_RESPONSE_WRAPPER", new Object[] {clsName,
+                            m.getReturnType().getName()});
+                }
+
                 return r;
             } catch (ClassNotFoundException e) {
                 //do nothing, we will mock a schema for wrapper bean later on
@@ -617,6 +627,10 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 Class r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
                 requestMethodClassCache.put(clsName, r);
                 requestMethodClassCache.put(selected, r);
+                if (m.getParameterTypes().length == 1 && r.equals(m.getParameterTypes()[0])) {
+                    LOG.log(Level.WARNING, "INVALID_REQUEST_WRAPPER", new Object[] {clsName,
+                            m.getParameterTypes()[0].getName()});
+                }
                 return r;
             } catch (ClassNotFoundException e) {
                 //do nothing, we will mock a schema for wrapper bean later on
