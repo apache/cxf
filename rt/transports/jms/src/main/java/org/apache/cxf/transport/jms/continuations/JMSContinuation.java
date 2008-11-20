@@ -83,20 +83,19 @@ public class JMSContinuation implements Continuation {
     }
     
     protected void doResume() {
-        if (isResumed) {
+        if (isResumed || !isPending) {
             return;
         }
         
         continuations.remove(this);
         
-        isResumed = true;
-        isPending = false;
-        isNew = false;
-
         BusFactory.setThreadDefaultBus(bus);
         try {
             incomingObserver.onMessage(inMessage);
         } finally {
+            isResumed = true;
+            isPending = false;
+            
             BusFactory.setThreadDefaultBus(null);
         }
     }
@@ -127,7 +126,9 @@ public class JMSContinuation implements Continuation {
     protected void createTimerTask(long timeout) {
         timer.schedule(new TimerTask() {
             public void run() {
-                doResume();
+                synchronized (JMSContinuation.this) { 
+                    doResume();
+                }
             }
         }, timeout);
     }
