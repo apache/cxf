@@ -492,6 +492,15 @@ public final class CustomizationParser {
                     break;
                 }
             }
+            nlist = root.getElementsByTagNameNS(ToolConstants.JAXB_BINDINGS.getNamespaceURI(),
+                                                "globalBindings");
+            for (int i = 0; i < nlist.getLength(); i++) {
+                Node node = nlist.item(i);
+                if (node instanceof Element) {
+                    hasJaxbBindingChild = true;
+                    break;
+                }
+            }
                            
             if (StringUtils.isEmpty(schemaLocation) && !hasJaxbBindingChild) {
                 InputSource tmpIns = null;
