@@ -95,7 +95,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
             }
             
             if (isGET(message)) {
-                LOG.info("WrapperClassInInterceptor skipped in HTTP GET method");
+                LOG.fine("WrapperClassInInterceptor skipped in HTTP GET method");
                 return;
             }
             

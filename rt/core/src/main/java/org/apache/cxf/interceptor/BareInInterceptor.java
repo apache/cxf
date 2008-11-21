@@ -62,7 +62,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
     public void handleMessage(Message message) {
         if (isGET(message) && message.getContent(List.class) != null) {
-            LOG.info("BareInInterceptor skipped in HTTP GET method");
+            LOG.fine("BareInInterceptor skipped in HTTP GET method");
             return;
         }
 

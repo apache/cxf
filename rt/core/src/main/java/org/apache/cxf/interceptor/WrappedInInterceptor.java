@@ -55,7 +55,7 @@ public class WrappedInInterceptor extends AbstractInDatabindingInterceptor {
 
     public void handleMessage(Message message) {
         if (isGET(message) && message.getContent(List.class) != null) {
-            LOG.info("WrappedInInterceptor skipped in HTTP GET method");
+            LOG.fine("WrappedInInterceptor skipped in HTTP GET method");
             return;
         }
         

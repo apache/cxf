@@ -64,7 +64,7 @@ public class JBIWrapperInInterceptor extends AbstractInDatabindingInterceptor {
 
     public void handleMessage(Message message) throws Fault {
         if (isGET(message)) {
-            LOG.info("JbiMessageInInterceptor skipped in HTTP GET method");
+            LOG.fine("JbiMessageInInterceptor skipped in HTTP GET method");
             return;
         }
         XMLStreamReader xsr = message.getContent(XMLStreamReader.class);

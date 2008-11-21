@@ -68,7 +68,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
 
     public void handleMessage(SoapMessage message) {
         if (isGET(message)) {
-            LOG.info("ReadHeadersInterceptor skipped in HTTP GET method");
+            LOG.fine("ReadHeadersInterceptor skipped in HTTP GET method");
             return;
         }
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
