@@ -44,16 +44,15 @@ public final class AttachmentUtil {
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "http://cxf.apache.org/";
-        //String name = UUID.randomUUID().toString();
-        String name = ATT_UUID + String.valueOf(++counter);
+        
+        String name = ATT_UUID + "-" + String.valueOf(++counter);
         if (ns != null && (ns.length() > 0)) {
             try {
                 URI uri = new URI(ns);
                 String host = uri.toURL().getHost();
                 cid = host;
             } catch (URISyntaxException e) {
-                e.printStackTrace();
-                return null;
+                cid = ns;
             } catch (MalformedURLException e) {
                 cid = ns;
             }
