@@ -61,7 +61,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
     public void handleMessage(Message message) {
         if (isGET(message) && message.getContent(List.class) != null) {
-            LOG.info("DocLiteralInInterceptor skipped in HTTP GET method");
+            LOG.fine("DocLiteralInInterceptor skipped in HTTP GET method");
             return;
         }
 

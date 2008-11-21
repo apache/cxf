@@ -44,7 +44,7 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public void handleMessage(Message message) {
         if (isGET(message)) {
-            LOG.info("AttachmentInInterceptor skipped in HTTP GET method");
+            LOG.fine("AttachmentInInterceptor skipped in HTTP GET method");
             return;
         }
         

@@ -57,7 +57,7 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
 
     public void handleMessage(Message message) throws Fault {
         if (isGET(message)) {
-            LOG.info("XMLMessageInInterceptor skipped in HTTP GET method");
+            LOG.fine("XMLMessageInInterceptor skipped in HTTP GET method");
             return;
         }
         Endpoint ep = message.getExchange().get(Endpoint.class);
