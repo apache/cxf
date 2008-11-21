@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URLDecoder;
 
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
@@ -125,7 +126,7 @@ public class AttachmentSerializer {
         writer.write("Content-Transfer-Encoding: binary\r\n");
 
         writer.write("Content-ID: <");
-        writer.write(attachmentId);
+        writer.write(URLDecoder.decode(attachmentId, "UTF-8"));
         writer.write(">\r\n\r\n");
     }
 
