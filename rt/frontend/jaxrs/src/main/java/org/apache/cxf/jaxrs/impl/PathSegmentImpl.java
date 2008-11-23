@@ -29,23 +29,22 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public class PathSegmentImpl implements PathSegment {
 
     private String path;
-    private boolean decode;
-    
+        
     public PathSegmentImpl(String path) {
         this(path, true);
     }
     
     public PathSegmentImpl(String path, boolean decode) {
-        this.path = path;
-        this.decode = decode;
+        this.path = decode ? JAXRSUtils.uriDecode(path) : path;
     }
     
     public MultivaluedMap<String, String> getMatrixParameters() {
-        return JAXRSUtils.getMatrixParams(path, decode);
+        return JAXRSUtils.getMatrixParams(path, false);
     }
 
     public String getPath() {
-        return path;
+        int index = path.indexOf(';');
+        return index != -1 ? path.substring(0, index) : path;
     }
 
 }
