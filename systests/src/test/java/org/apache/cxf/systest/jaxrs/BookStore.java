@@ -37,6 +37,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -92,6 +94,18 @@ public class BookStore {
         int index = url2.lastIndexOf('/');
         return doGetBook(url2.substring(index + 1));
     } 
+    
+    @GET
+    @Path("/segment/{pathsegment}/")
+    public Book getBookBySegment(@PathParam("pathsegment") PathSegment segment) throws Exception {
+        if (!"matrix".equals(segment.getPath())) {
+            throw new RuntimeException();
+        }
+        MultivaluedMap<String, String> map = segment.getMatrixParameters();
+        String s1 = map.getFirst("first").toString();
+        String s2 = map.getFirst("second").toString();
+        return doGetBook(s1 + s2);
+    }
     
     @GET
     @Path("/bookquery")

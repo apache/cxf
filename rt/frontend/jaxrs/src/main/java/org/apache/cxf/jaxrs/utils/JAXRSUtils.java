@@ -551,12 +551,17 @@ public final class JAXRSUtils {
             return InjectionUtils.handleBean(paramType, values);
         } else {
             List<String> results = values.get(parameterName);
-            return InjectionUtils.createParameterObject(results, 
+            if (PathSegment.class.isAssignableFrom(paramType)
+                && results != null && results.size() > 0) {
+                return new PathSegmentImpl(results.get(0), decoded);
+            } else {
+                return InjectionUtils.createParameterObject(results, 
                                                         paramType, 
                                                         genericType,
                                                         defaultValue,
                                                         true,
                                                         decoded);
+            }
         }
     }
     
