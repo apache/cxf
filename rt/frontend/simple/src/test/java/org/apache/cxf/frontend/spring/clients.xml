@@ -71,7 +71,8 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
     serviceName="s:XMLService"
     xmlns:s="http://apache.org/hello_world_soap_http"
     endpointName="s:XMLPort"
-    bindingId="http://cxf.apache.org/bindings/xformat">
+    bindingId="http://cxf.apache.org/bindings/xformat"
+    transportId="http://cxf.apache.org/transports/local">
    </simple:client>
 
    <simple:client id="client3"
