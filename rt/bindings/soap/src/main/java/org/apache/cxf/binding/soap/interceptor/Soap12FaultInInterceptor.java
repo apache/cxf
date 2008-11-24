@@ -50,6 +50,12 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
+        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+        message.setContent(Exception.class, unmarshalFault(message, reader));
+    }
+
+    public static SoapFault unmarshalFault(SoapMessage message, 
+                                           XMLStreamReader reader) {
         String exMessage = null;
         QName faultCode = null;
         QName subCode = null;
@@ -57,7 +63,6 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         String node = null;
         Element detail = null;
 
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
         XPathUtils xu = new XPathUtils(ns);        
@@ -106,8 +111,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         fault.setDetail(detail);
         fault.setRole(role);
         fault.setNode(node);
-
-        message.setContent(Exception.class, fault);
+        return fault;
     }
 
 }

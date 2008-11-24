@@ -967,10 +967,10 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                     if (!outbound) {
                         LogicalMessage msg = ctx.getMessage();
                         String payload = convertDOMToString(msg.getPayload());
-                        assertTrue(payload.indexOf(
-                            "<faultstring>"
-                            + "servant throws SOAPFaultException"
-                            + "</faultstring>") > -1);
+                        assertTrue("expected faultstring in: " + payload,
+                            payload.indexOf(
+                                "servant throws SOAPFaultException"
+                                + "</faultstring>") > -1);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
