@@ -274,7 +274,11 @@
               <xsd:documentation>Specifies if the service should be automatically published.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
-          <xsd:attribute name="transportId" type="xsd:string"/>
+           <xsd:attribute name="transportId" type="xsd:string">
+        	<xsd:annotation>
+              <xsd:documentation>Specifies the transportId that endpoint will use, it will override the transport which is defined in the wsdl.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
           <xsd:attribute name="wsdlLocation" type="xsd:string">
             <xsd:annotation>
               <xsd:documentation>Specifies the location of the endpoint's WSDL contract. The WSDL contract's location is relative to the folder 
@@ -401,6 +405,11 @@
           <xsd:attribute name="username" type="xsd:string">
             <xsd:annotation>
               <xsd:documentation>Specifies a password that is used for simple username/password authentication.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="transportId" type="xsd:string">
+        	<xsd:annotation>
+              <xsd:documentation>Specifies the transportId that endpoint will use, it will override the transport which is defined in the wsdl.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
           <xsd:attribute name="wsdlLocation" type="xsd:string">

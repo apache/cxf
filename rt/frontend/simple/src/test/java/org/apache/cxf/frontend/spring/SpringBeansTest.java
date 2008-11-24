@@ -129,13 +129,17 @@ public class SpringBeansTest extends Assert {
         ClientProxyFactoryBean clientProxyFactoryBean =
             (ClientProxyFactoryBean) ctx.getBean("client2.proxyFactory");
         assertNotNull(clientProxyFactoryBean);
+        assertEquals("get the wrong transportId", 
+                     clientProxyFactoryBean.getTransportId(),
+                     "http://cxf.apache.org/transports/local");
 
         assertEquals("get the wrong bindingId",
                      clientProxyFactoryBean.getBindingId(),
                      "http://cxf.apache.org/bindings/xformat");
 
-        greeter = (HelloService) ctx.getBean("client2");
+        greeter = (HelloService) ctx.getBean("client2");        
         assertNotNull(greeter);
+     
 
         greeter = (HelloService) ctx.getBean("client3");
         assertNotNull(greeter);

@@ -246,6 +246,14 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     public String getBindingId() {
         return clientFactoryBean.getBindingId();
     }
+    
+    public void setTransportId(String transportId) {
+        clientFactoryBean.setTransportId(transportId);
+    }
+    
+    public String getTransportId() {
+        return clientFactoryBean.getTransportId();
+    }
 
     public ReflectionServiceFactoryBean getServiceFactory() {
         return clientFactoryBean.getServiceFactory();
