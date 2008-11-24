@@ -42,9 +42,24 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 @Provider
 public final class FormEncodingReaderProvider implements MessageBodyReader<Object> {
 
+    private static final char SPACE_CHAR = '+';
+    private static final String NEXT_LINE = "%0D%0A";
+    
+    
+    private boolean decode;
+    private FormValidator validator;
+    
+    public void setDecode(boolean formDecoding) {
+        decode = formDecoding;
+    }
+    
+    public void setValidator(FormValidator formValidator) {
+        validator = formValidator;
+    }
+    
     public boolean isReadable(Class<?> type, Type genericType, 
                               Annotation[] annotations) {
-        return type.isAssignableFrom(MultivaluedMap.class);
+        return MultivaluedMap.class.isAssignableFrom(type);
     }
 
     public MultivaluedMap<String, String> readFrom(
@@ -59,9 +74,12 @@ public final class FormEncodingReaderProvider implements MessageBodyReader<Objec
             copy(is, bos, 1024);
             String postBody = new String(bos.toByteArray(), charset);
 
-            MultivaluedMap<String, String> params = getParams(postBody);
-
+            MultivaluedMap<String, String> params = createMap(clazz);
+            populateMap(params, postBody);
+            validateMap(params);
             return params;
+        } catch (WebApplicationException e) {
+            throw e;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -78,26 +96,47 @@ public final class FormEncodingReaderProvider implements MessageBodyReader<Objec
         }
     }
 
+    @SuppressWarnings("unchecked")
+    protected MultivaluedMap<String, String> createMap(Class<?> clazz) throws Exception {
+        if (clazz == MultivaluedMap.class) {
+            return new MetadataMap<String, String>();
+        }
+        return (MultivaluedMap<String, String>)clazz.newInstance();
+    }
+    
     /**
      * Retrieve map of parameters from the passed in message
      *
      * @param message
      * @return a Map of parameters.
      */
-    protected static MultivaluedMap<String, String> getParams(String body) {
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+    protected void populateMap(MultivaluedMap<String, String> params, 
+                               String body) {
         if (!StringUtils.isEmpty(body)) {
             List<String> parts = Arrays.asList(body.split("&"));
             for (String part : parts) {
                 String[] keyValue = part.split("=");
                 // Change to add blank string if key but not value is specified
                 if (keyValue.length == 2) {
-                    params.add(keyValue[0], keyValue[1]);
+                    if (decode) {
+                        String[] values = keyValue[1].split(NEXT_LINE);
+                        for (String value : values) {
+                            params.add(keyValue[0], 
+                                       value.replace(SPACE_CHAR, ' '));
+                        }
+                    } else {
+                        params.add(keyValue[0], keyValue[1]);
+                    }
                 } else {
                     params.add(keyValue[0], "");
                 }
             }
         }
-        return params;
+    }
+    
+    protected void validateMap(MultivaluedMap<String, String> params) {
+        if (validator != null) {
+            validator.validate(params);
+        }
     }
 }

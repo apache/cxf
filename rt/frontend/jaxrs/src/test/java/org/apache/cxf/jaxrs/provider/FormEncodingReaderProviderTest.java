@@ -19,12 +19,15 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,21 +41,94 @@ public class FormEncodingReaderProviderTest extends Assert {
         ferp = new FormEncodingReaderProvider();
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFrom() throws Exception {
         InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
         MultivaluedMap<String, String> mvMap = 
-            ferp.readFrom(Object.class, null, null, null, null, is);
+            ferp.readFrom((Class)MultivaluedMap.class, null, null, null, null, is);
         assertEquals("Wrong entry for foo", "bar", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "far", mvMap.getFirst("boo"));
 
     }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testDecoded() throws Exception {
+        ferp.setDecode(true);
+        String values = "foo=1+2&bar=1+3";
+        
+        MultivaluedMap<String, String> mvMap = 
+            ferp.readFrom((Class)MultivaluedMap.class, null, null, null, null, 
+                          new ByteArrayInputStream(values.getBytes()));
+        assertEquals("Wrong entry for foo", "1 2", mvMap.getFirst("foo"));
+        assertEquals("Wrong entry for boo", "1 3", mvMap.getFirst("bar"));
 
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCustomMapImpl() throws Exception {
+        ferp.setDecode(true);
+        String values = "foo=1+2&bar=1+3&baz=4";
+        
+        MultivaluedMap<String, String> mvMap = 
+            ferp.readFrom((Class)CustomMap.class, null, null, null, null, 
+                          new ByteArrayInputStream(values.getBytes()));
+        assertEquals(3, mvMap.size());
+        assertEquals(1,  mvMap.get("foo").size());
+        assertEquals(1,  mvMap.get("bar").size());
+        assertEquals(1,  mvMap.get("baz").size());
+        assertEquals("Wrong entry for foo", "1 2", mvMap.getFirst("foo"));
+        assertEquals("Wrong entry for boo", "1 3", mvMap.getFirst("bar"));
+        assertEquals("Wrong entry for baz", "4", mvMap.getFirst("baz"));
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testMultiLines() throws Exception {
+        ferp.setDecode(true);
+        String values = "foo=1+2&bar=line1%0D%0Aline+2&baz=4";
+        
+        MultivaluedMap<String, String> mvMap = 
+            ferp.readFrom((Class)CustomMap.class, null, null, null, null, 
+                          new ByteArrayInputStream(values.getBytes()));
+        assertEquals(3, mvMap.size());
+        assertEquals(1,  mvMap.get("foo").size());
+        assertEquals(2,  mvMap.get("bar").size());
+        assertEquals(1,  mvMap.get("baz").size());
+        assertEquals("Wrong entry for foo", "1 2", mvMap.getFirst("foo"));
+        assertEquals("Wrong first line for boo", "line1", mvMap.get("bar").get(0));
+        assertEquals("Wrong first line for boo", "line 2", mvMap.get("bar").get(1));
+        assertEquals("Wrong entry for baz", "4", mvMap.getFirst("baz"));
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testvalidation() throws Exception {
+        ferp.setValidator(new CustomFormValidator());
+        String values = "foo=1+2&bar=1+3";
+        
+        try {
+            ferp.readFrom((Class)CustomMap.class, null, null, null, null, 
+                new ByteArrayInputStream(values.getBytes()));
+            fail();
+        } catch (WebApplicationException ex) {
+            // ignore
+        }
+
+    }
+    
+
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromMultiples() throws Exception {
         InputStream is = getClass().getResourceAsStream("multiValPostBody.txt");
+        
         MultivaluedMap<String, String> mvMap = 
-            ferp.readFrom(Object.class, null, null, null, null, is);
+            ferp.readFrom((Class)MultivaluedMap.class, null, null, null, null, is);
         List<String> vals = mvMap.get("foo");
 
         assertEquals("Wrong size for foo params", 2, vals.size());
@@ -74,4 +150,15 @@ public class FormEncodingReaderProviderTest extends Assert {
                      .value()[0]);
     }
 
+    public static class CustomMap extends MetadataMap<String, String> {
+        
+    }
+    
+    private static class CustomFormValidator implements FormValidator {
+
+        public void validate(MultivaluedMap<String, ? extends Object> params) {
+            throw new WebApplicationException();
+        }
+        
+    }
 }

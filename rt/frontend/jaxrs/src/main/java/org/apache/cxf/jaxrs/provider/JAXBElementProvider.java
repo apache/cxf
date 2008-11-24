@@ -74,14 +74,13 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             
         } catch (JAXBException e) {
-            // TODO : refactor it such that thsi caode can be used by across the board
+            Throwable t = e.getLinkedException() != null 
+                ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
             String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
-                                 BUNDLE,
-                                 e.getLinkedException() != null 
-                                 ? e.getLinkedException().getMessage() : e.getMessage()).toString();
+                                 BUNDLE, t.getMessage()).toString();
             Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .type(MediaType.TEXT_PLAIN).entity(message).build();
-            throw new WebApplicationException(r);
+            throw new WebApplicationException(t, r);
         } catch (Exception e) {
             throw new WebApplicationException(e);        
         }
