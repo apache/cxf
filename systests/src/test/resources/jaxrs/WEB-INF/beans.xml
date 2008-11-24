@@ -42,7 +42,19 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <jaxrs:serviceBeans>
       <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" />
     </jaxrs:serviceBeans>		   
+    <jaxrs:providers>
+       <ref bean="jaxbProvider"/>
+       
+    </jaxrs:providers>
+    
   </jaxrs:server>
 
+  <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+      <property name="schemas">
+        <list>
+           <value>classpath:/org/apache/cxf/systest/jaxrs/book.xsd</value>
+        </list>
+      </property>
+  </bean>
 </beans>
 <!-- END SNIPPET: beans -->

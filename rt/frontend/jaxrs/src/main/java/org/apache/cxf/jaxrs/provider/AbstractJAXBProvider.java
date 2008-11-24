@@ -30,6 +30,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
@@ -52,6 +53,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -60,6 +62,8 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 public abstract class AbstractJAXBProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
+    protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
+       
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
 
     private static final String CHARSET_PARAMETER = "charset"; 
@@ -67,7 +71,7 @@ public abstract class AbstractJAXBProvider
         
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
-    
+        
     @Context protected ContextResolver<JAXBContext> resolver;
     private Schema schema;
     

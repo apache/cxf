@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><b:Book xmlns:b="http://www.example.org/books"><b:name>CXF in Action</b:name><b:id>123</b:id></b:Book>

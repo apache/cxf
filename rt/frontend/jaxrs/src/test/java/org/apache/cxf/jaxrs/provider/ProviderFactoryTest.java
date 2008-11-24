@@ -31,9 +31,11 @@ import java.util.List;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBContext;
@@ -44,8 +46,10 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
+import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.MessageImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +60,21 @@ public class ProviderFactoryTest extends Assert {
     @Before
     public void setUp() {
         ProviderFactory.getInstance().clearProviders();
+    }
+    
+    @Test
+    public void testExceptionMappers() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        ExceptionMapper<?> mapper = 
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertNotNull(mapper);
+        WebApplicationExceptionMapper m = new WebApplicationExceptionMapper(); 
+        pf.registerUserProvider(m);
+        ExceptionMapper<?> mapper2 = 
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertNotSame(mapper, mapper2);
+        assertSame(m, mapper2);
+        
     }
     
     @Test
