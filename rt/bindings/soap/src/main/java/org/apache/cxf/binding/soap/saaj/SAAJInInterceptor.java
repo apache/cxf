@@ -28,6 +28,7 @@ import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
@@ -45,6 +46,8 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.Soap11FaultInInterceptor;
+import org.apache.cxf.binding.soap.interceptor.Soap12FaultInInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.Header;
@@ -107,11 +110,38 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             }
             
             XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
-            StaxUtils.readDocElements(soapMessage.getSOAPBody(), xmlReader, true);
-            DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
-            xmlReader = StaxUtils.createXMLStreamReader(bodySource);
-            xmlReader.nextTag();
-            xmlReader.nextTag(); // move past body tag
+
+            if (hasFault(message, xmlReader)) {
+                SOAPFault soapFault = 
+                    soapMessage.getSOAPPart().getEnvelope().getBody().addFault();
+                SoapFault fault = 
+                    message.getVersion() instanceof Soap11 
+                    ? Soap11FaultInInterceptor.unmarshalFault(message, xmlReader)
+                    : Soap12FaultInInterceptor.unmarshalFault(message, xmlReader);
+                if (fault.getFaultCode() != null) {
+                    soapFault.setFaultCode(fault.getFaultCode());
+                }
+                if (fault.getMessage() != null) {
+                    soapFault.setFaultString(fault.getMessage());
+                }
+                if (fault.getRole() != null) {
+                    soapFault.setFaultActor(fault.getRole());
+                }
+                if (fault.getDetail() != null) {
+                    soapFault.addDetail().appendChild(
+                        soapMessage.getSOAPPart().importNode(
+                            fault.getDetail().getFirstChild(), true));
+                }
+
+                DOMSource bodySource = new DOMSource(soapFault);
+                xmlReader = StaxUtils.createXMLStreamReader(bodySource);
+            } else { 
+                StaxUtils.readDocElements(soapMessage.getSOAPBody(), xmlReader, true);
+                DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
+                xmlReader = StaxUtils.createXMLStreamReader(bodySource);
+                xmlReader.nextTag();
+                xmlReader.nextTag(); // move past body tag
+            }
             message.setContent(XMLStreamReader.class, xmlReader);           
         } catch (SOAPException soape) {
             throw new SoapFault(new org.apache.cxf.common.i18n.Message(
@@ -170,4 +200,14 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
         }
     }
 
+
+    private static boolean hasFault(SoapMessage message, 
+                                    XMLStreamReader xmlReader) {
+        try {
+            QName name = xmlReader.getName();
+            return message.getVersion().getFault().equals(name);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

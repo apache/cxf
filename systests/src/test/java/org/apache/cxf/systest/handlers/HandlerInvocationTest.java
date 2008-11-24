@@ -20,6 +20,7 @@ package org.apache.cxf.systest.handlers;
 
 
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,9 +32,15 @@ import javax.xml.soap.Detail;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
@@ -813,6 +820,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testSOAPHandlerHandleFaultThrowsSOAPFaultExceptionServerOutbound() throws PingException {
+
         try {
             handlerTest.pingWithArgs("soapHandler3 inbound throw ProtocolException "
                                      + "soapHandler4HandleFaultThrowsSOAPFaultException");
@@ -943,6 +951,97 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertTrue("Did not get expected exception message",  baos.toString()
                 .indexOf("RemoteException with nested RuntimeException") > -1);*/
         }        
+    }
+
+
+    @Test
+    public void testServerEndpointRemoteFault() throws PingException {
+
+        TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
+        TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false) {
+            public boolean handleFault(LogicalMessageContext ctx) {
+                super.handleFault(ctx);
+                try {
+                    Boolean outbound = (Boolean)
+                        ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                    if (!outbound) {
+                        LogicalMessage msg = ctx.getMessage();
+                        String payload = convertDOMToString(msg.getPayload());
+                        assertTrue(payload.indexOf(
+                            "<faultstring>"
+                            + "servant throws SOAPFaultException"
+                            + "</faultstring>") > -1);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    fail(e.toString());
+                }
+                return true;
+            }
+
+            private String convertDOMToString(Source s) 
+                throws TransformerException {
+                StringWriter stringWriter = new StringWriter();
+                StreamResult streamResult = new StreamResult(stringWriter);
+                TransformerFactory transformerFactory = 
+                    TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "no");
+                transformer.setOutputProperty(
+                    "{http://xml.apache.org/xslt}indent-amount", 
+                    "2");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.transform(s, streamResult);
+                return stringWriter.toString();
+            }
+        };
+       
+        TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
+        TestSOAPHandler soapHandler2 = new TestSOAPHandler(false) {
+            public boolean handleFault(SOAPMessageContext ctx) {
+                super.handleFault(ctx);
+                try {
+                    Boolean outbound = (Boolean)
+                        ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                    if (!outbound) {
+                        SOAPEnvelope env =
+                            ctx.getMessage().getSOAPPart().getEnvelope();
+                        assertTrue("expected SOAPFault in SAAJ model",
+                                   env.getBody().hasFault());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    fail(e.toString());
+                }
+                return true;
+            }
+        };
+
+        addHandlersToChain((BindingProvider)handlerTest, handler1, handler2, soapHandler1, soapHandler2);
+
+        try {
+            handlerTest.pingWithArgs("servant throw SOAPFaultException");
+            fail("did not get expected Exception");
+        } catch (SOAPFaultException sfe) {
+            // expected
+        }        
+
+        assertEquals(1, handler1.getHandleMessageInvoked());
+        assertEquals(1, handler2.getHandleMessageInvoked());
+        assertEquals(1, soapHandler1.getHandleMessageInvoked());
+        assertEquals(1, soapHandler2.getHandleMessageInvoked());
+        
+        assertEquals(1, handler2.getHandleFaultInvoked());
+        assertEquals(1, handler1.getHandleFaultInvoked());
+        assertEquals(1, soapHandler1.getHandleFaultInvoked());
+        assertEquals(1, soapHandler2.getHandleFaultInvoked());
+
+        assertEquals(1, handler1.getCloseInvoked());
+        assertEquals(1, handler2.getCloseInvoked());
+        assertEquals(1, soapHandler1.getCloseInvoked());
+        assertEquals(1, soapHandler2.getCloseInvoked());
+        assertTrue(handler2.getInvokeOrderOfClose()
+                   < handler1.getInvokeOrderOfClose());   
     }
  
     /*-------------------------------------------------------

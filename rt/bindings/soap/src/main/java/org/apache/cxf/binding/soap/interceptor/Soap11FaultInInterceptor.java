@@ -41,12 +41,17 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
+        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+
+        message.setContent(Exception.class, unmarshalFault(message, reader));
+    }
+
+    public static SoapFault unmarshalFault(SoapMessage message, 
+                                           XMLStreamReader reader) {
         String exMessage = null;
         QName faultCode = null;
         String role = null;
         Element detail = null;
-
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         
         try {
             while (reader.nextTag() == XMLStreamReader.START_ELEMENT) {
@@ -70,8 +75,6 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         SoapFault fault = new SoapFault(exMessage, faultCode);
         fault.setDetail(detail);
         fault.setRole(role);
-
-        message.setContent(Exception.class, fault);
+        return fault;
     }
-
 }
