@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -54,6 +55,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
@@ -138,7 +140,17 @@ public final class InjectionUtils {
         }
     }
     
-    public static Object handleParameter(String value, Class<?> pClass) {
+    public static Object handleParameter(String value, Class<?> pClass, boolean pathParam) {
+        
+        if (pathParam) {
+            PathSegment ps = new PathSegmentImpl(value, false);    
+            if (PathSegment.class.isAssignableFrom(pClass)) {
+                return ps;   
+            } else {
+                value = ps.getPath();                 
+            }
+        }
+        
         if (pClass.isPrimitive()) {
             return PrimitiveUtils.read(value, pClass);
         }
@@ -160,10 +172,12 @@ public final class InjectionUtils {
         } catch (Exception ex) {
             // no luck
         }
+        
         return null;
     }
     
-    public static Object handleBean(Class<?> paramType, MultivaluedMap<String, String> values) {
+    public static Object handleBean(Class<?> paramType, MultivaluedMap<String, String> values,
+                                    boolean pathParam) {
         Object bean = null;
         try {
             bean = paramType.newInstance();
@@ -173,7 +187,8 @@ public final class InjectionUtils {
                     if (m.getName().equalsIgnoreCase("set" + entry.getKey())
                         && m.getParameterTypes().length == 1) {
                         Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                            m.getParameterTypes()[0]);
+                                                            m.getParameterTypes()[0],
+                                                            pathParam);
                         if (paramValue != null) {
                             injectThroughMethod(bean, m, paramValue);
                             injected = true;
@@ -187,7 +202,7 @@ public final class InjectionUtils {
                 for (Field f : paramType.getFields()) {
                     if (f.getName().equalsIgnoreCase(entry.getKey())) {
                         Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                            f.getType());
+                                                            f.getType(), pathParam);
                         if (paramValue != null) {
                             injectFieldValue(f, bean, paramValue);
                             break;
@@ -205,14 +220,14 @@ public final class InjectionUtils {
     
     @SuppressWarnings("unchecked")
     public static Object injectIntoList(Type genericType, List<String> values,
-                                        boolean decoded) {
+                                        boolean decoded, boolean pathParam) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
         List theValues = new ArrayList();
         for (String r : values) {
             if (decoded) {
                 r = JAXRSUtils.uriDecode(r);
             }
-            Object o = InjectionUtils.handleParameter(r, realType);
+            Object o = InjectionUtils.handleParameter(r, realType, pathParam);
             if (o != null) {
                 theValues.add(o);
             }
@@ -224,14 +239,14 @@ public final class InjectionUtils {
     
     @SuppressWarnings("unchecked")
     public static Object injectIntoSet(Type genericType, List<String> values, 
-                                       boolean sorted, boolean decoded) {
+                                       boolean sorted, boolean decoded, boolean pathParam) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
         Set theValues = sorted ? new TreeSet() : new HashSet();
         for (String r : values) {
             if (decoded) {
                 r = JAXRSUtils.uriDecode(r);
             }
-            Object o = InjectionUtils.handleParameter(r, realType);
+            Object o = InjectionUtils.handleParameter(r, realType, pathParam);
             if (o != null) {
                 theValues.add(o);
             }
@@ -244,7 +259,8 @@ public final class InjectionUtils {
                                                Type genericType,
                                                String defaultValue,
                                                boolean isLast,
-                                               boolean decoded) {
+                                               boolean decoded,
+                                               boolean pathParam) {
         
         if (paramValues == null) {
             if (defaultValue != null) {
@@ -260,11 +276,11 @@ public final class InjectionUtils {
         }
         
         if (List.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoList(genericType, paramValues, decoded);
+            return InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam);
         } else if (Set.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded);
+            return InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam);
         } else if (SortedSet.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded);
+            return InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam);
         } else {
             String result = null;
             if (paramValues.size() > 0) {
@@ -275,7 +291,7 @@ public final class InjectionUtils {
                 if (decoded) {
                     result = JAXRSUtils.uriDecode(result);
                 }
-                return InjectionUtils.handleParameter(result, paramType);
+                return InjectionUtils.handleParameter(result, paramType, pathParam);
             } else {
                 return null;
             }

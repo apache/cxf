@@ -19,11 +19,14 @@
 
 package org.apache.cxf.jaxrs;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
@@ -32,6 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -92,6 +96,12 @@ public class Customer implements CustomerInfo {
         
     }
     public void testPathBean(@PathParam("") CustomerBean cb) {
+        
+    }
+    public void testFormBean(@FormParam("") CustomerBean cb) {
+        
+    }
+    public void testMatrixBean(@MatrixParam("") CustomerBean cb) {
         
     }
     
@@ -194,6 +204,12 @@ public class Customer implements CustomerInfo {
     }
     
     @Produces("text/xml")   
+    public void testPathSegment(@PathParam("ps") PathSegment ps, 
+                                @PathParam("ps") String path) {
+        // complete
+    }
+    
+    @Produces("text/xml")   
     public void testMultipleQuery(@QueryParam("query")  String queryString, 
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
@@ -203,8 +219,16 @@ public class Customer implements CustomerInfo {
     }
     
     @Produces("text/xml")   
-    public void testMatrixParam(@MatrixParam("p1")  String queryString, 
-                                @MatrixParam("p2") String queryString2) {
+    public void testMatrixParam(@MatrixParam("p1") String mp1, 
+                                @MatrixParam("p2") String mp2,
+                                @MatrixParam("p3") String mp3,
+                                @MatrixParam("p4") String mp4,
+                                @MatrixParam("p4") List<String> mp4List) {
+        // complete
+    }
+    
+    public void testFormParam(@FormParam("p1") String fp1, 
+                              @FormParam("p2") List<String> fp2) {
         // complete
     }
     

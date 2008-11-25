@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs.utils;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -503,6 +505,42 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testMatrixParametersBean() throws Exception {
+        Class[] argType = {Customer.CustomerBean.class};
+        Method m = Customer.class.getMethod("testMatrixBean", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.REQUEST_URI, "/bar;a=aValue/baz;b=123");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           new MetadataMap<String, String>(), 
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+        
+        assertEquals("aValue", cb.getA());
+        assertEquals(new Long(123), cb.getB());
+    }
+    
+    @Test
+    public void testFormParametersBean() throws Exception {
+        Class[] argType = {Customer.CustomerBean.class};
+        Method m = Customer.class.getMethod("testFormBean", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.REQUEST_URI, "/bar");
+        String body = "a=aValue&b=123";
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           new MetadataMap<String, String>(), 
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+        
+        assertEquals("aValue", cb.getA());
+        assertEquals(new Long(123), cb.getB());
+    }
+    
+    @Test
     public void testMultipleQueryParameters() throws Exception {
         Class[] argType = {String.class, String.class, Long.class, 
                            Boolean.TYPE, String.class};
@@ -525,21 +563,73 @@ public class JAXRSUtilsTest extends Assert {
                      "", params.get(4));
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testMatrixParameters() throws Exception {
-        Class[] argType = {String.class, String.class};
+        Class[] argType = {String.class, String.class, String.class, String.class, List.class};
         Method m = Customer.class.getMethod("testMatrixParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         
-        messageImpl.put(Message.REQUEST_URI, "/foo/bar;p1=1;p2");
+        messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2/baz;p4=4;p4=5");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
                                                            null, messageImpl);
-        assertEquals("2 Matrix params should've been identified", 2, params.size());
+        assertEquals("5 Matrix params should've been identified", 5, params.size());
         
-        assertEquals("First Matrix Parameter of multiple was not matched correctly", 
+        assertEquals("First Matrix Parameter not matched correctly", 
                      "1", params.get(0));
-        assertEquals("Second Matrix Parameter of multiple was not matched correctly", 
+        assertEquals("Second Matrix Parameter was not matched correctly", 
                      "", params.get(1));
+        assertEquals("Third Matrix Parameter was not matched correctly", 
+                     "3", params.get(2));
+        assertEquals("Fourth Matrix Parameter was not matched correctly", 
+                     "0", params.get(3));
+        List<String> list = (List<String>)params.get(4);
+        assertEquals(3, list.size());
+        assertEquals("0", list.get(0));
+        assertEquals("4", list.get(1));
+        assertEquals("5", list.get(2));
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testMatrixAndPathSegmentParameters() throws Exception {
+        Class[] argType = {PathSegment.class, String.class};
+        Method m = Customer.class.getMethod("testPathSegment", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.REQUEST_URI, "/bar%20foo;p4=0%201");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        values.add("ps", "bar%20foo;p4=0%201");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+                                                           values, 
+                                                           messageImpl);
+        assertEquals("2 params should've been identified", 2, params.size());
+        
+        PathSegment ps = (PathSegment)params.get(0);
+        assertEquals("bar foo", ps.getPath());
+        assertEquals(1, ps.getMatrixParameters().size());
+        assertEquals("0 1", ps.getMatrixParameters().getFirst("p4"));
+        assertEquals("bar foo", params.get(1));
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testFormParameters() throws Exception {
+        Class[] argType = {String.class, List.class};
+        Method m = Customer.class.getMethod("testFormParam", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        String body = "p1=1&p2=2&p2=3";
+        messageImpl.put(Message.REQUEST_URI, "/foo");
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+                                                           null, messageImpl);
+        assertEquals("2 form params should've been identified", 2, params.size());
+        
+        assertEquals("First Form Parameter not matched correctly", 
+                     "1", params.get(0));
+        List<String> list = (List<String>)params.get(1);
+        assertEquals(2, list.size());
+        assertEquals("2", list.get(0));
+        assertEquals("3", list.get(1));
     }
     
     @Test

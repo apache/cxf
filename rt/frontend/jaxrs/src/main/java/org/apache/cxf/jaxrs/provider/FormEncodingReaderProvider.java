@@ -19,39 +19,28 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.FormUtils;
 
 @Consumes("application/x-www-form-urlencoded")
 @Provider
 public final class FormEncodingReaderProvider implements MessageBodyReader<Object> {
 
-    private static final char SPACE_CHAR = '+';
-    private static final String NEXT_LINE = "%0D%0A";
-    
-    
-    private boolean decode;
     private FormValidator validator;
-    
-    public void setDecode(boolean formDecoding) {
-        decode = formDecoding;
-    }
     
     public void setValidator(FormValidator formValidator) {
         validator = formValidator;
@@ -68,31 +57,15 @@ public final class FormEncodingReaderProvider implements MessageBodyReader<Objec
         throws IOException {
         try {
 
-            String charset = "UTF-8";
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            copy(is, bos, 1024);
-            String postBody = new String(bos.toByteArray(), charset);
-
             MultivaluedMap<String, String> params = createMap(clazz);
-            populateMap(params, postBody);
+            populateMap(params, is, 
+                        AnnotationUtils.getAnnotation(annotations, Encoded.class) == null);
             validateMap(params);
             return params;
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
             throw new WebApplicationException(e);
-        }
-    }
-
-    public static void copy(final InputStream input, final OutputStream output, final int bufferSize)
-        throws IOException {
-        final byte[] buffer = new byte[bufferSize];
-        int n = 0;
-        n = input.read(buffer);
-        while (-1 != n) {
-            output.write(buffer, 0, n);
-            n = input.read(buffer);
         }
     }
 
@@ -111,27 +84,9 @@ public final class FormEncodingReaderProvider implements MessageBodyReader<Objec
      * @return a Map of parameters.
      */
     protected void populateMap(MultivaluedMap<String, String> params, 
-                               String body) {
-        if (!StringUtils.isEmpty(body)) {
-            List<String> parts = Arrays.asList(body.split("&"));
-            for (String part : parts) {
-                String[] keyValue = part.split("=");
-                // Change to add blank string if key but not value is specified
-                if (keyValue.length == 2) {
-                    if (decode) {
-                        String[] values = keyValue[1].split(NEXT_LINE);
-                        for (String value : values) {
-                            params.add(keyValue[0], 
-                                       value.replace(SPACE_CHAR, ' '));
-                        }
-                    } else {
-                        params.add(keyValue[0], keyValue[1]);
-                    }
-                } else {
-                    params.add(keyValue[0], "");
-                }
-            }
-        }
+                               InputStream is,
+                               boolean decode) {
+        FormUtils.populateMap(params, FormUtils.readBody(is), decode);
     }
     
     protected void validateMap(MultivaluedMap<String, String> params) {
