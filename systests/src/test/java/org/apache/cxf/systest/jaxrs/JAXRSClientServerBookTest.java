@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -490,6 +491,40 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             int result = httpclient.executeMethod(post);
             assertEquals(200, result);
             assertEquals(post.getResponseBodyAsString(), "12345");
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }  
+    }
+    
+    @Test
+    public void testDeleteBook() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstore/books/123"; 
+
+        DeleteMethod post = new DeleteMethod(endpointAddress);
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(200, result);
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }  
+    }
+    
+    @Test
+    public void testDeleteBookByQuery() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstore/books/id?value=123"; 
+
+        DeleteMethod post = new DeleteMethod(endpointAddress);
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(200, result);
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();

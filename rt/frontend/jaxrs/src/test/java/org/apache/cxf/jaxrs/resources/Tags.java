@@ -16,30 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.jaxrs.resources;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "Books")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Books {
-
-    private List<Book> books = new ArrayList<Book>();
+@XmlRootElement(name = "Tags")
+public class Tags {
+    @XmlElement
+    private List<TagVO> list = new ArrayList<TagVO>();
     
-    public Books() {
+    public Tags() {
+        
     }
     
-    public Books(Book b) {
-        books.add(b);
+    public Tags(List<TagVO> tags) {
+        list.addAll(tags);
     }
-
-    public Book getBook() {
-        return books.size() == 0 ? null : books.get(0);
+    
+    public void addTag(TagVO tag) {
+        list.add(tag);
     }
 }

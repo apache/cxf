@@ -1,0 +1,1 @@
+{"b.Book":{"b.name":"CXF in Action","b.id":123}}

@@ -23,6 +23,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -45,6 +46,12 @@ public class BookStoreSpring {
     public BookStoreSpring() {
         init();
         System.out.println("----books: " + books.size());
+    }
+    
+    @GET
+    @Path("/books/list/{id}")
+    public Books getBookAsJsonList(@PathParam("id") Long id) {
+        return new Books(books.get(id));
     }
     
     @GET
@@ -88,6 +95,7 @@ public class BookStoreSpring {
 
     @POST
     @Path("books/convert")
+    @Consumes({"application/xml", "application/json" })
     @Produces("application/xml")
     public Book convertBook(Book2 book) {
         // how to have Book2 populated ?
@@ -96,6 +104,8 @@ public class BookStoreSpring {
         b.setName(book.getName());
         return b;
     }
+    
+    
     
     final void init() {
         Book book = new Book();

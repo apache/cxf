@@ -17,29 +17,35 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.jaxrs.resources;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "Books")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Books {
-
-    private List<Book> books = new ArrayList<Book>();
+public class TagVO {
+    private String name;
+    private String group;
     
-    public Books() {
+    public TagVO() { 
+        
     }
     
-    public Books(Book b) {
-        books.add(b);
+    public TagVO(String name, String group) {
+        this.name = name;
+        this.group = group;
     }
-
-    public Book getBook() {
-        return books.size() == 0 ? null : books.get(0);
+    
+    public void setName(String n) {
+        this.name = n;
     }
+    
+    public void setGroup(String g) {
+        this.group = g;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public String getGroup() {
+        return group;
+    }
+    
 }

@@ -289,6 +289,24 @@ public class BookStore {
 
         return r;
     }
+    
+    @DELETE
+    @Path("/books/id")
+    public Response deleteWithQuery(@QueryParam("value") @DefaultValue("-1") int id) {
+        if (id != 123) {
+            throw new WebApplicationException();
+        }
+        Book b = books.get(new Long(id));
+
+        Response r;
+        if (b != null) {
+            r = Response.ok().build();
+        } else {
+            r = Response.notModified().build();
+        }
+
+        return r;
+    }
 
     @POST
     @Path("/booksplain")
