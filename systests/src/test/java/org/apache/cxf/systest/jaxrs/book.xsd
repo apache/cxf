@@ -18,12 +18,13 @@
   under the License.
 -->
 
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/books" xmlns:tns="http://www.example.org/books" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/books" xmlns:tns="http://www.example.org/books" xmlns:bookids="http://www.example.org/books/id" elementFormDefault="qualified">
+  <xs:import namespace="http://www.example.org/books/id"/>
   <element name="Book">
      <complexType>
        <sequence>
         <element name="name" type="xs:string"/>
-        <element name="id" type="xs:long"/>
+        <element name="id" type="bookids:bid"/>
        </sequence> 
      </complexType>
   </element>
