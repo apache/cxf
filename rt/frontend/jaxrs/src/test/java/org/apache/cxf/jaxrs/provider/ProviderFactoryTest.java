@@ -63,6 +63,13 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testMultipleFactories() {
+        assertSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
+        assertSame(ProviderFactory.getInstance("/bar"), ProviderFactory.getInstance("/bar"));
+        assertNotSame(ProviderFactory.getInstance("/bar"), ProviderFactory.getInstance("/"));
+    }
+    
+    @Test
     public void testExceptionMappers() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         ExceptionMapper<?> mapper = 

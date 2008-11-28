@@ -57,10 +57,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     public void handleMessage(Message message) {
         
+        String baseAddress = (String)message.getExchange().getInMessage().get(Message.BASE_PATH);
         try {
-            processResponse(message);
+            processResponse(message, baseAddress);
         } finally {
-            ProviderFactory.getInstance().cleatThreadLocalProxies();
+            ProviderFactory.getInstance(baseAddress).cleatThreadLocalProxies();
             ClassResourceInfo cri =
                 (ClassResourceInfo)message.getExchange().get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
             if (cri != null) {
@@ -72,7 +73,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     @SuppressWarnings("unchecked")
-    private void processResponse(Message message) {
+    private void processResponse(Message message, String baseAddress) {
         
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {
@@ -93,7 +94,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 .getName());
 
             List<ProviderInfo<ResponseHandler>> handlers = 
-                ProviderFactory.getInstance().getResponseHandlers();
+                ProviderFactory.getInstance(baseAddress).getResponseHandlers();
             for (ProviderInfo<ResponseHandler> rh : handlers) {
                 Response r = rh.getProvider().handleResponse(message, operation, response);
                 if (r != null) {
@@ -118,7 +119,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             MessageBodyWriter writer = null;
             MediaType responseType = null;
             for (MediaType type : availableContentTypes) { 
-                writer = ProviderFactory.getInstance()
+                writer = ProviderFactory.getInstance(baseAddress)
                     .createMessageBodyWriter(targetType, 
                           invoked != null ? invoked.getGenericReturnType() : null, 
                           invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 

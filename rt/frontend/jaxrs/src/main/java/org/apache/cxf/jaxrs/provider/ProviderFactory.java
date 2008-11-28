@@ -26,7 +26,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -48,26 +50,31 @@ import org.apache.cxf.message.Message;
 
 public final class ProviderFactory {
     
-    private static final ProviderFactory PF = new ProviderFactory();
+    private static final Map<String, ProviderFactory> FACTORIES = 
+        new HashMap<String, ProviderFactory>();
+    
+    static {
+        FACTORIES.put("/", new ProviderFactory());
+    }
     
     private List<ProviderInfo<MessageBodyReader>> defaultMessageReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader>>();
     private List<ProviderInfo<MessageBodyWriter>> defaultMessageWriters = 
         new ArrayList<ProviderInfo<MessageBodyWriter>>();
     private List<ProviderInfo<MessageBodyReader>> userMessageReaders = 
-        new ArrayList<ProviderInfo<MessageBodyReader>>();
+        new ArrayList<ProviderInfo<MessageBodyReader>>(1);
     private List<ProviderInfo<MessageBodyWriter>> userMessageWriters = 
-        new ArrayList<ProviderInfo<MessageBodyWriter>>();
+        new ArrayList<ProviderInfo<MessageBodyWriter>>(1);
     private List<ProviderInfo<ContextResolver>> userContextResolvers = 
-        new ArrayList<ProviderInfo<ContextResolver>>();
+        new ArrayList<ProviderInfo<ContextResolver>>(1);
     private List<ProviderInfo<ExceptionMapper>> defaultExceptionMappers = 
-        new ArrayList<ProviderInfo<ExceptionMapper>>();
+        new ArrayList<ProviderInfo<ExceptionMapper>>(1);
     private List<ProviderInfo<ExceptionMapper>> userExceptionMappers = 
-        new ArrayList<ProviderInfo<ExceptionMapper>>();
+        new ArrayList<ProviderInfo<ExceptionMapper>>(1);
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
-        new ArrayList<ProviderInfo<RequestHandler>>();
+        new ArrayList<ProviderInfo<RequestHandler>>(1);
     private List<ProviderInfo<ResponseHandler>> responseHandlers = 
-        new ArrayList<ProviderInfo<ResponseHandler>>();
+        new ArrayList<ProviderInfo<ResponseHandler>>(1);
     private RequestPreprocessor requestPreprocessor;
     
     private ProviderFactory() {
@@ -91,7 +98,19 @@ public final class ProviderFactory {
     }
     
     public static ProviderFactory getInstance() {
-        return PF;
+        return getInstance("/");
+    }
+    
+    public static ProviderFactory getInstance(String baseAddress) {
+        ProviderFactory pf = null;
+        synchronized (ProviderFactory.class) { 
+            pf = FACTORIES.get(baseAddress);
+            if (pf == null) {
+                pf = new ProviderFactory();
+                FACTORIES.put(baseAddress, pf);
+            }
+        }
+        return pf;
     }
 
     public <T> ContextResolver<T> createContextResolver(Type contextType, 
