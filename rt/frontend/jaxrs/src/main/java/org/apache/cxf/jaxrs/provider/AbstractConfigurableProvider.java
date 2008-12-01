@@ -17,38 +17,28 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.impl;
+package org.apache.cxf.jaxrs.provider;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.ext.Provider;
+import java.util.List;
 
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+public abstract class AbstractConfigurableProvider {
 
-@Provider
-public class PathSegmentImpl implements PathSegment {
-
-    private String path;
-        
-    public PathSegmentImpl(String path) {
-        this(path, true);
+    private List<String> consumeMediaTypes;
+    private List<String> produceMediaTypes;
+    
+    protected void setConsumeMediaTypes(List<String> types) {
+        consumeMediaTypes = types;
     }
     
-    public PathSegmentImpl(String path, boolean decode) {
-        this.path = decode ? JAXRSUtils.uriDecode(path) : path;
+    public List<String> getConsumeMediaTypes() {
+        return consumeMediaTypes;    
     }
     
-    public MultivaluedMap<String, String> getMatrixParameters() {
-        return JAXRSUtils.getMatrixParams(path, false);
-    }
-
-    public String getPath() {
-        int index = path.indexOf(';');
-        return index != -1 ? path.substring(0, index) : path;
+    protected void setProduceMediaTypes(List<String> types) {
+        produceMediaTypes = types;
     }
     
-    public String getOriginalPath() {
-        return path;
+    public List<String> getProduceMediaTypes() {
+        return produceMediaTypes;    
     }
-
 }

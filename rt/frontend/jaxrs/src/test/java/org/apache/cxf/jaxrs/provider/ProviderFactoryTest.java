@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -102,6 +103,28 @@ public class ProviderFactoryTest extends Assert {
         
         //REVISIT the compare algorithm
         //assertTrue(indexOf(providers, JSONProvider.class) < indexOf(providers, TestStringProvider.class));
+    }
+    
+    @Test
+    public void testSortEntityProvidersWithConfig() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        JSONProvider json1 = new JSONProvider();
+        pf.registerUserProvider(json1);
+        JSONProvider json2 = new JSONProvider();
+        json2.setConsumeMediaTypes(Collections.singletonList("application/abc"));
+        json2.setProduceMediaTypes(Collections.singletonList("application/sbc"));
+        pf.registerUserProvider(json2);
+        
+        List<ProviderInfo<MessageBodyReader>> readers = pf.getUserMessageReaders();
+
+        assertTrue(indexOf(readers, json2) 
+                   < indexOf(readers, json1));
+        
+        List<ProviderInfo<MessageBodyWriter>> writers = pf.getUserMessageWriters();
+
+        assertTrue(indexOf(writers, json1) 
+                   < indexOf(writers, json2));
+        
     }
     
     @Test
@@ -200,6 +223,17 @@ public class ProviderFactoryTest extends Assert {
         for (Object pi : providerInfos) {
             Object p = ((ProviderInfo)pi).getProvider();
             if (p.getClass().isAssignableFrom(providerType)) {
+                break;
+            }
+            index++;
+        }
+        return index;
+    }
+    
+    private int indexOf(List<? extends Object> providerInfos, Object provider) {
+        int index = 0;
+        for (Object pi : providerInfos) {
+            if (((ProviderInfo)pi).getProvider() == provider) {
                 break;
             }
             index++;

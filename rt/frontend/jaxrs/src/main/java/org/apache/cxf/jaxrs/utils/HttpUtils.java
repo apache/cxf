@@ -20,14 +20,17 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.PathSegment;
 
+import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class HttpUtils {
-    
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
     private static final String LOCAL_HOST = "localhost";
     
@@ -51,4 +54,23 @@ public final class HttpUtils {
         }
         return u;
     }
+    
+    
+    public static String fromPathSegment(PathSegment ps) {
+        if (PathSegmentImpl.class.isAssignableFrom(ps.getClass())) {
+            return ((PathSegmentImpl)ps).getOriginalPath();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(ps.getPath());
+        for (Map.Entry<String, List<String>> entry : ps.getMatrixParameters().entrySet()) {
+            for (String value : entry.getValue()) {
+                sb.append(';').append(entry.getKey());
+                if (value != null) {
+                    sb.append('=').append(value);
+                }
+            }
+        }
+        return sb.toString();
+    }
+    
 }

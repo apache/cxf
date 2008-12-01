@@ -79,6 +79,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <value>classpath:/org/apache/cxf/systest/jaxrs/book.xsd</value>
   </util:list>
   
+  <util:list id="jsonTypes">
+    <value>application/json</value>
+    <value>application/jettison</value>
+  </util:list>
+  
   <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
        <entry key="http://www.example.org/books" value="b"/>
   </util:map> 
@@ -93,6 +98,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
       <property name="serializeAsArray" value="true"/> 
       <property name="arrayKeys" ref="jsonKeys"/>
+      
+      <property name="produceMediaTypes" ref="jsonTypes"/>
+      <property name="consumeMediaTypes" ref="jsonTypes"/>
   </bean>
 </beans>
 <!-- END SNIPPET: beans -->

@@ -54,7 +54,7 @@ import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 @Produces("application/json")
 @Consumes("application/json")
 @Provider
-public final class JSONProvider extends AbstractJAXBProvider  {
+public class JSONProvider extends AbstractJAXBProvider  {
     
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
@@ -62,6 +62,14 @@ public final class JSONProvider extends AbstractJAXBProvider  {
     private Map<String, String> namespaceMap = new HashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
+    
+    public void setConsumeMediaTypes(List<String> types) {
+        super.setConsumeMediaTypes(types);
+    }
+    
+    public void setProduceMediaTypes(List<String> types) {
+        super.setProduceMediaTypes(types);
+    }
     
     public void setSchemas(List<String> locations) {
         super.setSchemaLocations(locations);

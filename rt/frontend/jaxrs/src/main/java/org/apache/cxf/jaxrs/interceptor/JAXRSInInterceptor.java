@@ -77,6 +77,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private static String updatePath(String path, String address) {
+        if (address.startsWith("http")) {
+            int idx = address.indexOf('/', 7);
+            if (idx != -1) {
+                address = address.substring(idx);
+            }
+        }
+        
         if (path.startsWith(address)) {
             path = path.substring(address.length());
             if (!path.startsWith("/")) {
@@ -94,7 +101,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
-        String path = (String)message.get(Message.REQUEST_URI);
+        String rawPath = (String)message.get(Message.REQUEST_URI);
         
         RequestPreprocessor rp = 
             ProviderFactory.getInstance(baseAddress).getRequestPreprocessor();
@@ -108,7 +115,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             requestContentType = "*/*";
         }
         
-        path = updatePath(path, baseAddress);
+        rawPath = updatePath(rawPath, baseAddress);
         
         //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);
@@ -123,12 +130,14 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values);
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, 
+                                          rawPath, 
+                                          values);
         if (resource == null) {
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC", 
                                                    BUNDLE, 
-                                                   path);
+                                                   rawPath);
             LOG.severe(errorMsg.toString());
 
             throw new WebApplicationException(404);
@@ -149,7 +158,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 
                 if (ori != null) {
                     values = new MetadataMap<String, String>();
-                    resource = JAXRSUtils.selectResourceClass(resources, path, values);
+                    resource = JAXRSUtils.selectResourceClass(resources, 
+                                                              rawPath, 
+                                                              values);
                 }
                 ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
                                                   httpMethod, values, requestContentType, acceptContentTypes);
@@ -169,7 +180,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
             if (ori != null) {
                 values = new MetadataMap<String, String>();
-                resource = JAXRSUtils.selectResourceClass(resources, path, values);
+                resource = JAXRSUtils.selectResourceClass(resources, 
+                                                          rawPath, 
+                                                          values);
             }
             ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
                                               httpMethod, values, requestContentType, acceptContentTypes);
@@ -177,7 +190,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         
-        LOG.fine("Request path is: " + path);
+        LOG.fine("Request path is: " + rawPath);
         LOG.fine("Request HTTP method is: " + httpMethod);
         LOG.fine("Request contentType is: " + requestContentType);
         LOG.fine("Accept contentType is: " + acceptTypes);
@@ -186,7 +199,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("NO_OP_EXC", 
                                                    BUNDLE, 
-                                                   path,
+                                                   rawPath,
                                                    requestContentType,
                                                    acceptTypes);
             LOG.severe(errorMsg.toString());

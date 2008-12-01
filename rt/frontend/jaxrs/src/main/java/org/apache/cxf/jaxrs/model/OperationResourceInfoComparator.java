@@ -20,9 +20,6 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Comparator;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
@@ -51,17 +48,14 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             return g1 < g2 ? 1 : -1;
         }
         
-        List<MediaType> mimeType1 = e1.getConsumeTypes();
-        List<MediaType> mimeType2 = e2.getConsumeTypes();
         
-        int result = JAXRSUtils.compareMediaTypes(mimeType1.get(0), 
-                                                  mimeType2.get(0));
+        int result = JAXRSUtils.compareSortedMediaTypes(
+                          e1.getConsumeTypes(), 
+                          e2.getConsumeTypes());
         if (result == 0) {
             //use the media type of output data as the secondary key.
-            List<MediaType> mimeTypeP1 = e1.getProduceTypes();
-            List<MediaType> mimeTypeP2 = e2.getProduceTypes();
-            result =  JAXRSUtils.compareMediaTypes(mimeTypeP1.get(0), 
-                                                mimeTypeP2.get(0));
+            result = JAXRSUtils.compareSortedMediaTypes(e1.getProduceTypes(), 
+                                                        e2.getProduceTypes());
         }
         
         return result;

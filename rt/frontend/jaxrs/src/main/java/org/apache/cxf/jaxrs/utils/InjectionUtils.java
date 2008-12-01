@@ -142,6 +142,10 @@ public final class InjectionUtils {
     
     public static Object handleParameter(String value, Class<?> pClass, boolean pathParam) {
         
+        if (value == null) {
+            return null;
+        }
+        
         if (pathParam) {
             PathSegment ps = new PathSegmentImpl(value, false);    
             if (PathSegment.class.isAssignableFrom(pClass)) {
