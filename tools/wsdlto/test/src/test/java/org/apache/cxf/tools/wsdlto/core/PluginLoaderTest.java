@@ -34,7 +34,7 @@ public class PluginLoaderTest extends Assert {
     @Test
     public void testLoadPlugins() throws Exception {
         PluginLoader loader = PluginLoader.getInstance();
-        assertEquals(2, loader.getPlugins().size());
+        assertEquals(3, loader.getPlugins().size());
 
         Plugin plugin = getPlugin(loader, 0);
         assertNotNull(plugin.getName());
@@ -59,7 +59,7 @@ public class PluginLoaderTest extends Assert {
                   
         Map<String, DataBinding> databindings = loader.getDataBindings();
         assertNotNull(databindings);
-        assertEquals(1, databindings.size());
+        assertEquals(2, databindings.size());
         
         DataBinding databinding = getDataBinding(databindings, 0);
         assertEquals("jaxb", databinding.getName());
