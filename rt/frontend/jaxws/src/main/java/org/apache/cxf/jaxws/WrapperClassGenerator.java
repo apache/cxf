@@ -161,14 +161,17 @@ public final class WrapperClassGenerator extends ASMHelper {
                                         boolean isRequest) {
 
         QName wrapperElement = messageInfo.getName();
+        
+        boolean anonymous = factory.getAnonymousWrapperTypes();
 
         ClassWriter cw = createClassWriter();
-        String className = getPackageName(method) + ".jaxws_asm." 
+        String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
+        String className =  pkg + "." 
             + StringUtils.capitalize(op.getName().getLocalPart());
         if (!isRequest) {
             className = className + "Response";
         }
-        String pname = getPackageName(method) + ".jaxws_asm.package-info";
+        String pname = pkg + ".package-info";
         Class<?> def = findClass(pname, method.getDeclaringClass());
         if (def == null) {
             generatePackageInfo(pname, wrapperElement.getNamespaceURI(),
@@ -195,8 +198,12 @@ public final class WrapperClassGenerator extends ASMHelper {
         av0.visitEnd();
 
         av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/XmlType;", true);
-        av0.visit("name", wrapperElement.getLocalPart());
-        av0.visit("namespace", wrapperElement.getNamespaceURI());
+        if (!anonymous) {
+            av0.visit("name", wrapperElement.getLocalPart());
+            av0.visit("namespace", wrapperElement.getNamespaceURI());
+        } else {
+            av0.visit("name", "");            
+        }
         av0.visitEnd();
 
         // add constructor

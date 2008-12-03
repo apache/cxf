@@ -26,9 +26,11 @@ import org.apache.cxf.jaxb_element_test.JaxbElementTestImpl;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolderImpl;
+import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.PerRequestFactory;
 import org.apache.cxf.service.invoker.PooledFactory;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
@@ -41,6 +43,8 @@ public class ServerMisc extends AbstractBusTestServerBase {
         "http://localhost:9003/DocLitWrappedCodeFirstServiceBaseService/";
     public static final String DOCLITBARE_CODEFIRST_URL = 
         "http://localhost:9003/DocLitBareCodeFirstService/";
+    public static final String DOCLIT_CODEFIRST_SETTINGS_URL = 
+        "http://localhost:9003/DocLitWrappedCodeFirstServiceSettings/";
     
     protected void run() {
         
@@ -48,10 +52,27 @@ public class ServerMisc extends AbstractBusTestServerBase {
         factory = new PooledFactory(factory, 4);
         
         JAXWSMethodInvoker invoker = new JAXWSMethodInvoker(factory);
-        JaxWsServerFactoryBean factoryBean = new JaxWsServerFactoryBean();
+        JaxWsServerFactoryBean factoryBean;
+        
+        factoryBean = new JaxWsServerFactoryBean();
         factoryBean.setAddress(DOCLIT_CODEFIRST_URL);
         factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
         factoryBean.setInvoker(invoker);
+        factoryBean.create();
+        
+        factoryBean = new JaxWsServerFactoryBean();
+        factoryBean.setAddress(DOCLIT_CODEFIRST_SETTINGS_URL);
+        factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
+        factoryBean.setInvoker(invoker);
+        factoryBean.getServiceFactory().setAnonymousWrapperTypes(true);
+        factoryBean.getServiceFactory().getServiceConfigurations().add(0, new AbstractServiceConfiguration() {
+            public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
+                return Boolean.TRUE;
+            }
+            public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+                return Long.valueOf(1L);
+            }
+        });
         factoryBean.create();
          
         //Object implementor4 = new DocLitWrappedCodeFirstServiceImpl();
