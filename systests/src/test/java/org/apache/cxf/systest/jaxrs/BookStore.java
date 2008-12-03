@@ -51,7 +51,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.helpers.XMLUtils;
 
-@Path("/bookstore/")
+@Path("/bookstore")
 public class BookStore {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
@@ -135,6 +135,12 @@ public class BookStore {
     @GET
     @Path("/books/{bookId}/")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
+        return doGetBook(id);
+    }
+    
+    @GET
+    @Path("books/custom/{bookId:\\d\\d\\d}")
+    public Book getBookCustom(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
     }
     
