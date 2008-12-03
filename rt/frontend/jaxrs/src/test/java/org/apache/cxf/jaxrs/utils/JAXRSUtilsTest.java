@@ -624,7 +624,6 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("5", list.get(2));
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testMatrixAndPathSegmentParameters() throws Exception {
         Class[] argType = {PathSegment.class, String.class};

@@ -133,7 +133,6 @@ public final class JAXRSUtils {
         return values;
     }
     
-    @SuppressWarnings("unchecked")
     public static List<MediaType> getProviderConsumeTypes(MessageBodyReader provider) {
         String[] values = getUserMediaTypes(provider, "getConsumeMediaTypes");
         
@@ -548,7 +547,6 @@ public final class JAXRSUtils {
                            : JAXRSUtils.getStructuredParams(path.substring(index + 1), ";", decode);
     }
     
-    @SuppressWarnings("unchecked")
     private static Object processHeaderParam(Message m, 
                                              String header, 
                                              Class<?> pClass, 
