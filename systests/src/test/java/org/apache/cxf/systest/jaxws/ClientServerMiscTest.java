@@ -19,12 +19,16 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.io.InputStream;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -32,6 +36,10 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexType;
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeService;
@@ -39,7 +47,10 @@ import org.apache.cxf.anonymous_complex_type.RefSplitName;
 import org.apache.cxf.anonymous_complex_type.RefSplitNameResponse;
 import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest_Service;
 import org.apache.cxf.ordered_param_holder.ComplexStruct;
@@ -555,5 +566,45 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(1, port.operationInBase(1));
         assertEquals(2, port.operationInSub1(2));
         assertEquals(3, port.operationInSub2(3));
+    }
+    
+    
+    
+    @Test
+    public void testAnonymousMinOccursConfig() throws Exception {
+        HttpURLConnection httpConnection = 
+            getHttpConnection(ServerMisc.DOCLIT_CODEFIRST_SETTINGS_URL + "?wsdl");    
+        httpConnection.connect();        
+        
+        assertEquals(200, httpConnection.getResponseCode());
+        assertEquals("OK", httpConnection.getResponseMessage());
+        InputStream in = httpConnection.getInputStream();
+        assertNotNull(in);
+        
+        Document doc = XMLUtils.parse(in);
+        assertNotNull(doc);
+        
+        
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("soap", Soap11.SOAP_NAMESPACE);
+        ns.put("tns", "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService");
+        ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        ns.put("xs", "http://www.w3.org/2001/XMLSchema");
+        
+        
+        XPathUtils xu = new XPathUtils(ns);
+        
+        //make sure the wrapper types are anonymous types
+        Node ct = (Node) xu.getValue("//wsdl:definitions/wsdl:types/xs:schema"
+                                     + "/xs:element[@name='getFooSetResponse']/xs:complexType/xs:sequence",
+                                     doc, XPathConstants.NODE);
+        assertNotNull(ct);
+        
+        //make sure the params are nillable, not minOccurs=0
+        ct = (Node) xu.getValue("//wsdl:definitions/wsdl:types/xs:schema"
+                                + "/xs:element[@name='multiInOut']/xs:complexType/xs:sequence"
+                                + "/xs:element[@nillable='true']",
+                                doc, XPathConstants.NODE);
+        assertNotNull(ct);
     }
 }
