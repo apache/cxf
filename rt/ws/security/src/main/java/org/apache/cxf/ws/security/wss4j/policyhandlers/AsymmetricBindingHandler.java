@@ -41,6 +41,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecBase;
@@ -275,12 +276,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     setKeyIdentifierType(encr, recToken, encrToken);
                     
                     encr.setDocument(saaj.getSOAPPart());
-                    setEncryptionUser(encr, recToken, false);
+                    Crypto crypto = getEncryptionCrypto(recToken);
+                    setEncryptionUser(encr, recToken, false, crypto);
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
                     encr.setKeyEncAlgo(algorithmSuite.getAsymmetricKeyWrap());
                     
                     encr.prepare(saaj.getSOAPPart(),
-                                 getEncryptionCrypto(recToken));
+                                 crypto);
                     
                     if (encr.getBSTTokenId() != null) {
                         encr.prependBSTElementToHeader(secHeader);

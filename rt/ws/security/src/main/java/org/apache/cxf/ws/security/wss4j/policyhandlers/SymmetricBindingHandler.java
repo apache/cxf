@@ -52,6 +52,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -461,7 +462,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     encr.setEncKeyId(encrTokId);
                     encr.setEphemeralKey(encrTok.getSecret());
-                    setEncryptionUser(encr, recToken, false);
+                    Crypto crypto = getEncryptionCrypto(recToken);
+                    setEncryptionUser(encr, recToken, false, crypto);
                    
                     encr.setDocument(saaj.getSOAPPart());
                     encr.setEncryptSymmKey(false);
@@ -475,7 +477,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
                     
                     encr.prepare(saaj.getSOAPPart(),
-                                 getEncryptionCrypto(recToken));
+                                 crypto);
                    
                     if (encr.getBSTTokenId() != null) {
                         encr.prependBSTElementToHeader(secHeader);

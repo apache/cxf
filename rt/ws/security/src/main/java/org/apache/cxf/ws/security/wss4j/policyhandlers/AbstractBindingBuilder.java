@@ -21,9 +21,11 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -720,13 +722,13 @@ public abstract class AbstractBindingBuilder {
     protected WSSecEncryptedKey getEncryptedKeyBuilder(TokenWrapper wrapper, 
                                                        Token token) throws WSSecurityException {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
-        
+        Crypto crypto = getEncryptionCrypto(wrapper);
         setKeyIdentifierType(encrKey, wrapper, token);
-        setEncryptionUser(encrKey, wrapper, false);
+        setEncryptionUser(encrKey, wrapper, false, crypto);
         encrKey.setKeySize(binding.getAlgorithmSuite().getMaximumSymmetricKeyLength());
         encrKey.setKeyEncAlgo(binding.getAlgorithmSuite().getAsymmetricKeyWrap());
         
-        encrKey.prepare(saaj.getSOAPPart(), getEncryptionCrypto(wrapper));
+        encrKey.prepare(saaj.getSOAPPart(), crypto);
         
         return encrKey;
     }
@@ -823,10 +825,30 @@ public abstract class AbstractBindingBuilder {
             secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         }
     }
-    public void setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, TokenWrapper token, boolean sign) {
+    public void setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, TokenWrapper token,
+                                  boolean sign, Crypto crypto) {
         String encrUser = (String)message.getContextualProperty(sign 
                                                                 ? SecurityConstants.USERNAME
                                                                 : SecurityConstants.ENCRYPT_USERNAME);
+        if (encrUser == null) {
+            encrUser = crypto.getDefaultX509Alias();
+        }
+        if (encrUser == null) {
+            try {
+                Enumeration<String> en = crypto.getKeyStore().aliases();
+                if (en.hasMoreElements()) {
+                    encrUser = en.nextElement();
+                }
+                if (en.hasMoreElements()) {
+                    //more than one alias in the keystore, user WILL need
+                    //to specify
+                    encrUser = null;
+                }            
+            } catch (KeyStoreException e) {
+                //ignore
+            }
+        }
+
         if (encrUser == null || "".equals(encrUser)) {
             policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " username found.");
         }
