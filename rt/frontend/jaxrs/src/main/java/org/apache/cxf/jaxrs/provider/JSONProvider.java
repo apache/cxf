@@ -23,6 +23,7 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -35,28 +36,47 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLOutputFactory;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.codehaus.jettison.AbstractXMLStreamWriter;
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
-import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 @ProduceMime("application/json")
 @ConsumeMime("application/json")
 @Provider
 public final class JSONProvider extends AbstractJAXBProvider  {
     
+    private static final String JAXB_DEFAULT_NAMESPACE = "##default";
+    private static final String JAXB_DEFAULT_NAME = "##default";
+    
     private Map<String, String> namespaceMap = new HashMap<String, String>();
+    private boolean serializeAsArray;
+    private List<String> arrayKeys;
     
     public void setSchemas(List<String> locations) {
-        super.setSchemas(locations);
+        super.setSchemaLocations(locations);
+    }
+    
+    public void setSchemaHandler(SchemaHandler handler) {
+        super.setSchema(handler.getSchema());
+    }
+    
+    public void setSerializeAsArray(boolean asArray) {
+        this.serializeAsArray = asArray;
+    }
+    
+    public void setArrayKeys(List<String> keys) {
+        this.arrayKeys = keys;
     }
     
     public void setNamespaceMap(Map<String, String> namespaceMap) {
@@ -69,8 +89,7 @@ public final class JSONProvider extends AbstractJAXBProvider  {
         
         try {
             Class<?> theType = getActualType(type, genericType);
-            JAXBContext context = getJAXBContext(theType, genericType);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
             MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
             XMLStreamReader xsw = factory.createXMLStreamReader(is);
@@ -83,12 +102,14 @@ public final class JSONProvider extends AbstractJAXBProvider  {
             return response;
             
         } catch (JAXBException e) {
-            throw new WebApplicationException(e);         
+            handleJAXBException(e);
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
         } catch (Exception e) {
             throw new WebApplicationException(e);
-        } 
+        }
+        // unreachable
+        return null;
     }
 
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
@@ -103,8 +124,22 @@ public final class JSONProvider extends AbstractJAXBProvider  {
             }
             Marshaller ms = createMarshaller(actualObject, actualClass, genericType, m);
 
-            XMLOutputFactory factory = new MappedXMLOutputFactory(namespaceMap);
-            XMLStreamWriter xsw = factory.createXMLStreamWriter(os);            
+            Configuration c = new Configuration(namespaceMap);
+            MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
+            AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
+                                               convention, 
+                                               new OutputStreamWriter(os, "UTF-8"));
+            if (serializeAsArray) {
+                if (arrayKeys != null) {
+                    for (String key : arrayKeys) {
+                        xsw.seriliazeAsArray(key);
+                    }
+                } else {
+                    String key = getKey(convention, cls);
+                    xsw.seriliazeAsArray(key);
+                }
+            }
+                        
             ms.marshal(actualObject, xsw);
             xsw.close();
             
@@ -115,7 +150,33 @@ public final class JSONProvider extends AbstractJAXBProvider  {
         }
     }
 
-    
+    private String getKey(MappedNamespaceConvention convention, Class<?> cls) {
+        String key = null;
+        
+        XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
+        if (root != null) {
+            
+            String namespace = root.namespace();
+            if (JAXB_DEFAULT_NAMESPACE.equals(namespace)) {
+                namespace = "";
+            }
+            
+            String prefix = namespaceMap.get(namespace);
+            if (prefix == null) {
+                prefix = "";
+            }
+            
+            String name = root.name();
+            if (JAXB_DEFAULT_NAME.equals(name)) {
+                name = cls.getSimpleName();
+            }
+            key = convention.createKey(prefix, namespace, name);
+            
+        } else {
+            key = convention.createKey("", "", cls.getSimpleName());
+        }
+        return key;
+    }
     
     
 }

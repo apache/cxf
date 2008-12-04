@@ -19,27 +19,21 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -48,16 +42,14 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
 public abstract class AbstractJAXBProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
@@ -67,7 +59,6 @@ public abstract class AbstractJAXBProvider
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
 
     private static final String CHARSET_PARAMETER = "charset"; 
-    private static final String CLASSPATH_PREFIX = "classpath:";
         
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
@@ -84,13 +75,18 @@ public abstract class AbstractJAXBProvider
         return isSupported(type, genericType, annotations);
     }
 
-    public void setSchemas(List<String> locations) {
-        schema = createSchema(locations);    
+    public void setSchemaLocations(List<String> locations) {
+        schema = SchemaHandler.createSchema(locations);    
     }
     
     public long getSize(Object o) {
         return -1;
     }
+
+    public void setSchema(Schema s) {
+        schema = s;    
+    }
+ 
 
     protected JAXBContext getJAXBContext(Class<?> type, Type genericType) throws JAXBException {
         
@@ -222,43 +218,17 @@ public abstract class AbstractJAXBProvider
         return obj;
     }
     
-    private Schema createSchema(List<String> locations) {
-        
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema s = null;
-        try {
-            List<Source> sources = new ArrayList<Source>();
-            for (String loc : locations) {
-                InputStream is = null;
-                if (loc.startsWith(CLASSPATH_PREFIX)) {
-                    String path = loc.substring(CLASSPATH_PREFIX.length() + 1);
-                    is = getClass().getClassLoader().getResourceAsStream(path);
-                    if (is == null) {
-                        LOG.warning("No schema resource " + loc + " is available on classpath");
-                        return null;
-                    }
-                } else {
-                    File f = new File(loc);
-                    if (!f.exists()) {
-                        LOG.warning("No schema resource " + loc + " is available on local disk");
-                        return null;
-                    }
-                    is = new FileInputStream(f);
-                }
-                                
-                Reader r = new BufferedReader(
-                               new InputStreamReader(is, "UTF-8"));
-                sources.add(new StreamSource(r));
-            }
-            s = factory.newSchema(sources.toArray(new Source[]{}));
-        } catch (Exception ex) {
-            LOG.warning("Validation will be disabled, failed to create schema : " + ex.getMessage());
-        }
-        return s;
-        
-    }
-    
     protected Schema getSchema() {
         return schema;
+    }
+    
+    protected static void handleJAXBException(JAXBException e) {
+        Throwable t = e.getLinkedException() != null 
+            ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
+        String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
+                             BUNDLE, t.getMessage()).toString();
+        Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .type(MediaType.TEXT_PLAIN).entity(message).build();
+        throw new WebApplicationException(t, r);
     }
 }

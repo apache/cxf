@@ -47,98 +47,125 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:9080/bookstore/bookinfo?"
                                + "param1=12&param2=3"; 
-        getBook(endpointAddress);
+        getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
     
     @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/books/123"; 
-        getBook(endpointAddress); 
+        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+    }
+    
+    @Test
+    public void testGetBookAsArray() throws Exception {
+        URL url = new URL("http://localhost:9080/bookstore/books/list/123");
+        URLConnection connect = url.openConnection();
+        connect.addRequestProperty("Accept", "application/json");
+        InputStream in = connect.getInputStream();           
+
+        assertEquals("{\"Books\":{\"books\":[{\"id\":123,\"name\":\"CXF in Action\"}]}}", 
+                     getStringFromInputStream(in)); 
+        
     }
     
     @Test
     public void testGetBookWithEncodedQueryValue() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/booksquery?id=12%2B3"; 
-        getBook(endpointAddress); 
+        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
     
     @Test
     public void testGetBookWithEncodedPathValue() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore/id=12%2B3"; 
-        getBook(endpointAddress); 
+        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
     
     @Test
     public void testGetDefaultBook() throws Exception {
         String endpointAddress =
             "http://localhost:9080/bookstore"; 
-        getBook(endpointAddress); 
+        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
 
-    private void getBook(String endpointAddress) throws Exception {
+    private void getBook(String endpointAddress, String resource) throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
         InputStream in = connect.getInputStream();           
 
-        InputStream expected = getClass()
-            .getResourceAsStream("resources/expected_get_book123json.txt");
-
+        InputStream expected = getClass().getResourceAsStream(resource);
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
     }
     
     @Test
-    public void testAddInvalidBook() throws Exception {
+    public void testAddInvalidXmlBook() throws Exception {
         
-        String endpointAddress =
-            "http://localhost:9080/bookstore/books/convert";
-        
-        File input = new File(getClass().getResource("resources/add_book.txt").toURI());         
-        PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestHeader("Content-Type", "application/xml");
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        post.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
-        
-        try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(500, result);
-            assertTrue(post.getResponseBodyAsString().contains("JAXBException"));
-        } finally {
-            // Release current connection to the connection pool once you are done
-            post.releaseConnection();
-        }
+        doPost("http://localhost:9080/bookstore/books/convert",
+               500,
+               "application/xml",
+               "resources/add_book.txt",
+               null);
                 
     }
     
     @Test
-    public void testAddValidBook() throws Exception {
+    public void testAddInvalidJsonBook() throws Exception {
         
-        String endpointAddress =
-            "http://localhost:9080/bookstore/books/convert";
+        doPost("http://localhost:9080/bookstore/books/convert",
+               500,
+               "application/json",
+               "resources/add_book2json_invalid.txt",
+               null);
+                
+    }
+    
+    @Test
+    public void testAddValidXmlBook() throws Exception {
         
-        File input = new File(getClass().getResource("resources/add_book2.txt").toURI());         
+        doPost("http://localhost:9080/bookstore/books/convert",
+               200,
+               "application/xml",
+               "resources/add_book2.txt",
+               "resources/expected_get_book123.txt");
+                
+    }
+    
+    @Test
+    public void testAddValidBookJson() throws Exception {
+        doPost("http://localhost:9080/bookstore/books/convert",
+               200,
+               "application/json",
+               "resources/add_book2json.txt",
+               "resources/expected_get_book123.txt");
+    }
+    
+    private void doPost(String endpointAddress, int expectedStatus, String contentType,
+                        String inResource, String expectedResource) throws Exception {
+        
+        File input = new File(getClass().getResource(inResource).toURI());         
         PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestHeader("Content-Type", "application/xml");
+        post.setRequestHeader("Content-Type", contentType);
         RequestEntity entity = new FileRequestEntity(input, "text/xml");
         post.setRequestEntity(entity);
         HttpClient httpclient = new HttpClient();
         
         try {
             int result = httpclient.executeMethod(post);
-            assertEquals(200, result);
+            assertEquals(expectedStatus, result);
             
-            InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
-            
-            assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            if (expectedStatus != 500) {
+                InputStream expected = getClass().getResourceAsStream(expectedResource);
+                assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            } else {
+                assertTrue(post.getResponseBodyAsString().contains("JAXBException"));
+            }
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
         }
-                
     }
     
     private String getStringFromInputStream(InputStream in) throws Exception {        

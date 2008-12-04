@@ -33,13 +33,14 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+
+import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
 @ProduceMime({"application/xml", "text/xml" })
 @ConsumeMime({"application/xml", "text/xml" })
@@ -49,7 +50,11 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     
     public void setSchemas(List<String> locations) {
-        super.setSchemas(locations);
+        super.setSchemaLocations(locations);
+    }
+    
+    public void setSchemaHandler(SchemaHandler handler) {
+        super.setSchema(handler.getSchema());
     }
     
     public void setMarshallerProperties(Map<String, Object> marshallProperties) {
@@ -74,16 +79,12 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             
         } catch (JAXBException e) {
-            Throwable t = e.getLinkedException() != null 
-                ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
-            String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
-                                 BUNDLE, t.getMessage()).toString();
-            Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .type(MediaType.TEXT_PLAIN).entity(message).build();
-            throw new WebApplicationException(t, r);
+            handleJAXBException(e);
         } catch (Exception e) {
             throw new WebApplicationException(e);        
         }
+        // unreachable
+        return null;
     }
 
     
