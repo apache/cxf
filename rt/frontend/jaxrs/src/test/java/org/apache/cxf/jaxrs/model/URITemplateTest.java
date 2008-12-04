@@ -88,6 +88,14 @@ public class URITemplateTest extends Assert {
     }
     
     @Test
+    public void testMatchWithMatrixOnClearPath4() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        assertTrue(uriTemplate.match("/customers;123456/123/orders;456/3", values));
+    }
+    
+    @Test
     public void testMatchBasicTwoParametersVariation1() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{name}/{department}");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();

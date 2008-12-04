@@ -100,13 +100,22 @@ public class BookStore {
     @GET
     @Path("/segment/{pathsegment}/")
     public Book getBookBySegment(@PathParam("pathsegment") PathSegment segment) throws Exception {
-        if (!"matrix".equals(segment.getPath())) {
+        if (!"matrix2".equals(segment.getPath())) {
             throw new RuntimeException();
         }
         MultivaluedMap<String, String> map = segment.getMatrixParameters();
         String s1 = map.getFirst("first").toString();
         String s2 = map.getFirst("second").toString();
         return doGetBook(s1 + s2);
+    }
+    
+    @GET
+    @Path("/segment/list/{pathsegment:.+}/")
+    public Book getBookBySegment(@PathParam("pathsegment") List<PathSegment> list) 
+        throws Exception {
+        return doGetBook(list.get(0).getPath()
+                         + list.get(1).getPath()
+                         + list.get(2).getPath());
     }
     
     @GET

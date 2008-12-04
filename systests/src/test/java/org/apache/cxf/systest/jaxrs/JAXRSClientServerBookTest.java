@@ -215,18 +215,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBookBySegment() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/bookstore/segment/matrix;first=12;second=3",
+        getAndCompareAsStrings("http://localhost:9080/bookstore/segment/matrix2;first=12;second=3",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         getAndCompareAsStrings("http://localhost:9080/bookstore;bar/segment;foo/"
-                               + "matrix;first=12;second=3;third",
+                               + "matrix2;first=12;second=3;third",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
     }
     
     @Test
-    public void testGetBookByHeader() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/bookstore/bookheaders",
+    public void testGetBookByListOfSegments() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/segment/list/1/2/3",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
     }
@@ -236,8 +236,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/segment/matrix;first=12;second=3",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
-        getAndCompareAsStrings("http://localhost:9080/bookstore;bar/segment;foo;"
-                               + "first=12;second=3/matrix;third",
+        getAndCompareAsStrings("http://localhost:9080/bookstore;bar;first=12/segment;foo;"
+                               + "second=3/matrix;third",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBookByHeader() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/bookheaders",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
     }

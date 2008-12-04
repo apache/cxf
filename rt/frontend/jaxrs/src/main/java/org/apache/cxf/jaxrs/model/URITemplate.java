@@ -113,6 +113,7 @@ public final class URITemplate {
     }
     
     private static String escapeCharacters(String expression) {
+        
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < expression.length(); i++) {
             char ch = expression.charAt(i);
@@ -145,11 +146,10 @@ public final class URITemplate {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < uList.size(); i++) {
                     sb.append('/');
-                    if (pList.size() > i && pList.get(i).getPath().indexOf('{') != -1) {
-                        // if it's URI template variable then keep the original value
-                        sb.append(HttpUtils.fromPathSegment(uList.get(i)));
-                    } else {
+                    if (pList.size() > i && pList.get(i).getPath().indexOf('{') == -1) {
                         sb.append(uList.get(i).getPath());
+                    } else {
+                        sb.append(HttpUtils.fromPathSegment(uList.get(i)));
                     }
                 }
                 uri = sb.toString();

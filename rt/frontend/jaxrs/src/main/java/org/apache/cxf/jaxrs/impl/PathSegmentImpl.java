@@ -44,7 +44,11 @@ public class PathSegmentImpl implements PathSegment {
 
     public String getPath() {
         int index = path.indexOf(';');
-        return index != -1 ? path.substring(0, index) : path;
+        String value = index != -1 ? path.substring(0, index) : path;
+        if (value.startsWith("/")) {
+            value = value.length() == 1 ? "" : value.substring(1);
+        }
+        return value; 
     }
     
     public String getOriginalPath() {
