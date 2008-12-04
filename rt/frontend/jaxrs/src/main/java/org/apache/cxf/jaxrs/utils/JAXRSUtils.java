@@ -389,35 +389,37 @@ public final class JAXRSUtils {
         boolean isEncoded = AnnotationUtils.isEncoded(anns, ori);
         String defaultValue = AnnotationUtils.getDefaultParameterValue(anns, ori);
         
+        Object result = null;
+        
         PathParam pathParam = AnnotationUtils.getAnnotation(anns, PathParam.class);
         if (pathParam != null) {
-            return readFromUriParam(pathParam, parameterClass, genericParam, path, 
+            result = readFromUriParam(pathParam, parameterClass, genericParam, path, 
                                     values, defaultValue, !isEncoded);
         } 
         
         QueryParam qp = AnnotationUtils.getAnnotation(anns, QueryParam.class);
         if (qp != null) {
-            return readQueryString(qp, parameterClass, genericParam, message, 
+            result = readQueryString(qp, parameterClass, genericParam, message, 
                                    defaultValue, !isEncoded);
         }
         
         MatrixParam mp = AnnotationUtils.getAnnotation(anns, MatrixParam.class);
         if (mp != null) {
-            return processMatrixParam(message, mp.value(), parameterClass, genericParam, 
+            result = processMatrixParam(message, mp.value(), parameterClass, genericParam, 
                                       defaultValue, !isEncoded);
         }
         
         CookieParam cookie = AnnotationUtils.getAnnotation(anns, CookieParam.class);
         if (cookie != null) {
-            return processCookieParam(message, cookie.value(), parameterClass, genericParam, defaultValue);
+            result = processCookieParam(message, cookie.value(), parameterClass, genericParam, defaultValue);
         } 
         
         HeaderParam hp = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
         if (hp != null) {
-            return processHeaderParam(message, hp.value(), parameterClass, genericParam, defaultValue);
+            result = processHeaderParam(message, hp.value(), parameterClass, genericParam, defaultValue);
         } 
 
-        return null;
+        return result;
     }
     
     private static Object processMatrixParam(Message m, String key, 
@@ -427,19 +429,34 @@ public final class JAXRSUtils {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(
                                       (String)m.get(Message.REQUEST_URI), decode);
         if (segments.size() > 0) {
-            MultivaluedMap<String, String> params = 
-                segments.get(segments.size() - 1).getMatrixParameters();
-            List<String> values = params.get(key);
-            return InjectionUtils.createParameterObject(values, 
-                                                        pClass, 
-                                                        genericType,
-                                                        defaultValue,
-                                                        false,
-                                                        false);
+            MultivaluedMap<String, String> params = new MetadataMap<String, String>(); 
+            for (PathSegment ps : segments) {
+                MultivaluedMap<String, String> matrix = ps.getMatrixParameters();
+                for (Map.Entry<String, List<String>> entry : matrix.entrySet()) {
+                    for (String value : entry.getValue()) {                    
+                        params.add(entry.getKey(), value);
+                    }
+                }
+            }
+            
+            if ("".equals(key)) {
+                return InjectionUtils.handleBean(pClass, params, false);
+            } else {
+                List<String> values = params.get(key);
+                return InjectionUtils.createParameterObject(values, 
+                                                            pClass, 
+                                                            genericType,
+                                                            defaultValue,
+                                                            false,
+                                                            false,
+                                                            true);
+            }
         }
         
         return null;
     }
+    
+    
     
     public static MultivaluedMap<String, String> getMatrixParams(String path, boolean decode) {
         int index = path.indexOf(';');
@@ -461,7 +478,8 @@ public final class JAXRSUtils {
                 }
             }
         }
-        return sb.length() > 0 ? InjectionUtils.handleParameter(sb.toString(), pClass) : defaultValue;
+        return sb.length() > 0 ? InjectionUtils.handleParameter(sb.toString(), pClass, false) 
+                               : defaultValue;
     }
     
     @SuppressWarnings("unchecked")
@@ -478,7 +496,8 @@ public final class JAXRSUtils {
         if (pClass.isAssignableFrom(Cookie.class)) {
             return Cookie.valueOf(value.length() == 0 ? defaultValue : value);
         }
-        return value.length() > 0 ? InjectionUtils.handleParameter(value, pClass) : defaultValue;
+        return value.length() > 0 ? InjectionUtils.handleParameter(value, pClass, false) 
+                                  : defaultValue;
     }
     
     public static Object createContextValue(Message m, Type genericType, Class<?> clazz) {
@@ -548,20 +567,16 @@ public final class JAXRSUtils {
                                            boolean  decoded) {
         String parameterName = uriParamAnnotation.value();
         if ("".equals(parameterName)) {
-            return InjectionUtils.handleBean(paramType, values);
+            return InjectionUtils.handleBean(paramType, values, true);
         } else {
             List<String> results = values.get(parameterName);
-            if (PathSegment.class.isAssignableFrom(paramType)
-                && results != null && results.size() > 0) {
-                return new PathSegmentImpl(results.get(0), decoded);
-            } else {
-                return InjectionUtils.createParameterObject(results, 
-                                                        paramType, 
-                                                        genericType,
-                                                        defaultValue,
-                                                        true,
-                                                        decoded);
-            }
+            return InjectionUtils.createParameterObject(results, 
+                                                    paramType, 
+                                                    genericType,
+                                                    defaultValue,
+                                                    true,
+                                                    decoded,
+                                                    true);
         }
     }
     
@@ -577,7 +592,9 @@ public final class JAXRSUtils {
         String queryName = queryParam.value();
 
         if ("".equals(queryName)) {
-            return InjectionUtils.handleBean(paramType, new UriInfoImpl(m, null).getQueryParameters());
+            return InjectionUtils.handleBean(paramType, 
+                                             new UriInfoImpl(m, null).getQueryParameters(),
+                                             false);
         } else {
             List<String> results = getStructuredParams((String)m.get(Message.QUERY_STRING),
                                        "&",
@@ -587,6 +604,7 @@ public final class JAXRSUtils {
                                                         paramType, 
                                                         genericType,
                                                         defaultValue,
+                                                        false,
                                                         false,
                                                         false);
              

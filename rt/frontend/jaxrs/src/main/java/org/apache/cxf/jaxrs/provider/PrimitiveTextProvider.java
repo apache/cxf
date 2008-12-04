@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -32,6 +33,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 @ProduceMime("text/plain")
@@ -52,7 +54,9 @@ public class PrimitiveTextProvider
     public Object readFrom(Class<Object> type, Type genType, Annotation[] anns, MediaType mt, 
                            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         return InjectionUtils.handleParameter(
-                    IOUtils.readStringFromStream(is).toString(), type);
+                    IOUtils.readStringFromStream(is).toString(), 
+                    type,
+                    AnnotationUtils.getAnnotation(anns, PathParam.class) != null);
     }
 
     public long getSize(Object t) {
