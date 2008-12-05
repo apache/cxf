@@ -828,7 +828,7 @@ public abstract class AbstractBindingBuilder {
     public void setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, TokenWrapper token,
                                   boolean sign, Crypto crypto) {
         String encrUser = (String)message.getContextualProperty(sign 
-                                                                ? SecurityConstants.USERNAME
+                                                                ? SecurityConstants.SIGNATURE_USERNAME
                                                                 : SecurityConstants.ENCRYPT_USERNAME);
         if (encrUser == null) {
             encrUser = crypto.getDefaultX509Alias();
@@ -962,31 +962,48 @@ public abstract class AbstractBindingBuilder {
         setKeyIdentifierType(sig, wrapper, token);
         
         boolean encryptCrypto = false;
-        String userNameKey = SecurityConstants.USERNAME;
+        String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         String type = "signature";
         if (binding instanceof SymmetricBinding) {
             encryptCrypto = ((SymmetricBinding)binding).getProtectionToken() != null;
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
         }
 
-        
+        Crypto crypto = encryptCrypto ? getEncryptionCrypto(wrapper) : getSignatureCrypto(wrapper);
         String user = (String)message.getContextualProperty(userNameKey);
+        if (StringUtils.isEmpty(user)) {
+            user = crypto.getDefaultX509Alias();
+        }
+        if (user == null) {
+            try {
+                Enumeration<String> en = crypto.getKeyStore().aliases();
+                if (en.hasMoreElements()) {
+                    user = en.nextElement();
+                }
+                if (en.hasMoreElements()) {
+                    //more than one alias in the keystore, user WILL need
+                    //to specify
+                    user = null;
+                }            
+            } catch (KeyStoreException e) {
+                //ignore
+            }
+        }
         if (StringUtils.isEmpty(user)) {
             policyNotAsserted(token, "No " + type + " username found.");
         }
 
         String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
-        if (StringUtils.isEmpty(password)) {
-            policyNotAsserted(token, "No password found.");
+        if (password == null) {
+            password = "";
         }
-
         sig.setUserInfo(user, password);
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
         
         try {
             sig.prepare(saaj.getSOAPPart(),
-                        encryptCrypto ? getEncryptionCrypto(wrapper) : getSignatureCrypto(wrapper), 
+                        crypto, 
                         secHeader);
         } catch (WSSecurityException e) {
             policyNotAsserted(token, e);

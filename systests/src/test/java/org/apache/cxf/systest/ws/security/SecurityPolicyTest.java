@@ -82,7 +82,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
         EndpointInfo ei = ep.getServer().getEndpoint().getEndpointInfo(); 
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new ServerPasswordCallback());
-        ei.setProperty(SecurityConstants.USERNAME, "alice");
+        ei.setProperty(SecurityConstants.SIGNATURE_USERNAME, "alice");
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
                        SecurityPolicyTest.class.getResource("alice.properties").toString());
@@ -95,7 +95,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new ServerPasswordCallback());
-        ei.setProperty(SecurityConstants.USERNAME, "alice");
+        ei.setProperty(SecurityConstants.SIGNATURE_USERNAME, "alice");
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
                        SecurityPolicyTest.class.getResource("alice.properties").toString());
@@ -110,7 +110,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleItPortType pt;
 
         pt = service.getDoubleItPortEncryptThenSign();
-        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -122,7 +122,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
         
         pt = service.getDoubleItPortSignThenEncrypt();
-        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -141,7 +141,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 throw ex;
             }
         }
-        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "bob");
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "bob");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.PASSWORD, "pwd");
         pt.doubleIt(BigInteger.valueOf(25));
         

@@ -27,7 +27,9 @@ public final class SecurityConstants {
     public static final String PASSWORD = "ws-security.password";
     public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     
+    public static final String SIGNATURE_USERNAME = "ws-security.signature.username";
     public static final String SIGNATURE_PROPERTIES = "ws-security.signature.properties";
+    
     public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
     public static final String ENCRYPT_PROPERTIES = "ws-security.encryption.properties";
     
