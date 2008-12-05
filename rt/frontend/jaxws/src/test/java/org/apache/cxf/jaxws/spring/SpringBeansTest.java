@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.NullConduitSelector;
@@ -44,6 +45,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -157,7 +159,14 @@ public class SpringBeansTest extends Assert {
         String expectedEndpointUrl = "http://cxf.apache.org/Greeter";
         ep = (EndpointImpl) bean;
         assertEquals(expectedEndpointUrl, ep.getPublishedEndpointUrl());
-
+        
+        bean = ctx.getBean("epWithDataBinding");
+        assertNotNull(bean);
+        ep = (EndpointImpl) bean;
+        DataBinding dataBinding = ep.getDataBinding();
+        
+        assertTrue(dataBinding instanceof JAXBDataBinding);
+        assertEquals("The namespace map should have an entry", ((JAXBDataBinding)dataBinding).getNamespaceMap().size(),1);
         // test for existence of Endpoint without an id element
         boolean found = false;
         String[] names = ctx.getBeanNamesForType(EndpointImpl.class);

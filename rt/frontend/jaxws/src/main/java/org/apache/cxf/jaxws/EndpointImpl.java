@@ -48,6 +48,7 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
@@ -443,8 +444,17 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setBindingUri(String binding) {
         this.bindingUri = binding;
     }
+    
     public String getBindingUri() {
         return this.bindingUri;
+    }
+    
+    public void setDataBinding(DataBinding dataBinding) {
+        serverFactory.setDataBinding(dataBinding);
+    }
+    
+    public DataBinding getDataBinding() {
+        return serverFactory.getDataBinding();
     }
 
     public List<Interceptor> getOutFaultInterceptors() {

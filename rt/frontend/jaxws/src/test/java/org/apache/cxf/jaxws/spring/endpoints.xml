@@ -112,9 +112,24 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 	</jaxws:outInterceptors>
   </jaxws:endpoint>
 
-  <jaxws:endpoint implementor="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test2"/>
+  <jaxws:endpoint id="epWithDataBinding" implementor="org.apache.cxf.jaxws.service.Hello"
+    address="http://localhost:8080/test2">
+    <jaxws:dataBinding>
+      <bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+        <property name="namespaceMap">
+    		<map>
+   			<entry>
+      			<key><value>http://cxf.apache.org/anonymous_complex_type/</value></key>
+      			<value>BeepBeep</value>
+   			</entry>
+      		</map>
+        </property>
+      </bean>
+      </jaxws:dataBinding>
+  </jaxws:endpoint>
     
+  <jaxws:endpoint implementor="org.apache.cxf.jaxws.service.Hello"
+    address="http://localhost:8080/testx"/>
     
   <jaxws:endpoint id="implementorClass"
     implementor="java.lang.Object"
