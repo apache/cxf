@@ -19,14 +19,11 @@
 
 package demo.stream.client;
 
-import java.io.File;
 import java.net.URL;
 import javax.xml.namespace.QName;
-//import javax.xml.ws.ProtocolException;
 import org.apache.hello_world_soap_http.Greeter;
-//import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.SOAPService;
-//import org.apache.hello_world_soap_http.types.FaultDetail;
+
 
 public final class Client {
 
@@ -38,21 +35,8 @@ public final class Client {
     } 
 
     public static void main(String args[]) throws Exception {
-        
-        if (args.length == 0) { 
-            System.out.println("please specify wsdl");
-            System.exit(1); 
-        }
 
-        URL wsdlURL;
-        File wsdlFile = new File(args[0]);
-        if (wsdlFile.exists()) {
-            wsdlURL = wsdlFile.toURL();
-        } else {
-            wsdlURL = new URL(args[0]);
-        }
-        
-        System.out.println(wsdlURL);
+        URL wsdlURL = Client.class.getResource("hello_world.wsdl");
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
         String resp; 

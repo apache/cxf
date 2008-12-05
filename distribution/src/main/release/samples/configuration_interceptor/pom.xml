@@ -49,8 +49,9 @@
 	    	        </goals>
 	    	        <configuration>
 	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/stream/client/client.xml" todir="${basedir}/target/classes/demo/stream/client"/>
-	    	               <copy file="${basedir}/src/demo/stream/server/server.xml" todir="${basedir}/target/classes/demo/stream/server"/>
+	    	               <copy file="${basedir}/client.xml" todir="${basedir}/target/classes/demo/stream/client"/>
+	    	               <copy file="${basedir}/server.xml" todir="${basedir}/target/classes/demo/stream/server"/>
+	    	               <copy file="${basedir}/wsdl/hello_world.wsdl" todir="${basedir}/target/classes/demo/stream/client"/>
 	    	            </tasks>
 	    	        </configuration>
 	    	    </execution>
@@ -100,13 +101,15 @@
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>java</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.stream.client.Client</mainClass>
+                                   <executable>java</executable>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
-                                        <argument>insecure</argument>
+                                        <argument>-Dcxf.config.file=${basedir}/src/demo/stream/client/client.xml</argument>
+                                        <argument>-classpath</argument>
+                                        <classpath/>
+                                        <argument>demo.stream.client.Client</argument>
                                    </arguments>
                                </configuration>
                            </execution>
