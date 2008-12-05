@@ -147,10 +147,6 @@ public class SpringBeansTest extends Assert {
         assertEquals("http://service.jaxws.cxf.apache.org/service", name.getNamespaceURI());
         assertEquals("HelloServiceCustomized", name.getLocalPart());
 
-        name = ep.getServer().getEndpoint().getEndpointInfo().getName();
-        assertEquals("http://service.jaxws.cxf.apache.org/endpoint", name.getNamespaceURI());
-        assertEquals("HelloEndpointCustomized", name.getLocalPart());
-
         bean = ctx.getBean("wsdlLocation");
         assertNotNull(bean);
 
@@ -166,7 +162,8 @@ public class SpringBeansTest extends Assert {
         DataBinding dataBinding = ep.getDataBinding();
         
         assertTrue(dataBinding instanceof JAXBDataBinding);
-        assertEquals("The namespace map should have an entry", ((JAXBDataBinding)dataBinding).getNamespaceMap().size(),1);
+        assertEquals("The namespace map should have an entry",
+                        ((JAXBDataBinding)dataBinding).getNamespaceMap().size(), 1);
         // test for existence of Endpoint without an id element
         boolean found = false;
         String[] names = ctx.getBeanNamesForType(EndpointImpl.class);
