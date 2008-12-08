@@ -101,8 +101,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
-        String rawPath = (String)message.get(Message.REQUEST_URI);
-        
         RequestPreprocessor rp = 
             ProviderFactory.getInstance(baseAddress).getRequestPreprocessor();
         if (rp != null) {
@@ -115,6 +113,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             requestContentType = "*/*";
         }
         
+        String rawPath = (String)message.get(Message.REQUEST_URI);
         rawPath = updatePath(rawPath, baseAddress);
         
         //1. Matching target resource class
@@ -212,8 +211,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
       
         //2. Process parameters
-        List<Object> params = JAXRSUtils
-            .processParameters(ori, values, message);
+        List<Object> params = JAXRSUtils.processParameters(ori, values, message);
 
         message.setContent(List.class, params);
     }
