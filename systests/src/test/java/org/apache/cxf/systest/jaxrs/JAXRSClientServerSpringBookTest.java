@@ -160,7 +160,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                 InputStream expected = getClass().getResourceAsStream(expectedResource);
                 assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
             } else {
-                assertTrue(post.getResponseBodyAsString().contains("JAXBException"));
+                assertTrue(post.getResponseBodyAsString()
+                               .contains("Cannot find the declaration of element"));
             }
         } finally {
             // Release current connection to the connection pool once you are done
