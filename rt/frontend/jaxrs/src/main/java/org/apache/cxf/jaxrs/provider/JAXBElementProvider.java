@@ -49,6 +49,14 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     
+    public void setConsumeMediaTypes(List<String> types) {
+        super.setConsumeMediaTypes(types);
+    }
+    
+    public void setProduceMediaTypes(List<String> types) {
+        super.setProduceMediaTypes(types);
+    }
+    
     public void setSchemas(List<String> locations) {
         super.setSchemaLocations(locations);
     }

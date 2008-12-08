@@ -46,6 +46,53 @@ public class URITemplateTest extends Assert {
     }
     
     @Test
+    public void testMatchWithMatrixAndTemplate() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers/{id}",
+                                                  false);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        boolean match = uriTemplate.match("/customers/123;123456/", values);
+        assertTrue(match);
+        String value = values.getFirst("id");
+        assertEquals("123;123456", value);
+    }
+    
+    @Test
+    public void testMatchWithMatrixOnClearPath1() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers/{id}",
+                                                  false);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        boolean match = uriTemplate.match("/customers;123456/123/", values);
+        assertTrue(match);
+        String value = values.getFirst("id");
+        assertEquals("123", value);
+    }
+    
+    @Test
+    public void testMatchWithMatrixOnClearPath2() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers/{id}/orders/{order}",
+                                                  false);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        assertTrue(uriTemplate.match("/customers;123456/123/orders;456/3", values));
+        assertEquals("123", values.getFirst("id"));
+        assertEquals("3", values.getFirst("order"));
+    }
+    
+    @Test
+    public void testMatchWithMatrixOnClearPath3() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/{id}/customers/",
+                                                  false);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        boolean match = uriTemplate.match("/123/customers;123456/", values);
+        assertTrue(match);
+        String value = values.getFirst("id");
+        assertEquals("123", value);
+    }
+    
+    @Test
     public void testMatchBasicTwoParametersVariation1() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{name}/{department}",
                                                   false);

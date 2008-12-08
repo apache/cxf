@@ -56,6 +56,7 @@ public class BookStoreSpring {
     
     @GET
     @Path("/books/{id}")
+    @ProduceMime({"application/jettison", "application/json" })
     public Book getBookById(@PathParam("id") Long id) {
         return books.get(id);
     }
@@ -96,7 +97,7 @@ public class BookStoreSpring {
     @POST
     @Path("books/convert")
     @ProduceMime("application/xml")
-    @ConsumeMime({"application/xml", "application/json" })
+    @ConsumeMime({"application/xml", "application/json", "application/jettison" })
     public Book convertBook(Book2 book) {
         // how to have Book2 populated ?
         Book b = new Book();

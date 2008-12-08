@@ -421,6 +421,40 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testCompareSortedMediaTypes() throws Exception {
+        MediaType m1 = MediaType.valueOf("text/xml");
+        MediaType m2 = MediaType.valueOf("text/*");
+        assertTrue("text/xml is more specific than text/*", 
+                   JAXRSUtils.compareSortedMediaTypes(Collections.singletonList(m1), 
+                                                      Collections.singletonList(m2)) < 0);
+        assertTrue("text/* is less specific than text/xml", 
+                   JAXRSUtils.compareSortedMediaTypes(Collections.singletonList(m2), 
+                                                      Collections.singletonList(m1)) > 0);
+        
+        assertTrue("text/xml is the same as text/xml", 
+                   JAXRSUtils.compareSortedMediaTypes(Collections.singletonList(m1), 
+                                                      Collections.singletonList(m1)) == 0);
+        
+        List<MediaType> sortedList1 = new ArrayList<MediaType>();
+        sortedList1.add(m1);
+        sortedList1.add(m2);
+                
+        List<MediaType> sortedList2 = new ArrayList<MediaType>();
+        sortedList2.add(m1);
+        sortedList2.add(m2);
+        
+        assertTrue("lists should be equal", 
+                   JAXRSUtils.compareSortedMediaTypes(sortedList1, sortedList2) == 0);
+        
+        sortedList1.add(MediaType.valueOf("*/*"));
+        assertTrue("first list should be less specific", 
+                   JAXRSUtils.compareSortedMediaTypes(sortedList1, sortedList2) > 0);
+        sortedList1.add(MediaType.valueOf("*/*"));
+        assertTrue("second list should be more specific", 
+                   JAXRSUtils.compareSortedMediaTypes(sortedList2, sortedList1) < 0);
+    }
+    
+    @Test
     public void testAcceptTypesMatch() throws Exception {
         
         Method m = Customer.class.getMethod("test", new Class[]{});

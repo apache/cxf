@@ -30,6 +30,7 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -62,7 +63,6 @@ public class BookStore {
 
     public BookStore() {
         init();
-        System.out.println("----books: " + books.size());
     }
     
     @GET
@@ -104,6 +104,14 @@ public class BookStore {
         MultivaluedMap<String, String> map = segment.getMatrixParameters();
         String s1 = map.getFirst("first").toString();
         String s2 = map.getFirst("second").toString();
+        return doGetBook(s1 + s2);
+    }
+    
+    @GET
+    @Path("/segment/matrix")
+    public Book getBookByMatrixParams(@MatrixParam("first") String s1,
+                                      @MatrixParam("second") String s2) throws Exception {
+        
         return doGetBook(s1 + s2);
     }
     
@@ -185,7 +193,6 @@ public class BookStore {
     
     @Path("/booksubresource/{bookId}/")
     public Book getBookSubResource(@PathParam("bookId") String id) throws BookNotFoundFault {
-        System.out.println("----invoking getBookSubResource with id: " + id);
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
@@ -200,7 +207,6 @@ public class BookStore {
     @Path("/booknames/{bookId}/")
     @ProduceMime("text/*")
     public String getBookName(@PathParam("bookId") int id) throws BookNotFoundFault {
-        System.out.println("----invoking getBookName with id: " + id);
         Book book = books.get(new Long(id));
         if (book != null) {
             return book.getName();
@@ -216,7 +222,6 @@ public class BookStore {
     @ProduceMime("text/xml")
     @ConsumeMime("application/xml")
     public Response addBook(Book book) {
-        System.out.println("----invoking addBook, book name is: " + book.getName());
         book.setId(++bookId);
         books.put(book.getId(), book);
 
@@ -234,7 +239,6 @@ public class BookStore {
     @PUT
     @Path("/books/")
     public Response updateBook(Book book) {
-        System.out.println("----invoking updateBook, book name is: " + book.getName());
         Book b = books.get(book.getId());
 
         Response r;
@@ -251,7 +255,6 @@ public class BookStore {
     @PUT
     @Path("/bookswithdom/")
     public DOMSource updateBook(DOMSource ds) {
-        System.out.println("----invoking updateBook with DOMSource");
         XMLUtils.printDOM(ds.getNode());
         return ds;
     }
@@ -260,7 +263,6 @@ public class BookStore {
     @Path("/bookswithjson/")
     @ConsumeMime("application/json")
     public Response updateBookJSON(Book book) {
-        System.out.println("----invoking updateBook, book name is: " + book.getName());
         Book b = books.get(book.getId());
 
         Response r;
@@ -277,7 +279,6 @@ public class BookStore {
     @DELETE
     @Path("/books/{bookId}/")
     public Response deleteBook(@PathParam("bookId") String id) {
-        System.out.println("----invoking deleteBook with bookId: " + id);
         Book b = books.get(Long.parseLong(id));
 
         Response r;
@@ -319,7 +320,6 @@ public class BookStore {
     @GET
     @Path("/cd/{CDId}/")
     public CD getCD() {
-        System.out.println("----invoking getCD with cdId: " + currentCdId);
         CD cd = cds.get(Long.parseLong(currentCdId));
 
         return cd;
@@ -329,7 +329,6 @@ public class BookStore {
     @Path("/cdwithmultitypes/{CDId}/")
     @ProduceMime({"application/xml", "application/json" }) 
     public CD getCDWithMultiContentTypes(@PathParam("CDId") String id) {
-        System.out.println("----invoking getCDWithMultiContentTypes with cdId: " + id);
         CD cd = cds.get(Long.parseLong(id));
 
         return cd;
@@ -338,7 +337,6 @@ public class BookStore {
     @GET
     @Path("/cds/")
     public CDs getCDs() {
-        System.out.println("----invoking getCDs");
         CDs c = new CDs();
         c.setCD(cds.values());
         return c;

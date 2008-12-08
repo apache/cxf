@@ -50,7 +50,7 @@ import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
 @ProduceMime("application/json")
 @ConsumeMime("application/json")
 @Provider
-public final class XMLBeansJSONProvider extends XMLBeansElementProvider {
+public class XMLBeansJSONProvider extends XMLBeansElementProvider {
 
     /** {@inheritDoc} */
     @Override

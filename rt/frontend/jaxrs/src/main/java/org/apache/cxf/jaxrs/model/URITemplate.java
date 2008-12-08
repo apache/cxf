@@ -28,6 +28,10 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+
+import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public final class URITemplate {
     
@@ -133,7 +137,29 @@ public final class URITemplate {
 
         Matcher m = templateRegexPattern.matcher(uri);
         if (!m.matches()) {
-            return false;
+            if (uri.contains(";")) {
+                // we might be trying to match one or few path segments containing matrix
+                // parameters against a clear path segment as in @Path("base").
+                List<PathSegment> pList = JAXRSUtils.getPathSegments(template, false);
+                List<PathSegment> uList = JAXRSUtils.getPathSegments(uri, false);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < uList.size(); i++) {
+                    sb.append('/');
+                    if (pList.size() > i && pList.get(i).getPath().indexOf('{') != -1) {
+                        // if it's URI template variable then keep the original value
+                        sb.append(HttpUtils.fromPathSegment(uList.get(i)));
+                    } else {
+                        sb.append(uList.get(i).getPath());
+                    }
+                }
+                uri = sb.toString();
+                m = templateRegexPattern.matcher(uri);
+                if (!m.matches()) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         // Assign the matched template values to template variables

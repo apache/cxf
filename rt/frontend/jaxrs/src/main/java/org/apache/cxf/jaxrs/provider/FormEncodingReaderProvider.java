@@ -38,7 +38,7 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 
 @ConsumeMime("application/x-www-form-urlencoded")
 @Provider
-public final class FormEncodingReaderProvider implements MessageBodyReader<Object> {
+public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
 
     private FormValidator validator;
     

@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -52,10 +50,8 @@ public final class ProviderFactory {
     
     private static final Map<String, ProviderFactory> FACTORIES = 
         new HashMap<String, ProviderFactory>();
-    
-    static {
-        FACTORIES.put("/", new ProviderFactory());
-    }
+    private static final ProviderFactory DEFAULT_FACTORY = new ProviderFactory(); 
+    private static final String SLASH = "/"; 
     
     private List<ProviderInfo<MessageBodyReader>> defaultMessageReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader>>();
@@ -80,6 +76,10 @@ public final class ProviderFactory {
     private ProviderFactory() {
         // TODO : this needs to be done differently,
         // we need to use cxf-jaxrs-extensions
+        
+        // TODO : make sure the default providers are shared between multiple
+        // factories
+        
         setProviders(defaultMessageReaders,
                      defaultMessageWriters,
                      userContextResolvers,
@@ -102,6 +102,10 @@ public final class ProviderFactory {
     }
     
     public static ProviderFactory getInstance(String baseAddress) {
+        if (SLASH.equals(baseAddress)) {
+            return DEFAULT_FACTORY;
+        }
+        
         ProviderFactory pf = null;
         synchronized (ProviderFactory.class) { 
             pf = FACTORIES.get(baseAddress);
@@ -341,8 +345,7 @@ public final class ProviderFactory {
             return false;
         }
         
-        List<MediaType> supportedMediaTypes =
-            JAXRSUtils.getConsumeTypes(ep.getClass().getAnnotation(ConsumeMime.class));
+        List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderConsumeTypes(ep);
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
@@ -391,8 +394,7 @@ public final class ProviderFactory {
             return false;
         }
         
-        List<MediaType> supportedMediaTypes =
-            JAXRSUtils.getProduceTypes(ep.getClass().getAnnotation(ProduceMime.class));
+        List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderProduceTypes(ep);
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
@@ -400,25 +402,6 @@ public final class ProviderFactory {
 
         return availableMimeTypes.size() != 0 ? true : false;
         
-    }
-    
-    public boolean deregisterEntityProvide(Object o) {
-        
-        if (o instanceof MessageBodyReader) {
-            return userMessageReaders.remove(o);
-        }
-        if (o instanceof MessageBodyWriter) {
-            return userMessageWriters.remove(o);
-        }
-        if (o instanceof ContextResolver) {
-            return userContextResolvers.remove(o);
-        }
-        if (o instanceof RequestHandler) {
-            return requestHandlers.remove(o);
-        }
-        
-        return false;
-                                               
     }
     
     List<ProviderInfo<MessageBodyReader>> getDefaultMessageReaders() {
@@ -466,31 +449,13 @@ public final class ProviderFactory {
                            ProviderInfo<MessageBodyReader> p2) {
             MessageBodyReader e1 = p1.getProvider();
             MessageBodyReader e2 = p2.getProvider();
-            
-            ConsumeMime c = e1.getClass().getAnnotation(ConsumeMime.class);
-            String[] mimeType1 = {"*/*"};
-            if (c != null) {
-                mimeType1 = c.value();               
-            }
-            
-            ConsumeMime c2 = e2.getClass().getAnnotation(ConsumeMime.class);
-            String[] mimeType2 = {"*/*"};
-            if (c2 != null) {
-                mimeType2 = c2.value();               
-            }
+            List<MediaType> types1 = JAXRSUtils.getProviderConsumeTypes(e1);
+            types1 = JAXRSUtils.sortMediaTypes(types1);
+            List<MediaType> types2 = JAXRSUtils.getProviderConsumeTypes(e2);
+            types2 = JAXRSUtils.sortMediaTypes(types2);
     
-            return compareString(mimeType1[0], mimeType2[0]);
+            return JAXRSUtils.compareSortedMediaTypes(types1, types2);
             
-        }
-
-        private int compareString(String str1, String str2) {
-            if (!str1.startsWith("*/") && str2.startsWith("*/")) {
-                return -1;
-            } else if (str1.startsWith("*/") && !str2.startsWith("*/")) {
-                return 1;
-            } 
-            
-            return str1.compareTo(str2);
         }
     }
     
@@ -502,30 +467,13 @@ public final class ProviderFactory {
             MessageBodyWriter e1 = p1.getProvider();
             MessageBodyWriter e2 = p2.getProvider();
             
-            ProduceMime c = e1.getClass().getAnnotation(ProduceMime.class);
-            String[] mimeType1 = {"*/*"};
-            if (c != null) {
-                mimeType1 = c.value();               
-            }
-            
-            ProduceMime c2 = e2.getClass().getAnnotation(ProduceMime.class);
-            String[] mimeType2 = {"*/*"};
-            if (c2 != null) {
-                mimeType2 = c2.value();               
-            }
+            List<MediaType> types1 =
+                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e1));
+            List<MediaType> types2 =
+                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e2));
     
-            return compareString(mimeType1[0], mimeType2[0]);
+            return JAXRSUtils.compareSortedMediaTypes(types1, types2);
             
-        }
-        
-        private int compareString(String str1, String str2) {
-            if (!str1.startsWith("*/") && str2.startsWith("*/")) {
-                return -1;
-            } else if (str1.startsWith("*/") && !str2.startsWith("*/")) {
-                return 1;
-            } 
-            
-            return str1.compareTo(str2);
         }
     }
     

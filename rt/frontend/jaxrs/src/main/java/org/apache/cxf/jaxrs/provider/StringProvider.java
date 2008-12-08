@@ -35,7 +35,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.helpers.IOUtils;
 
 @Provider
-public final class StringProvider 
+public class StringProvider 
     implements MessageBodyWriter<String>, MessageBodyReader<String>  {
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
