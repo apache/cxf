@@ -28,15 +28,14 @@ import org.w3c.dom.Element;
 
 public class JAXWSBinding implements ExtensibilityElement, Serializable {
 
-    private boolean enableAsyncMapping;
-
-    private boolean enableMime;
+    private Boolean enableAsyncMapping;
+    private Boolean enableWrapperStyle;
+    private Boolean enableMime;
 
     private Element element;
     private boolean required;
     private QName elementType;
 
-    private boolean enableWrapperStyle = true;
 
     private String documentBaseURI;
 
@@ -87,25 +86,31 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     }
 
     public boolean isEnableMime() {
-        return enableMime;
+        return enableMime == null ? false : enableMime;
     }
-
+    public boolean isSetEnableMime() {
+        return enableMime != null;
+    }
     public void setEnableMime(boolean enableMime) {
         this.enableMime = enableMime;
     }
 
     public boolean isEnableAsyncMapping() {
-        return this.enableAsyncMapping;
+        return enableAsyncMapping == null ? false : enableAsyncMapping;
     }
-
+    public boolean isSetEnableAsyncMapping() {
+        return enableAsyncMapping != null;
+    }
     public void setEnableAsyncMapping(boolean enableAsync) {
         this.enableAsyncMapping = enableAsync;
     }
 
     public boolean isEnableWrapperStyle() {
-        return enableWrapperStyle;
+        return enableWrapperStyle == null ? true : enableWrapperStyle;
     }
-
+    public boolean isSetEnableWrapperStyle() {
+        return enableWrapperStyle != null;
+    }
     public void setEnableWrapperStyle(boolean pEnableWrapperStyle) {
         this.enableWrapperStyle = pEnableWrapperStyle;
     }

@@ -383,12 +383,12 @@ public class ServiceProcessor extends AbstractProcessor {
                     // changed wrapper style
 
                     jm.setWrapperStyle(false);
-                    processor.processMethod(jm, bop.getOperationInfo(), jaxwsBinding);
+                    processor.processMethod(jm, bop.getOperationInfo());
                     jm.getAnnotationMap().remove("ResponseWrapper");
                     jm.getAnnotationMap().remove("RequestWrapper");
 
                 } else {
-                    processor.processMethod(jm, bop.getOperationInfo(), jaxwsBinding);
+                    processor.processMethod(jm, bop.getOperationInfo());
 
                 }
 
