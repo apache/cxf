@@ -40,49 +40,13 @@ import javax.xml.ws.ResponseWrapper;
 import javax.xml.ws.WebFault;
 
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
-import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
-import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
-import org.apache.cxf.tools.wsdlto.core.PluginLoader;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
-import org.junit.After;
-import org.junit.Before;
+import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 import org.junit.Test;
 
-public class CodeGenTest extends ProcessorTestBase {
-    private JAXWSContainer processor;
-    private ClassLoader classLoader;
-    private String origCP;
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        origCP = System.getProperty("java.class.path");
-        File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
-        classFile.mkdir();
-        System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                                              + File.separatorChar);
-        classLoader = AnnotationUtil.getClassLoader(Thread.currentThread().getContextClassLoader());
-        env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
-        env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
-        env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
-        env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
-        env.put(ToolConstants.CFG_IMPL, "impl");
-        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-
-        processor = new JAXWSContainer(null);
-    }
-
-    @After
-    public void tearDown() {
-        super.tearDown();
-        System.setProperty("java.class.path", origCP);
-        processor = null;
-        env = null;
-    }
+public class CodeGenTest extends AbstractCodeGenTest {
 
     @Test
     public void testHeaderFromAnotherMessage1() throws Exception {
