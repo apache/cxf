@@ -32,12 +32,12 @@ import org.apache.cxf.message.Message;
  */
 public class ClientCallback implements Future<Object[]> {
     
-    Map<String, Object> context;
-    Object[] result;
-    Throwable exception;
-    boolean done;
-    boolean cancelled;
-    boolean started;
+    protected Map<String, Object> context;
+    protected Object[] result;
+    protected Throwable exception;
+    protected boolean done;
+    protected boolean cancelled;
+    protected boolean started;
     
     public ClientCallback() {
     }
