@@ -60,8 +60,8 @@ public final class FileUtils {
             if (!checkExists.exists()) {
                 throw new RuntimeException("The directory " 
                                        + checkExists.getAbsolutePath() 
-                                       + " does not exist, please set "
-                                       + "java.io.tempdir to an existing directory");
+                                       + " does not exist, please set java.io.tempdir"
+                                       + " to an existing directory");
             }
             File f = new File(s, "cxf-tmp-" + x);
             while (!f.mkdir()) {
