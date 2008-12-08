@@ -115,7 +115,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         String rawPath = (String)message.get(Message.REQUEST_URI);        
-        String rawPath = (String)message.get(Message.REQUEST_URI);
         rawPath = updatePath(rawPath, baseAddress);
         
         //1. Matching target resource class
