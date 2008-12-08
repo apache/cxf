@@ -231,11 +231,16 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         }
         
         final ClientCallback callback = new ClientCallback() {
+            boolean handlerCalled;
             public void handleResponse(Map<String, Object> ctx, Object[] res) {
                 super.handleResponse(ctx, res);
                 if (handler != null) {
                     handler.handleResponse(new ResponseCallback(this));
                 }
+                handlerCalled = true;
+            }
+            public boolean isDone() {
+                return handlerCalled && super.isDone();
             }
         };
         
