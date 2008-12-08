@@ -34,54 +34,17 @@ import javax.xml.ws.WebServiceClient;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
+import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
-import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
-import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
-import org.apache.cxf.tools.wsdlto.core.PluginLoader;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
 
-public class CodeGenBugTest extends ProcessorTestBase {
-
-    private JAXWSContainer processor;
-    private ClassLoader classLoader;
-
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
-        classFile.mkdir();
-        System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                                              + File.separatorChar);
-        classLoader = AnnotationUtil.getClassLoader(Thread.currentThread().getContextClassLoader());
-        env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
-        env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
-        env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
-        env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
-        env.put(ToolConstants.CFG_IMPL, "impl");
-        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-        env.put(ToolConstants.CFG_SUPPRESS_WARNINGS, true);
-        processor = new JAXWSContainer(null);
-
-    }
-
-
-    @After
-    public void tearDown() {
-        super.tearDown();
-        //processor = null;
-        env = null;
-    }
+public class CodeGenBugTest extends AbstractCodeGenTest {
 
     @Test
     // Test for CXF-1678

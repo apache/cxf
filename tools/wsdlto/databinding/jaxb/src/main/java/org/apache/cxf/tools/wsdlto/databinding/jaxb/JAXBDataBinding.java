@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,32 +145,10 @@ public class JAXBDataBinding implements DataBindingProfile {
         
         Options opts = null;
         opts = getOptions(schemaCompiler);
-
-        addSchemas(opts, schemaCompiler, schemaLists);
-
-        for (InputSource binding : jaxbBindings) {
-            opts.addBindFile(binding);
-        }
-
-                       
-        for (String ns : context.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
-            try {
-                InputSource ins = new InputSource(file.toURI().toString());
-                schemaCompiler.parseSchema(ins);
-            } finally {
-                FileUtils.delete(file);                
-            }
-        }
+        List<String> args = new ArrayList<String>();
         
-        if (context.getPackageName() != null) {
-            schemaCompiler.setDefaultPackageName(context.getPackageName());
-        }  
-        
-        
-        Vector<String> args = new Vector<String>();
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
-            //hard code to enabale jaxb extensions
+            //hard code to enable jaxb extensions
             args.add("-extension");
             URL bindingFileUrl = getClass().getResource("W3CEPRJaxbBinding.xml");
             InputSource ins = new InputSource(bindingFileUrl.toString());
@@ -187,6 +164,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 LOG.log(Level.FINE, "xjc arg:" + arg);
             }
         }
+
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null
             || context.get(ToolConstants.CFG_XJC_ARGS) != null) {
             try {
@@ -213,6 +191,29 @@ public class JAXBDataBinding implements DataBindingProfile {
                 throw new ToolException(msg, e);
             }
         }
+        
+        
+        addSchemas(opts, schemaCompiler, schemaLists);
+
+        for (InputSource binding : jaxbBindings) {
+            opts.addBindFile(binding);
+        }
+
+                       
+        for (String ns : context.getNamespacePackageMap().keySet()) {
+            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
+            try {
+                InputSource ins = new InputSource(file.toURI().toString());
+                schemaCompiler.parseSchema(ins);
+            } finally {
+                FileUtils.delete(file);                
+            }
+        }
+        
+        if (context.getPackageName() != null) {
+            schemaCompiler.setDefaultPackageName(context.getPackageName());
+        }  
+        
 
         rawJaxbModelGenCode = schemaCompiler.bind();
 
