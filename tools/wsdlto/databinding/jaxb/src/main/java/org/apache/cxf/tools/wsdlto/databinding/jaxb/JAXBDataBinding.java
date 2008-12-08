@@ -266,18 +266,10 @@ public class JAXBDataBinding implements DataBindingProfile {
         return buf.toString();
     }
 
-    // TODO  this can be repaced with schemaCompiler.getOptions() once we
-    // move to a version => 2.0.3 for jaxb-xjc
+    // JAXB 'deprecates' getOptions, by which they mean that they reserve the right to change it.
+    @SuppressWarnings("deprecation")
     private Options getOptions(SchemaCompiler schemaCompiler) throws ToolException {
-        try {
-            Field delegateField = schemaCompiler.getClass().getDeclaredField("opts");
-            delegateField.setAccessible(true);
-            return (Options)delegateField.get(schemaCompiler);
-        } catch (Exception e) {
-            String msg = "Failed to access 'opts' field of XJC SchemaCompilerImpl, reason:" + e;
-            LOG.log(Level.SEVERE, msg, e);
-            throw new ToolException(msg, e);
-        }
+        return schemaCompiler.getOptions();
     }
 
     // JAXB bug. JAXB ClassNameCollector may not be invoked when generated
