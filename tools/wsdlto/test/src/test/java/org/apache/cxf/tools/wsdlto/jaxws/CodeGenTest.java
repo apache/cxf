@@ -283,7 +283,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
-    public void testAsynMethod() throws Exception {
+    public void testAsyncMethod() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_async.wsdl"));
         processor.setContext(env);
         processor.execute();
@@ -321,6 +321,81 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
     }
 
+    @Test
+    public void testAsyncMethodNoService() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_async_noservice.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+
+        assertNotNull(output);
+
+        File org = new File(output, "org");
+        assertTrue(org.exists());
+        File apache = new File(org, "apache");
+        assertTrue(apache.exists());
+        File cxf = new File(apache, "cxf");
+        assertTrue(cxf.exists());
+        File w2j = new File(cxf, "w2j");
+        assertTrue(w2j.exists());
+        File async = new File(w2j, "hello_world_async_soap_http");
+        assertTrue(async.exists());
+
+        File[] files = async.listFiles();
+        assertEquals(Arrays.asList(files).toString(), 9, files.length);
+
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterAsync");
+
+        Method method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                                            javax.xml.ws.AsyncHandler.class});
+        WebMethod webMethodAnno1 = AnnotationUtil.getPrivMethodAnnotation(method1, WebMethod.class);
+
+        assertEquals(method1.getName() + "()" + " Annotation : WebMethod.operationName ", "greetMeSometime",
+                     webMethodAnno1.operationName());
+
+        java.lang.reflect.Method method2 = clz.getMethod("greetMeSometimeAsync",
+                                                         new Class[] {java.lang.String.class});
+        WebMethod webMethodAnno2 = AnnotationUtil.getPrivMethodAnnotation(method2, WebMethod.class);
+        assertEquals(method2.getName() + "()" + " Annotation : WebMethod.operationName ", "greetMeSometime",
+                     webMethodAnno2.operationName());
+
+        method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                                     javax.xml.ws.AsyncHandler.class});
+        try {
+            method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
+                                                                 javax.xml.ws.AsyncHandler.class});
+            fail("Should not have generated testIntAsync");
+        } catch (NoSuchMethodException ex) {
+            //ignore
+        }
+
+        
+        clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterDAsync");
+        method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                                     javax.xml.ws.AsyncHandler.class});
+        
+        clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterCAsync");
+        try {
+            method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                                         javax.xml.ws.AsyncHandler.class});
+            fail("Should not have generated greetMeSometimeAsync");
+        } catch (NoSuchMethodException ex) {
+            //ignore
+        }
+        method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
+                                                             javax.xml.ws.AsyncHandler.class});
+        
+        clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterBAsync");
+        try {
+            method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                                         javax.xml.ws.AsyncHandler.class});
+            fail("Should not have generated greetMeSometimeAsync");
+        } catch (NoSuchMethodException ex) {
+            //ignore
+        }
+        method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
+                                                             javax.xml.ws.AsyncHandler.class});
+    }    
+    
     @Test
     public void testHelloWorldSoap12() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_soap12.wsdl"));
