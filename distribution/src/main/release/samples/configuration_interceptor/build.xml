@@ -26,12 +26,15 @@
   </path>
 
   <target name="client" description="run demo client" depends="build">
-    <cxfrun classname="demo.stream.client.Client"
-	    param1="${basedir}/wsdl/hello_world.wsdl"/>
+    <cxfrun classname="demo.stream.client.AntClient"
+            param1="${basedir}/wsdl/hello_world.wsdl"
+	    jvmarg1="-Dcxf.config.file=client.xml"/>
   </target>
 
   <target name="server" description="run demo server" depends="build">
-    <cxfrun classname="demo.stream.server.Server"/>
+    <cxfrun classname="demo.stream.server.Server"
+            param1="${basedir}/wsdl/hello_world.wsdl"
+            jvmarg1="-Dcxf.config.file=server.xml"/>
   </target>
 
   <target name="generate.code">

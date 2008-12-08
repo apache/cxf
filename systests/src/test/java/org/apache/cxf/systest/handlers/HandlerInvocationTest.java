@@ -953,7 +953,6 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         }        
     }
 
-
     @Test
     public void testServerEndpointRemoteFault() throws PingException {
 
@@ -967,10 +966,10 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                     if (!outbound) {
                         LogicalMessage msg = ctx.getMessage();
                         String payload = convertDOMToString(msg.getPayload());
-                        assertTrue("expected faultstring in: " + payload,
-                            payload.indexOf(
-                                "servant throws SOAPFaultException"
-                                + "</faultstring>") > -1);
+                        assertTrue(payload.indexOf(
+                            "<faultstring>"
+                            + "servant throws SOAPFaultException"
+                            + "</faultstring>") > -1);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

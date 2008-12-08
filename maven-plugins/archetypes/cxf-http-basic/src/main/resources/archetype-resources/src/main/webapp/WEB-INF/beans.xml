@@ -29,7 +29,7 @@
 
 	<jaxws:endpoint 
 	  id="helloWorld" 
-	  implementor="${groupId}.HelloWorldImpl" 
+	  implementor="${packageName}.HelloWorldImpl" 
 	  address="/HelloWorld" />
 	  
 </beans>
