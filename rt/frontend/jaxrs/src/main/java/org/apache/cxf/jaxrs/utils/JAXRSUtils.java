@@ -531,7 +531,7 @@ public final class JAXRSUtils {
     
     public static ContextResolver<?> createContextResolver(Type genericType, Message m) {
         if (genericType instanceof ParameterizedType) {
-            return ProviderFactory.getInstance().createContextResolver(
+            return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createContextResolver(
                       ((ParameterizedType)genericType).getActualTypeArguments()[0], m);
         }
         return null;
@@ -658,7 +658,7 @@ public final class JAXRSUtils {
         MessageBodyReader provider = null;
         
         for (MediaType type : types) { 
-            provider = ProviderFactory.getInstance()
+            provider = ProviderFactory.getInstance((String)m.get(Message.BASE_PATH))
                 .createMessageBodyReader(targetTypeClass,
                                          parameterType,
                                          parameterAnnotations,
@@ -798,10 +798,10 @@ public final class JAXRSUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static Response convertFaultToResponse(Throwable ex) {
+    public static Response convertFaultToResponse(Throwable ex, String baseAddress) {
         
         ExceptionMapper mapper = 
-            ProviderFactory.getInstance().createExceptionMapper(ex.getClass(),
+            ProviderFactory.getInstance(baseAddress).createExceptionMapper(ex.getClass(),
                                                                 new MessageImpl());
         if (mapper != null) {
             Response excResponse = mapper.toResponse(ex);

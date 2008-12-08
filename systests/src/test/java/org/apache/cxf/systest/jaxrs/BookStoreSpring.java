@@ -34,7 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-@Path("/bookstore")
+@Path("/")
 @ProduceMime("application/json")
 public class BookStoreSpring {
 

@@ -45,7 +45,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetBookByUriInfo() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore/bookinfo?"
+            "http://localhost:9080/thebooks/bookstore/bookinfo?"
                                + "param1=12&param2=3"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
@@ -108,6 +108,12 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "application/xml",
                "resources/add_book.txt",
                null);
+        
+        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+               500,
+               "application/xml",
+               "resources/add_book.txt",
+               null);
                 
     }
     
@@ -115,6 +121,12 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testAddInvalidJsonBook() throws Exception {
         
         doPost("http://localhost:9080/bookstore/books/convert",
+               500,
+               "application/json",
+               "resources/add_book2json_invalid.txt",
+               null);
+        
+        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
                500,
                "application/json",
                "resources/add_book2json_invalid.txt",
@@ -130,12 +142,24 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "application/xml",
                "resources/add_book2.txt",
                "resources/expected_get_book123.txt");
+        
+        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+               200,
+               "application/xml",
+               "resources/add_book2.txt",
+               "resources/expected_get_book123.txt");
                 
     }
     
     @Test
     public void testAddValidBookJson() throws Exception {
         doPost("http://localhost:9080/bookstore/books/convert",
+               200,
+               "application/json",
+               "resources/add_book2json.txt",
+               "resources/expected_get_book123.txt");
+        
+        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
                200,
                "application/json",
                "resources/add_book2json.txt",

@@ -865,7 +865,7 @@ public class JAXRSUtilsTest extends Assert {
         ProviderFactory.getInstance().registerUserProvider(cr);
         
         Message m = new MessageImpl();
-            
+        m.put(Message.BASE_PATH, "/");    
         List<Object> params = 
             JAXRSUtils.processParameters(ori, new MetadataMap<String, String>(), m);
         assertEquals("1 parameters expected", 1, params.size());
@@ -884,7 +884,7 @@ public class JAXRSUtilsTest extends Assert {
         ProviderFactory.getInstance().registerUserProvider(cr);
         
         Message m = new MessageImpl();
-            
+        m.put(Message.BASE_PATH, "/");    
         InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
         assertSame(cr.getClass(), c.getContextResolver().getClass());
     }

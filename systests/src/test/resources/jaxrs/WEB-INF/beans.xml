@@ -40,15 +40,29 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
   
+  <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
+  
   <jaxrs:server id="bookservice"
-		        address="/">
+		        address="/bookstore">
     <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" />
+      <ref bean="serviceBean" />
     </jaxrs:serviceBeans>		   
     <jaxrs:providers>
        <ref bean="jaxbProvider"/>
        <ref bean="jsonProvider"/>
     </jaxrs:providers>
+    
+  </jaxrs:server>
+
+  <jaxrs:server id="bookservice2"
+		        address="/thebooks/bookstore">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="jaxbProvider"/>
+       <ref bean="jsonProvider"/>
+    </jaxrs:providers> 
     
   </jaxrs:server>
 

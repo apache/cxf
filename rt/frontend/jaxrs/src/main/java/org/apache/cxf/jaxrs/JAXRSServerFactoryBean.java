@@ -97,12 +97,12 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
                 ep.getService().setInvoker(invoker);
             }
             if (entityProviders != null) {
-                ProviderFactory.getInstance().setUserProviders(entityProviders); 
+                ProviderFactory.getInstance(getAddress()).setUserProviders(entityProviders); 
             }
-            ProviderFactory.getInstance().setRequestPreporcessor(
+            ProviderFactory.getInstance(getAddress()).setRequestPreporcessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
             if (schemaLocations != null) {
-                ProviderFactory.getInstance().setSchemaLocations(schemaLocations);
+                ProviderFactory.getInstance(getAddress()).setSchemaLocations(schemaLocations);
             }
             
             if (start) {

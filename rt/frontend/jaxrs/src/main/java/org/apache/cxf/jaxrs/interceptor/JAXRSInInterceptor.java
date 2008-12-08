@@ -61,12 +61,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleMessage(Message message) {
         
+        String baseAddress = (String)message.get(Message.BASE_PATH);
         try {
-            processRequest(message);
+            processRequest(message, baseAddress);
         } catch (RuntimeException ex) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex);
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress);
             if (excResponse == null) {
-                ProviderFactory.getInstance().cleatThreadLocalProxies();
+                ProviderFactory.getInstance(baseAddress).cleatThreadLocalProxies();
                 throw ex;
             }
             message.getExchange().put(Response.class, excResponse);
@@ -86,34 +87,29 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         return path;
     }
     
-    private void processRequest(Message message) {
+    private void processRequest(Message message, String baseAddress) {
         
         if (message.getExchange().get(OperationResourceInfo.class) != null) {
             // it's a suspended invocation;
             return;
         }
         
+        String path = (String)message.get(Message.REQUEST_URI);
+        
         RequestPreprocessor rp = 
-            ProviderFactory.getInstance().getRequestPreprocessor();
+            ProviderFactory.getInstance(baseAddress).getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
         }
         
-        String path = (String)message.get(Message.REQUEST_URI);
-        String address = (String)message.get(Message.BASE_PATH);
+
         String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {
             requestContentType = "*/*";
         }
         
-        if (address.startsWith("http")) {
-            int idx = address.indexOf('/', 7);
-            if (idx != -1) {
-                address = address.substring(idx);
-            }
-        }
-        path = updatePath(path, address);
+        path = updatePath(path, baseAddress);
         
         //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);
@@ -144,7 +140,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         OperationResourceInfo ori = null;     
         
         List<ProviderInfo<RequestHandler>> shs = 
-            ProviderFactory.getInstance().getRequestHandlers();
+            ProviderFactory.getInstance(baseAddress).getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
             String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
             if (!acceptTypes.equals(newAcceptTypes) || ori == null) {
