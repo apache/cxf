@@ -48,6 +48,12 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             return g1 < g2 ? 1 : -1;
         }
         
+        int gCustom1 = e1.getURITemplate().getNumberOfGroupsWithCustomExpression();
+        int gCustom2 = e2.getURITemplate().getNumberOfGroupsWithCustomExpression();
+        if (gCustom1 != gCustom2) {
+            // descending order 
+            return gCustom1 < gCustom2 ? 1 : -1;
+        }
         
         int result = JAXRSUtils.compareSortedMediaTypes(
                           e1.getConsumeTypes(), 

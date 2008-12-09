@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.model;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,68 +37,63 @@ public final class URITemplate {
     public static final String TEMPLATE_PARAMETERS = "jaxrs.template.parameters";
     
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
-    public static final String UNLIMITED_REGEX_SUFFIX = "(/)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     
     /**
      * The regular expression for matching URI templates and names.
      */
     private static final Pattern TEMPLATE_NAMES_PATTERN = 
-        Pattern.compile("\\{(\\w[-\\w\\.]*)\\}");
+        Pattern.compile("\\{(\\w[-\\w\\.]*)(\\:(.+?))?\\}");
 
-    /**
-     * A URI template is converted into a regular expression by substituting
-     * (.*?) for each occurrence of {\([w- 14 \. ]+?\)} within the URL
-     * template
-     */
-    private static final String PATH_VARIABLE_REGEX = "([^/]+?)";
-    private static final String PATH_UNLIMITED_VARIABLE_REGEX = "(.*?)";
-
+    private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
+    
     private final String template;
-    private final List<String> templateVariables;
+    private final List<String> templateVariables = new ArrayList<String>();
+    private final List<String> customTemplateVariables = new ArrayList<String>();
     private final Pattern templateRegexPattern;
     private final String literals;
 
-    public URITemplate(String theTemplate) {
-        this(theTemplate, true);
-    }
     
-    public URITemplate(String theTemplate, boolean limited) {
+    public URITemplate(String theTemplate) {
+        
         this.template = theTemplate;
         
         StringBuilder literalChars = new StringBuilder();
-        StringBuilder stringBuilder = new StringBuilder();
-        List<String> names = new ArrayList<String>();
-
+        StringBuilder patternBuilder = new StringBuilder();
+        
         // compute a regular expression from URI template
         Matcher matcher = TEMPLATE_NAMES_PATTERN.matcher(template);
         int i = 0;
         while (matcher.find()) {
-            literalChars.append(template.substring(i, matcher.start()));
-            copyURITemplateCharacters(template, i, matcher.start(), stringBuilder);
+            templateVariables.add(matcher.group(1).trim());
+            
+            String substr = escapeCharacters(template.substring(i, matcher.start()));
+            literalChars.append(substr);
+            patternBuilder.append(substr);
             i = matcher.end();
-            if (!limited && i == template.length()) {
-                stringBuilder.append(PATH_UNLIMITED_VARIABLE_REGEX);
+            if (matcher.group(2) != null && matcher.group(3) != null) {
+                patternBuilder.append('(');
+                patternBuilder.append(matcher.group(3).trim());
+                patternBuilder.append(')');
+                customTemplateVariables.add(matcher.group(1).trim());
             } else {
-                stringBuilder.append(PATH_VARIABLE_REGEX);
-            }
-            names.add(matcher.group(1));
+                patternBuilder.append(DEFAULT_PATH_VARIABLE_REGEX);
+            } 
         }
-        literalChars.append(template.substring(i, template.length()));
-        copyURITemplateCharacters(template, i, template.length(), stringBuilder);
+        String substr = escapeCharacters(template.substring(i, template.length()));
+        literalChars.append(substr);
+        patternBuilder.append(substr);
 
         literals = literalChars.toString();
-        templateVariables = Collections.unmodifiableList(names);
-
-        int endPos = stringBuilder.length() - 1;
-        boolean endsWithSlash = (endPos >= 0) ? stringBuilder.charAt(endPos) == '/' : false;
         
+        int endPos = patternBuilder.length() - 1;
+        boolean endsWithSlash = (endPos >= 0) ? patternBuilder.charAt(endPos) == '/' : false;
         if (endsWithSlash) {
-            stringBuilder.deleteCharAt(endPos);
+            patternBuilder.deleteCharAt(endPos);
         }
-        stringBuilder.append(limited ? LIMITED_REGEX_SUFFIX : UNLIMITED_REGEX_SUFFIX);
+        patternBuilder.append(LIMITED_REGEX_SUFFIX);
         
-        templateRegexPattern = Pattern.compile(stringBuilder.toString());
+        templateRegexPattern = Pattern.compile(patternBuilder.toString());
     }
 
     public String getLiteralChars() {
@@ -114,15 +108,21 @@ public final class URITemplate {
         return templateVariables.size();
     }
     
-    private void copyURITemplateCharacters(String templateValue, int start, int end, StringBuilder b) {
-        for (int i = start; i < end; i++) {
-            char c = templateValue.charAt(i);
-            if (c == '?') {
-                b.append("\\?");
-            } else {
-                b.append(c);
-            }
+    public int getNumberOfGroupsWithCustomExpression() {
+        return customTemplateVariables.size();
+    }
+    
+    private static String escapeCharacters(String expression) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < expression.length(); i++) {
+            char ch = expression.charAt(i);
+            sb.append(isReservedCharater(ch) ? "\\" + ch : ch);
         }
+        return sb.toString();
+    }
+    
+    private static boolean isReservedCharater(char ch) {
+        return '.' == ch;
     }
 
     public boolean match(String uri, MultivaluedMap<String, String> templateVariableToValue) {
@@ -190,6 +190,6 @@ public final class URITemplate {
             pathValue = "/" + pathValue;
         }
         
-        return new URITemplate(pathValue, path.limited());
+        return new URITemplate(pathValue);
     }
 }
