@@ -35,6 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -71,18 +72,45 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    public void testExceptionMappers() throws Exception {
+    public void testDefaultUserExceptionMappers() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         ExceptionMapper<?> mapper = 
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertNotNull(mapper);
-        WebApplicationExceptionMapper m = new WebApplicationExceptionMapper(); 
-        pf.registerUserProvider(m);
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+        pf.registerUserProvider(wm);
         ExceptionMapper<?> mapper2 = 
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertNotSame(mapper, mapper2);
-        assertSame(m, mapper2);
+        assertSame(wm, mapper2);
+    }
+    
+    @Test
+    public void testExceptionMappersHierarchy1() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+        pf.registerUserProvider(wm);
+        assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+        assertNull(pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
+        pf.registerUserProvider(rm);
+        assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+    }
+    
+    @Test
+    public void testExceptionMappersHierarchy2() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
         
+        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
+        pf.registerUserProvider(rm);
+        assertSame(rm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+        
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+        pf.registerUserProvider(wm);
+        assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
     }
     
     @Test
@@ -360,6 +388,15 @@ public class ProviderFactoryTest extends Assert {
         pf.setSchemaLocations(locations);
         Schema s = provider.getSchema();
         assertNotNull("schema can not be read from classpath", s);
+    }
+    
+    private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
+
+        public Response toResponse(RuntimeException exception) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
     }
     
 }

@@ -47,6 +47,12 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
         books.put(book.getId(), book);
     }
     
+    public Book getThatBook(Long id, String s) throws BookNotFoundFault {
+        if (!id.toString().equals(s)) {
+            throw new RuntimeException();
+        }
+        return doGetBook(id);
+    }
     
     public Book getThatBook(Long id) throws BookNotFoundFault {
         return doGetBook(id);
@@ -62,6 +68,10 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
             details.setId(id);
             throw new BookNotFoundFault(details);
         }
+    }
+
+    public Book getThatBook() throws BookNotFoundFault {
+        return books.get(123L);
     }
 
 }
