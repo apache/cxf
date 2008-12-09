@@ -20,9 +20,6 @@ package org.apache.cxf.transport.http.spring;
 
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -32,12 +29,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
-import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.HTTPConduit;

@@ -40,8 +40,12 @@ import org.apache.cxf.staxutils.StaxUtils;
  * type TLSClientParametersType that was used in the Spring configuration
  * of the http-conduit bean.
  */
-public class TLSClientParametersConfig {
-    static JAXBContext context = null;
+public final class TLSClientParametersConfig {
+    static JAXBContext context;
+    
+    private TLSClientParametersConfig() {
+        //not constructed
+    }
     
     private static synchronized JAXBContext getContext() throws JAXBException {
         if (context == null) {
