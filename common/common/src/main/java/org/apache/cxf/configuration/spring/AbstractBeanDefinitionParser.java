@@ -220,7 +220,6 @@ public abstract class AbstractBeanDefinitionParser
         mapElementToJaxbProperty(parent, bean, name, propertyName, null);
     }
    
-    @SuppressWarnings("deprecation")
     protected void mapElementToJaxbProperty(Element parent, 
                                             BeanDefinitionBuilder bean, 
                                             QName name,
@@ -241,7 +240,14 @@ public abstract class AbstractBeanDefinitionParser
         if (data == null) {
             return;
         }
-
+        mapElementToJaxbProperty(data, bean, propertyName, c);
+    }
+    
+    @SuppressWarnings("deprecation")
+    protected void mapElementToJaxbProperty(Element data, 
+                                            BeanDefinitionBuilder bean, 
+                                            String propertyName, 
+                                            Class<?> c) {
         JAXBContext context = null;
         try {
             String pkg = getJaxbPackage();
