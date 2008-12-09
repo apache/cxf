@@ -226,6 +226,7 @@ public final class InjectionUtils {
     public static Object injectIntoList(Type genericType, List<String> values,
                                         boolean decoded, boolean pathParam) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
+        values = checkPathSegment(values, realType, pathParam);
         List theValues = new ArrayList();
         for (String r : values) {
             if (decoded) {
@@ -245,6 +246,9 @@ public final class InjectionUtils {
     public static Object injectIntoSet(Type genericType, List<String> values, 
                                        boolean sorted, boolean decoded, boolean pathParam) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
+        
+        values = checkPathSegment(values, realType, pathParam);
+        
         Set theValues = sorted ? new TreeSet() : new HashSet();
         for (String r : values) {
             if (decoded) {
@@ -256,6 +260,25 @@ public final class InjectionUtils {
             }
         }
         return theValues;
+    }
+    
+    private static List<String> checkPathSegment(List<String> values, Class<?> type, boolean pathParam) {
+        if (!pathParam || !PathSegment.class.isAssignableFrom(type)) {
+            return values;
+        }
+        List<String> newValues = new ArrayList<String>();
+        for (String v : values) {
+            String[] segments = v.split("/");
+            for (String s : segments) {
+                if (s.length() != 0) {
+                    newValues.add(s);
+                }
+            }
+            if (v.endsWith("/")) {
+                newValues.add("");
+            }
+        }
+        return newValues;
     }
     
     public static Object createParameterObject(List<String> paramValues,

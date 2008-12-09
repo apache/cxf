@@ -126,7 +126,7 @@ public final class JAXRSUtils {
                                                : new String[]{"*/*"};
                 }
             } catch (Exception ex) {
-                System.out.println();
+                // ignore
             }
         }
         return values;
