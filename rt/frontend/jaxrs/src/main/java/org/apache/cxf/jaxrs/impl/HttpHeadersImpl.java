@@ -73,12 +73,14 @@ public class HttpHeadersImpl implements HttpHeaders {
     public MultivaluedMap<String, String> getRequestHeaders() {
         // should we really worry about immutability given that the Message does not ?
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putAll(headers);
+        for (String key : headers.keySet()) {
+            map.put(key, getRequestHeader(key));
+        }
         return map;
     }
 
     public List<String> getAcceptableLanguages() {
-        List<String> values = getRequestHeader(HttpHeaders.ACCEPT_LANGUAGE);
+        List<String> values = headers.get(HttpHeaders.ACCEPT_LANGUAGE);
         if (values == null || values.isEmpty()) {
             return Collections.emptyList();
         }
@@ -108,7 +110,16 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public List<String> getRequestHeader(String name) {
-        return headers.get(name);
+        List<String> values = headers.get(name); 
+        if (values == null || values.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> hValues = new ArrayList<String>();
+        String[] ls =  values.get(0).split(",");
+        for (String s : ls) {
+            hValues.add(s.trim());
+        }
+        return hValues;
     }
 
     private static class AcceptLanguageComparator implements Comparator<String> {

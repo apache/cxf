@@ -219,6 +219,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookByHeader() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/bookheaders",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
     public void testGetBookByMatrixParameters() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/segment/matrix;first=12;second=3",
                                "resources/expected_get_book123.txt",
@@ -661,6 +668,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         GetMethod get = new GetMethod(address);
         get.setRequestHeader("Accept", acceptType);
         get.setRequestHeader("Accept-Language", "en,da;q=0.8");
+        get.setRequestHeader("BOOK", "1,2,3");
         HttpClient httpClient = new HttpClient();
         try {
             int result = httpClient.executeMethod(get);

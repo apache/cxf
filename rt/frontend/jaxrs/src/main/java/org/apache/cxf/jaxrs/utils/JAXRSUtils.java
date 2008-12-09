@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -514,21 +513,23 @@ public final class JAXRSUtils {
     }
     
     @SuppressWarnings("unchecked")
-    private static Object processHeaderParam(Message m, String header, 
-                                             Class<?> pClass, Type genericType, String defaultValue) {
-        Map<String, List<String>> headers = (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS);
-        List<String> values = headers.get(header);
-        StringBuilder sb = new StringBuilder();
-        if (values != null) {
-            for (Iterator<String> it = values.iterator(); it.hasNext();) {
-                sb.append(it.next());
-                if (it.hasNext()) {
-                    sb.append(',');
-                }
-            }
-        }
-        return sb.length() > 0 ? InjectionUtils.handleParameter(sb.toString(), pClass, false) 
-                               : defaultValue;
+    private static Object processHeaderParam(Message m, 
+                                             String header, 
+                                             Class<?> pClass, 
+                                             Type genericType, 
+                                             String defaultValue) {
+        
+        List<String> values = new HttpHeadersImpl(m).getRequestHeader(header);
+        
+        return InjectionUtils.createParameterObject(values, 
+                                                    pClass, 
+                                                    genericType,
+                                                    defaultValue,
+                                                    false,
+                                                    false,
+                                                    false);
+             
+        
     }
     
     @SuppressWarnings("unchecked")

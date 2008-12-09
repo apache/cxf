@@ -661,6 +661,7 @@ public class JAXRSUtilsTest extends Assert {
         assertSame(ori, ori2);
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testHttpContextParameters() throws Exception {
         
@@ -673,26 +674,30 @@ public class JAXRSUtilsTest extends Assert {
                                                      Request.class,
                                                      SecurityContext.class,
                                                      MessageBodyWorkers.class,
-                                                     String.class}), 
+                                                     String.class,
+                                                     List.class}), 
                 cri);
         ori.setHttpMethod("GET");
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
-        headers.add("Foo", "bar");
-        headers.add("Foo", "baz");
+        headers.add("Foo", "bar, baz");
         
         Message m = new MessageImpl();
         m.put(Message.PROTOCOL_HEADERS, headers);
         
         List<Object> params = 
             JAXRSUtils.processParameters(ori, new MetadataMap<String, String>(), m);
-        assertEquals("6 parameters expected", 6, params.size());
+        assertEquals("7 parameters expected", 7, params.size());
         assertSame(UriInfoImpl.class, params.get(0).getClass());
         assertSame(HttpHeadersImpl.class, params.get(1).getClass());
         assertSame(RequestImpl.class, params.get(2).getClass());
         assertSame(SecurityContextImpl.class, params.get(3).getClass());
         assertSame(MessageBodyWorkersImpl.class, params.get(4).getClass());
         assertSame(String.class, params.get(5).getClass());
-        assertEquals("Wrong header param", "bar,baz", params.get(5));
+        assertEquals("Wrong header param", "bar", params.get(5));
+        List<String> values = (List<String>)params.get(6);
+        assertEquals("Wrong headers size", 2, values.size());
+        assertEquals("Wrong 1st header param", "bar", values.get(0));
+        assertEquals("Wrong 2nd header param", "baz", values.get(1));
     }
     
     @Test

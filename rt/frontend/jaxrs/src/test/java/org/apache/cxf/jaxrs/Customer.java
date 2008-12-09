@@ -229,7 +229,8 @@ public class Customer implements CustomerInfo {
                            @Context Request r,
                            @Context SecurityContext s,
                            @Context MessageBodyWorkers workers,
-                           @HeaderParam("Foo") String h) {
+                           @HeaderParam("Foo") String h,
+                           @HeaderParam("Foo") List<String> l) {
         // complete
     }
     

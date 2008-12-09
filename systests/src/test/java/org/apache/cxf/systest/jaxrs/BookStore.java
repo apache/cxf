@@ -24,12 +24,14 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -113,6 +115,13 @@ public class BookStore {
                                       @MatrixParam("second") String s2) throws Exception {
         
         return doGetBook(s1 + s2);
+    }
+    
+    @GET
+    @Path("/bookheaders/")
+    public Book getBookByHeader(@HeaderParam("BOOK") List<String> ids) throws Exception {
+        
+        return doGetBook(ids.get(0) + ids.get(1) + ids.get(2));
     }
     
     @GET
