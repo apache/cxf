@@ -210,6 +210,17 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         o.setProperty(METHOD, method);
         initializeWrapping(o, method);
 
+        bindOperation(o, method);
+
+        // rpc out-message-part-info class mapping
+        Operation op = (Operation)o.getProperty(WSDLServiceBuilder.WSDL_OPERATION);
+
+        initializeClassInfo(o, method, op == null ? null
+            : CastUtils.cast(op.getParameterOrdering(), String.class));
+    }
+    
+    protected void bindOperation(OperationInfo op, Method method) {
+        
         try {
             // Find the Async method which returns a Response
             Method responseMethod = method.getDeclaringClass().getDeclaredMethod(method.getName() + "Async",
@@ -224,20 +235,15 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 .getDeclaredMethod(method.getName() + "Async",
                                    asyncHandlerParams.toArray(new Class<?>[asyncHandlerParams.size()]));
 
-            getMethodDispatcher().bind(o, method, responseMethod, futureMethod);
+            getMethodDispatcher().bind(op, method, responseMethod, futureMethod);
 
         } catch (SecurityException e) {
             throw new ServiceConstructionException(e);
         } catch (NoSuchMethodException e) {
-            getMethodDispatcher().bind(o, method);
+            getMethodDispatcher().bind(op, method);
         }
-
-        // rpc out-message-part-info class mapping
-        Operation op = (Operation)o.getProperty(WSDLServiceBuilder.WSDL_OPERATION);
-
-        initializeClassInfo(o, method, op == null ? null
-            : CastUtils.cast(op.getParameterOrdering(), String.class));
     }
+
 
     @Override
     protected void initializeWSDLOperations() {

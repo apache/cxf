@@ -553,7 +553,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         if (initializeClassInfo(o, method, op == null ? null
             : CastUtils.cast(op.getParameterOrdering(), String.class))) {
-            getMethodDispatcher().bind(o, method);
+            bindOperation(o, method);
             o.setProperty(ReflectionServiceFactoryBean.METHOD, method);
         } else {
             LOG.log(Level.WARNING, "NO_METHOD_FOR_OP", o.getName());
@@ -800,9 +800,13 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             createMessageParts(intf, op, m);
         }
 
-        getMethodDispatcher().bind(op, m);
+        bindOperation(op, m);
 
         return op;
+    }
+    
+    protected void bindOperation(OperationInfo op, Method m) {
+        getMethodDispatcher().bind(op, m);
     }
 
     protected void initializeWrappedSchema(ServiceInfo serviceInfo) {
