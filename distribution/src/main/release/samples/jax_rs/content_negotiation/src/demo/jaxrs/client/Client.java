@@ -78,7 +78,6 @@ public final class Client {
         }
 
         System.out.println("\n");
-        System.out.println("Client Invoking is succeeded!");
         System.exit(0);
     }
 }

@@ -104,7 +104,6 @@ public final class Client {
         }
 
         System.out.println("\n");
-        System.out.println("Client Invoking is succeeded!");
         System.exit(0);
     }
 
@@ -113,7 +112,6 @@ public final class Client {
         IOUtils.copy(in, bos);
         in.close();
         bos.close();
-        //System.out.println(bos.getOut().toString());
         return bos.getOut().toString();
     }
 
