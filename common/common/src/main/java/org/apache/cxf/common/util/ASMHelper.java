@@ -126,7 +126,7 @@ public class ASMHelper {
             try {
                 cls = ClassWriter.class;
             } catch (NoClassDefFoundError error) {
-                return null;
+                throw new RuntimeException("No ASM ClassWriterFound", error);
             }
             try {
                 // ASM 1.5.x/2.x
