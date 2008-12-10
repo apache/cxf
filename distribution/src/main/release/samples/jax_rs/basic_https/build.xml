@@ -29,7 +29,7 @@
     </target> 
         
     <target name="server" description="run demo server" depends="build">
-        <cxfrun classname="demo.jaxrs.server.Server"  jvmarg1="-Dcxf.config.file=CherryServer.cxf"/>
+        <cxfrun classname="demo.jaxrs.server.Server"  jvmarg1="-Dcxf.config.file=CherryServer.xml"/>
     </target>
     
     <target name="compile" depends="maybe.generate.code">
