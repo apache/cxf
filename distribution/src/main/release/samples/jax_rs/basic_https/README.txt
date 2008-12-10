@@ -7,7 +7,7 @@ by doing the communication using HTTPS.
 The JAX-RS server is configured with a HTTPS listener. The listener 
 requires client authentication so the client must provide suitable 
 credentials. The listener configuration is taken from the 
-"CherryServer.cxf" file located under demo directory.  
+"CherryServer.xml" file located under demo directory.  
 
 The client is configured to provide its certificate "CN=Wibble" and
 chain stored in the Java KeyStore "certs/wibble.jks" to the server. The
