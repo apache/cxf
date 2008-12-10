@@ -35,7 +35,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public final class URITemplate {
     
     public static final String TEMPLATE_PARAMETERS = "jaxrs.template.parameters";
-    
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     
@@ -46,6 +45,7 @@ public final class URITemplate {
         Pattern.compile("\\{(\\w[-\\w\\.]*)(\\:(.+?))?\\}");
 
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
+    private static final String CHARACTERS_TO_ESCAPE = ".";
     
     private final String template;
     private final List<String> templateVariables = new ArrayList<String>();
@@ -123,9 +123,9 @@ public final class URITemplate {
     }
     
     private static boolean isReservedCharater(char ch) {
-        return '.' == ch;
+        return CHARACTERS_TO_ESCAPE.indexOf(ch) != -1;
     }
-
+    
     public boolean match(String uri, MultivaluedMap<String, String> templateVariableToValue) {
 
         if (uri == null) {
@@ -191,5 +191,28 @@ public final class URITemplate {
         }
         
         return new URITemplate(pathValue);
+    }
+    
+    public static int compareTemplates(URITemplate t1, URITemplate t2) {
+        String l1 = t1.getLiteralChars();
+        String l2 = t2.getLiteralChars();
+        if (!l1.equals(l2)) {
+            // descending order 
+            return l1.length() < l2.length() ? 1 : -1; 
+        }
+        
+        int g1 = t1.getNumberOfGroups();
+        int g2 = t2.getNumberOfGroups();
+        // descending order 
+        int result = g1 < g2 ? 1 : g1 > g2 ? -1 : 0;
+        if (result == 0) {
+            int gCustom1 = t1.getNumberOfGroupsWithCustomExpression();
+            int gCustom2 = t2.getNumberOfGroupsWithCustomExpression();
+            if (gCustom1 != gCustom2) {
+                // descending order 
+                return gCustom1 < gCustom2 ? 1 : -1;
+            }
+        }
+        return result;
     }
 }

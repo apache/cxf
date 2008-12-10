@@ -34,30 +34,17 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         }
 
             
-        String l1 = e1.getURITemplate().getLiteralChars();
-        String l2 = e2.getURITemplate().getLiteralChars();
-        if (!l1.equals(l2)) {
-            // descending order 
-            return l1.length() < l2.length() ? 1 : -1; 
-        }
+        int result = URITemplate.compareTemplates(
+                          e1.getURITemplate(),
+                          e2.getURITemplate());
         
-        int g1 = e1.getURITemplate().getNumberOfGroups();
-        int g2 = e2.getURITemplate().getNumberOfGroups();
-        if (g1 != g2) {
-            // descending order 
-            return g1 < g2 ? 1 : -1;
-        }
+        if (result == 0) {
         
-        int gCustom1 = e1.getURITemplate().getNumberOfGroupsWithCustomExpression();
-        int gCustom2 = e2.getURITemplate().getNumberOfGroupsWithCustomExpression();
-        if (gCustom1 != gCustom2) {
-            // descending order 
-            return gCustom1 < gCustom2 ? 1 : -1;
-        }
-        
-        int result = JAXRSUtils.compareSortedMediaTypes(
+            result = JAXRSUtils.compareSortedMediaTypes(
                           e1.getConsumeTypes(), 
                           e2.getConsumeTypes());
+        }
+        
         if (result == 0) {
             //use the media type of output data as the secondary key.
             result = JAXRSUtils.compareSortedMediaTypes(e1.getProduceTypes(), 
