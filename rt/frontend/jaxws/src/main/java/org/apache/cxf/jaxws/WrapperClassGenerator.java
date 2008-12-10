@@ -111,7 +111,9 @@ public final class WrapperClassGenerator extends ASMHelper {
 
     public Set<Class<?>> generate() {
         try {
-            createClassWriter();
+            if (createClassWriter() == null) {
+                throw new ClassNotFoundException();
+            }
         } catch (Throwable t) {
             for (OperationInfo opInfo : interfaceInfo.getOperations()) {
                 if (opInfo.isUnwrappedCapable()
