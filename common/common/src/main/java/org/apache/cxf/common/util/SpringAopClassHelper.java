@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util;
 
+import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 
 /**
@@ -27,12 +28,23 @@ import org.springframework.aop.support.AopUtils;
 class SpringAopClassHelper extends ClassHelper {
     SpringAopClassHelper() throws Exception {
         Class.forName("org.springframework.aop.support.AopUtils");
+        Class.forName("org.springframework.aop.framework.Advised");
     }
     
     protected Class getRealClassInternal(Object o) {
         if (AopUtils.isAopProxy(o)) {
-            return AopUtils.getTargetClass(o);
+            Advised advised = (Advised)o;
+            if (advised == null) {
+                return AopUtils.getTargetClass(o);
+            }
+            try {
+                return getRealClassInternal(advised.getTargetSource().getTarget());
+            } catch (Exception ex) {
+                // ignore
+            }
+            
         } 
         return o.getClass();
     }
+    
 }

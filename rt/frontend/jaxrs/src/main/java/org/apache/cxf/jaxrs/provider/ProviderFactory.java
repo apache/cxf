@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -155,6 +156,9 @@ public final class ProviderFactory {
     @SuppressWarnings("unchecked")
     private static <T> ExceptionMapper<T> doCreateExceptionMapper(
         List<ProviderInfo<ExceptionMapper>> mappers, Class<?> exceptionType, Message m) {
+        
+        List<ExceptionMapper<T>> candidates = new LinkedList<ExceptionMapper<T>>();
+        
         for (ProviderInfo<ExceptionMapper> em : mappers) {
             Type[] types = em.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
@@ -165,13 +169,17 @@ public final class ProviderFactory {
                         if (((Class<?>)args[i]).isAssignableFrom(exceptionType)) {
                             InjectionUtils.injectContextFields(em.getProvider(), em, m);
                             InjectionUtils.injectContextMethods(em.getProvider(), em, m);
-                            return em.getProvider();
+                            candidates.add(em.getProvider());
                         }
                     }
                 }
             }
         }
-        return null;
+        if (candidates.size() == 0) {
+            return null;
+        }
+        Collections.sort((List)candidates, new ExceptionMapperComparator());
+        return candidates.get(0);
     }
     
     public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType,
@@ -530,5 +538,27 @@ public final class ProviderFactory {
                 // ignore
             }
         }
+    }
+    
+    private static class ExceptionMapperComparator implements 
+        Comparator<ExceptionMapper<? extends Throwable>> {
+
+        public int compare(ExceptionMapper<? extends Throwable> em1, 
+                           ExceptionMapper<? extends Throwable> em2) {
+            Type[] types1 = em1.getClass().getGenericInterfaces();
+            Type[] types2 = em2.getClass().getGenericInterfaces();
+            
+            Class<?> realClass1 = InjectionUtils.getActualType(types1[0]);
+            Class<?> realClass2 = InjectionUtils.getActualType(types2[0]);
+            if (realClass1 == realClass2) {
+                return 0;
+            }
+            if (realClass1.isAssignableFrom(realClass2)) {
+                // subclass should go first
+                return 1;
+            }
+            return -1;
+        }
+        
     }
 }

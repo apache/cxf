@@ -81,7 +81,6 @@ public final class InjectionUtils {
 
     public static Method checkProxy(Method methodToInvoke, Object resourceObject) {
         if (Proxy.class.isInstance(resourceObject)) {
-            
             for (Class<?> c : resourceObject.getClass().getInterfaces()) {
                 try {
                     Method m = c.getMethod(
@@ -93,7 +92,6 @@ public final class InjectionUtils {
                     //ignore
                 }
             }
-            
         }
         return methodToInvoke; 
     }
