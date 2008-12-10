@@ -306,7 +306,7 @@ public class JAXBDataBinding extends AbstractDataBinding {
                 schemas = new HashSet<DOMSource>();
                 try {
                     for (DOMResult r : generateJaxbSchemas()) {
-                        schemas.add(new DOMSource(r.getNode()));
+                        schemas.add(new DOMSource(r.getNode(), r.getSystemId()));
                     }
                 } catch (IOException e) {
                     throw new ServiceConstructionException(new Message("SCHEMA_GEN_EXC", LOG), e);
