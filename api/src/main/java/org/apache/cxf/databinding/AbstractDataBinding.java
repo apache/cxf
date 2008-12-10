@@ -101,6 +101,9 @@ public abstract class AbstractDataBinding implements DataBinding {
                     e.removeAttribute("schemaLocation");
                     updateSchemaLocation(e);
                 }
+                if (StringUtils.isEmpty(e.getAttribute("namespace"))) {
+                    e.setAttribute("namespace", serviceInfo.getInterface().getName().getNamespaceURI());
+                }
             }
             n = n.getNextSibling();
         }
