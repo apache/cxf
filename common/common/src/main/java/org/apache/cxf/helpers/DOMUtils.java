@@ -22,6 +22,7 @@ package org.apache.cxf.helpers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
@@ -340,6 +341,25 @@ public final class DOMUtils {
         // db.setErrorHandler( new MyErrorHandler());
 
         return db.parse(is);
+    }
+    public static Document readXml(Reader is) throws SAXException, IOException,
+        ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    
+        dbf.setValidating(false);
+        dbf.setIgnoringComments(false);
+        dbf.setIgnoringElementContentWhitespace(true);
+        dbf.setNamespaceAware(true);
+        // dbf.setCoalescing(true);
+        // dbf.setExpandEntityReferences(true);
+    
+        DocumentBuilder db = null;
+        db = dbf.newDocumentBuilder();
+        db.setEntityResolver(new NullResolver());
+    
+        // db.setErrorHandler( new MyErrorHandler());
+        InputSource ips = new InputSource(is);
+        return db.parse(ips);
     }
     public static Document readXml(StreamSource is) throws SAXException, IOException,
         ParserConfigurationException {

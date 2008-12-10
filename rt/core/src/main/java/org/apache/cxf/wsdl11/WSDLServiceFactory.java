@@ -69,6 +69,15 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         }
 
     }
+    public WSDLServiceFactory(Bus b, String url) {
+        setBus(b);
+        try {
+            // use wsdl manager to parse wsdl or get cached definition
+            definition = getBus().getExtension(WSDLManager.class).getDefinition(url);
+        } catch (WSDLException ex) {
+            throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
+        }
+    }
 
     public WSDLServiceFactory(Bus b, URL url, QName sn) {
         this(b, url);

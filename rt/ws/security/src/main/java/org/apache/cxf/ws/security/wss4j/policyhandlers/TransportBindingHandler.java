@@ -20,15 +20,19 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.Collection;
+import java.util.Vector;
 
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
+import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
 
@@ -51,18 +55,67 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         Collection<AssertionInfo> ais;
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
-        
-        ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        if (ais != null) {
-            SupportingToken sgndSuppTokens = null;
-            for (AssertionInfo ai : ais) {
-                sgndSuppTokens = (SupportingToken)ai.getAssertion();
-                ai.setAsserted(true);
+        try {
+            Vector<WSEncryptionPart> sigParts = getSignedParts();
+            if (this.isRequestor()) {
+                ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+                if (ais != null) {
+                    SupportingToken sgndSuppTokens = null;
+                    for (AssertionInfo ai : ais) {
+                        sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }
+                    if (sgndSuppTokens != null && sgndSuppTokens.getTokens() != null 
+                        && sgndSuppTokens.getTokens().size() > 0) {
+                        addSignatureParts(handleSupportingTokens(sgndSuppTokens), sigParts);
+                    }
+                }
+                ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+                if (ais != null) {
+                    SupportingToken sgndSuppTokens = null;
+                    for (AssertionInfo ai : ais) {
+                        sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }
+                    if (sgndSuppTokens != null && sgndSuppTokens.getTokens() != null 
+                        && sgndSuppTokens.getTokens().size() > 0) {
+                        doEndorsedSignatures(handleSupportingTokens(sgndSuppTokens), false);
+                    }
+                }
+                ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+                if (ais != null) {
+                    SupportingToken sgndSuppTokens = null;
+                    for (AssertionInfo ai : ais) {
+                        sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }
+                    if (sgndSuppTokens != null && sgndSuppTokens.getTokens() != null 
+                        && sgndSuppTokens.getTokens().size() > 0) {
+                        
+                        
+                        doEndorsedSignatures(handleSupportingTokens(sgndSuppTokens), false);
+                    }
+                }
+                
+                ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
+                if (ais != null) {
+                    SupportingToken suppTokens = null;
+                    for (AssertionInfo ai : ais) {
+                        suppTokens = (SupportingToken)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }
+                    if (suppTokens != null && suppTokens.getTokens() != null 
+                        && suppTokens.getTokens().size() > 0) {
+                        handleSupportingTokens(suppTokens);
+                    }
+                }
+
+            } else {
+                addSignatureConfirmation(null);
             }
-            if (sgndSuppTokens != null && sgndSuppTokens.getTokens() != null 
-                && sgndSuppTokens.getTokens().size() > 0) {
-                handleSupportingTokens(sgndSuppTokens);
-            }
+
+        } catch (SOAPException e) {
+            throw new Fault(e);
         }
     }
 

@@ -29,6 +29,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -67,35 +68,41 @@ public class TransportBindingBuilder implements AssertionBuilder {
     private void processAlternative(Element element, 
                                     TransportBinding parent,
                                     SPConstants consts) {
-        Element polEl = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
-        if (polEl != null) {
-            Element child = DOMUtils.getFirstElement(polEl);
-            while (child != null) {
-                String name = child.getLocalName();
-                if (name.equals(SPConstants.ALGO_SUITE)) {
-                    parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder().build(child));
-                } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
-                    parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)
-                                                    .build(child));
-                } else if (name.equals(SPConstants.INCLUDE_TIMESTAMP)) {
-                    parent.setIncludeTimestamp(true);
-                } else if (name.equals(SPConstants.LAYOUT)) {
-                    parent.setLayout((Layout)new LayoutBuilder().build(child));
-                } else if (name.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
-                    || name.equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
-                    
-                    if (consts.getVersion() == SPConstants.Version.SP_V11) {
-                        parent.setSignedSupportingToken((SupportingToken)new SupportingTokensBuilder(builder)
+        Element polEl = DOMUtils.getFirstElement(element);
+        while (polEl != null) {
+            if (PolicyConstants.isPolicyElem(new QName(polEl.getNamespaceURI(),
+                                                       polEl.getLocalName()))) {
+                Element child = DOMUtils.getFirstElement(polEl);
+                while (child != null) {
+                    String name = child.getLocalName();
+                    if (name.equals(SPConstants.ALGO_SUITE)) {
+                        parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder().build(child));
+                    } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
+                        parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)
                                                         .build(child));
-                    } else {
-                        parent.setSignedSupportingToken((SupportingToken)
-                                                        new SupportingTokens12Builder(builder)
-                                                            .build(child));                        
+                    } else if (name.equals(SPConstants.INCLUDE_TIMESTAMP)) {
+                        parent.setIncludeTimestamp(true);
+                    } else if (name.equals(SPConstants.LAYOUT)) {
+                        parent.setLayout((Layout)new LayoutBuilder().build(child));
+                    } else if (name.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
+                        || name.equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
+                        
+                        if (consts.getVersion() == SPConstants.Version.SP_V11) {
+                            parent.setSignedSupportingToken((SupportingToken)
+                                                            new SupportingTokensBuilder(builder)
+                                                            .build(child));
+                        } else {
+                            parent.setSignedSupportingToken((SupportingToken)
+                                                            new SupportingTokens12Builder(builder)
+                                                                .build(child));                        
+                        }
                     }
+                    child = DOMUtils.getNextElement(child);
                 }
-                child = DOMUtils.getNextElement(child);
             }
+            polEl = DOMUtils.getNextElement(polEl);
         }
+        
     }
 
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
