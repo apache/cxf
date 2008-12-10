@@ -19,11 +19,20 @@
 package org.apache.cxf.configuration.jsse.spring;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.security.GeneralSecurityException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamReader;
 
+
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * This class provides the TLSClientParameters that programmatically
@@ -31,38 +40,73 @@ import org.apache.cxf.configuration.security.TLSClientParametersType;
  * type TLSClientParametersType that was used in the Spring configuration
  * of the http-conduit bean.
  */
-public class TLSClientParametersConfig 
-    extends TLSClientParameters {
+public class TLSClientParametersConfig {
+    static JAXBContext context = null;
     
-    public TLSClientParametersConfig(TLSClientParametersType params) 
+    private static synchronized JAXBContext getContext() throws JAXBException {
+        if (context == null) {
+            context = JAXBContext.newInstance(PackageUtils.getPackageName(TLSClientParametersType.class), 
+                                              TLSClientParametersConfig.class.getClassLoader());            
+        }
+        return context;
+    }
+
+    static TLSClientParameters createTLSClientParametersFromType(TLSClientParametersType params) 
         throws GeneralSecurityException,
                IOException {
 
+        TLSClientParameters ret = new TLSClientParameters();
         if (params.isDisableCNCheck()) {
-            this.setDisableCNCheck(true);
+            ret.setDisableCNCheck(true);
         }
         if (params.isSetCipherSuitesFilter()) {
-            this.setCipherSuitesFilter(params.getCipherSuitesFilter());
+            ret.setCipherSuitesFilter(params.getCipherSuitesFilter());
         }
         if (params.isSetCipherSuites()) {
-            this.setCipherSuites(params.getCipherSuites().getCipherSuite());
+            ret.setCipherSuites(params.getCipherSuites().getCipherSuite());
         }
         if (params.isSetJsseProvider()) {
-            this.setJsseProvider(params.getJsseProvider());
+            ret.setJsseProvider(params.getJsseProvider());
         }
         if (params.isSetSecureRandomParameters()) {
-            this.setSecureRandom(
+            ret.setSecureRandom(
                 TLSParameterJaxBUtils.getSecureRandom(
                         params.getSecureRandomParameters()));
         }
         if (params.isSetKeyManagers()) {
-            this.setKeyManagers(
+            ret.setKeyManagers(
                 TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers()));
         }
         if (params.isSetTrustManagers()) {
-            this.setTrustManagers(
+            ret.setTrustManagers(
                 TLSParameterJaxBUtils.getTrustManagers(
                         params.getTrustManagers()));
+        }
+        return ret;
+    }
+    
+
+
+    public static Object createTLSClientParameters(String s) {
+        
+        StringReader reader = new StringReader(s);
+        XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
+        Unmarshaller u;
+        try {
+            u = getContext().createUnmarshaller();
+            Object obj = u.unmarshal(data, TLSClientParametersType.class);
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> el = (JAXBElement<?>)obj;
+                obj = el.getValue();
+
+            }
+            
+            TLSClientParametersType cpt = (TLSClientParametersType)obj;
+            return createTLSClientParametersFromType(cpt);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

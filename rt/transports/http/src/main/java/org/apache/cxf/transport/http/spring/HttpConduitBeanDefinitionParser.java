@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.transport.http.spring;
 
+import java.io.StringWriter;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,6 +39,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HttpBasicAuthSupplier;
 import org.apache.cxf.transport.http.MessageTrustDecider;
@@ -90,7 +95,7 @@ public class HttpConduitBeanDefinitionParser
             } else if ("basicAuthSupplier".equals(elementName)) {
                 mapBeanOrClassElement((Element)n, bean, HttpBasicAuthSupplier.class);
             } else if ("tlsClientParameters".equals(elementName)) {
-                mapTLSClientParameters(n, bean);
+                mapTLSClientParameters((Element)n, bean);
             }
         }
 
@@ -101,23 +106,22 @@ public class HttpConduitBeanDefinitionParser
      * a TLSClientParametersConfig object initialized with the JAXB
      * generated type unmarshalled from the selected node.
      */
-    public void mapTLSClientParameters(Node n, BeanDefinitionBuilder bean) {
-
-        // Unmarshal the JAXB Generated Type from Config and inject
-        // the configured TLSClientParameters into the HTTPConduit.
-        JAXBContext context = null;
+    @SuppressWarnings("deprecation")
+    public void mapTLSClientParameters(Element n, BeanDefinitionBuilder bean) {
+        StringWriter writer = new StringWriter();
+        XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
         try {
-            context = JAXBContext.newInstance(PackageUtils.getPackageName(TLSClientParametersType.class), 
-                    getClass().getClassLoader());
-            Unmarshaller u = context.createUnmarshaller();
-            JAXBElement<TLSClientParametersType> jaxb = 
-                u.unmarshal(n, TLSClientParametersType.class);
-            TLSClientParameters params = 
-                new TLSClientParametersConfig(jaxb.getValue());
-            bean.addPropertyValue("tlsClientParameters", params);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not process configuration.", e);
+            StaxUtils.copy(n, xmlWriter);
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
         }
+
+        BeanDefinitionBuilder jaxbbean 
+            = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.class);
+        jaxbbean.getRawBeanDefinition().setFactoryMethodName("createTLSClientParameters");
+        jaxbbean.addConstructorArg(writer.toString());
+        bean.addPropertyValue("tlsClientParameters", jaxbbean.getBeanDefinition());
     }
     
     /**
