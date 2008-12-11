@@ -63,7 +63,7 @@ public final class Client {
         System.out.println("\n");
         System.out.println("Sent HTTP PUT request to update customer info");
         Client client = new Client();
-        String inputFile = client.getClass().getResource("update_customer.txt").getFile();
+        String inputFile = client.getClass().getResource("update_customer.xml").getFile();
         File input = new File(inputFile);
         PutMethod put = new PutMethod("http://localhost:9000/customerservice/customers");
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
@@ -84,7 +84,7 @@ public final class Client {
         // Sent HTTP POST request to add customer
         System.out.println("\n");
         System.out.println("Sent HTTP POST request to add customer");
-        inputFile = client.getClass().getResource("add_customer.txt").getFile();
+        inputFile = client.getClass().getResource("add_customer.xml").getFile();
         input = new File(inputFile);
         PostMethod post = new PostMethod("http://localhost:9000/customerservice/customers");
         post.addRequestHeader("Accept" , "text/xml");
