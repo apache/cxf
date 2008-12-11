@@ -130,15 +130,10 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <!-- Jetty is needed if you're using the CXFServlet -->
+        <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
