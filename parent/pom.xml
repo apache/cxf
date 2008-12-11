@@ -41,22 +41,23 @@
         <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
         <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
         <saaj.impl.artifactId>saaj-impl</saaj.impl.artifactId>
-
+	<!-- please maintain alphabetical order here -->
+        <abdera.version>0.4.0-incubating</abdera.version>
+        <activemq.version>4.1.1</activemq.version>
+        <derby.version>10.2.2.0</derby.version>
         <jaxb.version>2.1</jaxb.version>
         <jaxb.impl.version>2.1.9</jaxb.impl.version>
         <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
+        <jdom.version>1.0</jdom.version>
         <jetty.version>6.1.11</jetty.version>
+        <rhino.version>1.6R7</rhino.version>
         <saaj.version>1.3</saaj.version>
         <saaj.impl.version>1.3.2</saaj.impl.version>
         <spring.version>2.5.5</spring.version>
         <spring.mock>spring-test</spring.mock>
         <wsdl4j.version>1.6.2</wsdl4j.version>
-        <derby.version>10.2.2.0</derby.version>
-        <activemq.version>4.1.1</activemq.version>
-        <rhino.version>1.6R7</rhino.version>
-        <jdom.version>1.0</jdom.version>
         <xmlbeans.version>2.3.0</xmlbeans.version>
-        <abdera.version>0.4.0-incubating</abdera.version>
+	<xmlschema.version>1.4.3</xmlschema.version>
         <checkstyle.extension />
 
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
@@ -561,7 +562,7 @@
             <dependency>
                 <groupId>org.apache.ws.commons.schema</groupId>
                 <artifactId>XmlSchema</artifactId>
-                <version>1.4.2</version>
+                <version>${xmlschema.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.soap</groupId>
