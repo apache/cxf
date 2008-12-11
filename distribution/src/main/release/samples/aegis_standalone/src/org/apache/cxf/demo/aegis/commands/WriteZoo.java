@@ -25,7 +25,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javanet.staxutils.IndentingXMLStreamWriter;
+import javanet.staxutils.XMLStreamEventWriter;
+
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -34,8 +38,6 @@ import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.demo.aegis.types.Animal;
 import org.apache.cxf.demo.aegis.types.Zoo;
-import org.codehaus.staxmate.SMOutputFactory;
-import org.codehaus.staxmate.out.SMOutputDocument;
 
 /**
  * 
@@ -60,14 +62,13 @@ public class WriteZoo {
         AegisWriter<XMLStreamWriter> writer = context.createXMLStreamWriter();
         FileOutputStream output = new FileOutputStream(outputPathname);
         XMLStreamWriter xmlWriter = outputFactory.createXMLStreamWriter(output);
-        SMOutputDocument smOutput = SMOutputFactory.createOutputDocument(xmlWriter);
-        smOutput.setIndentation("\n  ", 1, 2);
+        IndentingXMLStreamWriter indentWriter = new IndentingXMLStreamWriter(xmlWriter);
+        
         Zoo zoo = populateZoo();
         Type aegisType = context.getTypeMapping().getType(zoo.getClass());
         writer.write(zoo, new QName("urn:aegis:demo", "zoo"),
-                      false, xmlWriter, aegisType);
+                      false, indentWriter, aegisType);
         xmlWriter.close();
-        smOutput.closeRoot();
         output.close();
     }
     

@@ -120,9 +120,15 @@
             <version>${cxf.version}</version>
         </dependency>
 	<dependency>
-	  <groupId>org.codehaus.staxmate</groupId>
-	  <artifactId>staxmate</artifactId>
-	  <version>1.3.0</version>
+	  <groupId>net.java.dev.stax-utils</groupId>
+	  <artifactId>stax-utils</artifactId>
+	  <version>20060502</version>
+	  <exclusions>
+	    <exclusion>
+	      <groupId>com.bea.xml</groupId>
+	      <artifactId>jsr173-ri</artifactId>
+	    </exclusion>
+	  </exclusions>
 	</dependency>
     </dependencies>
 </project>
