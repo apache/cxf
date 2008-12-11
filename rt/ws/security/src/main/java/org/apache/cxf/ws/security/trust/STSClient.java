@@ -19,12 +19,15 @@
 
 package org.apache.cxf.ws.security.trust;
 
-import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -40,7 +43,7 @@ import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingInfo;
@@ -51,12 +54,19 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
+import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
+import org.apache.ws.security.util.Base64;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * 
@@ -69,6 +79,10 @@ public class STSClient implements Configurable {
     String location;
     Policy policy;
     String soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
+    int keySize = 256;
+    Trust10 trust10;
+    Trust13 trust13;
+    AlgorithmSuite algorithmSuite;
     
     Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -87,6 +101,20 @@ public class STSClient implements Configurable {
     }
     public void setPolicy(Policy policy) {
         this.policy = policy;
+        if (algorithmSuite == null) {
+            Iterator i = policy.getAlternatives();
+            while (i.hasNext() && algorithmSuite == null) {
+                List<PolicyComponent> p = CastUtils.cast((List)i.next());
+                for (PolicyComponent p2 : p) {
+                    if (p2 instanceof Binding) {
+                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
+                    }
+                }
+            }
+        }
+    }
+    public void setPolicy(Element policy) {
+        setPolicy(bus.getExtension(PolicyBuilder.class).getPolicy(policy));
     }
     public void setSoap12() {
         soapVersion = SoapBindingConstants.SOAP12_BINDING_ID;
@@ -102,10 +130,13 @@ public class STSClient implements Configurable {
         }
     }
     public void setTrust(Trust10 trust) {
-        
+        trust10 = trust;
     }
     public void setTrust(Trust13 trust) {
-        
+        trust13 = trust;        
+    }
+    public void setAlgorithmSuite(AlgorithmSuite ag) {
+        algorithmSuite = ag;
     }
     
     public Map<String, Object> getRequestContext() {
@@ -180,31 +211,50 @@ public class STSClient implements Configurable {
     }
 
     public SecurityToken requestSecurityToken() throws Exception {
+        return requestSecurityToken(null);
+    }
+    public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
         createClient();
         client.getRequestContext().putAll(ctx);
         
-        //TODO: create the DOM based on the Trust10/Trust13 tokens
-        String rqst = "<t:RequestSecurityToken " 
-            + "xmlns:u='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd' "
-            + "xmlns:t='http://schemas.xmlsoap.org/ws/2005/02/trust'>\n"
-            + "<t:RequestType>"
-            + "http://schemas.xmlsoap.org/ws/2005/02/trust/Issue"
-            + "</t:RequestType>\n"
-            + "<t:Entropy>\n"
-            + "<t:BinarySecret u:Id='uuid-4acf589c-0076-4a83-8b66-5f29341514b7-3'"
-            + " Type='http://schemas.xmlsoap.org/ws/2005/02/trust/Nonce'>"
-            + "Uv38QLxDQM9gLoDZ6OwYDiFk094nmwu3Wmay7EdKmhw=</t:BinarySecret>\n"
-            + "</t:Entropy>\n"
-            + "<t:KeyType>http://schemas.xmlsoap.org/ws/2005/02/trust/SymmetricKey</t:KeyType>\n"
-            + "<t:KeySize>256</t:KeySize>\n"
-            + "<t:ComputedKeyAlgorithm>\n"
-            + "http://schemas.xmlsoap.org/ws/2005/02/trust/CK/PSHA1"
-            + "</t:ComputedKeyAlgorithm>\n"
-            + "</t:RequestSecurityToken>\n";
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        String namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+        writer.writeStartElement(namespace, "RequestSecurityToken");
+        writer.writeStartElement(namespace, "RequestType");
+        writer.writeCharacters("http://schemas.xmlsoap.org/ws/2005/02/trust/Issue");
+        writer.writeEndElement();
+        if (appliesTo != null) {
+            //TODO: AppliesTo element? 
+        }
+        //TODO: Lifetime element?
+        writer.writeStartElement(namespace, "KeyType");
+        //TODO: Set the KeyType?
+        writer.writeCharacters(namespace + "/SymmetricKey");
+        writer.writeEndElement();
+        writer.writeStartElement(namespace, "KeySize");
+        writer.writeCharacters(Integer.toString(keySize));
+        writer.writeEndElement();
+        
+        
+        if ((trust10 != null && trust10.isRequireClientEntropy())
+            || (trust13 != null && trust13.isRequireClientEntropy())) {
+            writer.writeStartElement(namespace, "Entropy");
+            writer.writeStartElement(namespace, "BinarySecret");
+            writer.writeAttribute("Type", namespace + "/Nounce");
+            byte[] requestorEntropy =
+                WSSecurityUtil.generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+            writer.writeCharacters(Base64.encode(requestorEntropy));
 
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeStartElement(namespace, "ComputedKeyAlgorithm");
+            writer.writeCharacters(namespace + "/CK/PSHA1");
+            writer.writeEndElement();
+        }
+        writer.writeEndElement();
         
         client.invoke("RequestSecurityToken",
-                      new DOMSource(DOMUtils.readXml(new StringReader(rqst)).getDocumentElement()));
+                      new DOMSource(writer.getDocument().getDocumentElement()));
         return null;
     }
 
