@@ -47,10 +47,16 @@ public class JMSOldConfigHolder {
     private ServerConfig serverConfig;
     private ServerBehaviorPolicyType serverBehavior;
 
-    private ConnectionFactory getConnectionFactoryFromJndi(String connectionFactoryName, String userName,
-                                                           String password, JndiTemplate jt,
-                                                           boolean use11,
+    private ConnectionFactory getConnectionFactoryFromJndi(JndiTemplate jt,
                                                            boolean pubSubDomain) {
+        
+        String connectionFactoryName = address.getJndiConnectionFactoryName();
+        String userName = address.getConnectionUserName();
+        String password = address.getConnectionPassword();
+        boolean use11 = address.isSetUseJms11() 
+            ? address.isUseJms11() : JMSConfiguration.DEFAULT_USEJMS11;
+            
+            
         if (connectionFactoryName == null) {
             return null;
         }
@@ -62,15 +68,24 @@ public class JMSOldConfigHolder {
             uccf.setTargetConnectionFactory(connectionFactory);
 
             if (use11) {
-                return new SingleConnectionFactory(uccf);
+                SingleConnectionFactory cf = new SingleConnectionFactory(uccf);
+                if (address.isSetReconnectOnException() && address.isReconnectOnException()) {
+                    cf.setReconnectOnException(true);
+                }
+                return cf;
             }
-            return new SingleConnectionFactory102(uccf, pubSubDomain);
+            SingleConnectionFactory102 cf = new SingleConnectionFactory102(uccf, pubSubDomain);
+            if (address.isSetReconnectOnException() && address.isReconnectOnException()) {
+                cf.setReconnectOnException(true);
+            }
+            return cf;
         } catch (NamingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus, EndpointInfo endpointInfo,
+    public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus,
+                                                                   EndpointInfo endpointInfo,
                                                                    boolean isConduit) {
         jmsConfig = new JMSConfiguration();
 
@@ -99,10 +114,7 @@ public class JMSOldConfigHolder {
         if (address.isSetDestinationStyle()) {
             pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
         }
-        ConnectionFactory cf = getConnectionFactoryFromJndi(address.getJndiConnectionFactoryName(), address
-            .getConnectionUserName(), address.getConnectionPassword(), jt,
-            address.isSetUseJms11() ? address.isUseJms11() : JMSConfiguration.DEFAULT_USEJMS11,
-                pubSubDomain);
+        ConnectionFactory cf = getConnectionFactoryFromJndi(jt, pubSubDomain);
 
         jmsConfig.setConnectionFactory(cf);
         jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
