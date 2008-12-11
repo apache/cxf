@@ -32,6 +32,8 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.configuration.Configurable;
+import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -59,8 +61,10 @@ import org.apache.neethi.Policy;
 /**
  * 
  */
-public class STSClient {
+public class STSClient implements Configurable {
+    
     Bus bus;
+    String name = "default.sts-client";
     Client client;
     String location;
     Policy policy;
@@ -72,6 +76,12 @@ public class STSClient {
         bus = b;
     }
 
+    public String getBeanName() {
+        return name;
+    }
+    public void setBeanName(String s) {
+        name = s;
+    }
     public void setLocation(String location) {
         this.location = location;
     }
@@ -84,16 +94,37 @@ public class STSClient {
     public void setSoap11() {
         soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
     }
+    public void setSoap11(boolean b) {
+        if (b) {
+            setSoap11();
+        } else {
+            setSoap12();
+        }
+    }
     public void setTrust(Trust10 trust) {
         
     }
     public void setTrust(Trust13 trust) {
         
     }
+    
+    public Map<String, Object> getRequestContext() {
+        return ctx;
+    }
+    public void setProperties(Map<String, Object> p) {
+        ctx.putAll(p);
+    }
+    public Map<String, Object> getProperties() {
+        return ctx;
+    }
+    
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
             return;
         }
+        bus.getExtension(Configurer.class).configureBean(name, this);
+        
+        
         Service service = null;
         String ns = "http://schemas.xmlsoap.org/ws/2005/02/trust/wsdl";
         String typeNs = "http://schemas.xmlsoap.org/ws/2005/02/trust";
@@ -148,9 +179,6 @@ public class STSClient {
         
     }
 
-    public Map<String, Object> getRequestContext() throws Exception {
-        return ctx;
-    }
     public SecurityToken requestSecurityToken() throws Exception {
         createClient();
         client.getRequestContext().putAll(ctx);
@@ -179,6 +207,8 @@ public class STSClient {
                       new DOMSource(DOMUtils.readXml(new StringReader(rqst)).getDocumentElement()));
         return null;
     }
+
+
 
    
 
