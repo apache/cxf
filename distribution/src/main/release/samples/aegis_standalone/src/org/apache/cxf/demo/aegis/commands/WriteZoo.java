@@ -25,11 +25,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javanet.staxutils.IndentingXMLStreamWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+
+import javanet.staxutils.IndentingXMLStreamWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
@@ -40,17 +40,17 @@ import org.apache.cxf.demo.aegis.types.Zoo;
 /**
  * 
  */
-public class WriteZoo {
+public final class WriteZoo {
     private XMLOutputFactory outputFactory;
     private String outputPathname;
-    
+
     private WriteZoo() {
         outputFactory = XMLOutputFactory.newInstance();
     }
-    
+
     private void go() throws Exception {
         AegisContext context;
-        
+
         context = new AegisContext();
         context.setWriteXsiTypes(true);
         Set<Class<?>> rootClasses = new HashSet<Class<?>>();
@@ -61,15 +61,14 @@ public class WriteZoo {
         FileOutputStream output = new FileOutputStream(outputPathname);
         XMLStreamWriter xmlWriter = outputFactory.createXMLStreamWriter(output);
         IndentingXMLStreamWriter indentWriter = new IndentingXMLStreamWriter(xmlWriter);
-        
+
         Zoo zoo = populateZoo();
         Type aegisType = context.getTypeMapping().getType(zoo.getClass());
-        writer.write(zoo, new QName("urn:aegis:demo", "zoo"),
-                      false, indentWriter, aegisType);
+        writer.write(zoo, new QName("urn:aegis:demo", "zoo"), false, indentWriter, aegisType);
         xmlWriter.close();
         output.close();
     }
-    
+
     private Zoo populateZoo() {
         Zoo zoo = new Zoo();
         zoo.setFounder("Noah");
@@ -90,7 +89,7 @@ public class WriteZoo {
 
     /**
      * @param args
-     * @throws Exception 
+     * @throws Exception
      */
     public static void main(String[] args) throws Exception {
         WriteZoo wz = new WriteZoo();

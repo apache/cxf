@@ -35,41 +35,41 @@ import org.apache.cxf.demo.aegis.types.Zoo;
 /**
  * 
  */
-public class ReadZoo {
+public final class ReadZoo {
 
-	private XMLInputFactory inputFactory;
-	private String inputPathname;
+    private XMLInputFactory inputFactory;
+    private String inputPathname;
 
-	private ReadZoo() {
-		inputFactory = XMLInputFactory.newInstance();
-	}
+    private ReadZoo() {
+        inputFactory = XMLInputFactory.newInstance();
+    }
 
-	private void go() throws Exception {
-		AegisContext context;
+    private void go() throws Exception {
+        AegisContext context;
 
-		context = new AegisContext();
-		Set<Class<?>> rootClasses = new HashSet<Class<?>>();
-		rootClasses.add(Zoo.class);
-		context.setRootClasses(rootClasses);
-		context.initialize();
-		AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
-		FileInputStream input = new FileInputStream(inputPathname);
-		XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(input);
-		Zoo zoo = (Zoo)reader.read(xmlReader);
-		System.out.println("Name " + zoo.getName());
-		System.out.println("Founder " + zoo.getFounder());
-		for(Map.Entry<String, Animal> e : zoo.getAnimals().entrySet()) {
-			System.out.println(e.getKey() + " -> " + e.getValue().getName());
-		}
-	}
+        context = new AegisContext();
+        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+        rootClasses.add(Zoo.class);
+        context.setRootClasses(rootClasses);
+        context.initialize();
+        AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
+        FileInputStream input = new FileInputStream(inputPathname);
+        XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(input);
+        Zoo zoo = (Zoo)reader.read(xmlReader);
+        System.out.println("Name " + zoo.getName());
+        System.out.println("Founder " + zoo.getFounder());
+        for (Map.Entry<String, Animal> e : zoo.getAnimals().entrySet()) {
+            System.out.println(e.getKey() + " -> " + e.getValue().getName());
+        }
+    }
 
-	/**
-	 * @param args
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws Exception {
-		ReadZoo rz = new ReadZoo();
-		rz.inputPathname = args[0];
-		rz.go();
-	}
+    /**
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        ReadZoo rz = new ReadZoo();
+        rz.inputPathname = args[0];
+        rz.go();
+    }
 }

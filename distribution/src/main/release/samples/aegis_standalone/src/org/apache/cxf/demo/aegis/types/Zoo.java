@@ -27,15 +27,14 @@ import java.util.Map;
 public class Zoo {
     private String name;
     private String founder;
-    
+    private Map<String, Animal> animals;
+
     public String getFounder() {
         return founder;
     }
     public void setFounder(String founder) {
         this.founder = founder;
     }
-    private Map<String, Animal> animals;
-    
     
     public String getName() {
         return name;
