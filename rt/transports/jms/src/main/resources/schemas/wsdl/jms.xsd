@@ -215,7 +215,8 @@
     					</xs:documentation>
     				</xs:annotation>
     			</xs:attribute>
-    			<xs:attribute name="useJms11" type="xs:boolean" use="optional"></xs:attribute>
+    			<xs:attribute name="useJms11" type="xs:boolean" use="optional"/>
+    			<xs:attribute name="reconnectOnException" type="xs:boolean" use="optional"/>
     		</xs:extension>
     	</xs:complexContent>
     </xs:complexType>
