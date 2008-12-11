@@ -26,10 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
-import javanet.staxutils.XMLStreamEventWriter;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
