@@ -81,6 +81,7 @@ import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.ClassResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -218,24 +219,7 @@ public final class JAXRSUtils {
         
         SortedMap<ClassResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<ClassResourceInfo, MultivaluedMap<String, String>>(
-                new Comparator<ClassResourceInfo>() {
-
-                    public int compare(ClassResourceInfo cr1, ClassResourceInfo cr2) {
-                        
-                        String l1 = cr1.getURITemplate().getLiteralChars();
-                        String l2 = cr2.getURITemplate().getLiteralChars();
-                        if (!l1.equals(l2)) {
-                            // descending order 
-                            return l1.length() < l2.length() ? 1 : -1; 
-                        }
-                        
-                        int g1 = cr1.getURITemplate().getNumberOfGroups();
-                        int g2 = cr2.getURITemplate().getNumberOfGroups();
-                        // descending order 
-                        return g1 < g2 ? 1 : g1 > g2 ? -1 : 0;
-                    }
-                    
-                });
+                new ClassResourceInfoComparator());
         
         for (ClassResourceInfo resource : resources) {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
