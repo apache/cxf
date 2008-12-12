@@ -53,40 +53,41 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     }
 
     public Object read(QName name, XMLStreamReader input, Class type) {
-        if (SAXSource.class.isAssignableFrom(type)) {
-            try {
-                CachedOutputStream out = new CachedOutputStream();
+        if (type != null) {
+            if (SAXSource.class.isAssignableFrom(type)) {
                 try {
-                    XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
-                    StaxUtils.copy(input, xsw);
-                    xsw.close();
-                    return new SAXSource(new InputSource(out.getInputStream()));
-                } finally {
-                    out.close();
+                    CachedOutputStream out = new CachedOutputStream();
+                    try {
+                        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
+                        StaxUtils.copy(input, xsw);
+                        xsw.close();
+                        return new SAXSource(new InputSource(out.getInputStream()));
+                    } finally {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+                } catch (XMLStreamException e) {
+                    throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
                 }
-            } catch (IOException e) {
-                throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
-            } catch (XMLStreamException e) {
-                throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
-            }
-        } else if (StreamSource.class.isAssignableFrom(type)) {
-            try {
-                CachedOutputStream out = new CachedOutputStream();
+            } else if (StreamSource.class.isAssignableFrom(type)) {
                 try {
-                    XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
-                    StaxUtils.copy(input, xsw);
-                    xsw.close();
-                    return new StreamSource(out.getInputStream());
-                } finally {
-                    out.close();
+                    CachedOutputStream out = new CachedOutputStream();
+                    try {
+                        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
+                        StaxUtils.copy(input, xsw);
+                        xsw.close();
+                        return new StreamSource(out.getInputStream());
+                    } finally {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+                } catch (XMLStreamException e) {
+                    throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
                 }
-            } catch (IOException e) {
-                throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
-            } catch (XMLStreamException e) {
-                throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
-            }
-        } 
-        
+            } 
+        }
         return read(input);
     }
 
