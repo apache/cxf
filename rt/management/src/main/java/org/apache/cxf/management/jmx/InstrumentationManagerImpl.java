@@ -20,6 +20,7 @@
 package org.apache.cxf.management.jmx;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +66,8 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     private Set<ObjectName> busMBeans = new HashSet<ObjectName>();
     private ModelMBeanAssembler assembler;
     private boolean connectFailed;
+    private String mbeanServerName = ManagementConstants.DEFAULT_DOMAIN_NAME;
+    private boolean usePlatformMBeanServer;
     
     public InstrumentationManagerImpl() {
         super();
@@ -80,6 +83,12 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         this.bus = bus;
     }
 
+    public void setServerName(String s) {
+        mbeanServerName = s;
+    }
+    public void setUsePlatformMBeanServer(Boolean flag) {
+        usePlatformMBeanServer = flag;
+    }
 
     @PostConstruct     
     public void register() {    
@@ -94,12 +103,18 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     
     @PostConstruct     
     public void init() {    
-        if (isEnabled()) {            
-            List servers = MBeanServerFactory.findMBeanServer(ManagementConstants.DEFAULT_DOMAIN_NAME);
-            if (servers.size() <= 1) {
-                mbs = MBeanServerFactory.createMBeanServer(ManagementConstants.DEFAULT_DOMAIN_NAME);
+        if (isEnabled()) {
+            
+            // return platform mbean server if the option is specified.
+            if (usePlatformMBeanServer) {
+                mbs = ManagementFactory.getPlatformMBeanServer();
             } else {
-                mbs = (MBeanServer)servers.get(0);
+                List servers = MBeanServerFactory.findMBeanServer(mbeanServerName);
+                if (servers.size() <= 1) {
+                    mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
+                } else {
+                    mbs = (MBeanServer)servers.get(0);
+                }
             }
             mcf = MBServerConnectorFactory.getInstance();
             mcf.setMBeanServer(mbs);
