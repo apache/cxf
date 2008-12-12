@@ -282,6 +282,7 @@ public class DispatchOutDatabindingInterceptor extends AbstractOutDatabindingInt
                         message.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, Boolean.TRUE);
                         new AttachmentOutInterceptor().handleMessage(message);
                     }
+                    message.put(Message.CONTENT_TYPE, dataSource.getContentType());
                     OutputStream os = message.getContent(OutputStream.class);
                     doTransform(dataSource, os);
                     os.flush();
