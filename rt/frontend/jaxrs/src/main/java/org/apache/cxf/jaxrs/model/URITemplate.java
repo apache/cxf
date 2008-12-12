@@ -36,6 +36,7 @@ public final class URITemplate {
     
     public static final String TEMPLATE_PARAMETERS = "jaxrs.template.parameters";
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
+    public static final String UNLIMITED_REGEX_SUFFIX = "(/)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     
     /**
@@ -45,6 +46,8 @@ public final class URITemplate {
         Pattern.compile("\\{(\\w[-\\w\\.]*)(\\:(.+?))?\\}");
 
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
+    private static final String PATH_UNLIMITED_VARIABLE_REGEX = "(.*?)";
+        
     private static final String CHARACTERS_TO_ESCAPE = ".";
     
     private final String template;
@@ -53,8 +56,11 @@ public final class URITemplate {
     private final Pattern templateRegexPattern;
     private final String literals;
 
-    
     public URITemplate(String theTemplate) {
+        this(theTemplate, true);
+    }
+
+    public URITemplate(String theTemplate, boolean limited) {
         
         this.template = theTemplate;
         
@@ -77,7 +83,11 @@ public final class URITemplate {
                 patternBuilder.append(')');
                 customTemplateVariables.add(matcher.group(1).trim());
             } else {
-                patternBuilder.append(DEFAULT_PATH_VARIABLE_REGEX);
+                if (!limited && i == template.length()) {
+                    patternBuilder.append(PATH_UNLIMITED_VARIABLE_REGEX);
+                } else {
+                    patternBuilder.append(DEFAULT_PATH_VARIABLE_REGEX);
+                }
             } 
         }
         String substr = escapeCharacters(template.substring(i, template.length()));
@@ -91,7 +101,7 @@ public final class URITemplate {
         if (endsWithSlash) {
             patternBuilder.deleteCharAt(endPos);
         }
-        patternBuilder.append(LIMITED_REGEX_SUFFIX);
+        patternBuilder.append(limited ? LIMITED_REGEX_SUFFIX : UNLIMITED_REGEX_SUFFIX);
         
         templateRegexPattern = Pattern.compile(patternBuilder.toString());
     }
@@ -190,7 +200,7 @@ public final class URITemplate {
             pathValue = "/" + pathValue;
         }
         
-        return new URITemplate(pathValue);
+        return new URITemplate(pathValue, path.limited());
     }
     
     public static int compareTemplates(URITemplate t1, URITemplate t2) {

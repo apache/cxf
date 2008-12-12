@@ -34,6 +34,19 @@ public class URITemplateTest extends Assert {
     }
 
     @Test
+    public void testUnlimited() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers/{id}", false);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        assertTrue(uriTemplate.match("/customers/123", values));
+        assertEquals("123", values.getFirst("id"));
+        values.clear();
+  
+        assertTrue(uriTemplate.match("/customers/123/456", values));
+        assertEquals("123/456", values.getFirst("id"));
+    }
+
+    @Test
     public void testMatchBasic() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
