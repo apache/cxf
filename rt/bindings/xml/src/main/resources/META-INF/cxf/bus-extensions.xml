@@ -21,7 +21,8 @@
 
     <extension class="org.apache.cxf.binding.xml.XMLBindingFactory" deferred="true">
         <namespace>http://cxf.apache.org/bindings/xformat</namespace>
-        <namespace>http://www.w3.org/2004/08/wsdl/http</namespace>       
+        <namespace>http://www.w3.org/2004/08/wsdl/http</namespace>  
+        <namespace>http://schemas.xmlsoap.org/wsdl/http/</namespace>       
     </extension>
     
 </extensions>

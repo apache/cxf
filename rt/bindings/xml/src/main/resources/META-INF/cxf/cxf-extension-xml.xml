@@ -30,6 +30,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
             <set>
                 <value>http://cxf.apache.org/bindings/xformat</value>
                 <value>http://www.w3.org/2004/08/wsdl/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
             </set>
         </property>
         <property name="bus" ref="cxf"/>
