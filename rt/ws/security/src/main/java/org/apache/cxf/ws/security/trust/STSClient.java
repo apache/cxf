@@ -23,10 +23,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -35,6 +39,9 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.source.SourceDataBinding;
@@ -44,6 +51,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingInfo;
@@ -54,6 +62,7 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -65,6 +74,13 @@ import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.conversation.dkalgo.P_SHA1;
+import org.apache.ws.security.message.token.Reference;
+import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -72,6 +88,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
  * 
  */
 public class STSClient implements Configurable {
+    private static final Logger LOG = LogUtils.getL7dLogger(STSClient.class);
     
     Bus bus;
     String name = "default.sts-client";
@@ -82,9 +99,15 @@ public class STSClient implements Configurable {
     int keySize = 256;
     Trust10 trust10;
     Trust13 trust13;
+    Element template;
     AlgorithmSuite algorithmSuite;
+    String namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     
     Map<String, Object> ctx = new HashMap<String, Object>();
+
+    private CallbackHandler cbHandler;
+
+    private Crypto crypto;
     
     public STSClient(Bus b) {
         bus = b;
@@ -129,11 +152,14 @@ public class STSClient implements Configurable {
             setSoap12();
         }
     }
+    
     public void setTrust(Trust10 trust) {
+        namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
         trust10 = trust;
     }
     public void setTrust(Trust13 trust) {
         trust13 = trust;        
+        namespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512"; 
     }
     public void setAlgorithmSuite(AlgorithmSuite ag) {
         algorithmSuite = ag;
@@ -157,8 +183,7 @@ public class STSClient implements Configurable {
         
         
         Service service = null;
-        String ns = "http://schemas.xmlsoap.org/ws/2005/02/trust/wsdl";
-        String typeNs = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+        String ns = namespace + "/wsdl";
         ServiceInfo si = new ServiceInfo();
         
         QName iName = new QName(ns, "SecurityTokenService");
@@ -169,13 +194,13 @@ public class STSClient implements Configurable {
                                            MessageInfo.Type.INPUT);
         oi.setInput("RequestSecurityTokenMsg", mii);
         MessagePartInfo mpi = mii.addMessagePart("request");
-        mpi.setElementQName(new QName(typeNs, "RequestSecurityToken"));
+        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
         
         MessageInfo mio = oi.createMessage(new QName(ns, "RequestSecurityTokenResponseMsg"), 
                                            MessageInfo.Type.OUTPUT);
         oi.setOutput("RequestSecurityTokenResponseMsg", mio);
         mpi = mio.addMessagePart("response");
-        mpi.setElementQName(new QName(typeNs, "RequestSecurityTokenResponse"));
+        mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
         
         si.setInterface(ii);
         service = new ServiceImpl(si);
@@ -200,7 +225,7 @@ public class STSClient implements Configurable {
             soi = new SoapOperationInfo();
             boi.addExtensor(soi);
         }
-        soi.setAction("http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue");
+        soi.setAction(namespace + "/RST/Issue");
         
 
         service.setDataBinding(new SourceDataBinding());
@@ -218,30 +243,49 @@ public class STSClient implements Configurable {
         client.getRequestContext().putAll(ctx);
         
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        String namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
         writer.writeStartElement(namespace, "RequestSecurityToken");
+        boolean wroteKeyType = false;
+        boolean wroteKeySize = false;
+        if (template != null) {
+            Element tl = DOMUtils.getFirstElement(template);
+            while (tl != null) {
+                StaxUtils.copy(tl, writer);
+                wroteKeyType |= "KeyType".equals(tl.getLocalName());
+                if ("KeySize".equals(tl.getLocalName())) {
+                    wroteKeySize = true;
+                    keySize = Integer.parseInt(DOMUtils.getContent(tl));
+                }
+                tl = DOMUtils.getNextElement(tl);
+            }
+        }
+        
+        
         writer.writeStartElement(namespace, "RequestType");
-        writer.writeCharacters("http://schemas.xmlsoap.org/ws/2005/02/trust/Issue");
+        writer.writeCharacters(namespace + "/Issue");
         writer.writeEndElement();
         if (appliesTo != null) {
             //TODO: AppliesTo element? 
         }
         //TODO: Lifetime element?
-        writer.writeStartElement(namespace, "KeyType");
-        //TODO: Set the KeyType?
-        writer.writeCharacters(namespace + "/SymmetricKey");
-        writer.writeEndElement();
-        writer.writeStartElement(namespace, "KeySize");
-        writer.writeCharacters(Integer.toString(keySize));
-        writer.writeEndElement();
+        if (!wroteKeyType) {
+            writer.writeStartElement(namespace, "KeyType");
+            //TODO: Set the KeyType?
+            writer.writeCharacters(namespace + "/SymmetricKey");
+            writer.writeEndElement();
+        }
+        if (!wroteKeySize) {
+            writer.writeStartElement(namespace, "KeySize");
+            writer.writeCharacters(Integer.toString(keySize));
+            writer.writeEndElement();
+        }
         
-        
+        byte[] requestorEntropy = null;
         if ((trust10 != null && trust10.isRequireClientEntropy())
             || (trust13 != null && trust13.isRequireClientEntropy())) {
             writer.writeStartElement(namespace, "Entropy");
             writer.writeStartElement(namespace, "BinarySecret");
             writer.writeAttribute("Type", namespace + "/Nounce");
-            byte[] requestorEntropy =
+            requestorEntropy =
                 WSSecurityUtil.generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
             writer.writeCharacters(Base64.encode(requestorEntropy));
 
@@ -253,13 +297,148 @@ public class STSClient implements Configurable {
         }
         writer.writeEndElement();
         
-        client.invoke("RequestSecurityToken",
-                      new DOMSource(writer.getDocument().getDocumentElement()));
-        return null;
+        Object obj[] = client.invoke("RequestSecurityToken",
+                                     new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        return createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
+    }
+
+    private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy) 
+        throws WSSecurityException {
+        
+        Element el = document.getDocumentElement();
+        if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
+            el = DOMUtils.getFirstElement(el);
+        }
+        el = DOMUtils.getFirstElement(el);
+        
+        Element rst = null;
+        Element rar = null;
+        Element rur = null;
+        Element rpt = null;
+        Element lte = null;
+        Element entropy = null;
+        
+        while (el != null) {
+            String ln = el.getLocalName();
+            if (namespace.equals(el.getNamespaceURI())) {
+                if ("Lifetime".equals(ln)) {
+                    lte = el;
+                } else if ("RequestedSecurityToken".equals(ln)) {
+                    rst = DOMUtils.getFirstElement(el);
+                } else if ("RequestedAttachedReference".equals(ln)) {
+                    rar = DOMUtils.getFirstElement(el);
+                } else if ("RequestedUnattachedReference".equals(ln)) {
+                    rur = DOMUtils.getFirstElement(el);
+                } else if ("RequestedProofToken".equals(ln)) {
+                    rpt = el;
+                } else if ("Entropy".equals(ln)) {
+                    entropy = el;
+                }
+            }
+            el = DOMUtils.getNextElement(el);
+        }
+        
+        String id = findID(rar, rur, rst);
+        if (StringUtils.isEmpty(id)) {
+            throw new TrustException(new Message("NO_ID", LOG));
+        }
+        
+        SecurityToken token = new SecurityToken(id, rst, lte);
+        token.setAttachedReference(rar);
+        token.setUnattachedReference(rur);
+        token.setIssuerAddress(location);
+                
+        
+        byte[] secret = null;
+
+        if (rpt != null) {
+            Element child = DOMUtils.getFirstElement(rpt);
+            QName childQname = DOMUtils.getElementQName(child);
+            if (childQname.equals(new QName(namespace, "BinarySecret"))) {
+                //First check for the binary secret
+                String b64Secret = DOMUtils.getContent(child);
+                secret = Base64.decode(b64Secret);
+            } else if (childQname.equals(new QName(namespace, WSConstants.ENC_KEY_LN))) {
+                try {
+
+
+                    EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
+
+                    processor.handleToken(child, null, crypto,
+                                          cbHandler, null, new Vector(),
+                                          null);
+
+                    secret = processor.getDecryptedBytes();
+                } catch (WSSecurityException e) {
+                    throw new TrustException(new Message("ENCRYPTED_KEY_ERROR", LOG), e);
+                }
+            } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
+                //Handle the computed key
+                Element binSecElem = entropy == null ? null 
+                    : DOMUtils.getFirstElement(entropy);
+                String content = binSecElem == null ? null
+                    : DOMUtils.getContent(binSecElem);
+                if (content != null && !StringUtils.isEmpty(content.trim())) {
+
+                    byte[] serviceEntr = Base64.decode(content);
+
+                    //Right now we only use PSHA1 as the computed key algo                    
+                    P_SHA1 psha1 = new P_SHA1();
+
+                    int length = (keySize > 0) ? keySize
+                                 : algorithmSuite
+                                     .getMaximumSymmetricKeyLength();
+                    try {
+                        secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
+                    } catch (ConversationException e) {
+                        throw new TrustException(new Message("DERIVED_KEY_ERROR", LOG), e);
+                    }
+                } else {
+                    //Service entropy missing
+                    throw new TrustException(new Message("NO_ENTROPY", LOG));
+                }
+            }
+        } else if (requestorEntropy != null) {
+            //Use requester entropy as the key
+            secret = requestorEntropy;
+        }
+        token.setSecret(secret);
+        
+        return token;
     }
 
 
-
+    private String findID(Element rar, Element rur, Element rst) {
+        String id = null;
+        if (rar != null) {
+            id = this.getIDFromSTR(rar);
+        }
+        if (id == null && rur != null) {
+            id = this.getIDFromSTR(rur);
+        } 
+        if (id == null) {
+            id = rst.getAttributeNS(WSConstants.WSU_NS, "Id");
+        }
+        return id;
+    }
    
+    private String getIDFromSTR(Element el) {
+        Element child = DOMUtils.getFirstElement(el);
+        if (child == null) {
+            return null;
+        }
+        if (DOMUtils.getElementQName(child).equals(new QName(WSConstants.SIG_NS, "KeyInfo"))
+            || DOMUtils.getElementQName(child).equals(new QName(WSConstants.WSSE_NS, "KeyIdentifier"))) {
+            return DOMUtils.getContent(child);
+        } else if (DOMUtils.getElementQName(child).equals(Reference.TOKEN)) {
+            return child.getAttribute("URI");
+        }
+        return null;        
+    }
+
+    public void setTemplate(Element rstTemplate) {
+        template = rstTemplate;
+    }
 
 }

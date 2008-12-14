@@ -168,6 +168,9 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
         this.addToken(tok);
     }
     public Token getToken() {
+        if (tokens.size() == 1) { 
+            return tokens.get(0);
+        }
         return null;
     }
 

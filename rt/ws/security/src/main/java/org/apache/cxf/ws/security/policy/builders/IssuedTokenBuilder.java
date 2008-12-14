@@ -67,64 +67,51 @@ public class IssuedTokenBuilder implements AssertionBuilder {
         if (includeAttr != null) {
             issuedToken.setInclusion(consts.getInclusionFromAttributeValue(includeAttr));
         }
-        // Extract Issuer
-        Element issuerElem = DOMUtils.getFirstChildWithName(element, SP11Constants.ISSUER);
-        if (issuerElem != null) {
-            Element issuerEpr = DOMUtils
-                .getFirstChildWithName(issuerElem, 
+        
+        Element child = DOMUtils.getFirstElement(element);
+        while (child != null) {
+            String ln = child.getLocalName();
+            if (SP11Constants.ISSUER.getLocalPart().equals(ln)) {
+                Element issuerEpr = DOMUtils
+                    .getFirstChildWithName(child, 
                                        new QName(WSA_NAMESPACE, "Address"));
 
-            // try the other addressing namespace
-            if (issuerEpr == null) {
-                issuerEpr = DOMUtils
-                    .getFirstChildWithName(issuerElem,
+                // try the other addressing namespace
+                if (issuerEpr == null) {
+                    issuerEpr = DOMUtils
+                        .getFirstChildWithName(child,
                                            new QName(WSA_NAMESPACE_SUB,
                                                      "Address"));
-            }
+                }
+                issuedToken.setIssuerEpr(issuerEpr);
 
-            issuedToken.setIssuerEpr(issuerEpr);
-        }
-
-        // TODO check why this returns an Address element
-        // iter = issuerElem.getChildrenWithLocalName("Metadata");
-
-        if (issuerElem != null) {
-            Element issuerMex = DOMUtils
-                .getFirstChildWithName(issuerElem,
+                Element issuerMex = DOMUtils
+                    .getFirstChildWithName(child,
                                        new QName(WSA_NAMESPACE, "Metadata"));
 
-            // try the other addressing namespace
-            if (issuerMex == null) {
-                issuerMex = DOMUtils
-                    .getFirstChildWithName(issuerElem,
-                                           new QName(WSA_NAMESPACE_SUB, 
-                                                     "Metadata"));
+                // try the other addressing namespace
+                if (issuerMex == null) {
+                    issuerMex = DOMUtils
+                        .getFirstChildWithName(child,
+                                               new QName(WSA_NAMESPACE_SUB, 
+                                                         "Metadata"));
+                }
+    
+                issuedToken.setIssuerMex(issuerMex);
+            } else if (SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE.equals(ln)) {
+                issuedToken.setRstTemplate(child);
+            } else if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
+                Policy policy = builder.getPolicy(child);
+                policy = (Policy)policy.normalize(false);
+
+                for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+                    processAlternative((List)iterator.next(), issuedToken);
+                    break; // since there should be only one alternative ..
+                }                
             }
-
-            issuedToken.setIssuerMex(issuerMex);
+            
+            child = DOMUtils.getNextElement(child);
         }
-
-        // Extract RSTTemplate
-        Element rstTmplElem = DOMUtils.getFirstChildWithName(element, 
-                                                             SP11Constants.REQUEST_SECURITY_TOKEN_TEMPLATE);
-        if (rstTmplElem != null) {
-            issuedToken.setRstTemplate(rstTmplElem);
-        }
-
-        Element policyElement = DOMUtils.getFirstChildWithName(element,
-                                                               org.apache.neethi.Constants.Q_ELEM_POLICY);
-
-        if (policyElement != null) {
-
-            Policy policy = builder.getPolicy(policyElement);
-            policy = (Policy)policy.normalize(false);
-
-            for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-                processAlternative((List)iterator.next(), issuedToken);
-                break; // since there should be only one alternative ..
-            }
-        }
-
         return issuedToken;
     }
 

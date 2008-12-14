@@ -33,7 +33,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -81,12 +80,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                     SoapMessage message) {
         super(binding, saaj, secHeader, aim, message);
         this.sbinding = binding;
-        tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-        if (tokenStore == null) {
-            tokenStore = new MemoryTokenStore();
-            message.getExchange().get(Endpoint.class).getEndpointInfo()
-                .setProperty(TokenStore.class.getName(), tokenStore);
-        }
+        tokenStore = getTokenStore();
     }
     
     private TokenWrapper getSignatureToken() {
@@ -160,9 +154,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             //The encryption token can be an IssuedToken or a 
              //SecureConversationToken
             String tokenId = null;
-            
+            SecurityToken tok = null;
             if (encryptionToken instanceof IssuedToken) {
-                //REVISIT - IssuedToken
+                tok = getSecurityToken();
             } else if (encryptionToken instanceof SecureConversationToken) {
                 //REVISIT - SecureConversation
             } else if (encryptionToken instanceof X509Token) {
@@ -172,18 +166,19 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     tokenId = getEncryptedKey();
                 }
             }
-            
-            if (tokenId == null || tokenId.length() == 0) {
-                //REVISIT - no tokenM
+            if (tok != null) {
+                if (tokenId == null || tokenId.length() == 0) {
+                    //REVISIT - no tokenM
+                }
+                if (tokenId.startsWith("#")) {
+                    tokenId = tokenId.substring(1);
+                }
+                
+                /*
+                 * Get hold of the token from the token storage
+                 */
+                tok = tokenStore.getToken(tokenId);
             }
-            if (tokenId.startsWith("#")) {
-                tokenId = tokenId.substring(1);
-            }
-            
-            /*
-             * Get hold of the token from the token storage
-             */
-            SecurityToken tok = tokenStore.getToken(tokenId);
 
             boolean attached = false;
             
@@ -194,13 +189,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         == encryptionToken.getInclusion())) {
                 
                 Element el = tok.getToken();
-                el = (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
-                this.addEncyptedKeyElement(el);
+                this.addEncyptedKeyElement(cloneElement(el));
                 attached = true;
             } else if (encryptionToken instanceof X509Token && isRequestor()) {
                 Element el = tok.getToken();
-                el = (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
-                this.addEncyptedKeyElement(el);
+                this.addEncyptedKeyElement(cloneElement(el));
             }
             
             WSSecBase encr = doEncryption(encryptionWrapper, tok, attached, encrParts, true);
@@ -281,11 +274,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         Element sigTokElem = null;
         
         try {
+            SecurityToken sigTok = null;
             if (sigToken != null) {
                 if (sigToken instanceof SecureConversationToken) {
                     //sigTokId = getSecConvTokenId();
                 } else if (sigToken instanceof IssuedToken) {
-                    //sigTokId = getIssuedSignatureTokenId();
+                    sigTok = getSecurityToken();
                 } else if (sigToken instanceof X509Token) {
                     if (isRequestor()) {
                         sigTokId = setupEncryptedKey(sigTokenWrapper, sigToken);
@@ -298,14 +292,15 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 return;
             }
             
-            if (StringUtils.isEmpty(sigTokId)) {
+            if (sigTok == null && StringUtils.isEmpty(sigTokId)) {
                 policyNotAsserted(sigTokenWrapper, "No signature token id");
                 return;
             } else {
                 policyAsserted(sigTokenWrapper);
             }
-            
-            SecurityToken sigTok = tokenStore.getToken(sigTokId);
+            if (sigTok == null) {
+                sigTok = tokenStore.getToken(sigTokId);
+            }
             if (sigTok == null) {
                 //REVISIT - no token?
             }
@@ -316,8 +311,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         == sigToken.getInclusion())) {
                 
                 Element el = sigTok.getToken();
-                sigTokElem = (Element)secHeader.getSecurityHeader().getOwnerDocument()
-                        .importNode(el, true);
+                sigTokElem = cloneElement(el);
                 this.addEncyptedKeyElement((Element)sigTokElem);
             } else if (isRequestor() && sigToken instanceof X509Token) {
                 Element el = sigTok.getToken();

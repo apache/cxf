@@ -55,6 +55,9 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
         KNOWN.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
         KNOWN.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
         KNOWN.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
+        KNOWN.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705);
+        KNOWN.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
+        KNOWN.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
     }
     
     public PolicyAssertion build(Element elem) {
@@ -68,14 +71,20 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
         if (attribute != null) {
             optional = Boolean.valueOf(attribute.getValue());
         }
-        if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)) {
+        if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)
+            || MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705.equals(qn)) {
             PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-            return new NestedPrimitiveAssertion(elem, builder);
-        } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)) {
+            NestedPrimitiveAssertion nap = new NestedPrimitiveAssertion(elem, builder);
+            nap.setName(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
+            return nap;
+        } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)
+            || MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705.equals(qn)) {
             return new PrimitiveAssertion(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME, 
                                           optional);
         } else if (MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME.getLocalPart()
-            .equals(localName)) {
+            .equals(localName)
+            || MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705.getLocalPart()
+                .equals(localName)) {
             return new PrimitiveAssertion(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME,
                                           optional);
         }

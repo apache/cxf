@@ -35,7 +35,11 @@ public final class SecurityConstants {
     
     public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
     public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
+
+    public static final String TRUST_TOKEN = "ws-security.trust.token";
+    public static final String TRUST_TOKEN_ID = "ws-security.trust.token.id";
     
+
     private SecurityConstants() {
         //utility class
     }

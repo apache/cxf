@@ -268,7 +268,6 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 policyAsserted(aim, abinding.getInitiatorToken().getToken());
                 policyAsserted(aim, abinding.getRecipientToken().getToken());
                 policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
-                policyAsserted(aim, SP12Constants.SIGNED_PARTS);
             }
         }
      
@@ -307,7 +306,6 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 policyAsserted(aim, abinding.getSignatureToken());
                 policyAsserted(aim, abinding.getProtectionToken());
                 policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
-                policyAsserted(aim, SP12Constants.SIGNED_PARTS);
             }
         }
         return action;
@@ -382,6 +380,8 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             assertPolicy(aim, SP12Constants.WSS10);
             assertPolicy(aim, SP12Constants.TRUST_13);
             assertPolicy(aim, SP11Constants.TRUST_10);
+            policyAsserted(aim, SP12Constants.SIGNED_PARTS);
+
             message.put(WSHandlerConstants.ACTION, action.trim());
         }
     }

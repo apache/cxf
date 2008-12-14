@@ -48,8 +48,8 @@ public final class SP12Constants extends SPConstants {
     public static final String INCLUDE_ALWAYS = SP12Constants.SP_NS
         + SPConstants.INCLUDE_TOKEN_ALWAYS_SUFFIX;
     
-    public static final QName TRUST_13 = new QName(SP11Constants.SP_NS, SPConstants.TRUST_13,
-            SP11Constants.SP_PREFIX);
+    public static final QName TRUST_13 = new QName(SP12Constants.SP_NS, SPConstants.TRUST_13,
+            SP12Constants.SP_PREFIX);
     
     public static final QName REQUIRE_CLIENT_CERTIFICATE 
         = new QName(SP12Constants.SP_NS, "RequireClientCertificate", SP12Constants.SP_PREFIX); 

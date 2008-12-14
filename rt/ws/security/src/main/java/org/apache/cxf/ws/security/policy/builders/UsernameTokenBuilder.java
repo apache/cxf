@@ -51,7 +51,7 @@ public class UsernameTokenBuilder implements AssertionBuilder {
 
         UsernameToken usernameToken = new UsernameToken(consts);
 
-        String attribute = DOMUtils.getAttribute(element, SP11Constants.INCLUDE_TOKEN);
+        String attribute = element.getAttributeNS(element.getNamespaceURI(), SPConstants.ATTR_INCLUDE_TOKEN);
         if (attribute != null) {
             usernameToken.setInclusion(consts.getInclusionFromAttributeValue(attribute));
         }

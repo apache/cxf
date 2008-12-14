@@ -120,7 +120,9 @@ public class SecurityToken {
      */
     private String encrKeySha1Value;
     
-    
+    public SecurityToken() {
+        
+    }
     public SecurityToken(String id, Calendar created, Calendar expires) {
         this.id = id;
         this.created = created;

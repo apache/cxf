@@ -47,6 +47,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -56,6 +57,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.resource.ResourceManager;
@@ -72,6 +74,7 @@ import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
@@ -82,6 +85,9 @@ import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.Wss10;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
+import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.velocity.util.ClassUtils;
 import org.apache.ws.security.WSConstants;
@@ -92,15 +98,19 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecBase;
+import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
@@ -224,6 +234,9 @@ public abstract class AbstractBindingBuilder {
             org.apache.cxf.message.Message.REQUESTOR_ROLE));
     }  
     protected void policyNotAsserted(PolicyAssertion assertion, Exception reason) {
+        if (assertion == null) {
+            return;
+        }
         LOG.log(Level.INFO, "Not asserting " + assertion.getName() + ": " + reason);
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
@@ -237,6 +250,9 @@ public abstract class AbstractBindingBuilder {
         throw new PolicyException(reason);
     }
     protected void policyNotAsserted(PolicyAssertion assertion, String reason) {
+        if (assertion == null) {
+            return;
+        }
         LOG.log(Level.INFO, "Not asserting " + assertion.getName() + ": " + reason);
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
@@ -250,6 +266,9 @@ public abstract class AbstractBindingBuilder {
         throw new PolicyException(new Message(reason, LOG));
     }
     protected void policyAsserted(PolicyAssertion assertion) {
+        if (assertion == null) {
+            return;
+        }
         LOG.log(Level.INFO, "Asserting " + assertion.getName());
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
@@ -287,6 +306,15 @@ public abstract class AbstractBindingBuilder {
         return null;
     } 
     
+    protected final TokenStore getTokenStore() {
+        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+        if (tokenStore == null) {
+            tokenStore = new MemoryTokenStore();
+            message.getExchange().get(Endpoint.class).getEndpointInfo()
+                .setProperty(TokenStore.class.getName(), tokenStore);
+        }
+        return tokenStore;
+    }
     protected WSSecTimestamp createTimestamp() {
         Collection<AssertionInfo> ais;
         ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
@@ -359,8 +387,19 @@ public abstract class AbstractBindingBuilder {
                 }
             } else if (token instanceof IssuedToken && isRequestor()) {
                 //ws-trust stuff.......
-                //REVISIT
-                policyNotAsserted(token, "Issued token not yet supported");
+                SecurityToken secToken = getSecurityToken();
+                if (secToken == null) {
+                    policyNotAsserted(token, "Could not find IssuedToken");
+                }
+                addSupportingElement(cloneElement(secToken.getToken()));
+        
+                if (suppTokens.isEncryptedToken()) {
+                    this.encryptedTokensIdList.add(secToken.getId());
+                }
+        
+                //Add the extracted token
+                ret.put(token, new WSSecurityTokenHolder(secToken));
+
             } else if (token instanceof X509Token) {
                 //We have to use a cert
                 //Prepare X509 signature
@@ -379,6 +418,21 @@ public abstract class AbstractBindingBuilder {
         return ret;
     }
     
+    protected Element cloneElement(Element el) {
+        return (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
+    }
+
+    protected SecurityToken getSecurityToken() {
+        SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TRUST_TOKEN);
+        if (st == null) {
+            String id = (String)message.getContextualProperty(SecurityConstants.TRUST_TOKEN_ID);
+            if (id != null) {
+                st = getTokenStore().getToken(id);
+            }
+        }
+        return st;
+    }
+
     protected void addSignatureParts(Map<Token, WSSecBase> tokenMap,
                                        List<WSEncryptionPart> sigParts) {
         
@@ -1036,9 +1090,200 @@ public abstract class AbstractBindingBuilder {
                     policyNotAsserted(ent.getKey(), e);
                 }
                 
+            } else if (tempTok instanceof WSSecurityTokenHolder) {
+                SecurityToken token = ((WSSecurityTokenHolder)tempTok).getToken();
+                if (isTokenProtection) {
+                    sigParts.add(new WSEncryptionPart(token.getId()));
+                }
+                
+                try {
+                    doSymmSignature(ent.getKey(), token, sigParts, isTokenProtection);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         } 
     }
+    private void doSymmSignature(Token policyToken, SecurityToken tok,
+                                 Vector<WSEncryptionPart> sigParts, boolean isTokenProtection)
+        throws WSSecurityException, ConversationException {
+        
+        Document doc = saaj.getSOAPPart();
+        if (policyToken.isDerivedKeys()) {
+            WSSecDKSign dkSign = new WSSecDKSign();  
+            
+            //Check whether it is security policy 1.2 and use the secure conversation accordingly
+            if (SP12Constants.INSTANCE == policyToken.getSPConstants()) {
+                dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+            }
+                          
+            //Check for whether the token is attached in the message or not
+            boolean attached = false;
+            
+            if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == policyToken.getInclusion()
+                || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == policyToken.getInclusion()
+                || (isRequestor() && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                        == policyToken.getInclusion())) {
+                attached = true;
+            }
+            
+            // Setting the AttachedReference or the UnattachedReference according to the flag
+            Element ref;
+            if (attached) {
+                ref = tok.getAttachedReference();
+            } else {
+                ref = tok.getUnattachedReference();
+            }
+            
+            if (ref != null) {
+                dkSign.setExternalKey(tok.getSecret(), (Element) 
+                                      cloneElement(ref));
+            } else if (!isRequestor() && policyToken.isDerivedKeys()) { 
+                // If the Encrypted key used to create the derived key is not
+                // attached use key identifier as defined in WSS1.1 section
+                // 7.7 Encrypted Key reference
+                SecurityTokenReference tokenRef 
+                    = new SecurityTokenReference(doc);
+                if (tok.getSHA1() != null) {
+                    tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
+                }
+                dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
+            
+            } else {
+                dkSign.setExternalKey(tok.getSecret(), tok.getId());
+            }
+
+            //Set the algo info
+            dkSign.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+            dkSign.setDerivedKeyLength(binding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
+            if (tok.getSHA1() != null) {
+                //Set the value type of the reference
+                dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
+                    + WSConstants.ENC_KEY_VALUE_TYPE);
+            }
+            
+            dkSign.prepare(doc, secHeader);
+            
+            if (isTokenProtection) {
+
+                //Hack to handle reference id issues
+                //TODO Need a better fix
+                String sigTokId = tok.getId();
+                if (sigTokId.startsWith("#")) {
+                    sigTokId = sigTokId.substring(1);
+                }
+                sigParts.add(new WSEncryptionPart(sigTokId));
+            }
+            
+            dkSign.setParts(sigParts);
+            
+            dkSign.addReferencesToSign(sigParts, secHeader);
+            
+            //Do signature
+            dkSign.computeSignature();
+
+            //Add elements to header
+            
+            /*
+            if (rpd.getProtectionOrder().equals(SPConstants.ENCRYPT_BEFORE_SIGNING) &&
+                    this.getInsertionLocation() == null ) {
+                this.setInsertionLocation(RampartUtil
+                        
+                        .insertSiblingBefore(rmd, 
+                                this.mainRefListElement,
+                                dkSign.getdktElement()));
+
+                    this.setInsertionLocation(RampartUtil.insertSiblingAfter(
+                            rmd, 
+                            this.getInsertionLocation(), 
+                            dkSign.getSignatureElement()));                
+            } else {
+                this.setInsertionLocation(RampartUtil
+            
+                    .insertSiblingAfter(rmd, 
+                            this.getInsertionLocation(),
+                            dkSign.getdktElement()));
+
+                this.setInsertionLocation(RampartUtil.insertSiblingAfter(
+                        rmd, 
+                        this.getInsertionLocation(), 
+                        dkSign.getSignatureElement()));
+            }
+            */
+        } else {
+            WSSecSignature sig = new WSSecSignature();
+            // If a EncryptedKeyToken is used, set the correct value type to
+            // be used in the wsse:Reference in ds:KeyInfo
+            if (policyToken instanceof X509Token) {
+                if (isRequestor()) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                          + WSConstants.ENC_KEY_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+                } else {
+                    //the tok has to be an EncryptedKey token
+                    sig.setEncrKeySha1value(tok.getSHA1());
+                    sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+                }
+                
+            } else {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                      + WSConstants.SAML_ASSERTION_ID);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+            }
+            
+            String sigTokId; 
+            
+            if (policyToken instanceof SecureConversationToken) {
+                Element ref = tok.getAttachedReference();
+                if (ref == null) {
+                    ref = tok.getUnattachedReference();
+                }
+                
+                if (ref != null) {
+                    sigTokId = MemoryTokenStore.getIdFromSTR(ref);
+                } else {
+                    sigTokId = tok.getId();
+                }
+            } else {
+                sigTokId = tok.getId();
+            }
+                           
+            //Hack to handle reference id issues
+            //TODO Need a better fix
+            if (sigTokId.startsWith("#")) {
+                sigTokId = sigTokId.substring(1);
+            }
+            
+            sig.setCustomTokenId(sigTokId);
+            sig.setSecretKey(tok.getSecret());
+            sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+            sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+            sig.prepare(doc, getSignatureCrypto(null), secHeader);
+
+            sig.setParts(sigParts);
+            sig.addReferencesToSign(sigParts, secHeader);
+
+            //Do signature
+            sig.computeSignature();
+
+            /*
+            if (rpd.getProtectionOrder().equals(SPConstants.ENCRYPT_BEFORE_SIGNING) &&
+                    this.getInsertionLocation() == null) {
+                this.setInsertionLocation(RampartUtil.insertSiblingBefore(
+                        rmd,
+                        this.mainRefListElement,
+                        sig.getSignatureElement()));                    
+            } else {
+                this.setInsertionLocation(RampartUtil.insertSiblingAfter(
+                        rmd,
+                        this.getInsertionLocation(),
+                        sig.getSignatureElement()));     
+            }
+            */
+        }
+    }
+
     protected void assertSupportingTokens(Vector<WSEncryptionPart> sigs) {
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS));

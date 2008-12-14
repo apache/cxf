@@ -37,6 +37,9 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     public AbstractSecurityAssertion(SPConstants version) {
         constants = version;
     }
+    public final SPConstants getSPConstants() {
+        return constants;
+    }
 
     public boolean isOptional() {
         return isOptional;
