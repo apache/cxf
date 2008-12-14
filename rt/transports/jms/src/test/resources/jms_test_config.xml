@@ -46,15 +46,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
       <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
     
-    <jms:destination name="{http://cxf.apache.org/jms_conf_test}HelloWorldQueueBinMsgPort.jms-destination">
-      <jms:serverConfig
-        messageTimeToLive="500"
-        durableSubscriptionClientId="test-server-id"/>
-      <jms:runtimePolicy               
-         messageSelector="cxf_message_selector"
-         useMessageIDAsCorrelationID="true"
-         transactional="true"
-         durableSubscriberName="cxf_subscriber"/>
+    <jms:destination name="{http://cxf.apache.org/jms_conf_test}HelloWorldQueueBinMsgPort.jms-destination">     
       <jms:sessionPool
           lowWaterMark="10"
           highWaterMark="5000"/>
@@ -66,11 +58,12 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
           connectionUserName="testUser"
           connectionPassword="testPassword">
           <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-          <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-      </jms:address>   
-  </jms:destination> 
+          <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61511"/>
+      </jms:address> 
+      <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>  
+  </jms:destination>
   
-   <jms:destination name="{http://cxf.apache.org/hello_world_jms}HelloWorldPubSubPort.jms-destination">
+  <jms:destination name="{http://cxf.apache.org/hello_world_jms}HelloWorldPubSubPort.jms-destination">
       <jms:serverConfig
         messageTimeToLive="500"
         durableSubscriptionClientId="test-server-id"/>      
@@ -93,7 +86,29 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   	p:connectionFactory-ref="connectionFactory"
   	p:targetDestination="queue:test"
   	p:pubSubDomain="false"
+  	
   />
+  
+  <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+    p:brokerURL="tcp://localhost:61500"
+  />
+  
+
+  
+  <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration"
+  	p:connectionFactory-ref="jmsConnectionFactory"
+  	p:timeToLive="500"
+  	p:messageSelector="cxf_message_selector"
+  	p:sessionTransacted="true"
+    p:durableSubscriptionName="cxf_subscriber"
+  	p:targetDestination="queue:test"
+  	p:replyDestination="queue:test.reply"
+  	p:pubSubDomain="false"
+  	p:usingEndpointInfo="false"
+  	p:concurrentConsumers="3"
+  	p:maxConcurrentConsumers="5"
+  />    
+ 
 <!--
   <bean class="org.apache.cxf.transport.jms.JMSTransportFactory"
 	  id="org.apache.cxf.transport.jms.JMSTransportFactory"

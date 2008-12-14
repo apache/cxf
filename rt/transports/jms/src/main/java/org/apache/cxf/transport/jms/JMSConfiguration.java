@@ -31,6 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class JMSConfiguration implements InitializingBean {
     static final boolean DEFAULT_USEJMS11 = true;
     
+    private boolean usingEndpointInfo = true;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
     private PlatformTransactionManager transactionManager;
@@ -59,6 +60,13 @@ public class JMSConfiguration implements InitializingBean {
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
 
+    public boolean isUsingEndpointInfo() {
+        return this.usingEndpointInfo;
+    }
+    
+    public void setUsingEndpointInfo(boolean usingEndpointInfo) {
+        this.usingEndpointInfo = usingEndpointInfo;
+    }
     public boolean isUseJndi() {
         return useJndi;
     }

@@ -39,6 +39,7 @@
                         <xs:element name="runtimePolicy" type="jms:ServerBehaviorPolicyType" minOccurs="0"/>
                         <xs:element name="sessionPool" type="jms:SessionPoolType" minOccurs="0"/>
                         <xs:element name="address" type="jms:AddressType" minOccurs="0"/>
+                        <xs:element name="jmsConfig-ref" type="xs:string" maxOccurs="1" minOccurs="0"/>                    	
                     </xs:sequence>
                     <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
                 </xs:extension>
@@ -59,9 +60,7 @@
                     		type="jms:SessionPoolType" minOccurs="0" />
                     	<xs:element name="address"
                     		type="jms:AddressType" minOccurs="0" />
-                    	<xs:element name="jmsConfig-ref"
-                    		type="xs:string" maxOccurs="1" minOccurs="0">
-                    	</xs:element>
+                    	<xs:element name="jmsConfig-ref" type="xs:string" maxOccurs="1" minOccurs="0"/>                    	
                     </xs:sequence>
                     <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
                 </xs:extension>
