@@ -45,7 +45,7 @@ import org.jdom.Text;
  * 
  * @author <a href="mailto:tsztelak@gmail.com">Tomasz Sztelak</a>
  */
-public class JDOMStreamReader extends AbstractDOMStreamReader {
+public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> {
 
     private Content content;
 
@@ -62,7 +62,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader {
      * @param element
      */
     public JDOMStreamReader(Element element) {
-        super(new ElementFrame(element, null));
+        super(new ElementFrame<Element, Integer>(element, null, -1));
 
         namespaceContext = new JDOMNamespaceContext();
         setupNamespaces(element);
@@ -182,21 +182,28 @@ public class JDOMStreamReader extends AbstractDOMStreamReader {
     }
 
     public Element getCurrentElement() {
-        return (Element)getCurrentFrame().getElement();
+        return getCurrentFrame().getElement();
     }
 
     @Override
-    protected ElementFrame getChildFrame(int currentChild) {
-        return new ElementFrame(getCurrentElement().getContent(currentChild), getCurrentFrame());
+    protected ElementFrame<Element, Integer> getChildFrame() {
+        int currentChild = getCurrentFrame().getCurrentChild();
+        return new ElementFrame<Element, Integer>((Element)getCurrentElement().getContent(currentChild),
+                                                  getCurrentFrame(),
+                                                  -1);
     }
 
     @Override
-    protected int getChildCount() {
-        return getCurrentElement().getContentSize();
+    protected boolean hasMoreChildren() {
+        int currentChild = getCurrentFrame().getCurrentChild();
+        return currentChild < (getCurrentElement().getContentSize() - 1);
     }
 
     @Override
-    protected int moveToChild(int currentChild) {
+    protected int nextChild() {
+        int currentChild = getCurrentFrame().getCurrentChild();
+        currentChild++;
+        getCurrentFrame().setCurrentChild(currentChild);
         this.content = getCurrentElement().getContent(currentChild);
 
         if (content instanceof Text) {

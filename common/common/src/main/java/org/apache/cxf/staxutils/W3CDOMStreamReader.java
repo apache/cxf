@@ -36,7 +36,7 @@ import org.w3c.dom.TypeInfo;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.AbstractDOMStreamReader.ElementFrame;
 
-public class W3CDOMStreamReader extends AbstractDOMStreamReader {
+public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     private Node content;
 
     private Document document;
@@ -47,13 +47,13 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
      * @param element
      */
     public W3CDOMStreamReader(Element element) {
-        super(new ElementFrame(element, null));
+        super(new ElementFrame<Node, Node>(element, null));
         newFrame(getCurrentFrame());
                 
         this.document = element.getOwnerDocument();
     }
     public W3CDOMStreamReader(Document doc) {
-        super(new ElementFrame(doc));
+        super(new ElementFrame<Node, Node>(doc));
         this.document = doc;
     }
 
@@ -71,7 +71,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
      * collection.
      */
     @Override
-    protected final void newFrame(ElementFrame frame) {
+    protected final void newFrame(ElementFrame<Node, Node> frame) {
         Node element = getCurrentNode();
         frame.uris = new ArrayList<String>();
         frame.prefixes = new ArrayList<String>();
@@ -133,22 +133,29 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
     }
 
     @Override
-    protected ElementFrame getChildFrame(int currentChild) {
-        return new ElementFrame(getCurrentNode().getChildNodes().item(currentChild), getCurrentFrame());
+    protected ElementFrame<Node, Node> getChildFrame() {
+        return new ElementFrame<Node, Node>(getCurrentFrame().currentChild, 
+                                getCurrentFrame());
     }
 
     @Override
-    protected int getChildCount() {
-        return getCurrentNode().getChildNodes().getLength();
-    }
-
-    @Override
-    protected int moveToChild(int currentChild) {
-        content = getCurrentNode().getFirstChild();
-        while (currentChild > 0 && content != null) {
-            content = content.getNextSibling();
-            --currentChild;
+    protected boolean hasMoreChildren() {
+        if (getCurrentFrame().currentChild == null) {
+            return getCurrentNode().getFirstChild() != null;            
         }
+        return ((Node)getCurrentFrame().currentChild).getNextSibling() != null;
+    }
+
+    @Override
+    protected int nextChild() {
+        ElementFrame<Node, Node> frame = getCurrentFrame();
+        if (frame.currentChild == null) {
+            content = getCurrentNode().getFirstChild();            
+        } else {
+            content = ((Node)frame.currentChild).getNextSibling();
+        }
+        
+        frame.currentChild = content;
         switch (content.getNodeType()) {
         case Node.ELEMENT_NODE:
             return START_ELEMENT;
@@ -169,7 +176,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
     public String getElementText() throws XMLStreamException {
         String result = DOMUtils.getContent(content);
 
-        ElementFrame frame = getCurrentFrame();
+        ElementFrame<Node, Node> frame = getCurrentFrame();
         frame.ended = true;
         currentEvent = END_ELEMENT;
         endElement();
@@ -180,7 +187,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader {
 
     @Override
     public String getNamespaceURI(String prefix) {
-        ElementFrame frame = getCurrentFrame();
+        ElementFrame<Node, Node> frame = getCurrentFrame();
 
         while (null != frame) {
             int index = frame.prefixes.indexOf(prefix);
