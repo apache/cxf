@@ -47,6 +47,7 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
@@ -77,6 +78,19 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 if (utBuilder != null) {
                     utBuilder.prepare(saaj.getSOAPPart());
                     utBuilder.appendToHeader(secHeader);
+                }
+            } else if (token instanceof IssuedToken) {
+                SecurityToken secTok = getSecurityToken();
+                
+                SPConstants.IncludeTokenType inclusion = token.getInclusion();
+                
+                if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS
+                    || ((inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                        || inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE) 
+                        && isRequestor())) {
+                  
+                    //Add the token
+                    addEncyptedKeyElement(cloneElement(secTok.getToken()));
                 }
             } else {
                 //REVISIT - not supported for signed.  Exception?
@@ -135,29 +149,30 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         addUsernameTokens(sgndSuppTokens);
                     }
                 }
+                
                 ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
                 if (ais != null) {
                     SupportingToken sgndSuppTokens = null;
                     for (AssertionInfo ai : ais) {
                         sgndSuppTokens = (SupportingToken)ai.getAssertion();
                         ai.setAsserted(true);
-                    }
+                    } 
+                    
                     if (sgndSuppTokens != null) {
-                        SignedEncryptedParts signdParts = sgndSuppTokens.getSignedParts();
-
                         for (Token token : sgndSuppTokens.getTokens()) {
                             if (token instanceof IssuedToken) {
-                                signatureValues.add(doIssuedTokenSignature(token, signdParts, 
+                                signatureValues.add(doIssuedTokenSignature(token, null, 
                                                                            sgndSuppTokens));
                             } else if (token instanceof X509Token) {
-                                signatureValues.add(doX509TokenSignature(token, signdParts, 
+                                signatureValues.add(doX509TokenSignature(token, null, 
                                                                          sgndSuppTokens));
                             } else if (token instanceof SecureConversationToken) {
                                 signatureValues.add(doSecureConversationSignature(token,
-                                                                                  signdParts));
+                                                                                  null));
                             }
                         }
                     }
+                    
                 }
                 
                 ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
@@ -326,8 +341,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
           
             //    Set the algo info
             dkSign.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
-            dkSign.setDerivedKeyLength(algorithmSuite.getSignatureDerivedKeyLength());
-          
+            dkSign.setDerivedKeyLength(algorithmSuite.getSignatureDerivedKeyLength() / 8);
+            if (token.getSPConstants() == SP12Constants.INSTANCE) {
+                dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+            }
             dkSign.prepare(doc, secHeader);
           
             addDerivedKeyElement(dkSign.getdktElement());

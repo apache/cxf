@@ -21,7 +21,7 @@ package org.apache.cxf.interceptor;
 public final class LoggingMessage {
 
     private final String heading;
-
+    private final StringBuilder address;
     private final StringBuilder encoding;
     private final StringBuilder header;
     private final StringBuilder message;
@@ -30,10 +30,14 @@ public final class LoggingMessage {
     public LoggingMessage(String h) {
         heading = h;
 
+        address = new StringBuilder();
         encoding = new StringBuilder();
         header = new StringBuilder();
         message = new StringBuilder();
         payload = new StringBuilder();
+    }
+    public StringBuilder getAddress() {
+        return address;
     }
 
     public StringBuilder getEncoding() {
@@ -55,6 +59,10 @@ public final class LoggingMessage {
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append(heading);
+        if (address.length() > 0) {
+            buffer.append("\nAddress: ");
+            buffer.append(address);
+        }
         buffer.append("\nEncoding: ");
         buffer.append(encoding);
         buffer.append("\nHeaders: ");

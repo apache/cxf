@@ -64,14 +64,18 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.security.WSConstants;
@@ -94,6 +98,11 @@ public class STSClient implements Configurable {
     String name = "default.sts-client";
     Client client;
     String location;
+    
+    String wsdlLocation;
+    QName serviceName;
+    QName endpointName;
+    
     Policy policy;
     String soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
     int keySize = 256;
@@ -175,64 +184,104 @@ public class STSClient implements Configurable {
         return ctx;
     }
     
+    public void setWsdlLocation(String wsdl) {
+        wsdlLocation = wsdl;
+    }
+    public void setServiceName(QName qn) {
+        serviceName = qn;
+    }
+    public void setServiceName(String qn) {
+        serviceName = QName.valueOf(qn);
+    }
+    public void setEndpointName(QName qn) {
+        endpointName = qn;
+    }
+    public void setEndpointName(String qn) {
+        endpointName = QName.valueOf(qn);
+    }
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
             return;
         }
         bus.getExtension(Configurer.class).configureBean(name, this);
         
-        
-        Service service = null;
-        String ns = namespace + "/wsdl";
-        ServiceInfo si = new ServiceInfo();
-        
-        QName iName = new QName(ns, "SecurityTokenService");
-        si.setName(iName);
-        InterfaceInfo ii = new InterfaceInfo(si, iName);
-        OperationInfo oi = ii.addOperation(new QName(ns, "RequestSecurityToken"));
-        MessageInfo mii = oi.createMessage(new QName(ns, "RequestSecurityTokenMsg"), 
-                                           MessageInfo.Type.INPUT);
-        oi.setInput("RequestSecurityTokenMsg", mii);
-        MessagePartInfo mpi = mii.addMessagePart("request");
-        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
-        
-        MessageInfo mio = oi.createMessage(new QName(ns, "RequestSecurityTokenResponseMsg"), 
-                                           MessageInfo.Type.OUTPUT);
-        oi.setOutput("RequestSecurityTokenResponseMsg", mio);
-        mpi = mio.addMessagePart("response");
-        mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
-        
-        si.setInterface(ii);
-        service = new ServiceImpl(si);
-        
-        BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
-        BindingFactory bindingFactory = bfm.getBindingFactory(soapVersion);
-        BindingInfo bi = bindingFactory.createBindingInfo(service, 
-                                                          soapVersion, null);
-        si.addBinding(bi);
-        ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
-        ConduitInitiator ci = cim.getConduitInitiatorForUri(location);
-        EndpointInfo ei = new EndpointInfo(si, ci.getTransportIds().get(0));
-        ei.setBinding(bi);
-        ei.setName(iName);
-        ei.setAddress(location);
-        si.addEndpoint(ei);
-        ei.addExtensor(policy);
-        
-        BindingOperationInfo boi = bi.getOperation(oi);
-        SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-        if (soi == null) {
-            soi = new SoapOperationInfo();
-            boi.addExtensor(soi);
+        if (wsdlLocation != null) {
+            WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlLocation, serviceName);
+            SourceDataBinding dataBinding = new SourceDataBinding();
+            factory.setDataBinding(dataBinding);
+            Service service = factory.create();
+            service.setDataBinding(dataBinding);
+            EndpointInfo ei = service.getEndpointInfo(endpointName);
+            Endpoint endpoint = new EndpointImpl(bus, service, ei);
+            client = new ClientImpl(bus, endpoint);
+        } else {
+            Service service = null;
+            String ns = namespace + "/wsdl";
+            ServiceInfo si = new ServiceInfo();
+            
+            QName iName = new QName(ns, "SecurityTokenService");
+            si.setName(iName);
+            InterfaceInfo ii = new InterfaceInfo(si, iName);
+            OperationInfo oi = ii.addOperation(new QName(ns, "RequestSecurityToken"));
+            MessageInfo mii = oi.createMessage(new QName(ns, "RequestSecurityTokenMsg"), 
+                                               MessageInfo.Type.INPUT);
+            oi.setInput("RequestSecurityTokenMsg", mii);
+            MessagePartInfo mpi = mii.addMessagePart("request");
+            mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
+            
+            MessageInfo mio = oi.createMessage(new QName(ns, "RequestSecurityTokenResponseMsg"), 
+                                               MessageInfo.Type.OUTPUT);
+            oi.setOutput("RequestSecurityTokenResponseMsg", mio);
+            mpi = mio.addMessagePart("response");
+            mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
+            
+            si.setInterface(ii);
+            service = new ServiceImpl(si);
+            
+            BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
+            BindingFactory bindingFactory = bfm.getBindingFactory(soapVersion);
+            BindingInfo bi = bindingFactory.createBindingInfo(service, 
+                                                              soapVersion, null);
+            si.addBinding(bi);
+            ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
+            ConduitInitiator ci = cim.getConduitInitiatorForUri(location);
+            EndpointInfo ei = new EndpointInfo(si, ci.getTransportIds().get(0));
+            ei.setBinding(bi);
+            ei.setName(iName);
+            ei.setAddress(location);
+            si.addEndpoint(ei);
+            ei.addExtensor(policy);
+            
+            BindingOperationInfo boi = bi.getOperation(oi);
+            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
+            if (soi == null) {
+                soi = new SoapOperationInfo();
+                boi.addExtensor(soi);
+            }
+            soi.setAction(namespace + "/RST/Issue");
+            
+    
+            service.setDataBinding(new SourceDataBinding());
+            Endpoint endpoint = new EndpointImpl(bus, service, ei);
+            
+            client = new ClientImpl(bus, endpoint);
         }
-        soi.setAction(namespace + "/RST/Issue");
-        
-
-        service.setDataBinding(new SourceDataBinding());
-        Endpoint endpoint = new EndpointImpl(bus, service, ei);
-        
-        client = new ClientImpl(bus, endpoint);
-        
+    }
+    private BindingOperationInfo findOperation(String suffix) {
+        BindingInfo bi = client.getEndpoint().getBinding().getBindingInfo();
+        for (BindingOperationInfo boi : bi.getOperations()) {
+            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
+            if (soi != null && soi.getAction() != null && soi.getAction().endsWith(suffix)) {
+                PolicyEngine pe = bus.getExtension(PolicyEngine.class);
+                Conduit conduit = client.getConduit();
+                EffectivePolicy effectivePolicy 
+                    = pe.getEffectiveClientRequestPolicy(client.getEndpoint().getEndpointInfo(),
+                                                         boi, conduit);
+                setPolicy(effectivePolicy.getPolicy());
+                return boi;
+            }
+        }
+        return null;
     }
 
     public SecurityToken requestSecurityToken() throws Exception {
@@ -240,18 +289,21 @@ public class STSClient implements Configurable {
     }
     public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
         createClient();
+        BindingOperationInfo boi = findOperation("/RST/Issue");
+        
         client.getRequestContext().putAll(ctx);
         
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement(namespace, "RequestSecurityToken");
-        boolean wroteKeyType = false;
         boolean wroteKeySize = false;
+        String keyType = null;
         if (template != null) {
             Element tl = DOMUtils.getFirstElement(template);
             while (tl != null) {
                 StaxUtils.copy(tl, writer);
-                wroteKeyType |= "KeyType".equals(tl.getLocalName());
-                if ("KeySize".equals(tl.getLocalName())) {
+                if ("KeyType".equals(tl.getLocalName())) {
+                    keyType = DOMUtils.getContent(tl);
+                } else if ("KeySize".equals(tl.getLocalName())) {
                     wroteKeySize = true;
                     keySize = Integer.parseInt(DOMUtils.getContent(tl));
                 }
@@ -267,41 +319,46 @@ public class STSClient implements Configurable {
             //TODO: AppliesTo element? 
         }
         //TODO: Lifetime element?
-        if (!wroteKeyType) {
+        if (keyType == null) {
             writer.writeStartElement(namespace, "KeyType");
             //TODO: Set the KeyType?
             writer.writeCharacters(namespace + "/SymmetricKey");
             writer.writeEndElement();
+            keyType = namespace + "/SymmetricKey";
         }
-        if (!wroteKeySize) {
-            writer.writeStartElement(namespace, "KeySize");
-            writer.writeCharacters(Integer.toString(keySize));
-            writer.writeEndElement();
-        }
-        
         byte[] requestorEntropy = null;
-        if ((trust10 != null && trust10.isRequireClientEntropy())
-            || (trust13 != null && trust13.isRequireClientEntropy())) {
-            writer.writeStartElement(namespace, "Entropy");
-            writer.writeStartElement(namespace, "BinarySecret");
-            writer.writeAttribute("Type", namespace + "/Nounce");
-            requestorEntropy =
-                WSSecurityUtil.generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
-            writer.writeCharacters(Base64.encode(requestorEntropy));
-
-            writer.writeEndElement();
-            writer.writeEndElement();
-            writer.writeStartElement(namespace, "ComputedKeyAlgorithm");
-            writer.writeCharacters(namespace + "/CK/PSHA1");
-            writer.writeEndElement();
+        
+        if (keyType.endsWith("SymmetricKey")) {
+            if (!wroteKeySize) {
+                writer.writeStartElement(namespace, "KeySize");
+                writer.writeCharacters(Integer.toString(keySize));
+                writer.writeEndElement();
+            }
+        
+            if ((trust10 != null && trust10.isRequireClientEntropy())
+                || (trust13 != null && trust13.isRequireClientEntropy())) {
+                writer.writeStartElement(namespace, "Entropy");
+                writer.writeStartElement(namespace, "BinarySecret");
+                writer.writeAttribute("Type", namespace + "/Nounce");
+                requestorEntropy =
+                    WSSecurityUtil.generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                writer.writeCharacters(Base64.encode(requestorEntropy));
+    
+                writer.writeEndElement();
+                writer.writeEndElement();
+                writer.writeStartElement(namespace, "ComputedKeyAlgorithm");
+                writer.writeCharacters(namespace + "/CK/PSHA1");
+                writer.writeEndElement();
+            }
         }
         writer.writeEndElement();
         
-        Object obj[] = client.invoke("RequestSecurityToken",
+        Object obj[] = client.invoke(boi,
                                      new DOMSource(writer.getDocument().getDocumentElement()));
         
         return createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
     }
+
 
     private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy) 
         throws WSSecurityException {

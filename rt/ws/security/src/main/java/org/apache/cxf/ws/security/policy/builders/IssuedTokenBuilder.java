@@ -124,11 +124,11 @@ public class IssuedTokenBuilder implements AssertionBuilder {
             assertion = (Assertion)iterator.next();
             name = assertion.getName();
 
-            if (SP11Constants.REQUIRE_DERIVED_KEYS.equals(name)) {
+            if (SPConstants.REQUIRE_DERIVED_KEYS.equals(name.getLocalPart())) {
                 parent.setDerivedKeys(true);
-            } else if (SP11Constants.REQUIRE_EXTERNAL_REFERENCE.equals(name)) {
+            } else if (SPConstants.REQUIRE_EXTERNAL_REFERENCE.equals(name.getLocalPart())) {
                 parent.setRequireExternalReference(true);
-            } else if (SP11Constants.REQUIRE_INTERNAL_REFERENCE.equals(name)) {
+            } else if (SPConstants.REQUIRE_INTERNAL_REFERENCE.equals(name.getLocalPart())) {
                 parent.setRequireInternalReference(true);
             }
         }

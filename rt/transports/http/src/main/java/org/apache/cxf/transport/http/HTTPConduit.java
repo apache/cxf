@@ -680,9 +680,12 @@ public class HTTPConduit
         String queryString = (String)message.get(Message.QUERY_STRING);
         if (result == null) {
             if (pathInfo == null && queryString == null) {
-                return getURL();
+                URL url = getURL();
+                message.put(Message.ENDPOINT_ADDRESS, url.toString());
+                return url;
             }
             result = getURL().toString();
+            message.put(Message.ENDPOINT_ADDRESS, result);
         }
         
         // REVISIT: is this really correct?
