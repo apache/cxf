@@ -39,6 +39,7 @@ public class MapTestImpl implements MapTest {
     public ObjectWithAMap returnObjectWithAMap() {
         ObjectWithAMap ret = new ObjectWithAMap();
         ret.getTheMap().put("rainy", Boolean.TRUE);
+        ret.getTheMap().put("raw", null);
         ret.getTheMap().put("sunny", Boolean.FALSE);
         return ret;
     }
@@ -46,6 +47,7 @@ public class MapTestImpl implements MapTest {
     public Map<Long, String> getMapLongToString() {
         Map<Long, String> map = new HashMap<Long, String>();
         map.put(Long.valueOf(1), "one");
+        map.put(Long.valueOf(2), null);
         map.put(Long.valueOf(27), "twenty-seven");
         return map;
     }

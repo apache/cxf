@@ -124,6 +124,10 @@ public class ElementReader extends AbstractMessageReader implements MessageReade
     public String getValue() {
         if (value == null) {
             try {
+                if (isXsiNil()) {
+                    readToEnd();
+                    return null;
+                }
                 value = root.getElementText();
                 
                 hasCheckedChildren = true;

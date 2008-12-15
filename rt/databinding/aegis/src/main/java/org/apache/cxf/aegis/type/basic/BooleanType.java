@@ -24,16 +24,24 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
+ * Aegis type for {@link java.lang.Boolean}. These can be null.
  */
 public class BooleanType extends Type {
     @Override
     public Object readObject(MessageReader reader, Context context) {
+        if (reader.isXsiNil()) {
+            reader.readToEnd();
+            return null;
+        }
         return Boolean.valueOf(reader.getValueAsBoolean());
     }
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
-        writer.writeValueAsBoolean(((Boolean)object).booleanValue());
+        if (object == null) {
+            writer.writeXsiNil();
+        } else {
+            writer.writeValueAsBoolean(((Boolean)object).booleanValue());
+        }
     }
 }
