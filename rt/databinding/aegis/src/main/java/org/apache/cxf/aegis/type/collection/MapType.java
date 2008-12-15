@@ -64,14 +64,15 @@ public class MapType extends Type {
             Type kType = getKeyType();
             Type vType = getValueType();
 
-            Object key = null;
-            Object value = null;
-
             while (reader.hasMoreElementReaders()) {
                 MessageReader entryReader = reader.getNextElementReader();
 
                 if (entryReader.getName().equals(getEntryName())) {
+                    Object key = null;
+                    Object value = null;
+
                     while (entryReader.hasMoreElementReaders()) {
+                                                
                         MessageReader evReader = entryReader.getNextElementReader();
 
                         if (evReader.getName().equals(getKeyName())) {

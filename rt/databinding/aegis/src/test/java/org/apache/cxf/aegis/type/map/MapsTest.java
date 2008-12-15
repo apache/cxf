@@ -86,6 +86,16 @@ public class MapsTest extends AbstractAegisTest {
     }
     
     @Test
+    public void testNull() throws Exception {
+        ObjectWithAMap obj1 = clientInterface.returnObjectWithAMap();
+        assertNull(obj1.getTheMap().get("raw"));
+        Map<Long, String> m = clientInterface.getMapLongToString();
+        String str2 = m.get(Long.valueOf(2)); 
+        assertNull("value for 2 should be null, was " + str2, str2);
+                  
+    }
+    
+    @Test
     public void testObjectsWithMaps() throws Exception {
         ObjectWithAMap obj1 = clientInterface.returnObjectWithAMap();
         ObjectWithAMapNs2 obj2 = clientInterface.returnObjectWithAMapNs2();
@@ -95,7 +105,7 @@ public class MapsTest extends AbstractAegisTest {
         assertNotNull(obj1.getTheMap());
         assertNotNull(obj2.getTheMap()); 
         
-        assertEquals(2, obj1.getTheMap().size());
+        assertEquals(3, obj1.getTheMap().size());
         assertEquals(3, obj2.getTheMap().size());
         
         assertTrue(obj1.getTheMap().get("rainy"));

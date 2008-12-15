@@ -38,6 +38,10 @@ public class StringType extends Type {
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
-        writer.writeValue(object);
+        if (object == null && isNillable()) {
+            writer.writeXsiNil();
+        } else {
+            writer.writeValue(object);
+        }
     }
 }
