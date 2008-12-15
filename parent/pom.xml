@@ -1058,6 +1058,34 @@
         </profile>
 
         <profile>
+	  <!-- pmd and checkstyle, no tests. -->
+            <id>justsourcecheck</id>
+	    <properties>
+	      <maven.test.skip.exec>true</maven.test.skip.exec>
+	    </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <showDeprecation>true</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgument>${compile.flags}</compilerArgument>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>setup.eclipse</id>
             <build>
                 <defaultGoal>process-test-sources</defaultGoal>
