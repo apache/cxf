@@ -25,6 +25,7 @@ import java.io.InputStream;
 
 import javax.jms.DeliveryMode;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.IOUtils;
@@ -103,8 +104,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
         BusFactory.setDefaultBus(bus);
         setupServiceInfo("http://cxf.apache.org/jms_conf_test", "/wsdl/others/jms_test_no_addr.wsdl",
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
-        JMSDestination destination = setupJMSDestination(false);
-        JMSConfiguration jmsConfig = destination.getJmsConfig();
+        JMSDestination destination = setupJMSDestination(false);        
+        JMSConfiguration jmsConfig = destination.getJmsConfig();        
         //JmsTemplate jmsTemplate = destination.getJmsTemplate();
         //AbstractMessageListenerContainer jmsListener = destination.getJmsListener();
         assertEquals("Can't get the right ServerConfig's MessageTimeToLive ", 500L, jmsConfig
@@ -117,6 +118,21 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // .getConnectionPassword());
         assertEquals("Can't get the right DurableSubscriberName", "cxf_subscriber", jmsConfig
             .getDurableSubscriptionName());
+        
+        /*setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
+        destination = setupJMSDestination(false);
+        jmsConfig = destination.getJmsConfig();*/
+        assertEquals("The concurrentConsumer should be set", jmsConfig.getConcurrentConsumers(), 3);
+        assertEquals("The maxConcurrentConsumer should be set", jmsConfig.getMaxConcurrentConsumers(), 5);
+        assertNotNull("The connectionFactory should not be null", jmsConfig.getConnectionFactory());
+        assertTrue("Should get the instance of ActiveMQConnectionFactory", 
+                   jmsConfig.getConnectionFactory() instanceof ActiveMQConnectionFactory);
+        ActiveMQConnectionFactory cf = (ActiveMQConnectionFactory)jmsConfig.getConnectionFactory();
+        assertEquals("The borker URL is wrong", cf.getBrokerURL(), "tcp://localhost:61500");
+        assertEquals("Get a wrong TargetDestination", jmsConfig.getTargetDestination(), "queue:test");
+        assertEquals("Get the wrong pubSubDomain value", jmsConfig.isPubSubDomain(), false);
+        
         BusFactory.setDefaultBus(null);
 
     }
