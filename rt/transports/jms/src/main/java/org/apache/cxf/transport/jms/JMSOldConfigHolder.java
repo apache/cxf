@@ -33,7 +33,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory102;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
@@ -120,8 +119,11 @@ public class JMSOldConfigHolder {
             if (address.isSetDestinationStyle()) {
                 pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
             }
-            ConnectionFactory cf = getConnectionFactoryFromJndi(jt, pubSubDomain);            
-            jmsConfig.setConnectionFactory(cf);
+            
+            if (jmsConfig.getConnectionFactory() == null) {
+                ConnectionFactory cf = getConnectionFactoryFromJndi(jt, pubSubDomain);
+                jmsConfig.setConnectionFactory(cf);
+            }
         
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);        
@@ -131,22 +133,24 @@ public class JMSOldConfigHolder {
             }        
             jmsConfig.setPubSubDomain(pubSubDomain);
             jmsConfig.setPubSubNoLocal(true);
-            if (jmsConfig.getReceiveTimeout() == JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT) {
-                jmsConfig.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
-            }            
+            //if (clientConfig.isSetClientReceiveTimeout()) {
+            jmsConfig.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
+            //}            
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());       
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());        
         
             long timeToLive = isConduit ? clientConfig.getMessageTimeToLive() : serverConfig
                 .getMessageTimeToLive();
-            jmsConfig.setTimeToLive(timeToLive);
+            jmsConfig.setTimeToLive(timeToLive);            
             if (address.isSetUseJms11()) {                
                 jmsConfig.setUseJms11(address.isUseJms11());        
             }
             boolean useJndi = address.isSetJndiDestinationName();
             jmsConfig.setUseJndi(useJndi);
         
-            jmsConfig.setSessionTransacted(serverBehavior.isSetTransactional());
+            if (serverBehavior.isSetTransactional()) {
+                jmsConfig.setSessionTransacted(serverBehavior.isTransactional());                
+            }            
 
             if (useJndi) {
                 // Setup Destination jndi destination resolver
