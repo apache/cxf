@@ -34,12 +34,16 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
       <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
     
+   <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+  	p:brokerURL="tcp://localhost:61500"/>
   
-  <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <bean id="singleConnectionFactory"
+    class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
+    <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
   </bean>
-  
+    
   <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration"
-  	p:connectionFactory-ref="connectionFactory"
+    p:connectionFactory-ref="singleConnectionFactory" 
   	p:concurrentConsumers="10"
   	p:maxConcurrentConsumers="10"/>
 
