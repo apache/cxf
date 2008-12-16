@@ -32,10 +32,10 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
-public class MessageBodyWorkersImpl implements Providers {
+public class ProvidersImpl implements Providers {
 
     private Message m;
-    public MessageBodyWorkersImpl(Message m) {
+    public ProvidersImpl(Message m) {
         this.m = m;
     }
     

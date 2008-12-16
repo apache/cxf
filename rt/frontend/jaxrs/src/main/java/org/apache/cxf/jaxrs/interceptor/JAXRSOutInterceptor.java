@@ -61,7 +61,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             processResponse(message, baseAddress);
         } finally {
-            ProviderFactory.getInstance(baseAddress).cleatThreadLocalProxies();
+            ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();
             ClassResourceInfo cri =
                 (ClassResourceInfo)message.getExchange().get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
             if (cri != null) {

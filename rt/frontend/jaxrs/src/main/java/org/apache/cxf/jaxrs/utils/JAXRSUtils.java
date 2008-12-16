@@ -36,11 +36,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,15 +71,15 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.impl.MessageBodyWorkersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
+import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -96,7 +98,7 @@ public final class JAXRSUtils {
 
     public static final MediaType ALL_TYPES = new MediaType();
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
-    //private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
 
     private JAXRSUtils() {        
     }
@@ -388,8 +390,12 @@ public final class JAXRSUtils {
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
             if (contentType == null) {
-                throw new Fault(new  org.apache.cxf.common.i18n.Message("NO_CONTENT_TYPE_SPECIFIED",
-                                                                        LOG, ori.getHttpMethod()));
+                org.apache.cxf.common.i18n.Message errorMsg = 
+                    new org.apache.cxf.common.i18n.Message("NO_CONTENT_TYPE_SPECIFIED", 
+                                                           BUNDLE, 
+                                                           ori.getHttpMethod());
+                LOG.fine(errorMsg.toString());
+                contentType = MediaType.WILDCARD;
             }
 
             return readFromMessageBody(parameterClass,
@@ -568,7 +574,7 @@ public final class JAXRSUtils {
                                   : defaultValue;
     }
     
-    public static Object createContextValue(Message m, Type genericType, Class<?> clazz) {
+    public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
  
         Object o = null;
         if (UriInfo.class.isAssignableFrom(clazz)) {
@@ -580,14 +586,15 @@ public final class JAXRSUtils {
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
             o = new SecurityContextImpl(m);
         } else if (Providers.class.isAssignableFrom(clazz)) {
-            o = new MessageBodyWorkersImpl(m);
+            o = new ProvidersImpl(m);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
             o = createContextResolver(genericType, m);
         } else if (MessageContext.class.isAssignableFrom(clazz)) {
             o = new MessageContextImpl(m);
         }
         
-        return o == null ? createServletResourceValue(m, clazz) : o;
+        o = o == null ? createServletResourceValue(m, clazz) : o;
+        return clazz.cast(o);
     }
     
     @SuppressWarnings("unchecked")
@@ -611,19 +618,23 @@ public final class JAXRSUtils {
         return createContextValue(m, genericType, clazz);
     }
     
-    private static Object createServletResourceValue(Message m, Class<?> clazz) {
+    public static <T> T createServletResourceValue(Message m, Class<T> clazz) {
         
+        Object value = null; 
         if (HttpServletRequest.class.isAssignableFrom(clazz)) {
-            return (HttpServletRequest) m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            value = m.get(AbstractHTTPDestination.HTTP_REQUEST);
         }
         if (HttpServletResponse.class.isAssignableFrom(clazz)) {
-            return (HttpServletResponse) m.get(AbstractHTTPDestination.HTTP_RESPONSE);
+            value = m.get(AbstractHTTPDestination.HTTP_RESPONSE);
         }
         if (ServletContext.class.isAssignableFrom(clazz)) {
-            return (ServletContext) m.get(AbstractHTTPDestination.HTTP_CONTEXT);
+            value = m.get(AbstractHTTPDestination.HTTP_CONTEXT);
+        }
+        if (ServletConfig.class.isAssignableFrom(clazz)) {
+            value = m.get(AbstractHTTPDestination.HTTP_CONFIG);
         }
         
-        return null;
+        return clazz.cast(value);
     }
 
     private static Object readFromUriParam(Message m,

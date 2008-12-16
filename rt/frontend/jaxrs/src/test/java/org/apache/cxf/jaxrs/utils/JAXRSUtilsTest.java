@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,9 +48,9 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.impl.MessageBodyWorkersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
+import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -733,7 +734,7 @@ public class JAXRSUtilsTest extends Assert {
         assertSame(HttpHeadersImpl.class, params.get(1).getClass());
         assertSame(RequestImpl.class, params.get(2).getClass());
         assertSame(SecurityContextImpl.class, params.get(3).getClass());
-        assertSame(MessageBodyWorkersImpl.class, params.get(4).getClass());
+        assertSame(ProvidersImpl.class, params.get(4).getClass());
         assertSame(String.class, params.get(5).getClass());
         assertEquals("Wrong header param", "bar", params.get(5));
         List<String> values = (List<String>)params.get(6);
@@ -772,27 +773,33 @@ public class JAXRSUtilsTest extends Assert {
                 Customer.class.getMethod("testServletParams", 
                                          new Class[]{HttpServletRequest.class, 
                                                      HttpServletResponse.class, 
-                                                     ServletContext.class}), 
+                                                     ServletContext.class,
+                                                     ServletConfig.class}), 
                 cri);
         ori.setHttpMethod("GET");
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
         HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
         ServletContext context = EasyMock.createMock(ServletContext.class);
+        ServletConfig config = EasyMock.createMock(ServletConfig.class);        
+        
         EasyMock.replay(request);
         EasyMock.replay(response);
         EasyMock.replay(context);
+        EasyMock.replay(config);
         
         Message m = new MessageImpl();
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, context);
+        m.put(AbstractHTTPDestination.HTTP_CONFIG, config);
         
         List<Object> params = 
             JAXRSUtils.processParameters(ori, new MetadataMap<String, String>(), m);
-        assertEquals("3 parameters expected", 3, params.size());
+        assertEquals("4 parameters expected", 4, params.size());
         assertSame(request.getClass(), params.get(0).getClass());
         assertSame(response.getClass(), params.get(1).getClass());
         assertSame(context.getClass(), params.get(2).getClass());
+        assertSame(config.getClass(), params.get(3).getClass());
         
     }
     
@@ -813,7 +820,7 @@ public class JAXRSUtilsTest extends Assert {
         assertSame(HttpHeadersImpl.class, c.getHeaders().getClass());
         assertSame(RequestImpl.class, c.getRequest().getClass());
         assertSame(SecurityContextImpl.class, c.getSecurityContext().getClass());
-        assertSame(MessageBodyWorkersImpl.class, c.getBodyWorkers().getClass());
+        assertSame(ProvidersImpl.class, c.getBodyWorkers().getClass());
         
     }
     
@@ -845,9 +852,9 @@ public class JAXRSUtilsTest extends Assert {
                    ((ThreadLocalProxy)c.getRequest()).get().getClass());
         assertSame(SecurityContextImpl.class, 
                    ((ThreadLocalProxy)c.getSecurityContext()).get().getClass());
-        assertSame(MessageBodyWorkersImpl.class, 
+        assertSame(ProvidersImpl.class, 
                    ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
-        assertSame(MessageBodyWorkersImpl.class, 
+        assertSame(ProvidersImpl.class, 
                    ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
   
         assertSame(servletContextMock, 

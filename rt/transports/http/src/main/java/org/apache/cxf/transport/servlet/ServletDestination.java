@@ -22,10 +22,10 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
@@ -73,13 +73,20 @@ public class ServletDestination extends AbstractHTTPDestination {
         return LOG;
     }
 
-    
     public void invoke(final ServletContext context, 
-                         final HttpServletRequest req, 
-                         final HttpServletResponse resp) throws IOException {
+                       final HttpServletRequest req, 
+                       final HttpServletResponse resp) throws IOException {
+        invoke(null, context, req, resp);
+    }
+    
+    public void invoke(final ServletConfig config,
+                       final ServletContext context, 
+                       final HttpServletRequest req, 
+                       final HttpServletResponse resp) throws IOException {
         
         MessageImpl inMessage = new MessageImpl();
         setupMessage(inMessage,
+                     config,
                      context,
                      req,
                      resp);

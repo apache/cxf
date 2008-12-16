@@ -29,7 +29,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
-public class ThreadLocalMessageBodyWorkers extends AbstractThreadLocalProxy<Providers>
+public class ThreadLocalProviders extends AbstractThreadLocalProxy<Providers>
        implements Providers {
 
     public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, 

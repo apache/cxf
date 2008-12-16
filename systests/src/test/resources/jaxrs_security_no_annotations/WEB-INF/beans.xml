@@ -54,7 +54,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:server>
 
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-  <aop:config proxy-target-class="true"/>
   
   <security:global-method-security>
       <security:protect-pointcut 

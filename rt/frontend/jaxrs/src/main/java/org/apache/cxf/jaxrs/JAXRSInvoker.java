@@ -111,7 +111,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             String baseAddress = (String)exchange.getInMessage().get(Message.BASE_PATH);
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), baseAddress);
             if (excResponse == null) {
-                ProviderFactory.getInstance(baseAddress).cleatThreadLocalProxies();
+                ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();
                 ClassResourceInfo criRoot =
                     (ClassResourceInfo)exchange.get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
                 if (criRoot != null) {
