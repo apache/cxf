@@ -52,6 +52,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -81,6 +82,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         super(binding, saaj, secHeader, aim, message);
         this.sbinding = binding;
         tokenStore = getTokenStore();
+        protectionOrder = binding.getProtectionOrder();
     }
     
     private TokenWrapper getSignatureToken() {
@@ -402,7 +404,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (encrToken.isDerivedKeys()) {
                 try {
                     WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
-                    
+                    if (recToken.getToken().getSPConstants() == SP12Constants.INSTANCE) {
+                        dkEncr.setWscVersion(ConversationConstants.VERSION_05_12);
+                    }
+
                     if (attached && encrTok.getAttachedReference() != null) {
                         dkEncr.setExternalKey(encrTok.getSecret(),
                                               (Element)saaj.getSOAPPart()
@@ -499,6 +504,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                SecurityToken tok) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign();
+        if (policyTokenWrapper.getToken().getSPConstants() == SP12Constants.INSTANCE) {
+            dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        }
         
         //Check for whether the token is attached in the message or not
         boolean attached = false;

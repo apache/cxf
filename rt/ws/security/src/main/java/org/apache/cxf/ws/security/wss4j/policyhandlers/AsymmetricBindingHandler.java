@@ -70,6 +70,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                     SoapMessage message) {
         super(binding, saaj, secHeader, aim, message);
         this.abinding = binding;
+        protectionOrder = binding.getProtectionOrder();
     }
     
     public void handleBinding() {

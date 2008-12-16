@@ -119,6 +119,8 @@ import org.apache.ws.security.util.WSSecurityUtil;
 public abstract class AbstractBindingBuilder {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBindingBuilder.class); 
     
+    protected SPConstants.ProtectionOrder protectionOrder = SPConstants.ProtectionOrder.SignBeforeEncrypting;
+    
     protected SOAPMessage saaj;
     protected WSSecHeader secHeader;
     protected AssertionInfoMap aim;
@@ -1097,7 +1099,11 @@ public abstract class AbstractBindingBuilder {
                 }
                 
                 try {
-                    doSymmSignature(ent.getKey(), token, sigParts, isTokenProtection);
+                    if (ent.getKey().isDerivedKeys()) {
+                        doSymmSignatureDerived(ent.getKey(), token, sigParts, isTokenProtection);
+                    } else {
+                        doSymmSignature(ent.getKey(), token, sigParts, isTokenProtection);
+                    }
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -1105,185 +1111,151 @@ public abstract class AbstractBindingBuilder {
             }
         } 
     }
-    private void doSymmSignature(Token policyToken, SecurityToken tok,
+    private void doSymmSignatureDerived(Token policyToken, SecurityToken tok,
                                  Vector<WSEncryptionPart> sigParts, boolean isTokenProtection)
         throws WSSecurityException, ConversationException {
         
         Document doc = saaj.getSOAPPart();
-        if (policyToken.isDerivedKeys()) {
-            WSSecDKSign dkSign = new WSSecDKSign();  
-            
-            //Check whether it is security policy 1.2 and use the secure conversation accordingly
-            if (SP12Constants.INSTANCE == policyToken.getSPConstants()) {
-                dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        WSSecDKSign dkSign = new WSSecDKSign();  
+        
+        //Check whether it is security policy 1.2 and use the secure conversation accordingly
+        if (SP12Constants.INSTANCE == policyToken.getSPConstants()) {
+            dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        }
+                      
+        //Check for whether the token is attached in the message or not
+        boolean attached = false;
+        
+        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == policyToken.getInclusion()
+            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == policyToken.getInclusion()
+            || (isRequestor() && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                    == policyToken.getInclusion())) {
+            attached = true;
+        }
+        
+        // Setting the AttachedReference or the UnattachedReference according to the flag
+        Element ref;
+        if (attached) {
+            ref = tok.getAttachedReference();
+        } else {
+            ref = tok.getUnattachedReference();
+        }
+        
+        if (ref != null) {
+            ref = cloneElement(ref);
+            dkSign.setExternalKey(tok.getSecret(), ref);
+        } else if (!isRequestor() && policyToken.isDerivedKeys()) { 
+            // If the Encrypted key used to create the derived key is not
+            // attached use key identifier as defined in WSS1.1 section
+            // 7.7 Encrypted Key reference
+            SecurityTokenReference tokenRef 
+                = new SecurityTokenReference(doc);
+            if (tok.getSHA1() != null) {
+                tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
             }
-                          
-            //Check for whether the token is attached in the message or not
-            boolean attached = false;
-            
-            if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == policyToken.getInclusion()
-                || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == policyToken.getInclusion()
-                || (isRequestor() && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                        == policyToken.getInclusion())) {
-                attached = true;
+            dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
+        
+        } else {
+            dkSign.setExternalKey(tok.getSecret(), tok.getId());
+        }
+
+        //Set the algo info
+        dkSign.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        dkSign.setDerivedKeyLength(binding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
+        if (tok.getSHA1() != null) {
+            //Set the value type of the reference
+            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
+                + WSConstants.ENC_KEY_VALUE_TYPE);
+        }
+        
+        dkSign.prepare(doc, secHeader);
+        
+        if (isTokenProtection) {
+            //Hack to handle reference id issues
+            //TODO Need a better fix
+            String sigTokId = tok.getId();
+            if (sigTokId.startsWith("#")) {
+                sigTokId = sigTokId.substring(1);
             }
-            
-            // Setting the AttachedReference or the UnattachedReference according to the flag
-            Element ref;
-            if (attached) {
-                ref = tok.getAttachedReference();
+            sigParts.add(new WSEncryptionPart(sigTokId));
+        }
+        
+        dkSign.setParts(sigParts);
+        
+        dkSign.addReferencesToSign(sigParts, secHeader);
+        
+        //Do signature
+        dkSign.computeSignature();
+
+        //Add elements to header
+        addSupportingElement(dkSign.getdktElement());
+        secHeader.getSecurityHeader().appendChild(dkSign.getSignatureElement());
+        
+        signatures.add(dkSign.getSignatureValue());
+    }
+    private void doSymmSignature(Token policyToken, SecurityToken tok,
+                                         Vector<WSEncryptionPart> sigParts, boolean isTokenProtection)
+        throws WSSecurityException, ConversationException {
+        
+        Document doc = saaj.getSOAPPart();
+        WSSecSignature sig = new WSSecSignature();
+        // If a EncryptedKeyToken is used, set the correct value type to
+        // be used in the wsse:Reference in ds:KeyInfo
+        if (policyToken instanceof X509Token) {
+            if (isRequestor()) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                      + WSConstants.ENC_KEY_VALUE_TYPE);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             } else {
+                //the tok has to be an EncryptedKey token
+                sig.setEncrKeySha1value(tok.getSHA1());
+                sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+            }
+            
+        } else {
+            sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                  + WSConstants.SAML_ASSERTION_ID);
+            sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        }
+        
+        String sigTokId; 
+        
+        if (policyToken instanceof SecureConversationToken) {
+            Element ref = tok.getAttachedReference();
+            if (ref == null) {
                 ref = tok.getUnattachedReference();
             }
             
             if (ref != null) {
-                dkSign.setExternalKey(tok.getSecret(), (Element) 
-                                      cloneElement(ref));
-            } else if (!isRequestor() && policyToken.isDerivedKeys()) { 
-                // If the Encrypted key used to create the derived key is not
-                // attached use key identifier as defined in WSS1.1 section
-                // 7.7 Encrypted Key reference
-                SecurityTokenReference tokenRef 
-                    = new SecurityTokenReference(doc);
-                if (tok.getSHA1() != null) {
-                    tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
-                }
-                dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
-            
-            } else {
-                dkSign.setExternalKey(tok.getSecret(), tok.getId());
-            }
-
-            //Set the algo info
-            dkSign.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
-            dkSign.setDerivedKeyLength(binding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
-            if (tok.getSHA1() != null) {
-                //Set the value type of the reference
-                dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                    + WSConstants.ENC_KEY_VALUE_TYPE);
-            }
-            
-            dkSign.prepare(doc, secHeader);
-            
-            if (isTokenProtection) {
-
-                //Hack to handle reference id issues
-                //TODO Need a better fix
-                String sigTokId = tok.getId();
-                if (sigTokId.startsWith("#")) {
-                    sigTokId = sigTokId.substring(1);
-                }
-                sigParts.add(new WSEncryptionPart(sigTokId));
-            }
-            
-            dkSign.setParts(sigParts);
-            
-            dkSign.addReferencesToSign(sigParts, secHeader);
-            
-            //Do signature
-            dkSign.computeSignature();
-
-            //Add elements to header
-            
-            /*
-            if (rpd.getProtectionOrder().equals(SPConstants.ENCRYPT_BEFORE_SIGNING) &&
-                    this.getInsertionLocation() == null ) {
-                this.setInsertionLocation(RampartUtil
-                        
-                        .insertSiblingBefore(rmd, 
-                                this.mainRefListElement,
-                                dkSign.getdktElement()));
-
-                    this.setInsertionLocation(RampartUtil.insertSiblingAfter(
-                            rmd, 
-                            this.getInsertionLocation(), 
-                            dkSign.getSignatureElement()));                
-            } else {
-                this.setInsertionLocation(RampartUtil
-            
-                    .insertSiblingAfter(rmd, 
-                            this.getInsertionLocation(),
-                            dkSign.getdktElement()));
-
-                this.setInsertionLocation(RampartUtil.insertSiblingAfter(
-                        rmd, 
-                        this.getInsertionLocation(), 
-                        dkSign.getSignatureElement()));
-            }
-            */
-        } else {
-            WSSecSignature sig = new WSSecSignature();
-            // If a EncryptedKeyToken is used, set the correct value type to
-            // be used in the wsse:Reference in ds:KeyInfo
-            if (policyToken instanceof X509Token) {
-                if (isRequestor()) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                          + WSConstants.ENC_KEY_VALUE_TYPE);
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-                } else {
-                    //the tok has to be an EncryptedKey token
-                    sig.setEncrKeySha1value(tok.getSHA1());
-                    sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-                }
-                
-            } else {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                      + WSConstants.SAML_ASSERTION_ID);
-                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-            }
-            
-            String sigTokId; 
-            
-            if (policyToken instanceof SecureConversationToken) {
-                Element ref = tok.getAttachedReference();
-                if (ref == null) {
-                    ref = tok.getUnattachedReference();
-                }
-                
-                if (ref != null) {
-                    sigTokId = MemoryTokenStore.getIdFromSTR(ref);
-                } else {
-                    sigTokId = tok.getId();
-                }
+                sigTokId = MemoryTokenStore.getIdFromSTR(ref);
             } else {
                 sigTokId = tok.getId();
             }
-                           
-            //Hack to handle reference id issues
-            //TODO Need a better fix
-            if (sigTokId.startsWith("#")) {
-                sigTokId = sigTokId.substring(1);
-            }
-            
-            sig.setCustomTokenId(sigTokId);
-            sig.setSecretKey(tok.getSecret());
-            sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
-            sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
-            sig.prepare(doc, getSignatureCrypto(null), secHeader);
-
-            sig.setParts(sigParts);
-            sig.addReferencesToSign(sigParts, secHeader);
-
-            //Do signature
-            sig.computeSignature();
-
-            /*
-            if (rpd.getProtectionOrder().equals(SPConstants.ENCRYPT_BEFORE_SIGNING) &&
-                    this.getInsertionLocation() == null) {
-                this.setInsertionLocation(RampartUtil.insertSiblingBefore(
-                        rmd,
-                        this.mainRefListElement,
-                        sig.getSignatureElement()));                    
-            } else {
-                this.setInsertionLocation(RampartUtil.insertSiblingAfter(
-                        rmd,
-                        this.getInsertionLocation(),
-                        sig.getSignatureElement()));     
-            }
-            */
+        } else {
+            sigTokId = tok.getId();
         }
-    }
+                       
+        //Hack to handle reference id issues
+        //TODO Need a better fix
+        if (sigTokId.startsWith("#")) {
+            sigTokId = sigTokId.substring(1);
+        }
+        
+        sig.setCustomTokenId(sigTokId);
+        sig.setSecretKey(tok.getSecret());
+        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        sig.prepare(doc, getSignatureCrypto(null), secHeader);
 
+        sig.setParts(sigParts);
+        sig.addReferencesToSign(sigParts, secHeader);
+
+        //Do signature
+        sig.computeSignature();
+        signatures.add(sig.getSignatureValue());
+
+        secHeader.getSecurityHeader().appendChild(sig.getSignatureElement());
+    }
     protected void assertSupportingTokens(Vector<WSEncryptionPart> sigs) {
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS));

@@ -164,7 +164,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                                 signatureValues.add(doIssuedTokenSignature(token, null, 
                                                                            sgndSuppTokens));
                             } else if (token instanceof X509Token) {
-                                signatureValues.add(doX509TokenSignature(token, null, 
+                                signatureValues.add(doX509TokenSignature(token, 
+                                                                         sgndSuppTokens.getSignedParts(), 
                                                                          sgndSuppTokens));
                             } else if (token instanceof SecureConversationToken) {
                                 signatureValues.add(doSecureConversationSignature(token,
