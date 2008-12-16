@@ -67,7 +67,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
   	<property name="target" ref="implementor" />
   	<property name="transactionAttributes">
   	  <props>
-  	  	<prop key="greetMe">PROPAGATION_REQUIRED</prop>  	  	
+  	  	<prop key="greetMe">PROPAGATION_REQUIRED</prop>
+  	  	<!-- Commit if pingMe throw PingMeFault -->
+  	  	<prop key="pingMe">PROPAGATION_REQUIRED,+PingMeFault</prop>  	  	
   	  </props>
     </property>
   </bean>  

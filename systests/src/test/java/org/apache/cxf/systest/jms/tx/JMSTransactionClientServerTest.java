@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_doc_lit.Greeter;
+import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,6 +92,13 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             assertNotNull("No response received from service", greeting);
             exResponse = response1 + "[Bad guy]";
             assertEquals("Get unexcpeted result", exResponse, greeting);
+            
+            try {
+                greeter.pingMe();
+                fail("Should have thrown FaultException");
+            } catch (PingMeFault ex) {
+                assertNotNull(ex.getFaultInfo());
+            }  
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
