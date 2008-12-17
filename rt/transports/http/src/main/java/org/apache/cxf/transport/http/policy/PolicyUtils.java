@@ -518,6 +518,9 @@ public final class PolicyUtils {
         if (compatible) {
             compatible &= p1.isSuppressClientSendErrors() == p2.isSuppressClientSendErrors();
         }
+        if (compatible) {
+            compatible &= compatible(p1.getKeepAliveParameters(), p2.getKeepAliveParameters());
+        }
         
         return compatible;
     }
@@ -553,6 +556,12 @@ public final class PolicyUtils {
         } else if (p2.isSetHonorKeepAlive()) {
             p.setHonorKeepAlive(p2.isHonorKeepAlive());
         } 
+        if (p1.isSetKeepAliveParameters()) {
+            p.setKeepAliveParameters(p1.getKeepAliveParameters());
+        } else if (p2.isSetKeepAliveParameters()) {
+            p.setKeepAliveParameters(p2.getKeepAliveParameters());
+        } 
+        
         if (p1.isSetReceiveTimeout() || p2.isSetReceiveTimeout()) {
             p.setReceiveTimeout(Math.min(p1.getReceiveTimeout(), p2.getReceiveTimeout()));
         }
@@ -591,7 +600,8 @@ public final class PolicyUtils {
                 : p1.getCacheControl().value().equals(p2.getCacheControl().value()))
             && equals(p1.getContentEncoding(), p2.getContentEncoding())
             && equals(p1.getContentLocation(), p2.getContentLocation())
-            && equals(p1.getContentType(), p2.getContentType());
+            && equals(p1.getContentType(), p2.getContentType())
+            && equals(p1.getKeepAliveParameters(), p2.getKeepAliveParameters());
         if (!result) {
             return false;
         }
