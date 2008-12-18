@@ -173,6 +173,7 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
             ComplexException.MyBean bean = new ComplexException.MyBean();
             bean.setName("Marco");
             ex.setBeans(new ComplexException.MyBean[] {bean});
+            ex.setInts(new int[] {1, 2, 3});
             throw ex;
         }
         default:

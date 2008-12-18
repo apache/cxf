@@ -130,24 +130,10 @@ public final class JAXBEncoderDecoder {
                     } else if (part.getMessageInfo().getOperation().isUnwrapped()
                                && (mObj.getClass().isArray() || mObj instanceof List)
                                && el.getMaxOccurs() != 1) {
-                        // Have to handle this ourselves.... which really
-                        // sucks.... but what can we do?
-                        Object objArray;
-                        if (mObj instanceof List) {
-                            List l = (List)mObj;
-                            objArray = l.toArray(new Object[l.size()]);
-                            cls = null;
-                        } else {
-                            objArray = mObj;
-                            cls = objArray.getClass().getComponentType();
-                        }
-                        int len = Array.getLength(objArray);
-                        for (int x = 0; x < len; x++) {
-                            Object o = Array.get(objArray, x);
-                            writeObject(marshaller, source, 
-                                        new JAXBElement(elName, cls == null ? o.getClass() : cls,
-                                                                   o));
-                        }
+                        writeArrayObject(marshaller, 
+                                         source,
+                                         elName,
+                                         mObj);
                     } else {
                         writeObject(marshaller, source, new JAXBElement(elName, cls, mObj));
                     }
@@ -275,7 +261,12 @@ public final class JAXBEncoderDecoder {
                 if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                     QName fname = new QName(namespace, f.getName());
                     f.setAccessible(true);
-                    writeObject(marshaller, writer, new JAXBElement(fname, String.class, f.get(elValue)));
+                    if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
+                        writeArrayObject(marshaller, writer, fname, f.get(elValue));                        
+                    } else {
+                        writeObject(marshaller, writer, new JAXBElement(fname, String.class, 
+                                                                        f.get(elValue)));
+                    }
                 }
             }
             for (Method m : cls.getMethods()) {
@@ -284,7 +275,12 @@ public final class JAXBEncoderDecoder {
                     String name = m.getName().substring(idx);
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
                     QName mname = new QName(namespace, name);
-                    writeObject(marshaller, writer, new JAXBElement(mname, String.class, m.invoke(elValue)));
+                    if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
+                        writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
+                    } else {
+                        writeObject(marshaller, writer, new JAXBElement(mname, String.class, 
+                                                                        m.invoke(elValue)));
+                    }
                 }
             }
 
@@ -293,6 +289,31 @@ public final class JAXBEncoderDecoder {
         } catch (Exception e) {
             throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void writeArrayObject(Marshaller marshaller, 
+                                         Object source,
+                                         QName mname,
+                                         Object mObj) throws Fault, JAXBException {
+        // Have to handle this ourselves.... which really
+        // sucks.... but what can we do?
+        Object objArray;
+        Class cls = null;
+        if (mObj instanceof List) {
+            List<?> l = (List)mObj;
+            objArray = l.toArray(new Object[l.size()]);
+            cls = null;
+        } else {
+            objArray = mObj;
+            cls = objArray.getClass().getComponentType();
+        }
+        int len = Array.getLength(objArray);
+        for (int x = 0; x < len; x++) {
+            Object o = Array.get(objArray, x);
+            writeObject(marshaller, source, 
+                        new JAXBElement(mname, cls == null ? o.getClass() : cls, o));
+        }        
     }
 
     public static Exception unmarshallException(Unmarshaller u, 
@@ -339,9 +360,32 @@ public final class JAXBEncoderDecoder {
                 QName q = reader.getName();
                 try {
                     Field f = cls.getField(q.getLocalPart());
+                    Type type = f.getGenericType();
                     if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                         f.setAccessible(true);
-                        f.set(obj, u.unmarshal(reader, f.getType()));
+                        if (JAXBSchemaInitializer.isArray(type)) {
+                            Class<?> compType = JAXBSchemaInitializer
+                                .getArrayComponentType(type);
+                            List<Object> ret = unmarshallArray(u, reader,
+                                                               q,
+                                                               compType,
+                                                               createList(type));
+                            Object o = ret;
+                            if (!isList(type)) {
+                                if (compType.isPrimitive()) {
+                                    o = java.lang.reflect.Array.newInstance(compType, ret.size());
+                                    for (int x = 0; x < ret.size(); x++) {
+                                        Array.set(o, x, ret.get(x));
+                                    }
+                                } else {
+                                    o = ret.toArray((Object[])Array.newInstance(compType, ret.size()));
+                                }
+                            }
+
+                            f.set(obj, o);
+                        } else {
+                            f.set(obj, u.unmarshal(reader, f.getType()));
+                        }
                     }
                 } catch (NoSuchFieldException ex) {
                     String s = Character.toUpperCase(q.getLocalPart().charAt(0))
@@ -352,9 +396,32 @@ public final class JAXBEncoderDecoder {
                     } catch (NoSuchMethodException mex) {
                         m = cls.getMethod("is" + s);
                     }
+                    Type type = m.getGenericReturnType();
                     Method m2 = cls.getMethod("set" + s, m.getReturnType());
-                    Object o = getElementValue(u.unmarshal(reader, m.getReturnType()));
-                    m2.invoke(obj, o);
+                    if (JAXBSchemaInitializer.isArray(type)) {
+                        Class<?> compType = JAXBSchemaInitializer
+                            .getArrayComponentType(type);
+                        List<Object> ret = unmarshallArray(u, reader,
+                                                           q,
+                                                           compType,
+                                                           createList(type));
+                        Object o = ret;
+                        if (!isList(type)) {
+                            if (compType.isPrimitive()) {
+                                o = java.lang.reflect.Array.newInstance(compType, ret.size());
+                                for (int x = 0; x < ret.size(); x++) {
+                                    Array.set(o, x, ret.get(x));
+                                }
+                            } else {
+                                o = ret.toArray((Object[])Array.newInstance(compType, ret.size()));
+                            }
+                        }
+
+                        m2.invoke(obj, o);
+                    } else {
+                        Object o = getElementValue(u.unmarshal(reader, m.getReturnType()));
+                        m2.invoke(obj, o);
+                    }
                 }
             }
             return (Exception)obj;
@@ -464,6 +531,9 @@ public final class JAXBEncoderDecoder {
 
     private static List<Object> createList(MessagePartInfo part) {
         Type genericType = (Type)part.getProperty("generic.type");
+        return createList(genericType); 
+    }
+    private static List<Object> createList(Type genericType) {
         if (genericType instanceof ParameterizedType) {
             Type tp2 = ((ParameterizedType)genericType).getRawType();
             if (tp2 instanceof Class) {
@@ -477,10 +547,15 @@ public final class JAXBEncoderDecoder {
                 }
             }
         }
-
         return new ArrayList<Object>();
     }
 
+    private static boolean isList(Type cls) {
+        if (cls instanceof ParameterizedType) {
+            return true;
+        }
+        return false;
+    }
     private static boolean isList(MessagePartInfo part) {
         if (part.getTypeClass().isArray() && !part.getTypeClass().getComponentType().isPrimitive()) {
             // && Collection.class.isAssignableFrom(part.getTypeClass())) {

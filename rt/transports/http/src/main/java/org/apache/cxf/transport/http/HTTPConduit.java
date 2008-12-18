@@ -1673,9 +1673,14 @@ public class HTTPConduit
     private String extractLocation(
             Map<String, List<String>> headers
     ) {
-        List<String> locs = headers.get("Location");
-        if (locs != null && locs.size() > 0) {
-            return locs.get(0);
+        
+        for (Map.Entry<String, List<String>> head : headers.entrySet()) {
+            if ("Location".equalsIgnoreCase(head.getKey())) {
+                List<String> locs = head.getValue();
+                if (locs != null && locs.size() > 0) {
+                    return locs.get(0);
+                }                
+            }
         }
         return null;
     }

@@ -27,6 +27,7 @@ public class ComplexException extends org.omg.CORBA.UserException {
 
     private String reason;
     private MyBean[] beans;
+    private int[] ints;
     
     public ComplexException(String msg) {
         super(msg);
@@ -46,6 +47,13 @@ public class ComplexException extends org.omg.CORBA.UserException {
 
     public void setBeans(MyBean[] beans) {
         this.beans = beans;
+    }
+    public int[] getInts() {
+        return ints;
+    }
+
+    public void setInts(int[] ints) {
+        this.ints = ints;
     }
     
     

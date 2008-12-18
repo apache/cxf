@@ -390,6 +390,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             fail("Expected exception not found");
         } catch (ComplexException ex) {
             assertEquals("Throw user fault -3", ex.getMessage());
+            assertEquals(3, ex.getInts().length);
         }          
         try {
             port.throwException(-3);
