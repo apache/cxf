@@ -29,15 +29,22 @@ http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/jaxrs
 http://cxf.apache.org/schemas/jaxrs.xsd">
 
-   <jaxws:endpoint xmlns:s="http://books.com"
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+
+  <jaxws:endpoint xmlns:s="http://books.com"
       serviceName="s:BookService"
       endpointName="s:BookPort"
       id="soapservice"
       implementor="#bookstore"
-      address="http://localhost:9092/soap/bookservice" />
-  
+      address="/soap/bookservice" />
+
   <jaxrs:server id="restservice"
-		        address="http://localhost:9092/rest">
+		        address="/rest">
     <jaxrs:serviceBeans>
       <ref bean="bookstore"/>
     </jaxrs:serviceBeans>		   

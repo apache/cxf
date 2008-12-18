@@ -50,7 +50,7 @@ public class BookServerResourceCreatedSpringProviders extends AbstractBusTestSer
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
-        webappcontext.setContextPath("/");
+        webappcontext.setContextPath("/webapp");
 
         webappcontext.setWar(contextPath);
 

@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -108,7 +109,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         try {
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
-            String baseAddress = (String)exchange.getInMessage().get(Message.BASE_PATH);
+            String baseAddress = HttpUtils.getOriginalAddress(exchange.getInMessage());
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), baseAddress);
             if (excResponse == null) {
                 ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();

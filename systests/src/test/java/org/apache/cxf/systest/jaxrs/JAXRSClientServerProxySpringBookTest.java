@@ -40,7 +40,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     @Test
     public void testGetThatBook123() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:9080/test/bookstorestorage/thosebooks/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -56,7 +56,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     @Test
     public void testGetThatBookOverloaded() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:9080/test/bookstorestorage/thosebooks/123/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -72,7 +72,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     @Test
     public void testGetThatBookOverloaded2() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks"; 
+            "http://localhost:9080/test/bookstorestorage/thosebooks"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -88,7 +88,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/123"; 
+            "http://localhost:9080/test/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");

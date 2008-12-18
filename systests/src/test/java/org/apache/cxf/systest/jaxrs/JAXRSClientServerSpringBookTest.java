@@ -45,7 +45,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetBookByUriInfo() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/thebooks/bookstore/bookinfo?"
+            "http://localhost:9080/the/thebooks/bookstore/bookinfo?"
                                + "param1=12&param2=3"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
@@ -53,7 +53,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/123"; 
+            "http://localhost:9080/the/bookstore/books/123"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
         getBook(endpointAddress, "resources/expected_get_book123json.txt",
                 "application/jettison");
@@ -61,7 +61,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     @Test
     public void testGetBookAsArray() throws Exception {
-        URL url = new URL("http://localhost:9080/bookstore/books/list/123");
+        URL url = new URL("http://localhost:9080/the/bookstore/books/list/123");
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
         InputStream in = connect.getInputStream();           
@@ -74,21 +74,21 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetBookWithEncodedQueryValue() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore/booksquery?id=12%2B3"; 
+            "http://localhost:9080/the/bookstore/booksquery?id=12%2B3"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
     
     @Test
     public void testGetBookWithEncodedPathValue() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore/id=12%2B3"; 
+            "http://localhost:9080/the/bookstore/id=12%2B3"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
     
     @Test
     public void testGetDefaultBook() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore"; 
+            "http://localhost:9080/the/bookstore"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
 
@@ -109,13 +109,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testAddInvalidXmlBook() throws Exception {
         
-        doPost("http://localhost:9080/bookstore/books/convert",
+        doPost("http://localhost:9080/the/bookstore/books/convert",
                500,
                "application/xml",
                "resources/add_book.txt",
                null);
         
-        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+        doPost("http://localhost:9080/the/thebooks/bookstore/books/convert",
                500,
                "application/xml",
                "resources/add_book.txt",
@@ -126,13 +126,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testAddInvalidJsonBook() throws Exception {
         
-        doPost("http://localhost:9080/bookstore/books/convert",
+        doPost("http://localhost:9080/the/bookstore/books/convert",
                500,
                "application/json",
                "resources/add_book2json_invalid.txt",
                null);
         
-        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+        doPost("http://localhost:9080/the/thebooks/bookstore/books/convert",
                500,
                "application/json",
                "resources/add_book2json_invalid.txt",
@@ -143,13 +143,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testAddValidXmlBook() throws Exception {
         
-        doPost("http://localhost:9080/bookstore/books/convert",
+        doPost("http://localhost:9080/the/bookstore/books/convert",
                200,
                "application/xml",
                "resources/add_book2.txt",
                "resources/expected_get_book123.txt");
         
-        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+        doPost("http://localhost:9080/the/thebooks/bookstore/books/convert",
                200,
                "application/xml",
                "resources/add_book2.txt",
@@ -159,19 +159,19 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     @Test
     public void testAddValidBookJson() throws Exception {
-        doPost("http://localhost:9080/bookstore/books/convert",
+        doPost("http://localhost:9080/the/bookstore/books/convert",
                200,
                "application/json",
                "resources/add_book2json.txt",
                "resources/expected_get_book123.txt");
         
-        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+        doPost("http://localhost:9080/the/thebooks/bookstore/books/convert",
                200,
                "application/json",
                "resources/add_book2json.txt",
                "resources/expected_get_book123.txt");
         
-        doPost("http://localhost:9080/thebooks/bookstore/books/convert",
+        doPost("http://localhost:9080/the/thebooks/bookstore/books/convert",
                200,
                "application/jettison",
                "resources/add_book2json.txt",

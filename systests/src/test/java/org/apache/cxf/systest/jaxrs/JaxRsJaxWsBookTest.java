@@ -47,7 +47,7 @@ public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBook123() throws Exception {
         
-        InputStream in = getRestInputStream("http://localhost:9092/rest/bookstore/123");
+        InputStream in = getRestInputStream("http://localhost:9092/test/services/rest/bookstore/123");
         
         InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
@@ -58,7 +58,7 @@ public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
     public void testAddGetBookRest() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9092/rest/bookstore/books";
+            "http://localhost:9092/test/services/rest/bookstore/books";
         
         File input = new File(getClass().getResource("resources/add_book.txt").toURI());         
         PostMethod post = new PostMethod(endpointAddress);
@@ -84,7 +84,7 @@ public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookSoap() throws Exception {
         String wsdlAddress =
-            "http://localhost:9092/soap/bookservice?wsdl"; 
+            "http://localhost:9092/test/services/soap/bookservice?wsdl"; 
         URL wsdlUrl = new URL(wsdlAddress);
         BookSoapService service = 
             new BookSoapService(wsdlUrl,
