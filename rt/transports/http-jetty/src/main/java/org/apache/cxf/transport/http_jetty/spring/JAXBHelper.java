@@ -27,10 +27,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 public final class JAXBHelper {
@@ -44,7 +42,6 @@ public final class JAXBHelper {
                                            QName name, 
                                            Class<?> c) throws JAXBException {                                
         List<V> list = new ArrayList<V>();
-        NodeList nl = parent.getChildNodes();
         Node data = null;
            
         JAXBContext context = null;
@@ -55,18 +52,18 @@ public final class JAXBHelper {
         } else {
             context = JAXBContext.newInstance(pkg);
         }
-           
-           
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node n = nl.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(n.getLocalName())
-                && name.getNamespaceURI().equals(n.getNamespaceURI())) {
-                data = n;
+          
+        Node node = parent.getFirstChild();           
+        while (node != null) {
+            if (node.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(node.getLocalName())
+                && name.getNamespaceURI().equals(node.getNamespaceURI())) {
+                data = node;
                 Object obj = unmarshal(context, data, c);                
                 if (obj != null) {                    
                     list.add((V) obj);
                 }
             }
+            node = node.getNextSibling();
         }
         return list;
     }

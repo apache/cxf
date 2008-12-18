@@ -41,6 +41,7 @@ import javax.xml.validation.Schema;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -48,6 +49,7 @@ import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
@@ -426,18 +428,15 @@ public class WSDLServiceBuilderTest extends Assert {
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = db.parse(this.getClass().getResourceAsStream("./s1/s2/schema2.xsd"));
         Element schemaImport = null;
-        for (int i = 0; i < doc.getChildNodes().getLength(); i++) {
-            if (doc.getChildNodes().item(i) instanceof Element) {
-                Element schema = (Element) doc.getChildNodes().item(i);
-                for (int j = 0; j < schema.getChildNodes().getLength(); j++) {
-                    if (schema.getChildNodes().item(j) instanceof Element) {
-                        schemaImport = (Element) schema.getChildNodes().item(j);
-                        break;
-                    }
-                }
-                break;
+        
+        Node node = doc.getFirstChild();
+        while (node != null) {
+            if (node instanceof Element) {
+                schemaImport  = DOMUtils.getFirstElement(node);                
             }
+            node = node.getNextSibling();
         }
+        
         if (schemaImport == null) {
             fail("Can't find import element");
         }

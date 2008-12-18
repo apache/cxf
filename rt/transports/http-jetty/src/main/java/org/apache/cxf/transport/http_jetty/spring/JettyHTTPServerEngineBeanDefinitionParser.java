@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.transport.http_jetty.spring;
 
+
+
 import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -34,6 +33,7 @@ import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
@@ -47,6 +47,10 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+
+
+
 
 public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -65,7 +69,64 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         MutablePropertyValues engineFactoryProperties = ctx.getContainingBeanDefinition().getPropertyValues();
         PropertyValue busValue = engineFactoryProperties.getPropertyValue("bus");
               
-        // get the property value from paranets
+        // get the property value from parents
+        
+        try {
+            Element elem = DOMUtils.getFirstElement(element);
+            while (elem != null) {
+                String name = elem.getLocalName();
+                if ("tlsServerParameters".equals(name)) {
+                    
+                    TLSServerParametersType parametersType = 
+                        JAXBHelper.parseElement(elem, bean, TLSServerParametersType.class);
+                    
+                    TLSServerParametersConfig param = 
+                        new TLSServerParametersConfig(parametersType);
+                    
+                    bean.addPropertyValue("tlsServerParameters", param);
+                    
+                } else if ("tlsServerParametersRef".equals(name)) {
+                    
+                    TLSServerParametersIdentifiedType parameterTypeRef = 
+                        JAXBHelper.parseElement(elem, bean, 
+                                                TLSServerParametersIdentifiedType.class);
+                    
+                    TLSServerParameters param = 
+                        getTlsServerParameters(engineFactoryProperties, parameterTypeRef.getId()); 
+                    bean.addPropertyValue("tlsServerParameters", param);
+                    
+                } else if ("threadingParameters".equals(name)) {
+                    ThreadingParametersType parametersType = 
+                        JAXBHelper.parseElement(elem, bean, ThreadingParametersType.class);
+                    
+                    ThreadingParameters param = toThreadingParameters(parametersType);
+                    bean.addPropertyValue("threadingParameters", param);  
+                    
+                } else if ("threadingParametersRef".equals(name)) {
+                    ThreadingParametersIdentifiedType parametersTypeRef =
+                        JAXBHelper.parseElement(elem, bean, 
+                                                ThreadingParametersIdentifiedType.class);
+                    ThreadingParameters param = 
+                        getThreadingParameters(engineFactoryProperties, parametersTypeRef.getId());
+                    bean.addPropertyValue("threadingParameters", param);
+                    
+                } else if ("connector".equals(name)) { 
+                    // only deal with the one connector here
+                    List list = 
+                        ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
+                    bean.addPropertyValue("connector", list.get(0));
+                } else if ("handlers".equals(name)) {
+                    List handlers = 
+                        ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
+                    bean.addPropertyValue("handlers", handlers);
+                } else if ("sessionSupport".equals(name) || "reuseAddress".equals(name)) {
+                    String text = elem.getTextContent();                        
+                    bean.addPropertyValue(name, Boolean.valueOf(text));
+                }                         
+
+                elem = org.apache.cxf.helpers.DOMUtils.getNextElement(elem);          
+            }
+        /*
         try {
             
             NodeList children = element.getChildNodes();
@@ -123,6 +184,7 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
                     }                         
                 }
             }
+            */
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
         }
