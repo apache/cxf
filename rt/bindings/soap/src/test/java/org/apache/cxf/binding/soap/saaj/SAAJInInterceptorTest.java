@@ -90,13 +90,7 @@ public class SAAJInInterceptorTest extends TestBase {
                 headerChilds.add((Element) hdr.getObject());
             }
         }
-//        for (int i = 0; i < eleHeaders.getChildNodes().getLength(); i++) {
-//            if (eleHeaders.getChildNodes().item(i) instanceof Element) {
-//                Element element = (Element)eleHeaders.getChildNodes().item(i);
-//                headerChilds.add(element);
-//            }
-//        }
-
+        
         assertEquals(2, headerChilds.size());
     }
 
