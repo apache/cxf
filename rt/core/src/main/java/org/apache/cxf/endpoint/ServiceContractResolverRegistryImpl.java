@@ -28,6 +28,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 
+/**
+ * A simple contract resolver registry. It maintains a list of contract resolvers in an
+ * <code>ArrayList</code>.
+ */
 public class ServiceContractResolverRegistryImpl implements ServiceContractResolverRegistry {
 
     private Bus bus;
@@ -44,6 +48,14 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
         }
     }
 
+    /**
+     * Calls each of the registered <code>ServiceContractResolver</code> instances
+     * to resolve the location of the service's contract. It returns the location 
+     * from the first resolver that matches the QName to a location.
+     *
+     * @param qname QName to be resolved into a contract location
+     * @return URI representing the location of the contract
+    */
     public URI getContractLocation(QName qname) {
         for (ServiceContractResolver resolver : resolvers) {
             URI contractLocation = resolver.getContractLocation(qname);
@@ -54,18 +66,39 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
         return null;
     }
 
+    /**
+     * Tests if a resolver is alreadey registered with this registry.
+     *
+     * @param resolver the contract resolver for which to searche
+     * @return <code>true</code> if the resolver is registered
+     */
     public boolean isRegistered(ServiceContractResolver resolver) {
         return resolvers.contains(resolver);
     }
 
+    /**
+     * Registers a contract resolver with this registry.
+     *
+     * @param resolver the contract resolver to register
+     */
     public synchronized void register(ServiceContractResolver resolver) {
         resolvers.add(resolver);        
     }
 
+    /**
+     * Removes a contract resolver from this registry.
+     *
+     * @param resolver the contract resolver to remove
+     */
     public synchronized void unregister(ServiceContractResolver resolver) {
         resolvers.remove(resolver);        
     }
 
+    /**
+     * Sets the bus with which the registry is associated.
+     *
+     * @param bus
+     */
     public void setBus(Bus bus) {
         this.bus = bus;
     }

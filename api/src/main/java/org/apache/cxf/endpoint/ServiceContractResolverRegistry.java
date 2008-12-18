@@ -23,10 +23,43 @@ import java.net.URI;
 
 import javax.xml.namespace.QName;
 
+/**
+ * A registry for maintaining a collection of contract resolvers.
+ */
 public interface ServiceContractResolverRegistry {
+
+    /**
+     * Resolves a QName to a URI respresenting the location of a WSDL contract.
+     * The registry method is called by the bus and should use the 
+     * <code>getContractLocation</code> methods of the registered contract 
+     * resolvers to do the actual resolution.
+     *
+     * @param qname the qname to resolve into a URI
+     * @return URI representing the WSDL contract's location
+     */
     URI getContractLocation(QName qname);
+
+    /**
+     * Registers a contract resolver.
+     *
+     * @param resolver the contract resolver being registered
+     */
     void register(ServiceContractResolver resolver);
+
+    /**
+     * Removes a contract resolver from the registry.
+     *
+     * @param resolver the contract resolver being removed
+     */
     void unregister(ServiceContractResolver resolver);
+
+    /**
+     * Determines if a contract resolver is already registered with a
+     * registry.
+     *
+     * @param resolver the contract resolver for which to search
+     * @return <code>true</code> if the contract resolver is already registered
+     */
     boolean isRegistered(ServiceContractResolver resolver);
 
 }
