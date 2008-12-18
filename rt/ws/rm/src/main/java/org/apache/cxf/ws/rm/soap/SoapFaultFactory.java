@@ -114,7 +114,8 @@ public class SoapFaultFactory implements BindingFaultFactory {
             Identifier id = (Identifier)detail;  
             m.marshal(id, doc);            
         }
-        elem = (Element)doc.getChildNodes().item(0);
+        
+        elem =  (Element)doc.getFirstChild();
         fault.setDetail(elem);
     }
     

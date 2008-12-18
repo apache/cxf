@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -55,12 +56,13 @@ public class Form implements TokenConsumer {
     }
 
     private void getOptions(Element el) {
-        NodeList children = el.getChildNodes();
-
-        for (int i = 0; i < children.getLength(); i++) {
-            if ("option".equals(children.item(i).getNodeName())) {
-                options.add(new Option((Element)children.item(i)));
+        
+        Node node = el.getFirstChild();
+        while (node != null) {
+            if ("option".equals(node.getNodeName())) {
+                options.add(new Option((Element)node));
             }
+            node = node.getNextSibling();
         }
     }
 
