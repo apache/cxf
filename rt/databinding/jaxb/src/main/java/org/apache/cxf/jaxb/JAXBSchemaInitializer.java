@@ -20,7 +20,9 @@
 package org.apache.cxf.jaxb;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -74,6 +76,45 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         this.qualifiedSchemas = q;
     }
 
+    static Class<?> getArrayComponentType(Type cls) {
+        if (cls instanceof Class) {
+            if (((Class)cls).isArray()) {
+                return ((Class)cls).getComponentType();
+            } else {
+                return (Class)cls;
+            }
+        } else if (cls instanceof ParameterizedType) {
+            for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
+                return getArrayComponentType(t2);
+            }
+        } else if (cls instanceof GenericArrayType) {
+            GenericArrayType gt = (GenericArrayType)cls;
+            Class ct = (Class) gt.getGenericComponentType();
+            return Array.newInstance(ct, 0).getClass();
+        }
+        return null;
+    }
+    public JAXBBeanInfo getBeanInfo(Type cls) {
+        if (cls instanceof Class) {
+            if (((Class)cls).isArray()) {
+                return getBeanInfo(((Class)cls).getComponentType());
+            } else {
+                return getBeanInfo((Class)cls);
+            }
+        } else if (cls instanceof ParameterizedType) {
+            for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
+                return getBeanInfo(t2);
+            }
+        } else if (cls instanceof GenericArrayType) {
+            GenericArrayType gt = (GenericArrayType)cls;
+            Class ct = (Class) gt.getGenericComponentType();
+            ct = Array.newInstance(ct, 0).getClass();
+
+            return getBeanInfo(ct);
+        }
+        
+        return null;
+    }
     public JAXBBeanInfo getBeanInfo(Class<?> cls) {
         return getBeanInfo(context, cls);
     }
@@ -452,35 +493,54 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         for (Field f : cls.getDeclaredFields()) {
             if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                 //map field
-                JAXBBeanInfo beanInfo = getBeanInfo(f.getType());
+                Type type = f.getGenericType();
+                JAXBBeanInfo beanInfo = getBeanInfo(type);
                 if (beanInfo != null) {
-                    addElement(seq, beanInfo, new QName(namespace, f.getName()));
+                    addElement(seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
                 }                
             }
         }
         for (Method m : cls.getMethods()) {
             if (JAXBContextInitializer.isMethodAccepted(m, accessType)) {
                 //map field
-                JAXBBeanInfo beanInfo = getBeanInfo(m.getReturnType());
+                Type type = m.getGenericReturnType();
+                JAXBBeanInfo beanInfo = getBeanInfo(type);
                 if (beanInfo != null) {
                     int idx = m.getName().startsWith("get") ? 3 : 2;
                     String name = m.getName().substring(idx);
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                    addElement(seq, beanInfo, new QName(namespace, name));
+                    addElement(seq, beanInfo, new QName(namespace, name), isArray(type));
                 }                
             }
         }
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
     
-    public void addElement(XmlSchemaSequence seq, JAXBBeanInfo beanInfo, QName name) {    
+    static boolean isArray(Type cls) {
+        if (cls instanceof Class) {
+            return ((Class)cls).isArray();
+        } else if (cls instanceof ParameterizedType) {
+            return true;
+        } else if (cls instanceof GenericArrayType) {
+            return true;
+        }
+        return false;
+    }
+
+    public void addElement(XmlSchemaSequence seq, JAXBBeanInfo beanInfo,
+                           QName name, boolean isArray) {    
         XmlSchemaElement el = new XmlSchemaElement();
         el.setName(name.getLocalPart());
         XmlSchemaTools.setElementQName(el, name);
 
-        el.setMinOccurs(1);
-        el.setMaxOccurs(1);
-        el.setNillable(true);
+        if (isArray) {
+            el.setMinOccurs(0);
+            el.setMaxOccurs(Long.MAX_VALUE);
+        } else {
+            el.setMinOccurs(1);
+            el.setMaxOccurs(1);
+            el.setNillable(true);
+        }
 
         if (beanInfo.isElement()) {
             QName ename = new QName(beanInfo.getElementNamespaceURI(null), 
