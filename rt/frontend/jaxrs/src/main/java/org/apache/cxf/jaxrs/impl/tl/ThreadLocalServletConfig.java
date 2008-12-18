@@ -17,28 +17,33 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security;
 
-import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
+package org.apache.cxf.jaxrs.impl.tl;
 
+import java.util.Enumeration;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
-public class BookServerSecuritySpringClass extends AbstractSpringServer {
+public class ThreadLocalServletConfig extends AbstractThreadLocalProxy<ServletConfig> 
+    implements ServletConfig {
 
-    public BookServerSecuritySpringClass() {
-        super("/jaxrs_security_cglib");
+    public String getInitParameter(String name) {
+        return get().getInitParameter(name);
     }
+
+    public Enumeration getInitParameterNames() {
+        return get().getInitParameterNames();
+    }
+
+    public ServletContext getServletContext() {
+        return get().getServletContext();    
+    }
+
+    public String getServletName() {
+        return get().getServletName();
+    }
+
     
-    public static void main(String args[]) {
-        try {
-            BookServerSecuritySpringClass s = new BookServerSecuritySpringClass();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
-    }
 
 }

@@ -39,6 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,11 +61,12 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletResponse;
-import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageBodyWorkers;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageContext;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -336,7 +338,7 @@ public final class InjectionUtils {
         } else if (Request.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalRequest();
         }  else if (MessageBodyWorkers.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalMessageBodyWorkers();
+            proxy = new ThreadLocalProviders();
         } else if (HttpServletRequest.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletRequest();
         } else if (ServletContext.class.isAssignableFrom(type)) {
@@ -345,6 +347,8 @@ public final class InjectionUtils {
             proxy = new ThreadLocalHttpServletResponse();
         } else if (MessageContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalMessageContext();
+        }  else if (ServletConfig.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalServletConfig();
         }
         return proxy;
     }

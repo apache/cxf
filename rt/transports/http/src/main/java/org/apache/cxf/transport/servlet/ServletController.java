@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +51,7 @@ public class ServletController {
 
     private ServletTransportFactory transport;
     private ServletContext servletContext;
+    private ServletConfig servletConfig;
     private Bus bus;
     private String lastBase = "";
     private boolean isHideServiceList;
@@ -57,11 +59,15 @@ public class ServletController {
     private String forcedBaseAddress;
     private String serviceListStyleSheet;
  
-    public ServletController(ServletTransportFactory df, ServletContext context, Bus b) {
+    public ServletController(ServletTransportFactory df,
+                             ServletConfig config,
+                             ServletContext context, 
+                             Bus b) {
         this.transport = df;
+        this.servletConfig = config;
         this.servletContext = context;
         this.bus = b;
-        df.setServletController(this);
+        init();
     }
     
     public void setHideServiceList(boolean generate) {
@@ -282,7 +288,7 @@ public class ServletController {
         }
 
         try {
-            d.invoke(servletContext, request, response);
+            d.invoke(servletConfig, servletContext, request, response);
         } catch (IOException e) {
             throw new ServletException(e);
         } finally {
@@ -291,5 +297,27 @@ public class ServletController {
             }
         }
 
+    }
+    
+    private void init() {
+        
+        transport.setServletController(this);
+        
+        String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
+        if (hideServiceList != null) {
+            isHideServiceList = Boolean.valueOf(hideServiceList);
+        }
+        String isDisableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
+        if (isDisableAddressUpdates != null) {
+            disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
+        }
+        String isForcedBaseAddress = servletConfig.getInitParameter("base-address");
+        if (isForcedBaseAddress != null) {
+            forcedBaseAddress = isForcedBaseAddress;
+        }
+        String serviceListTransform = servletConfig.getInitParameter("service-list-stylesheet");
+        if (serviceListTransform != null) {
+            serviceListStyleSheet = serviceListTransform;
+        }
     }
 }

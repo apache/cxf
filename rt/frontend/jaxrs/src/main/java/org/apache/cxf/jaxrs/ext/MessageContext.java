@@ -19,10 +19,33 @@
 
 package org.apache.cxf.jaxrs.ext;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWorkers;
+
 /**
  * Represents an inbound internal message
  *
  */
 public interface MessageContext {
     Object get(Object key);
+    
+    UriInfo getUriInfo();
+    Request getRequest();
+    HttpHeaders getHttpHeaders();
+    SecurityContext getSecurityContext();
+    MessageBodyWorkers getProviders();
+    
+    HttpServletRequest getHttpServletRequest(); 
+    HttpServletResponse getHttpServletResponse();
+    ServletContext getServletContext();
+    ServletConfig getServletConfig();
+    
+    <T> T getContext(Class<T> contextClass);
 }

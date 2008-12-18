@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -236,7 +237,8 @@ public class Customer implements CustomerInfo {
     
     public void testServletParams(@Context HttpServletRequest req,
                                   @Context HttpServletResponse res,
-                                  @Context ServletContext context) {
+                                  @Context ServletContext context,
+                                  @Context ServletConfig config) {
         // complete
     }
     

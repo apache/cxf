@@ -493,7 +493,7 @@ public final class ProviderFactory {
         return requestPreprocessor;
     }
     
-    public void cleatThreadLocalProxies() {
+    public void clearThreadLocalProxies() {
         clearProxies(defaultMessageReaders,
                      defaultMessageWriters,
                      userMessageReaders,

@@ -25,7 +25,7 @@ import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 public class BookServerSecuritySpringInterface extends AbstractSpringServer {
 
     public BookServerSecuritySpringInterface() {
-        super("/jaxrs_security_cglib");
+        super("/jaxrs_security");
     }    
     
     public static void main(String args[]) {

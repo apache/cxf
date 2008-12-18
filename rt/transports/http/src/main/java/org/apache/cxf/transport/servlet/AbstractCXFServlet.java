@@ -52,24 +52,12 @@ public abstract class AbstractCXFServlet extends HttpServlet {
     }
     
     public ServletController createServletController(ServletConfig servletConfig) {
-        String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
         ServletController newController =
-            new ServletController(servletTransportFactory, this.getServletContext(), bus);
-        if (hideServiceList != null) {
-            newController.setHideServiceList(Boolean.valueOf(hideServiceList));
-        }
-        String disableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
-        if (disableAddressUpdates != null) {
-            newController.setDisableAddressUpdates(Boolean.valueOf(disableAddressUpdates));
-        }
-        String forcedBaseAddress = servletConfig.getInitParameter("base-address");
-        if (forcedBaseAddress != null) {
-            newController.setForcedBaseAddress(forcedBaseAddress);
-        }
-        String serviceListStyleSheet = servletConfig.getInitParameter("service-list-stylesheet");
-        if (serviceListStyleSheet != null) {
-            newController.setServiceListStyleSheet(serviceListStyleSheet);
-        }
+            new ServletController(servletTransportFactory,
+                                  servletConfig,
+                                  this.getServletContext(), 
+                                  bus);
+        
         return newController;
     }
     

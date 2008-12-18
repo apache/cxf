@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.impl;
+package org.apache.cxf.jaxrs.impl.tl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -27,26 +27,21 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.message.Message;
+public class ThreadLocalProviders extends AbstractThreadLocalProxy<MessageBodyWorkers>
+       implements MessageBodyWorkers {
 
-public class MessageBodyWorkersImpl implements MessageBodyWorkers {
-
-    private Message m;
-    public MessageBodyWorkersImpl(Message m) {
-        this.m = m;
-    }
-    
-    public <T> MessageBodyReader<T> getMessageBodyReader(
-         Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createMessageBodyReader(
-            type, genericType, annotations, mediaType, m);
+    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, 
+                                                         Type genericType, 
+                                                         Annotation[] annotations,
+                                                         MediaType mediaType) {
+        return get().getMessageBodyReader(type, genericType, annotations, mediaType);
     }
 
-    public <T> MessageBodyWriter<T> getMessageBodyWriter(
-        Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createMessageBodyWriter(
-                   type, genericType, annotations, mediaType, m);
+    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, 
+                                                         Type genericType, 
+                                                         Annotation[] annotations,
+                                                         MediaType mediaType) {
+        return get().getMessageBodyWriter(type, genericType, annotations, mediaType);
     }
 
 }

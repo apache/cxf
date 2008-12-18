@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,6 +77,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     public static final String HTTP_REQUEST = "HTTP.REQUEST";
     public static final String HTTP_RESPONSE = "HTTP.RESPONSE";
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
+    public static final String HTTP_CONFIG = "HTTP.CONFIG";
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
         
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
@@ -242,14 +244,24 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     }
     
     protected void setupMessage(Message inMessage,
-                                  final ServletContext context, 
-                                  final HttpServletRequest req, 
-                                  final HttpServletResponse resp) throws IOException {
+                                final ServletContext context, 
+                                final HttpServletRequest req, 
+                                final HttpServletResponse resp) throws IOException {
+        setupMessage(inMessage, null, context, req, resp);
+    }
+    
+    protected void setupMessage(Message inMessage,
+                                final ServletConfig config,
+                                final ServletContext context, 
+                                final HttpServletRequest req, 
+                                final HttpServletResponse resp) throws IOException {
 
         inMessage.setContent(InputStream.class, req.getInputStream());
         inMessage.put(HTTP_REQUEST, req);
         inMessage.put(HTTP_RESPONSE, resp);
         inMessage.put(HTTP_CONTEXT, context);
+        inMessage.put(HTTP_CONFIG, config);
+        
         inMessage.put(Message.HTTP_REQUEST_METHOD, req.getMethod());
         inMessage.put(Message.REQUEST_URI, req.getRequestURI());
         String contextPath = req.getContextPath();

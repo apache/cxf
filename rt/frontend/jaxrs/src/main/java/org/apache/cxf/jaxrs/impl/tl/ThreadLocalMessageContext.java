@@ -19,6 +19,16 @@
 
 package org.apache.cxf.jaxrs.impl.tl;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWorkers;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
 public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageContext> 
@@ -28,6 +38,44 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
         return get().get(key);
     }
 
-    
+    public <T> T getContext(Class<T> contextClass) {
+        return get().getContext(contextClass);
+    }
+
+    public HttpHeaders getHttpHeaders() {
+        return get().getHttpHeaders();
+    }
+
+    public HttpServletRequest getHttpServletRequest() {
+        return get().getHttpServletRequest();
+    }
+
+    public HttpServletResponse getHttpServletResponse() {
+        return get().getHttpServletResponse();
+    }
+
+    public MessageBodyWorkers getProviders() {
+        return get().getProviders();
+    }
+
+    public SecurityContext getSecurityContext() {
+        return get().getSecurityContext();
+    }
+
+    public ServletConfig getServletConfig() {
+        return get().getServletConfig();
+    }
+
+    public ServletContext getServletContext() {
+        return get().getServletContext();
+    }
+
+    public UriInfo getUriInfo() {
+        return get().getUriInfo();
+    }
+
+    public Request getRequest() {
+        return get().getRequest();
+    }
 
 }
