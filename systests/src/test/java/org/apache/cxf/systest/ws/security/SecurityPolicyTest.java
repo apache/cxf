@@ -54,7 +54,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 UnsupportedCallbackException {
             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 
-            if (pc.getIdentifer().equals("bob")) {
+            if (pc.getIdentifier().equals("bob")) {
                 // set the password on the callback. This will be compared to the
                 // password which was sent from the client.
                 pc.setPassword("pwd");

@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -462,6 +463,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setEncKeyId(encrTokId);
                     encr.setEphemeralKey(encrTok.getSecret());
                     Crypto crypto = getEncryptionCrypto(recToken);
+                    this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
                     setEncryptionUser(encr, recToken, false, crypto);
                    
                     encr.setDocument(saaj.getSOAPPart());
@@ -630,14 +632,14 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sig.setSecretKey(tok.getSecret());
             sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getAsymmetricSignature());
             sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
+            Crypto crypto = null;
             if (sbinding.getProtectionToken() != null) {
-                sig.prepare(saaj.getSOAPPart(), getEncryptionCrypto(sbinding.getProtectionToken()),
-                        secHeader);
+                crypto = getEncryptionCrypto(sbinding.getProtectionToken());
             } else {
-                sig.prepare(saaj.getSOAPPart(), getSignatureCrypto(policyTokenWrapper),
-                            secHeader);
+                crypto = getSignatureCrypto(policyTokenWrapper);
             }
-
+            this.message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
+            sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
             sig.setParts(sigs);
             sig.addReferencesToSign(sigs, secHeader);
 

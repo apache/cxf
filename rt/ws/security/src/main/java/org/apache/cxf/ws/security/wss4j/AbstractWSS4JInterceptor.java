@@ -311,6 +311,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return action;
     }
     void assertWSS11(AssertionInfoMap aim, SoapMessage message) {
+        if (isRequestor(message)) {
+            message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
+        }
         Collection<AssertionInfo> ais = aim.get(SP12Constants.WSS11);
         if (ais != null) {
             for (AssertionInfo ai : ais) {

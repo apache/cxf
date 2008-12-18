@@ -61,9 +61,11 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -356,10 +358,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
             for (int i = 0; i < callbacks.length; i++) {
                 WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                String id = pc.getIdentifer();
-                for (SecurityToken token : store.getValidTokens()) {
-                    if (id.equals(token.getSHA1())) {
-                        pc.setKey(token.getSecret());
+                
+                String id = pc.getIdentifier();
+                if (pc.getKeyType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                    for (SecurityToken token : store.getValidTokens()) {
+                        if (id.equals(token.getSHA1())) {
+                            pc.setKey(token.getSecret());
+                            return;
+                        }
+                    }                    
+                } else { 
+                    SecurityToken tok = store.getToken(id);
+                    if (tok != null) {
+                        pc.setKey(tok.getSecret());
                         return;
                     }
                 }
@@ -403,6 +414,24 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         return cbHandler;
     }
+    public Crypto loadSignatureCrypto(RequestData reqData) 
+        throws WSSecurityException {
+        try {
+            return super.loadSignatureCrypto(reqData);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    protected Crypto loadDecryptionCrypto(RequestData reqData) 
+        throws WSSecurityException {
+        try {
+            return super.loadDecryptionCrypto(reqData);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+
     
     /**
      * @return      the WSSecurityEngine in use by this interceptor.

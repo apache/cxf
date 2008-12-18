@@ -432,6 +432,7 @@ public abstract class AbstractBindingBuilder {
                 st = getTokenStore().getToken(id);
             }
         }
+        getTokenStore().add(st);
         return st;
     }
 
@@ -779,6 +780,7 @@ public abstract class AbstractBindingBuilder {
                                                        Token token) throws WSSecurityException {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         Crypto crypto = getEncryptionCrypto(wrapper);
+        message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         setKeyIdentifierType(encrKey, wrapper, token);
         setEncryptionUser(encrKey, wrapper, false, crypto);
         encrKey.setKeySize(binding.getAlgorithmSuite().getMaximumSymmetricKeyLength());
@@ -1026,6 +1028,8 @@ public abstract class AbstractBindingBuilder {
         }
 
         Crypto crypto = encryptCrypto ? getEncryptionCrypto(wrapper) : getSignatureCrypto(wrapper);
+        message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
+
         String user = (String)message.getContextualProperty(userNameKey);
         if (StringUtils.isEmpty(user)) {
             user = crypto.getDefaultX509Alias();
