@@ -85,7 +85,21 @@
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
-
+                <xs:attribute name="KeepAliveParameters" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>
+                        If KeepAlive connections are turned on, this allows sending additional
+                        parameters back to the client via the Keep-Alive header.   Common 
+                        parameters are timeout and max to specify how long the client should
+                        hold open the connection and how many connections to hold open.   Different
+                        clients may have different defaults.   For Java HTTPUrlConnection, the 
+                        defaults would be timeout=5, max=5
+                                                
+                        Example:  timeout=60, max=5;
+                        </xs:documentation>
+                    </xs:annotation>      
+                </xs:attribute>
+                
                 <xs:attribute name="RedirectURL" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
