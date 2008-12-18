@@ -219,11 +219,13 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                                    marshaller);
                 }
             }
-            for (int i = 0; i < hdr.getChildNodes().getLength(); i++) {
-                Node node = hdr.getChildNodes().item(i);
+            Node node = hdr.getFirstChild();
+            while (node != null) {
                 Header holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
                 header.add(holder);
+                node = node.getNextSibling();
             }
+
         } catch (SOAPException se) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", se); 
         } catch (JAXBException je) {
