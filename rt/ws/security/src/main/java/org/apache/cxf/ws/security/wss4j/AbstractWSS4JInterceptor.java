@@ -251,16 +251,13 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 }
                 Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                 Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
-                if (isRequestor(message)) {
-                    message.put("SignaturePropRefId", "SigRefId");
-                    message.put("SigRefId", getProps(e, message));
-                    message.put("decryptionPropRefId", "DecRefId");
-                    message.put("DecRefId", getProps(s, message));
-                } else {
-                    message.put("SignaturePropRefId", "SigRefId");
-                    message.put("SigRefId", getProps(s, message));
-                    message.put("decryptionPropRefId", "DecRefId");
-                    message.put("DecRefId", getProps(e, message));                        
+                if (e != null) {
+                    message.put("SignaturePropRefId", "RefId-" + e.toString());
+                    message.put("RefId-" + e.toString(), getProps(e, message));
+                }
+                if (s != null) {
+                    message.put("decryptionPropRefId", "RefId-" + s.toString());
+                    message.put("RefId-" + s.toString(), getProps(s, message));
                 }
                 ai.setAsserted(true);
                 policyAsserted(aim, abinding.getInitiatorToken());
@@ -291,15 +288,23 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     s = e;
                 }
                 if (isRequestor(message)) {
-                    message.put("SignaturePropRefId", "SigRefId");
-                    message.put("SigRefId", getProps(e, message));
-                    message.put("decryptionPropRefId", "DecRefId");
-                    message.put("DecRefId", getProps(s, message));
+                    if (e != null) {
+                        message.put("SignaturePropRefId", "RefId-" + e.toString());
+                        message.put("RefId-" + e.toString(), getProps(e, message));
+                    }
+                    if (s != null) {
+                        message.put("decryptionPropRefId", "RefId-" + s.toString());
+                        message.put("RefId-" + s.toString(), getProps(s, message));
+                    }
                 } else {
-                    message.put("SignaturePropRefId", "SigRefId");
-                    message.put("SigRefId", getProps(s, message));
-                    message.put("decryptionPropRefId", "DecRefId");
-                    message.put("DecRefId", getProps(e, message));                        
+                    if (s != null) {
+                        message.put("SignaturePropRefId", "RefId-" + s.toString());
+                        message.put("RefId-" + s.toString(), getProps(s, message));
+                    }
+                    if (e != null) {
+                        message.put("decryptionPropRefId", "RefId-" + e.toString());
+                        message.put("RefId-" + e.toString(), getProps(e, message));
+                    }
                 }
                 ai.setAsserted(true);
                 policyAsserted(aim, abinding.getEncryptionToken());

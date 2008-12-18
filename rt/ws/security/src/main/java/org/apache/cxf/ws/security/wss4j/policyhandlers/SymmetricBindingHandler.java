@@ -169,9 +169,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     tokenId = getEncryptedKey();
                 }
             }
-            if (tok != null) {
+            if (tok == null) {
                 if (tokenId == null || tokenId.length() == 0) {
-                    //REVISIT - no tokenM
+                    //REVISIT - no tokenId?   Exception?
                 }
                 if (tokenId.startsWith("#")) {
                     tokenId = tokenId.substring(1);
