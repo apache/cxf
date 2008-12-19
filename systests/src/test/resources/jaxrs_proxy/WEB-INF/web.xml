@@ -44,7 +44,7 @@
 
 	<servlet-mapping>
 		<servlet-name>CXFServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/test/*</url-pattern>
 	</servlet-mapping>
 </web-app>
 <!-- END SNIPPET: webxml -->

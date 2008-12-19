@@ -572,7 +572,7 @@ public final class JAXRSUtils {
     
     public static ContextResolver<?> createContextResolver(Type genericType, Message m) {
         if (genericType instanceof ParameterizedType) {
-            return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createContextResolver(
+            return ProviderFactory.getInstance(HttpUtils.getOriginalAddress(m)).createContextResolver(
                       ((ParameterizedType)genericType).getActualTypeArguments()[0], m);
         }
         return null;
@@ -702,9 +702,8 @@ public final class JAXRSUtils {
         List<MediaType> types = JAXRSUtils.intersectMimeTypes(consumeTypes, contentType);
         
         MessageBodyReader provider = null;
-        
         for (MediaType type : types) { 
-            provider = ProviderFactory.getInstance((String)m.get(Message.BASE_PATH))
+            provider = ProviderFactory.getInstance(HttpUtils.getOriginalAddress(m))
                 .createMessageBodyReader(targetTypeClass,
                                          parameterType,
                                          parameterAnnotations,

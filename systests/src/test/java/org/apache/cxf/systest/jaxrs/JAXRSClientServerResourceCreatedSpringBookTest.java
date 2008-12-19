@@ -41,7 +41,7 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
     public void testGetBook123() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/123"; 
+            "http://localhost:9080/webapp/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -58,7 +58,7 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
     public void testPetStore() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/petstore/pets/24"; 
+            "http://localhost:9080/webapp/petstore/pets/24"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "text/xml");

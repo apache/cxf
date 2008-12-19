@@ -41,6 +41,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -57,7 +58,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     public void handleMessage(Message message) {
         
-        String baseAddress = (String)message.getExchange().getInMessage().get(Message.BASE_PATH);
+        String baseAddress = HttpUtils.getOriginalAddress(message.getExchange().getInMessage());
         try {
             processResponse(message, baseAddress);
         } finally {

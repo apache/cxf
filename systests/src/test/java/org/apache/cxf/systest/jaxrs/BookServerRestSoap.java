@@ -50,7 +50,7 @@ public class BookServerRestSoap extends AbstractBusTestServerBase {
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
-        webappcontext.setContextPath("/");
+        webappcontext.setContextPath("/test");
 
         webappcontext.setWar(contextPath);
 

@@ -44,7 +44,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBook123() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/123"; 
+            "http://localhost:9080/webapp/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
@@ -65,7 +65,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBookNotFound() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/12345"; 
+            "http://localhost:9080/webapp/bookstore/books/12345"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
@@ -84,7 +84,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testPostPetStatus() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/petstore/pets";
+            "http://localhost:9080/webapp/petstore/pets";
 
         URL url = new URL(endpointAddress);   
         HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();  

@@ -19,7 +19,9 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,9 @@ import javax.ws.rs.core.PathSegment;
 
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.servlet.ServletDestination;
 
 public final class HttpUtils {
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
@@ -55,6 +59,46 @@ public final class HttpUtils {
         return u;
     }
     
+    public static String getPathToMatch(Message m) {
+        
+        String requestAddress = (String)m.get(Message.REQUEST_URI);
+        String baseAddress = getBaseAddress(m);
+        
+        return getPathToMatch(requestAddress, baseAddress);
+    }
+    
+    public static String getBaseAddress(Message m) {
+        try {
+            String address = null;
+            Destination d = m.getExchange().getDestination();
+            if (d instanceof ServletDestination) {
+                address = ((ServletDestination)d).getEndpointInfo().getAddress();
+            } else {
+                address = d.getAddress().getAddress().getValue();
+            }
+            return new URL(address).getPath();
+        } catch (MalformedURLException ex) {
+            return (String)m.get(Message.BASE_PATH);
+        }
+    }
+    
+    public static String getPathToMatch(String path, String address) {
+        
+        int ind = path.indexOf(address);
+        if (ind == 0) {
+            path = path.substring(ind + address.length());
+        }
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        
+        return path;
+    }
+    
+    public static String getOriginalAddress(Message m) {
+        Destination d = m.getDestination();
+        return d == null ? "/" : d.getAddress().getAddress().getValue();
+    }
     
     public static String fromPathSegment(PathSegment ps) {
         if (PathSegmentImpl.class.isAssignableFrom(ps.getClass())) {

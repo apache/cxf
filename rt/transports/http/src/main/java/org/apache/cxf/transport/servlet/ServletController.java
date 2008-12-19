@@ -21,6 +21,7 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -269,7 +270,16 @@ public class ServletController {
         String reqPrefix = request.getRequestURL().toString();        
         String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
         //fix for CXF-898
-        if (!"/".equals(pathInfo) || reqPrefix.endsWith("/")) {            
+        if (!"/".equals(pathInfo) || reqPrefix.endsWith("/")) {
+            // needs to be done given that pathInfo is decoded
+            // TODO :
+            // it's unlikely servlet path will contain encoded values so we're most likely safe
+            // however we need to ensure if it happens then thsi code works propely too
+            try {
+                reqPrefix = URLDecoder.decode(reqPrefix, "UTF-8");
+            } catch (Exception ex) {
+                // unlikey to happen
+            }
             reqPrefix = reqPrefix.substring(0, reqPrefix.length() - pathInfo.length());
         }
         return reqPrefix;
