@@ -44,10 +44,8 @@ public class UriInfoImpl implements UriInfo {
     }
     
     public URI getAbsolutePath() {
-        String address = getBaseUri().toString();
-        address = address.endsWith("/") ? address.substring(0, address.length() - 1)
-                                        : address; 
-        return URI.create(address + getPath());
+        String path = getAbsolutePathAsString();
+        return URI.create(path);
     }
 
     public UriBuilder getAbsolutePathBuilder() {
@@ -55,7 +53,7 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public URI getBaseUri() {
-        URI u = URI.create(getEndpointAddress());
+        URI u = URI.create(HttpUtils.getEndpointAddress(message));
         return HttpUtils.toAbsoluteUri(u, message);
     }
 
@@ -69,8 +67,7 @@ public class UriInfoImpl implements UriInfo {
 
     public String getPath(boolean decode) {
         
-        String path = (String)message.get(Message.REQUEST_URI);
-        return decode ? JAXRSUtils.uriDecode(path) : path;
+        return doGetPath(decode, true);
     }
 
     public List<PathSegment> getPathSegments() {
@@ -91,12 +88,13 @@ public class UriInfoImpl implements UriInfo {
                                               decode);
     }
 
-    //TODO : check the fragment as well
     public URI getRequestUri() {
+        String path = getAbsolutePathAsString();
         String queries = (String)message.get(Message.QUERY_STRING);
-        return URI.create(getEndpointAddress() 
-                          + message.get(Message.REQUEST_URI)
-                          + (queries == null ? "" : "?" + queries));
+        if (queries != null) {
+            path += "?" + queries;
+        }
+        return URI.create(path);
     }
 
     public UriBuilder getRequestUriBuilder() {
@@ -108,7 +106,6 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public MultivaluedMap<String, String> getPathParameters(boolean decode) {
-        // this needs to be changed
         MetadataMap<String, String> values = new MetadataMap<String, String>();
         for (Map.Entry<String, List<String>> entry : templateParams.entrySet()) {
             if (entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
@@ -119,13 +116,6 @@ public class UriInfoImpl implements UriInfo {
                               : entry.getValue().get(0));
         }
         return values;
-    }
-
-    protected String getEndpointAddress() {
-        String value = message.getExchange().getDestination().getAddress()
-               .getAddress().getValue();
-        
-        return value;
     }
 
     public List<Object> getMatchedResources() {
@@ -143,5 +133,17 @@ public class UriInfoImpl implements UriInfo {
         return null;
     }
 
+    private String doGetPath(boolean decode, boolean addSlash) {
+        String path = HttpUtils.getPathToMatch(message, addSlash);
+        return decode ? JAXRSUtils.uriDecode(path) : path;
+    }
     
+    private String getAbsolutePathAsString() {
+        String address = getBaseUri().toString();
+        String path = doGetPath(true, false);
+        if (path.startsWith("/") && address.endsWith("/")) {
+            address = address.substring(0, address.length() - 1);
+        }
+        return address + path;
+    }
 }

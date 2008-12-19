@@ -59,36 +59,41 @@ public final class HttpUtils {
         return u;
     }
     
-    public static String getPathToMatch(Message m) {
-        
+    public static String getPathToMatch(Message m, boolean addSlash) {
         String requestAddress = (String)m.get(Message.REQUEST_URI);
         String baseAddress = getBaseAddress(m);
-        
-        return getPathToMatch(requestAddress, baseAddress);
+        return getPathToMatch(requestAddress, baseAddress, addSlash);
     }
+    
     
     public static String getBaseAddress(Message m) {
         try {
-            String address = null;
-            Destination d = m.getExchange().getDestination();
-            if (d instanceof ServletDestination) {
-                address = ((ServletDestination)d).getEndpointInfo().getAddress();
-            } else {
-                address = d.getAddress().getAddress().getValue();
-            }
-            return new URL(address).getPath();
+            String endpointAddress = getEndpointAddress(m);
+            return new URL(endpointAddress).getPath();
         } catch (MalformedURLException ex) {
             return (String)m.get(Message.BASE_PATH);
         }
     }
     
-    public static String getPathToMatch(String path, String address) {
+    public static String getEndpointAddress(Message m) {
+        String address = null;
+        Destination d = m.getExchange().getDestination();
+        if (d instanceof ServletDestination) {
+            address = ((ServletDestination)d).getEndpointInfo().getAddress();
+        } else {
+            address = d.getAddress().getAddress().getValue();
+        }
+        
+        return address;
+    }
+    
+    public static String getPathToMatch(String path, String address, boolean addSlash) {
         
         int ind = path.indexOf(address);
         if (ind == 0) {
             path = path.substring(ind + address.length());
         }
-        if (!path.startsWith("/")) {
+        if (addSlash && !path.startsWith("/")) {
             path = "/" + path;
         }
         
