@@ -99,7 +99,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             requestContentType = "*/*";
         }
         
-        String rawPath = HttpUtils.getPathToMatch(message);
+        String rawPath = HttpUtils.getPathToMatch(message, true);
         
         //1. Matching target resource class
         Service service = message.getExchange().get(Service.class);

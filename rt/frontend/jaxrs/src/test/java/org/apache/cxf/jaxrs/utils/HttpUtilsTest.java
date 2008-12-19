@@ -26,13 +26,13 @@ public class HttpUtilsTest extends Assert {
 
     @Test
     public void testUpdatePath() {
-        assertEquals("/", HttpUtils.getPathToMatch("/", "/"));
-        assertEquals("/", HttpUtils.getPathToMatch("/", "/bar"));
-        assertEquals("/bar", HttpUtils.getPathToMatch("/bar", "/"));
+        assertEquals("/", HttpUtils.getPathToMatch("/", "/", true));
+        assertEquals("/", HttpUtils.getPathToMatch("/", "/bar", true));
+        assertEquals("/bar", HttpUtils.getPathToMatch("/bar", "/", true));
         
-        assertEquals("/", HttpUtils.getPathToMatch("/bar", "/bar"));
-        assertEquals("/bar", HttpUtils.getPathToMatch("/baz/bar", "/baz"));
-        assertEquals("/baz/bar/foo/", HttpUtils.getPathToMatch("/baz/bar/foo/", "/bar"));
+        assertEquals("/", HttpUtils.getPathToMatch("/bar", "/bar", true));
+        assertEquals("/bar", HttpUtils.getPathToMatch("/baz/bar", "/baz", true));
+        assertEquals("/baz/bar/foo/", HttpUtils.getPathToMatch("/baz/bar/foo/", "/bar", true));
         
     }
     

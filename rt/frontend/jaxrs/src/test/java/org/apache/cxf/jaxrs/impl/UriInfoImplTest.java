@@ -25,11 +25,12 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.ws.addressing.AttributedURIType;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,7 +85,7 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testGetRequestURI() {
         
-        UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar", "n=1%202"),
+        UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/bar", "/baz/bar", "n=1%202"),
                             null);
 
         assertEquals("Wrong request uri", "http://localhost:8080/baz/bar?n=1%202",
@@ -132,11 +133,10 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testGetBaseUri() {
         
-        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
-                                        null);
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", null), null);
         assertEquals("Wrong base path", "http://localhost:8080/baz", 
                      u.getBaseUri().toString());
-        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", "/bar"),
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", null),
                                         null);
         assertEquals("Wrong base path", "http://localhost:8080/baz/", 
                      u.getBaseUri().toString());
@@ -145,17 +145,28 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testGetPath() {
         
-        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz", 
+                                                    "/baz"),
                                         null);
-        assertEquals("Wrong path", "/bar", u.getPath());
+        assertEquals("Wrong path", "/baz", u.getPath());
         
-        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar%201"),
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz", 
+                            "/bar/baz"), null);
+        assertEquals("Wrong path", "/", u.getPath());
+        
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz/", 
+                "/bar/baz/"), null);
+        assertEquals("Wrong path", "/", u.getPath());
+        
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/baz/bar%201"),
                                         null);
         assertEquals("Wrong path", "/bar 1", u.getPath());
         
-        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar%201"),
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/baz/bar%201"),
                             null);
         assertEquals("Wrong path", "/bar%201", u.getPath(false));
+      
+        
     }
     
     private Message mockMessage(String baseAddress, String pathInfo) {
@@ -168,23 +179,19 @@ public class UriInfoImplTest extends Assert {
     
     private Message mockMessage(String baseAddress, String pathInfo, 
                                 String query, String fragment) {
+        Message m = new MessageImpl();
         control.reset();
-        Message m = control.createMock(Message.class);
         Exchange e = control.createMock(Exchange.class);
-        m.getExchange();
-        EasyMock.expectLastCall().andReturn(e);
-        Destination d = control.createMock(Destination.class);
+        m.setExchange(e);
+        ServletDestination d = control.createMock(ServletDestination.class);
         e.getDestination();
-        EasyMock.expectLastCall().andReturn(d);
-        EndpointReferenceType epr = new EndpointReferenceType(); 
-        epr.setAddress(new AttributedURIType());
-        epr.getAddress().setValue(baseAddress);
-        d.getAddress();
-        EasyMock.expectLastCall().andReturn(epr);
-        m.get(Message.REQUEST_URI);
-        EasyMock.expectLastCall().andReturn(pathInfo);
-        m.get(Message.QUERY_STRING);
-        EasyMock.expectLastCall().andReturn(query);
+        EasyMock.expectLastCall().andReturn(d).anyTimes();
+        EndpointInfo epr = new EndpointInfo(); 
+        epr.setAddress(baseAddress);
+        d.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(epr).anyTimes();
+        m.put(Message.REQUEST_URI, pathInfo);
+        m.put(Message.QUERY_STRING, query);
         control.replay();
         return m;
     }
