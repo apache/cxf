@@ -30,8 +30,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -60,7 +62,7 @@ public final class PluginLoader {
 
     private Map<String, FrontEnd> frontends = new LinkedHashMap<String, FrontEnd>();
 
-    private Map<String, DataBinding> databindings = new LinkedHashMap<String, DataBinding>();
+    private Map<String, DataBinding> databindings = new TreeMap<String, DataBinding>();
 
     private Unmarshaller unmarshaller;
 
