@@ -85,7 +85,7 @@ public class MtoMTest extends JavascriptRhinoTest {
         Notifier notifier = 
             testUtilities.rhinoCallConvert("testMtoMReply", Notifier.class, 
                                            testUtilities.javaToJS(getAddress()));
-        boolean notified = notifier.waitForJavascript(1000 * 10);
+        boolean notified = notifier.waitForJavascript(1000 * 30);
         assertTrue(notified);
         Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
         String errorText = testUtilities.rhinoEvaluateConvert("globalErrorStatusText", String.class);

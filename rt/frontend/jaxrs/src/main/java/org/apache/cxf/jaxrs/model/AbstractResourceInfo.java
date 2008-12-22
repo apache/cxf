@@ -79,7 +79,8 @@ public abstract class AbstractResourceInfo {
                         fieldProxyMap = new HashMap<Field, ThreadLocalProxy>();
                     }
                     fieldProxyMap.put(f, InjectionUtils.createThreadLocalProxy(f.getType()));
-                } else if (a.annotationType() == Resource.class) {
+                } else if (a.annotationType() == Resource.class 
+                           && AnnotationUtils.isContextClass(f.getType())) {
                     if (resourceFields == null) {
                         resourceFields = new ArrayList<Field>();
                     }

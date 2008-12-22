@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +48,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 
 public final class AnnotationUtils {
@@ -75,7 +77,10 @@ public final class AnnotationUtils {
         classes.add(Request.class);
         classes.add(HttpServletRequest.class);
         classes.add(HttpServletResponse.class);
+        classes.add(ServletConfig.class);
         classes.add(ServletContext.class);
+        // CXF-specific
+        classes.add(MessageContext.class);
         return classes;
     }
     

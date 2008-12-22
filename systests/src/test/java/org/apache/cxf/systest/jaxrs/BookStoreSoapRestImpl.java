@@ -22,18 +22,27 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jws.WebService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.WebServiceContext;
 
-@WebService
+import org.apache.cxf.jaxrs.ext.MessageContext;
+
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
+    
+    @Resource
+    private WebServiceContext jaxwsContext;
+    @Resource
+    private MessageContext jaxrsContext;
     
     public BookStoreSoapRestImpl() {
         init();
     }
     
     public Book getBook(Long id) {
+        System.out.println(getContentType());
         return books.get(id);
     }
     
@@ -49,4 +58,17 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
+ 
+    private String getContentType() {
+        
+        // TODO : it may be worth indeed to introduce a shared ServiceContext
+        // such that users combining JAXWS and JAXRS won't have to write if/else code 
+        HttpServletRequest request = jaxrsContext.getHttpServletRequest();
+        if (request == null) {
+            request = (HttpServletRequest)jaxwsContext.getMessageContext().get(
+                 javax.xml.ws.handler.MessageContext.SERVLET_REQUEST);
+        }
+        return request.getContentType();
+    }
+    
 }
