@@ -35,47 +35,47 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
     implements MessageContext {
 
     public Object get(Object key) {
-        return get().get(key);
+        return get() != null ? get().get(key) : null;
     }
 
     public <T> T getContext(Class<T> contextClass) {
-        return get().getContext(contextClass);
+        return get() != null ? get().getContext(contextClass) : null;
     }
 
     public HttpHeaders getHttpHeaders() {
-        return get().getHttpHeaders();
+        return get() != null ? get().getHttpHeaders() : null;
     }
 
     public HttpServletRequest getHttpServletRequest() {
-        return get().getHttpServletRequest();
+        return get() != null ? get().getHttpServletRequest() : null;
     }
 
     public HttpServletResponse getHttpServletResponse() {
-        return get().getHttpServletResponse();
+        return get() != null ? get().getHttpServletResponse() : null;
     }
 
     public MessageBodyWorkers getProviders() {
-        return get().getProviders();
+        return get() != null ? get().getProviders() : null;
     }
 
     public SecurityContext getSecurityContext() {
-        return get().getSecurityContext();
+        return get() != null ? get().getSecurityContext() : null;
     }
 
     public ServletConfig getServletConfig() {
-        return get().getServletConfig();
+        return get() != null ? get().getServletConfig() : null;
     }
 
     public ServletContext getServletContext() {
-        return get().getServletContext();
+        return get() != null ? get().getServletContext() : null;
     }
 
     public UriInfo getUriInfo() {
-        return get().getUriInfo();
+        return get() != null ? get().getUriInfo() : null;
     }
 
     public Request getRequest() {
-        return get().getRequest();
+        return get() != null ? get().getRequest() : null;
     }
 
 }
