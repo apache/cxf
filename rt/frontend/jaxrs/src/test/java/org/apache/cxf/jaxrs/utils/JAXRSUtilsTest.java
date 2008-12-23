@@ -122,6 +122,23 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testSelectBetweenMultipleResourceClasses3() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResourceTemplate4.class,
+                              org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class);
+        sf.create();        
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        ClassResourceInfo bStore = JAXRSUtils.selectResourceClass(resources, "/", map);
+        assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class);
+        
+        bStore = JAXRSUtils.selectResourceClass(resources, "/test", map);
+        assertEquals(bStore.getResourceClass(), 
+                     org.apache.cxf.jaxrs.resources.TestResourceTemplate4.class);
+        
+    }
+    
+    @Test
     public void testFindTargetResourceClass() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class);
