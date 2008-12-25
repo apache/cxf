@@ -41,6 +41,8 @@
         <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
         <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
         <saaj.impl.artifactId>saaj-impl</saaj.impl.artifactId>
+        <saaj.impl.version>1.3.2</saaj.impl.version>
+
 	<!-- please maintain alphabetical order here -->
         <abdera.version>0.4.0-incubating</abdera.version>
         <activemq.version>4.1.1</activemq.version>
@@ -52,7 +54,6 @@
         <jetty.version>6.1.11</jetty.version>
         <rhino.version>1.6R7</rhino.version>
         <saaj.version>1.3</saaj.version>
-        <saaj.impl.version>1.3.2</saaj.impl.version>
         <spring.version>2.5.5</spring.version>
         <spring.mock>spring-test</spring.mock>
         <wsdl4j.version>1.6.2</wsdl4j.version>
@@ -1004,6 +1005,15 @@
     </reporting>
 
     <profiles>
+	<profile>
+	  <id>axis2-saaj</id>
+	  <properties>
+	    <saaj.impl.groupId>org.apache.axis2</saaj.impl.groupId>
+	    <saaj.impl.artifactId>axis2-saaj</saaj.impl.artifactId>
+	    <saaj.impl.version>1.4.1</saaj.impl.version>
+	  </properties>
+	</profile>
+
         <profile>
             <id>fastinstall</id>
             <properties>
