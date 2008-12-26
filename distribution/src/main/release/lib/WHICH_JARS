@@ -5,7 +5,10 @@ specific parts of CXF.
 
 Jars marked with a [6] at the end are optional for Java 6 (update 4 or 
 later is supported) as the functionality provided by those jars are 
-provided in the JDK
+provided in the JDK.
+
+Some users may prefer to use axis2-saaj.jar rather than saaj-impl.jar. Both are
+supported.
 
 The following jars are required for all CXF usage:
 - cxf.jar
