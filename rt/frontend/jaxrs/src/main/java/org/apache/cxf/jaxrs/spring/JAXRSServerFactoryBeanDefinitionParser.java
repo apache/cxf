@@ -25,14 +25,22 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-
+import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+
 
 
 public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
@@ -40,7 +48,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
 
     public JAXRSServerFactoryBeanDefinitionParser() {
         super();
-        setBeanClass(JAXRSServerFactoryBean.class);
+        setBeanClass(SpringJAXRSServerFactoryBean.class);
     }
     
     @Override
@@ -106,6 +114,26 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
     @Override
     protected boolean hasBusProperty() {
         return true;
+    }
+    
+    public static class SpringJAXRSServerFactoryBean extends JAXRSServerFactoryBean implements
+        ApplicationContextAware {
+
+        public SpringJAXRSServerFactoryBean() {
+            super();
+        }
+
+        public SpringJAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
+            super(sf);
+        }
+
+        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (getBus() == null) {
+                Bus bus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+                setBus(bus);
+            }
+        }
     }
 
 }
