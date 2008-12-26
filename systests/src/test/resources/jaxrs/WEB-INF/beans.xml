@@ -66,6 +66,18 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     
   </jaxrs:server>
 
+  <jaxrs:server id="bookservice3"
+		        address="/thebooks3/bookstore">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="jaxbProvider"/>
+       <ref bean="jsonProvider"/>
+    </jaxrs:providers> 
+    
+  </jaxrs:server> 
+
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>
   </bean>

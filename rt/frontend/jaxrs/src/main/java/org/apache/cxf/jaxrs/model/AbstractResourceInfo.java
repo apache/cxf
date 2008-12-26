@@ -37,16 +37,17 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public abstract class AbstractResourceInfo {
     
+    private static Map<Class<?>, List<Field>> contextFields;
+    private static Map<Class<?>, List<Field>> resourceFields;
+    private static Map<Class<?>, Map<Class<?>, Method>> contextMethods;
+    private static Map<Class<?>, Map<Field, ThreadLocalProxy>> fieldProxyMap;
+    private static Map<Class<?>, Map<Field, ThreadLocalProxy>> resourceProxyMap;
+    private static Map<Class<?>, Map<Method, ThreadLocalProxy>> setterProxyMap;
+    
     private boolean root;
     private Class<?> resourceClass;
     private Class<?> serviceClass;
     
-    private List<Field> contextFields;
-    private List<Field> resourceFields;
-    private Map<Class<?>, Method> contextMethods;
-    private Map<Field, ThreadLocalProxy> fieldProxyMap;
-    private Map<Field, ThreadLocalProxy> resourceProxyMap;
-    private Map<Method, ThreadLocalProxy> setterProxyMap;
     
     protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot) {
         this.serviceClass = serviceClass;
@@ -72,23 +73,23 @@ public abstract class AbstractResourceInfo {
             for (Annotation a : f.getAnnotations()) {
                 if (a.annotationType() == Context.class) {
                     if (contextFields == null) {
-                        contextFields = new ArrayList<Field>();
+                        contextFields = new HashMap<Class<?>, List<Field>>();
                     }
-                    contextFields.add(f);
+                    addContextField(contextFields, f);
                     if (fieldProxyMap == null) {
-                        fieldProxyMap = new HashMap<Field, ThreadLocalProxy>();
+                        fieldProxyMap = new HashMap<Class<?>, Map<Field, ThreadLocalProxy>>();
                     }
-                    fieldProxyMap.put(f, InjectionUtils.createThreadLocalProxy(f.getType()));
+                    addToMap(fieldProxyMap, f, InjectionUtils.createThreadLocalProxy(f.getType()));
                 } else if (a.annotationType() == Resource.class 
                            && AnnotationUtils.isContextClass(f.getType())) {
                     if (resourceFields == null) {
-                        resourceFields = new ArrayList<Field>();
+                        resourceFields = new HashMap<Class<?>, List<Field>>();
                     }
-                    resourceFields.add(f);
+                    addContextField(resourceFields, f);
                     if (resourceProxyMap == null) {
-                        resourceProxyMap = new HashMap<Field, ThreadLocalProxy>();
+                        resourceProxyMap = new HashMap<Class<?>, Map<Field, ThreadLocalProxy>>();
                     }
-                    resourceProxyMap.put(f, InjectionUtils.createThreadLocalProxy(f.getType()));
+                    addToMap(resourceProxyMap, f, InjectionUtils.createThreadLocalProxy(f.getType()));
                 }
             }
         }
@@ -120,20 +121,21 @@ public abstract class AbstractResourceInfo {
     
     @SuppressWarnings("unchecked")
     public Map<Class<?>, Method> getContextMethods() {
-        return contextMethods == null ? Collections.EMPTY_MAP 
-                                      : Collections.unmodifiableMap(contextMethods);
+        Map<Class<?>, Method> methods = contextMethods == null ? null : contextMethods.get(getServiceClass());
+        return methods == null ? Collections.EMPTY_MAP 
+                                      : Collections.unmodifiableMap(methods);
     }
     
     private void addContextMethod(Class<?> contextClass, Method m) {
         if (contextMethods == null) {
-            contextMethods = new HashMap<Class<?>, Method>();
+            contextMethods = new HashMap<Class<?>, Map<Class<?>, Method>>();
         }
-        contextMethods.put(contextClass, m);
+        addToMap(contextMethods, contextClass, m);
         if (setterProxyMap == null) {
-            setterProxyMap = new HashMap<Method, ThreadLocalProxy>();
+            setterProxyMap = new HashMap<Class<?>, Map<Method, ThreadLocalProxy>>();
         }
-        setterProxyMap.put(m, 
-             InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]));
+        addToMap(setterProxyMap, m, 
+                 InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]));
     }
     
     public boolean isRoot() {
@@ -152,28 +154,16 @@ public abstract class AbstractResourceInfo {
         return getList(resourceFields);
     }
     
-    private static List<Field> getList(List<Field> fields) {
-        List<Field> ret;
-        if (fields != null) {
-            ret = Collections.unmodifiableList(fields);
-        } else {
-            ret = Collections.emptyList();
-        }
-        return ret;
-    }
-    
     public ThreadLocalProxy getContextFieldProxy(Field f) {
-        return fieldProxyMap == null ? null
-               : fieldProxyMap.get(f);
+        return getProxy(fieldProxyMap, f);
     }
     
     public ThreadLocalProxy getResourceFieldProxy(Field f) {
-        return resourceProxyMap == null ? null
-               : resourceProxyMap.get(f);
+        return getProxy(resourceProxyMap, f);
     }
     
     public ThreadLocalProxy getContextSetterProxy(Method m) {
-        return setterProxyMap == null ? null : setterProxyMap.get(m);
+        return getProxy(setterProxyMap, m);
     }
     
     public abstract boolean isSingleton();
@@ -184,14 +174,55 @@ public abstract class AbstractResourceInfo {
         clearProxies(setterProxyMap);
     }
     
-    private static void clearProxies(Map<?, ThreadLocalProxy> tlps) {
-        if (tlps == null) {
+    private <T> void clearProxies(Map<Class<?>, Map<T, ThreadLocalProxy>> tlps) {
+        Map<T, ThreadLocalProxy> proxies = tlps == null ? null : tlps.get(getServiceClass());
+        if (proxies == null) {
             return;
         }
-        for (ThreadLocalProxy tlp : tlps.values()) {
+        for (ThreadLocalProxy tlp : proxies.values()) {
             if (tlp != null) {
                 tlp.remove();
             }
         }
+    }
+    
+    private void addContextField(Map<Class<?>, List<Field>> theFields, Field f) {
+        List<Field> fields = theFields.get(serviceClass);
+        if (fields == null) {
+            fields = new ArrayList<Field>();
+            theFields.put(serviceClass, fields);
+        }
+        if (!fields.contains(f)) {
+            fields.add(f);
+        }
+    }
+    
+    private <T, V> void addToMap(Map<Class<?>, Map<T, V>> theFields, 
+                               T f, V proxy) {
+        Map<T, V> proxies = theFields.get(serviceClass);
+        if (proxies == null) {
+            proxies = new HashMap<T, V>();
+            theFields.put(serviceClass, proxies);
+        }
+        if (!proxies.containsKey(f)) {
+            proxies.put(f, proxy);
+        }
+    }
+
+    private List<Field> getList(Map<Class<?>, List<Field>> fields) {
+        List<Field> ret = fields == null ? null : fields.get(getServiceClass());
+        if (ret != null) {
+            ret = Collections.unmodifiableList(ret);
+        } else {
+            ret = Collections.emptyList();
+        }
+        return ret;
+    }
+    
+    private <T> ThreadLocalProxy getProxy(Map<Class<?>, Map<T, ThreadLocalProxy>> proxies, T key) {
+        
+        Map<T, ThreadLocalProxy> theMap = proxies == null ? null : proxies.get(getServiceClass());
+        
+        return theMap != null ? theMap.get(key) : null;
     }
 }
