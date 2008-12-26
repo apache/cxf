@@ -122,16 +122,6 @@ public class AtomClientBookTest extends AbstractBusClientServerTestBase {
         
     }
     
-    @Test
-    public void testGetBooks2() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080"; 
-        Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:9080/", 
-                     feed.getBaseUri().toString());
-        assertEquals("Collection of Books", feed.getTitle());
-    }
-    
     private void getAndCompareJson(String address, 
                                    String resourcePath,
                                    String type) throws Exception {

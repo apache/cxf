@@ -42,7 +42,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 		        address="/">
     <jaxrs:serviceBeans>
       <ref bean="atomstore"/>
-      <ref bean="atomstore2"/>
     </jaxrs:serviceBeans>
     <jaxrs:providers>
         <bean class="org.apache.cxf.jaxrs.provider.AtomFeedProvider"/>
@@ -53,7 +52,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:extensionMappings>		   
   </jaxrs:server>
   <bean id="atomstore" class="org.apache.cxf.systest.jaxrs.AtomBookStore"/>
-  <bean id="atomstore2" class="org.apache.cxf.systest.jaxrs.AtomBookStore2"/>
+  
 </beans>
 <!-- END SNIPPET: beans -->
 

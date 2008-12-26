@@ -87,10 +87,6 @@ public class AtomBookStore {
             throw new WebApplicationException();
         }
         
-        return doGetBookAsFeed(uParam);
-    }
-    
-    private Feed doGetBookAsFeed(@Context UriInfo uParam) {
         Factory factory = Abdera.getNewFactory();
         Feed f = factory.newFeed();
         f.setBaseUri(uParam.getAbsolutePath().toString());

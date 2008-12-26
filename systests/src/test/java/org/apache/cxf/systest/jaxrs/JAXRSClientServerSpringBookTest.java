@@ -51,14 +51,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
-    public void testGetBookByUriInfo2() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/the/thebooks3/bookstore/bookinfo?"
-                               + "param1=12&param2=3"; 
-        getBook(endpointAddress, "resources/expected_get_book123json.txt");
-    }
-    
-    @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
             "http://localhost:9080/the/bookstore/books/123"; 
