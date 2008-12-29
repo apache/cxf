@@ -117,12 +117,12 @@ public final class URITemplate {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < expression.length(); i++) {
             char ch = expression.charAt(i);
-            sb.append(isReservedCharater(ch) ? "\\" + ch : ch);
+            sb.append(isReservedCharacter(ch) ? "\\" + ch : ch);
         }
         return sb.toString();
     }
     
-    private static boolean isReservedCharater(char ch) {
+    private static boolean isReservedCharacter(char ch) {
         return CHARACTERS_TO_ESCAPE.indexOf(ch) != -1;
     }
     

@@ -99,7 +99,7 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
             if (entityProviders != null) {
                 ProviderFactory.getInstance(getAddress()).setUserProviders(entityProviders); 
             }
-            ProviderFactory.getInstance(getAddress()).setRequestPreporcessor(
+            ProviderFactory.getInstance(getAddress()).setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
             if (schemaLocations != null) {
                 ProviderFactory.getInstance(getAddress()).setSchemaLocations(schemaLocations);

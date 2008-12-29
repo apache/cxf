@@ -496,7 +496,7 @@ public final class ProviderFactory {
         }
     }
     
-    public void setRequestPreporcessor(RequestPreprocessor rp) {
+    public void setRequestPreprocessor(RequestPreprocessor rp) {
         this.requestPreprocessor = rp;
     }
     
