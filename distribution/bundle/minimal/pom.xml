@@ -146,6 +146,7 @@
                             com.ctc.wstx.*
                         </DynamicImport-Package>
                         <Import-Package>
+                            org.apache.cxf.tools.*;version=${pom.version};resolution:=optional,
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
