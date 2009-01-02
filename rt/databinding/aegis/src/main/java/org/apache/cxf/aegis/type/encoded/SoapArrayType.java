@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
@@ -40,7 +39,7 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.jdom.Element;
 
 import static org.apache.cxf.aegis.type.encoded.SoapEncodingUtil.readAttributeValue;
 
@@ -334,7 +333,7 @@ public class SoapArrayType extends Type {
      * Throws UnsupportedOperationException
      */
     @Override
-    public void writeSchema(XmlSchema root) {
+    public void writeSchema(Element root) {
         throw new UnsupportedOperationException();
     }
 

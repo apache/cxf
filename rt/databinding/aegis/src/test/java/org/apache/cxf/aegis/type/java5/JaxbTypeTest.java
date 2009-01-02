@@ -64,7 +64,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
         AnnotatedTypeInfo info = new AnnotatedTypeInfo(tm, JaxbBean1.class, "urn:foo",
                                                        new TypeCreationOptions());
 
-        Iterator elements = info.getElements().iterator();
+        Iterator elements = info.getElements();
         assertTrue(elements.hasNext());
         QName element = (QName)elements.next();
         assertTrue(elements.hasNext());
@@ -91,7 +91,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
             fail("Unexpected element name: " + element.getLocalPart());
         }
 
-        Iterator atts = info.getAttributes().iterator();
+        Iterator atts = info.getAttributes();
         assertTrue(atts.hasNext());
         atts.next();
         assertFalse(atts.hasNext());
@@ -104,9 +104,9 @@ public class JaxbTypeTest extends AbstractAegisTest {
     public void testAegisType() {
         BeanType type = (BeanType)tm.getTypeCreator().createType(JaxbBean3.class);
 
-        assertEquals(0, type.getTypeInfo().getAttributes().size());
+        assertFalse(type.getTypeInfo().getAttributes().hasNext());
 
-        Iterator itr = type.getTypeInfo().getElements().iterator();
+        Iterator itr = type.getTypeInfo().getElements();
         assertTrue(itr.hasNext());
         QName q = (QName)itr.next();
         assertEquals("attProp", q.getLocalPart());
@@ -124,7 +124,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
     public void testNillableAndMinOccurs() {
         BeanType type = (BeanType)tm.getTypeCreator().createType(JaxbBean4.class);
         AnnotatedTypeInfo info = (AnnotatedTypeInfo)type.getTypeInfo();
-        Iterator elements = info.getElements().iterator();
+        Iterator elements = info.getElements();
         assertTrue(elements.hasNext());
         // nillable first
         QName element = (QName)elements.next();
@@ -177,7 +177,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
                                                            new TypeCreationOptions()));
         type.setSchemaType(new QName("urn:foo", "BadBean"));
 
-        assertEquals(0, type.getTypeInfo().getElements().size());
+        assertFalse(type.getTypeInfo().getElements().hasNext());
     }
 
     public static class BadBean {

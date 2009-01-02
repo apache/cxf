@@ -399,12 +399,12 @@ public class BeanTypeInfo {
         return mappedName2pdName.get(name);
     }
 
-    public List<QName> getAttributes() {
-        return attributes;
+    public Iterator<QName> getAttributes() {
+        return attributes.iterator();
     }
 
-    public List<QName> getElements() {
-        return elements;
+    public Iterator<QName> getElements() {
+        return elements.iterator();
     }
 
     public boolean isExtensibleElements() {

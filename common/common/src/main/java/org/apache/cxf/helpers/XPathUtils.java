@@ -29,11 +29,11 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Node;
 
 public class XPathUtils {
-    private static final XPathFactory FACTORY = XPathFactory.newInstance();
-    private XPath xpath;
+
+    XPath xpath;
 
     public XPathUtils() {
-        xpath = FACTORY.newXPath();
+        xpath = XPathFactory.newInstance().newXPath();
     }
 
     public XPathUtils(final Map<String, String> ns) {
@@ -59,9 +59,5 @@ public class XPathUtils {
 
     public boolean isExist(String xpathExpression, Node node, QName type) {
         return getValue(xpathExpression, node, type) != null;
-    }
-
-    public static XPathFactory getFactory() {
-        return FACTORY;
     }
 }

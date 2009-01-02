@@ -21,7 +21,7 @@ package org.apache.cxf.aegis.xml.jdom;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.aegis.util.stax.JDOMNamespaceContext;
+import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.xml.AbstractMessageWriter;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.jdom.Attribute;
@@ -44,7 +44,7 @@ public class JDOMWriter extends AbstractMessageWriter {
     }
 
     public void writeValue(Object value, String ns, String attr) {
-        String prefix = getUniquePrefix(element, ns);
+        String prefix = NamespaceHelper.getUniquePrefix(element, ns);
 
         element.setAttribute(new Attribute(attr, value.toString(), Namespace.getNamespace(prefix, ns)));
     }
@@ -54,7 +54,7 @@ public class JDOMWriter extends AbstractMessageWriter {
     }
 
     public MessageWriter getElementWriter(String name, String namespace) {
-        String prefix = getUniquePrefix(element, namespace);
+        String prefix = NamespaceHelper.getUniquePrefix(element, namespace);
 
         Element child = new Element(name, Namespace.getNamespace(prefix, namespace));
         element.addContent(child);
@@ -67,7 +67,7 @@ public class JDOMWriter extends AbstractMessageWriter {
     }
 
     public String getPrefixForNamespace(String namespace) {
-        return getUniquePrefix(element, namespace);
+        return NamespaceHelper.getUniquePrefix(element, namespace);
     }
 
     public XMLStreamWriter getXMLStreamWriter() {
@@ -77,7 +77,7 @@ public class JDOMWriter extends AbstractMessageWriter {
     public String getPrefixForNamespace(String namespace, String hint) {
         // todo: this goes for the option of ignoring the hint - we should
         // probably at least attempt to honour it
-        return getUniquePrefix(element, namespace);
+        return NamespaceHelper.getUniquePrefix(element, namespace);
     }
 
     public MessageWriter getAttributeWriter(String name) {
@@ -89,7 +89,7 @@ public class JDOMWriter extends AbstractMessageWriter {
     public MessageWriter getAttributeWriter(String name, String namespace) {
         Attribute att;
         if (namespace != null && namespace.length() > 0) {
-            String prefix = getUniquePrefix(element, namespace);
+            String prefix = NamespaceHelper.getUniquePrefix(element, namespace);
             att = new Attribute(name, "", Namespace.getNamespace(prefix, namespace));
         } else {
             att = new Attribute(name, "");
@@ -104,33 +104,5 @@ public class JDOMWriter extends AbstractMessageWriter {
     }
 
     public void close() {
-    }
-    
-    private static String getUniquePrefix(Element el) {
-        int n = 1;
-
-        while (true) {
-            String nsPrefix = "ns" + n;
-
-            if (el.getNamespace(nsPrefix) == null) {
-                return nsPrefix;
-            }
-
-            n++;
-        }
-    }
-    
-    private static String getUniquePrefix(Element element, String namespaceURI) {
-        String prefix = JDOMNamespaceContext.rawGetPrefix(element, namespaceURI);
-
-        // it is OK to have both namespace URI and prefix be empty. 
-        if (prefix == null) {
-            if ("".equals(namespaceURI)) {
-                return "";
-            }
-            prefix = getUniquePrefix(element);
-            element.addNamespaceDeclaration(Namespace.getNamespace(prefix, namespaceURI));
-        }
-        return prefix;
     }
 }

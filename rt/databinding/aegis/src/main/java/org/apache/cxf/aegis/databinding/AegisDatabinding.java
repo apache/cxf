@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis.databinding;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,12 +29,13 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.DatabindingException;
@@ -46,26 +48,34 @@ import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaTools;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
-import org.apache.ws.commons.schema.XmlSchemaForm;
+import org.apache.ws.commons.schema.utils.NamespaceMap;
+import org.jaxen.JaxenException;
+import org.jaxen.jdom.JDOMXPath;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.output.DOMOutputter;
 
 /**
  * CXF databinding object for Aegis. By default, this creates an AegisContext object. To customize
@@ -100,6 +110,7 @@ public class AegisDatabinding
     protected static final int FAULT_PARAM = 2;
 
     private static final Logger LOG = LogUtils.getL7dLogger(AegisDatabinding.class);
+    private static org.w3c.dom.Document xmimeSchemaDocument;
 
     private AegisContext aegisContext;
     private Map<MessagePartInfo, Type> part2Type;
@@ -109,15 +120,36 @@ public class AegisDatabinding
     private TypeCreationOptions configuration;
     private boolean mtomEnabled;
     private boolean mtomUseXmime;
+    private JDOMXPath importXmimeXpath;
 
     public AegisDatabinding() {
         super();
         part2Type = new HashMap<MessagePartInfo, Type>();
+        // we have this also in AbstractXOPType. There has to be a better way.
+        importXmimeXpath = AbstractXOPType.getXmimeXpathImport();
     }
 
-    private void addXmimeSchema(XmlSchemaCollection collection) {
-        collection.read(new 
-                        InputSource(getClass().getResourceAsStream("/schemas/wsdl/xmime.xsd")), null);
+    private boolean schemaImportsXmime(Element schemaElement) {
+        try {
+            return importXmimeXpath.selectSingleNode(schemaElement) != null;
+        } catch (JaxenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void ensureXmimeSchemaDocument() {
+        if (xmimeSchemaDocument != null) {
+            return;
+        }
+        try {
+            xmimeSchemaDocument = DOMUtils.readXml(getClass().getResourceAsStream("/schemas/wsdl/xmime.xsd"));
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -426,49 +458,107 @@ public class AegisDatabinding
             }
         }
 
+        Map<String, String> namespaceMap = getDeclaredNamespaceMappings();
         boolean needXmimeSchema = false;
+        // utility types.
         boolean needTypesSchema = false;
-        
-        for (ServiceInfo si : s.getServiceInfos()) {
-            for (Map.Entry<String, Set<Type>> entry : tns2Type.entrySet()) {
-                String schemaNamespaceUri = entry.getKey();
-                if (XmlSchemaConstants.XSD_NAMESPACE_URI.equals(schemaNamespaceUri)) {
-                    continue;
-                }
-                SchemaInfo schemaInfo = si.addNewSchema(entry.getKey());
-                XmlSchema schema = schemaInfo.getSchema();
-                schema.setTargetNamespace(entry.getKey());
-                schema.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
-                schema.setAttributeFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
 
-
-                for (Type t : entry.getValue()) {
-                    t.writeSchema(schema);
-                }
-
-                if (schemaImportsXmime(schema)) {
-                    needXmimeSchema = true;
-                }
-            
-                if (AegisContext.schemaImportsUtilityTypes(schema)) {
-                    needTypesSchema = true;
-                }
-
+        for (Map.Entry<String, Set<Type>> entry : tns2Type.entrySet()) {
+            String xsdPrefix = SOAPConstants.XSD_PREFIX;
+            if (namespaceMap != null && namespaceMap.containsKey(SOAPConstants.XSD)) {
+                xsdPrefix = namespaceMap.get(SOAPConstants.XSD);
             }
 
-            if (needXmimeSchema) {
-                addXmimeSchema(si.getXmlSchemaCollection().getXmlSchemaCollection());
+            Element e = new Element("schema", xsdPrefix, SOAPConstants.XSD);
+
+            e.setAttribute(new Attribute(WSDLConstants.ATTR_TNS, entry.getKey()));
+
+            if (null != namespaceMap) { // did application hand us some
+                                        // additional namespaces?
+                for (Map.Entry<String, String> mapping : namespaceMap.entrySet()) {
+                    // user gives us namespace->prefix mapping.
+                    e.addNamespaceDeclaration(Namespace.getNamespace(mapping.getValue(), mapping.getKey()));
+                }
             }
-            
-            if (needTypesSchema) {
-                aegisContext.addTypesSchemaDocument(si.getXmlSchemaCollection().getXmlSchemaCollection());
+
+            // if the user didn't pick something else, assign 'tns' as the
+            // prefix.
+            if (namespaceMap == null || !namespaceMap.containsKey(entry.getKey())) {
+                // Schemas are more readable if there is a specific prefix for
+                // the TNS.
+                e.addNamespaceDeclaration(Namespace.getNamespace(WSDLConstants.CONVENTIONAL_TNS_PREFIX, entry
+                    .getKey()));
+            }
+            e.setAttribute(new Attribute("elementFormDefault", "qualified"));
+            e.setAttribute(new Attribute("attributeFormDefault", "qualified"));
+
+            for (Type t : entry.getValue()) {
+                t.writeSchema(e);
+            }
+
+            if (e.getChildren().size() == 0) {
+                continue;
+            }
+
+            if (schemaImportsXmime(e)) {
+                needXmimeSchema = true;
+            }
+            if (AegisContext.schemaImportsUtilityTypes(e)) {
+                needTypesSchema = true;
+            }
+
+            try {
+                NamespaceMap nsMap = new NamespaceMap();
+
+                nsMap.add(xsdPrefix, SOAPConstants.XSD);
+
+                // We prefer explicit prefixes over those generated in the
+                // types.
+                // This loop may have intended to support prefixes from
+                // individual aegis files,
+                // but that isn't a good idea.
+                for (Iterator itr = e.getAdditionalNamespaces().iterator(); itr.hasNext();) {
+                    Namespace n = (Namespace)itr.next();
+                    if (!nsMap.containsValue(n.getURI())) {
+                        nsMap.add(n.getPrefix(), n.getURI());
+                    }
+                }
+
+                org.w3c.dom.Document schema = new DOMOutputter().output(new Document(e));
+
+                for (ServiceInfo si : s.getServiceInfos()) {
+                    SchemaCollection col = si.getXmlSchemaCollection();
+                    col.setNamespaceContext(nsMap);
+                    XmlSchema xmlSchema = addSchemaDocument(si, col, schema, entry.getKey());
+                    // Work around bug in JDOM DOMOutputter which fails to
+                    // correctly
+                    // assign namespaces to attributes. If JDOM worked right,
+                    // the collection object would get the prefixes for itself.
+                    xmlSchema.setNamespaceContext(nsMap);
+                }
+            } catch (JDOMException e1) {
+                throw new ServiceConstructionException(e1);
+            }
+
+        }
+
+        if (needXmimeSchema) {
+            ensureXmimeSchemaDocument();
+            for (ServiceInfo si : s.getServiceInfos()) {
+                SchemaCollection col = si.getXmlSchemaCollection();
+                // invented systemId.
+                addSchemaDocument(si, col, xmimeSchemaDocument, AbstractXOPType.XML_MIME_NS);
             }
         }
         
-    }
-
-    private boolean schemaImportsXmime(XmlSchema schema) {
-        return XmlSchemaTools.schemaImportsNamespace(schema, AbstractXOPType.XML_MIME_NS);
+        if (needTypesSchema) {
+            org.w3c.dom.Document schema = aegisContext.getTypesSchemaDocument(); 
+            for (ServiceInfo si : s.getServiceInfos()) {
+                SchemaCollection col = si.getXmlSchemaCollection();
+                addSchemaDocument(si, col, schema, AegisContext.SCHEMA_NS);
+            }
+        }
+        
     }
 
     public QName getSuggestedName(Service s, TypeMapping tm, OperationInfo op, int param) {

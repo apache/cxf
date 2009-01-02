@@ -26,13 +26,11 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.util.NamespaceHelper;
-import org.apache.cxf.helpers.DOMUtils;
+import org.jdom.Element;
 
 public class XMLBeanTypeInfo extends BeanTypeInfo {
     private static final Log LOG = LogFactory.getLog(XMLBeanTypeInfo.class);
@@ -52,7 +50,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
     @Override
     protected boolean registerType(PropertyDescriptor desc) {
         Element e = getPropertyElement(desc.getName());
-        if (e != null && DOMUtils.getAttributeValueEmptyNull(e, "type") != null) {
+        if (e != null && e.getAttributeValue("type") != null) {
             return false;
         }
 
@@ -66,14 +64,14 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         QName mappedName = null;
 
         if (e != null) {
-            String ignore = e.getAttribute("ignore");
+            String ignore = e.getAttributeValue("ignore");
             if (ignore != null && ignore.equals("true")) {
                 return;
             }
 
             LOG.debug("Found mapping for property " + pd.getName());
 
-            style = e.getAttribute("style");
+            style = e.getAttributeValue("style");
         }
 
         if (style == null) {
@@ -93,7 +91,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         }
         
         if (e != null) {
-            mappedName = NamespaceHelper.createQName(e, e.getAttribute("mappedName"),
+            mappedName = NamespaceHelper.createQName(e, e.getAttributeValue("mappedName"),
                                                      namespace);
         }
 
@@ -102,18 +100,18 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         }
 
         if (e != null) {
-            QName mappedType = NamespaceHelper.createQName(e, e.getAttribute("typeName"),
+            QName mappedType = NamespaceHelper.createQName(e, e.getAttributeValue("typeName"),
                                                            getDefaultNamespace());
             if (mappedType != null) {
                 mapTypeName(mappedName, mappedType);
             }
 
-            String nillableVal = e.getAttribute("nillable");
+            String nillableVal = e.getAttributeValue("nillable");
             if (nillableVal != null && nillableVal.length() > 0) {
                 ensurePropertyInfo(mappedName).setNillable(Boolean.valueOf(nillableVal).booleanValue());
             }
 
-            String minOccurs = e.getAttribute("minOccurs");
+            String minOccurs = e.getAttributeValue("minOccurs");
             if (minOccurs != null && minOccurs.length() > 0) {
                 ensurePropertyInfo(mappedName).setMinOccurs(Integer.parseInt(minOccurs));
             }
@@ -139,10 +137,10 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
     private Element getPropertyElement(String name2) {
         for (Iterator itr = mappings.iterator(); itr.hasNext();) {
             Element mapping2 = (Element)itr.next();
-            List<Element> elements = DOMUtils.getChildrenWithName(mapping2, null, "property");
+            List elements = mapping2.getChildren("property");
             for (int i = 0; i < elements.size(); i++) {
                 Element e = (Element)elements.get(i);
-                String name = e.getAttribute("name");
+                String name = e.getAttributeValue("name");
 
                 if (name != null && name.equals(name2)) {
                     return e;
