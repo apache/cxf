@@ -213,8 +213,10 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
         if (outdir != null) {
             File dir = new File(outdir);
             if (!dir.exists()) {
-                Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, outdir);
-                throw new ToolException(msg);
+            	if ( !dir.mkdirs() ) {
+                	Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, outdir);
+                	throw new ToolException(msg);
+				}
             }
             if (!dir.isDirectory()) {
                 Message msg = new Message("NOT_A_DIRECTORY", LOG, outdir);
@@ -227,8 +229,10 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             if (clsdir != null) {
                 File dir = new File(clsdir);
                 if (!dir.exists()) {
-                    Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, clsdir);
-                    throw new ToolException(msg);
+                	if ( !dir.mkdirs() ) {
+                    	Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, clsdir);
+                    	throw new ToolException(msg);
+                    }
                 }
             }
         }
