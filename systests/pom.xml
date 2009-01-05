@@ -411,6 +411,12 @@
             <groupId>org.apache.servicemix</groupId>
             <artifactId>servicemix-core</artifactId>
             <version>${servicemix.version}</version>
+           <exclusions>
+             <exclusion>
+              <groupId>jaxen</groupId>
+              <artifactId>jaxen</artifactId>
+             </exclusion>
+	   </exclusions>
         </dependency>
 
         <dependency>

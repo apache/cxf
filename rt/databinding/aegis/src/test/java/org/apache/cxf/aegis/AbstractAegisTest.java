@@ -42,6 +42,7 @@ import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
@@ -53,10 +54,13 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.jdom.Element;
 import org.jdom.output.DOMOutputter;
 import org.junit.Before;
@@ -260,5 +264,19 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         AegisContext globalContext = new AegisContext();
         globalContext.initialize();
         return new Context(globalContext);
+    }
+    
+    protected XmlSchema newXmlSchema(String targetNamespace) {
+        XmlSchema s = new XmlSchema();
+        s.setTargetNamespace(targetNamespace);
+        NamespaceMap xmlsNamespaceMap = new NamespaceMap();
+        s.setNamespaceContext(xmlsNamespaceMap);
+
+        // tns: is conventional, and besides we have unit tests that are hardcoded to it.
+        xmlsNamespaceMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, targetNamespace);
+        
+        // ditto for xsd: instead of just namespace= for the schema schema.
+        xmlsNamespaceMap.add("xsd", XmlSchemaConstants.XSD_NAMESPACE_URI);
+        return s;
     }
 }

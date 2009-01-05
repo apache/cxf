@@ -26,7 +26,8 @@ import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.jdom.Element;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaElement;
 
 /**
  * A Type reads and writes XML fragments to create and write objects.
@@ -76,7 +77,7 @@ public abstract class Type {
      * type object adds it to the schema.
      * @param root root of the XSD document.
      */
-    public void writeSchema(Element root) {
+    public void writeSchema(XmlSchema root) {
     }
     
     /**
@@ -84,7 +85,7 @@ public abstract class Type {
      * xsd:element element, it can implement this. 
      * @param schemaElement
      */
-    public void addToSchemaElement(Element schemaElement) {
+    public void addToSchemaElement(XmlSchemaElement schemaElement) {
     }
 
     /**

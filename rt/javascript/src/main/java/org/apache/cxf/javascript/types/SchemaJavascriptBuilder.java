@@ -579,7 +579,8 @@ public class SchemaJavascriptBuilder {
         String accessorName = "set" + StringUtils.capitalize(itemInfo.getJavascriptName());
         utils.appendLine("cxfjsutils.trace('processing " + itemInfo.getJavascriptName() + "');");
         XmlSchemaElement element = (XmlSchemaElement) itemInfo.getParticle();
-        String elementNamespaceURI = element.getQName().getNamespaceURI();
+        QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, schemaInfo.getSchema()); 
+        String elementNamespaceURI = elementQName.getNamespaceURI();
         boolean elementNoNamespace = "".equals(elementNamespaceURI);
         XmlSchema elementSchema = null;
         if (!elementNoNamespace) {
@@ -595,7 +596,7 @@ public class SchemaJavascriptBuilder {
             elementNamespaceURI = "";
         }
         
-        String localName = element.getQName().getLocalPart();
+        String localName = elementQName.getLocalPart();
         String valueTarget = "item";
 
         if (itemInfo.isOptional() || itemInfo.isArray()) {

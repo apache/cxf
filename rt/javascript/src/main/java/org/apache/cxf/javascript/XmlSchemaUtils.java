@@ -330,6 +330,25 @@ public final class XmlSchemaUtils {
     }
     
     /**
+     * By convention, an element that is named in its schema's TNS can have a 'name' but
+     * no QName. This can get inconvenient for consumers who want to think about qualified names.
+     * Unfortunately, XmlSchema elements, unlike types, don't store a reference to their containing
+     * schema.
+     * @param element
+     * @param schema
+     * @return
+     */
+    public static QName getElementQualifiedName(XmlSchemaElement element, XmlSchema schema) {
+        if (element.getQName() != null) {
+            return element.getQName();
+        } else if (element.getName() != null) {
+            return new QName(schema.getTargetNamespace(), element.getName());
+        } else {
+            return null;
+        }
+    }
+    
+    /**
      * due to a bug, feature, or just plain oddity of JAXB, it isn't good enough
      * to just check the form of an element and of its schema. If schema 'a'
      * (default unqualified) has a complex type with an element with a ref= to
@@ -351,18 +370,19 @@ public final class XmlSchemaUtils {
                                              boolean global,
                                              XmlSchema localSchema,
                                              XmlSchema elementSchema) {
-        if (element.getQName() == null) {
-            throw new RuntimeException("getSchemaQualifier on anonymous element.");
+        QName qn = XmlSchemaUtils.getElementQualifiedName(element, localSchema);
+        if (qn == null) {
+            throw new RuntimeException("isElementQualified on anonymous element.");
         }
         if (element.getRefName() != null) {
-            throw new RuntimeException("getSchemaQualified on the 'from' side of ref=.");
+            throw new RuntimeException("isElementQualified on the 'from' side of ref=.");
         }
             
 
         if (global) {
             return isElementNameQualified(element, elementSchema)
                 || (localSchema != null 
-                    && !(element.getQName().getNamespaceURI().equals(localSchema.getTargetNamespace())));
+                    && !(qn.getNamespaceURI().equals(localSchema.getTargetNamespace())));
         } else {
             return isElementNameQualified(element, elementSchema);
         }

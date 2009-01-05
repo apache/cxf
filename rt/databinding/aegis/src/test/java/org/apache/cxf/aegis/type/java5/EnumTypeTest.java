@@ -30,8 +30,10 @@ import org.apache.cxf.aegis.type.java5.CurrencyService.Currency;
 import org.apache.cxf.aegis.xml.jdom.JDOMReader;
 import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaSerializer;
 import org.jdom.Element;
-import org.jdom.output.DOMOutputter;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -118,12 +120,11 @@ public class EnumTypeTest extends AbstractAegisTest {
         EnumType type = new EnumType();
         type.setTypeClass(smallEnum.class);
         type.setSchemaType(new QName("urn:test", "test"));
+        XmlSchema schema = newXmlSchema("urn:test");
+        type.writeSchema(schema);
 
-        Element root = new Element("root");
-        org.jdom.Document wsdl = new org.jdom.Document(root);
-        type.writeSchema(root);
-
-        Document doc = new DOMOutputter().output(wsdl);
+        XmlSchemaSerializer ser = new XmlSchemaSerializer();
+        Document doc = ser.serializeSchema(schema, false)[0];
         addNamespace("xsd", SOAPConstants.XSD);
         assertValid("//xsd:simpleType[@name='test']/xsd:restriction[@base='xsd:string']", doc);
         assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='VALUE1']", doc);

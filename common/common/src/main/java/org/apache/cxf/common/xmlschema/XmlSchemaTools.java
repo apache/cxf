@@ -26,9 +26,12 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
 import org.apache.ws.commons.schema.XmlSchemaFacet;
+import org.apache.ws.commons.schema.XmlSchemaImport;
+import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeContent;
@@ -147,5 +150,54 @@ public final class XmlSchemaTools {
             values.add(enumFacet.getValue().toString());
         }
         return values;
+    }
+    
+    /**
+     * Is there an import for a particular namespace in a schema?
+     * @param schema
+     * @param namespaceUri
+     * @return
+     */
+    public static boolean schemaImportsNamespace(XmlSchema schema, String namespaceUri) {
+        XmlSchemaObjectCollection inc = schema.getIncludes();
+        for (int x = 0; x < inc.getCount(); x++) {
+            XmlSchemaObject what = inc.getItem(x);
+            if (what instanceof XmlSchemaImport) {
+                XmlSchemaImport imp = (XmlSchemaImport)what;
+                // already there.
+                if (namespaceUri.equals(imp.getNamespace())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Assist in managing the required <import namespace='uri'> for imports of peer schemas.
+     * @param schema
+     * @param namespaceUri
+     */
+    public static void addImportIfNeeded(XmlSchema schema, String namespaceUri) {
+        // no need to import nothing or the XSD schema.
+        if ("".equals(namespaceUri) || XmlSchemaConstants.XSD_NAMESPACE_URI.equals(namespaceUri)) {
+            return;
+        }
+            
+        XmlSchemaObjectCollection inc = schema.getIncludes();
+        for (int x = 0; x < inc.getCount(); x++) {
+            XmlSchemaObject what = inc.getItem(x);
+            if (what instanceof XmlSchemaImport) {
+                XmlSchemaImport imp = (XmlSchemaImport)what;
+                // already there.
+                if (namespaceUri.equals(imp.getNamespace())) {
+                    return;
+                }
+            }
+        }
+        XmlSchemaImport imp = new XmlSchemaImport();
+        imp.setNamespace(namespaceUri);
+        inc.add(imp);
+        schema.getItems().add(imp);
     }
 }

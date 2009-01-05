@@ -35,8 +35,10 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.jdom.Attribute;
-import org.jdom.Element;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaSimpleType;
+import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 
 /**
  * Type for runtime inspection of types. Looks as the class to be written, and
@@ -278,16 +280,15 @@ public class ObjectType extends Type {
     }
 
     @Override
-    public void writeSchema(Element root) {
+    public void writeSchema(XmlSchema root) {
         if (serializedWhenUnknown) {
-            Element simple = new Element("simpleType", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-            simple.setAttribute(new Attribute("name", "serializedJavaObject"));
-            root.addContent(simple);
-
-            Element restriction = new Element("restriction", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-            restriction.setAttribute(new Attribute("base", SOAPConstants.XSD_PREFIX + ":base64Binary"));
-
-            simple.addContent(restriction);
+            XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root);
+            simple.setName("serializedJavaObject");
+            root.addType(simple);
+            root.getItems().add(simple);
+            XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();    
+            simple.setContent(restriction);
+            restriction.setBaseTypeName(XmlSchemaConstants.BASE64BINARY_QNAME);
         }
     }
 }

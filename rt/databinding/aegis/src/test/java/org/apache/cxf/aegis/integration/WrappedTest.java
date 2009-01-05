@@ -106,7 +106,8 @@ public class WrappedTest extends AbstractAegisTest {
                         + "[@type=\"xsd:string\"]",
                     doc);
     }
-    
+
+    @org.junit.Ignore // uses Jaxen.
     @Test 
     public void testSubmitJDOMArray() throws Exception {
         

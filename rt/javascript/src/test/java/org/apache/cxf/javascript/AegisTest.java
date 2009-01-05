@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AegisServiceImpl;
@@ -62,7 +61,6 @@ public class AegisTest extends JavascriptRhinoTest {
                    true);
         implementor = (AegisServiceImpl)rawImplementor;
         implementor.reset();
-        serverFactoryBean.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
     }
     
     private Void acceptAny(Context context) {

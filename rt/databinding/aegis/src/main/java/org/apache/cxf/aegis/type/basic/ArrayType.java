@@ -22,8 +22,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -34,14 +32,13 @@ import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
-import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.jdom.Attribute;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaComplexType;
+import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaSequence;
 
 /**
  * An ArrayType.
@@ -165,8 +162,8 @@ public class ArrayType extends Type {
     }
 
     @Override
-    public void writeObject(Object values, MessageWriter writer, Context context) 
-        throws DatabindingException {
+    public void writeObject(Object values, MessageWriter writer, 
+                            Context context) throws DatabindingException {
         boolean forceXsiWrite = false;
         if (values == null) {
             return;
@@ -188,7 +185,6 @@ public class ArrayType extends Type {
         }
 
         String name = type.getSchemaType().getLocalPart();
-
 
         Class arrayType = type.getTypeClass();
 
@@ -266,70 +262,50 @@ public class ArrayType extends Type {
         } else {
             type.writeObject(value, cwriter, context);
         }
-        
+
         if (type.isWriteOuter()) {
             cwriter.close();
         }
     }
 
     @Override
-    public void writeSchema(Element root) {
-        try {
-            if (hasDefinedArray(root)) {
-                return;
-            }
-
-            Element complex = new Element("complexType", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-            complex.setAttribute(new Attribute("name", getSchemaType().getLocalPart()));
-            root.addContent(complex);
-
-            Element seq = new Element("sequence", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-            complex.addContent(seq);
-
-            Element element = new Element("element", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-            seq.addContent(element);
-
-            Type componentType = getComponentType();
-            String prefix = NamespaceHelper.getUniquePrefix(root, componentType.getSchemaType()
-                .getNamespaceURI());
-
-            element.setAttribute(new Attribute("name", componentType.getSchemaType().getLocalPart()));
-            element.setAttribute(TypeUtil.createTypeAttribute(prefix, componentType, root));
-
-            if (componentType.isNillable()) {
-                element.setAttribute(new Attribute("nillable", "true"));
-            }
-
-            element.setAttribute(new Attribute("minOccurs", Long.valueOf(getMinOccurs()).toString()));
-
-            if (maxOccurs == Long.MAX_VALUE) {
-                element.setAttribute(new Attribute("maxOccurs", "unbounded"));
-            } else {
-                element.setAttribute(new Attribute("maxOccurs", Long.valueOf(getMaxOccurs()).toString()));
-            }
-
-        } catch (IllegalArgumentException e) {
-            throw new DatabindingException("Illegal argument.", e);
+    public void writeSchema(XmlSchema root) {
+        if (hasDefinedArray(root)) {
+            return;
         }
+
+        XmlSchemaComplexType complex = new XmlSchemaComplexType(root);
+        complex.setName(getSchemaType().getLocalPart());
+        root.addType(complex);
+        root.getItems().add(complex);
+
+        XmlSchemaSequence seq = new XmlSchemaSequence();
+        complex.setParticle(seq);
+
+        Type componentType = getComponentType();
+        XmlSchemaElement element = new XmlSchemaElement();
+        element.setName(componentType.getSchemaType().getLocalPart());
+        element.setSchemaTypeName(componentType.getSchemaType());
+        seq.getItems().add(element);
+
+        if (componentType.isNillable()) {
+            element.setNillable(true);
+        }
+
+        element.setMinOccurs(getMinOccurs());
+        element.setMaxOccurs(getMaxOccurs());
+
     }
 
     /**
-     * Since both an Array and a List can have the same type definition, double
-     * check that there isn't already a defined type already.
+     * Since both an Array and a List can have the same type definition, double check that there isn't already
+     * a defined type already.
      * 
      * @param root
      * @return
      */
-    private boolean hasDefinedArray(Element root) {
-        List children = root.getChildren("complexType", Namespace.getNamespace(SOAPConstants.XSD));
-        for (Iterator itr = children.iterator(); itr.hasNext();) {
-            Element e = (Element)itr.next();
-
-            if (e.getAttributeValue("name").equals(getSchemaType().getLocalPart())) {
-                return true;
-            }
-        }
-        return false;
+    private boolean hasDefinedArray(XmlSchema root) {
+        return root.getTypeByName(getSchemaType().getLocalPart()) != null;
     }
 
     /**
@@ -416,7 +392,7 @@ public class ArrayType extends Type {
         setWriteOuter(!flat);
         this.flat = flat;
     }
-    
+
     @Override
     public boolean hasMaxOccurs() {
         return true;

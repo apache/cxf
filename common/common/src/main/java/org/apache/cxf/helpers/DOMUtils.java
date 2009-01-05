@@ -24,9 +24,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +41,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -50,7 +53,6 @@ import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.util.StringUtils;
 
-
 /**
  * Few simple utils to read DOM. This is originally from the Jakarta Commons
  * Modeler.
@@ -58,8 +60,8 @@ import org.apache.cxf.common.util.StringUtils;
  * @author Costin Manolache
  */
 public final class DOMUtils {
-    static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
-    static DocumentBuilder builder;
+    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
+    private static DocumentBuilder builder;
     private static final String XMLNAMESPACE = "xmlns";
 
     private DOMUtils() {
@@ -72,8 +74,24 @@ public final class DOMUtils {
         }
         return builder;
     }
+    
     /**
-     * Get the trimed text content of a node or null if there is no text
+     * This function is much like getAttribute, but returns null, not "", for a nonexistent attribute.
+     * @param e
+     * @param attributeName
+     * @return
+     */
+    public static String getAttributeValueEmptyNull(Element e, String attributeName) {
+        Attr node = e.getAttributeNode(attributeName);
+        if (node == null) {
+            return null;
+        }
+        return node.getValue();
+    }
+    
+    
+    /**
+     * Get the trimmed text content of a node or null if there is no text
      */
     public static String getContent(Node n) {
         if (n == null) {
@@ -249,24 +267,63 @@ public final class DOMUtils {
         return null;
     }
     
+    /**
+     * Return the first element child with the specified qualified name.
+     * @param parent
+     * @param q
+     * @return
+     */
     public static Element getFirstChildWithName(Element parent, QName q) { 
         String ns = q.getNamespaceURI();
         String lp = q.getLocalPart();
         return getFirstChildWithName(parent, ns, lp);
     }
-    public static Element getFirstChildWithName(Element parent, String ns, String lp) { 
-        Node n = parent.getFirstChild();
-        while (n != null) {
-            if (ns.equals(n.getNamespaceURI())
-                && lp.equals(n.getLocalName())) {
-                return (Element)n;
-            }
-            n = n.getNextSibling();
-        }
-        return (Element)n;
-    }
+    
     /**
-     * Get the first direct child with a given type
+     * Return the first element child with the specified qualified name.
+     * @param parent
+     * @param ns
+     * @param lp
+     * @return
+     */
+    public static Element getFirstChildWithName(Element parent, String ns, String lp) { 
+        for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
+            if (n instanceof Element) {
+                Element e = (Element) n;
+                String ens = e.getNamespaceURI();
+                if (ns.equals(ens) && lp.equals(e.getNodeName())) {
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return child elements with specified name.
+     * @param parent
+     * @param ns
+     * @param localName
+     * @return
+     */
+    public static List<Element> getChildrenWithName(Element parent, String ns, String localName) {
+        List<Element> r = new ArrayList<Element>();
+        for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
+            if (n instanceof Element) {
+                Element e = (Element) n;
+                if (ns.equals(e.getNamespaceURI()) && localName.equals(e.getLocalName())) {
+                    r.add(e);
+                }
+            }
+        }
+        return r;
+    }
+
+    /**
+     * Get the first child of the specified type.
+     * @param parent
+     * @param type
+     * @return
      */
     public static Node getChild(Node parent, int type) {
         Node n = parent.getFirstChild();
@@ -302,8 +359,7 @@ public final class DOMUtils {
             if (type >= 0 && node.getNodeType() != type) {
                 continue;
             }
-            // System.out.println("getNode: " + name + " " +
-            // node.getNodeName());
+
             if (name == null) {
                 return node;
             }
@@ -401,6 +457,7 @@ public final class DOMUtils {
             throw new RuntimeException("Couldn't find a DOM parser.", e);
         }
     }
+    
     public static Document createDocument() {
         try {
             return getBuilder().newDocument();
@@ -428,6 +485,38 @@ public final class DOMUtils {
             }
         }
         return null;
+    }
+    
+    /**
+     * Get all prefixes defined, up to the root, for a namespace URI.
+     * @param element
+     * @param namespaceUri
+     * @param prefixes
+     */
+    public static void getPrefixesRecursive(Element element, String namespaceUri, List<String> prefixes) {
+        getPrefixes(element, namespaceUri, prefixes);
+        Node parent = element.getParentNode();
+        if (parent instanceof Element) {
+            getPrefixesRecursive((Element)parent, namespaceUri, prefixes);
+        }
+    }
+    
+    /**
+     * Get all prefixes defined on this element for the specified namespace.
+     * @param element
+     * @param namespaceUri
+     * @param prefixes
+     */
+    public static void getPrefixes(Element element, String namespaceUri, List<String> prefixes) {
+        NamedNodeMap atts = element.getAttributes();
+        for (int i = 0; i < atts.getLength(); i++) {
+            Node node = atts.item(i);
+            String name = node.getNodeName();
+            if (namespaceUri.equals(node.getNodeValue()) 
+                && (name != null && (XMLNAMESPACE.equals(name) || name.startsWith(XMLNAMESPACE + ":")))) {
+                prefixes.add(node.getPrefix());
+            }
+        }
     }
 
     public static String createNamespace(Element el, String ns) {
@@ -514,5 +603,37 @@ public final class DOMUtils {
             findAllElementsByTagName(elem, tagName, elementList);
             elem = getNextElement(elem);
         }
+    }
+    
+
+    /**
+     * Set a namespace/prefix on an element if it is not set already. First off, it
+     * searches for the element for the prefix associated with the specified
+     * namespace. If the prefix isn't null, then this is returned. Otherwise, it
+     * creates a new attribute using the namespace/prefix passed as parameters.
+     * 
+     * @param element
+     * @param namespace
+     * @param prefix
+     * @return the prefix associated with the set namespace
+     */
+    public static String setNamespace(Element element, String namespace,
+            String prefix) {
+        String pre = getPrefixRecursive(element, namespace);
+        if (pre != null) {
+            return pre;
+        }
+        element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespace);
+        return prefix;
+    }
+    
+    /**
+     * Add a namespace prefix definition to an element.
+     * @param element
+     * @param namespaceUri
+     * @param prefix
+     */
+    public static void addNamespacePrefix(Element element, String namespaceUri, String prefix) {
+        element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespaceUri);
     }
 }

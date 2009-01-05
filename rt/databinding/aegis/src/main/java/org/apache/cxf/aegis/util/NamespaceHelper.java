@@ -20,7 +20,6 @@ package org.apache.cxf.aegis.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -30,10 +29,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.JavaUtils;
-import org.jdom.Element;
-import org.jdom.Namespace;
 
 /**
  * Namespace utilities.
@@ -62,51 +62,17 @@ public final class NamespaceHelper {
                 return "";
             }
             prefix = getUniquePrefix(element);
-            element.addNamespaceDeclaration(Namespace.getNamespace(prefix, namespaceURI));
+            DOMUtils.addNamespacePrefix(element, namespaceURI, prefix);
         }
         return prefix;
     }
 
     public static String getPrefix(Element element, String namespaceURI) {
-        if (element.getNamespaceURI().equals(namespaceURI)) {
-            return element.getNamespacePrefix();
-        }
-
-        List namespaces = element.getAdditionalNamespaces();
-
-        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
-            Namespace ns = (Namespace)itr.next();
-
-            if (ns.getURI().equals(namespaceURI)) {
-                return ns.getPrefix();
-            }
-        }
-
-        if (element.getParentElement() != null) {
-            return getPrefix(element.getParentElement(), namespaceURI);
-        } else {
-            return null;
-        }
+        return DOMUtils.getPrefixRecursive(element, namespaceURI);
     }
 
     public static void getPrefixes(Element element, String namespaceURI, List<String> prefixes) {
-        if (element.getNamespaceURI().equals(namespaceURI)) {
-            prefixes.add(element.getNamespacePrefix());
-        }
-
-        List namespaces = element.getAdditionalNamespaces();
-
-        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
-            Namespace ns = (Namespace)itr.next();
-
-            if (ns.getURI().equals(namespaceURI)) {
-                prefixes.add(ns.getPrefix());
-            }
-        }
-
-        if (element.getParentElement() != null) {
-            getPrefixes(element.getParentElement(), namespaceURI, prefixes);
-        }
+        DOMUtils.getPrefixesRecursive(element, namespaceURI, prefixes);
     }
 
     private static String getUniquePrefix(Element el) {
@@ -115,7 +81,7 @@ public final class NamespaceHelper {
         while (true) {
             String nsPrefix = "ns" + n;
 
-            if (el.getNamespace(nsPrefix) == null) {
+            if (DOMUtils.getNamespace(el, nsPrefix) == null) {
                 return nsPrefix;
             }
 
@@ -373,17 +339,15 @@ public final class NamespaceHelper {
 
         String prefix = value.substring(0, index);
         String localName = value.substring(index + 1);
-        Namespace jNS = e.getNamespace(prefix);
+        String jNS = DOMUtils.getNamespace(e, prefix);
         if (jNS == null) {
             throw new DatabindingException("No namespace was found for prefix: " + prefix);
         }
         
-        String ns = jNS.getURI();
-
-        if (ns == null || localName == null) {
+        if (jNS == null || localName == null) {
             throw new DatabindingException("Invalid QName in mapping: " + value);
         }
 
-        return new QName(ns, localName, prefix);
+        return new QName(jNS, localName, prefix);
     }
 }
