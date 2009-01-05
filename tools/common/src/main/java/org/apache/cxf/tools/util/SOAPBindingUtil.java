@@ -50,6 +50,7 @@ import javax.wsdl.extensions.soap12.SOAP12Header;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.ExtensionInvocationHandler;
 import org.apache.cxf.tools.common.extensions.soap.SoapAddress;
@@ -58,7 +59,6 @@ import org.apache.cxf.tools.common.extensions.soap.SoapBody;
 import org.apache.cxf.tools.common.extensions.soap.SoapFault;
 import org.apache.cxf.tools.common.extensions.soap.SoapHeader;
 import org.apache.cxf.tools.common.extensions.soap.SoapOperation;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 public final class SOAPBindingUtil {
     private static Map<String, String> bindingMap = new HashMap<String, String>();

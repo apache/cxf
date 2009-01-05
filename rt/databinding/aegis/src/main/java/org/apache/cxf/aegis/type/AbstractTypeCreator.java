@@ -34,8 +34,8 @@ import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.util.ServiceUtils;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 /**
  * @author Hani Suleiman Date: Jun 14, 2005 Time: 11:59:57 PM

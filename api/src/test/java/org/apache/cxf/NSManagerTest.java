@@ -19,8 +19,8 @@
 
 package org.apache.cxf;
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.http.HttpConstants;
 import org.apache.cxf.binding.http.URIMapper;
 import org.apache.cxf.binding.xml.interceptor.XMLMessageOutInterceptor;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
@@ -39,7 +40,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 public class DatabindingOutSetupInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final WrappedOutInterceptor WRAPPED_OUT = new WrappedOutInterceptor();

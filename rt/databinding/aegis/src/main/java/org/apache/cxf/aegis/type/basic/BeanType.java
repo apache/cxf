@@ -40,7 +40,7 @@ import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaTools;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAny;
@@ -584,7 +584,7 @@ public class BeanType extends Type {
     }
 
     private void addXmimeToSchema(XmlSchema root) {
-        XmlSchemaTools.addImportIfNeeded(root, AbstractXOPType.XML_MIME_NS);
+        XmlSchemaUtils.addImportIfNeeded(root, AbstractXOPType.XML_MIME_NS);
     }
 
     @Override
@@ -697,7 +697,7 @@ public class BeanType extends Type {
             attribute.setSchemaTypeName(type.getSchemaType());
             String ns = name.getNamespaceURI();
             if (!ns.equals(root.getTargetNamespace())) {
-                XmlSchemaTools.addImportIfNeeded(root, ns);
+                XmlSchemaUtils.addImportIfNeeded(root, ns);
             }
         }
 

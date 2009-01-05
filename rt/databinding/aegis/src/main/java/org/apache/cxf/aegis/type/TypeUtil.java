@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaTools;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 
 
@@ -159,6 +159,6 @@ public final class TypeUtil {
     
     public static void setAttributeAttributes(QName name, Type type, XmlSchema root) {
         String ns = type.getSchemaType().getNamespaceURI();
-        XmlSchemaTools.addImportIfNeeded(root, ns);
+        XmlSchemaUtils.addImportIfNeeded(root, ns);
     }
 }

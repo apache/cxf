@@ -29,7 +29,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaTools;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.javascript.AttributeInfo;
 import org.apache.cxf.javascript.ItemInfo;
 import org.apache.cxf.javascript.JavascriptUtils;
@@ -37,7 +37,6 @@ import org.apache.cxf.javascript.NameManager;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
 import org.apache.cxf.javascript.ParticleInfo;
 import org.apache.cxf.javascript.UnsupportedConstruct;
-import org.apache.cxf.javascript.XmlSchemaUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
@@ -111,8 +110,8 @@ public class SchemaJavascriptBuilder {
                 }
             } else if (xmlSchemaObject instanceof XmlSchemaSimpleType) {
                 XmlSchemaSimpleType simpleType = (XmlSchemaSimpleType)xmlSchemaObject;
-                if (XmlSchemaTools.isEumeration(simpleType)) {
-                    List<String> values = XmlSchemaTools.enumeratorValues(simpleType);
+                if (XmlSchemaUtils.isEumeration(simpleType)) {
+                    List<String> values = XmlSchemaUtils.enumeratorValues(simpleType);
                     code.append("//\n");
                     code.append("// Simple type (enumeration) " + simpleType.getQName() + "\n");
                     code.append("//\n");

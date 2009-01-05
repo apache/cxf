@@ -51,12 +51,12 @@ import com.ibm.wsdl.extensions.soap.SOAPHeaderSerializer;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.catalog.CatalogWSDLLocator;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**

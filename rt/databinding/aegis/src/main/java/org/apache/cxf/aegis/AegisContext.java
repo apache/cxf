@@ -46,7 +46,7 @@ import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaTools;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
@@ -239,7 +239,7 @@ public class AegisContext {
     }
 
     public static boolean schemaImportsUtilityTypes(XmlSchema schema) {
-        return XmlSchemaTools.schemaImportsNamespace(schema, UTILITY_TYPES_SCHEMA_NS);
+        return XmlSchemaUtils.schemaImportsNamespace(schema, UTILITY_TYPES_SCHEMA_NS);
     }
     
     private Document getSchemaDocument(String resourcePath) { 
@@ -278,7 +278,7 @@ public class AegisContext {
     }
 
     public static void addUtilityTypesToSchema(XmlSchema root) {
-        XmlSchemaTools.addImportIfNeeded(root, UTILITY_TYPES_SCHEMA_NS);
+        XmlSchemaUtils.addImportIfNeeded(root, UTILITY_TYPES_SCHEMA_NS);
     }
 
     /**
