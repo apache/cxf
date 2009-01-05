@@ -37,6 +37,7 @@ import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Attachment;
 import org.junit.Before;
@@ -104,11 +105,10 @@ public class ReadHeaderInterceptorTest extends TestBase {
             if (ele.getLocalName().equals("reservation")) {
                 Element reservation = ele;
                 List<Element> reservationChilds = new ArrayList<Element>();
-                for (int j = 0; j < reservation.getChildNodes().getLength(); j++) {
-                    if (reservation.getChildNodes().item(j) instanceof Element) {
-                        Element element = (Element)reservation.getChildNodes().item(j);
-                        reservationChilds.add(element);
-                    }
+                Element elem = DOMUtils.getFirstElement(reservation);
+                while (elem != null) {
+                    reservationChilds.add(elem);
+                    elem = DOMUtils.getNextElement(elem);
                 }
                 assertEquals(2, reservationChilds.size());
                 assertEquals("reference", reservationChilds.get(0).getLocalName());
@@ -122,13 +122,8 @@ public class ReadHeaderInterceptorTest extends TestBase {
             if (ele.getLocalName().equals("passenger")) {
                 Element passenger = ele;
                 assertNotNull(passenger);
-                Element child = null;
-                for (int j = 0; j < passenger.getChildNodes().getLength(); j++) {
-                    if (passenger.getChildNodes().item(j) instanceof Element) {
-                        child = (Element)passenger.getChildNodes().item(j);
-                    }
-                }
-                assertNotNull("passenger should has child element", child);                
+                Element child = DOMUtils.getFirstElement(passenger);
+                assertNotNull("passenger should have a child element", child);                
                 assertEquals("name", child.getLocalName());
                 assertEquals("Bob", child.getTextContent());
             }
