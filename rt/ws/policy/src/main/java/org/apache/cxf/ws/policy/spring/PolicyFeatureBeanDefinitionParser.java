@@ -22,10 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.WSPolicyFeature;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -39,21 +38,15 @@ public class PolicyFeatureBeanDefinitionParser extends AbstractBeanDefinitionPar
         List<Element> ps = new ArrayList<Element>();
         List<Element> prs = new ArrayList<Element>();     
         
-        NodeList children = e.getChildNodes();
-        if (children != null) {
-            for (int i = 0; i < children.getLength(); i++) {
-                Node nd = children.item(i);
-                if (nd.getNodeType() == Node.ELEMENT_NODE) {
-                    Element elem = (Element)nd;
-                    if ("Policy".equals(elem.getLocalName())) {
-                        ps.add(elem);
-                    } else if ("PolicyReference".equals(elem.getLocalName())) {
-                        prs.add(elem);
-                    }   
-                }
+        Element elem = DOMUtils.getFirstElement(e);
+        while (elem != null) {
+            if ("Policy".equals(elem.getLocalName())) {
+                ps.add(elem);
+            } else if ("PolicyReference".equals(elem.getLocalName())) {
+                prs.add(elem);
             }
+            elem = DOMUtils.getNextElement(elem);
         }
-        
         bean.addPropertyValue("policyElements", ps);
         bean.addPropertyValue("policyReferenceElements", prs);
         
