@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.spring.TLSClientParametersConfig;
@@ -74,7 +73,25 @@ public class HttpConduitBeanDefinitionParser
     private void mapSpecificElements(
         Element               parent, 
         BeanDefinitionBuilder bean
-    ) {
+    ) { 
+        Node n = parent.getFirstChild();
+        while (n != null) {
+            if (Node.ELEMENT_NODE != n.getNodeType() 
+                || !HTTP_NS.equals(n.getNamespaceURI())) {
+                continue;
+            }
+            String elementName = n.getLocalName();
+            // Schema should require that no more than one each of these exist.
+            if ("trustDecider".equals(elementName)) {                
+                mapBeanOrClassElement((Element)n, bean, MessageTrustDecider.class);
+            } else if ("basicAuthSupplier".equals(elementName)) {
+                mapBeanOrClassElement((Element)n, bean, HttpBasicAuthSupplier.class);
+            } else if ("tlsClientParameters".equals(elementName)) {
+                mapTLSClientParameters((Element)n, bean);
+            } 
+        }
+        
+        /*
         NodeList nl = parent.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node n = nl.item(i);
@@ -92,6 +109,7 @@ public class HttpConduitBeanDefinitionParser
                 mapTLSClientParameters((Element)n, bean);
             }
         }
+        */
 
     }
     
