@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import javax.wsdl.Definition;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -83,7 +83,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     public void execute() throws ToolException {
         buildToolContext();
         validate(context);
-        
+
         WSDLConstants.WSDLVersion version = getWSDLVersion();
 
         String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
@@ -97,8 +97,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
 
             // Build the ServiceModel from the WSDLModel
             if (version == WSDLConstants.WSDLVersion.WSDL11) {
-                AbstractWSDLBuilder<Definition> builder = (AbstractWSDLBuilder<Definition>)frontend
-                    .getWSDLBuilder();
+                AbstractWSDLBuilder<Definition> builder = frontend.getWSDLBuilder();
                 builder.setContext(context);
                 builder.setBus(getBus());
                 context.put(Bus.class, getBus());
@@ -191,16 +190,15 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             try {
                 pns = (String[])env.get(ToolConstants.CFG_JSPACKAGEPREFIX);
             } catch (ClassCastException e) {
-                Message msg = new Message("INVALID_PREFIX_MAPPING", LOG, 
-                                          env.get(ToolConstants.CFG_JSPACKAGEPREFIX));
+                Message msg = new Message("INVALID_PREFIX_MAPPING", LOG, env
+                    .get(ToolConstants.CFG_JSPACKAGEPREFIX));
                 throw new ToolException(msg);
             }
-            for (int j = 0; j < pns.length; j++) {
-                int pos = pns[j].indexOf("=");
-                String jsprefix = pns[j];
+            for (String jsprefix : pns) {
+                int pos = jsprefix.indexOf("=");
                 if (pos != -1) {
-                    String ns = pns[j].substring(0, pos);
-                    jsprefix = pns[j].substring(pos + 1);
+                    String ns = jsprefix.substring(0, pos);
+                    jsprefix = jsprefix.substring(pos + 1);
                     nsPrefixMap.put(ns, jsprefix);
                 }
             }
@@ -212,11 +210,9 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
         String outdir = (String)env.get(ToolConstants.CFG_OUTPUTDIR);
         if (outdir != null) {
             File dir = new File(outdir);
-            if (!dir.exists()) {
-            	if ( !dir.mkdirs() ) {
-                	Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, outdir);
-                	throw new ToolException(msg);
-				}
+            if (!dir.exists() && !dir.mkdirs()) {
+                Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, outdir);
+                throw new ToolException(msg);
             }
             if (!dir.isDirectory()) {
                 Message msg = new Message("NOT_A_DIRECTORY", LOG, outdir);
@@ -228,11 +224,9 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             String clsdir = (String)env.get(ToolConstants.CFG_CLASSDIR);
             if (clsdir != null) {
                 File dir = new File(clsdir);
-                if (!dir.exists()) {
-                	if ( !dir.mkdirs() ) {
-                    	Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, clsdir);
-                    	throw new ToolException(msg);
-                    }
+                if (!dir.exists() && !dir.mkdirs()) {
+                    Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, clsdir);
+                    throw new ToolException(msg);
                 }
             }
         }
@@ -312,8 +306,8 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             throw new RuntimeException(ex);
         }
 
-        for (Iterator it = initialExtensions.values().iterator(); it.hasNext();) {
-            String validatorClass = (String)it.next();
+        for (Object element : initialExtensions.values()) {
+            String validatorClass = (String)element;
             try {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Found service validator : " + validatorClass);
