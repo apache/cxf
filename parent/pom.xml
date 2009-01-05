@@ -949,6 +949,38 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+	    <dependency>
+	      <groupId>jaxen</groupId>
+	      <artifactId>jaxen</artifactId>
+	      <version>1.1</version>
+	      <exclusions>
+		<exclusion>
+		  <artifactId>dom4j</artifactId>
+		  <groupId>dom4j</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>xmlParserAPIs</artifactId>
+		  <groupId>xerces</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>xercesImpl</artifactId>
+		  <groupId>xerces</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>xom</artifactId>
+		  <groupId>xom</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>xalan</artifactId>
+		  <groupId>xalan</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>xml-apis</artifactId>
+		  <groupId>xml-apis</groupId>
+		</exclusion>
+	      </exclusions>
+	    </dependency>
         </dependencies>
     </dependencyManagement>
 
