@@ -78,6 +78,7 @@ public class HttpConduitBeanDefinitionParser
         while (n != null) {
             if (Node.ELEMENT_NODE != n.getNodeType() 
                 || !HTTP_NS.equals(n.getNamespaceURI())) {
+                n = n.getNextSibling();
                 continue;
             }
             String elementName = n.getLocalName();
