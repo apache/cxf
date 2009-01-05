@@ -248,11 +248,13 @@ public final class CustomizationParser {
             
             Element childEl = (Element)childNode;
             if (isJaxbBindingsElement(childEl)) {
+                
                 NodeList nlist = nodeSelector.queryNodes(schemaNode, childEl.getAttribute("node"));
                 for (int i = 0; i < nlist.getLength(); i++) {
                     Node node = nlist.item(i);
                     copyAllJaxbDeclarations(node, childEl);
-                }
+                }              
+                
             } else {
                 Element cloneNode = (Element)ProcessorUtil.cloneNode(schemaNode.getOwnerDocument(), 
                                                                      childEl, true);
@@ -270,9 +272,9 @@ public final class CustomizationParser {
                 childNode = childNode.getNextSibling();
             }
         }
-
-        if (schemaNode.getChildNodes().getLength() > 0) {
-            schemaNode.insertBefore(annotationNode, schemaNode.getChildNodes().item(0));
+        
+        if (schemaNode.getFirstChild() != null) {
+            schemaNode.insertBefore(annotationNode, schemaNode.getFirstChild());
         } else {
             schemaNode.appendChild(annotationNode);
         }
@@ -370,13 +372,17 @@ public final class CustomizationParser {
 
         }
 
-        for (int i = 0; i < bindings.getChildNodes().getLength(); i++) {
-            Node childNode = bindings.getChildNodes().item(i);
-            if (childNode.getNodeType() == Element.ELEMENT_NODE
-                && childNode.getNamespaceURI().equals(ToolConstants.JAXWS_BINDINGS.getNamespaceURI())) {
-                childNode.setPrefix("jaxws");
+        
+        
+        Element element = DOMUtils.getFirstElement(bindings);
+        while (element != null) {
+            if (element.getNamespaceURI().equals(ToolConstants.JAXWS_BINDINGS.getNamespaceURI())) {
+                element.setPrefix("jaxws");
             }
+            element = DOMUtils.getNextElement(element);
         }
+        
+        
 
         Node cloneNode = ProcessorUtil.cloneNode(node.getOwnerDocument(), bindings, true);
         Node firstChild = DOMUtils.getChild(node, "jaxws:bindings");

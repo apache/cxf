@@ -20,6 +20,8 @@
 package org.apache.cxf.javascript;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
@@ -38,7 +40,7 @@ public class JsSimpleDomNode extends ScriptableObject {
     private boolean attributesWrapped;
     private JsSimpleDomNode previousSibling;
     private JsSimpleDomNode nextSibling;
-    private JsSimpleDomNode[] children;
+    private List<JsSimpleDomNode> children;
     private JsNamedNodeMap attributes;
 
     /**
@@ -79,8 +81,8 @@ public class JsSimpleDomNode extends ScriptableObject {
     
     public Object jsGet_firstChild() {
         establishChildren();
-        if (children.length > 0)
-            return children[0];
+        if (children.size() > 0)
+            return children.get(0);
         else 
             return null;
     }
@@ -116,13 +118,13 @@ public class JsSimpleDomNode extends ScriptableObject {
             return null;
         } else {
             establishChildren();
-            return children[0]; // it is, after all, just a convenience feature.
+            return children.get(0); // it is, after all, just a convenience feature.
         }
     }
     
     public Object[] jsGet_childNodes() {
         establishChildren();
-        return children;
+        return children.toArray();
     }
     
     public Object jsGet_attributes() {
@@ -175,23 +177,23 @@ public class JsSimpleDomNode extends ScriptableObject {
     private void establishChildren() {
         if (!childrenWrapped) {
             if (wrappedNode.hasChildNodes()) {
-                children = new JsSimpleDomNode[wrappedNode.getChildNodes().getLength()];
+                children = new ArrayList<JsSimpleDomNode>();
                 Node node = wrappedNode.getFirstChild();
                 int x = 0;
                 while (node != null) {
                     JsSimpleDomNode prev = null;
                     if (x > 0) {
-                        prev = (JsSimpleDomNode)children[x - 1]; 
+                        prev = (JsSimpleDomNode)children.get(x - 1); 
                     }
-                    children[x] = newObject(node, prev);
+                    children.add(x, newObject(node, prev));
                     if (x > 0) {
-                        children[x - 1].setNext(children[x]);
+                        children.get(x - 1).setNext(children.get(x));
                     }                    
                     node = node.getNextSibling();
                     x++;
                 }
             } else {
-                children = new JsSimpleDomNode[0];
+                children = new ArrayList<JsSimpleDomNode>();
             }
             childrenWrapped = true;
         }
