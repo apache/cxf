@@ -75,7 +75,7 @@ public final class NamespaceHelper {
         DOMUtils.getPrefixesRecursive(element, namespaceURI, prefixes);
     }
 
-    private static String getUniquePrefix(Element el) {
+    public static String getUniquePrefix(Element el) {
         int n = 1;
 
         while (true) {

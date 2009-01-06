@@ -19,9 +19,12 @@
 package org.apache.cxf.aegis.type.encoded;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
@@ -32,15 +35,13 @@ import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
+import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.cxf.helpers.XMLUtils;
+
 import org.junit.Before;
 
 public abstract class AbstractEncodedTest extends AbstractAegisTest {
@@ -100,10 +101,14 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
     }
 
     public Object readRef(Element element) throws XMLStreamException {
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        String xml = xmlOutputter.outputString(element);
-        ElementReader root = new ElementReader(new ByteArrayInputStream(xml.getBytes()));
-        return readRef(root);
+        String xml = XMLUtils.toString(element);
+        ElementReader root;
+        try {
+            root = new ElementReader(new ByteArrayInputStream(xml.getBytes("utf-8")));
+            return readRef(root);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Object readRef(ElementReader root) throws XMLStreamException {
@@ -135,12 +140,12 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
         assertNotNull("no type found for " + instance.getClass().getName());
 
         // create the document
-        Element element = new Element("root", "b", "urn:Bean");
+        Element element = createElement("urn:Bean", "root", "b");
+        MapNamespaceContext namespaces = new MapNamespaceContext();
         for (Map.Entry<String, String> entry : getNamespaces().entrySet()) {
-            element.addNamespaceDeclaration(Namespace.getNamespace(entry.getKey(), entry.getValue()));
+            namespaces.addNamespace(entry.getKey(), entry.getValue());
         }
-        new Document(element);
-        JDOMWriter rootWriter = new JDOMWriter(element);
+        ElementWriter rootWriter = getElementWriter(element, namespaces);
         Context context = getContext();
 
         // get Type based on the object instance

@@ -88,7 +88,7 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
     }
 
     public void assertEquals(ArrayTypeInfo expected, String actualString) throws Exception {
-        ArrayTypeInfo actual = new ArrayTypeInfo(actualString);
+        ArrayTypeInfo actual = new ArrayTypeInfo(getNamespaceContext(), actualString);
 
         // only compare local part because prefix is only resolved when using the MessageReader constructor
         assertEquals(expected.getRanks(), actual.getRanks());
@@ -128,7 +128,7 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
 
     public void assertInvalid(String actualString) {
         try {
-            new ArrayTypeInfo(actualString);
+            new ArrayTypeInfo(getNamespaceContext(), actualString);
             fail("Expected a DatabindingException from invalid arrayType " + actualString);
         } catch (Exception expected) {
             // expected

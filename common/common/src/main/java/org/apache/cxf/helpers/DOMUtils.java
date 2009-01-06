@@ -531,13 +531,20 @@ public final class DOMUtils {
     }
 
     /**
-     * Searches the given element including it's parent elements
-     * for a matching namspace decleration.
-     * @param el element to search for namespace definitions
+     * Starting from a node, find the namespace declaration for a prefix.
+     * for a matching namespace declaration.
+     * @param node search up from here to search for namespace definitions
      * @param searchPrefix the prefix we are searching for
      * @return the namespace if found.
      */
-    public static String getNamespace(Element el, String searchPrefix) {
+    public static String getNamespace(Node node, String searchPrefix) {
+        
+        Element el;
+        while (!(node instanceof Element)) {
+            node = node.getParentNode();
+        }
+        el = (Element) node;
+        
         NamedNodeMap atts = el.getAttributes();
         for (int i = 0; i < atts.getLength(); i++) {
             Node currentAttribute = atts.item(i);

@@ -162,6 +162,7 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     public void close() {
         try {
             writer.writeEndElement();
+            writer.flush();
         } catch (XMLStreamException e) {
             throw new DatabindingException("Error writing document.", e);
         }
@@ -207,13 +208,18 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     public String getPrefixForNamespace(String ns, String hint) {
         try {
             String pfx = writer.getPrefix(ns);
+            String contextPfx = writer.getNamespaceContext().getPrefix(ns);
 
             if (pfx == null) {
                 String ns2 = writer.getNamespaceContext().getNamespaceURI(hint);
-                if (ns2 == null) {
+                // if the hint is "" (the default) and the context does 
+                if (ns2 == null && !"".equals(hint)) { 
                     pfx = hint;
-                } else if (ns2.equals(ns)) {
-                    return pfx;
+                } else if (ns.equals(ns2)) {
+                    // just because it's in the context, doesn't mean it has been written.
+                    pfx = hint;
+                } else if (contextPfx != null) {
+                    pfx = contextPfx;
                 } else {
                     pfx = NamespaceHelper.getUniquePrefix(writer);
                 }

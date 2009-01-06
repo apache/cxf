@@ -26,16 +26,22 @@ import javax.wsdl.Import;
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLWriter;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
@@ -48,9 +54,12 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -61,8 +70,6 @@ import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
-import org.jdom.Element;
-import org.jdom.output.DOMOutputter;
 import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {
@@ -71,7 +78,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     @Before
     public void setUp() throws Exception {
         super.setUpBus();
-
+        
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
         bindingFactory.setBus(bus);
 
@@ -234,23 +241,6 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
 
     }
 
-    protected void assertXPathEquals(String xpath, String value, Element element) throws Exception {
-        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
-        assertXPathEquals(xpath, value, doc);
-    }
-
-    protected NodeList assertValid(String xpath, Element element) throws Exception {
-        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
-
-        return assertValid(xpath, doc);
-    }
-
-    protected void assertInvalid(String xpath, Element element) throws Exception {
-        org.w3c.dom.Document doc = new DOMOutputter().output(element.getDocument());
-
-        assertInvalid(xpath, doc);
-    }
-
     protected Document getWSDLDocument(String string) throws WSDLException {
         Definition definition = getWSDLDefinition(string);
         if (definition == null) {
@@ -279,4 +269,48 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         xmlsNamespaceMap.add("xsd", XmlSchemaConstants.XSD_NAMESPACE_URI);
         return s;
     }
+    
+    protected Element createElement(String namespace, String name) {
+        return createElement(namespace, name, null);
+    }
+
+    protected Element createElement(String namespace, String name, String namespacePrefix) {
+        Document doc = DOMUtils.createDocument();
+
+        Element element = doc.createElementNS(namespace, name);
+        if (namespacePrefix != null) {
+            element.setPrefix(namespacePrefix);
+            DOMUtils.addNamespacePrefix(element, namespace, namespacePrefix);
+        }
+
+        doc.appendChild(element);
+        return element;
+    }
+    
+    protected ElementWriter getElementWriter(Element element) {
+        return getElementWriter(element, new MapNamespaceContext());
+    }
+
+    protected ElementWriter getElementWriter(Element element, NamespaceContext namespaceContext) {
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(new DOMResult(element));
+        try {
+            writer.setNamespaceContext(namespaceContext);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        return new ElementWriter(writer);
+    }
+
+    protected Element writeObjectToElement(Type type, Object bean) {
+        return writeObjectToElement(type, bean, getContext());
+    }
+
+    protected Element writeObjectToElement(Type type, Object bean, Context context) {
+        Element element = createElement("urn:Bean", "root", "b");
+        ElementWriter writer = getElementWriter(element, new MapNamespaceContext());
+        type.writeObject(bean, writer, getContext());
+        writer.close();
+        return element;
+    }
+    
 }

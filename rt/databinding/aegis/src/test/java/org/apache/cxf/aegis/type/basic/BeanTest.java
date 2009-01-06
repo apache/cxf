@@ -24,6 +24,10 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
@@ -32,21 +36,18 @@ import org.apache.cxf.aegis.services.SimpleBean;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
-import org.apache.cxf.aegis.util.jdom.StaxBuilder;
-import org.apache.cxf.aegis.xml.jdom.JDOMReader;
-import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
-import org.jdom.Document;
-import org.jdom.Element;
 import org.junit.Test;
 
 public class BeanTest extends AbstractAegisTest {
@@ -99,14 +100,12 @@ public class BeanTest extends AbstractAegisTest {
         bean.setBleh("bleh");
 
         // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Element element = writeObjectToElement(type, bean, getContext());
 
         assertValid("/b:root/b:bleh[text()='bleh']", element);
         assertValid("/b:root/b:howdy[text()='howdy']", element);
     }
-    
+
     @Test
     public void testBeanWithXsiType() throws Exception {
         BeanType type = new BeanType();
@@ -125,10 +124,7 @@ public class BeanTest extends AbstractAegisTest {
 
         reader.getXMLStreamReader().close();
 
-        // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Element element = writeObjectToElement(type, bean, getContext());
 
         assertValid("/b:root/b:bleh[text()='bleh']", element);
         assertValid("/b:root/b:howdy[text()='howdy']", element);
@@ -158,10 +154,7 @@ public class BeanTest extends AbstractAegisTest {
 
         reader.getXMLStreamReader().close();
 
-        // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Element element = writeObjectToElement(type, bean, getContext());
 
         assertInvalid("/b:root/b:bleh", element);
         assertValid("/b:root/b:howdycustom[text()='howdy']", element);
@@ -188,10 +181,7 @@ public class BeanTest extends AbstractAegisTest {
         reader.getXMLStreamReader().close();
 
         // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
-
+        Element element = writeObjectToElement(type, bean, getContext());
         assertValid("/b:root[@b:bleh='bleh']", element);
         assertValid("/b:root[@b:howdy='howdy']", element);
         
@@ -247,9 +237,8 @@ public class BeanTest extends AbstractAegisTest {
 
         bos.close();
         
-        StaxBuilder builder = new StaxBuilder();
-        Document doc = builder.build(new ByteArrayInputStream(bos.toByteArray()));
-        Element element = doc.getRootElement();
+        Document doc = DOMUtils.readXml(new ByteArrayInputStream(bos.toByteArray()));
+        Element element = doc.getDocumentElement();
 
         addNamespace("b2", "urn:Bean2");
         assertValid("/b:root[@b2:bleh='bleh']", element);
@@ -271,9 +260,8 @@ public class BeanTest extends AbstractAegisTest {
         SimpleBean bean = new SimpleBean();
 
         // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        
+        Element element = writeObjectToElement(type, bean, getContext());
 
         assertInvalid("/b:root[@b:howdy]", element);
         assertValid("/b:root/b:bleh[@xsi:nil='true']", element);
@@ -449,12 +437,10 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(littleByteOk);
         assertTrue(bigByteOk);
         
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
         SimpleBean bean = new SimpleBean();
         bean.setBigByte(new Byte((byte)0xfe));
         bean.setLittleByte((byte)0xfd);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Element element = writeObjectToElement(type, bean, getContext());
         Byte bb = new Byte((byte)0xfe);
         String bbs = bb.toString();
         assertValid("/b:root/bz:bigByte[text()='" + bbs + "']", element);
@@ -482,9 +468,7 @@ public class BeanTest extends AbstractAegisTest {
         DateBean bean = new DateBean();
 
         // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Element element = writeObjectToElement(type, bean, getContext());
 
         // Make sure the date doesn't have an element. Its non nillable so it
         // just
@@ -508,10 +492,7 @@ public class BeanTest extends AbstractAegisTest {
         ExtendedBean bean = new ExtendedBean();
         bean.setHowdy("howdy");
 
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
-
+        Element element = writeObjectToElement(type, bean, getContext());
         assertValid("/b:root/b:howdy[text()='howdy']", element);
     }
     @Test
@@ -533,9 +514,7 @@ public class BeanTest extends AbstractAegisTest {
         ByteBean bean = new ByteBean();
 
         // Test writing
-        Element element = new Element("root", "b", "urn:Bean");
-        new Document(element);
-        type.writeObject(bean, new JDOMWriter(element), getContext());
+        Element element = writeObjectToElement(type, bean, getContext());
 
         // Make sure the date doesn't have an element. Its non nillable so it
         // just
@@ -544,7 +523,8 @@ public class BeanTest extends AbstractAegisTest {
         addNamespace("xsi", SOAPConstants.XSI_NS);
         assertValid("/b:root/b:data[@xsi:nil='true']", element);
 
-        bean = (ByteBean)type.readObject(new JDOMReader(element), getContext());
+        XMLStreamReader sreader = StaxUtils.createXMLStreamReader(element);
+        bean = (ByteBean)type.readObject(new ElementReader(sreader), getContext());
         assertNotNull(bean);
         assertNull(bean.getData());
     }

@@ -55,11 +55,16 @@ public  final class MapNamespaceContext implements NamespaceContext {
     }
 
     public String getNamespaceURI(String prefix) {
+        if (null == prefix) {
+            throw new IllegalArgumentException("Null prefix to getNamespacePrefix");
+        }
+        // if we have a target node, facts-on-the-ground in its parent tree take precedence.
         if (targetNode != null) {
-            String s = targetNode.lookupNamespaceURI(prefix);
-            if (prefix != null && s != null) {
-                namespaces.put(prefix, s);
+            String uri = DOMUtils.getNamespace(targetNode, prefix);
+            if (uri != null) {
+                return uri;
             }
+            
         }
         return namespaces.get(prefix);
     }

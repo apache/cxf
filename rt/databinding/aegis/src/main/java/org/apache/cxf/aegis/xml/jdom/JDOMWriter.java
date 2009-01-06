@@ -71,7 +71,7 @@ public class JDOMWriter extends AbstractMessageWriter {
     }
 
     public XMLStreamWriter getXMLStreamWriter() {
-        throw new UnsupportedOperationException("Stream writing not supported from a JDOMWriter.");
+        throw new UnsupportedOperationException("Stream writing not supported from a W3CDOMWriter.");
     }
 
     public String getPrefixForNamespace(String namespace, String hint) {
