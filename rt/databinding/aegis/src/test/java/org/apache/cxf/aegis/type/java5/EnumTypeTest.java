@@ -19,7 +19,6 @@
 package org.apache.cxf.aegis.type.java5;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
