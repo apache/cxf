@@ -44,6 +44,11 @@
 		<simple:dataBinding>
 			<bean
 				class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+				<property name="aegisContext">
+					<bean class="org.apache.cxf.aegis.AegisContext">
+						<property name="enableJDOMMappings" value="true"/>
+					</bean>
+				</property>
 			</bean>
 		</simple:dataBinding>
 		<simple:serviceFactory>

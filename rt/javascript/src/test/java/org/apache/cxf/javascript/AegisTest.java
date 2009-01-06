@@ -104,6 +104,7 @@ public class AegisTest extends JavascriptRhinoTest {
         });
     }
     
+
     private Void returnBeanWithAnyTypeArray(Context context) {
         Notifier notifier = 
             testUtilities.rhinoCallConvert("testReturningBeanWithAnyTypeArray", Notifier.class, 
@@ -131,7 +132,8 @@ public class AegisTest extends JavascriptRhinoTest {
         assertEquals(new Float(42), new Float(intValue.toString()));
         return null;
     }
-    
+
+    @org.junit.Ignore
     @Test
     public void callReturnBeanWithAnyTypeArray() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
