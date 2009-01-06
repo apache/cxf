@@ -72,7 +72,6 @@ public class W3CDOMStreamReaderTest extends Assert {
 
     }
     
-    @org.junit.Ignore
     @Test
     public void testTopLevelText() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(
