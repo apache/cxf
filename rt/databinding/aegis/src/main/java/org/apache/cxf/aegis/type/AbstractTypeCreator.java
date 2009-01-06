@@ -41,6 +41,8 @@ import org.apache.cxf.common.util.XMLSchemaQNames;
  * @author Hani Suleiman Date: Jun 14, 2005 Time: 11:59:57 PM
  */
 public abstract class AbstractTypeCreator implements TypeCreator {
+    public static final String HTTP_CXF_APACHE_ORG_ARRAYS = "http://cxf.apache.org/arrays";
+
     protected TypeMapping tm;
 
     protected AbstractTypeCreator nextCreator;
@@ -308,7 +310,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             ns = tm.getMappingIdentifierURI();
         }
         if (WSDLConstants.NS_SCHEMA_XSD.equals(ns)) {
-            ns = "http://cxf.apache.org/arrays";
+            ns = HTTP_CXF_APACHE_ORG_ARRAYS;
         }
 
         String first = type.getSchemaType().getLocalPart().substring(0, 1);

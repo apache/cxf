@@ -22,6 +22,8 @@ package org.apache.cxf.javascript;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
@@ -70,7 +72,7 @@ public class AegisTest extends JavascriptRhinoTest {
                                 testUtilities.javaToJS(getAddress()));
         implementor.waitForOneWay();
         assertEquals("before items", implementor.getAcceptedString());
-        Collection<org.jdom.Element> something = implementor.getAcceptedCollection();
+        Collection<Document> something = implementor.getAcceptedCollection();
         assertNotNull(something);
         return null;
     }
@@ -133,7 +135,6 @@ public class AegisTest extends JavascriptRhinoTest {
         return null;
     }
 
-    @org.junit.Ignore
     @Test
     public void callReturnBeanWithAnyTypeArray() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {

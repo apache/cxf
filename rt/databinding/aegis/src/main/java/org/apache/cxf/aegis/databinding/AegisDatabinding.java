@@ -501,9 +501,8 @@ public class AegisDatabinding
                 si.addSchema(schemaInfo);
             }
         }
-        
     }
-
+    
     private boolean schemaImportsXmime(XmlSchema schema) {
         return XmlSchemaUtils.schemaImportsNamespace(schema, AbstractXOPType.XML_MIME_NS);
     }

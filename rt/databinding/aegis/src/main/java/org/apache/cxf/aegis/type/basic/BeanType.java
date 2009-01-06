@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.TypeUtil;
@@ -664,6 +665,10 @@ public class BeanType extends Type {
             sequence.getItems().add(element);
 
             Type type = getType(inf, name);
+            if (AbstractTypeCreator.
+                HTTP_CXF_APACHE_ORG_ARRAYS.equals(type.getSchemaType().getNamespaceURI())) {
+                XmlSchemaUtils.addImportIfNeeded(root, AbstractTypeCreator.HTTP_CXF_APACHE_ORG_ARRAYS);
+            }
 
             writeTypeReference(name, element, type);
             needXmime |= type.usesXmime();

@@ -30,11 +30,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
@@ -286,6 +288,7 @@ public class ArrayType extends Type {
         XmlSchemaElement element = new XmlSchemaElement();
         element.setName(componentType.getSchemaType().getLocalPart());
         element.setSchemaTypeName(componentType.getSchemaType());
+      
         seq.getItems().add(element);
 
         if (componentType.isNillable()) {

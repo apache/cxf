@@ -202,7 +202,9 @@ public final class XmlSchemaUtils {
      */
     public static void addImportIfNeeded(XmlSchema schema, String namespaceUri) {
         // no need to import nothing or the XSD schema.
-        if ("".equals(namespaceUri) || XmlSchemaConstants.XSD_NAMESPACE_URI.equals(namespaceUri)) {
+        if ("".equals(namespaceUri) 
+            || XmlSchemaConstants.XSD_NAMESPACE_URI.equals(namespaceUri)
+            || schema.getTargetNamespace().equals(namespaceUri)) {
             return;
         }
             
