@@ -56,9 +56,7 @@ For standalone HTTP support:
 - sl4j.jar & sl4j-jdk14.jar (optional - but improves logging)
  
 For Aegis support:
-- jaxen.jar
-- jdom.jar
-- stax-utils.jar
+- jdom.jar (optional, if you want to map xsd:anyType to JDOM)
 
 For WS-Security support:
 - bcprov-jdk15.jar
