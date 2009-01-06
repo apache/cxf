@@ -82,6 +82,7 @@
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <version>${jdom.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -92,6 +92,7 @@ public class AegisContext {
     private TypeCreationOptions configuration;
     private boolean mtomEnabled;
     private boolean mtomUseXmime;
+    private boolean enableJDOMMappings;
     // this URI goes into the type map.
     private String mappingNamespaceURI;
 
@@ -140,7 +141,9 @@ public class AegisContext {
         }
         if (typeMapping == null) {
             boolean defaultNillable = configuration.isDefaultNillable();
-            TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, mtomUseXmime);
+            TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, 
+                                                                             mtomUseXmime, 
+                                                                             enableJDOMMappings);
             // The use of the XSD URI in the mapping is, MAGIC.
             if (mappingNamespaceURI == null) {
                 mappingNamespaceURI = SOAPConstants.XSD;
@@ -460,5 +463,17 @@ public class AegisContext {
 
     public void setMappingNamespaceURI(String mappingNamespaceURI) {
         this.mappingNamespaceURI = mappingNamespaceURI;
+    }
+
+    public boolean isEnableJDOMMappings() {
+        return enableJDOMMappings;
+    }
+    
+    /**
+     * Whether to enable JDOM as a mapping for xsd:anyType if JDOM is in the classpath. 
+     * @param enableJDOMMappings
+     */
+    public void setEnableJDOMMappings(boolean enableJDOMMappings) {
+        this.enableJDOMMappings = enableJDOMMappings;
     }
 }

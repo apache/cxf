@@ -40,6 +40,7 @@ public class ParameterMappingTest extends AbstractAegisTest {
     @Before 
     public void setUp() throws Exception {
         super.setUp();
+        setEnableJDOM(true); // there are JDOM types in here.
         createService(AddNumbers.class, "AddNumbers", null);
         createService(ArrayService.class, "ArrayService", null);
     }

@@ -74,6 +74,7 @@ import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {
     protected LocalTransportFactory localTransport;
+    private boolean enableJDOM;
 
     @Before
     public void setUp() throws Exception {
@@ -205,7 +206,14 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     @SuppressWarnings("deprecation")
     protected void setupAegis(AbstractWSDLBasedEndpointFactory sf, AegisDatabinding binding) {
         if (binding == null) {
+            AegisContext context = new AegisContext();
+            if (enableJDOM) {
+                context.setEnableJDOMMappings(true);
+            }
             binding = new AegisDatabinding();
+            if (enableJDOM) { // this preserves pre-2.1 behavior.
+                binding.setAegisContext(context);
+            }
         }
         sf.getServiceFactory().getServiceConfigurations()
             .add(0, new org.apache.cxf.aegis.databinding.AegisServiceConfiguration());
@@ -311,6 +319,14 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         type.writeObject(bean, writer, getContext());
         writer.close();
         return element;
+    }
+
+    protected boolean isEnableJDOM() {
+        return enableJDOM;
+    }
+
+    protected void setEnableJDOM(boolean enableJDOM) {
+        this.enableJDOM = enableJDOM;
     }
     
 }

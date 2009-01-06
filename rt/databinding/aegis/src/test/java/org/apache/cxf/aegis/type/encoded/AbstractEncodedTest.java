@@ -59,7 +59,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
 
         AegisContext context = new AegisContext();
         // create a different mapping than the context creates.
-        TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false);
+        TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
         mapping = new DefaultTypeMapping(SOAPConstants.XSD, baseMapping);
         mapping.setTypeCreator(context.createTypeCreator());
         context.setTypeMapping(mapping);

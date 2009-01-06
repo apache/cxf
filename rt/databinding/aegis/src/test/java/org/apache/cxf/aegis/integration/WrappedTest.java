@@ -41,6 +41,7 @@ public class WrappedTest extends AbstractAegisTest {
     @Before 
     public void setUp() throws Exception {
         super.setUp();
+        setEnableJDOM(true);
         arrayService = new ArrayService();
         createService(BeanService.class, "BeanService");
         createService(ArrayService.class, arrayService, "Array", new QName("urn:Array", "Array"));
