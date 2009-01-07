@@ -126,65 +126,6 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
                 elem = org.apache.cxf.helpers.DOMUtils.getNextElement(elem);          
             }
-        /*
-        try {
-            
-            NodeList children = element.getChildNodes();
-            for (int i = 0; i < children.getLength(); i++) {
-                Node n = children.item(i);
-                if (n.getNodeType() == Node.ELEMENT_NODE) {
-                    String name = n.getLocalName();
-                    if ("tlsServerParameters".equals(name)) {
-                        
-                        TLSServerParametersType parametersType = 
-                            JAXBHelper.parseElement((Element)n, bean, TLSServerParametersType.class);
-                        
-                        TLSServerParametersConfig param = 
-                            new TLSServerParametersConfig(parametersType);
-                        
-                        bean.addPropertyValue("tlsServerParameters", param);
-                        
-                    } else if ("tlsServerParametersRef".equals(name)) {
-                        
-                        TLSServerParametersIdentifiedType parameterTypeRef = 
-                            JAXBHelper.parseElement((Element)n, bean, 
-                                                    TLSServerParametersIdentifiedType.class);
-                        
-                        TLSServerParameters param = 
-                            getTlsServerParameters(engineFactoryProperties, parameterTypeRef.getId()); 
-                        bean.addPropertyValue("tlsServerParameters", param);
-                        
-                    } else if ("threadingParameters".equals(name)) {
-                        ThreadingParametersType parametersType = 
-                            JAXBHelper.parseElement((Element)n, bean, ThreadingParametersType.class);
-                        
-                        ThreadingParameters param = toThreadingParameters(parametersType);
-                        bean.addPropertyValue("threadingParameters", param);  
-                        
-                    } else if ("threadingParametersRef".equals(name)) {
-                        ThreadingParametersIdentifiedType parametersTypeRef =
-                            JAXBHelper.parseElement((Element)n, bean, 
-                                                    ThreadingParametersIdentifiedType.class);
-                        ThreadingParameters param = 
-                            getThreadingParameters(engineFactoryProperties, parametersTypeRef.getId());
-                        bean.addPropertyValue("threadingParameters", param);
-                        
-                    } else if ("connector".equals(name)) { 
-                        // only deal with the one connector here
-                        List list = 
-                            ctx.getDelegate().parseListElement((Element) n, bean.getBeanDefinition());
-                        bean.addPropertyValue("connector", list.get(0));
-                    } else if ("handlers".equals(name)) {
-                        List handlers = 
-                            ctx.getDelegate().parseListElement((Element) n, bean.getBeanDefinition());
-                        bean.addPropertyValue("handlers", handlers);
-                    } else if ("sessionSupport".equals(name) || "reuseAddress".equals(name)) {
-                        String text = n.getTextContent();                        
-                        bean.addPropertyValue(name, Boolean.valueOf(text));
-                    }                         
-                }
-            }
-            */
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
         }

@@ -39,7 +39,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -277,15 +276,15 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 }
                 encodeReferenceParameters(maps, hdr, marshaller);
                 
-                NodeList children = hdr.getChildNodes();
-                int len = children.getLength();
-                for (int i = 0; i < len; i++) {
-                    Node node = children.item(i);
-              
+                Node childNode = hdr.getFirstChild();
+                
+                while (childNode != null) {
                     Header holder = new Header(
-                            new QName(node.getNamespaceURI(), node.getLocalName()), 
-                            node);
+                                               new QName(childNode.getNamespaceURI(), 
+                                                         childNode.getLocalName()), 
+                                                         childNode);
                     header.add(holder);
+                    childNode = childNode.getNextSibling();
                 }
                 ((AddressingPropertiesImpl)maps).setDuplicate(null);
                 
@@ -631,15 +630,6 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 iter.remove();
             }
         }
-        /*
-        NodeList headerElements =
-            header.getElementsByTagNameNS(maps.getNamespaceURI(), "*");        
-        for (int i = 0; i < headerElements.getLength(); i++) {
-            Node headerElement = headerElements.item(i);
-            if (Names.WSA_NAMESPACE_NAME.equals(headerElement.getNamespaceURI())) {
-                header.removeChild(headerElement);
-            }
-        } */
     }
 
     /**

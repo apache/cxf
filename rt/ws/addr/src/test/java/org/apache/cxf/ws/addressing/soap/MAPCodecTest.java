@@ -32,7 +32,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -302,24 +302,24 @@ public class MAPCodecTest extends Assert {
             marshaller.marshal(null, header);
             EasyMock.expectLastCall();
         }
-
-        NodeList children = control.createMock(NodeList.class);
-        header.getChildNodes();
-        EasyMock.expectLastCall().andReturn(children);
-        children.getLength();
-        EasyMock.expectLastCall().andReturn(expectedMarshals).anyTimes();
-        for (int i = 0; i < expectedMarshals; i++) {
-            Element child = control.createMock(Element.class);
-            children.item(i);
-            EasyMock.expectLastCall().andReturn(child);
-            /*
-             * child.setAttributeNS(EasyMock.eq("http://www.w3.org/2000/xmlns/"), EasyMock.eq("xmlns:wsa"),
-             * EasyMock.eq(maps.getNamespaceURI())); EasyMock.expectLastCall();
-             */
+        
+        Node child = control.createMock(Node.class);
+        header.getFirstChild();
+        EasyMock.expectLastCall().andReturn(child);
+        
+        int i = 0;
+        while (child != null) {
             child.getNamespaceURI();
             EasyMock.expectLastCall().andReturn(expectedNames[i].getNamespaceURI());
             child.getLocalName();
             EasyMock.expectLastCall().andReturn(expectedNames[i].getLocalPart());
+
+            Node nextChild = ++i < expectedMarshals
+                             ? control.createMock(Node.class)
+                             : null;
+            child.getNextSibling();
+            EasyMock.expectLastCall().andReturn(nextChild);
+            child = nextChild;
         }
 
         mimeHeaders = new HashMap<String, List<String>>();
