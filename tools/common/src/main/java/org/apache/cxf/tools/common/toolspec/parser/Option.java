@@ -19,14 +19,15 @@
 
 package org.apache.cxf.tools.common.toolspec.parser;
 
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.common.toolspec.Tool;
 
 public class Option implements TokenConsumer {
@@ -42,22 +43,27 @@ public class Option implements TokenConsumer {
 
     public Option(Element el) {
         this.element = el;
-
-        NodeList list = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "associatedArgument");
-
-        if (list != null && list.getLength() > 0) {
-            argument = (Element)list.item(0);
+        
+        
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                     "associatedArgument");
+        if (elemList != null && elemList.size() > 0) {            
+            argument = (Element)elemList.get(0);
         }
-
-        list = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
-        if (list != null && list.getLength() > 0) {
-            annotation = (Element)list.item(0);
+        
+        elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                       Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                       "annotation");
+        if (elemList != null && elemList.size() > 0) {            
+            annotation = (Element)elemList.get(0);
         }
 
         if (annotation == null && argument != null) {
-            list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
-            if (list != null && list.getLength() > 0) {
-                annotation = (Element)list.item(0);
+            elemList =  DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
+
+            if (elemList != null && elemList.size() > 0) {
+                annotation = (Element)elemList.get(0);
             }
         }
     }
@@ -85,13 +91,14 @@ public class Option implements TokenConsumer {
         }
 
         // go through each switch to see if we can match one to the arg.
-        NodeList switches = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "switch");
+        List<Element> switches = 
+            DOMUtils.findAllElementsByTagNameNS(element, Tool.TOOL_SPEC_PUBLIC_ID, "switch");
 
         boolean accepted = false;
 
-        for (int i = 0; i < switches.getLength(); i++) {
+        for (Element switchElem : switches) {
 
-            String switchArg = "-" + switches.item(i).getFirstChild().getNodeValue();
+            String switchArg = "-" + switchElem.getFirstChild().getNodeValue();
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("switchArg is " + switchArg);
             }
@@ -152,11 +159,14 @@ public class Option implements TokenConsumer {
     }
 
     private boolean hasInvalidCharacter(String argValue) {
-        NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
+        
+        List<Element> list = 
+            DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
+        //NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
         String valuetypeStr = null;
 
-        if (list != null && list.getLength() > 0) {
-            valueType = (Element)list.item(0);
+        if (list != null && list.size() > 0) {
+            valueType = (Element)list.get(0);
             valuetypeStr = valueType.getFirstChild().getNodeValue();
 
             if ("IdentifyString".equals(valuetypeStr)) {
@@ -176,10 +186,14 @@ public class Option implements TokenConsumer {
     
     private boolean isInEnumArgumentValue(String argValue) {
         boolean result = true;
-        NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valueenum");
-        if (list != null && list.getLength() == 1) {
+        List<Element> list = 
+            DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "valueenum");
+        
+        
+        //NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valueenum");
+        if (list != null && list.size() == 1) {
             result = false;
-            String enumValue = list.item(0).getTextContent();
+            String enumValue = list.get(0).getTextContent();
             StringTokenizer stk = new StringTokenizer(enumValue, VALUE_ENUM_SEPARATOR);
             if (stk.countTokens() <= 0) {
                 return result;
@@ -274,11 +288,14 @@ public class Option implements TokenConsumer {
     }
 
     public String getPrimarySwitch() {
-        NodeList switches = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "switch");
+        //NodeList switches = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "switch");
+        
+        List<Element> switches = 
+            DOMUtils.findAllElementsByTagNameNS(element, Tool.TOOL_SPEC_PUBLIC_ID, "switch");
 
         // options must have atleast one switch, as enforced by schema, so no
         // need for defensive coding.
-        return switches.item(0).getFirstChild().getNodeValue();
+        return switches.get(0).getFirstChild().getNodeValue();
     }
 
     public String toString() {

@@ -26,9 +26,9 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.common.toolspec.Tool;
 
 
@@ -43,15 +43,24 @@ public class Form implements TokenConsumer {
 
     public Form(Element el) {
         this.element = el;
-        NodeList list = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "optionGroup");
-
-        for (int i = 0; i < list.getLength(); i++) {
-            optionGroups.add(new OptionGroup((Element)list.item(i)));
+        
+        List<Element> elemList = 
+            DOMUtils.findAllElementsByTagNameNS(element, 
+                                                Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                "optionGroup");
+        
+        for (Element elem : elemList) {
+            optionGroups.add(new OptionGroup(elem));
         }
-        list = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "argument");
-        for (int i = 0; i < list.getLength(); i++) {
-            arguments.add(new Argument((Element)list.item(i)));
-        }
+        
+        elemList = 
+            DOMUtils.findAllElementsByTagNameNS(element, 
+                                                Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                "argument");
+        for (Element elem : elemList) {
+            arguments.add(new Argument(elem));
+        }     
+        
         getOptions(element);
     }
 

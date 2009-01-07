@@ -26,9 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.common.toolspec.Tool;
 
 public class OptionGroup implements TokenConsumer {
@@ -40,10 +40,13 @@ public class OptionGroup implements TokenConsumer {
 
     public OptionGroup(Element el) {
         this.element = el;
-        NodeList optionEls = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "option");
-
-        for (int i = 0; i < optionEls.getLength(); i++) {
-            options.add(new Option((Element)optionEls.item(i)));
+        
+        List<Element> optionEls = 
+            DOMUtils.findAllElementsByTagNameNS(element, 
+                                                Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                "option");        
+        for (Element elem : optionEls) {
+            options.add(new Option(elem));
         }
     }
 
