@@ -63,4 +63,8 @@ public class HttpURLConnectionFactoryImpl implements HttpURLConnectionFactory {
         // to represent for an HttpURLConnection.
         return new HttpURLConnectionInfo(connection);
     }
+
+    public String getProtocol() {
+        return "http";
+    }
 }

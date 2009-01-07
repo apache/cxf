@@ -51,6 +51,7 @@ public abstract class AbstractTestServerBase extends Assert {
     
     public boolean stopInProcess() throws Exception {
         boolean ret = true;
+        tearDown();
         if (verify(getLog())) {
             if (!inProcess) {
                 System.out.println("server passed");

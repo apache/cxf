@@ -56,7 +56,20 @@ under the License.
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
-    </jaxws:server>    
+    </jaxws:server>   
+    
+    <!--  Non http endpoint -->
+    <jaxws:server 
+        id="JaxwsHttpEndpoint"        
+        address="http://localhost:9003/SoapContext/HttpPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server> 
 
     <!-- -->
     <!-- TLS Port configuration parameters for port 9002 -->

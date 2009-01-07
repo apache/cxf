@@ -51,4 +51,9 @@ public interface HttpURLConnectionFactory {
     HttpURLConnectionInfo getConnectionInfo(
             HttpURLConnection connnection
     ) throws IOException;
+    
+    /**
+     * @return the protocol that this connection supports (http or https)
+     */
+    String getProtocol();
 }
