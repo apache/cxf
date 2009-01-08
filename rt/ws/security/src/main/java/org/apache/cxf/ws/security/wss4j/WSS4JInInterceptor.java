@@ -67,6 +67,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
@@ -108,7 +109,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
         setProperties(properties);
-        final Map<QName, String> map = CastUtils.cast(
+        final Map<QName, Object> map = CastUtils.cast(
             (Map)properties.get(PROCESSOR_MAP));
         if (map != null) {
             secEngineOverride = createSecurityEngine(map);
@@ -462,20 +463,25 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      */
     private WSSecurityEngine
     createSecurityEngine(
-        final Map<QName, String> map
+        final Map<QName, Object> map
     ) {
         assert map != null;
         final WSSConfig config = WSSConfig.getNewInstance();
-        for (Map.Entry<QName, String> entry : map.entrySet()) {
+        for (Map.Entry<QName, Object> entry : map.entrySet()) {
             final QName key = entry.getKey();
-            String val = entry.getValue();
-            if (val != null) {
-                val = val.trim();
-                if ("null".equals(val) || val.length() == 0) {
-                    val = null;
+            Object val = entry.getValue();
+            
+            if (val instanceof String) {
+                String valStr = ((String)val).trim();
+                if ("null".equals(valStr) || valStr.length() == 0) {
+                    valStr = null;
                 }
+                config.setProcessor(key, valStr);
+            } else if (val instanceof Processor) {
+                config.setProcessor(key, (Processor)val);
+            } else if (val == null) {
+                config.setProcessor(key, (String)val);
             }
-            config.setProcessor(key, val);
         }
         final WSSecurityEngine ret = new WSSecurityEngine();
         ret.setWssConfig(config);

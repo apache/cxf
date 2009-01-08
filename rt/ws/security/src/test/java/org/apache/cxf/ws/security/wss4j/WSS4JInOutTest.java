@@ -374,6 +374,83 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertNull(result);
     }
     
+    
+    @Test
+    public void testCustomProcessorObject() throws Exception {
+        Document doc = readDocument("wsse-request-clean.xml");
+
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
+        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
+
+        SoapMessage msg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(msg);
+        
+        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
+        SOAPPart part = saajMsg.getSOAPPart();
+        part.setContent(new DOMSource(doc));
+        saajMsg.saveChanges();
+
+        msg.setContent(SOAPMessage.class, saajMsg);
+
+        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.USER, "myalias");
+        msg.put("password", "myAliasPassword");
+
+        handler.handleMessage(msg);
+
+        doc = part;
+        
+        assertValid("//wsse:Security", doc);
+        assertValid("//wsse:Security/ds:Signature", doc);
+
+        byte[] docbytes = getMessageBytes(doc);
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        dbf.setValidating(false);
+        dbf.setIgnoringComments(false);
+        dbf.setIgnoringElementContentWhitespace(true);
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setEntityResolver(new NullResolver());
+        doc = StaxUtils.read(db, reader, false);
+
+        final Map<String, Object> properties = new HashMap<String, Object>();
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        customMap.put(
+            new QName(
+                WSConstants.SIG_NS,
+                WSConstants.SIG_LN
+            ),
+            new CustomProcessor()
+        );
+        properties.put(
+            WSS4JInInterceptor.PROCESSOR_MAP,
+            customMap
+        );
+        WSS4JInInterceptor inHandler = new WSS4JInInterceptor(properties);
+
+        SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        ex.setInMessage(inmsg);
+        inmsg.setContent(SOAPMessage.class, saajMsg);
+
+        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+
+        inHandler.handleMessage(inmsg);
+        
+        WSSecurityEngineResult result = 
+            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
+        assertNotNull(result);
+        
+        Object obj = result.get("foo");
+        assertNotNull(obj);
+        assertEquals(obj.getClass().getName(), CustomProcessor.class.getName());
+    }
+    
     private byte[] getMessageBytes(Document doc) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         XMLStreamWriter byteArrayWriter = StaxUtils.createXMLStreamWriter(outputStream);
