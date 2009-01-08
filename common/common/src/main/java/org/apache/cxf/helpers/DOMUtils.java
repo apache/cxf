@@ -291,7 +291,7 @@ public final class DOMUtils {
             if (n instanceof Element) {
                 Element e = (Element) n;
                 String ens = e.getNamespaceURI();
-                if (ns.equals(ens) && lp.equals(e.getNodeName())) {
+                if (ns.equals(ens) && lp.equals(e.getLocalName())) {
                     return e;
                 }
             }
