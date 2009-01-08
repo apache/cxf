@@ -489,23 +489,21 @@ public final class CustomizationParser {
         } else if (isValidJaxbBindingFile(reader)) {
             String schemaLocation = root.getAttribute("schemaLocation");
             boolean hasJaxbBindingChild = false;
-            NodeList nlist = root.getElementsByTagNameNS(ToolConstants.JAXB_BINDINGS.getNamespaceURI(),
-                                                             ToolConstants.JAXB_BINDINGS.getLocalPart());
-            for (int i = 0; i < nlist.getLength(); i++) {
-                Node node = nlist.item(i);
-                if (node instanceof Element) {
-                    hasJaxbBindingChild = true;
-                    break;
-                }
+            
+            List<Element> elemList = 
+                DOMUtils.findAllElementsByTagNameNS(root, 
+                                                    ToolConstants.JAXB_BINDINGS.getNamespaceURI(), 
+                                                    ToolConstants.JAXB_BINDINGS.getLocalPart()); 
+            if (elemList.size() > 1) {
+                hasJaxbBindingChild = true;
             }
-            nlist = root.getElementsByTagNameNS(ToolConstants.JAXB_BINDINGS.getNamespaceURI(),
-                                                "globalBindings");
-            for (int i = 0; i < nlist.getLength(); i++) {
-                Node node = nlist.item(i);
-                if (node instanceof Element) {
-                    hasJaxbBindingChild = true;
-                    break;
-                }
+            
+            elemList = 
+                DOMUtils.findAllElementsByTagNameNS(root, 
+                                                    ToolConstants.JAXB_BINDINGS.getNamespaceURI(), 
+                                                    "globalBindings");
+            if (elemList.size() > 1) {
+                hasJaxbBindingChild = true;
             }
                            
             if (StringUtils.isEmpty(schemaLocation) && !hasJaxbBindingChild) {

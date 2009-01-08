@@ -575,7 +575,7 @@ public final class DOMUtils {
         return ret;
     }
     
-    public static void findAllElementsByTagNameNS(Element el, 
+    private static void findAllElementsByTagNameNS(Element el, 
                                                   String nameSpaceURI, 
                                                   String localName, 
                                                   List<Element> elementList) {
@@ -600,7 +600,7 @@ public final class DOMUtils {
         return ret;
     }
     
-    public static void findAllElementsByTagName(Element el, String tagName, List<Element> elementList) {
+    private static void findAllElementsByTagName(Element el, String tagName, List<Element> elementList) {
         
         if (tagName.equals(el.getTagName())) {
             elementList.add(el);

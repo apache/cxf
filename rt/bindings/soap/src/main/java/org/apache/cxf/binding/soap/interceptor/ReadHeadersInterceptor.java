@@ -20,6 +20,7 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -32,7 +33,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+//import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
@@ -107,17 +108,18 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 // TODO - we could stream read the "known" headers and just DOM read the 
                 // unknown ones
                 Element element = doc.getDocumentElement();
-                QName header = soapVersion.getHeader();
-                NodeList headerEls = element.getElementsByTagNameNS(header.getNamespaceURI(), header
-                    .getLocalPart());
-                for (int i = 0; i < headerEls.getLength(); i++) {
-                    Node currentHead  = headerEls.item(i);
-                    Element hel = DOMUtils.getFirstElement(currentHead);
+                QName header = soapVersion.getHeader();                
+                List<Element> elemList = 
+                    DOMUtils.findAllElementsByTagNameNS(element, 
+                                                        header.getNamespaceURI(), 
+                                                        header.getLocalPart());
+                for (Element elem : elemList) {
+                    Element hel = DOMUtils.getFirstElement(elem);
                     while (hel != null) {
                         // Need to add any attributes that are present on the parent element
                         // which otherwise would be lost.
-                        if (currentHead.hasAttributes()) {
-                            NamedNodeMap nnp = currentHead.getAttributes();
+                        if (elem.hasAttributes()) {
+                            NamedNodeMap nnp = elem.getAttributes();
                             for (int ct = 0; ct < nnp.getLength(); ct++) {
                                 Node attr = nnp.item(ct);
                                 Node headerAttrNode = hel.hasAttributes() 
@@ -135,8 +137,6 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                             }
                         }
                         
-//                            System.out.println("READHEADERSINTERCEPTOR : node name : " 
-//                            + node.getLocalName() +  " namespace URI" + node.getNamespaceURI());
                         HeaderProcessor p = bus.getExtension(HeaderManager.class)
                             .getHeaderProcessor(hel.getNamespaceURI());
 
