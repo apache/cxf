@@ -106,8 +106,8 @@ public class WSDLToSoap extends AbstractCXFToolContainer {
         String outdir = (String)env.get(ToolConstants.CFG_OUTPUTDIR);
         if (outdir != null) {
             File dir = new File(outdir);
-            if (!dir.exists()) {
-                Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, outdir);
+            if (!dir.exists() && !dir.mkdirs()) {
+                Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, outdir);
                 throw new ToolException(msg);
             }
             if (!dir.isDirectory()) {
