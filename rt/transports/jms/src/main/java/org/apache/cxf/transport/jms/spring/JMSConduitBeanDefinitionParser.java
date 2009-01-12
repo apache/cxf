@@ -18,14 +18,16 @@
  */
 package org.apache.cxf.transport.jms.spring;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.ClientBehaviorPolicyType;
 import org.apache.cxf.transport.jms.ClientConfig;
@@ -48,10 +50,13 @@ public class JMSConduitBeanDefinitionParser extends AbstractBeanDefinitionParser
         mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "address"), "address", AddressType.class);
         mapElementToJaxbProperty(element, bean, new QName(JMS_NS, "sessionPool"), "sessionPool",
                                  SessionPoolType.class);
-        NodeList el = element.getElementsByTagNameNS(JMS_NS, "jmsConfig-ref");
+        
+        
+        List<Element> elemList = 
+            DOMUtils.findAllElementsByTagNameNS(element, JMS_NS, "jmsConfig-ref");
 
-        if (el.getLength() == 1) {
-            Node el1 = el.item(0);
+        if (elemList.size() == 1) {
+            Node el1 = elemList.get(0);
             bean.addPropertyReference("jmsConfig", el1.getTextContent());
         }
     }
