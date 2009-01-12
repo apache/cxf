@@ -226,8 +226,8 @@ public class ToolSpec {
         }
     }
 
-    public NodeList getUsageForms() {
-        return getUsage().getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "form");
+    public List<Element> getUsageForms() {  
+        return DOMUtils.findAllElementsByTagNameNS(getUsage(), Tool.TOOL_SPEC_PUBLIC_ID, "form");   
     }
 
     /**

@@ -38,9 +38,9 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.common.toolspec.Tool;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
@@ -114,14 +114,37 @@ public class CommandLineParser {
         // for all form elements...
         Element usage = toolspec.getUsage();
 
-        NodeList usageForms = toolspec.getUsageForms();
+        List<Element> usageForms = toolspec.getUsageForms();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Found " + usageForms.getLength()
+            LOG.fine("Found " + usageForms.size()
                       + " alternative forms of usage, will use default form");
         }
-        if (usageForms.getLength() > 0) {
+        if (usageForms.size() > 0) {
             ErrorVisitor errors = new ErrorVisitor();
+            
+            for (Element elem : usageForms) {
+                Form form = new Form(elem);
 
+                int pos = tokens.getPosition();
+
+                if (form.accept(tokens, commandEl, errors)) {
+                    commandEl.setAttribute("form", form.getName());
+                    break;
+                } else {
+                    // if no more left then return null;
+                    tokens.setPosition(pos);
+                    
+                    if (elem.getNextSibling() == null) {
+                        if (LOG.isLoggable(Level.INFO)) {
+                            LOG.info("No more forms left to try, returning null");
+                        }
+                        throwUsage(errors);
+                    }
+                }
+            
+                
+            }
+/*
             for (int i = 0; i < usageForms.getLength(); i++) {
                 Form form = new Form((Element)usageForms.item(i));
 
@@ -141,6 +164,7 @@ public class CommandLineParser {
                     }
                 }
             }
+*/
         } else {
             ErrorVisitor errors = new ErrorVisitor();
             Form form = new Form(usage);
@@ -291,9 +315,14 @@ public class CommandLineParser {
     public String getDetailedUsage(String id) {
         String result = null;
         Element element = toolspec.getElementById(id);
-        NodeList annotations = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
-        if ((annotations != null) && (annotations.getLength() > 0)) {
-            result = annotations.item(0).getFirstChild().getNodeValue();
+        
+        List<Element> annotations = DOMUtils.findAllElementsByTagNameNS(element,
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+                                                                     "annotation");
+        
+        
+        if ((annotations != null) && (annotations.size() > 0)) {
+            result = annotations.get(0).getFirstChild().getNodeValue();
         }
         return result;
     }
