@@ -29,18 +29,17 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
  */
 public class BusServer extends AbstractBusTestServerBase {
 
-
     protected void run()  {
         //
         // Just instantiate the Bus; services will be instantiated
         // and published automatically through Spring
         //
         final BusFactory factory = BusFactory.newInstance();
-        final Bus bus = factory.createBus();
+        Bus bus = factory.createBus();
+        setBus(bus);
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
     }
-
 
     public static void main(String[] args) {
         try {

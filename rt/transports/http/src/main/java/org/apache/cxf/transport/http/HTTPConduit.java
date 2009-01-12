@@ -444,6 +444,9 @@ public class HTTPConduit
     protected void retrieveConnectionFactory() {
         connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this);
     }
+    protected void retrieveConnectionFactory(String url) {
+        connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this, url);
+    }
     
     /**
      * Prepare to send an outbound HTTP message over this http conduit to a 
@@ -683,6 +686,16 @@ public class HTTPConduit
                 return getURL();
             }
             result = getURL().toString();
+        } else {
+            if (connectionFactory == null 
+                || result.startsWith(connectionFactory.getProtocol() + ":/")) {
+            
+                connectionFactory = null;
+                if (!result.startsWith("https:/")) {
+                    tlsClientParameters = null;
+                }
+                retrieveConnectionFactory(result);
+            }
         }
         
         // REVISIT: is this really correct?

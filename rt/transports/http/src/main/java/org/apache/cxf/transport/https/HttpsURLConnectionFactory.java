@@ -223,6 +223,11 @@ public final class HttpsURLConnectionFactory
     ) throws IOException {  
         return new HttpsURLConnectionInfo((HttpsURLConnection)connection);
     }
+    
+    public String getProtocol() {
+        return "https";
+    }
+
 }
 
 

@@ -237,14 +237,21 @@ public abstract class AbstractHTTPTransportFactory
      * This static call creates a connection factory based on
      * the existence of the SSL (TLS) client side configuration. 
      */
+    static HttpURLConnectionFactory getConnectionFactory(HTTPConduit configuredConduit) {
+        return getConnectionFactory(configuredConduit, null);
+    }
+    
     static HttpURLConnectionFactory getConnectionFactory(
-        HTTPConduit configuredConduit
+        HTTPConduit configuredConduit,
+        String address
     ) {
         HttpURLConnectionFactory fac = null;
         boolean useHttps = false;
 
         try {
-            String address = configuredConduit.getAddress();
+            if (address == null) {
+                address = configuredConduit.getAddress();
+            }
             if (address != null 
                 && address.startsWith(HttpsURLConnectionFactory.HTTPS_URL_PROTOCOL_ID + ":/")) {
                 useHttps = true;
@@ -252,9 +259,7 @@ public abstract class AbstractHTTPTransportFactory
         } catch (MalformedURLException e) {
             //ignore, just use info based on Tls
         }
-        if (useHttps 
-            || configuredConduit.getTlsClientParameters() != null) {
-            
+        if (useHttps) {
             TLSClientParameters params = configuredConduit.getTlsClientParameters();
             if (params == null) {
                 params = new TLSClientParameters(); //use defaults
