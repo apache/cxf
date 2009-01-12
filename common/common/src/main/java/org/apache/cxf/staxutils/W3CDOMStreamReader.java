@@ -48,6 +48,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
      */
     public W3CDOMStreamReader(Element element) {
         super(new ElementFrame<Node, Node>(element, null));
+        content = element;
         newFrame(getCurrentFrame());
                 
         this.document = element.getOwnerDocument();
