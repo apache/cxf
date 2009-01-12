@@ -211,7 +211,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
         if (outdir != null) {
             File dir = new File(outdir);
             if (!dir.exists() && !dir.mkdirs()) {
-                Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, outdir);
+                Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, outdir);
                 throw new ToolException(msg);
             }
             if (!dir.isDirectory()) {
@@ -225,7 +225,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             if (clsdir != null) {
                 File dir = new File(clsdir);
                 if (!dir.exists() && !dir.mkdirs()) {
-                    Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, clsdir);
+                    Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, clsdir);
                     throw new ToolException(msg);
                 }
             }
