@@ -25,6 +25,7 @@ import java.util.concurrent.Executor;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
@@ -34,7 +35,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
     String RESPONSE_CONTEXT = "ResponseContext";
 
     /**
-     * Invokes an operation syncronously
+     * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
      * @param params  The params that matches the parts of the input message of the operation.  If the 
@@ -46,7 +47,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;
     
     /**
-     * Invokes an operation syncronously
+     * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation.  If the 
      * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
@@ -58,7 +59,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
 
 
     /**
-     * Invokes an operation syncronously
+     * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
      * @param params  The params that matches the parts of the input message of the operation
@@ -68,7 +69,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;
     
     /**
-     * Invokes an operation syncronously
+     * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
      * @return The return values that matche the parts of the output message of the operation
@@ -77,7 +78,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;
     
     /**
-     * Invokes an operation syncronously
+     * Invokes an operation synchronously
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
      * @return The return values that matche the parts of the output message of the operation
@@ -86,7 +87,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;
 
     /**
-     * Invokes an operation syncronously
+     * Invokes an operation synchronously
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
      * @param context  Optional (can be null) contextual information for the invocation     
@@ -96,9 +97,21 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object[] params,
                     Map<String, Object> context) throws Exception;
     
+    /**
+     * Invokes an operation synchronously
+     * @param oi  The operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation
+     * @param context  Optional (can be null) contextual information for the invocation
+     * @param exchange The Exchange to be used for the invocation     
+     * @return The return values that matche the parts of the output message of the operation
+     */
+    Object[] invoke(BindingOperationInfo oi,
+            Object[] params, 
+            Map<String, Object> context,
+            Exchange exchange) throws Exception;
     
     /**
-     * Invokes an operation asyncronously
+     * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
@@ -112,7 +125,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;
     
     /**
-     * Invokes an operation asyncronously
+     * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation.  If the 
@@ -126,7 +139,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
 
 
     /**
-     * Invokes an operation asyncronously
+     * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
@@ -138,7 +151,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;
     
     /**
-     * Invokes an operation asyncronously
+     * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
@@ -149,7 +162,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
                     Object... params) throws Exception;    
     
     /**
-     * Invokes an operation asyncronously
+     * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
