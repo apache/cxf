@@ -254,11 +254,14 @@ public final class DOMUtils {
         return getFirstChildWithName(parent, ns, lp);
     }
     public static Element getFirstChildWithName(Element parent, String ns, String lp) { 
-        Node n = parent.getFirstChild();
-        while (n != null 
-            && !ns.equals(n.getNamespaceURI())
-            && !lp.equals(n.getLocalName())) {
-            n = n.getNextSibling();
+        for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
+            if (n instanceof Element) {
+                Element e = (Element) n;
+                String ens = e.getNamespaceURI();
+                if (ns.equals(ens) && lp.equals(e.getLocalName())) {
+                    return e;
+                }
+            }
         }
         return (Element)n;
     }

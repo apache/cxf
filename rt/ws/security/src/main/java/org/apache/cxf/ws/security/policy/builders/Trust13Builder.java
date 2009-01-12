@@ -36,12 +36,11 @@ import org.apache.cxf.ws.security.policy.model.Trust13;
 public class Trust13Builder implements AssertionBuilder {
 
     public PolicyAssertion build(Element element) {
-
         element = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
 
         if (element == null) {
             throw new IllegalArgumentException(
-                    "Trust10 assertion doesn't contain any Policy");
+                    "Trust13 assertion doesn't contain any Policy");
         }
 
         Trust13 trust13 = new Trust13(SP12Constants.INSTANCE);
