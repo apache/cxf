@@ -32,7 +32,6 @@ import javax.xml.ws.Service.Mode;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.hello_world_soap_http.SOAPService1;
 import org.apache.hello_world_soap_http.SOAPService2;
@@ -127,14 +126,14 @@ public final class Client {
     }
 
     private static Element fetchElementByName(Node parent, String name) {
-        Element ret = null;
-        NodeList nodeList = parent.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
+        Element ret = null;        
+        Node node = parent.getFirstChild();
+        while (node != null) {
             if (node instanceof Element && ((Element)node).getLocalName().equals(name)) {
                 ret = (Element)node;
                 break;
             }
+            node = node.getNextSibling();
         }
         return ret;
     }
