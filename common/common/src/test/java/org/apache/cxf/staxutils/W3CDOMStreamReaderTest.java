@@ -31,7 +31,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 
 import org.junit.Assert;
@@ -49,7 +51,8 @@ public class W3CDOMStreamReaderTest extends Assert {
     @Test
     public void testReader() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(
-                "<Test xmlns=\"http://example.org/types\"><argument>foobar</argument></Test>".getBytes());
+                "<Test xmlns=\"http://example.org/types\"><argument>foobar</argument></Test>"
+                    .getBytes("utf-8"));
         DocumentBuilderFactory docBuilderFactory =
                 DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
@@ -67,6 +70,19 @@ public class W3CDOMStreamReaderTest extends Assert {
         StaxUtils.copy(reader, writer);
         assertTrue(XMLUtils.toString(writer.getDocument()).endsWith(RESULT));
 
+    }
+    
+    @org.junit.Ignore
+    @Test
+    public void testTopLevelText() throws Exception {
+        ByteArrayInputStream is = new ByteArrayInputStream(
+               "<t:Test xmlns:t=\"http://example.org/types\">gorilla</t:Test>"
+               .getBytes("utf-8"));
+        Document doc = DOMUtils.readXml(is);
+        Element e = doc.getDocumentElement();
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(e);
+        String value = reader.getElementText();
+        assertEquals("gorilla", value);
     }
 
 }
