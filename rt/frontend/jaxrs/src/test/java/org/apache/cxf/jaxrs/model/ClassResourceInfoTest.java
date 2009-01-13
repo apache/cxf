@@ -58,6 +58,11 @@ public class ClassResourceInfoTest extends Assert {
     private static class TestClass2 extends TestClass1 {
     }
     
+    private static class TestClass3 {
+        @Resource HttpServletRequest req;
+        @Resource HttpServletResponse res;
+        @Resource ServletContext c;
+    }
     
     @Test
     public void testGetHttpContexts() {
@@ -77,10 +82,10 @@ public class ClassResourceInfoTest extends Assert {
 
     @Test
     public void testGetResources() {
-        ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
+        ClassResourceInfo c = new ClassResourceInfo(TestClass3.class);
         List<Field> fields = c.getResourceFields();
         assertEquals("Only root classes should check these fields", 0, fields.size());
-        c = new ClassResourceInfo(TestClass.class, true);
+        c = new ClassResourceInfo(TestClass3.class, true);
         fields = c.getResourceFields();
         
         Set<Class<?>> clses = new HashSet<Class<?>>(); 

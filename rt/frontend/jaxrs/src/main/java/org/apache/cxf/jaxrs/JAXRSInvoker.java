@@ -204,6 +204,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             for (Object resourceObject : resources) {
                 if (c.isInstance(resourceObject)) {
                     serviceObject = resourceObject;
+                    break;
                 }
             }
         }
