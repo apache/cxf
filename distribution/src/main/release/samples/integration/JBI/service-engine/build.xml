@@ -37,13 +37,14 @@
       <fileset dir="${env.CXF_HOME}/lib">
         <include name="cxf-manifest.jar"/>
         <include name="cxf*.jar"/>
+        <include name="FastInfoset-*.jar"/>
         <include name="jaxb*.jar"/>
         <include name="neethi-*.jar"/>
-        <include name="jaxws-api-*.jar"/>
+        <include name="geronimo-jaxws_2.1_spec-1.0.jar"/>
         <include name="geronimo-annotation_1.0_spec-*.jar"/>
+        <include name="geronimo-ws-metadata_2.0_spec-*.jar"/>
         <include name="xml-resolver-*.jar"/>
         <include name="saaj*.jar"/>
-        <include name="geronimo-ws-metadata_2.0_spec-*.jar"/>
         <include name="XmlSchema-*.jar"/>
         <include name="wstx-asl-*.jar"/>
       </fileset>
