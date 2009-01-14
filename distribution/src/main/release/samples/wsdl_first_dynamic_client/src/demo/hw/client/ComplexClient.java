@@ -19,10 +19,8 @@
 
 package demo.hw.client;
 
-import java.beans.BeanDescriptor;
 import java.beans.PropertyDescriptor;
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 
