@@ -72,8 +72,8 @@ For UNIX:
  > ant -f $SERVICEMIX_HOME/ant/servicemix-ant-task.xml install-component -Dsm.install.file=../service-engine/build/lib/cxf-service-engine.jar -Dsm.username=smx -Dsm.password=smx
  > ant -f $SERVICEMIX_HOME/ant/servicemix-ant-task.xml start-component -Dsm.component.name=CXFServiceEngine -Dsm.username=smx -Dsm.password=smx
 For Windows:
- > ant -f "%SERVICEMIX_HOME%"/ant/servicemix-ant-task.xml install-component -Dsm.install.file=../service-engine/build/lib/cxf-service-engine.jar -Dsm.username=smx -Dsm.password=smx
- > ant -f "%SERVICEMIX_HOME%"/ant/servicemix-ant-task.xml start-component -Dsm.component.name=CXFServiceEngine -Dsm.username=smx -Dsm.password=smx
+ > ant -f "%SERVICEMIX_HOME%"\ant\servicemix-ant-task.xml install-component -Dsm.install.file=..\service-engine\build\lib\cxf-service-engine.jar -Dsm.username=smx -Dsm.password=smx
+ > ant -f "%SERVICEMIX_HOME%"\ant\servicemix-ant-task.xml start-component -Dsm.component.name=CXFServiceEngine -Dsm.username=smx -Dsm.password=smx
 
 Deploy and start the CXF demo service assembly
 
@@ -81,15 +81,15 @@ For UNIX:
  > ant -f $SERVICEMIX_HOME/ant/servicemix-ant-task.xml  deploy-service-assembly -Dsm.deploy.file=./service-assembly/build/lib/cxf-service-assembly.zip -Dsm.username=smx -Dsm.password=smx
  > ant -f $SERVICEMIX_HOME/ant/servicemix-ant-task.xml start-service-assembly -Dsm.service.assembly.name=cxf-demo-service-assembly -Dsm.username=smx -Dsm.password=smx
 For Windows:
- > ant -f "%SERVICEMIX_HOME%"/ant/servicemix-ant-task.xml  deploy-service-assembly -Dsm.deploy.file=./service-assembly/build/lib/cxf-service-assembly.zip -Dsm.username=smx -Dsm.password=smx
- > ant -f "%SERVICEMIX_HOME%"/ant/servicemix-ant-task.xml start-service-assembly -Dsm.service.assembly.name=cxf-demo-service-assembly -Dsm.username=smx -Dsm.password=smx
+ > ant -f "%SERVICEMIX_HOME%"\ant\servicemix-ant-task.xml  deploy-service-assembly -Dsm.deploy.file=.\service-assembly\build\lib\cxf-service-assembly.zip -Dsm.username=smx -Dsm.password=smx
+ > ant -f "%SERVICEMIX_HOME%"\ant\servicemix-ant-task.xml start-service-assembly -Dsm.service.assembly.name=cxf-demo-service-assembly -Dsm.username=smx -Dsm.password=smx
 
 More lifecycle management task
 
 For UNIX:
  > ant -f $SERVICEMIX_HOME/ant/servicemix-ant-task.xml -projecthelp
 For Windows:
- > ant -f "%SERVICEMIX_HOME%"/ant/servicemix-ant-task.xml -projecthelp
+ > ant -f "%SERVICEMIX_HOME%"\ant\servicemix-ant-task.xml -projecthelp
 
 What happened
 =============
