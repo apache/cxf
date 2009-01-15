@@ -1597,9 +1597,14 @@ public class HTTPConduit
         // Disconnect the old, and in with the new.
         connection.disconnect();
         
-        connection = 
+        if (connectionFactory.getProtocol().equals(newURL.getProtocol())) {
+            connection = 
                 connectionFactory.createConnection(
-                          getProxy(clientSidePolicy), newURL);
+                          getProxy(clientSidePolicy), newURL);            
+        } else {
+            connection = AbstractHTTPTransportFactory.getConnectionFactory(this, newURL.toString())
+                .createConnection(getProxy(clientSidePolicy), newURL);
+        }
 
         connection.setDoOutput(true);        
         // TODO: using Message context to deceided HTTP send properties        
