@@ -127,7 +127,8 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 if (fault.getRole() != null) {
                     soapFault.setFaultActor(fault.getRole());
                 }
-                if (fault.getDetail() != null) {
+                if (fault.getDetail() != null
+                    && fault.getDetail().getFirstChild() != null) {
                     soapFault.addDetail().appendChild(
                         soapMessage.getSOAPPart().importNode(
                             fault.getDetail().getFirstChild(), true));
