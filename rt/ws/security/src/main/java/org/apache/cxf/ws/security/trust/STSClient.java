@@ -350,6 +350,22 @@ public class STSClient implements Configurable {
                 writer.writeCharacters(namespace + "/CK/PSHA1");
                 writer.writeEndElement();
             }
+        } else if (keyType.endsWith("PublicKey")) {
+            writer.writeStartElement(namespace, "UseKey");
+            writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
+            writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyValue");
+            
+            /*
+            //REVISIT - KeyValueToken support - how to get the key?
+            RSAPublicKey key = getPublicKey();
+            
+            RSAKeyValue value = new RSAKeyValue(writer.getDocument(), key);
+            StaxUtils.copy(value.getElement(), writer);
+            */
+            
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
         writer.writeEndElement();
         
@@ -358,7 +374,6 @@ public class STSClient implements Configurable {
         
         return createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
     }
-
 
     private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy) 
         throws WSSecurityException {

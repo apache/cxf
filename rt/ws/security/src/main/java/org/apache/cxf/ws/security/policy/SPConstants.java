@@ -124,6 +124,7 @@ public abstract class SPConstants {
     
     
     public static final String USERNAME_TOKEN = "UsernameToken";
+    public static final String KEYVALUE_TOKEN = "KeyValueToken";
     
     public static final String USERNAME_TOKEN10 = "WssUsernameToken10";
     

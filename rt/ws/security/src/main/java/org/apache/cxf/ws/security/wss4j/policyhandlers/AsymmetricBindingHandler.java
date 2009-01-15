@@ -375,7 +375,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 e.printStackTrace();
             }
         } else {
-            WSSecSignature sig = getSignatureBuider(wrapper, sigToken);
+            WSSecSignature sig = getSignatureBuider(wrapper, sigToken, false);
             sig.prependBSTElementToHeader(secHeader);
             
             if (abinding.isTokenProtection()

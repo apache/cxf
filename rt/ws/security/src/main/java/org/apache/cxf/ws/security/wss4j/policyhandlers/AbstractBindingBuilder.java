@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -371,7 +372,7 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens) {
+    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens, boolean endorse) {
         Map<Token, WSSecBase> ret = new HashMap<Token, WSSecBase>();
         if (suppTokens == null) {
             return ret;
@@ -405,7 +406,7 @@ public abstract class AbstractBindingBuilder {
             } else if (token instanceof X509Token) {
                 //We have to use a cert
                 //Prepare X509 signature
-                WSSecSignature sig = getSignatureBuider(suppTokens, token);
+                WSSecSignature sig = getSignatureBuider(suppTokens, token, endorse);
                 Element bstElem = sig.getBinarySecurityTokenElement();
                 if (bstElem != null) {
                     sig.prependBSTElementToHeader(secHeader);
@@ -790,24 +791,26 @@ public abstract class AbstractBindingBuilder {
         
         return encrKey;
     }
+
     public Crypto getSignatureCrypto(TokenWrapper wrapper) {
-        return getCrypto(wrapper, true);
+        return getCrypto(wrapper, SecurityConstants.SIGNATURE_CRYPTO,
+                         SecurityConstants.SIGNATURE_PROPERTIES);
     }
+
+
     public Crypto getEncryptionCrypto(TokenWrapper wrapper) {
-        return getCrypto(wrapper, false);
+        return getCrypto(wrapper, 
+                         SecurityConstants.ENCRYPT_CRYPTO,
+                         SecurityConstants.ENCRYPT_PROPERTIES);
     }
-    public Crypto getCrypto(TokenWrapper wrapper, boolean sign) {
-        Crypto crypto = (Crypto)message.getContextualProperty(sign 
-                                                      ? SecurityConstants.SIGNATURE_CRYPTO 
-                                                      : SecurityConstants.ENCRYPT_CRYPTO);
+    public Crypto getCrypto(TokenWrapper wrapper, String cryptoKey, String propKey) {
+        Crypto crypto = (Crypto)message.getContextualProperty(cryptoKey);
         if (crypto != null) {
             return crypto;
         }
         
         
-        Object o = message.getContextualProperty(sign 
-                                                 ? SecurityConstants.SIGNATURE_PROPERTIES 
-                                                 : SecurityConstants.ENCRYPT_PROPERTIES);
+        Object o = message.getContextualProperty(propKey); 
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
@@ -1014,7 +1017,7 @@ public abstract class AbstractBindingBuilder {
             }
         }
     }
-    protected WSSecSignature getSignatureBuider(TokenWrapper wrapper, Token token) {
+    protected WSSecSignature getSignatureBuider(TokenWrapper wrapper, Token token, boolean endorse) {
         WSSecSignature sig = new WSSecSignature();
         checkForX509PkiPath(sig, token);        
         setKeyIdentifierType(sig, wrapper, token);
@@ -1022,14 +1025,18 @@ public abstract class AbstractBindingBuilder {
         boolean encryptCrypto = false;
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         String type = "signature";
-        if (binding instanceof SymmetricBinding) {
+        if (binding instanceof SymmetricBinding && !endorse) {
             encryptCrypto = ((SymmetricBinding)binding).getProtectionToken() != null;
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
         }
 
-        Crypto crypto = encryptCrypto ? getEncryptionCrypto(wrapper) : getSignatureCrypto(wrapper);
-        message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
-
+        Crypto crypto = encryptCrypto ? getEncryptionCrypto(wrapper) 
+            : getSignatureCrypto(wrapper);
+        
+        
+        if (!endorse) {
+            message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
+        }
         String user = (String)message.getContextualProperty(userNameKey);
         if (StringUtils.isEmpty(user)) {
             user = crypto.getDefaultX509Alias();
@@ -1049,6 +1056,15 @@ public abstract class AbstractBindingBuilder {
                 //ignore
             }
         }
+        
+        try {
+            Key key = crypto.getKeyStore().getCertificate(user).getPublicKey();
+            System.out.println(key);
+        } catch (KeyStoreException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
         if (StringUtils.isEmpty(user)) {
             policyNotAsserted(token, "No " + type + " username found.");
         }
@@ -1276,41 +1292,41 @@ public abstract class AbstractBindingBuilder {
         SupportingToken sgndSuppTokens = 
             (SupportingToken)findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         
-        Map<Token, WSSecBase> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens);           
+        Map<Token, WSSecBase> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens, false);           
         
         SupportingToken endSuppTokens = 
             (SupportingToken)findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-        
-        endSuppTokMap = this.handleSupportingTokens(endSuppTokens);
-        
+
+        endSuppTokMap = this.handleSupportingTokens(endSuppTokens, true);
+
         SupportingToken sgndEndSuppTokens 
             = (SupportingToken)findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens);
+        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true);
         
         SupportingToken sgndEncryptedSuppTokens 
             = (SupportingToken)findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         Map<Token, WSSecBase> sgndEncSuppTokMap 
-            = this.handleSupportingTokens(sgndEncryptedSuppTokens);
+            = this.handleSupportingTokens(sgndEncryptedSuppTokens, false);
         
         SupportingToken endorsingEncryptedSuppTokens 
             = (SupportingToken)findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         endEncSuppTokMap 
-            = this.handleSupportingTokens(endorsingEncryptedSuppTokens);
-        
+            = this.handleSupportingTokens(endorsingEncryptedSuppTokens, true);
+
         SupportingToken sgndEndEncSuppTokens 
             = (SupportingToken)findAndAssertPolicy(SP12Constants
                                                        .SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         sgndEndEncSuppTokMap 
-            = this.handleSupportingTokens(sgndEndEncSuppTokens);
-        
+            = this.handleSupportingTokens(sgndEndEncSuppTokens, true);
+
         SupportingToken supportingToks 
             = (SupportingToken)findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
-        this.handleSupportingTokens(supportingToks);
-        
+        this.handleSupportingTokens(supportingToks, false);
+
         SupportingToken encryptedSupportingToks 
             = (SupportingToken)findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
-        this.handleSupportingTokens(encryptedSupportingToks);
-    
+        this.handleSupportingTokens(encryptedSupportingToks, false);
+
         //Setup signature parts
         addSignatureParts(sigSuppTokMap, sigs);
         addSignatureParts(sgndEncSuppTokMap, sigs);

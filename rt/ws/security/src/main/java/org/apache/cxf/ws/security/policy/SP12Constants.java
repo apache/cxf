@@ -123,6 +123,9 @@ public final class SP12Constants extends SPConstants {
 
     public static final QName USERNAME_TOKEN = new QName(SP12Constants.SP_NS,
             SPConstants.USERNAME_TOKEN , SP12Constants.SP_PREFIX);
+    public static final QName KEYVALUE_TOKEN = new QName(SP12Constants.SP_NS,
+                                                         SPConstants.KEYVALUE_TOKEN ,
+                                                         SP12Constants.SP_PREFIX);
 
     public static final QName WSS_USERNAME_TOKEN10 = new QName(SP12Constants.SP_NS,
             SPConstants.USERNAME_TOKEN10 , SP12Constants.SP_PREFIX);
@@ -436,6 +439,9 @@ public final class SP12Constants extends SPConstants {
     }
     public QName getUserNameToken() {
         return USERNAME_TOKEN;
+    }
+    public QName getKeyValueToken() {
+        return KEYVALUE_TOKEN;
     }
     public QName getX509Token() {
         return X509_TOKEN;

@@ -36,6 +36,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
@@ -170,6 +171,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             } else if (token instanceof SecureConversationToken) {
                                 signatureValues.add(doSecureConversationSignature(token,
                                                                                   null));
+                            } else if (token instanceof KeyValueToken) {
+                                //
                             }
                         }
                     }
@@ -185,7 +188,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     }
                     if (suppTokens != null && suppTokens.getTokens() != null 
                         && suppTokens.getTokens().size() > 0) {
-                        handleSupportingTokens(suppTokens);
+                        handleSupportingTokens(suppTokens, false);
                     }
                 }
 
@@ -257,7 +260,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             return dkSig.getSignatureValue();
         } else {
-            WSSecSignature sig = getSignatureBuider(wrapper, token);
+            WSSecSignature sig = getSignatureBuider(wrapper, token, false);
             sig.prependBSTElementToHeader(secHeader);
             /*
             if (isTokenProtection()

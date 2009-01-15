@@ -34,6 +34,7 @@ import org.apache.cxf.ws.security.policy.builders.EncryptedPartsBuilder;
 import org.apache.cxf.ws.security.policy.builders.HttpsTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.InitiatorTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.IssuedTokenBuilder;
+import org.apache.cxf.ws.security.policy.builders.KeyValueTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.LayoutBuilder;
 import org.apache.cxf.ws.security.policy.builders.ProtectionTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.RecipientTokenBuilder;
@@ -103,6 +104,7 @@ public class WSSecurityPolicyLoader {
         reg.register(new Trust10Builder());
         reg.register(new Trust13Builder());
         reg.register(new UsernameTokenBuilder(pbuild));
+        reg.register(new KeyValueTokenBuilder());
         reg.register(new WSS10Builder());
         reg.register(new WSS11Builder());
         reg.register(new X509TokenBuilder(pbuild));
