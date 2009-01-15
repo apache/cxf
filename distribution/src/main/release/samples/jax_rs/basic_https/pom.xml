@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_basic_https</artifactId>
+    <name>JAX-RS Basic Demo With HTTPS communications</name>
     <version>1.0</version>
     <properties>
             <cxf.version>[2,)</cxf.version>

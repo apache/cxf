@@ -4,6 +4,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_content_negotiation</artifactId>
     <version>1.0</version>
+    <name>JAX-RS Content Negotiation Demo</name>
     <properties>
             <cxf.version>[2,)</cxf.version>
             <httpclient.version>3.1</httpclient.version>

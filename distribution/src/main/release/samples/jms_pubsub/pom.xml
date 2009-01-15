@@ -4,6 +4,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jms_pubsub</artifactId>
     <version>1.0</version>
+    <name>JMS Transport Publish/Subscribe Demo using Document-Literal Style</name>
     <properties>
         <cxf.version>[2,)</cxf.version>
         <activemq.version>[5,)</activemq.version>

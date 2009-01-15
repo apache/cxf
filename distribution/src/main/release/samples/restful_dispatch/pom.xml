@@ -4,6 +4,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>restful_dispatch</artifactId>
     <version>1.0</version>
+    <name>RESTful Hello World Demo</name>
     <properties>
             <cxf.version>[2,)</cxf.version>
             <httpclient.version>3.1</httpclient.version>

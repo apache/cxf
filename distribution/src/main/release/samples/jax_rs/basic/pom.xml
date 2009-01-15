@@ -4,6 +4,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_basic</artifactId>
     <version>1.0</version>
+    <name>JAX-RS Basic Demo</name>
     <properties>
             <cxf.version>[2,)</cxf.version>
             <httpclient.version>3.1</httpclient.version>

@@ -4,6 +4,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>soap_header</artifactId>
     <version>1.0</version>
+    <name>Sample using SOAP Headers</name>
     <properties>
         <cxf.version>[2,)</cxf.version>
     </properties>
