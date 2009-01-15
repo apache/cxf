@@ -65,7 +65,8 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-
+        ClassCollector collector = penv.get(ClassCollector.class);
+        
         Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
         
         if (serviceClasses.size() == 0) {
@@ -113,10 +114,20 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 location = url;
             }
             
+            String serviceSuperclass = "Service";
+            for (String s : collector.getGeneratedFileInfo()) {
+                if (s.equals(js.getPackageName() + ".Service")) {
+                    serviceSuperclass = "javax.xml.ws.Service";
+                }
+            }
             clearAttributes();
-
+            
             setAttributes("service", js);
             setAttributes("wsdlLocation", location);
+            setAttributes("serviceSuperclass", serviceSuperclass);
+            if ("Service".equals(serviceSuperclass)) {
+                js.addImport("javax.xml.ws.Service");
+            }
             setAttributes("wsdlUrl", url);
             setCommonAttributes();
 

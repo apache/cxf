@@ -24,9 +24,6 @@ package $service.PackageName;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.namespace.QName;
-#if (${service.Name} != "Service")
-import javax.xml.ws.Service;
-#end
 import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceFeature;
@@ -55,7 +52,7 @@ import ${import};
 #foreach ($annotation in $service.Annotations)
 $annotation
 #end
-public class ${service.Name} extends #if (${service.Name} == "Service")javax.xml.ws.Service#else Service#end {
+public class ${service.Name} extends ${serviceSuperclass} {
 
     public final static URL WSDL_LOCATION;
     public final static QName SERVICE = new QName("$service.Namespace", "$service.ServiceName");
