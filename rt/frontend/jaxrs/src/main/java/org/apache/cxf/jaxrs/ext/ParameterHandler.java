@@ -19,18 +19,6 @@
 
 package org.apache.cxf.jaxrs.ext;
 
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.message.Message;
-
-/**
- * ResponseHandler is capable of postprocessing requests 
- * ex., they can update the response status code, etc
- *
- */
-public interface ResponseHandler {
-    Response handleResponse(Message m,
-                            OperationResourceInfo ori,
-                            Response response);
+public interface ParameterHandler<T> {
+    T fromString(String s);
 }

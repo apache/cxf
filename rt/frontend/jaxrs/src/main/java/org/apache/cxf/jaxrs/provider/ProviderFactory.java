@@ -38,6 +38,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.ext.MappingsHandler;
+import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
@@ -72,6 +73,8 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<RequestHandler>>(1);
     private List<ProviderInfo<ResponseHandler>> responseHandlers = 
         new ArrayList<ProviderInfo<ResponseHandler>>(1);
+    private List<ProviderInfo<ParameterHandler>> jaxrsParamHandlers = 
+        new ArrayList<ProviderInfo<ParameterHandler>>(1);
     private RequestPreprocessor requestPreprocessor;
     
     private ProviderFactory() {
@@ -87,6 +90,7 @@ public final class ProviderFactory {
                      requestHandlers,
                      responseHandlers,
                      defaultExceptionMappers,
+                     jaxrsParamHandlers,
                      new JAXBElementProvider(),
                      new JSONProvider(),
                      new BinaryDataProvider(),
@@ -193,6 +197,32 @@ public final class ProviderFactory {
         return candidates.get(0);
     }
     
+    @SuppressWarnings("unchecked")
+    public <T> ParameterHandler<T> createParameterHandler(Class<?> paramType) {
+        
+        List<ParameterHandler<T>> candidates = new LinkedList<ParameterHandler<T>>();
+        
+        for (ProviderInfo<ParameterHandler> em : jaxrsParamHandlers) {
+            Type[] types = em.getProvider().getClass().getGenericInterfaces();
+            for (Type t : types) {
+                if (t instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)t;
+                    Type[] args = pt.getActualTypeArguments();
+                    for (int i = 0; i < args.length; i++) {
+                        if (((Class<?>)args[i]).isAssignableFrom(paramType)) {
+                            candidates.add(em.getProvider());
+                        }
+                    }
+                }
+            }
+        }
+        if (candidates.size() == 0) {
+            return null;
+        }
+        Collections.sort(candidates, new ParameterHandlerComparator());
+        return candidates.get(0);
+    }
+    
     public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType,
                                                             Type parameterType,
                                                             Annotation[] parameterAnnotations,
@@ -257,13 +287,14 @@ public final class ProviderFactory {
         return mw;
     }
     
-       
+//CHECKSTYLE:OFF       
     private void setProviders(List<ProviderInfo<MessageBodyReader>> readers, 
                               List<ProviderInfo<MessageBodyWriter>> writers,
                               List<ProviderInfo<ContextResolver>> resolvers,
                               List<ProviderInfo<RequestHandler>> requestFilters,
                               List<ProviderInfo<ResponseHandler>> responseFilters,
                               List<ProviderInfo<ExceptionMapper>> excMappers,
+                              List<ProviderInfo<ParameterHandler>> paramHandlers,
                               Object... providers) {
         
         for (Object o : providers) {
@@ -290,6 +321,10 @@ public final class ProviderFactory {
             if (ExceptionMapper.class.isAssignableFrom(o.getClass())) {
                 excMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
             }
+            
+            if (ParameterHandler.class.isAssignableFrom(o.getClass())) {
+                paramHandlers.add(new ProviderInfo<ParameterHandler>((ParameterHandler)o)); 
+            }
         }
         
         sortReaders(readers);
@@ -297,6 +332,7 @@ public final class ProviderFactory {
         
         injectContexts(readers, writers, resolvers, requestFilters, responseFilters, excMappers);
     }
+//CHECKSTYLE:ON
     
     void injectContexts(List<?> ... providerLists) {
         for (List<?> list : providerLists) {
@@ -458,6 +494,7 @@ public final class ProviderFactory {
                      requestHandlers,
                      responseHandlers,
                      userExceptionMappers,
+                     jaxrsParamHandlers,
                      userProviders.toArray());
     }
 
@@ -531,6 +568,7 @@ public final class ProviderFactory {
         userExceptionMappers.clear();
         requestHandlers.clear();
         responseHandlers.clear();
+        jaxrsParamHandlers.clear();
     }
     
     public void setSchemaLocations(List<String> schemas) {
@@ -556,20 +594,34 @@ public final class ProviderFactory {
 
         public int compare(ExceptionMapper<? extends Throwable> em1, 
                            ExceptionMapper<? extends Throwable> em2) {
-            Type[] types1 = em1.getClass().getGenericInterfaces();
-            Type[] types2 = em2.getClass().getGenericInterfaces();
-            
-            Class<?> realClass1 = InjectionUtils.getActualType(types1[0]);
-            Class<?> realClass2 = InjectionUtils.getActualType(types2[0]);
-            if (realClass1 == realClass2) {
-                return 0;
-            }
-            if (realClass1.isAssignableFrom(realClass2)) {
-                // subclass should go first
-                return 1;
-            }
-            return -1;
+            return compareClasses(em1.getClass(), em2.getClass());
         }
         
+    }
+    
+    private static class ParameterHandlerComparator implements 
+        Comparator<ParameterHandler<? extends Object>> {
+
+        public int compare(ParameterHandler<? extends Object> em1, 
+                           ParameterHandler<? extends Object> em2) {
+            return compareClasses(em1.getClass(), em2.getClass());
+        }
+    
+    }
+    
+    private static int compareClasses(Class<?> cl1, Class<?> cl2) {
+        Type[] types1 = cl1.getGenericInterfaces();
+        Type[] types2 = cl2.getGenericInterfaces();
+        
+        Class<?> realClass1 = InjectionUtils.getActualType(types1[0]);
+        Class<?> realClass2 = InjectionUtils.getActualType(types2[0]);
+        if (realClass1 == realClass2) {
+            return 0;
+        }
+        if (realClass1.isAssignableFrom(realClass2)) {
+            // subclass should go first
+            return 1;
+        }
+        return -1;
     }
 }

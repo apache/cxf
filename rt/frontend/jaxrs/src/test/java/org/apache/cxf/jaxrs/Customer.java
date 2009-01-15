@@ -19,7 +19,9 @@
 
 package org.apache.cxf.jaxrs;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
@@ -88,6 +90,15 @@ public class Customer implements CustomerInfo {
     
     @QueryParam("b")
     private String b;
+    private String name;
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String n) {
+        name = n;
+    }
     
     public String getB() {
         return b;
@@ -225,6 +236,24 @@ public class Customer implements CustomerInfo {
                                 @MatrixParam("p3") String mp3,
                                 @MatrixParam("p4") String mp4,
                                 @MatrixParam("p4") List<String> mp4List) {
+        // complete
+    }
+    
+    public void testCustomerParam(@QueryParam("p1") Customer c) {
+        // complete
+    }
+    
+    public void testFromStringParam(@QueryParam("p1") UUID uuid,
+                                    @QueryParam("p2") CustomerGender gender,
+                                    @QueryParam("p3") CustomerGender gender2) {
+        // complete
+    }
+//  CHECKSTYLE:OFF
+    public void testWrongType(@QueryParam("p1") HashMap map) {
+        // complete
+    }
+//  CHECKSTYLE:ON    
+    public void testWrongType2(@QueryParam("p1") CustomerGender g) {
         // complete
     }
     

@@ -135,7 +135,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
             OutputStream out = message.getContent(OutputStream.class);
             if (writer == null) {
-                message.put(Message.RESPONSE_CODE, 406);
+                message.put(Message.RESPONSE_CODE, 500);
                 writeResponseErrorMessage(out, 
                       "NO_MSG_WRITER",
                       invoked != null ? invoked.getReturnType().getSimpleName() : "");
@@ -171,7 +171,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private void writeResponseErrorMessage(OutputStream out, String errorString, 
                                            String parameter) {
         try {
-            // TODO : make sure this message is picked up from a resource bundle
             out.write(new org.apache.cxf.common.i18n.Message(errorString,
                                                              BUNDLE,
                                                              parameter

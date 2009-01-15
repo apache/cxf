@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -43,10 +44,13 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
@@ -56,6 +60,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
@@ -70,6 +75,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
 public final class InjectionUtils {
@@ -108,9 +114,8 @@ public final class InjectionUtils {
                 try {
                     f.set(o, v);
                 } catch (IllegalAccessException ex) {
-                    LOG.warning(new org.apache.cxf.common.i18n.Message("FIELD_INJECTION_FAILURE", 
-                                                                       BUNDLE, 
-                                                                       f.getName()).toString());
+                    reportServerError("FIELD_ACCESS_FAILURE", 
+                                      f.getType().getName());
                 }
                 return null;
             }
@@ -133,20 +138,23 @@ public final class InjectionUtils {
         try {
             Method methodToInvoke = checkProxy(method, requestObject);
             methodToInvoke.invoke(requestObject, new Object[]{parameterValue});
+        } catch (IllegalAccessException ex) {
+            reportServerError("METHOD_ACCESS_FAILURE", method.getName());
         } catch (Exception ex) {
-            LOG.warning(new org.apache.cxf.common.i18n.Message("METHOD_INJECTION_FAILURE", 
-                                                               BUNDLE, 
-                                                               method.getName()).toString());
+            reportServerError("METHOD_INJECTION_FAILURE", method.getName());
         }
     }
     
-    public static Object handleParameter(String value, Class<?> pClass, boolean pathParam) {
+    public static Object handleParameter(String value, 
+                                         Class<?> pClass, 
+                                         ParameterType pType,
+                                         String basePath) {
         
         if (value == null) {
             return null;
         }
         
-        if (pathParam) {
+        if (pType == ParameterType.PATH) {
             PathSegment ps = new PathSegmentImpl(value, false);    
             if (PathSegment.class.isAssignableFrom(pClass)) {
                 return ps;   
@@ -161,70 +169,122 @@ public final class InjectionUtils {
         // check constructors accepting a single String value
         try {
             Constructor<?> c = pClass.getConstructor(new Class<?>[]{String.class});
-            if (c !=  null) {
-                return c.newInstance(new Object[]{value});
-            }
-        } catch (Exception ex) {
+            return c.newInstance(new Object[]{value});
+        } catch (NoSuchMethodException ex) {
             // try valueOf
-        }
-        // check for valueOf(String) static methods
-        try {
-            Method m = pClass.getMethod("valueOf", new Class<?>[]{String.class});
-            if (m != null && Modifier.isStatic(m.getModifiers())) {
-                return m.invoke(null, new Object[]{value});
-            }
         } catch (Exception ex) {
-            // no luck
+            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
+                                                               BUNDLE, 
+                                                               pClass.getName()).toString());
+            throw new WebApplicationException(ex, getFailureStatus(pType));
         }
         
+        // check for valueOf(String) static methods
+        String[] methodNames = pClass.isEnum() 
+            ? new String[] {"fromString", "valueOf"} 
+            : new String[] {"valueOf", "fromString"};
+        Object result = evaluateFactoryMethod(value, pClass, pType, methodNames[0]);
+        if (result == null) {
+            result = evaluateFactoryMethod(value, pClass, pType, methodNames[1]);
+        }
+        
+        if (basePath != null) {
+            ParameterHandler<?> pm = ProviderFactory.getInstance(basePath)
+                .createParameterHandler(pClass);
+            if (pm != null) {
+                result = pm.fromString(value);
+            }
+        }
+        
+        if (result != null) {
+            return result;
+        }
+        
+        reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
+        return null;
+    }
+
+    public static void reportServerError(String messageName, String parameter) {
+        org.apache.cxf.common.i18n.Message errorMessage = 
+            new org.apache.cxf.common.i18n.Message(messageName, 
+                                                   BUNDLE, 
+                                                   parameter);
+        LOG.severe(errorMessage.toString());
+        Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                         .type(MediaType.TEXT_PLAIN_TYPE)
+                         .entity(errorMessage.toString()).build();
+        throw new WebApplicationException(r);
+    }
+    
+    private static Object evaluateFactoryMethod(String value,
+                                                Class<?> pClass, 
+                                                ParameterType pType, 
+                                                String methodName) {
+        try {
+            Method m = pClass.getMethod(methodName, new Class<?>[]{String.class});
+            if (Modifier.isStatic(m.getModifiers())) {
+                return m.invoke(null, new Object[]{value});
+            }
+        } catch (NoSuchMethodException ex) {
+            // no luck
+        } catch (Exception ex) {
+            Throwable t = ex instanceof InvocationTargetException 
+                ? ((InvocationTargetException)ex).getTargetException() : ex; 
+            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
+                                                               BUNDLE, 
+                                                               pClass.getName()).toString());
+            throw new WebApplicationException(t, getFailureStatus(pType));
+        }
         return null;
     }
     
     public static Object handleBean(Class<?> paramType, MultivaluedMap<String, String> values,
-                                    boolean pathParam) {
+                                    ParameterType pType, String basePath) {
         Object bean = null;
         try {
             bean = paramType.newInstance();
-            for (Map.Entry<String, List<String>> entry : values.entrySet()) {
-                boolean injected = false;
-                for (Method m : paramType.getMethods()) {
-                    if (m.getName().equalsIgnoreCase("set" + entry.getKey())
-                        && m.getParameterTypes().length == 1) {
-                        Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                            m.getParameterTypes()[0],
-                                                            pathParam);
-                        if (paramValue != null) {
-                            injectThroughMethod(bean, m, paramValue);
-                            injected = true;
-                            break;
-                        }
-                    }
-                }
-                if (injected) {
-                    continue;
-                }
-                for (Field f : paramType.getFields()) {
-                    if (f.getName().equalsIgnoreCase(entry.getKey())) {
-                        Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                            f.getType(), pathParam);
-                        if (paramValue != null) {
-                            injectFieldValue(f, bean, paramValue);
-                            break;
-                        }
+        } catch (IllegalAccessException ex) {
+            reportServerError("CLASS_ACCESS_FAILURE", paramType.getName());
+        } catch (Exception ex) {
+            reportServerError("CLASS_INSTANTIATION_FAILURE", paramType.getName());
+        }    
+        
+        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
+            boolean injected = false;
+            for (Method m : paramType.getMethods()) {
+                if (m.getName().equalsIgnoreCase("set" + entry.getKey())
+                    && m.getParameterTypes().length == 1) {
+                    Object paramValue = handleParameter(entry.getValue().get(0), 
+                                                        m.getParameterTypes()[0],
+                                                        pType, basePath);
+                    if (paramValue != null) {
+                        injectThroughMethod(bean, m, paramValue);
+                        injected = true;
+                        break;
                     }
                 }
             }
-        } catch (Exception ex) {
-            LOG.warning(new org.apache.cxf.common.i18n.Message("CLASS_INSTANCIATION_FAILURE", 
-                                                               BUNDLE, 
-                                                               paramType.getName()).toString());    
+            if (injected) {
+                continue;
+            }
+            for (Field f : paramType.getFields()) {
+                if (f.getName().equalsIgnoreCase(entry.getKey())) {
+                    Object paramValue = handleParameter(entry.getValue().get(0), 
+                                                        f.getType(), pType, basePath);
+                    if (paramValue != null) {
+                        injectFieldValue(f, bean, paramValue);
+                        break;
+                    }
+                }
+            }
         }
+        
         return bean;
     }
     
     @SuppressWarnings("unchecked")
     public static Object injectIntoList(Type genericType, List<String> values,
-                                        boolean decoded, boolean pathParam) {
+                                        boolean decoded, ParameterType pathParam, String basePath) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
         values = checkPathSegment(values, realType, pathParam);
         List theValues = new ArrayList();
@@ -232,7 +292,7 @@ public final class InjectionUtils {
             if (decoded) {
                 r = JAXRSUtils.uriDecode(r);
             }
-            Object o = InjectionUtils.handleParameter(r, realType, pathParam);
+            Object o = InjectionUtils.handleParameter(r, realType, pathParam, basePath);
             if (o != null) {
                 theValues.add(o);
             }
@@ -244,7 +304,9 @@ public final class InjectionUtils {
     
     @SuppressWarnings("unchecked")
     public static Object injectIntoSet(Type genericType, List<String> values, 
-                                       boolean sorted, boolean decoded, boolean pathParam) {
+                                       boolean sorted, 
+                                       boolean decoded, 
+                                       ParameterType pathParam, String basePath) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
         
         values = checkPathSegment(values, realType, pathParam);
@@ -254,7 +316,7 @@ public final class InjectionUtils {
             if (decoded) {
                 r = JAXRSUtils.uriDecode(r);
             }
-            Object o = InjectionUtils.handleParameter(r, realType, pathParam);
+            Object o = InjectionUtils.handleParameter(r, realType, pathParam, basePath);
             if (o != null) {
                 theValues.add(o);
             }
@@ -262,8 +324,9 @@ public final class InjectionUtils {
         return theValues;
     }
     
-    private static List<String> checkPathSegment(List<String> values, Class<?> type, boolean pathParam) {
-        if (!pathParam || !PathSegment.class.isAssignableFrom(type)) {
+    private static List<String> checkPathSegment(List<String> values, Class<?> type, 
+                                                 ParameterType pathParam) {
+        if (pathParam != ParameterType.PATH || !PathSegment.class.isAssignableFrom(type)) {
             return values;
         }
         List<String> newValues = new ArrayList<String>();
@@ -285,9 +348,9 @@ public final class InjectionUtils {
                                                Class<?> paramType,
                                                Type genericType,
                                                String defaultValue,
-                                               boolean isLast,
                                                boolean decoded,
-                                               boolean pathParam) {
+                                               ParameterType pathParam,
+                                               String basePath) {
         
         if (paramValues == null) {
             if (defaultValue != null) {
@@ -303,14 +366,18 @@ public final class InjectionUtils {
         }
         
         if (List.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam);
+            return InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam,
+                                                 basePath);
         } else if (Set.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam);
+            return InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam,
+                                                basePath);
         } else if (SortedSet.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam);
+            return InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam,
+                                                basePath);
         } else {
             String result = null;
             if (paramValues.size() > 0) {
+                boolean isLast = pathParam == ParameterType.PATH ? true : false;
                 result = isLast ? paramValues.get(paramValues.size() - 1)
                                 : paramValues.get(0);
             }
@@ -318,7 +385,7 @@ public final class InjectionUtils {
                 if (decoded) {
                     result = JAXRSUtils.uriDecode(result);
                 }
-                return InjectionUtils.handleParameter(result, paramType, pathParam);
+                return InjectionUtils.handleParameter(result, paramType, pathParam, basePath);
             } else {
                 return null;
             }
@@ -432,5 +499,13 @@ public final class InjectionUtils {
             Object value = JAXRSUtils.createResourceValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value, true);
         }
+    }
+    
+    public static Response.Status getFailureStatus(ParameterType pType) {
+        if (pType == ParameterType.MATRIX || pType == ParameterType.PATH
+            || pType == ParameterType.QUERY) {
+            return Response.Status.NOT_FOUND;
+        }
+        return Response.Status.BAD_REQUEST;
     }
 }

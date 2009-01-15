@@ -90,6 +90,25 @@ public class BookStore {
     }
     
     @GET
+    @Path("wrongparametertype")
+    public void wrongParameterType(@QueryParam("p") Map p) {
+        throw new IllegalStateException("This op is not expected to be invoked");
+    }
+    
+    @GET
+    @Path("exceptionduringconstruction")
+    public void wrongParameterType(@QueryParam("p") BadBook p) {
+        throw new IllegalStateException("This op is not expected to be invoked");
+    }
+    
+    @POST
+    @Path("/unsupportedcontenttype")
+    @Consumes("application/xml")
+    public String unsupportedContentType() {
+        throw new IllegalStateException("This op is not expected to be invoked");
+    }
+    
+    @GET
     @Path("/bookurl/{URL}/")
     public Book getBookByURL(@PathParam("URL") String urlValue) throws Exception {
         String url2 = new URL(urlValue).toString();
@@ -418,6 +437,12 @@ public class BookStore {
             return null;
         }
         
+    }
+    
+    private static class BadBook {
+        public BadBook(String s) {
+            throw new RuntimeException("The bad book");
+        }
     }
 }
 

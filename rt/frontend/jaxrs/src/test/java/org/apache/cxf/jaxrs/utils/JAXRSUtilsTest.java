@@ -26,11 +26,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -43,6 +45,8 @@ import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 
 import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.CustomerGender;
+import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
@@ -67,6 +71,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.easymock.EasyMock;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -517,6 +522,77 @@ public class JAXRSUtilsTest extends Assert {
         
         
     }
+    
+    @Test
+    public void testFromStringParameters() throws Exception {
+        Class[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
+        Method m = Customer.class.getMethod("testFromStringParam", argType);
+        UUID u = UUID.randomUUID();
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.QUERY_STRING, "p1=" + u.toString() + "&p2=1&p3=2");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(3, params.size());
+        assertEquals("Query UUID Parameter was not matched correctly", 
+                     u.toString(), params.get(0).toString());
+        assertSame(CustomerGender.FEMALE, params.get(1));
+        assertSame(CustomerGender.MALE, params.get(2));
+    }
+    
+    @Test
+    public void testCustomerParameter() throws Exception {
+        ProviderFactory.getInstance().registerUserProvider(
+            new CustomerParameterHandler());
+        Class[] argType = {Customer.class};
+        Method m = Customer.class.getMethod("testCustomerParam", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.QUERY_STRING, "p1=Fred");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        Customer c = (Customer)params.get(0);
+        assertEquals("Fred", c.getName());
+    }
+    
+    @Test
+    public void testWrongType() throws Exception {
+        Class[] argType = {HashMap.class};
+        Method m = Customer.class.getMethod("testWrongType", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.QUERY_STRING, "p1=1");
+        try {
+            JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+            fail("HashMap can not be handled as parameter");
+        } catch (WebApplicationException ex) {
+            assertEquals(500, ex.getResponse().getStatus());
+            assertEquals("Parameter Class java.util.HashMap has no constructor with "
+                         + "single String parameter, static valueOf(String) or fromString(String) methods", 
+                         ex.getResponse().getEntity().toString());
+        }
+        
+    }
+    
+    @Test
+    public void testExceptionDuringConstruction() throws Exception {
+        Class[] argType = {CustomerGender.class};
+        Method m = Customer.class.getMethod("testWrongType2", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.QUERY_STRING, "p1=3");
+        try {
+            JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+            fail("CustomerGender have no instance with name 3");
+        } catch (WebApplicationException ex) {
+            assertEquals(404, ex.getResponse().getStatus());
+        }
+        
+    }
+    
     
     @Test
     public void testQueryParametersBean() throws Exception {

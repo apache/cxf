@@ -237,7 +237,6 @@ public final class JAXRSUtils {
             return firstEntry.getKey();
         }
         
-        
         return null;
     }
 
@@ -252,20 +251,34 @@ public final class JAXRSUtils {
                 new OperationResourceInfoComparator());
         MediaType requestType = requestContentType == null 
                                 ? ALL_TYPES : MediaType.valueOf(requestContentType);
+        
+        int pathMatched = 0;
+        int methodMatched = 0;
+        int consumeMatched = 0;
+        int produceMatched = 0;
+        
         for (MediaType acceptType : acceptContentTypes) {
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
-                
                 URITemplate uriTemplate = ori.getURITemplate();
                 MultivaluedMap<String, String> map = cloneMap(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
                     if (ori.isSubResourceLocator()) {
                         candidateList.put(ori, map);
-                    } else if (ori.getHttpMethod().equalsIgnoreCase(httpMethod)
-                               && matchMimeTypes(requestType, acceptType, ori)) {
+                    } else {
                         String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
                         if (finalGroup == null || StringUtils.isEmpty(finalGroup)
                             || finalGroup.equals("/")) {
-                            candidateList.put(ori, map);    
+                            pathMatched++;
+                            boolean mMatched = ori.getHttpMethod().equalsIgnoreCase(httpMethod);
+                            boolean cMatched = matchConsumeTypes(requestType, ori);
+                            boolean pMatched = matchProduceTypes(acceptType, ori);
+                            if (mMatched && cMatched && pMatched) {
+                                candidateList.put(ori, map);    
+                            } else {
+                                methodMatched = mMatched ? methodMatched + 1 : methodMatched;
+                                produceMatched = pMatched ? produceMatched + 1 : produceMatched;
+                                consumeMatched = cMatched ? consumeMatched + 1 : consumeMatched;
+                            }
                         }
                     }
                 }
@@ -279,10 +292,28 @@ public final class JAXRSUtils {
             }
         }
 
-        return null;
+        int status = pathMatched == 0 ? 404 : methodMatched == 0 ? 405 
+                     : consumeMatched == 0 ? 415 : produceMatched == 0 ? 406 : 404;
+        String name = resource.isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message(name, 
+                                                   BUNDLE, 
+                                                   path,
+                                                   requestType.toString(),
+                                                   convertTypesToString(acceptContentTypes));
+        LOG.severe(errorMsg.toString());
+        
+        throw new WebApplicationException(status);
+        
     }    
 
-    
+    private static String convertTypesToString(List<MediaType> types) {
+        StringBuilder sb = new StringBuilder();
+        for (MediaType type : types) {
+            sb.append(type.toString()).append(',');
+        }
+        return sb.toString();
+    }
     
     public static List<MediaType> getConsumeTypes(Consumes cm) {
         return cm == null ? Collections.singletonList(ALL_TYPES)
@@ -456,12 +487,14 @@ public final class JAXRSUtils {
         
         CookieParam cookie = AnnotationUtils.getAnnotation(anns, CookieParam.class);
         if (cookie != null) {
-            result = processCookieParam(message, cookie.value(), parameterClass, genericParam, defaultValue);
+            result = processCookieParam(message, cookie.value(), parameterClass, genericParam,
+                                        defaultValue);
         } 
         
         HeaderParam hp = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
         if (hp != null) {
-            result = processHeaderParam(message, hp.value(), parameterClass, genericParam, defaultValue);
+            result = processHeaderParam(message, hp.value(), parameterClass, genericParam, 
+                                        defaultValue);
         } 
 
         return result;
@@ -484,8 +517,13 @@ public final class JAXRSUtils {
                 }
             }
             
+            String basePath = HttpUtils.getOriginalAddress(m);
+            
             if ("".equals(key)) {
-                return InjectionUtils.handleBean(pClass, params, false);
+                return InjectionUtils.handleBean(pClass, 
+                                                 params, 
+                                                 ParameterType.MATRIX,
+                                                 basePath);
             } else {
                 List<String> values = params.get(key);
                 return InjectionUtils.createParameterObject(values, 
@@ -493,8 +531,8 @@ public final class JAXRSUtils {
                                                             genericType,
                                                             defaultValue,
                                                             false,
-                                                            false,
-                                                            true);
+                                                            ParameterType.MATRIX,
+                                                            basePath);
             }
         }
         
@@ -514,8 +552,9 @@ public final class JAXRSUtils {
         // TODO : this is done per every form parameter hence it needs to be refactored
         FormUtils.populateMap(params, body, decode);
         
+        String basePath = HttpUtils.getOriginalAddress(m);
         if ("".equals(key)) {
-            return InjectionUtils.handleBean(pClass, params, false);
+            return InjectionUtils.handleBean(pClass, params, ParameterType.FORM, basePath);
         } else {
             List<String> results = params.get(key);
     
@@ -524,8 +563,8 @@ public final class JAXRSUtils {
                                                         genericType,
                                                         defaultValue,
                                                         false,
-                                                        false,
-                                                        false);
+                                                        ParameterType.FORM,
+                                                        basePath);
              
         }
     }
@@ -544,14 +583,14 @@ public final class JAXRSUtils {
                                              String defaultValue) {
         
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(header);
-        
+        String basePath = HttpUtils.getOriginalAddress(m);
         return InjectionUtils.createParameterObject(values, 
                                                     pClass, 
                                                     genericType,
                                                     defaultValue,
                                                     false,
-                                                    false,
-                                                    false);
+                                                    ParameterType.HEADER,
+                                                    basePath);
              
         
     }
@@ -570,7 +609,12 @@ public final class JAXRSUtils {
         if (pClass.isAssignableFrom(Cookie.class)) {
             return Cookie.valueOf(value.length() == 0 ? defaultValue : value);
         }
-        return value.length() > 0 ? InjectionUtils.handleParameter(value, pClass, false) 
+        
+        String basePath = HttpUtils.getOriginalAddress(m);
+        return value.length() > 0 ? InjectionUtils.handleParameter(value, 
+                                                                   pClass, 
+                                                                   ParameterType.COOKIE,
+                                                                   basePath) 
                                   : defaultValue;
     }
     
@@ -645,18 +689,19 @@ public final class JAXRSUtils {
                                            String defaultValue,
                                            boolean  decoded) {
         
+        String basePath = HttpUtils.getOriginalAddress(m);
         String parameterName = uriParamAnnotation.value();
         if ("".equals(parameterName)) {
-            return InjectionUtils.handleBean(paramType, values, true);
+            return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, basePath);
         } else {
             List<String> results = values.get(parameterName);
             return InjectionUtils.createParameterObject(results, 
                                                     paramType, 
                                                     genericType,
                                                     defaultValue,
-                                                    true,
                                                     decoded,
-                                                    true);
+                                                    ParameterType.PATH,
+                                                    basePath);
         }
     }
     
@@ -671,10 +716,11 @@ public final class JAXRSUtils {
                                           boolean decode) {
         String queryName = queryParam.value();
 
+        String basePath = HttpUtils.getOriginalAddress(m);
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, 
                                              new UriInfoImpl(m, null).getQueryParameters(),
-                                             false);
+                                             ParameterType.QUERY, basePath);
         } else {
             List<String> results = getStructuredParams((String)m.get(Message.QUERY_STRING),
                                        "&",
@@ -685,8 +731,7 @@ public final class JAXRSUtils {
                                                         genericType,
                                                         defaultValue,
                                                         false,
-                                                        false,
-                                                        false);
+                                                        ParameterType.QUERY, basePath);
              
         }
     }
@@ -743,7 +788,6 @@ public final class JAXRSUtils {
                                          parameterAnnotations,
                                          type,
                                          m);
-            // TODO : make the exceptions
             if (provider != null) {
                 try {
                     HttpHeaders headers = new HttpHeadersImpl(m);
@@ -751,15 +795,19 @@ public final class JAXRSUtils {
                               targetTypeClass, parameterType, parameterAnnotations, contentType,
                               headers.getRequestHeaders(), is);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Error deserializing input stream into target class "
-                                               + targetTypeClass.getSimpleName() 
-                                               + ", content type : " + contentType);
+                    String errorMessage = "Error deserializing input stream into target class "
+                                          + targetTypeClass.getSimpleName() 
+                                           + ", content type : " + contentType;
+                    LOG.severe(errorMessage);
+                    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
                 }    
             } else {
-                throw new RuntimeException("No message body reader found for target class "
-                                           + targetTypeClass.getSimpleName() 
-                                           + ", content type : " + contentType);
+                String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
+                                                       BUNDLE,
+                                                       targetTypeClass.getSimpleName(),
+                                                       contentType).toString();
+                LOG.severe(errorMessage);
+                throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
             }
         }
 
@@ -768,6 +816,18 @@ public final class JAXRSUtils {
 
     
 
+    public static boolean matchConsumeTypes(MediaType requestContentType, 
+                                            OperationResourceInfo ori) {
+        
+        return intersectMimeTypes(ori.getConsumeTypes(), requestContentType).size() != 0;
+    }
+    
+    public static boolean matchProduceTypes(MediaType acceptContentType, 
+                                            OperationResourceInfo ori) {
+        
+        return intersectMimeTypes(ori.getProduceTypes(), acceptContentType).size() != 0;
+    }
+    
     public static boolean matchMimeTypes(MediaType requestContentType, 
                                          MediaType acceptContentType, 
                                          OperationResourceInfo ori) {

@@ -47,11 +47,15 @@ import javax.xml.validation.Schema;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
+import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,6 +135,15 @@ public class ProviderFactoryTest extends Assert {
         
         //REVISIT the compare algorithm
         //assertTrue(indexOf(providers, JSONProvider.class) < indexOf(providers, TestStringProvider.class));
+    }
+    
+    @Test
+    public void testParameterHandlerProvider() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        ParameterHandler h = new CustomerParameterHandler();
+        pf.registerUserProvider(h);
+        ParameterHandler h2 = pf.createParameterHandler(Customer.class);
+        assertSame(h2, h);
     }
     
     @Test
@@ -398,5 +411,5 @@ public class ProviderFactoryTest extends Assert {
         }
         
     }
-    
+     
 }

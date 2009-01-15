@@ -25,7 +25,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
 /**
- * SystemHandler is capable of pre/post processing requests 
+ * RequestHandler is capable of preprocessing requests 
  * ex., they can handle query extensions starting from _type
  *
  */

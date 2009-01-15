@@ -74,18 +74,48 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "application/xml", 404);
     }
     
+    @Test
+    public void testNoPathMatch() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/bookqueries",
+                      "",
+                      "application/xml", 404);
+    }
+    
     
     @Test
     public void testAcceptTypeMismatch() throws Exception {
-        // TODO : more specific message is needed
-        String msg = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\"><ns1:faultstring"
-            + " xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">.No operation matching request path "
-            + "/bookstore/booknames/123 is found, ContentType : */*, Accept : foo/bar.</ns1:faultstring>"
-            + "</ns1:XMLFault>";
-        
         getAndCompare("http://localhost:9080/bookstore/booknames/123",
-                      msg,
-                      "foo/bar", 500);
+                      "",
+                      "foo/bar", 406);
+    }
+            
+    @Test
+    public void testWrongHttpMethod() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/unsupportedcontenttype",
+                      "",
+                      "foo/bar", 405);
+    }
+    
+    @Test
+    public void testWrongQueryParameterType() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/wrongparametertype?p=1",
+                      "Parameter Class java.util.Map has no constructor with single String "
+                      + "parameter, static valueOf(String) or fromString(String) methods",
+                      "*/*", 500);
+    }
+    
+    @Test
+    public void testExceptionDuringConstruction() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/exceptionconstruction?p=1",
+                      "",
+                      "foo/bar", 404);
+    }
+    
+    @Test
+    public void testSubresourceMethodNotFound() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/interface/thesubresource",
+                      "",
+                      "foo/bar", 404);
     }
     
     @Test
@@ -96,19 +126,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
         getAndCompareStrings("http://localhost:9080/bookstore/timetable",
                       msg1, msg2,
-                      "*/*", 406);
+                      "*/*", 500);
     }
     
     @SuppressWarnings("deprecation")
     @Test
     public void testNoMessageReaderFound() throws Exception {
-//      TODO : more specific message is needed
-        String msg = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\"><ns1:faultstring"
-            + " xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">"
-            + "java.lang.RuntimeException: No message body reader found for target class long[], "
-            + "content type : application/octet-stream"
-            + "</ns1:faultstring>"
-            + "</ns1:XMLFault>";
         
         String endpointAddress =
             "http://localhost:9080/bookstore/binarybooks";
@@ -121,8 +144,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
         try {
             int result = httpclient.executeMethod(post);
-            assertEquals(500, result);
-            assertEquals(msg, post.getResponseBodyAsString());
+            assertEquals(415, result);
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -131,14 +153,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testConsumeTypeMismatch() throws Exception {
-        // TODO : more specific message is needed
-        String msg = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\"><ns1:faultstring"
-            + " xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">.No operation matching request path "
-            + "/bookstore/books is found, ContentType : application/bar, Accept : text/xml."
-            + "</ns1:faultstring></ns1:XMLFault>";
-        
         String endpointAddress =
-            "http://localhost:9080/bookstore/books";
+            "http://localhost:9080/bookstore/unsupportedcontenttype";
 
         PostMethod post = new PostMethod(endpointAddress);
         post.setRequestHeader("Content-Type", "application/bar");
@@ -147,8 +163,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
         try {
             int result = httpclient.executeMethod(post);
-            assertEquals(500, result);
-            assertEquals(msg, post.getResponseBodyAsString());
+            assertEquals(415, result);
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
