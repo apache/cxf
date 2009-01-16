@@ -19,12 +19,12 @@
 
 package org.apache.cxf.tools.util;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class ClassCollector {
 
@@ -90,8 +90,8 @@ public class ClassCollector {
         return typesPackages;
     }
 
-    public List<String> getGeneratedFileInfo() {
-        List<String> generatedFileList = new ArrayList<String>();
+    public Collection<String> getGeneratedFileInfo() {
+        Set<String> generatedFileList = new TreeSet<String>();
         generatedFileList.addAll(seiClassNames.values());
         generatedFileList.addAll(typesClassNames.values());
         generatedFileList.addAll(exceptionClassNames.values());

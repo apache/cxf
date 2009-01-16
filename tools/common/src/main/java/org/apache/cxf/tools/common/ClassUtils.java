@@ -69,9 +69,9 @@ public class ClassUtils {
         Set<String> dirSet = new HashSet<String>();
         ClassCollector classCollector = context.get(ClassCollector.class);
         List<String> fileList = new ArrayList<String>();
-        Iterator ite = classCollector.getGeneratedFileInfo().iterator();
+        Iterator<String> ite = classCollector.getGeneratedFileInfo().iterator();
         while (ite.hasNext()) {
-            String fileName = (String)ite.next();
+            String fileName = ite.next();
             fileName = fileName.replace('.', File.separatorChar);
             String dirName = fileName.substring(0, fileName.lastIndexOf(File.separator) + 1);
             
