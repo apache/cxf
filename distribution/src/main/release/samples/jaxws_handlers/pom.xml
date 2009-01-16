@@ -4,6 +4,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jaxws_handlers</artifactId>
     <version>1.0</version>
+    <name>JAX-WS Handler Demo</name>
     <properties>
         <cxf.version>[2,)</cxf.version>
     </properties>
