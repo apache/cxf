@@ -1056,15 +1056,7 @@ public abstract class AbstractBindingBuilder {
                 //ignore
             }
         }
-        
-        try {
-            Key key = crypto.getKeyStore().getCertificate(user).getPublicKey();
-            System.out.println(key);
-        } catch (KeyStoreException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        
+                
         if (StringUtils.isEmpty(user)) {
             policyNotAsserted(token, "No " + type + " username found.");
         }

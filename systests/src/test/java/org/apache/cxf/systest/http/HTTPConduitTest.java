@@ -503,10 +503,6 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     }
     
 
-    /**
-     * This test should fail when we hit Poltim, since it redirects
-     * to Mortimer, which is an http url, and Poltim is an https server.
-     */
     @Test
     public void testHttpsRedirectToHttpFail() throws Exception {
         startServer("Mortimer");
@@ -533,13 +529,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
-        
-        try {
-            String answer = poltim.sayHi();
-            fail("Unexpected answer from Poltim: " + answer);
-        } catch (Exception e) {
-            //e.printStackTrace();
-        }
+        poltim.sayHi();
     }
     
     class MyHttpsTrustDecider extends MessageTrustDecider {

@@ -70,13 +70,13 @@ public class JettyHTTPServerEngine
     /**
      * The bus.
      */
-    private Bus bus;
+    protected Bus bus;
     
     /**
      * This is the Jetty HTTP Server Engine Factory. This factory caches some 
      * engines based on port numbers.
      */
-    private JettyHTTPServerEngineFactory factory;
+    protected JettyHTTPServerEngineFactory factory;
     
     
     /**
@@ -531,7 +531,7 @@ public class JettyHTTPServerEngine
         this.configFinalized = true;
     }
     
-    private void retrieveEngineFactory() {
+    protected void retrieveEngineFactory() {
         if (null != bus && null == factory) {
             factory = bus.getExtension(JettyHTTPServerEngineFactory.class);
         }        

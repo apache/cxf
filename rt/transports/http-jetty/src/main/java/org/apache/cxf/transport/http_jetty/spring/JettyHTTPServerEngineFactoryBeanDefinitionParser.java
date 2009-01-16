@@ -20,7 +20,6 @@ package org.apache.cxf.transport.http_jetty.spring;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
@@ -31,19 +30,15 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
-import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 
-import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
-import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
-import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersType;
-
-
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -52,36 +47,50 @@ import org.springframework.context.ApplicationContextAware;
 
 public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         extends AbstractBeanDefinitionParser {
-    private static final String HTTP_JETTY_NS = "http://cxf.apache.org/transports/http-jetty/configuration";
+    static final String HTTP_JETTY_NS = "http://cxf.apache.org/transports/http-jetty/configuration";
 
+    protected String resolveId(Element elem, AbstractBeanDefinition definition, 
+                               ParserContext ctx) throws BeanDefinitionStoreException {
+        String id = this.getIdOrName(elem);
+        if (StringUtils.isEmpty(id)) {
+            return JettyHTTPServerEngineFactory.class.getName();            
+        }
+        id = super.resolveId(elem, definition, ctx);
+        if (!ctx.getRegistry().containsBeanDefinition(JettyHTTPServerEngineFactory.class.getName())) {
+            ctx.getRegistry().registerAlias(id, JettyHTTPServerEngineFactory.class.getName());
+        }
+        return id;
+    }
+    
+
+    @SuppressWarnings("deprecation")
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         //bean.setAbstract(true);        
         String bus = element.getAttribute("bus");
-         
+        
+        BeanDefinitionBuilder factbean 
+            = BeanDefinitionBuilder
+                .rootBeanDefinition(JettySpringTypesFactory.class);
+
+        ctx.getRegistry()
+            .registerBeanDefinition(JettySpringTypesFactory.class.getName(),
+                                    factbean.getBeanDefinition());
         try {
-            List <ThreadingParametersIdentifiedType> threadingParametersIdentifiedTypes = 
-                JAXBHelper.parseListElement(element, bean, 
-                                            new QName(HTTP_JETTY_NS, "identifiedThreadingParameters"), 
-                                            ThreadingParametersIdentifiedType.class);
-            Map<String, ThreadingParameters> threadingParametersMap =
-                toThreadingParameters(threadingParametersIdentifiedTypes);
-            List <TLSServerParametersIdentifiedType> tlsServerParameters =
-                JAXBHelper.parseListElement(element, bean, 
-                                            new QName(HTTP_JETTY_NS, "identifiedTLSServerParameters"),
-                                            TLSServerParametersIdentifiedType.class);
-            Map<String, TLSServerParameters> tlsServerParametersMap =
-                toTLSServerParamenters(tlsServerParameters);
-                                    
-            bean.addPropertyValue("threadingParametersMap", threadingParametersMap);
-            bean.addPropertyValue("tlsServerParametersMap", tlsServerParametersMap);
-            
-            
             if (StringUtils.isEmpty(bus)) {
-                addBusWiringAttribute(bean, BusWiringType.PROPERTY);
+                addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
             } else {
-                bean.addPropertyReference("bus", bus);
+                bean.addConstructorArgReference(bus);
             }
+
+            bean.addConstructorArg(mapElementToJaxbBean(element,
+                                                        Map.class,
+                                                        JettySpringTypesFactory.class,
+                                "createTLSServerParametersMap"));
+            bean.addConstructorArg(mapElementToJaxbBean(element,
+                                                        Map.class,
+                                                        JettySpringTypesFactory.class,
+                                "createThreadingParametersMap"));
             
             // parser the engine list
             List list = 
@@ -89,7 +98,6 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
             if (list.size() > 0) {
                 bean.addPropertyValue("enginesList", list);
             }
-            
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
         }
@@ -111,40 +119,6 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         return list;
     }
     
-    private Map<String, ThreadingParameters> toThreadingParameters(
-        List <ThreadingParametersIdentifiedType> list) {
-        Map<String, ThreadingParameters> map = new TreeMap<String, ThreadingParameters>();
-        for (ThreadingParametersIdentifiedType t : list) {
-            ThreadingParameters parameter = 
-                toThreadingParameters(t.getThreadingParameters());
-            map.put(t.getId(), parameter);
-        } 
-        return map;
-    }
-    
-    private ThreadingParameters toThreadingParameters(ThreadingParametersType paramtype) {
-        ThreadingParameters params = new ThreadingParameters();
-        params.setMaxThreads(paramtype.getMaxThreads());
-        params.setMinThreads(paramtype.getMinThreads());
-        return params;
-    }
-        
-    private Map<String, TLSServerParameters> toTLSServerParamenters(
-        List <TLSServerParametersIdentifiedType> list) {
-        Map<String, TLSServerParameters> map = new TreeMap<String, TLSServerParameters>();
-        for (TLSServerParametersIdentifiedType t : list) {
-            try {             
-                TLSServerParameters parameter = new TLSServerParametersConfig(t.getTlsServerParameters());
-                map.put(t.getId(), parameter);
-            } catch (Exception e) {
-                throw new RuntimeException(
-                        "Could not configure TLS for id " + t.getId(), e);
-            }
-            
-        }
-        return map;
-        
-    }
     
           
     /*
@@ -169,6 +143,11 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         public SpringJettyHTTPServerEngineFactory() {
             super();
         }
+        public SpringJettyHTTPServerEngineFactory(Bus bus,
+                                                  Map<String, TLSServerParameters> tls,
+                                                  Map<String, ThreadingParameters> threading) {
+            super(bus, tls, threading);
+        }    
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
@@ -179,5 +158,6 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
             }
         }
     }
+    
 
 }
