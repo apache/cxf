@@ -80,6 +80,16 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     public JettyHTTPServerEngineFactory() {
         // Empty
     }    
+    public JettyHTTPServerEngineFactory(Bus bus,
+                                        Map<String, TLSServerParameters> tls,
+                                        Map<String, ThreadingParameters> threading) {
+        tlsParametersMap.putAll(tls);
+        threadingParametersMap.putAll(threading);
+        this.bus = bus;
+        if (bus != null) {
+            bus.setExtension(this, JettyHTTPServerEngineFactory.class);
+        }
+    }    
     
     
     /**

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.configuration.spring;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -28,6 +29,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Attr;
@@ -293,6 +296,73 @@ public abstract class AbstractBeanDefinitionParser
         }
     }
 
+
+    public void mapElementToJaxbPropertyFactory(Element data, 
+                                                BeanDefinitionBuilder bean, 
+                                                String propertyName, 
+                                                Class<?> factory,
+                                                String method,
+                                                Object ... args) {
+        bean.addPropertyValue(propertyName, mapElementToJaxbBean(data, factory,
+                                                                 null, method, args));
+    }
+    
+    @SuppressWarnings("deprecation")
+    public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
+                                                       Class<?> cls,
+                                                      Class<?> factory,
+                                                      String method,
+                                                      Object ... args) {
+        StringWriter writer = new StringWriter();
+        XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
+        try {
+            StaxUtils.copy(data, xmlWriter);
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+
+        BeanDefinitionBuilder jaxbbean 
+            = BeanDefinitionBuilder.rootBeanDefinition(cls);
+        if (factory != null) {
+            jaxbbean.getRawBeanDefinition().setFactoryBeanName(factory.getName());
+        }
+        jaxbbean.getRawBeanDefinition().setFactoryMethodName(method);
+        jaxbbean.addConstructorArg(writer.toString());
+        if (args != null) {
+            for (Object o : args) {
+                jaxbbean.addConstructorArg(o);
+            }                
+        }
+        return jaxbbean.getBeanDefinition();
+    }
+    
+    protected static <T> T unmarshalFactoryString(String s, Class<T> cls) {
+        StringReader reader = new StringReader(s);
+        XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
+        try {
+            String pkg = cls.getPackage().getName();
+            JAXBContext context = packageContextCache.get(pkg);
+            if (context == null) {
+                context = JAXBContext.newInstance(pkg, cls.getClassLoader());
+                packageContextCache.put(pkg, context);
+            }
+            
+            Unmarshaller u = context.createUnmarshaller();
+            Object obj = u.unmarshal(data, cls);
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> el = (JAXBElement<?>)obj;
+                obj = el.getValue();
+
+            }
+            return cls.cast(obj);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     protected String getJaxbPackage() {
         return "";
     }
