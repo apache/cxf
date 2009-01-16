@@ -172,11 +172,13 @@ public final class InjectionUtils {
             return c.newInstance(new Object[]{value});
         } catch (NoSuchMethodException ex) {
             // try valueOf
-        } catch (Exception ex) {
+        } catch (WebApplicationException ex) {
+            throw ex;
+        } catch (Exception ex) { 
             LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                BUNDLE, 
                                                                pClass.getName()).toString());
-            throw new WebApplicationException(ex, getFailureStatus(pType));
+            throw new WebApplicationException(ex, HttpUtils.getParameterFailureStatus(pType));
         }
         
         // check for valueOf(String) static methods
@@ -233,7 +235,7 @@ public final class InjectionUtils {
             LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
                                                                BUNDLE, 
                                                                pClass.getName()).toString());
-            throw new WebApplicationException(t, getFailureStatus(pType));
+            throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
         }
         return null;
     }
@@ -499,13 +501,5 @@ public final class InjectionUtils {
             Object value = JAXRSUtils.createResourceValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value, true);
         }
-    }
-    
-    public static Response.Status getFailureStatus(ParameterType pType) {
-        if (pType == ParameterType.MATRIX || pType == ParameterType.PATH
-            || pType == ParameterType.QUERY) {
-            return Response.Status.NOT_FOUND;
-        }
-        return Response.Status.BAD_REQUEST;
     }
 }

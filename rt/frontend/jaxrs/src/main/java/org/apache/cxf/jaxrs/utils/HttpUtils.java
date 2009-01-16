@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.message.Message;
@@ -120,6 +121,14 @@ public final class HttpUtils {
             }
         }
         return sb.toString();
+    }
+    
+    public static Response.Status getParameterFailureStatus(ParameterType pType) {
+        if (pType == ParameterType.MATRIX || pType == ParameterType.PATH
+            || pType == ParameterType.QUERY) {
+            return Response.Status.NOT_FOUND;
+        }
+        return Response.Status.BAD_REQUEST;
     }
     
 }
