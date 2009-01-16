@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import javax.ws.rs.core.Response;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,6 +36,22 @@ public class HttpUtilsTest extends Assert {
         assertEquals("/bar", HttpUtils.getPathToMatch("/baz/bar", "/baz", true));
         assertEquals("/baz/bar/foo/", HttpUtils.getPathToMatch("/baz/bar/foo/", "/bar", true));
         
+    }
+    
+    @Test
+    public void testParameterErrorStatus() {
+        assertEquals(Response.Status.NOT_FOUND,
+                     HttpUtils.getParameterFailureStatus(ParameterType.PATH));
+        assertEquals(Response.Status.NOT_FOUND,
+                     HttpUtils.getParameterFailureStatus(ParameterType.QUERY));
+        assertEquals(Response.Status.NOT_FOUND,
+                     HttpUtils.getParameterFailureStatus(ParameterType.MATRIX));
+        assertEquals(Response.Status.BAD_REQUEST,
+                     HttpUtils.getParameterFailureStatus(ParameterType.HEADER));
+        assertEquals(Response.Status.BAD_REQUEST,
+                     HttpUtils.getParameterFailureStatus(ParameterType.FORM));
+        assertEquals(Response.Status.BAD_REQUEST,
+                     HttpUtils.getParameterFailureStatus(ParameterType.COOKIE));
     }
     
 }
