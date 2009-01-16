@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -98,6 +99,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                                             exchange.getInMessage());
         }
 
+        String baseAddress = HttpUtils.getOriginalAddress(exchange.getInMessage());
+        
         List<Object> params = null;
         if (request instanceof List) {
             params = CastUtils.cast((List<?>)request);
@@ -109,7 +112,6 @@ public class JAXRSInvoker extends AbstractInvoker {
         try {
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
-            String baseAddress = HttpUtils.getOriginalAddress(exchange.getInMessage());
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), baseAddress);
             if (excResponse == null) {
                 ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();
@@ -147,31 +149,28 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             List<MediaType> acceptContentType = 
                 (List<MediaType>)msg.getExchange().get(Message.ACCEPT_CONTENT_TYPE);
+
             ClassResourceInfo subCri = JAXRSUtils.findSubResourceClass(cri, result.getClass());
-            
             if (subCri == null) {
                 org.apache.cxf.common.i18n.Message errorM = 
                     new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",  
                                                            BUNDLE, 
                                                            subResourcePath);
                 LOG.severe(errorM.toString());
-                throw new Fault(errorM);
+                throw new WebApplicationException(404);
             }
             
-            OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri, 
-                                                                       subResourcePath, 
-                                                                       httpMethod, 
-                                                                       values, 
-                                                                       contentType, 
-                                                                       acceptContentType);
-            
-            if (subOri == null) {
-                org.apache.cxf.common.i18n.Message errorM = 
-                    new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_METHOD_FOUND",  
-                                                           BUNDLE, 
-                                                           subCri.getResourceClass().getSimpleName());
-                LOG.severe(errorM.toString());
-                throw new Fault(errorM);
+            OperationResourceInfo subOri = null;
+            try {
+                subOri = JAXRSUtils.findTargetMethod(subCri, 
+                                                     subResourcePath, 
+                                                     httpMethod, 
+                                                     values, 
+                                                     contentType, 
+                                                     acceptContentType);
+            } catch (WebApplicationException ex) {
+                Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress);
+                return new MessageContentsList(excResponse);
             }
             
             exchange.put(OperationResourceInfo.class, subOri);

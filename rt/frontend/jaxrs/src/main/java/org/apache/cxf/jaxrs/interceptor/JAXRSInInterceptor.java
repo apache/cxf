@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -124,7 +123,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    rawPath);
             LOG.severe(errorMsg.toString());
 
-            throw new WebApplicationException(404);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
 
         message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
@@ -179,16 +178,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         LOG.fine("Request contentType is: " + requestContentType);
         LOG.fine("Accept contentType is: " + acceptTypes);
         
-        if (ori == null) {
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("NO_OP_EXC", 
-                                                   BUNDLE, 
-                                                   rawPath,
-                                                   requestContentType,
-                                                   acceptTypes);
-            LOG.severe(errorMsg.toString());
-            throw new Fault(errorMsg);
-        }
         LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         
         message.getExchange().put(OperationResourceInfo.class, ori);

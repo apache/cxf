@@ -17,20 +17,16 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext;
+package org.apache.cxf.jaxrs.utils;
 
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.message.Message;
-
-/**
- * ResponseHandler is capable of postprocessing requests 
- * ex., they can update the response status code, etc
- *
- */
-public interface ResponseHandler {
-    Response handleResponse(Message m,
-                            OperationResourceInfo ori,
-                            Response response);
+public enum ParameterType {
+    PATH,
+    QUERY,
+    MATRIX,
+    HEADER,
+    COOKIE,
+    FORM,
+    
+    REQUEST_BODY,
+    UNKNOWN
 }
