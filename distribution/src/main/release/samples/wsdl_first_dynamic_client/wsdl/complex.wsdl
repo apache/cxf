@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="windows-1255"?>
+	<!--
+		Licensed to the Apache Software Foundation (ASF) under one or more
+		contributor license agreements. See the NOTICE file distributed with
+		this work for additional information regarding copyright ownership.
+		The ASF licenses this file to you under the Apache License, Version
+		2.0 (the "License"); you may not use this file except in compliance
+		with the License. You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://Company.com/Application"
+	xmlns:s1="http://Company.ESB.Hitum.Schemas.LegacySystemServices.Agent.AgentWSResponse"
+	xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+	xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://Company.com/Application"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">BizTalk
+		assembly "Company.ESB.Application.Biztalk, Version=1.0.0.0,
+		Culture=neutral, PublicKeyToken=3b97ca913d728b36" published web
+		service.</wsdl:documentation>
+	<wsdl:types>
+		<s:schema elementFormDefault="qualified" targetNamespace="http://Company.com/Application">
+			<s:import
+				namespace="http://Company.ESB.Hitum.Schemas.LegacySystemServices.Agent.AgentWSResponse" />
+			<s:element name="GetAgentDetails">
+				<s:complexType>
+					<s:sequence>
+						<s:element minOccurs="0" maxOccurs="1" name="part"
+							type="tns:AgentWSRequest" />
+					</s:sequence>
+				</s:complexType>
+			</s:element>
+			<s:complexType name="AgentWSRequest">
+				<s:sequence>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="AgentNumber" type="s:int" />
+				</s:sequence>
+			</s:complexType>
+			<s:element name="GetAgentDetailsResponse">
+				<s:complexType>
+					<s:sequence>
+						<s:element minOccurs="0" maxOccurs="1" ref="s1:AgentWSResponse" />
+					</s:sequence>
+				</s:complexType>
+			</s:element>
+		</s:schema>
+		<s:schema elementFormDefault="qualified"
+			targetNamespace="http://Company.ESB.Hitum.Schemas.LegacySystemServices.Agent.AgentWSResponse">
+			<s:element name="AgentWSResponse" type="s1:AgentWSResponse" />
+			<s:complexType name="AgentWSResponse">
+				<s:sequence>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="ResponseCode" type="s:short" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="ResponseDescription" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="AgentName" type="s:string" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="CancelledDate" type="s:date" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="Street" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="HouseNumber" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="City" type="s:string" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="ZipCode" type="s:int" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="AreaCode" type="s:short" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="PhoneNumber" type="s:int" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="AreaCode2" type="s:short" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="PhoneNumber2" type="s:int" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="InspectorNumber" type="s:short" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="SuperInspectorNumber" type="s:short" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="StaffNumber" type="s:short" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="AgenceNumber" type="s:int" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="StaffName" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="EmployeeNumber" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="ProductionConfirmCode" type="s:string" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="AddProductionLifePolicy" type="s:short" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="AddProductionHealthPolicy" type="s:short" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="AddLoginEmployee1" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="AddLoginEmployee2" type="s:string" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="Result" type="s1:AgentWSResponseResult" />
+				</s:sequence>
+			</s:complexType>
+			<s:complexType name="AgentWSResponseResult">
+				<s:sequence>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified"
+						name="Code" type="s:int" />
+					<s:element minOccurs="0" maxOccurs="1" form="unqualified"
+						name="Description" type="s:string" />
+				</s:sequence>
+			</s:complexType>
+		</s:schema>
+	</wsdl:types>
+	<wsdl:message name="GetAgentDetailsSoapIn">
+		<wsdl:part name="parameters" element="tns:GetAgentDetails" />
+	</wsdl:message>
+	<wsdl:message name="GetAgentDetailsSoapOut">
+		<wsdl:part name="parameters" element="tns:GetAgentDetailsResponse" />
+	</wsdl:message>
+	<wsdl:portType
+		name="Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap">
+		<wsdl:operation name="GetAgentDetails">
+			<wsdl:input message="tns:GetAgentDetailsSoapIn" />
+			<wsdl:output message="tns:GetAgentDetailsSoapOut" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding
+		name="Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap"
+		type="tns:Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="GetAgentDetails">
+			<soap:operation
+				soapAction="http://Company.com/Application/Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt/GetAgentDetails"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding
+		name="Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap12"
+		type="tns:Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap">
+		<soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="GetAgentDetails">
+			<soap12:operation
+				soapAction="http://Company.com/Application/Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt/GetAgentDetails"
+				style="document" />
+			<wsdl:input>
+				<soap12:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service
+		name="Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt">
+		<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">BizTalk
+			assembly "Company.ESB.Application.Biztalk, Version=1.0.0.0,
+			Culture=neutral, PublicKeyToken=3b97ca913d728b36" published web
+			service.</wsdl:documentation>
+		<wsdl:port
+			name="Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap"
+			binding="tns:Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap">
+			<soap:address
+				location="http://BiztalkServer/Application.Biztalk.Proxy/Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt.asmx" />
+		</wsdl:port>
+		<wsdl:port
+			name="Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap12"
+			binding="tns:Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap12">
+			<soap12:address
+				location="http://BiztalkServer/Application.Biztalk.Proxy/Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt.asmx" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
