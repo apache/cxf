@@ -503,7 +503,12 @@ public class ClientImpl
                 waitResponse(exchange);
             }
         }
-        getConduitSelector().complete(exchange);
+        
+        // leave the input stream open for the caller
+        Boolean keepConduitAlive = (Boolean)exchange.get(Client.KEEP_CONDUIT_ALIVE);
+        if (keepConduitAlive == null || !keepConduitAlive) {
+            getConduitSelector().complete(exchange);
+        }
 
         // Grab the response objects if there are any
         List resList = null;
