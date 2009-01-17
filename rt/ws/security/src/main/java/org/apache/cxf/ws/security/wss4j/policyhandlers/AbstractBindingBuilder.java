@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
