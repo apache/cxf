@@ -33,6 +33,7 @@ import org.apache.cxf.transport.MessageObserver;
 public interface Client extends InterceptorProvider, MessageObserver {
     String REQUEST_CONTEXT = "RequestContext";
     String RESPONSE_CONTEXT = "ResponseContext";
+    String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
 
     /**
      * Invokes an operation synchronously
