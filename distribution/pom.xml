@@ -337,11 +337,6 @@
                                     <artifactId>cxf-rt-transports-jbi</artifactId>
                                     <version>${pom.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>${pom.groupId}</groupId>
-                                    <artifactId>cxf-anttasks</artifactId>
-                                    <version>${pom.version}</version>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
