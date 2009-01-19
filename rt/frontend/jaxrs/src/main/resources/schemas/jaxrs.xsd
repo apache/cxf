@@ -59,6 +59,7 @@
           <xsd:attribute name="transportId" type="xsd:string"/>
           <xsd:attribute name="endpointName" type="xsd:QName" />
           <xsd:attribute name="serviceName" type="xsd:QName" />
+          <xsd:attribute name="staticSubresourceResolution" type="xsd:boolean" />
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

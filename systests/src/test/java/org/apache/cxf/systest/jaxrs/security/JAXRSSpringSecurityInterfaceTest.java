@@ -61,5 +61,11 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
     
-       
+    @Test
+    public void testGetBookSubresource() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/bookstorestorage/subresource"; 
+        getBook(endpointAddress, "foo", "bar", 200); 
+        getBook(endpointAddress, "bob", "bobspassword", 403);
+    }   
 }

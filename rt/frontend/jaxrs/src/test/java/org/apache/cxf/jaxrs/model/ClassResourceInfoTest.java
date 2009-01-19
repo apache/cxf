@@ -29,6 +29,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -50,18 +51,36 @@ public class ClassResourceInfoTest extends Assert {
         @Resource HttpServletResponse res;
         @Resource ServletContext c;
         int i;
+        
+        @GET
+        public void getIt() { 
+            
+        }
     }
     
     private static class TestClass1 extends TestClass {
+        @GET
+        public void getIt() { 
+            
+        }
     }
     
     private static class TestClass2 extends TestClass1 {
+        @GET
+        public void getIt() { 
+            
+        }
     }
     
     private static class TestClass3 {
         @Resource HttpServletRequest req;
         @Resource HttpServletResponse res;
         @Resource ServletContext c;
+        
+        @GET
+        public void getIt() { 
+            
+        }
     }
     
     @Test
@@ -133,5 +152,34 @@ public class ClassResourceInfoTest extends Assert {
         
         c = new ClassResourceInfo(TestClass2.class);
         assertEquals("test/foo", c.getConsumeMime().value()[0]);
+    }
+    
+    @Test
+    public void testGetSameSubresource() {
+        ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
+        assertEquals("No subresources expected", 0, c.getSubResources().size());
+        assertNull(c.findResource(TestClass.class, TestClass.class));
+        ClassResourceInfo c1 = c.getSubResource(TestClass.class, TestClass.class);
+        assertNotNull(c1);
+        assertSame(c1, c.findResource(TestClass.class, TestClass.class));
+        assertSame(c1, c.getSubResource(TestClass.class, TestClass.class));
+        assertEquals("Single subresources expected", 1, c.getSubResources().size());
+    }
+    
+    @Test
+    public void testGetSubresourceSubclass() {
+        ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
+        assertEquals("No subresources expected", 0, c.getSubResources().size());
+        assertNull(c.findResource(TestClass.class, TestClass1.class));
+        ClassResourceInfo c1 = c.getSubResource(TestClass.class, TestClass1.class);
+        assertNotNull(c1);
+        assertSame(c1, c.findResource(TestClass.class, TestClass1.class));
+        assertNull(c.findResource(TestClass.class, TestClass2.class));
+        ClassResourceInfo c2 = c.getSubResource(TestClass.class, TestClass2.class);
+        assertNotNull(c2);
+        assertSame(c2, c.findResource(TestClass.class, TestClass2.class));
+        assertSame(c2, c.getSubResource(TestClass.class, TestClass2.class));
+        assertNotSame(c1, c2);
+        
     }
 }

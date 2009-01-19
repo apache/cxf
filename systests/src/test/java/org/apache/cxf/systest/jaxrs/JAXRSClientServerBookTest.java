@@ -42,7 +42,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -287,6 +287,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/books/123",
                                "resources/expected_get_book123json.txt",
                                "application/xml,application/json", 200);
+    }
+    
+    @Test
+    public void testGetBook123FromSubObject() throws Exception {
+        getAndCompareAsStrings(
+            "http://localhost:9080/bookstore/booksubresourceobject/123/chaptersobject/sub/1",
+            "resources/expected_get_chapter1.txt", "application/xml", 200);
     }
     
     @Test

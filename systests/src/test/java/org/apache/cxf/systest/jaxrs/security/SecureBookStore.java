@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs.security;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.ws.rs.Path;
 
 import org.apache.cxf.systest.jaxrs.Book;
@@ -30,12 +31,18 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 @Path("/bookstorestorage/")
 public class SecureBookStore implements SecureBookInterface {
     private Map<Long, Book> books = new HashMap<Long, Book>();
-  
+    private SecureBookInterface subresource;
+    
     public SecureBookStore() {
         Book book = new Book();
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
+    }
+    
+    @Resource
+    public void setBookStore(SecureBookInterface sb) {
+        subresource = sb;
     }
     
     public Book getThatBook(Long id) {
@@ -50,6 +57,14 @@ public class SecureBookStore implements SecureBookInterface {
     }
     
     public Book getThatBook() throws BookNotFoundFault {
+        return books.get(123L);
+    }
+
+    public SecureBookInterface getBookSubResource() throws BookNotFoundFault {
+        return subresource;
+    }
+
+    public Book getDefaultBook() throws BookNotFoundFault {
         return books.get(123L);
     }
 }

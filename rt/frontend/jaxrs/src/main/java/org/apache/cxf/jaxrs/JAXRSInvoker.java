@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -126,64 +127,59 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         
         if (ori.isSubResourceLocator()) {
-            //the result becomes the object that will handle the request
-            if (result != null) {
-                if (result instanceof MessageContentsList) {
-                    result = ((MessageContentsList)result).get(0);
-                } else if (result instanceof List) {
-                    result = ((List)result).get(0);
-                } else if (result.getClass().isArray()) {
-                    result = ((Object[])result)[0];
-                } 
-            }
-            List<Object> newResourceObjects = new ArrayList<Object>();
-            newResourceObjects.add(result);
-        
-            Message msg = exchange.getInMessage();
-            MultivaluedMap<String, String> values = new MetadataMap<String, String>();                 
-            String subResourcePath = (String)msg.get(JAXRSInInterceptor.RELATIVE_PATH);
-            String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD); 
-            String contentType = (String)msg.get(Message.CONTENT_TYPE);
-            if (contentType == null) {
-                contentType = "*/*";
-            }
-            List<MediaType> acceptContentType = 
-                (List<MediaType>)msg.getExchange().get(Message.ACCEPT_CONTENT_TYPE);
-
-            ClassResourceInfo subCri = JAXRSUtils.findSubResourceClass(cri, result.getClass());
-            if (subCri == null) {
-                org.apache.cxf.common.i18n.Message errorM = 
-                    new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",  
-                                                           BUNDLE, 
-                                                           subResourcePath);
-                LOG.severe(errorM.toString());
-                throw new WebApplicationException(404);
-            }
-            
-            OperationResourceInfo subOri = null;
             try {
-                subOri = JAXRSUtils.findTargetMethod(subCri, 
-                                                     subResourcePath, 
-                                                     httpMethod, 
-                                                     values, 
-                                                     contentType, 
-                                                     acceptContentType);
+                Message msg = exchange.getInMessage();
+                MultivaluedMap<String, String> values = new MetadataMap<String, String>();                 
+                String subResourcePath = (String)msg.get(JAXRSInInterceptor.RELATIVE_PATH);
+                String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD); 
+                String contentType = (String)msg.get(Message.CONTENT_TYPE);
+                if (contentType == null) {
+                    contentType = "*/*";
+                }
+                List<MediaType> acceptContentType = 
+                    (List<MediaType>)msg.getExchange().get(Message.ACCEPT_CONTENT_TYPE);
+                
+                result = checkResultObject(result, subResourcePath); 
+                
+                List<Object> newResourceObjects = new ArrayList<Object>();
+                newResourceObjects.add(result);
+            
+                ClassResourceInfo subCri = cri.getSubResource(
+                     methodToInvoke.getReturnType(), 
+                     ClassHelper.getRealClass(result));
+                if (subCri == null) {
+                    org.apache.cxf.common.i18n.Message errorM = 
+                        new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",  
+                                                               BUNDLE, 
+                                                               subResourcePath);
+                    LOG.severe(errorM.toString());
+                    throw new WebApplicationException(404);
+                }
+                
+                OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri, 
+                                                         subResourcePath, 
+                                                         httpMethod, 
+                                                         values, 
+                                                         contentType, 
+                                                         acceptContentType);
+                
+                
+                exchange.put(OperationResourceInfo.class, subOri);
+                msg.put(JAXRSInInterceptor.RELATIVE_PATH, 
+                        values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+                msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
+                // work out request parameters for the sub-resouce class. Here we
+                // presume Inputstream has not been consumed yet by the root resource class.
+                //I.e., only one place either in the root resource or sub-resouce class can
+                //have a parameter that read from entitybody.
+                List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
+                msg.setContent(List.class, newParams);
+                
+                return this.invoke(exchange, newParams, newResourceObjects);
             } catch (WebApplicationException ex) {
                 Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress);
                 return new MessageContentsList(excResponse);
             }
-            
-            exchange.put(OperationResourceInfo.class, subOri);
-            msg.put(JAXRSInInterceptor.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
-            msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
-            // work out request parameters for the sub-resouce class. Here we
-            // presume Inputstream has not been consumed yet by the root resource class.
-            //I.e., only one place either in the root resource or sub-resouce class can
-            //have a parameter that read from entitybody.
-            List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
-            msg.setContent(List.class, newParams);
-            
-            return this.invoke(exchange, newParams, newResourceObjects);
         }
         
         return result;
@@ -215,5 +211,25 @@ public class JAXRSInvoker extends AbstractInvoker {
         return serviceObject;
     }
     
-    
+    private static Object checkResultObject(Object result, String subResourcePath) {
+        if (result == null) {
+            org.apache.cxf.common.i18n.Message errorM = 
+                new org.apache.cxf.common.i18n.Message("NULL_SUBRESOURCE",  
+                                                       BUNDLE, 
+                                                       subResourcePath);
+            LOG.severe(errorM.toString());
+            throw new WebApplicationException(500);
+        }
+        
+        //the result becomes the object that will handle the request
+        if (result instanceof MessageContentsList) {
+            result = ((MessageContentsList)result).get(0);
+        } else if (result instanceof List) {
+            result = ((List)result).get(0);
+        } else if (result.getClass().isArray()) {
+            result = ((Object[])result)[0];
+        }
+        
+        return result;
+    }
 }

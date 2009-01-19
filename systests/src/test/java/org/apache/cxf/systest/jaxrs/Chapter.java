@@ -54,5 +54,11 @@ public class Chapter {
     public Chapter getItself() {
         return this;
     }
+    
+    @GET
+    @Produces("application/xml;charset=ISO-8859-1")
+    public Chapter get() {
+        return this;
+    }
 
 }
