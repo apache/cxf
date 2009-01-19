@@ -359,14 +359,25 @@ public class MAPCodec extends AbstractSoapInterceptor {
 
     private void addMustUnderstandAttribute(Element header,
                                             QName name,
-                                            SoapVersion version,
+                                            SoapMessage msg,
                                             AddressingPropertiesImpl maps) {
         if (maps.getMustUnderstand().contains(name)) {
             Element lastAdded = (Element)header.getLastChild();
+            String pfx = msg.getVersion().getPrefix();
+            if (msg.hasAdditionalEnvNs()) {
+                String ns = msg.getVersion().getNamespace();
+                Map<String, String> nsMap = msg.getEnvelopeNs();
+                for (Map.Entry<String, String> entry : nsMap.entrySet()) {
+                    if (ns.equals(entry.getValue())) {
+                        pfx = entry.getKey();
+                    }
+                }
+            }
+            
             Attr mustUnderstandAttr = 
                 lastAdded.getOwnerDocument().createAttributeNS(
-                    version.getNamespace(),
-                    version.getPrefix() + ":mustUnderstand");
+                    msg.getVersion().getNamespace(),
+                    pfx + ":mustUnderstand");
             mustUnderstandAttr.setTextContent("1");
             lastAdded.setAttributeNodeNS(mustUnderstandAttr);
         }
@@ -403,7 +414,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
         }
         addMustUnderstandAttribute(header,
                                    name,
-                                   message.getVersion(),
+                                   message,
                                    maps);
     }
     

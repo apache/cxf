@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -52,7 +53,7 @@ public class SoapMessage extends AbstractWrappedMessage {
         }
         return heads;
     }
-    
+       
     public boolean hasHeader(QName qn) {
         for (Header head : getHeaders()) {
             if (head.getName().equals(qn)) {
@@ -73,5 +74,14 @@ public class SoapMessage extends AbstractWrappedMessage {
     public boolean hasHeaders() {
         return containsKey(Header.HEADER_LIST) && getHeaders().size() > 0;
     }
+    
+    public Map<String, String> getEnvelopeNs() {
+        return CastUtils.cast((Map<? , ?>)get("soap.env.ns.map"));
+    }
+    
+    public boolean hasAdditionalEnvNs() {
+        Map<String, String> ns = getEnvelopeNs();
+        return ns != null && !ns.isEmpty();
+    } 
     
 }

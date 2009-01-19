@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamException;
@@ -94,16 +95,35 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         final SoapVersion soapVersion = message.getVersion();
         try {            
             XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
-            xtw.setPrefix(soapVersion.getPrefix(), soapVersion.getNamespace());
-            xtw.writeStartElement(soapVersion.getPrefix(), 
-                                  soapVersion.getEnvelope().getLocalPart(),
-                                  soapVersion.getNamespace());
-            xtw.writeNamespace(soapVersion.getPrefix(), soapVersion.getNamespace());
-            
+            String soapPrefix = soapVersion.getPrefix();
+            if (message.hasAdditionalEnvNs()) {
+                Map<String, String> nsMap = message.getEnvelopeNs();
+                for (Map.Entry<String, String> entry : nsMap.entrySet()) {
+                    if (soapVersion.getNamespace().equals(entry.getValue())) {
+                        soapPrefix = entry.getKey();
+                    }
+                }
+                xtw.setPrefix(soapPrefix, soapVersion.getNamespace());
+                xtw.writeStartElement(soapPrefix, 
+                                      soapVersion.getEnvelope().getLocalPart(),
+                                      soapVersion.getNamespace());
+                xtw.writeNamespace(soapPrefix, soapVersion.getNamespace());
+                for (Map.Entry<String, String> entry : nsMap.entrySet()) {
+                    if (!soapVersion.getNamespace().equals(entry.getValue())) {
+                        xtw.writeNamespace(entry.getKey(), entry.getValue());
+                    }
+                }                
+            } else {
+                xtw.setPrefix(soapPrefix, soapVersion.getNamespace());
+                xtw.writeStartElement(soapPrefix, 
+                                      soapVersion.getEnvelope().getLocalPart(),
+                                      soapVersion.getNamespace());
+                xtw.writeNamespace(soapPrefix, soapVersion.getNamespace());
+            }
             boolean preexistingHeaders = message.hasHeaders();
 
             if (preexistingHeaders) {
-                xtw.writeStartElement(soapVersion.getPrefix(), 
+                xtw.writeStartElement(soapPrefix, 
                                       soapVersion.getHeader().getLocalPart(),
                                       soapVersion.getNamespace());   
                 List<Header> hdrList = message.getHeaders();
@@ -111,7 +131,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     XMLStreamWriter writer = xtw;
                     if (header instanceof SoapHeader) {
                         SoapHeader soapHeader = (SoapHeader)header;
-                        writer = new SOAPHeaderWriter(xtw, soapHeader, soapVersion);
+                        writer = new SOAPHeaderWriter(xtw, soapHeader, soapVersion, soapPrefix);
                     }
                     DataBinding b = header.getDataBinding();
                     if (b == null) {
@@ -132,12 +152,12 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     }
                 }
             }
-            boolean endedHeader = handleHeaderPart(preexistingHeaders, message);
+            boolean endedHeader = handleHeaderPart(preexistingHeaders, message, soapPrefix);
             if (preexistingHeaders && !endedHeader) {
                 xtw.writeEndElement();
             }
 
-            xtw.writeStartElement(soapVersion.getPrefix(), 
+            xtw.writeStartElement(soapPrefix, 
                                   soapVersion.getBody().getLocalPart(),
                                   soapVersion.getNamespace());
             
@@ -148,7 +168,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         }
     }
     
-    private boolean handleHeaderPart(boolean preexistingHeaders, SoapMessage message) {
+    private boolean handleHeaderPart(boolean preexistingHeaders, SoapMessage message, String soapPrefix) {
         //add MessagePart to soapHeader if necessary
         boolean endedHeader = false;
         Exchange exchange = message.getExchange();
@@ -194,7 +214,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 objs.remove(part);
                 if (!(startedHeader || preexistingHeaders)) {
                     try {
-                        xtw.writeStartElement(soapVersion.getPrefix(), 
+                        xtw.writeStartElement(soapPrefix, 
                                               soapVersion.getHeader().getLocalPart(),
                                               soapVersion.getNamespace());
                     } catch (XMLStreamException e) {
@@ -264,14 +284,18 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
     public static class SOAPHeaderWriter extends DelegatingXMLStreamWriter {
         final SoapHeader soapHeader;
         final SoapVersion soapVersion;
+        final String soapPrefix;
         boolean firstDone;
+        
         
         public SOAPHeaderWriter(XMLStreamWriter writer,
                                 SoapHeader header,
-                                SoapVersion version) {
+                                SoapVersion version,
+                                String pfx) {
             super(writer);
             soapHeader = header;
             soapVersion = version;
+            soapPrefix = pfx;
         }
         
         public void writeAttribute(String prefix, String uri, String local, String value)
@@ -296,13 +320,13 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             if (!firstDone) {
                 firstDone = true;
                 if (!StringUtils.isEmpty(soapHeader.getActor())) {
-                    super.writeAttribute(soapVersion.getPrefix(),
+                    super.writeAttribute(soapPrefix,
                                    soapVersion.getNamespace(),
                                    soapVersion.getAttrNameRole(),
                                    soapHeader.getActor());
                 }
                 if (soapHeader.isMustUnderstand()) {
-                    super.writeAttribute(soapVersion.getPrefix(),
+                    super.writeAttribute(soapPrefix,
                                    soapVersion.getNamespace(),
                                    soapVersion.getAttrNameMustUnderstand(),
                                    "true");                                        
