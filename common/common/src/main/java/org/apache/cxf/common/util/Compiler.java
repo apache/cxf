@@ -32,13 +32,37 @@ import org.apache.cxf.helpers.FileUtils;
 public class Compiler {
     public boolean compileFiles(String[] files, File outputDir) {
         List<String> list = new ArrayList<String>();
-        list.add("javac");
-        
+
+        // Start of honoring java.home for used javac
+        String fsep = System.getProperty("file.separator");
+        String javacstr = "javac";
+        String platformjavacname = "javac";
+
+        if (System.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
+            platformjavacname = "javac.exe";
+        }
+
+        if (new File(System.getProperty("java.home") + fsep + platformjavacname).exists()) {
+            // check if java.home is jdk home
+            javacstr = System.getProperty("java.home") + fsep + platformjavacname;
+        } else if (new File(System.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
+                            + platformjavacname).exists()) {
+            // check if java.home is jre home
+            javacstr = System.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
+                       + platformjavacname;
+        }
+
+        list.add(javacstr);
+        // End of honoring java.home for used javac
+
+        // This code doesn't honor java.home
+        // list.add("javac");
+
         if (outputDir != null) {
             list.add("-d");
             list.add(outputDir.getAbsolutePath().replace(File.pathSeparatorChar, '/'));
         }
-        
+
         String javaClasspath = System.getProperty("java.class.path");
         boolean classpathSetted = javaClasspath != null ? true : false;
         if (!classpathSetted) {
@@ -48,13 +72,13 @@ public class Compiler {
             list.add("-classpath");
             list.add(javaClasspath);
         }
-        
+
         int idx = list.size();
         list.addAll(Arrays.asList(files));
-        
+
         return internalCompile(list.toArray(new String[list.size()]), idx);
     }
-    
+
     public boolean internalCompile(String[] args, int sourceFileIndex) {
         Process p = null;
         String cmdArray[] = null;
@@ -69,7 +93,7 @@ public class Compiler {
                         args[i] = args[i].replace(File.separatorChar, '/');
                         //
                         // javac gives an error if you use forward slashes
-                        // with package-info.java.  Refer to:
+                        // with package-info.java. Refer to:
                         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6198196
                         //
                         if (args[i].indexOf("package-info.java") > -1
@@ -91,7 +115,7 @@ public class Compiler {
                 cmdArray = new String[args.length];
                 System.arraycopy(args, 0, cmdArray, 0, args.length);
             }
-            
+
             if (System.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
                 for (int i = 0; i < cmdArray.length; i++) {
                     if (cmdArray[i].indexOf("package-info") == -1) {
@@ -99,7 +123,7 @@ public class Compiler {
                     }
                 }
             }
-            
+
             p = Runtime.getRuntime().exec(cmdArray);
 
             if (p.getErrorStream() != null) {
@@ -124,8 +148,7 @@ public class Compiler {
             System.err.print("[ERROR] IOException during exec() of compiler \"" + args[0] + "\"");
             System.err.println(". Check your path environment variable.");
         } finally {
-            if (tmpFile != null
-                && tmpFile.exists()) {
+            if (tmpFile != null && tmpFile.exists()) {
                 FileUtils.delete(tmpFile);
             }
         }
