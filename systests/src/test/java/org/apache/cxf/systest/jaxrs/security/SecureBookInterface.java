@@ -53,7 +53,7 @@ public interface SecureBookInterface {
     SecureBookInterface getBookSubResource() throws BookNotFoundFault;
     
     @GET
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     @Secured("ROLE_ADMIN")
     Book getDefaultBook() throws BookNotFoundFault;
 }

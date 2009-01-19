@@ -56,7 +56,7 @@ public class Chapter {
     }
     
     @GET
-    @Produces("application/xml;charset=ISO-8859-1")
+    @ProduceMime("application/xml;charset=ISO-8859-1")
     public Chapter get() {
         return this;
     }
