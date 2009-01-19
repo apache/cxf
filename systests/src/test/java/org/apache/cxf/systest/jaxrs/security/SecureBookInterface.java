@@ -49,4 +49,11 @@ public interface SecureBookInterface {
     @Secured("ROLE_ADMIN")
     Book getThatBook() throws BookNotFoundFault;
     
+    @Path("/subresource")
+    SecureBookInterface getBookSubResource() throws BookNotFoundFault;
+    
+    @GET
+    @Produces("application/xml")
+    @Secured("ROLE_ADMIN")
+    Book getDefaultBook() throws BookNotFoundFault;
 }

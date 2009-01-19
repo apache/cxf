@@ -68,7 +68,7 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     private List<String> schemaLocations;
-
+    
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
     }
@@ -81,6 +81,10 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     
     public void setSchemaLocations(List<String> schemas) {
         this.schemaLocations = schemas;    
+    }
+    
+    public void setStaticSubresourceResolution(boolean enableStatic) {
+        serviceFactory.setEnableStaticResolution(enableStatic);
     }
     
     public Server create() {

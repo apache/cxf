@@ -39,7 +39,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
   
   <jaxrs:server id="atomservice"
-		        address="/">
+		        address="/" 
+		        staticSubresourceResolution="true">
     <jaxrs:serviceBeans>
       <ref bean="atomstore"/>
       <ref bean="atomstore2"/>

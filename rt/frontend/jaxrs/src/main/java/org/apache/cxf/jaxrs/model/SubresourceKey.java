@@ -17,48 +17,36 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.jaxrs.model;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
-import javax.xml.bind.annotation.XmlRootElement;
-
-
-@XmlRootElement(name = "Chapter")
-public class Chapter {
-    private String title;
-    private long id;
+public class SubresourceKey {
+    private Class<?> typedClass;
+    private Class<?> instanceClass;
     
-    public Chapter() {
+    public SubresourceKey(Class<?> tClass, Class<?> iClass) {
+        typedClass = tClass;
+        instanceClass = iClass;
     }
     
-    public void setTitle(String n) {
-        title = n;
-    }
-
-    public String getTitle() {
-        return title;
+    public Class<?> getTypedClass() {
+        return typedClass;
     }
     
-    public void setId(long i) {
-        id = i;
-    }
-    public long getId() {
-        return id;
+    public Class<?> getInstanceClass() {
+        return instanceClass;
     }
     
-    @GET
-    @Path("/recurse")
-    @ProduceMime("application/xml")
-    public Chapter getItself() {
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SubresourceKey)) {
+            return false;
+        }
+        SubresourceKey other = (SubresourceKey)o;
+        return typedClass == other.typedClass && instanceClass == other.instanceClass;
     }
     
-    @GET
-    @Produces("application/xml;charset=ISO-8859-1")
-    public Chapter get() {
-        return this;
+    @Override
+    public int hashCode() {
+        return typedClass.hashCode() + 37 * instanceClass.hashCode();
     }
-
 }

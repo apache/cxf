@@ -246,6 +246,11 @@ public class BookStore {
         }
     }
     
+    @Path("/booksubresourceobject/{bookId}/")
+    public Object getBookSubResourceObject(@PathParam("bookId") String id) throws BookNotFoundFault {
+        return getBookSubResource(id);
+    }
+    
     @GET
     @Path("/booknames/{bookId}/")
     @ProduceMime("text/*")

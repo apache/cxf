@@ -164,17 +164,6 @@ public final class JAXRSUtils {
         return supportedMimeTypes;
     }
     
-    public static ClassResourceInfo findSubResourceClass(ClassResourceInfo resource,
-                                                         Class subResourceClassType) {
-        for (ClassResourceInfo subCri : resource.getSubClassResourceInfo()) {
-            if (subCri.getResourceClass().isAssignableFrom(subResourceClassType)) {
-                return subCri;
-            }
-        }
-        return null;
-    }
-
-    
     @SuppressWarnings("unchecked")
     public static void handleSetters(OperationResourceInfo ori,
                                      Object requestObject,

@@ -23,8 +23,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.Path;
@@ -33,16 +35,19 @@ import javax.ws.rs.ProduceMime;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class ClassResourceInfo extends AbstractResourceInfo {
     
     private URITemplate uriTemplate;
     private MethodDispatcher methodDispatcher;
     private ResourceProvider resourceProvider;
-    private List<ClassResourceInfo> subClassResourceInfo = new ArrayList<ClassResourceInfo>();
+    private ConcurrentHashMap<SubresourceKey, ClassResourceInfo> subResources 
+        = new ConcurrentHashMap<SubresourceKey, ClassResourceInfo>();
    
     private List<Field> paramFields;
     private List<Method> paramMethods;
+    private boolean enableStatic;
     
     public ClassResourceInfo(Class<?> theResourceClass) {
         this(theResourceClass, false);
@@ -62,6 +67,41 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             initParamFields();
             initParamMethods();
         }
+    }
+    
+    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
+                             boolean theRoot, boolean enableStatic) {
+        super(theResourceClass, theServiceClass, theRoot);
+        this.enableStatic = enableStatic;
+        if (theRoot) {
+            initParamFields();
+            initParamMethods();
+        }
+    }
+    
+    public ClassResourceInfo findResource(Class<?> typedClass, Class<?> instanceClass) {
+        instanceClass = enableStatic ? typedClass : instanceClass;
+        SubresourceKey key = new SubresourceKey(typedClass, instanceClass);
+        return subResources.get(key);
+    }
+    
+    public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass) {
+        
+        instanceClass = enableStatic ? typedClass : instanceClass;
+        
+        SubresourceKey key = new SubresourceKey(typedClass, instanceClass);
+        ClassResourceInfo cri = subResources.get(key);
+        if (cri == null && !enableStatic) {
+            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, enableStatic);
+            if (cri != null) {
+                subResources.putIfAbsent(key, cri);
+            }
+        }
+        return cri;
+    }
+    
+    public Collection<ClassResourceInfo> getSubResources() {
+        return Collections.unmodifiableCollection(subResources.values());
     }
     
     private void initParamFields() {
@@ -115,15 +155,13 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     }
 
     public boolean hasSubResources() {
-        return !subClassResourceInfo.isEmpty();
+        return !subResources.isEmpty();
     }
     
     public void addSubClassResourceInfo(ClassResourceInfo cri) {
-        subClassResourceInfo.add(cri);
-    }
-    
-    public List<ClassResourceInfo> getSubClassResourceInfo() {
-        return subClassResourceInfo;
+        subResources.putIfAbsent(new SubresourceKey(cri.getResourceClass(), 
+                                            cri.getServiceClass()),
+                                 cri);
     }
     
     public ResourceProvider getResourceProvider() {

@@ -53,7 +53,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:providers>		   
   </jaxrs:server>
 
-  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
+  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore">
+     <property name="bookStore" ref="bookstore2"/>
+  </bean>
+  
+  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
 
   <security:global-method-security secured-annotations="enabled"/>
   

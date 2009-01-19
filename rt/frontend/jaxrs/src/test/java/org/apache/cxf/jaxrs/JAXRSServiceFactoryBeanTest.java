@@ -41,6 +41,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
     @Test
     public void testNoSubResources() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setEnableStaticResolution(true);
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class);
         sf.create();
         
@@ -70,6 +71,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
     @Test
     public void testSubResources() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setEnableStaticResolution(true);
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStore.class);
         sf.create();
         
@@ -124,8 +126,8 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         }
         
         // Verify sub-resource ClassResourceInfo: Book
-        assertEquals(2, rootCri.getSubClassResourceInfo().size());
-        ClassResourceInfo subCri = rootCri.getSubClassResourceInfo().get(0);        
+        assertEquals(1, rootCri.getSubResources().size());
+        ClassResourceInfo subCri = rootCri.getSubResources().iterator().next();        
         assertNull(subCri.getURITemplate());
         assertEquals(org.apache.cxf.jaxrs.resources.Book.class, subCri.getResourceClass());
         MethodDispatcher subMd = subCri.getMethodDispatcher();
