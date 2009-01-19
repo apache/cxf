@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -64,7 +65,8 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
     public void testInvocation() throws Exception {
         JaxWsDynamicClientFactory dcf = 
             JaxWsDynamicClientFactory.newInstance();
-        Client client = dcf.createClient("http://localhost:9020/NoBodyParts/NoBodyPartsService?wsdl");
+        URL wsdlURL = new URL("http://localhost:9020/NoBodyParts/NoBodyPartsService?wsdl");
+        Client client = dcf.createClient(wsdlURL);
         byte[] bucketOfBytes = 
             IOUtils.readBytesFromStream(getClass().getResourceAsStream("/wsdl/no_body_parts.wsdl"));
         Operation1 parameters = new Operation1();
