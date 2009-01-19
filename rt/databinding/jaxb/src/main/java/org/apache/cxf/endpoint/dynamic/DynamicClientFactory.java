@@ -146,6 +146,21 @@ public class DynamicClientFactory {
     public Client createClient(String wsdlUrl, List<String> bindingFiles) {
         return createClient(wsdlUrl, (QName)null, (QName)null, bindingFiles);
     }
+    
+    
+    /**
+     * Create a new <code>Client</code> instance using the WSDL to be loaded
+     * from the specified URL and using the current classloading context.
+     * 
+     * @param wsdlURL the URL to load
+     * @return
+     */
+    public Client createClient(URL wsdlUrl) {
+        return createClient(wsdlUrl, (QName)null, (QName)null);
+    }
+    public Client createClient(URL wsdlUrl, List<String> bindingFiles) {
+        return createClient(wsdlUrl, (QName)null, (QName)null, bindingFiles);
+    }
 
     /**
      * Create a new <code>Client</code> instance using the WSDL to be loaded
@@ -180,6 +195,52 @@ public class DynamicClientFactory {
     public Client createClient(String wsdlUrl, QName service, ClassLoader classLoader, QName port) {
         return createClient(wsdlUrl, service, classLoader, port, null);
     }
+
+    
+    /**
+     * Create a new <code>Client</code> instance using the WSDL to be loaded
+     * from the specified URL and with the specified <code>ClassLoader</code>
+     * as parent.
+     * 
+     * @param wsdlUrl
+     * @param classLoader
+     * @return
+     */
+    public Client createClient(URL wsdlUrl, ClassLoader classLoader) {
+        return createClient(wsdlUrl, null, classLoader, null);
+    }
+    public Client createClient(URL wsdlUrl, ClassLoader classLoader, List<String> bindingFiles) {
+        return createClient(wsdlUrl.toString(), null, classLoader, null, bindingFiles);
+    }
+
+    public Client createClient(URL wsdlUrl, QName service) {
+        return createClient(wsdlUrl, service, (QName)null);
+    }
+    public Client createClient(URL wsdlUrl, QName service, List<String> bindingFiles) {
+        return createClient(wsdlUrl, service, null, bindingFiles);
+    }
+
+    public Client createClient(URL wsdlUrl, QName service, QName port) {
+        return createClient(wsdlUrl, service, null, port);
+    }
+    public Client createClient(URL wsdlUrl, QName service, QName port, List<String> bindingFiles) {
+        return createClient(wsdlUrl.toString(), service, null, port, bindingFiles);
+    }
+
+    public Client createClient(URL wsdlUrl, QName service, ClassLoader classLoader, QName port) {
+        return createClient(wsdlUrl.toString(), service, classLoader, port, null);
+    }
+    
+    public Client createClient(URL wsdlUrl, 
+                               QName service, 
+                               ClassLoader classLoader, 
+                               QName port, 
+                               List<String> bindingFiles) {
+        return createClient(wsdlUrl.toString(), service, classLoader, port, bindingFiles);
+    }
+    
+    
+    
     public Client createClient(String wsdlUrl, QName service,
                                ClassLoader classLoader, QName port,
                                List<String> bindingFiles) {
