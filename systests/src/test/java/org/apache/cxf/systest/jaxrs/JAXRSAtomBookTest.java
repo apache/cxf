@@ -41,7 +41,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AtomClientBookTest extends AbstractBusClientServerTestBase {
+public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
 
     private Abdera abdera = new Abdera();
     

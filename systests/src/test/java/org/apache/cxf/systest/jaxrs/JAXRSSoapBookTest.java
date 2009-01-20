@@ -36,7 +36,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
+public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
