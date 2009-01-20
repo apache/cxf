@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public abstract class AbstractPhaseInterceptor<T extends Message> implements PhaseInterceptor<T> {
     private final String id;
@@ -103,8 +104,7 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
     
     protected boolean isRequestor(T message) {
-        return Boolean.TRUE.equals(message.containsKey(
-            org.apache.cxf.message.Message.REQUESTOR_ROLE));
+        return MessageUtils.isRequestor(message);
     }  
 
 }

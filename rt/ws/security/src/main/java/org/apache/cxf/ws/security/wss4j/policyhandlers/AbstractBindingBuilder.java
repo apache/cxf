@@ -61,6 +61,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -232,9 +233,9 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected boolean isRequestor() {
-        return Boolean.TRUE.equals(message.containsKey(
-            org.apache.cxf.message.Message.REQUESTOR_ROLE));
-    }  
+        return MessageUtils.isRequestor(message);
+    }
+    
     protected void policyNotAsserted(PolicyAssertion assertion, Exception reason) {
         if (assertion == null) {
             return;
@@ -1032,30 +1033,35 @@ public abstract class AbstractBindingBuilder {
         Crypto crypto = encryptCrypto ? getEncryptionCrypto(wrapper) 
             : getSignatureCrypto(wrapper);
         
+        if (endorse && crypto == null && binding instanceof SymmetricBinding) {
+            userNameKey = SecurityConstants.ENCRYPT_USERNAME;
+            crypto = getEncryptionCrypto(wrapper);
+        }
         
         if (!endorse) {
             message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
         }
         String user = (String)message.getContextualProperty(userNameKey);
-        if (StringUtils.isEmpty(user)) {
-            user = crypto.getDefaultX509Alias();
-        }
-        if (user == null) {
-            try {
-                Enumeration<String> en = crypto.getKeyStore().aliases();
-                if (en.hasMoreElements()) {
-                    user = en.nextElement();
+        if (crypto != null) {
+            if (StringUtils.isEmpty(user)) {
+                user = crypto.getDefaultX509Alias();
+            }
+            if (user == null) {
+                try {
+                    Enumeration<String> en = crypto.getKeyStore().aliases();
+                    if (en.hasMoreElements()) {
+                        user = en.nextElement();
+                    }
+                    if (en.hasMoreElements()) {
+                        //more than one alias in the keystore, user WILL need
+                        //to specify
+                        user = null;
+                    }            
+                } catch (KeyStoreException e) {
+                    //ignore
                 }
-                if (en.hasMoreElements()) {
-                    //more than one alias in the keystore, user WILL need
-                    //to specify
-                    user = null;
-                }            
-            } catch (KeyStoreException e) {
-                //ignore
             }
         }
-                
         if (StringUtils.isEmpty(user)) {
             policyNotAsserted(token, "No " + type + " username found.");
         }
