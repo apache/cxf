@@ -42,49 +42,49 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/stream";
+        String address = "http://localhost:9080/bookstore/books/stream";
         doAddBook(address);               
     }
     
     @Test
     public void testBookAsRootAttachmentInputStream() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/istream";
+        String address = "http://localhost:9080/bookstore/books/istream";
         doAddBook(address);               
     }
     
     @Test
     public void testBookAsMessageContextDataHandler() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/mchandlers";
+        String address = "http://localhost:9080/bookstore/books/mchandlers";
         doAddBook(address);               
     }
     
     @Test
     public void testAddBookAsRootAttachmentJAXB() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/jaxb";
+        String address = "http://localhost:9080/bookstore/books/jaxb";
         doAddBook(address);               
     }
     
     @Test
     public void testAddBookAsDataSource() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/dsource";
+        String address = "http://localhost:9080/bookstore/books/dsource";
         doAddBook(address);               
     }
     
     @Test
     public void testAddBookAsDataSource2() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/dsource2";
+        String address = "http://localhost:9080/bookstore/books/dsource2";
         doAddBook(address);               
     }
     
     @Test
     public void testAddBookAsJAXB2() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/jaxb2";
+        String address = "http://localhost:9080/bookstore/books/jaxb2";
         doAddBook(address);               
     }
     
     @Test
     public void testAddBookAsDataHandler() throws Exception {
-        String address = "http://localhost:9082/bookstore/books/dhandler";
+        String address = "http://localhost:9080/bookstore/books/dhandler";
         doAddBook(address);               
     }
     
