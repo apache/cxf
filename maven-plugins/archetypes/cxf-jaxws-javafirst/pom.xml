@@ -25,9 +25,9 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf</groupId>
-    <artifactId>cxf-http-basic</artifactId>
-    <name>Apache CXF Archetype - cxf-http-basic</name>
+    <groupId>org.apache.cxf.archetype</groupId>
+    <artifactId>cxf-jaxws-javafirst</artifactId>
+    <name>Apache CXF Archetype - Simple JAX-WS Java First</name>
     <version>2.2-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     <properties>
