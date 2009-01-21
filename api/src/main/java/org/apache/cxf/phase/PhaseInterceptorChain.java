@@ -239,27 +239,23 @@ public class PhaseInterceptorChain implements InterceptorChain {
                     FaultMode mode = message.get(FaultMode.class);
                     if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
                         if (LOG.isLoggable(Level.FINE)) { 
-                            LogUtils.log(LOG, Level.FINE,
-                                         "Application has thrown exception, unwinding now", ex);
+                            LOG.fine("Application has thrown exception, unwinding now " + ex.getMessage());
                         } else if (LOG.isLoggable(Level.INFO)) {
                             Throwable t = ex;
                             if (ex instanceof Fault
                                 && ex.getCause() != null) {
                                 t = ex.getCause();
-                            }                            
-                            
-                            LogUtils.log(LOG, Level.INFO,
-                                         "Application has thrown exception, unwinding now: "
+                            }  
+                                       
+                            LOG.info("Application has thrown exception, unwinding now: "
                                          + t.getClass().getName() 
-                                         + ": " + ex.getMessage());
+                                         + ": " + ex.getMessage());          
                         }
                     } else if (LOG.isLoggable(Level.INFO)) {
                         if (mode == FaultMode.UNCHECKED_APPLICATION_FAULT) {
-                            LogUtils.log(LOG, Level.INFO,
-                                         "Application has thrown exception, unwinding now", ex);
+                            LOG.info("Application has thrown exception, unwinding now " + ex.getMessage());
                         } else {
-                            LogUtils.log(LOG, Level.INFO,
-                                         "Interceptor has thrown exception, unwinding now", ex);
+                            LOG.info("Interceptor has thrown exception, unwinding now " + ex.getMessage());
                         }
                     }
 
