@@ -265,6 +265,14 @@ public class WSDLServiceBuilder {
         for (Port port : cast(serv.getPorts().values(), Port.class)) {
             Binding binding = port.getBinding();
             PortType bindingPt = binding.getPortType();
+            if (bindingPt == null) {
+                org.apache.cxf.common.i18n.Message msg = new 
+                org.apache.cxf.common.i18n.Message("BINDING_MISSING_TYPE",
+                                                   LOG,
+                                                   binding.getQName());
+                throw new WSDLRuntimeException(msg);
+            }
+
             //TODO: wsdl4j's bug. if there is recursive import,
             //wsdl4j can not get operation input message
             PortType pt = def.getPortType(bindingPt.getQName());

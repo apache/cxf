@@ -40,11 +40,27 @@ import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
+import org.apache.cxf.wsdl11.WSDLRuntimeException;
+
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
 
 public class CodeGenBugTest extends AbstractCodeGenTest {
+    
+    
+    @Test
+    public void testCXF1969() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, 
+                getLocation("/wsdl2java_wsdl/cxf1969/report_incident.wsdl"));
+        processor.setContext(env);
+        
+        try {
+            processor.execute();
+        } catch (WSDLRuntimeException wrex) {
+            assertEquals("BINDING_MISSING_TYPE", wrex.getMessage());
+        }  
+    }
 
     @Test
     // Test for CXF-1678
