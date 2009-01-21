@@ -48,14 +48,17 @@
     </xs:complexType>
     
     <xs:complexType name="ClientConfig">
-        <xs:complexContent>
-            <xs:extension base="wsdl:tExtensibilityElement">  
-				<xs:attribute name="clientReceiveTimeout" type="xs:long" default="60000"/>
-        		<xs:attribute name="messageTimeToLive" type="xs:long" default="0" />
-        	</xs:extension>
-		</xs:complexContent>        	
+    	<xs:complexContent>
+    		<xs:extension base="wsdl:tExtensibilityElement">
+    			<xs:attribute name="clientReceiveTimeout" type="xs:long"
+    				default="60000" />
+    			<xs:attribute name="messageTimeToLive" type="xs:long"
+    				default="0" />
+    			<xs:attribute name="useConduitIdSelector" type="xs:boolean" use="optional" default="true"></xs:attribute>
+    		</xs:extension>
+    	</xs:complexContent>
     </xs:complexType>
-    
+
     <xs:complexType name="ServerConfig">
 		<xs:complexContent>
             <xs:extension base="wsdl:tExtensibilityElement">

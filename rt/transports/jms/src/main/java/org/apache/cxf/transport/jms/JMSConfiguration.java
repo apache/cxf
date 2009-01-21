@@ -60,6 +60,7 @@ public class JMSConfiguration implements InitializingBean {
     private String replyDestination;
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
+    private boolean useConduitIdSelector = true;
 
     public boolean isUsingEndpointInfo() {
         return this.usingEndpointInfo;
@@ -265,6 +266,14 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setTaskExecutor(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
+    }
+
+    public void setUseConduitIdSelector(boolean useConduitIdSelector) {
+        this.useConduitIdSelector = useConduitIdSelector;
+    }
+
+    public boolean isUseConduitIdSelector() {
+        return useConduitIdSelector;
     }
 
 }

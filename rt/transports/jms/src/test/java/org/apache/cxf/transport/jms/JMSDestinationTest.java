@@ -207,14 +207,18 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.shutdown();
     }
 
-    private void setupMessageHeader(Message outMessage) {
+    private void setupMessageHeader(Message outMessage, String correlationId) {
         JMSMessageHeadersType header = new JMSMessageHeadersType();
-        header.setJMSCorrelationID("Destination test");
+        header.setJMSCorrelationID(correlationId);
         header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
         header.setJMSPriority(1);
         header.setTimeToLive(1000);
         outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
         outMessage.put(Message.ENCODING, "US-ASCII");
+    }
+    
+    private void setupMessageHeader(Message outMessage) {
+        setupMessageHeader(outMessage, "Destination test");
     }
 
     private void verifyReceivedMessage(Message inMessage) {
@@ -226,8 +230,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
             assertFalse("Read the Destination recieved Message error ", false);
             ex.printStackTrace();
         }
-        String reponse = IOUtils.newStringFromBytes(bytes);
-        assertEquals("The reponse date should be equal", reponse, "HelloWorld");
+        String response = IOUtils.newStringFromBytes(bytes);
+        assertEquals("The response content should be equal", AbstractJMSTester.MESSAGE_CONTENT, response);
     }
 
     private void verifyRequestResponseHeaders(Message inMessage, Message outMessage) {
@@ -257,8 +261,13 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     private void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
-        assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals", outHeader
-            .getJMSCorrelationID(), inHeader.getJMSCorrelationID());
+        if (outHeader.getJMSCorrelationID() != null) {
+            // only check if the correlation id was explicitly set as
+            // otherwise the in header will contain an automatically
+            // generated correlation id
+            assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals", outHeader
+                         .getJMSCorrelationID(), inHeader.getJMSCorrelationID());
+        }
         assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
             .getJMSPriority(), inHeader.getJMSPriority());
         assertEquals("The inMessage and outMessage JMS Header's JMSDeliveryMode should be equals", outHeader
@@ -276,7 +285,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduit(true, false);
         final Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage);
+        setupMessageHeader(outMessage, null);
         final JMSDestination destination = setupJMSDestination(true);
 
         // set up MessageObserver for handling the conduit message
@@ -331,7 +340,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduit(true, false);
         final Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage);
+        setupMessageHeader(outMessage, null);
 
         JMSPropertyType excludeProp = new JMSPropertyType();
         excludeProp.setName(customPropertyName);

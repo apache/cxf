@@ -42,6 +42,8 @@ import org.junit.Assert;
 import org.junit.Before;
 
 public abstract class AbstractJMSTester extends Assert {
+    protected static final String MESSAGE_CONTENT = "HelloWorld";
+
     private static JMSBrokerSetup broker;
 
     protected Bus bus;
@@ -102,7 +104,7 @@ public abstract class AbstractJMSTester extends Assert {
         }
         OutputStream os = message.getContent(OutputStream.class);
         assertTrue("The OutputStream should not be null ", os != null);
-        os.write("HelloWorld".getBytes()); // TODO encoding
+        os.write(MESSAGE_CONTENT.getBytes()); // TODO encoding
         os.close();
     }
 

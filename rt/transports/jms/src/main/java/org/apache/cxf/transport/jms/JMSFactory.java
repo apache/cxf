@@ -74,11 +74,13 @@ public final class JMSFactory {
      * @param jmsConfig configuration information
      * @param listenerHandler object to be called when a message arrives
      * @param destinationName null for temp dest or a destination name
+     * @param messageSelectorPrefix prefix for the messageselector
      * @return
      */
     public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
-                                                                    String destinationName) {
+                                                                    String destinationName, 
+                                                                    String messageSelectorPrefix) {
         DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
             ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
@@ -91,6 +93,9 @@ public final class JMSFactory {
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
         jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
         jmsListener.setMessageListener(listenerHandler);
+        if (messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" + messageSelectorPrefix + "%'");
+        }
         if (jmsConfig.getDestinationResolver() != null) {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
         }
