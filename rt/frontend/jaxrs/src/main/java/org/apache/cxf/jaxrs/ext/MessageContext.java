@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.ext;
 
+import java.util.Map;
+
+import javax.activation.DataHandler;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -30,11 +33,18 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Providers;
 
 /**
- * Represents an inbound internal message
+ * Represents an invocation context
  *
  */
 public interface MessageContext {
+    
+    String INBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.inbound";
+    String OUTBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.outbound";
+    
     Object get(Object key);
+    void put(Object key, Object value);
+    
+    Map<String, DataHandler> getAttachments();
     
     UriInfo getUriInfo();
     Request getRequest();

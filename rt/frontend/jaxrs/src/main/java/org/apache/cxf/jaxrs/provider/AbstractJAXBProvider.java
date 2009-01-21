@@ -28,10 +28,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBContext;
@@ -47,6 +45,7 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
@@ -63,10 +62,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
         
-    @Context protected ContextResolver<JAXBContext> resolver;
     private Schema schema;
-    
-        
+            
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         return isSupported(type, genericType, anns)
                || AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class) != null;
@@ -88,13 +85,15 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return -1;
     }
 
+    // TODO : no contexts can be inhected in superclasses
+    protected abstract MessageContext getContext(); 
+    
     protected JAXBContext getJAXBContext(Class<?> type, Type genericType) throws JAXBException {
-        
-        if (resolver != null) {
-            JAXBContext context = resolver.getContext(type);
-            // it's up to the resolver to keep its contexts in a map
-            if (context != null) {
-                return context;
+        MessageContext mc = getContext();
+        if (mc != null) {
+            JAXBContext customContext = mc.getContext(JAXBContext.class);
+            if (customContext != null) {
+                return customContext;
             }
         }
         

@@ -19,7 +19,10 @@
 package org.apache.cxf.jaxrs.ext;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Map;
 
+import javax.activation.DataHandler;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +34,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
 public class MessageContextImpl implements MessageContext {
@@ -43,9 +49,16 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public Object get(Object key) {
+        if (MessageContext.INBOUND_MESSAGE_ATTACHMENTS.equals(key.toString())) {
+            return createAttachments(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
+        }
         return m.get(key);
     }
 
+    public Map<String, DataHandler> getAttachments() {
+        return createAttachments(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
+    } 
+    
     public <T> T getContext(Class<T> contextClass) {
         return getContext(contextClass, contextClass);
     }
@@ -95,4 +108,20 @@ public class MessageContextImpl implements MessageContext {
         return JAXRSUtils.createServletResourceValue(m, ServletContext.class);
     }
 
+    public void put(Object key, Object value) {
+        throw new UnsupportedOperationException("MessageContext.put() is not supported yet");
+    }
+
+    private Map<String, DataHandler> createAttachments(String propertyName) {
+        Object o = m.get(propertyName);
+        if (o != null) {
+            return CastUtils.cast((Map)o);
+        }
+        Collection<Attachment> attachments = m.getAttachments();
+        attachments.size();
+        Map<String, DataHandler> dataHandlers = AttachmentUtil.getDHMap(attachments);
+        m.put(propertyName, dataHandlers);
+        return dataHandlers;
+    }
+       
 }

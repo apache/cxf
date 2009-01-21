@@ -21,9 +21,9 @@ package org.apache.cxf.jaxrs;
 
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
-
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
+import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor;
@@ -40,7 +40,10 @@ public class JAXRSBindingFactory extends AbstractBindingFactory {
     public Binding createBinding(BindingInfo bi) {
         XMLBinding binding = new XMLBinding(bi);
 
+        
+        binding.getInInterceptors().add(new AttachmentInInterceptor());
         binding.getInInterceptors().add(new JAXRSInInterceptor());
+        
         binding.getOutInterceptors().add(new JAXRSOutInterceptor());
         
         binding.getOutFaultInterceptors().add(new XMLFaultOutInterceptor());
