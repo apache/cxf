@@ -135,7 +135,8 @@ public class JMSOldConfigHolder {
             jmsConfig.setPubSubNoLocal(true);
             //if (clientConfig.isSetClientReceiveTimeout()) {
             jmsConfig.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
-            //}            
+            //}
+            jmsConfig.setUseConduitIdSelector(clientConfig.isUseConduitIdSelector());
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());       
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());        
         

@@ -20,10 +20,7 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -285,20 +282,4 @@ public final class JMSUtils {
         return jmsMessage;
     }
 
-    /**
-     * Create a unique correlation Id from
-     * <host>_<user.name>_<currentThread><time>
-     * @return correlationId
-     */
-    public static String generateCorrelationId() {
-        String host = "localhost";
-        try {
-            InetAddress addr = InetAddress.getLocalHost();
-            host = addr.getHostName();
-        } catch (UnknownHostException ukex) {
-            // Default to localhost
-        }
-        long time = Calendar.getInstance().getTimeInMillis();
-        return host + "_" + System.getProperty("user.name") + "_" + Thread.currentThread() + time;
-    }
 }

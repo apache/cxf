@@ -104,7 +104,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             throw new ConfigurationException(
                 new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name));
         }
-        jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination());
+        jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination(), null);
     }
 
     public void deactivate() {

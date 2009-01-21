@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,12 +60,21 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private JMSConfiguration jmsConfig;
     private Map<String, Exchange> correlationMap;
     private DefaultMessageListenerContainer jmsListener;
+    private String conduitId;
+    private int messageCount;
 
     public JMSConduit(EndpointInfo endpointInfo, EndpointReferenceType target, JMSConfiguration jmsConfig) {
         super(target);
         this.jmsConfig = jmsConfig;
         this.endpointInfo = endpointInfo;
         correlationMap = new ConcurrentHashMap<String, Exchange>();
+        conduitId = UUID.randomUUID().toString();
+        messageCount = 0;
+    }
+    
+    private synchronized String createCorrelationId() {
+        messageCount++;
+        return conduitId + "_" + messageCount;
     }
 
     /**
@@ -103,13 +113,14 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
         JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, headers);
         if (!exchange.isOneWay() && jmsListener == null) {
-            jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getReplyDestination());
+            jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getReplyDestination(), 
+                                                       conduitId);
         }
         
         final javax.jms.Destination replyTo = exchange.isOneWay() ? null : jmsListener.getDestination();
 
         final String correlationId = (headers != null && headers.isSetJMSCorrelationID()) ? headers
-            .getJMSCorrelationID() : JMSUtils.generateCorrelationId();
+            .getJMSCorrelationID() : createCorrelationId();
             
         MessageCreator messageCreator = new MessageCreator() {
             public javax.jms.Message createMessage(Session session) throws JMSException {
