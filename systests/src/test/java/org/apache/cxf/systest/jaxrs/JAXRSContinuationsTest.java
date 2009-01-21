@@ -27,8 +27,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -85,6 +87,7 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    @Ignore
     private class BookWorker implements Runnable {
 
         private String address;

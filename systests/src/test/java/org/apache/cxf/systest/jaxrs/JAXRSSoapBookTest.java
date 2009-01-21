@@ -36,7 +36,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
+public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -46,16 +46,12 @@ public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBook123() throws Exception {
-
-        String endpointAddress =
-            "http://localhost:9092/test/services/rest/bookstore/123"; 
-        URL url = new URL(endpointAddress);
-        URLConnection connect = url.openConnection();
-        connect.addRequestProperty("Accept", "application/xml");
-        InputStream in = connect.getInputStream();           
+        
+        InputStream in = getRestInputStream("http://localhost:9092/test/services/rest/bookstore/123");
         
         InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
+                
     }
     
     @Test
@@ -103,8 +99,23 @@ public class JaxRsJaxWsBookTest extends AbstractBusClientServerTestBase {
         IOUtils.copy(in, bos);
         in.close();
         bos.close();
-        //System.out.println(bos.getOut().toString());        
         return bos.getOut().toString();        
     }
 
+    private InputStream getRestInputStream(String endpointAddress) throws Exception {
+        URL url = new URL(endpointAddress);
+        
+        for (int count = 0; count < 25; count++) {
+            URLConnection connect = url.openConnection();
+            connect.addRequestProperty("Accept", "application/xml");
+            try {
+                return connect.getInputStream();
+            } catch (Exception ex) {
+                // continue;
+            }
+        }
+        fail("REST endpoint can not be accessed");
+        // unreachable
+        return null;
+    }
 }
