@@ -37,7 +37,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(MultipartServer.class, true));
+                   launchServer(MultipartServer.class));
     }
     
     @Test
