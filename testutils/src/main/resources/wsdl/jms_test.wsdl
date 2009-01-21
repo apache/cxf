@@ -338,6 +338,7 @@
         
     <service name="HelloWorldService">
            <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
+               <jms:clientConfig useConduitIdSelector="false"/>
                <jms:address
                    jndiConnectionFactoryName="ConnectionFactory" 
                    jndiDestinationName="dynamicQueues/test.jmstransport.text">
