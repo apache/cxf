@@ -19,9 +19,6 @@
 
 package org.apache.cxf.jaxrs.ext;
 
-import java.util.Map;
-
-import javax.activation.DataHandler;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +41,6 @@ public interface MessageContext {
     Object get(Object key);
     void put(Object key, Object value);
     
-    Map<String, DataHandler> getAttachments();
-    
     UriInfo getUriInfo();
     Request getRequest();
     HttpHeaders getHttpHeaders();
@@ -58,4 +53,5 @@ public interface MessageContext {
     ServletConfig getServletConfig();
     
     <T> T getContext(Class<T> contextClass);
+    <T, E> T getResolver(Class<T> resolverClass, Class<E> resolveClazz);
 }

@@ -42,7 +42,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.utils.AttachmentUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
 @Produces({"application/xml", "text/xml" })
@@ -52,14 +51,11 @@ import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     
-    private static final MediaType MULTIPART_RELATED_TYPE = 
-        MediaType.valueOf("multipart/related");
-    
     private Map<String, Object> mProperties = new HashMap<String, Object>();
-    @Context private MessageContext mc;
     
-    protected MessageContext getContext() {
-        return mc;
+    @Context
+    public void setMessageContext(MessageContext mc) {
+        super.setContext(mc);
     }
     
     public void setConsumeMediaTypes(List<String> types) {
@@ -87,15 +83,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     }
     
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+        MultivaluedMap<String, String> headers, InputStream stream) 
         throws IOException {
         try {
-            if (mt.isCompatible(MULTIPART_RELATED_TYPE)) {
-                is = (InputStream)AttachmentUtils.getMultipart(type, anns, mt, mc, is);
-                if (is == null) {
-                    throw new WebApplicationException(404);
-                }
-            }
+            InputStream is = getInputStream(type, anns, mt, stream);
             Class<?> theType = getActualType(type, genericType);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
@@ -107,6 +98,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             
         } catch (JAXBException e) {
             handleJAXBException(e);
+        } catch (WebApplicationException e) {
+            throw e;
         } catch (Exception e) {
             throw new WebApplicationException(e);        
         }

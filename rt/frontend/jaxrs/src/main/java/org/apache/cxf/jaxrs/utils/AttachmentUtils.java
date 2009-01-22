@@ -23,17 +23,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MultipartID;
 
 public final class AttachmentUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(AttachmentUtils.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AttachmentUtils.class);
+    
     private AttachmentUtils() {
+    }
+    
+    public static Map<String, DataHandler> getAttachments(MessageContext mc) {
+        return CastUtils.cast((Map)mc.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
     }
     
     public static Object getMultipart(Class<Object> c, Annotation[] anns, 
@@ -51,7 +63,7 @@ public final class AttachmentUtils {
             }
             if (stream == null) {
                 // TODO: looks like the lazy attachments collection can only be accessed this way
-                for (Map.Entry<String, DataHandler> entry : mc.getAttachments().entrySet()) {
+                for (Map.Entry<String, DataHandler> entry : getAttachments(mc).entrySet()) {
                     if (entry.getKey().equals(contentId)) {
                         DataHandler dh = entry.getValue();
                         return DataHandler.class.isAssignableFrom(c) ? dh 
@@ -59,6 +71,12 @@ public final class AttachmentUtils {
                             : dh.getInputStream();
                     }
                 }
+                org.apache.cxf.common.i18n.Message errorMsg = 
+                    new org.apache.cxf.common.i18n.Message("MULTTIPART_ID_NOT_FOUND", 
+                                                           BUNDLE, 
+                                                           contentId,
+                                                           mt.toString());
+                LOG.warning(errorMsg.toString());
             }
         } else {
             stream = is;
