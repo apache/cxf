@@ -65,10 +65,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private Map<String, String> namespaceMap = new HashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
-    @Context private MessageContext mc;
     
-    protected MessageContext getContext() {
-        return mc;
+    @Context
+    public void setMessageContext(MessageContext mc) {
+        super.setContext(mc);
     }
     
     public void setConsumeMediaTypes(List<String> types) {
@@ -99,11 +99,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
         this.namespaceMap = namespaceMap;
     }
 
-    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
+        MultivaluedMap<String, String> headers, InputStream stream) 
         throws IOException {
         
         try {
+            InputStream is = getInputStream(type, anns, mt, stream);
             Class<?> theType = getActualType(type, genericType);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
@@ -121,6 +122,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             handleJAXBException(e);
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
+        } catch (WebApplicationException e) {
+            throw e;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }

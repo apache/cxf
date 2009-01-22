@@ -37,6 +37,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MultipartID;
+import org.apache.cxf.jaxrs.utils.AttachmentUtils;
 
 @Path("/bookstore")
 public class MultipartStore {
@@ -118,7 +119,7 @@ public class MultipartStore {
     @Path("/books/mchandlers")
     @ProduceMime("text/xml")
     public Response addBookFromMessageContext() throws Exception {
-        Map<String, DataHandler> handlers = context.getAttachments();
+        Map<String, DataHandler> handlers = AttachmentUtils.getAttachments(context);
         for (Map.Entry<String, DataHandler> entry : handlers.entrySet()) {
             if (entry.getKey().equals("book2")) {
                 return readBookFromInputStream(entry.getValue().getInputStream());

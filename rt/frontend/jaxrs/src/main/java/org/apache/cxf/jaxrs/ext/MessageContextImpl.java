@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.ext;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -55,10 +56,6 @@ public class MessageContextImpl implements MessageContext {
         return m.get(key);
     }
 
-    public Map<String, DataHandler> getAttachments() {
-        return createAttachments(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
-    } 
-    
     public <T> T getContext(Class<T> contextClass) {
         return getContext(contextClass, contextClass);
     }
@@ -68,8 +65,11 @@ public class MessageContextImpl implements MessageContext {
     }
     
     @SuppressWarnings("unchecked")
-    public <T> ContextResolver<T> getContextResolver(Class<T> resolveClazz) {
-        return getContext(resolveClazz, ContextResolver.class);
+    public <T, E> T getResolver(Class<T> resolverClazz, Class<E> resolveClazz) {
+        if (ContextResolver.class == resolverClazz) {
+            return resolverClazz.cast(getContext(resolveClazz, ContextResolver.class));
+        }
+        return null;
     }
     
     public Request getRequest() {
@@ -118,6 +118,9 @@ public class MessageContextImpl implements MessageContext {
             return CastUtils.cast((Map)o);
         }
         Collection<Attachment> attachments = m.getAttachments();
+        if (attachments == null) {
+            return Collections.emptyMap();
+        }
         attachments.size();
         Map<String, DataHandler> dataHandlers = AttachmentUtil.getDHMap(attachments);
         m.put(propertyName, dataHandlers);

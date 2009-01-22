@@ -19,9 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl.tl;
 
-import java.util.Map;
-
-import javax.activation.DataHandler;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -81,16 +78,16 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
         return get() != null ? get().getRequest() : null;
     }
 
-    public Map<String, DataHandler> getAttachments() {
-        return get() != null ? get().getAttachments() : null;
-    }
-
     public void put(Object key, Object value) {
         if (get() != null) {
             get().put(key, value);
         }
         throw new IllegalStateException("MessageContext is not set");
         
+    }
+
+    public <T, E> T getResolver(Class<T> resolverClass, Class<E> resolveClazz) {
+        return get() != null ? get().getResolver(resolverClass, resolveClazz) : null;
     }
 
 }
