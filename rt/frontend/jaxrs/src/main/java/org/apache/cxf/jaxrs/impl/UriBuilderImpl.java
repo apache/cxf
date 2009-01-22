@@ -67,7 +67,6 @@ public class UriBuilderImpl extends UriBuilder {
     public UriBuilder clone() {
         return new UriBuilderImpl(build());
     }
-
     // CHECKSTYLE:ON
 
     @Override
@@ -97,7 +96,6 @@ public class UriBuilderImpl extends UriBuilder {
         return path(((Path)ann).value());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Class resource, String method) throws IllegalArgumentException {
         if (resource == null) {

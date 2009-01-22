@@ -64,7 +64,6 @@ public class MessageContextImpl implements MessageContext {
         return JAXRSUtils.createContextValue(m, genericType, clazz);
     }
     
-    @SuppressWarnings("unchecked")
     public <T, E> T getResolver(Class<T> resolverClazz, Class<E> resolveClazz) {
         if (ContextResolver.class == resolverClazz) {
             return resolverClazz.cast(getContext(resolveClazz, ContextResolver.class));

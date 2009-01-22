@@ -80,9 +80,15 @@ public final class HttpHeaderHelper {
         if (enc == null) {
             return UTF8.name();
         }
+        //older versions of tomcat don't properly parse ContentType headers with stuff
+        //after charset="UTF-8"
+        int idx = enc.indexOf(";");
+        if (idx != -1) {
+            enc = enc.substring(0, idx);
+        }
         // Charsets can be quoted. But it's quite certain that they can't have escaped quoted or
         // anything like that.
-        enc = enc.replace("\"", "");
+        enc = enc.replace("\"", "").trim();
         enc = enc.replace("'", "");
         if ("".equals(enc)) {
             return UTF8.name();
