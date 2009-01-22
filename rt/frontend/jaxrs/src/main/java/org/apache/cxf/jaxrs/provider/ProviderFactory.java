@@ -123,6 +123,7 @@ public final class ProviderFactory {
         return pf;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> ContextResolver<T> createContextResolver(Type contextType, Message m) {
         for (ProviderInfo<ContextResolver> cr : userContextResolvers) {
             Type[] types = cr.getProvider().getClass().getGenericInterfaces();
