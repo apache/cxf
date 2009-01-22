@@ -73,7 +73,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notUnderstandHeaders),
                             soapVersion.getMustUnderstand());
         }
-        if (!ultimateReceiverHeaders.isEmpty()) {
+        if (!ultimateReceiverHeaders.isEmpty() && !isRequestor(soapMessage)) {
             soapMessage.getInterceptorChain()
                 .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
         }

@@ -35,6 +35,6 @@
 
 
     <modules>
-        <module>cxf-http-basic</module>
+        <module>cxf-jaxws-javafirst</module>
     </modules>
 </project>
