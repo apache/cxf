@@ -98,6 +98,7 @@ public final class ProviderFactory {
                      new SourceProvider(),
                      new FormEncodingReaderProvider(),
                      new PrimitiveTextProvider(),
+                     new ActivationProvider(),
                      new WebApplicationExceptionMapper(),
                      new MappingsHandler());
     }
@@ -392,8 +393,7 @@ public final class ProviderFactory {
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderConsumeTypes(ep);
         
         List<MediaType> availableMimeTypes = 
-            JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
-                                          supportedMediaTypes);
+            JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType), supportedMediaTypes);
 
         return availableMimeTypes.size() != 0 ? true : false;
         

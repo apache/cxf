@@ -23,16 +23,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
 
-import org.apache.cxf.attachment.LazyAttachmentCollection;
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
@@ -290,27 +288,14 @@ public class WrappedMessageContext implements MessageContext {
             return null;
         }
         Collection<Attachment> attachments = mc.getAttachments();
-        Map<String, DataHandler> dataHandlers = getDHMap(attachments);
+        Map<String, DataHandler> dataHandlers = 
+            AttachmentUtil.getDHMap(attachments);
         mc.put(propertyName, 
                dataHandlers);
         scopes.put(propertyName, Scope.APPLICATION);
         return dataHandlers;
     }    
-    private static Map<String, DataHandler> getDHMap(Collection<Attachment> attachments) {
-        Map<String, DataHandler> dataHandlers = null;
-        if (attachments != null) {
-            if (attachments instanceof LazyAttachmentCollection) {
-                dataHandlers = ((LazyAttachmentCollection)attachments).createDataHandlerMap();
-            } else {
-                //preserve the order of iteration
-                dataHandlers = new LinkedHashMap<String, DataHandler>();
-                for (Attachment attachment : attachments) {
-                    dataHandlers.put(attachment.getId(), attachment.getDataHandler());
-                }
-            }
-        }
-        return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
-    }    
+        
     public final boolean isEmpty() {
         return message.isEmpty();
     }

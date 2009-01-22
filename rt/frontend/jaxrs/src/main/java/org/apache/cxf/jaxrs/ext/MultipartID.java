@@ -17,35 +17,15 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.model;
+package org.apache.cxf.jaxrs.ext;
 
-public class ProviderInfo<T> extends AbstractResourceInfo {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    private T provider;
-    
-    public ProviderInfo(T provider) {
-        super(provider.getClass(), provider.getClass(), true);
-        this.provider = provider;
-    }
-    
-    @Override
-    public boolean isSingleton() {
-        return true;
-    }
-
-    public T getProvider() {
-        return provider;
-    }
-    
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ProviderInfo)) {
-            return false;
-        }
-        return provider.equals(((ProviderInfo)obj).getProvider());
-    }
-
-    public int hashCode() {
-        return provider.hashCode();
-    }
-
+@Target({ElementType.PARAMETER, ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MultipartID {
+    String value();
 }

@@ -829,11 +829,16 @@ public final class JAXRSUtils {
             for (MediaType userType : userMediaTypes) {
                 if (requiredType.isCompatible(userType) || userType.isCompatible(requiredType)) {
                     
+                    boolean parametersMatched = true;
                     for (Map.Entry<String, String> entry : userType.getParameters().entrySet()) {
                         String value = requiredType.getParameters().get(entry.getKey());
                         if (value != null && !value.equals(entry.getValue())) {
-                            continue;
+                            parametersMatched = false;
+                            break;
                         }
+                    }
+                    if (!parametersMatched) {
+                        continue;
                     }
                     
                     String type = requiredType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) 

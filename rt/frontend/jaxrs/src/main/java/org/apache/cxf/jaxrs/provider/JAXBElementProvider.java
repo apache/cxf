@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -40,14 +41,26 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.AttachmentUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
 @ProduceMime({"application/xml", "text/xml" })
-@ConsumeMime({"application/xml", "text/xml" })
+@ConsumeMime({"application/xml", "text/xml", 
+           "multipart/related;type=\"text/xml\"",
+           "multipart/related;type=\"application/xml\"" })
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     
+    private static final MediaType MULTIPART_RELATED_TYPE = 
+        MediaType.valueOf("multipart/related");
+    
     private Map<String, Object> mProperties = new HashMap<String, Object>();
+    @Context private MessageContext mc;
+    
+    protected MessageContext getContext() {
+        return mc;
+    }
     
     public void setConsumeMediaTypes(List<String> types) {
         super.setConsumeMediaTypes(types);
@@ -73,10 +86,16 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         mProperties.put(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
     }
     
-    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
+            if (mt.isCompatible(MULTIPART_RELATED_TYPE)) {
+                is = (InputStream)AttachmentUtils.getMultipart(type, anns, mt, mc, is);
+                if (is == null) {
+                    throw new WebApplicationException(404);
+                }
+            }
             Class<?> theType = getActualType(type, genericType);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             

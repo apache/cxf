@@ -24,7 +24,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import javax.activation.DataHandler;
 
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Attachment;
@@ -79,4 +84,19 @@ public final class AttachmentUtil {
         return buffer.toString();
     }
 
+    public static Map<String, DataHandler> getDHMap(Collection<Attachment> attachments) {
+        Map<String, DataHandler> dataHandlers = null;
+        if (attachments != null) {
+            if (attachments instanceof LazyAttachmentCollection) {
+                dataHandlers = ((LazyAttachmentCollection)attachments).createDataHandlerMap();
+            } else {
+                //preserve the order of iteration
+                dataHandlers = new LinkedHashMap<String, DataHandler>();
+                for (Attachment attachment : attachments) {
+                    dataHandlers.put(attachment.getId(), attachment.getDataHandler());
+                }
+            }
+        }
+        return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
+    }
 }

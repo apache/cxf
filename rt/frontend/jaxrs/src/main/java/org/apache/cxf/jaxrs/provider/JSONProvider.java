@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -44,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
@@ -52,7 +54,8 @@ import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 @ProduceMime("application/json")
-@ConsumeMime("application/json")
+@ConsumeMime({"application/json",
+           "multipart/related;type=\"application/json\"" })
 @Provider
 public class JSONProvider extends AbstractJAXBProvider  {
     
@@ -62,6 +65,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private Map<String, String> namespaceMap = new HashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
+    @Context private MessageContext mc;
+    
+    protected MessageContext getContext() {
+        return mc;
+    }
     
     public void setConsumeMediaTypes(List<String> types) {
         super.setConsumeMediaTypes(types);
