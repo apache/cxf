@@ -19,9 +19,15 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -61,4 +67,23 @@ public class Chapter {
         return this;
     }
 
+    
+    @GET
+    @Path("/matched-resources")
+    @Produces("text/plain")
+    public String getMatchedResources(@Context UriInfo ui) {
+        List<String> list = new ArrayList<String>();
+        for (Object obj : ui.getMatchedResources()) {
+            list.add(obj.toString());
+        }
+        return list.toString();
+    }
+
+    @GET
+    @Path("/matched%21uris")
+    @Produces("text/plain")
+    public String getMatchedUris(@Context UriInfo ui, 
+                                 @QueryParam("decode") String decode) {
+        return ui.getMatchedURIs(Boolean.parseBoolean(decode)).toString();        
+    }
 }

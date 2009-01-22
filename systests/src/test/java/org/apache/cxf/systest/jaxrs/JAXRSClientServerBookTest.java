@@ -684,6 +684,39 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }  
     }
     
+    @Test
+    public void testUriInfoMatchedResources() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/"
+                      + "booksubresource/123/chapters/sub/1/matched-resources", 
+                      "[class org.apache.cxf.systest.jaxrs.BookStore, " 
+                      + "class org.apache.cxf.systest.jaxrs.Book, "
+                      + "class org.apache.cxf.systest.jaxrs.Chapter]", 
+                      "text/plain", 200);
+    }
+
+    @Test
+    public void testUriInfoMatchedUrisDecode() throws Exception {
+        String expected = "[/bookstore/booksubresource/{bookId}/, "
+                          + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/, "
+                          + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/matched!uris]";
+        getAndCompare("http://localhost:9080/bookstore/"
+                      + "booksubresource/123/chapters/sub/1/matched%21uris?decode=true", 
+                      expected, 
+                      "text/plain", 200);
+    }
+
+    @Test
+    public void testUriInfoMatchedUrisNoDecode() throws Exception {
+        //note '%21' instead of '!'
+        String expected = "[/bookstore/booksubresource/{bookId}/, "
+            + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/, "
+            + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/matched%21uris]";
+        getAndCompare("http://localhost:9080/bookstore/"
+                      + "booksubresource/123/chapters/sub/1/matched%21uris?decode=false", 
+                      expected,
+                      "text/plain", 200);
+    }
+    
     private void getAndCompareAsStrings(String address, 
                                         String resourcePath,
                                         String acceptType,

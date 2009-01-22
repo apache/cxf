@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -53,55 +54,56 @@ import org.apache.cxf.service.invoker.AbstractInvoker;
 public class JAXRSInvoker extends AbstractInvoker {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServiceFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInvoker.class);
-    
+
     private List<Object> resourceObjects;
 
     public JAXRSInvoker() {
     }
-    
+
     public JAXRSInvoker(List<Object> resourceObjects) {
         this.resourceObjects = resourceObjects;
     }
     public Object invoke(Exchange exchange, Object request) {
         return invoke(exchange, request, resourceObjects);
-    }    
+    }
     @SuppressWarnings("unchecked")
     public Object invoke(Exchange exchange, Object request, List<Object> resources) {
-        
+
         Response response = exchange.get(Response.class);
         if (response != null) {
             // this means a blocking request filter provided a Response
             // or earlier exception has been converted to Response
-            
+
             //TODO: should we remove response from exchange ?
-            //      or should we rather ignore content list and have 
-            //      Response set here for all cases and extract it 
-            //      in the out interceptor instead of dealing with the contents list ?  
-            return new MessageContentsList(response);    
+            //      or should we rather ignore content list and have
+            //      Response set here for all cases and extract it
+            //      in the out interceptor instead of dealing with the contents list ?
+            return new MessageContentsList(response);
         }
-        
+
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
+        pushOntoStack(ori, exchange.getInMessage());
 
         ClassResourceInfo cri = ori.getClassResourceInfo();
         Object resourceObject = getServiceObject(exchange, resources);
-        
+
         Method methodToInvoke = InjectionUtils.checkProxy(
              cri.getMethodDispatcher().getMethod(ori), resourceObject);
-        
+
         if (cri.isRoot()) {
-            JAXRSUtils.handleSetters(ori, resourceObject, 
+            JAXRSUtils.handleSetters(ori, resourceObject,
                                      exchange.getInMessage());
-            
-            InjectionUtils.injectContextFields(resourceObject, 
-                                               ori.getClassResourceInfo(), 
+
+            InjectionUtils.injectContextFields(resourceObject,
+                                               ori.getClassResourceInfo(),
                                                exchange.getInMessage());
-            InjectionUtils.injectResourceFields(resourceObject, 
-                                            ori.getClassResourceInfo(), 
+            InjectionUtils.injectResourceFields(resourceObject,
+                                            ori.getClassResourceInfo(),
                                             exchange.getInMessage());
         }
 
         String baseAddress = HttpUtils.getOriginalAddress(exchange.getInMessage());
-        
+
         List<Object> params = null;
         if (request instanceof List) {
             params = CastUtils.cast((List<?>)request);
@@ -125,47 +127,47 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             return new MessageContentsList(excResponse);
         }
-        
+
         if (ori.isSubResourceLocator()) {
             try {
                 Message msg = exchange.getInMessage();
-                MultivaluedMap<String, String> values = new MetadataMap<String, String>();                 
+                MultivaluedMap<String, String> values = new MetadataMap<String, String>();
                 String subResourcePath = (String)msg.get(JAXRSInInterceptor.RELATIVE_PATH);
-                String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD); 
+                String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD);
                 String contentType = (String)msg.get(Message.CONTENT_TYPE);
                 if (contentType == null) {
                     contentType = "*/*";
                 }
-                List<MediaType> acceptContentType = 
+                List<MediaType> acceptContentType =
                     (List<MediaType>)msg.getExchange().get(Message.ACCEPT_CONTENT_TYPE);
-                
-                result = checkResultObject(result, subResourcePath); 
-                
+
+                result = checkResultObject(result, subResourcePath);
+
                 List<Object> newResourceObjects = new ArrayList<Object>();
                 newResourceObjects.add(result);
-            
+
                 ClassResourceInfo subCri = cri.getSubResource(
-                     methodToInvoke.getReturnType(), 
+                     methodToInvoke.getReturnType(),
                      ClassHelper.getRealClass(result));
                 if (subCri == null) {
-                    org.apache.cxf.common.i18n.Message errorM = 
-                        new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",  
-                                                               BUNDLE, 
+                    org.apache.cxf.common.i18n.Message errorM =
+                        new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",
+                                                               BUNDLE,
                                                                subResourcePath);
                     LOG.severe(errorM.toString());
                     throw new WebApplicationException(404);
                 }
-                
-                OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri, 
-                                                         subResourcePath, 
-                                                         httpMethod, 
-                                                         values, 
-                                                         contentType, 
+
+                OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri,
+                                                         subResourcePath,
+                                                         httpMethod,
+                                                         values,
+                                                         contentType,
                                                          acceptContentType);
-                
-                
+
+
                 exchange.put(OperationResourceInfo.class, subOri);
-                msg.put(JAXRSInInterceptor.RELATIVE_PATH, 
+                msg.put(JAXRSInInterceptor.RELATIVE_PATH,
                         values.getFirst(URITemplate.FINAL_MATCH_GROUP));
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
                 // work out request parameters for the sub-resouce class. Here we
@@ -174,26 +176,26 @@ public class JAXRSInvoker extends AbstractInvoker {
                 //have a parameter that read from entitybody.
                 List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
                 msg.setContent(List.class, newParams);
-                
+
                 return this.invoke(exchange, newParams, newResourceObjects);
             } catch (WebApplicationException ex) {
                 Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress);
                 return new MessageContentsList(excResponse);
             }
         }
-        
+
         return result;
-    }    
-    
+    }
+
     public Object getServiceObject(Exchange exchange) {
         return getServiceObject(exchange, resourceObjects);
     }
     public Object getServiceObject(Exchange exchange, List<Object> resources) {
         Object serviceObject = null;
-        
+
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
-        
+
         if (resources != null) {
             Class c  = cri.getResourceClass();
             for (Object resourceObject : resources) {
@@ -203,24 +205,24 @@ public class JAXRSInvoker extends AbstractInvoker {
                 }
             }
         }
-        
+
         if (serviceObject == null) {
             serviceObject = cri.getResourceProvider().getInstance();
         }
-        
+
         return serviceObject;
     }
-    
+
     private static Object checkResultObject(Object result, String subResourcePath) {
         if (result == null) {
-            org.apache.cxf.common.i18n.Message errorM = 
-                new org.apache.cxf.common.i18n.Message("NULL_SUBRESOURCE",  
-                                                       BUNDLE, 
+            org.apache.cxf.common.i18n.Message errorM =
+                new org.apache.cxf.common.i18n.Message("NULL_SUBRESOURCE",
+                                                       BUNDLE,
                                                        subResourcePath);
             LOG.severe(errorM.toString());
             throw new WebApplicationException(500);
         }
-        
+
         //the result becomes the object that will handle the request
         if (result instanceof MessageContentsList) {
             result = ((MessageContentsList)result).get(0);
@@ -229,7 +231,16 @@ public class JAXRSInvoker extends AbstractInvoker {
         } else if (result.getClass().isArray()) {
             result = ((Object[])result)[0];
         }
-        
+
         return result;
+    }
+
+    private void pushOntoStack(OperationResourceInfo ori, Message msg) {
+        OperationResourceInfoStack stack = msg.get(OperationResourceInfoStack.class);
+        if (stack == null) {
+            stack = new OperationResourceInfoStack();
+            msg.put(OperationResourceInfoStack.class, stack);
+        }
+        stack.push(ori);
     }
 }

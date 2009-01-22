@@ -19,33 +19,104 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.lang.reflect.Method;
 import java.net.URI;
+
+import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookStore;
+import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class UriBuilderImplTest extends Assert {
-    
+
     @Test
     public void testUri() throws Exception {
         URI uri = new URI("http://foo/bar/baz?query=1#fragment");
         URI newUri = new UriBuilderImpl().uri(uri).build();
         assertEquals("URI is not built correctly", newUri, uri);
     }
-    
-    
+
     @Test
     public void testAddPath() throws Exception {
         URI uri = new URI("http://foo/bar");
         URI newUri = new UriBuilderImpl().uri(uri).path("baz").build();
-        assertEquals("URI is not built correctly", newUri, 
-                     new URI("http://foo/bar/baz"));
+        assertEquals("URI is not built correctly", new URI("http://foo/bar/baz"), newUri);
         newUri = new UriBuilderImpl().uri(uri).path("baz").path("1").path("2").build();
-        assertEquals("URI is not built correctly", newUri, 
-                     new URI("http://foo/bar/baz/1/2"));
+        assertEquals("URI is not built correctly", new URI("http://foo/bar/baz/1/2"), newUri);
     }
-    
-    
+
+    @Test
+    public void testAddPathSlashes() throws Exception {
+        URI uri = new URI("http://foo/");
+        URI newUri = new UriBuilderImpl().uri(uri).path("/bar").path("baz/").path("/blah/").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar/baz/blah/"), newUri);
+    }
+
+    @Test
+    public void testAddPathClass() throws Exception {
+        URI uri = new URI("http://foo/");
+        URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class).path("bar").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bookstore/bar"), newUri);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathClassNull() throws Exception {
+        new UriBuilderImpl().path((Class)null).build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathClassNoAnnotation() throws Exception {
+        new UriBuilderImpl().path(this.getClass()).build();
+    }
+
+    @Test
+    public void testAddPathClassMethod() throws Exception {
+        URI uri = new URI("http://foo/");
+        URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class, "updateBook").path("bar").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/books/bar"), newUri);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathClassMethodNull1() throws Exception {
+        new UriBuilderImpl().path(null, "methName").build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathClassMethodNull2() throws Exception {
+        new UriBuilderImpl().path(BookStore.class, null).build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathClassMethodTooMany() throws Exception {
+        new UriBuilderImpl().path(UriBuilderWrongAnnotations.class, "overloaded").build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathClassMethodTooLess() throws Exception {
+        new UriBuilderImpl().path(BookStore.class, "nonexistingMethod").build();
+    }
+
+    @Test
+    public void testAddPathMethod() throws Exception {
+        Method meth = BookStore.class.getMethod("updateBook", Book.class);
+        URI uri = new URI("http://foo/");
+        URI newUri = new UriBuilderImpl().uri(uri).path(meth).path("bar").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/books/bar"), newUri);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathMethodNull() throws Exception {
+        new UriBuilderImpl().path((Method)null).build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPathMethodNoAnnotation() throws Exception {
+        Method noAnnot = BookStore.class.getMethod("getBook", String.class);
+        new UriBuilderImpl().path(noAnnot).build();
+    }
+
     @Test
     public void testSchemeHostPortQueryFragment() throws Exception {
         URI uri;
@@ -54,11 +125,9 @@ public class UriBuilderImplTest extends Assert {
         } else {
             uri = new URI("http://foo:1234/bar?n1=v1&n2=v2#fragment");
         }
-        URI newUri = new UriBuilderImpl().scheme("http").host("foo")
-                     .port(1234).path("bar")
-                     .queryParam("n1", "v1").queryParam("n2", "v2")
-                     .fragment("fragment").build();
-        assertEquals("URI is not built correctly", newUri, uri);
+        URI newUri = new UriBuilderImpl().scheme("http").host("foo").port(1234).path("bar").queryParam("n1",
+                                                                                                       "v1")
+            .queryParam("n2", "v2").fragment("fragment").build();
+        assertEquals("URI is not built correctly", uri, newUri);
     }
-
 }

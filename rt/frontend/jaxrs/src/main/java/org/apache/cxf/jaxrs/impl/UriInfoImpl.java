@@ -20,29 +20,42 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class UriInfoImpl implements UriInfo {
+    private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
 
-    private MultivaluedMap<String, String> templateParams; 
+    private MultivaluedMap<String, String> templateParams;
     private Message message;
-    
+    private OperationResourceInfoStack stack;
+
     public UriInfoImpl(Message m, MultivaluedMap<String, String> templateParams) {
         this.message = m;
         this.templateParams = templateParams;
+        if (m != null) {
+            this.stack = m.get(OperationResourceInfoStack.class);
+        }
     }
-    
+
     public URI getAbsolutePath() {
         String path = getAbsolutePathAsString();
         return URI.create(path);
@@ -66,7 +79,6 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public String getPath(boolean decode) {
-        
         return doGetPath(decode, true);
     }
 
@@ -83,9 +95,7 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING),
-                                              "&",
-                                              decode);
+        return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), "&", decode);
     }
 
     public URI getRequestUri() {
@@ -111,33 +121,58 @@ public class UriInfoImpl implements UriInfo {
             if (entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
                 continue;
             }
-            values.add(entry.getKey(), 
-                       decode ? JAXRSUtils.uriDecode(entry.getValue().get(0)) 
-                              : entry.getValue().get(0));
+            values.add(entry.getKey(), decode ? JAXRSUtils.uriDecode(entry.getValue().get(0)) : entry
+                .getValue().get(0));
         }
         return values;
     }
 
     public List<Object> getMatchedResources() {
-        // TODO Auto-generated method stub
-        return null;
+        if (stack != null) {
+            List<Object> resources = new ArrayList<Object>(stack.size());
+            for (OperationResourceInfo ori : stack) {
+                resources.add(ori.getClassResourceInfo().getResourceClass());
+            }
+            return resources;
+        }
+        LOG.fine("No resource stack information, returning empty list");
+        return Collections.emptyList();
     }
 
     public List<String> getMatchedURIs() {
-        // TODO Auto-generated method stub
-        return null;
+        return getMatchedURIs(true);
     }
 
     public List<String> getMatchedURIs(boolean decode) {
-        // TODO Auto-generated method stub
-        return null;
+        if (stack != null) {
+            List<String> uris = new ArrayList<String>(stack.size());
+            String sum = "";
+            for (OperationResourceInfo ori : stack) {
+                Path[] paths = {
+                    (Path)AnnotationUtils.getClassAnnotation(ori.getClassResourceInfo().getResourceClass(),
+                                                             Path.class),
+                    (Path)AnnotationUtils.getMethodAnnotation(ori.getAnnotatedMethod(), Path.class)
+                };
+                for (Path p : paths) {
+                    if (p != null) {
+                        String v = p.value();
+                        sum += "/" + (decode ? JAXRSUtils.uriDecode(v) : v);
+                    }
+                }
+                UriBuilder ub = UriBuilder.fromPath(sum);
+                uris.add(ub.build().normalize().getPath());
+            }
+            return uris;
+        }
+        LOG.fine("No resource stack information, returning empty list");
+        return Collections.emptyList();
     }
 
     private String doGetPath(boolean decode, boolean addSlash) {
         String path = HttpUtils.getPathToMatch(message, addSlash);
         return decode ? JAXRSUtils.uriDecode(path) : path;
     }
-    
+
     private String getAbsolutePathAsString() {
         String address = getBaseUri().toString();
         String path = doGetPath(true, false);
