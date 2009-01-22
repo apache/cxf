@@ -148,18 +148,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
                     Constructor constructor = exClass.getConstructor(new Class[]{String.class});
                     e = constructor.newInstance(new Object[]{fault.getMessage()});
                 } else {
-                    Class<?> beanClass = e.getClass();
-                    Constructor constructor = null;
-                    try {
-                        constructor = exClass.getConstructor(new Class[]{String.class, beanClass});
-                    } catch (NoSuchMethodException ex) {
-                        Class<?> cls = getPrimitiveClass(beanClass);
-                        if (cls != null) {
-                            constructor = exClass.getConstructor(new Class[]{String.class, cls});
-                        } else {
-                            throw ex;
-                        }
-                    }
+                    Constructor constructor = getConstructor(exClass, e);
                     e = constructor.newInstance(new Object[]{fault.getMessage(), e});
                 }
                 msg.setContent(Exception.class, e);
@@ -179,7 +168,29 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             }
             msg.setContent(Exception.class, e);
         }
-        
+    }
+    
+    private Constructor getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
+        Class<?> beanClass = e.getClass();
+        Constructor cons[] = faultClass.getConstructors();
+        for (Constructor c : cons) {
+            if (c.getParameterTypes().length == 2
+                && String.class.equals(c.getParameterTypes()[0])
+                && c.getParameterTypes()[1].isInstance(e)) {
+                return c;
+            }
+        }
+        try {
+            return faultClass.getConstructor(new Class[]{String.class, beanClass});
+        } catch (NoSuchMethodException ex) {
+            Class<?> cls = getPrimitiveClass(beanClass);
+            if (cls != null) {
+                return faultClass.getConstructor(new Class[]{String.class, cls});
+            } else {
+                throw ex;
+            }
+        }
+
     }
 
     private boolean isDOMSupported(DataBinding db) {
