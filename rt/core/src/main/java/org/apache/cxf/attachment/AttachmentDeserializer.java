@@ -290,16 +290,28 @@ public class AttachmentDeserializer {
         MimeBodyPartInputStream partStream = new MimeBodyPartInputStream(stream, boundary, pbAmount);
 
         final String ct = headers.getHeader("Content-Type", null);
-        DataSource source = new AttachmentDataSource(ct, new DelegatingInputStream(partStream));
-        att.setDataHandler(new DataHandler(source));
-
+        
+        boolean quotedPrintable = false;
+        
         for (Enumeration<?> e = headers.getAllHeaders(); e.hasMoreElements();) {
             Header header = (Header) e.nextElement();
-            if (header.getName().equalsIgnoreCase("Content-Transfer-Encoding")
-                            && header.getValue().equalsIgnoreCase("binary")) {
-                att.setXOP(true);
+            if (header.getName().equalsIgnoreCase("Content-Transfer-Encoding")) {
+                if (header.getValue().equalsIgnoreCase("binary")) {
+                    att.setXOP(true);
+                } else if (header.getValue().equalsIgnoreCase("quoted-printable")) {
+                    quotedPrintable = true;
+                }
             }
             att.setHeader(header.getName(), header.getValue());
+        }
+        
+        DelegatingInputStream is = new DelegatingInputStream(partStream);
+        if (quotedPrintable) {
+            DataSource source = new AttachmentDataSource(ct, new QuotedPrintableDecoderStream(is));
+            att.setDataHandler(new DataHandler(source));
+        } else {
+            DataSource source = new AttachmentDataSource(ct, is);
+            att.setDataHandler(new DataHandler(source));
         }
     }
 
