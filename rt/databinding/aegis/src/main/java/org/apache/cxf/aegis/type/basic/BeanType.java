@@ -100,7 +100,7 @@ public class BeanType extends Type {
 
                 if (impl == null) {
                     InvocationHandler handler = new InterfaceInvocationHandler();
-                    object = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[] {
+                    object = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] {
                         clazz
                     }, handler);
                     target = handler;
