@@ -342,7 +342,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
             if (isFineLogging) {
                 LOG.fine("Invoking handleFault on interceptor " + currentInterceptor);
             }
-            currentInterceptor.handleFault(message);
+            try {
+                currentInterceptor.handleFault(message);
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e); 
+            }
         }
     }
 
