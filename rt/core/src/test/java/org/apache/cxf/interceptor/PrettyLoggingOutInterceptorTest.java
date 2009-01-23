@@ -26,12 +26,13 @@ import org.apache.cxf.io.CachedOutputStream;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Test;
 
 public class PrettyLoggingOutInterceptorTest extends Assert {
     
     
     @Ignore
-    //@Test
+    @Test
     public void testFormatting() throws Exception { 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
