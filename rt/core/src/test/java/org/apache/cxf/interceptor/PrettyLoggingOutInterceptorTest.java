@@ -26,7 +26,6 @@ import org.apache.cxf.io.CachedOutputStream;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
 
 public class PrettyLoggingOutInterceptorTest extends Assert {
     
