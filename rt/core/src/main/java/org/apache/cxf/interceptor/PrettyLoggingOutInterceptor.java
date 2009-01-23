@@ -19,10 +19,19 @@
 
 package org.apache.cxf.interceptor;
 
+
 import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.PrintWriter;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.w3c.dom.DOMConfiguration;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSParser;
+import org.w3c.dom.ls.LSSerializer;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -31,10 +40,7 @@ import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+
 
 /**
  *
@@ -42,13 +48,13 @@ import org.jdom.output.XMLOutputter;
 public class PrettyLoggingOutInterceptor extends AbstractPhaseInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(PrettyLoggingOutInterceptor.class);
+    private PrintWriter writer;
 
-    private SAXBuilder saxBuilder = new SAXBuilder();
-    private XMLOutputter xmlOutputter = new XMLOutputter();
 
-    public PrettyLoggingOutInterceptor() {
+    public PrettyLoggingOutInterceptor(PrintWriter w) {
         super(Phase.PRE_STREAM);
         addBefore(StaxOutInterceptor.class.getName());
+        writer = w;
     }
 
     public void handleMessage(Message message) throws Fault {
@@ -66,23 +72,40 @@ public class PrettyLoggingOutInterceptor extends AbstractPhaseInterceptor {
         newOut.registerCallback(new LoggingCallback());
     }
 
-    class LoggingCallback implements CachedOutputStreamCallback {
+    public class LoggingCallback implements CachedOutputStreamCallback {
 
         public void onFlush(CachedOutputStream cos) {
 
         }
 
         public void onClose(CachedOutputStream cos) {
-
+ 
             try {
-                Document jdoCument = saxBuilder.build(cos.getInputStream());
-                xmlOutputter.setFormat(Format.getPrettyFormat());
-                StringWriter writer = new StringWriter();
-                xmlOutputter.output(jdoCument, writer);
-                LOG.info(writer.getBuffer().toString());
+                DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+                DOMImplementationLS domLS = (DOMImplementationLS) registry.getDOMImplementation("LS");
+                LSParser lsParser = domLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null);
+
+                LSInput lsInput = domLS.createLSInput();
+                lsInput.setByteStream(cos.getInputStream());
+                org.w3c.dom.Document doc = lsParser.parse(lsInput);
+
+                LSSerializer lsSerializer = domLS.createLSSerializer();
+                DOMConfiguration config = lsSerializer.getDomConfig();
+                config.setParameter("format-pretty-print", true);
+                            
+                String prettyStr = lsSerializer.writeToString(doc.getDocumentElement());
+                if (writer != null) {
+                    writer.println(prettyStr);
+                    writer.close();
+                } else if (LOG.isLoggable(Level.INFO)) {
+                    System.out.println("writer is null " + prettyStr);
+                    LOG.info(prettyStr);
+                }
+         
             } catch (Exception e) {
-                LOG.severe("fatal parsing the SOAP message " + e.getMessage());
+                e.printStackTrace();
             }
+
         }
     }
 }

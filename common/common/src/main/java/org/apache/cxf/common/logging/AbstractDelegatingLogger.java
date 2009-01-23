@@ -45,7 +45,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
 
     public void log(LogRecord record) {
         if (isLoggable(record.getLevel())) {
-            internalLog(record);
+            doLog(record);
         }
     }
 
