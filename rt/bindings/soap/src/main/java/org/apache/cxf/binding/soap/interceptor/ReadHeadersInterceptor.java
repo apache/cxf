@@ -145,7 +145,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                         if (p == null || p.getDataBinding() == null) {
                             obj = hel;
                         } else {
-                            obj = p.getDataBinding().createReader(Node.class).read(hel);
+                            dataBinding = p.getDataBinding();
+                            obj = dataBinding.createReader(Node.class).read(hel);
                         }
                         //TODO - add the interceptors
                         
