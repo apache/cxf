@@ -25,13 +25,10 @@ import java.io.PrintWriter;
 import org.apache.cxf.io.CachedOutputStream;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class PrettyLoggingOutInterceptorTest extends Assert {
     
-    
-    @Ignore
     @Test
     public void testFormatting() throws Exception { 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -51,7 +48,4 @@ public class PrettyLoggingOutInterceptorTest extends Assert {
         assertTrue(str.contains("<today>"));
 
     }
-    
-
-
 }

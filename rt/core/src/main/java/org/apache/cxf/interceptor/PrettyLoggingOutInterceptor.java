@@ -22,16 +22,15 @@ package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.DOMConfiguration;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSParser;
-import org.w3c.dom.ls.LSSerializer;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -79,33 +78,35 @@ public class PrettyLoggingOutInterceptor extends AbstractPhaseInterceptor {
         }
 
         public void onClose(CachedOutputStream cos) {
- 
+            
             try {
-                DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
-                DOMImplementationLS domLS = (DOMImplementationLS) registry.getDOMImplementation("LS");
-                LSParser lsParser = domLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null);
-
-                LSInput lsInput = domLS.createLSInput();
-                lsInput.setByteStream(cos.getInputStream());
-                org.w3c.dom.Document doc = lsParser.parse(lsInput);
-
-                LSSerializer lsSerializer = domLS.createLSSerializer();
-                DOMConfiguration config = lsSerializer.getDomConfig();
-                config.setParameter("format-pretty-print", true);
-                            
-                String prettyStr = lsSerializer.writeToString(doc.getDocumentElement());
+                TransformerFactory tfactory = TransformerFactory.newInstance();
+                try { 
+                    tfactory.setAttribute("indent-number", "2");
+                } catch (Exception ex) {
+                    //ignore
+                }
+                Transformer serializer;
+                serializer = tfactory.newTransformer();
+                //Setup indenting to "pretty print"
+                serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+ 
                 if (writer != null) {
-                    writer.println(prettyStr);
+                    serializer.transform(new StreamSource(cos.getInputStream()),
+                                     new StreamResult(writer));
+ 
                     writer.close();
                 } else if (LOG.isLoggable(Level.INFO)) {
-                    System.out.println("writer is null " + prettyStr);
-                    LOG.info(prettyStr);
+                    StringWriter swriter = new StringWriter();
+                    serializer.transform(new StreamSource(cos.getInputStream()),
+                                         new StreamResult(swriter));
+                    LOG.info(swriter.toString());
                 }
-         
+ 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 }
