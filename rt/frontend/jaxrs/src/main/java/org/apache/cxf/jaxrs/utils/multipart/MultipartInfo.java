@@ -16,17 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.utils.multipart;
 
-package org.apache.cxf.jaxrs.ext;
+import javax.ws.rs.core.MediaType;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class MultipartInfo {
 
-@Target({ElementType.PARAMETER, ElementType.FIELD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface MultipartID {
-    String value() default "root";
-    String type() default "*/*";
+    private Object part;
+    private MediaType contentType;
+    
+    public MultipartInfo(Object o, MediaType type) {
+        part = o;
+        contentType = type;
+    }
+    
+    public Object getPart() {
+        return part;
+    }
+    
+    public MediaType getType() {
+        return contentType;
+    }
+    
 }

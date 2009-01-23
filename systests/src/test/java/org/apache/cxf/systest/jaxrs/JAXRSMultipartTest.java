@@ -37,76 +37,94 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(MultipartServer.class, true));
+                   launchServer(MultipartServer.class));
     }
     
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
         String address = "http://localhost:9080/bookstore/books/stream";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookAsRootAttachmentInputStream() throws Exception {
         String address = "http://localhost:9080/bookstore/books/istream";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookAsMessageContextDataHandler() throws Exception {
         String address = "http://localhost:9080/bookstore/books/mchandlers";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsRootAttachmentJAXB() throws Exception {
         String address = "http://localhost:9080/bookstore/books/jaxb";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsDataSource() throws Exception {
         String address = "http://localhost:9080/bookstore/books/dsource";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsDataSource2() throws Exception {
         String address = "http://localhost:9080/bookstore/books/dsource2";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsJAXB2() throws Exception {
         String address = "http://localhost:9080/bookstore/books/jaxb2";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
+    }
+    
+    @Test
+    public void testAddBookAsJAXBJSON() throws Exception {
+        String address = "http://localhost:9080/bookstore/books/jaxbjson";
+        doAddBook(address, "attachmentData2", 200);               
+    }
+    
+    @Test
+    public void testConsumesMismatch() throws Exception {
+        String address = "http://localhost:9080/bookstore/books/mismatch1";
+        doAddBook(address, "attachmentData2", 415);               
+    }
+    
+    @Test
+    public void testConsumesMismatch2() throws Exception {
+        String address = "http://localhost:9080/bookstore/books/mismatch2";
+        doAddBook(address, "attachmentData2", 415);               
     }
     
     @Test
     public void testAddBookAsDataHandler() throws Exception {
         String address = "http://localhost:9080/bookstore/books/dhandler";
-        doAddBook(address);               
+        doAddBook(address, "attachmentData", 200);               
     }
     
-    private void doAddBook(String address) throws Exception {
+    private void doAddBook(String address, String resourceName, int status) throws Exception {
         PostMethod post = new PostMethod(address);
         
         String ct = "multipart/related; type=\"text/xml\"; " + "start=\"rootPart\"; "
             + "boundary=\"----=_Part_4_701508.1145579811786\"";
         post.setRequestHeader("Content-Type", ct);
         InputStream is = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/attachmentData");
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/" + resourceName);
         RequestEntity entity = new InputStreamRequestEntity(is);
         post.setRequestEntity(entity);
         HttpClient httpclient = new HttpClient();
         
         try {
             int result = httpclient.executeMethod(post);
-            assertEquals(200, result);
-            
-            InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
-            
-            assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            assertEquals(status, result);
+            if (status == 200) {
+                InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
+                assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            }
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();

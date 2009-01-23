@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.utils;
+package org.apache.cxf.jaxrs.utils.multipart;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -36,10 +37,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MultipartID;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public final class AttachmentUtils {
-    private static final Logger LOG = LogUtils.getL7dLogger(AttachmentUtils.class);
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AttachmentUtils.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     
     private AttachmentUtils() {
     }
@@ -48,7 +51,8 @@ public final class AttachmentUtils {
         return CastUtils.cast((Map)mc.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
     }
     
-    public static Object getMultipart(Class<Object> c, Annotation[] anns, 
+    // TODO : refactor this 'piece'
+    public static MultipartInfo getMultipart(Class<Object> c, Annotation[] anns, 
          MediaType mt, MessageContext mc, InputStream is) throws IOException {
         InputStream stream = null;
         MultipartID id = AnnotationUtils.getAnnotation(anns, MultipartID.class);
@@ -66,9 +70,13 @@ public final class AttachmentUtils {
                 for (Map.Entry<String, DataHandler> entry : getAttachments(mc).entrySet()) {
                     if (entry.getKey().equals(contentId)) {
                         DataHandler dh = entry.getValue();
-                        return DataHandler.class.isAssignableFrom(c) ? dh 
+                        MediaType handlerType = dh.getContentType() == null 
+                            ? MediaType.WILDCARD_TYPE : MediaType.valueOf(dh.getContentType());
+                        checkMediaTypes(handlerType, id.type());
+                        Object o =  DataHandler.class.isAssignableFrom(c) ? dh 
                             : DataSource.class.isAssignableFrom(c) ? dh.getDataSource()
                             : dh.getInputStream();
+                        return new MultipartInfo(o, handlerType);    
                     }
                 }
                 org.apache.cxf.common.i18n.Message errorMsg = 
@@ -82,12 +90,29 @@ public final class AttachmentUtils {
             stream = is;
         }
         if (stream != null) {
+            MediaType partType = MediaType.WILDCARD_TYPE;
+            String ct = mt.getParameters().get("type");
+            if (ct != null) {
+                partType = MediaType.valueOf(ct.replace("\"", "").replace("'", "")); 
+            }
+            if (id != null) {
+                checkMediaTypes(partType, id.type());
+            }
             if (DataSource.class.isAssignableFrom(c)) {
-                return new ByteArrayDataSource(stream, mt.toString());
+                return new MultipartInfo(new ByteArrayDataSource(stream, mt.toString()), partType);
             } else if (DataHandler.class.isAssignableFrom(c)) {
-                return new DataHandler(new ByteArrayDataSource(stream, mt.toString()));
-            } 
+                return new MultipartInfo(new DataHandler(new ByteArrayDataSource(stream, mt.toString())),
+                                                         partType);
+            } else {
+                return new MultipartInfo(stream, partType);
+            }
         }
-        return stream;
+        return null;
+    }
+    
+    private static void checkMediaTypes(MediaType mt1, String mt2) {
+        if (!mt1.isCompatible(MediaType.valueOf(mt2))) {                                            
+            throw new WebApplicationException(415);
+        }
     }
 }

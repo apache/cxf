@@ -1,0 +1,18 @@
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/xml
+Content-ID: <rootPart>
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><b:Book xmlns:b="http://www.example.org/books"><b:name>CXF in Action</b:name><b:id>123</b:id></b:Book>
+------=_Part_4_701508.1145579811786
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+Content-ID: <foo>
+
+foobar
+------=_Part_4_701508.1145579811786--
+Content-Type: application/json
+Content-ID: <book2>
+
+{"Book":{"name":"CXF in Action - 2","id":123}}
+------=_Part_4_701508.1145579811786--
