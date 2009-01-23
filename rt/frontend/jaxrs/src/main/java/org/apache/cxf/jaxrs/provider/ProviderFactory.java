@@ -370,10 +370,9 @@ public final class ProviderFactory {
                                                          MediaType mediaType,
                                                          Message m) {
         for (ProviderInfo<MessageBodyReader> ep : readers) {
-            
+            InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+            InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);             
             if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
-                InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
                 return ep.getProvider();
             }
         }     
@@ -419,9 +418,9 @@ public final class ProviderFactory {
                                                          MediaType mediaType,
                                                          Message m) {
         for (ProviderInfo<MessageBodyWriter> ep : writers) {
+            InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+            InjectionUtils.injectContextMethods(ep.getProvider(), ep, m); 
             if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
-                InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
                 return ep.getProvider();
             }
         }     

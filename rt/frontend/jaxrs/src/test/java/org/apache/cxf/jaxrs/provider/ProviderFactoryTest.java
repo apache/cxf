@@ -189,11 +189,11 @@ public class ProviderFactoryTest extends Assert {
         MediaType mType = MediaType.valueOf(mediaType);
         
         MessageBodyReader reader = ProviderFactory.getInstance()
-            .createMessageBodyReader(type, null, null, mType, null);
+            .createMessageBodyReader(type, null, null, mType, new MessageImpl());
         assertSame(errorMessage, provider, reader.getClass());
     
         MessageBodyWriter writer = ProviderFactory.getInstance()
-            .createMessageBodyWriter(type, null, null, mType, null);
+            .createMessageBodyWriter(type, null, null, mType, new MessageImpl());
         assertTrue(errorMessage, provider == writer.getClass());
     }
     

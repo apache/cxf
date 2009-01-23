@@ -35,7 +35,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.utils.AttachmentUtils;
+import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
+import org.apache.cxf.jaxrs.utils.multipart.MultipartInfo;
 
 @Provider
 @ConsumeMime("multipart/related")
@@ -45,17 +46,37 @@ public class ActivationProvider implements MessageBodyReader<Object> {
     private MessageContext mc;
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
-        return DataSource.class.isAssignableFrom(type)
-               || DataHandler.class.isAssignableFrom(type);
+        
+        if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (mc == null) {
+            return false;
+        }
+        MediaType mt = mc.getHttpHeaders().getMediaType();        
+        if (mt.getType().equals("multipart") && mt.getSubtype().equals("related")) {
+            return true;
+        } 
+
+        return false;
     }
 
     public Object readFrom(Class<Object> c, Type t, Annotation[] anns, MediaType mt, 
                            MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
-        
-        Object multipart = AttachmentUtils.getMultipart(c, anns, mt, mc, is);
+        MultipartInfo multipart = AttachmentUtils.getMultipart(c, anns, mt, mc, is);
         if (multipart != null) {
-            return multipart;
+            if (InputStream.class.isAssignableFrom(multipart.getPart().getClass())) {
+                MessageBodyReader<Object> r = 
+                    mc.getProviders().getMessageBodyReader(c, t, anns, multipart.getType());
+                if (r != null) {
+                    return r.readFrom(c, t, anns, multipart.getType(), headers, 
+                                           (InputStream)multipart.getPart());
+                }
+            } else {
+                // it's either DataSource or DataHandler
+                return multipart.getPart();
+            }
         }
         throw new WebApplicationException(404);
     }

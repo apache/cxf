@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -50,7 +48,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
-import org.apache.cxf.jaxrs.utils.AttachmentUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
@@ -59,8 +56,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
 
-    private static final MediaType MULTIPART_RELATED_TYPE = 
-        MediaType.valueOf("multipart/related");
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
     private static final String CHARSET_PARAMETER = "charset"; 
         
@@ -98,17 +93,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
 
     protected MessageContext getContext() {
         return mc;
-    }
-    
-    public InputStream getInputStream(Class<Object> type, Annotation[] anns, MediaType mt, 
-                                      InputStream is) throws IOException {
-        if (mt.isCompatible(MULTIPART_RELATED_TYPE)) {
-            is = (InputStream)AttachmentUtils.getMultipart(type, anns, mt, getContext(), is);
-            if (is == null) {
-                throw new WebApplicationException(404);
-            }
-        }
-        return is;
     }
     
     @SuppressWarnings("unchecked")

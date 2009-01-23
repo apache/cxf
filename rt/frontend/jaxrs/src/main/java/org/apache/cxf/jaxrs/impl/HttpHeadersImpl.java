@@ -43,8 +43,9 @@ public class HttpHeadersImpl implements HttpHeaders {
     @SuppressWarnings("unchecked")
     public HttpHeadersImpl(Message message) {
         this.m = message;
-        this.headers = new MetadataMap<String, String>(
-            (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS));
+        Map<String, List<String>> mHeaders = (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
+        this.headers = mHeaders == null ? new MetadataMap<String, String>()
+                                        : new MetadataMap<String, String>(mHeaders);
     }
     
     public List<MediaType> getAcceptableMediaTypes() {
@@ -67,7 +68,8 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public MediaType getMediaType() {
-        return MediaType.valueOf((String)m.get(Message.CONTENT_TYPE));
+        String value = (String)m.get(Message.CONTENT_TYPE);
+        return value == null ? MediaType.valueOf("*/*") : MediaType.valueOf(value);
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {

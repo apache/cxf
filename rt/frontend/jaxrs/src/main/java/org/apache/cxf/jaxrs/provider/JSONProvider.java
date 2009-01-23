@@ -54,8 +54,7 @@ import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 @ProduceMime("application/json")
-@ConsumeMime({"application/json",
-           "multipart/related;type=\"application/json\"" })
+@ConsumeMime("application/json")
 @Provider
 public class JSONProvider extends AbstractJAXBProvider  {
     
@@ -100,11 +99,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
     }
 
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream stream) 
+        MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
         try {
-            InputStream is = getInputStream(type, anns, mt, stream);
             Class<?> theType = getActualType(type, genericType);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             

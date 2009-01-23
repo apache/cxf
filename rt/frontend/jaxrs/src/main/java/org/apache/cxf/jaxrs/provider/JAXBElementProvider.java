@@ -45,9 +45,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
 @ProduceMime({"application/xml", "text/xml" })
-@ConsumeMime({"application/xml", "text/xml", 
-           "multipart/related;type=\"text/xml\"",
-           "multipart/related;type=\"application/xml\"" })
+@ConsumeMime({"application/xml", "text/xml" })
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     
@@ -83,10 +81,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     }
     
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream stream) 
+        MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
-            InputStream is = getInputStream(type, anns, mt, stream);
             Class<?> theType = getActualType(type, genericType);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             

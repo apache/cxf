@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
@@ -37,7 +38,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MultipartID;
-import org.apache.cxf.jaxrs.utils.AttachmentUtils;
+import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Path("/bookstore")
 public class MultipartStore {
@@ -75,9 +76,10 @@ public class MultipartStore {
     
     @POST
     @Path("/books/jaxb2")
+    @ConsumeMime("multipart/related;type=\"text/xml\"")
     @ProduceMime("text/xml")
-    public Response addBook2(@MultipartID("rootPart") Book b1,
-                             @MultipartID("book2") Book b2) 
+    public Response addBookParts(@MultipartID("rootPart") Book b1,
+                                 @MultipartID("book2") Book b2) 
         throws Exception {
         if (b1.equals(b2)) {
             throw new WebApplicationException();
@@ -87,6 +89,21 @@ public class MultipartStore {
         }
         b1.setId(124);
         return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/jaxbjson")
+    @ProduceMime("text/xml")
+    public Response addBookJaxbJson(
+        @MultipartID(value = "rootPart", type = "text/xml") Book2 b1,
+        @MultipartID(value = "book2", type = "application/json") Book b2) 
+        throws Exception {
+        if (!"CXF in Action".equals(b1.getName())
+            || !"CXF in Action - 2".equals(b2.getName())) {
+            throw new WebApplicationException();
+        }
+        b2.setId(124);
+        return Response.ok(b2).build();
     }
     
     @POST
@@ -134,6 +151,21 @@ public class MultipartStore {
     public Response addBook(Book b) throws Exception {
         b.setId(124);
         return Response.ok(b).build();
+    }
+    
+    @POST
+    @Path("/books/mismatch1")
+    @ConsumeMime("multipart/related;type=\"bar/foo\"")
+    @ProduceMime("text/xml")
+    public Response addBookMismatched(Book b) {
+        throw new WebApplicationException();
+    }
+    
+    @POST
+    @Path("/books/mismatch2")
+    @ProduceMime("text/xml")
+    public Response addBookMismatched2(@MultipartID(value = "rootPart", type = "f/b") Book b) {
+        throw new WebApplicationException();
     }
     
     private Response readBookFromInputStream(InputStream is) throws Exception {
