@@ -51,6 +51,22 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:server>
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl">
   </bean>
+  
+  <jaxws:endpoint xmlns:s="http://books.com"
+      serviceName="s:BookService"
+      endpointName="s:BookPort"
+      id="soapservice2"
+      implementor="#bookstore2"
+      address="/soap/bookservice2" />
+
+  <jaxrs:server id="restservice2"
+		        address="/rest2">
+    <jaxrs:serviceBeans>
+      <ref bean="bookstore2"/>
+    </jaxrs:serviceBeans>		   
+  </jaxrs:server>
+  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl2">
+  </bean>
 
 </beans>
 <!-- END SNIPPET: beans -->

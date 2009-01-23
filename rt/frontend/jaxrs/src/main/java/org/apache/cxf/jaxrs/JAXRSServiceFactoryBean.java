@@ -61,6 +61,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         this.enableStatic = staticResolution;
     }
     
+    public boolean resourcesAvailable() {
+        return !classResourceInfos.isEmpty();
+    }
+    
     @Override
     public Service create() {
         initializeServiceModel();

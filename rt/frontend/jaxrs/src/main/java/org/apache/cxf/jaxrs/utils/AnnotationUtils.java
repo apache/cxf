@@ -128,7 +128,7 @@ public final class AnnotationUtils {
     
     public static boolean isMethodAnnotation(Annotation a) { 
         return METHOD_ANNOTATION_CLASSES.contains(a.annotationType())
-               || a.annotationType() == HttpMethod.class;
+               || a.annotationType().getAnnotation(HttpMethod.class) != null;
     }
     
     public static String getAnnotationValue(Annotation a) {

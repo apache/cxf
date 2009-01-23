@@ -22,11 +22,15 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -58,6 +62,10 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  * This will start a server for you and register it with the ServerManager.
  */
 public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServerFactoryBean.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSServerFactoryBean.class);
+    
     protected boolean doInit;
     private Server server;
     private Invoker invoker;
@@ -89,6 +97,13 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     
     public Server create() {
         try {
+            if (!serviceFactory.resourcesAvailable()) {
+                org.apache.cxf.common.i18n.Message msg = 
+                    new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
+                                                           BUNDLE);
+                LOG.severe(msg.toString());
+                throw new EndpointException(msg);
+            }
             Endpoint ep = createEndpoint();
             server = new ServerImpl(getBus(), 
                                     ep, 
