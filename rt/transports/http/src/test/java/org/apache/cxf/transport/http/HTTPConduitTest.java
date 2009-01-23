@@ -82,13 +82,15 @@ public class HTTPConduitTest extends Assert {
      * This test class is a Basic Auth Supplier with a
      * preemptive UserPass.
      */
-    class BasicAuthSupplier extends HttpBasicAuthSupplier {
-        public UserPass getPreemptiveUserPass(
-                String conduitName, URL url, Message m) {
-            return createUserPass("Gandalf", "staff");
+    class BasicAuthSupplier extends HttpAuthSupplier {
+        public String getPreemptiveAuthorization(
+                HTTPConduit conduit, URL url, Message m) {
+            String userpass = "Gandalf:staff";
+            String token = Base64Utility.encode(userpass.getBytes());
+            return "Basic " + token;
         }
-        public UserPass getUserPassForRealm(
-                String conduitName, URL url, Message m, String r) {
+        public String getAuthorizationForRealm(
+                HTTPConduit conduit, URL url, Message m, String r, String fh) {
             return null;
         }
     }
@@ -207,7 +209,7 @@ public class HTTPConduitTest extends Assert {
                 headers.get("Authorization").get(0));
 
         // Setting a Basic Auth User Pass should override
-        conduit.setBasicAuthSupplier(new BasicAuthSupplier());
+        conduit.setAuthSupplier(new BasicAuthSupplier());
         message = getNewMessage();
 
         // Test Call
@@ -216,14 +218,17 @@ public class HTTPConduitTest extends Assert {
         headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
-        assertEquals("Unexpected Authorization Token",
+        String head = headers.get("Authorization").get(0);
+        assertEquals("Unexpected Authorization Token: " 
+                     + new String(Base64Utility.decode(head.substring(6))),
                 "Basic " + Base64Utility.encode("Gandalf:staff".getBytes()),
-                headers.get("Authorization").get(0));
+                head);
 
         // Setting authorization policy on the message should override all.
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Hello");
         authPolicy.setPassword("world");
+        authPolicy.setAuthorizationType("Basic");
         message = getNewMessage();
         message.put(AuthorizationPolicy.class, authPolicy);
 
