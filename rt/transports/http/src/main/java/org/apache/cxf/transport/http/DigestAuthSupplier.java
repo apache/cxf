@@ -86,8 +86,8 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                 }
                 authInfo.put(currentURL, di);
                 return di.generateAuth(currentURL.getFile(), 
-                                       getUsername(message),
-                                       getPassword(message));
+                                       getUsername(conduit, message),
+                                       getPassword(conduit, message));
             }
             
         }
@@ -98,25 +98,35 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         DigestInfo di = authInfo.get(currentURL);
         if (di != null) {
             return di.generateAuth(currentURL.getFile(), 
-                                   getUsername(message),
-                                   getPassword(message));            
+                                   getUsername(conduit, message),
+                                   getPassword(conduit, message));            
         }
         return null;
     }
 
-    private String getPassword(Message message) {
+    private String getPassword(HTTPConduit conduit, Message message) {
         AuthorizationPolicy policy 
             = (AuthorizationPolicy)message.getContextualProperty(AuthorizationPolicy.class.getName());
-        if (policy != null) {
+        if (policy == null) {
+            policy = conduit.getAuthorization();
+        }
+        if (policy != null
+            && (!policy.isSetAuthorizationType()
+                || "Digest".equals(policy.getAuthorizationType()))) {
             return policy.getUserName();            
         }
         return null;
     }
 
-    private String getUsername(Message message) {
+    private String getUsername(HTTPConduit conduit, Message message) {
         AuthorizationPolicy policy 
             = (AuthorizationPolicy)message.getContextualProperty(AuthorizationPolicy.class.getName());
-        if (policy != null) {
+        if (policy == null) {
+            policy = conduit.getAuthorization();
+        }
+        if (policy != null
+            && (!policy.isSetAuthorizationType()
+                || "Digest".equals(policy.getAuthorizationType()))) {
             return policy.getPassword();            
         }
         return null;
@@ -135,7 +145,6 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         
         synchronized String generateAuth(String uri, String username, String password) {
             try {
-                StringBuilder builder = new StringBuilder("Digest qop=auth, realm=\"");
                 nc++;
                 String ncstring = Integer.toString(nc);
                 while (ncstring.length() < 8) {
@@ -172,7 +181,12 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                         + qop + ":" + hasha2;
                 }
                 serverDigestValue = encode(digester.digest(serverDigestValue.getBytes("US-ASCII")));
-                builder.append(realm).append("\", opaque=\"")
+                StringBuilder builder = new StringBuilder("Digest ");
+                if (qop != null) {
+                    builder.append("qop=auth, ");
+                }  
+                builder.append("realm=\"")
+                    .append(realm).append("\", opaque=\"")
                     .append(opaque)
                     .append("\", nonce=\"")
                     .append(nonce)
