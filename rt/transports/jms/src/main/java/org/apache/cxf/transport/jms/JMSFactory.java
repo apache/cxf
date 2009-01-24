@@ -24,6 +24,7 @@ import javax.jms.MessageListener;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.JmsTemplate102;
 import org.springframework.jms.core.SessionCallback;
@@ -101,6 +102,10 @@ public final class JMSFactory {
         }
         if (jmsConfig.getTaskExecutor() != null) {
             jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
+        } else {
+            SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+            taskExecutor.setConcurrencyLimit(jmsConfig.getMaxConcurrentTasks());
+            jmsListener.setTaskExecutor(taskExecutor);
         }
         JmsTemplate jmsTemplate = createJmsTemplate(jmsConfig, null);
         Destination dest = JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName, jmsConfig

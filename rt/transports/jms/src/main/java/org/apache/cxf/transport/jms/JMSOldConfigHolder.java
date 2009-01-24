@@ -119,14 +119,12 @@ public class JMSOldConfigHolder {
             if (address.isSetDestinationStyle()) {
                 pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
             }
-            
             if (jmsConfig.getConnectionFactory() == null) {
                 ConnectionFactory cf = getConnectionFactoryFromJndi(jt, pubSubDomain);
                 jmsConfig.setConnectionFactory(cf);
             }
-        
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
-            jmsConfig.setExplicitQosEnabled(true);        
+            jmsConfig.setExplicitQosEnabled(true);
             jmsConfig.setMessageSelector(serverBehavior.getMessageSelector());        
             if (isConduit && runtimePolicy.isSetMessageType()) {
                 jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
@@ -138,21 +136,21 @@ public class JMSOldConfigHolder {
             //}
             jmsConfig.setUseConduitIdSelector(clientConfig.isUseConduitIdSelector());
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());       
-            jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());        
-        
+            jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
+            if (sessionPool.isSetHighWaterMark()) {
+                jmsConfig.setMaxConcurrentTasks(sessionPool.getHighWaterMark());
+            }
             long timeToLive = isConduit ? clientConfig.getMessageTimeToLive() : serverConfig
                 .getMessageTimeToLive();
             jmsConfig.setTimeToLive(timeToLive);            
             if (address.isSetUseJms11()) {                
                 jmsConfig.setUseJms11(address.isUseJms11());        
             }
-            boolean useJndi = address.isSetJndiDestinationName();
-            jmsConfig.setUseJndi(useJndi);
-        
             if (serverBehavior.isSetTransactional()) {
                 jmsConfig.setSessionTransacted(serverBehavior.isTransactional());                
-            }            
-
+            }
+            boolean useJndi = address.isSetJndiDestinationName();
+            jmsConfig.setUseJndi(useJndi);
             if (useJndi) {
                 // Setup Destination jndi destination resolver
                 final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();

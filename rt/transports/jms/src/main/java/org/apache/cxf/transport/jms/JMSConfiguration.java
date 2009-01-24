@@ -50,6 +50,7 @@ public class JMSConfiguration implements InitializingBean {
     
     private int concurrentConsumers = 1;
     private int maxConcurrentConsumers = 1;
+    private int maxConcurrentTasks = 10;
 
     private volatile String messageSelector;
     private boolean subscriptionDurable;
@@ -273,6 +274,14 @@ public class JMSConfiguration implements InitializingBean {
 
     public boolean isUseConduitIdSelector() {
         return useConduitIdSelector;
+    }
+
+    public int getMaxConcurrentTasks() {
+        return maxConcurrentTasks;
+    }
+
+    public void setMaxConcurrentTasks(int maxConcurrentTasks) {
+        this.maxConcurrentTasks = maxConcurrentTasks;
     }
 
 }
