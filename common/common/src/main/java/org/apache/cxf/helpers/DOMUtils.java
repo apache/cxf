@@ -54,8 +54,7 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
- * Few simple utils to read DOM. This is originally from the Jakarta Commons
- * Modeler.
+ * Few simple utils to read DOM. This is originally from the Jakarta Commons Modeler.
  * 
  * @author Costin Manolache
  */
@@ -66,7 +65,7 @@ public final class DOMUtils {
 
     private DOMUtils() {
     }
-    
+
     private static synchronized DocumentBuilder getBuilder() throws ParserConfigurationException {
         if (builder == null) {
             FACTORY.setNamespaceAware(true);
@@ -74,9 +73,10 @@ public final class DOMUtils {
         }
         return builder;
     }
-    
+
     /**
      * This function is much like getAttribute, but returns null, not "", for a nonexistent attribute.
+     * 
      * @param e
      * @param attributeName
      * @return
@@ -88,8 +88,7 @@ public final class DOMUtils {
         }
         return node.getValue();
     }
-    
-    
+
     /**
      * Get the trimmed text content of a node or null if there is no text
      */
@@ -97,13 +96,13 @@ public final class DOMUtils {
         if (n == null) {
             return null;
         }
-        
+
         Node n1 = DOMUtils.getChild(n, Node.TEXT_NODE);
 
         if (n1 == null) {
             return null;
         }
-        
+
         return n1.getNodeValue().trim();
     }
 
@@ -114,16 +113,16 @@ public final class DOMUtils {
         if (n == null) {
             return null;
         }
-        
+
         Node n1 = DOMUtils.getChild(n, Node.TEXT_NODE);
 
         if (n1 == null) {
             return null;
         }
-        
+
         return n1.getNodeValue();
     }
-    
+
     /**
      * Get the first element child.
      * 
@@ -134,7 +133,7 @@ public final class DOMUtils {
         if (parent == null) {
             return null;
         }
-        
+
         Node first = parent.getFirstChild();
         if (first == null) {
             return null;
@@ -167,6 +166,7 @@ public final class DOMUtils {
         }
         return attN.getNodeValue();
     }
+
     public static String getAttribute(Element element, QName attName) {
         return element.getAttributeNS(attName.getNamespaceURI(), attName.getLocalPart());
     }
@@ -239,10 +239,11 @@ public final class DOMUtils {
         }
         return null;
     }
-    
+
     public static QName getElementQName(Element el) {
         return new QName(el.getNamespaceURI(), el.getLocalName());
     }
+
     /**
      * Get the first direct child with a given type
      */
@@ -254,8 +255,9 @@ public final class DOMUtils {
         if (n == null) {
             return null;
         }
-        return (Element) n;
+        return (Element)n;
     }
+
     public static Element getNextElement(Element el) {
         Node nd = el.getNextSibling();
         while (nd != null) {
@@ -266,31 +268,33 @@ public final class DOMUtils {
         }
         return null;
     }
-    
+
     /**
      * Return the first element child with the specified qualified name.
+     * 
      * @param parent
      * @param q
      * @return
      */
-    public static Element getFirstChildWithName(Element parent, QName q) { 
+    public static Element getFirstChildWithName(Element parent, QName q) {
         String ns = q.getNamespaceURI();
         String lp = q.getLocalPart();
         return getFirstChildWithName(parent, ns, lp);
     }
-    
+
     /**
      * Return the first element child with the specified qualified name.
+     * 
      * @param parent
      * @param ns
      * @param lp
      * @return
      */
-    public static Element getFirstChildWithName(Element parent, String ns, String lp) { 
+    public static Element getFirstChildWithName(Element parent, String ns, String lp) {
         for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
             if (n instanceof Element) {
-                Element e = (Element) n;
-                String ens = e.getNamespaceURI();
+                Element e = (Element)n;
+                String ens = (e.getNamespaceURI() == null) ? "" : e.getNamespaceURI();
                 if (ns.equals(ens) && lp.equals(e.getLocalName())) {
                     return e;
                 }
@@ -301,6 +305,7 @@ public final class DOMUtils {
 
     /**
      * Return child elements with specified name.
+     * 
      * @param parent
      * @param ns
      * @param localName
@@ -310,7 +315,7 @@ public final class DOMUtils {
         List<Element> r = new ArrayList<Element>();
         for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
             if (n instanceof Element) {
-                Element e = (Element) n;
+                Element e = (Element)n;
                 String eNs = (e.getNamespaceURI() == null) ? "" : e.getNamespaceURI();
                 if (ns.equals(eNs) && localName.equals(e.getLocalName())) {
                     r.add(e);
@@ -322,6 +327,7 @@ public final class DOMUtils {
 
     /**
      * Get the first child of the specified type.
+     * 
      * @param parent
      * @param type
      * @return
@@ -354,7 +360,7 @@ public final class DOMUtils {
         if (first == null) {
             return null;
         }
-        
+
         for (Node node = first; node != null; node = node.getNextSibling()) {
 
             if (type >= 0 && node.getNodeType() != type) {
@@ -399,47 +405,48 @@ public final class DOMUtils {
 
         return db.parse(is);
     }
-    public static Document readXml(Reader is) throws SAXException, IOException,
-        ParserConfigurationException {
+
+    public static Document readXml(Reader is) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    
+
         dbf.setValidating(false);
         dbf.setIgnoringComments(false);
         dbf.setIgnoringElementContentWhitespace(true);
         dbf.setNamespaceAware(true);
         // dbf.setCoalescing(true);
         // dbf.setExpandEntityReferences(true);
-    
+
         DocumentBuilder db = null;
         db = dbf.newDocumentBuilder();
         db.setEntityResolver(new NullResolver());
-    
+
         // db.setErrorHandler( new MyErrorHandler());
         InputSource ips = new InputSource(is);
         return db.parse(ips);
     }
+
     public static Document readXml(StreamSource is) throws SAXException, IOException,
         ParserConfigurationException {
-        
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    
+
         dbf.setValidating(false);
         dbf.setIgnoringComments(false);
         dbf.setIgnoringElementContentWhitespace(true);
         dbf.setNamespaceAware(true);
         // dbf.setCoalescing(true);
         // dbf.setExpandEntityReferences(true);
-    
+
         DocumentBuilder db = null;
         db = dbf.newDocumentBuilder();
         db.setEntityResolver(new NullResolver());
-    
+
         // db.setErrorHandler( new MyErrorHandler());
         InputSource is2 = new InputSource();
         is2.setSystemId(is.getSystemId());
         is2.setByteStream(is.getInputStream());
         is2.setCharacterStream(is.getReader());
-        
+
         return db.parse(is2);
     }
 
@@ -458,7 +465,7 @@ public final class DOMUtils {
             throw new RuntimeException("Couldn't find a DOM parser.", e);
         }
     }
-    
+
     public static Document createDocument() {
         try {
             return getBuilder().newDocument();
@@ -466,11 +473,11 @@ public final class DOMUtils {
             throw new RuntimeException("Couldn't find a DOM parser.", e);
         }
     }
-   
+
     public static String getPrefixRecursive(Element el, String ns) {
         String prefix = getPrefix(el, ns);
         if (prefix == null && el.getParentNode() instanceof Element) {
-            prefix = getPrefixRecursive((Element) el.getParentNode(), ns);
+            prefix = getPrefixRecursive((Element)el.getParentNode(), ns);
         }
         return prefix;
     }
@@ -480,16 +487,17 @@ public final class DOMUtils {
         for (int i = 0; i < atts.getLength(); i++) {
             Node node = atts.item(i);
             String name = node.getNodeName();
-            if (ns.equals(node.getNodeValue()) 
-                && (name != null && (XMLNAMESPACE.equals(name) || name.startsWith(XMLNAMESPACE + ":")))) { 
+            if (ns.equals(node.getNodeValue())
+                && (name != null && (XMLNAMESPACE.equals(name) || name.startsWith(XMLNAMESPACE + ":")))) {
                 return node.getPrefix();
             }
         }
         return null;
     }
-    
+
     /**
      * Get all prefixes defined, up to the root, for a namespace URI.
+     * 
      * @param element
      * @param namespaceUri
      * @param prefixes
@@ -501,9 +509,10 @@ public final class DOMUtils {
             getPrefixesRecursive((Element)parent, namespaceUri, prefixes);
         }
     }
-    
+
     /**
      * Get all prefixes defined on this element for the specified namespace.
+     * 
      * @param element
      * @param namespaceUri
      * @param prefixes
@@ -513,7 +522,7 @@ public final class DOMUtils {
         for (int i = 0; i < atts.getLength(); i++) {
             Node node = atts.item(i);
             String name = node.getNodeName();
-            if (namespaceUri.equals(node.getNodeValue()) 
+            if (namespaceUri.equals(node.getNodeValue())
                 && (name != null && (XMLNAMESPACE.equals(name) || name.startsWith(XMLNAMESPACE + ":")))) {
                 prefixes.add(node.getPrefix());
             }
@@ -532,13 +541,21 @@ public final class DOMUtils {
     }
 
     /**
-     * Searches the given element including it's parent elements
-     * for a matching namspace decleration.
-     * @param el element to search for namespace definitions
+     * Starting from a node, find the namespace declaration for a prefix. for a matching namespace
+     * declaration.
+     * 
+     * @param node search up from here to search for namespace definitions
      * @param searchPrefix the prefix we are searching for
      * @return the namespace if found.
      */
-    public static String getNamespace(Element el, String searchPrefix) {
+    public static String getNamespace(Node node, String searchPrefix) {
+
+        Element el;
+        while (!(node instanceof Element)) {
+            node = node.getParentNode();
+        }
+        el = (Element)node;
+
         NamedNodeMap atts = el.getAttributes();
         for (int i = 0; i < atts.getLength(); i++) {
             Node currentAttribute = atts.item(i);
@@ -546,80 +563,69 @@ public final class DOMUtils {
             String currentPrefix = currentAttribute.getPrefix();
             if (searchPrefix.equals(currentLocalName) && XMLNAMESPACE.equals(currentPrefix)) {
                 return currentAttribute.getNodeValue();
-            } else if (StringUtils.isEmpty(searchPrefix)
-                && XMLNAMESPACE.equals(currentLocalName) 
-                && StringUtils.isEmpty(currentPrefix)) {
+            } else if (StringUtils.isEmpty(searchPrefix) && XMLNAMESPACE.equals(currentLocalName)
+                       && StringUtils.isEmpty(currentPrefix)) {
                 return currentAttribute.getNodeValue();
             }
         }
-        
+
         Node parent = el.getParentNode();
         if (parent instanceof Element) {
-            return getNamespace((Element) parent, searchPrefix);
+            return getNamespace((Element)parent, searchPrefix);
         }
-        
+
         return null;
     }
-    
-    public static List<Element> findAllElementsByTagNameNS(Element elem, 
-                                                           String nameSpaceURI,
+
+    public static List<Element> findAllElementsByTagNameNS(Element elem, String nameSpaceURI,
                                                            String localName) {
         List<Element> ret = new LinkedList<Element>();
         findAllElementsByTagNameNS(elem, nameSpaceURI, localName, ret);
         return ret;
     }
-    
-    private static void findAllElementsByTagNameNS(Element el, 
-                                                  String nameSpaceURI, 
-                                                  String localName, 
-                                                  List<Element> elementList) {
-        
-        if (localName.equals(el.getLocalName()) 
-            && nameSpaceURI.contains(el.getNamespaceURI())) {
+
+    private static void findAllElementsByTagNameNS(Element el, String nameSpaceURI, String localName,
+                                                   List<Element> elementList) {
+
+        if (localName.equals(el.getLocalName()) && nameSpaceURI.contains(el.getNamespaceURI())) {
             elementList.add(el);
-        }     
+        }
         Element elem = getFirstElement(el);
         while (elem != null) {
             findAllElementsByTagNameNS(elem, nameSpaceURI, localName, elementList);
             elem = getNextElement(elem);
         }
     }
-    
-    
-    
-    
+
     public static List<Element> findAllElementsByTagName(Element elem, String tagName) {
         List<Element> ret = new LinkedList<Element>();
         findAllElementsByTagName(elem, tagName, ret);
         return ret;
     }
-    
+
     private static void findAllElementsByTagName(Element el, String tagName, List<Element> elementList) {
-        
+
         if (tagName.equals(el.getTagName())) {
             elementList.add(el);
-        }     
+        }
         Element elem = getFirstElement(el);
         while (elem != null) {
             findAllElementsByTagName(elem, tagName, elementList);
             elem = getNextElement(elem);
         }
     }
-    
 
     /**
-     * Set a namespace/prefix on an element if it is not set already. First off, it
-     * searches for the element for the prefix associated with the specified
-     * namespace. If the prefix isn't null, then this is returned. Otherwise, it
-     * creates a new attribute using the namespace/prefix passed as parameters.
+     * Set a namespace/prefix on an element if it is not set already. First off, it searches for the element
+     * for the prefix associated with the specified namespace. If the prefix isn't null, then this is
+     * returned. Otherwise, it creates a new attribute using the namespace/prefix passed as parameters.
      * 
      * @param element
      * @param namespace
      * @param prefix
      * @return the prefix associated with the set namespace
      */
-    public static String setNamespace(Element element, String namespace,
-            String prefix) {
+    public static String setNamespace(Element element, String namespace, String prefix) {
         String pre = getPrefixRecursive(element, namespace);
         if (pre != null) {
             return pre;
@@ -627,9 +633,10 @@ public final class DOMUtils {
         element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespace);
         return prefix;
     }
-    
+
     /**
      * Add a namespace prefix definition to an element.
+     * 
      * @param element
      * @param namespaceUri
      * @param prefix
