@@ -42,6 +42,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @goal wsdl2java
+ * @phase generate-sources
  * @description CXF WSDL To Java Tool
  * @requiresDependencyResolution test
 */
