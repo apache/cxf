@@ -311,7 +311,8 @@ public final class DOMUtils {
         for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
             if (n instanceof Element) {
                 Element e = (Element) n;
-                if (ns.equals(e.getNamespaceURI()) && localName.equals(e.getLocalName())) {
+                String eNs = (e.getNamespaceURI() == null) ? "" : e.getNamespaceURI();
+                if (ns.equals(eNs) && localName.equals(e.getLocalName())) {
                     r.add(e);
                 }
             }
