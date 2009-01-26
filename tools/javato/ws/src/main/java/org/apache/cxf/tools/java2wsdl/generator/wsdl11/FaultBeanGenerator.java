@@ -58,7 +58,9 @@ public final class FaultBeanGenerator extends BeanGenerator {
         String defaultPackage = seiPackageName + ".jaxws";
         FaultBean bean = new FaultBean();
         for (Class clz : exceptionClasses) {
-            faultBeanClasses.add(bean.transform(clz, defaultPackage));
+            if (!bean.faultBeanExists(clz)) {
+                faultBeanClasses.add(bean.transform(clz, defaultPackage));
+            }
         }
 
         return faultBeanClasses;
