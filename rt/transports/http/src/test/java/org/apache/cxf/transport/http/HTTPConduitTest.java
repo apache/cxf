@@ -82,17 +82,16 @@ public class HTTPConduitTest extends Assert {
      * This test class is a Basic Auth Supplier with a
      * preemptive UserPass.
      */
-    class BasicAuthSupplier extends HttpAuthSupplier {
-        public String getPreemptiveAuthorization(
-                HTTPConduit conduit, URL url, Message m) {
-            String userpass = "Gandalf:staff";
-            String token = Base64Utility.encode(userpass.getBytes());
-            return "Basic " + token;
+    class BasicAuthSupplier extends HttpBasicAuthSupplier {
+        public UserPass getPreemptiveUserPass(
+                String conduitName, URL url, Message m) {
+            return createUserPass("Gandalf", "staff");
         }
-        public String getAuthorizationForRealm(
-                HTTPConduit conduit, URL url, Message m, String r, String fh) {
+        public UserPass getUserPassForRealm(
+                String conduitName, URL url, Message m, String r) {
             return null;
         }
+
     }
 
     /**
@@ -218,11 +217,9 @@ public class HTTPConduitTest extends Assert {
         headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
-        String head = headers.get("Authorization").get(0);
-        assertEquals("Unexpected Authorization Token: " 
-                     + new String(Base64Utility.decode(head.substring(6))),
+        assertEquals("Unexpected Authorization Token",
                 "Basic " + Base64Utility.encode("Gandalf:staff".getBytes()),
-                head);
+                headers.get("Authorization").get(0));
 
         // Setting authorization policy on the message should override all.
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
