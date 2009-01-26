@@ -34,6 +34,7 @@ import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.annotator.WrapperBeanAnnotator;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.model.WrapperBeanClass;
+import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.util.URIParserUtil;
 
 public final class FaultBean {
@@ -42,6 +43,18 @@ public final class FaultBean {
                                                                   "getStackTrace",
                                                                   "getClass"};
 
+    public boolean faultBeanExists(final Class<?> exceptionClass) {
+        String fb = getWebFaultBean(exceptionClass);
+        if (!StringUtils.isEmpty(fb)) {
+            try {
+                return AnnotationUtil.loadClass(fb,
+                                                exceptionClass.getClassLoader()) != null;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false; 
+    }
     
     private String getWebFaultBean(final Class<?> exceptionClass) {
         WebFault fault = exceptionClass.getAnnotation(WebFault.class);
