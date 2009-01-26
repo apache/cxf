@@ -127,4 +127,12 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
         
         return Arrays.asList(new Foo[] {a, b}, new Foo[] {c, d});
     }
+
+    public String[] convertToString(int[] numbers) {
+        String ret[] = new String[numbers.length];
+        for (int x = 0; x < numbers.length; x++) {
+            ret[x] = Integer.toString(numbers[x]);
+        }
+        return ret;
+    }
 }
