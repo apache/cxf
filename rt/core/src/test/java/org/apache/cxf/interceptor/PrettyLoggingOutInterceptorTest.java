@@ -29,8 +29,6 @@ import org.junit.Test;
 
 public class PrettyLoggingOutInterceptorTest extends Assert {
     
-    
-
     @Test
     public void testFormatting() throws Exception { 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -50,7 +48,4 @@ public class PrettyLoggingOutInterceptorTest extends Assert {
         assertTrue(str.contains("<today>"));
 
     }
-    
-
-
 }
