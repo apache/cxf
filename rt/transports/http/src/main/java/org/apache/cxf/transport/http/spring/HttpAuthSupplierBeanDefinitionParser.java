@@ -22,9 +22,9 @@ package org.apache.cxf.transport.http.spring;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
-import org.apache.cxf.transport.http.HttpBasicAuthSupplier;
+import org.apache.cxf.transport.http.HttpAuthSupplier;
 
-public class HttpBasicAuthSupplierBeanDefinitionParser extends
+public class HttpAuthSupplierBeanDefinitionParser extends
         AbstractBeanDefinitionParser {
 
     @Override
@@ -33,7 +33,7 @@ public class HttpBasicAuthSupplierBeanDefinitionParser extends
     }
     @Override
     protected Class getBeanClass(Element arg0) {
-        return HttpBasicAuthSupplier.class;
+        return HttpAuthSupplier.class;
     }
 
 }

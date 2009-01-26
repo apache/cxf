@@ -42,6 +42,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.FiltersType;
@@ -51,7 +52,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transport.http.HttpBasicAuthSupplier;
+import org.apache.cxf.transport.http.HttpAuthSupplier;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
 import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
@@ -722,7 +723,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
     }
 
-    public class MyBasicAuthSupplier extends HttpBasicAuthSupplier {
+    public class MyBasicAuthSupplier extends HttpAuthSupplier {
 
         String realm;
         String user;
@@ -740,8 +741,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             pass  = p;
         }
         @Override
-        public UserPass getPreemptiveUserPass(
-                String  conduitName,
+        public String getPreemptiveAuthorization(
+                HTTPConduit  conduit,
                 URL     currentURL,
                 Message message
         ) {
@@ -753,11 +754,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
          * through the realms.
          */
         @Override
-        public UserPass getUserPassForRealm(
-                String  conduitName, 
+        public String getAuthorizationForRealm(
+                HTTPConduit  conduit, 
                 URL     currentURL,
                 Message message, 
-                String  reqestedRealm
+                String  reqestedRealm,
+                String fullHeader
         ) {
             if (realm != null && realm.equals(reqestedRealm)) {
                 return createUserPass(user, pass);
@@ -775,6 +777,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
                 return createUserPass("Mary", "password");
             }
             return null;
+        }
+
+        private String createUserPass(String usr, String pwd) {
+            String userpass = usr + ":" + pwd;
+            String token = Base64Utility.encode(userpass.getBytes());
+            return "Basic " + token;
         }
 
     }
@@ -818,7 +826,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         // 401 for realm Cronus. If we supply any name other
         // than Edward, George, or Mary, with the pass of "password"
         // we should succeed.
-        http.setBasicAuthSupplier(
+        http.setAuthSupplier(
                 new MyBasicAuthSupplier("Cronus", "Betty", "password"));
         
         // We actually get our answer from Bethal at the end of the
@@ -827,9 +835,9 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Bethal".equals(answer));
         
-        // Uhe loop auth supplier, 
+        // The loop auth supplier, 
         // We should die with looping realms.
-        http.setBasicAuthSupplier(new MyBasicAuthSupplier());
+        http.setAuthSupplier(new MyBasicAuthSupplier());
         
         try {
             answer = gordy.sayHi();

@@ -26,8 +26,8 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
                 new HttpConduitBeanDefinitionParser());        
         registerBeanDefinitionParser("trustDecider", 
                 new MessageTrustDeciderBeanDefinitionParser());        
-        registerBeanDefinitionParser("basicAuthSupplier", 
-                new HttpBasicAuthSupplierBeanDefinitionParser()); 
+        registerBeanDefinitionParser("authSupplier", 
+                new HttpAuthSupplierBeanDefinitionParser()); 
         registerBeanDefinitionParser("destination", 
                 new HttpDestinationBeanDefinitionParser());        
     }

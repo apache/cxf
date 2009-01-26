@@ -241,9 +241,9 @@ public class HTTPConduit
     private MessageTrustDecider trustDecider;
     
     /**
-     * This field contains the HttpBasicAuthSupplier.
+     * This field contains the HttpAuthSupplier.
      */
-    private HttpBasicAuthSupplier basicAuthSupplier;
+    private HttpAuthSupplier authSupplier;
 
     /**
      * This boolean signfies that that finalizeConfig is called, which is
@@ -360,9 +360,9 @@ public class HTTPConduit
             trustDecider = endpointInfo.getTraversedExtensor(
                     null, MessageTrustDecider.class);
         }
-        if (this.basicAuthSupplier == null) {
-            basicAuthSupplier = endpointInfo.getTraversedExtensor(
-                    null, HttpBasicAuthSupplier.class);
+        if (this.authSupplier == null) {
+            authSupplier = endpointInfo.getTraversedExtensor(
+                    null, HttpAuthSupplier.class);
         }
         if (trustDecider == null) {
             if (LOG.isLoggable(Level.FINE)) {
@@ -381,18 +381,18 @@ public class HTTPConduit
                     + "'");
             }
         }
-        if (basicAuthSupplier == null) {
+        if (authSupplier == null) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE,
-                    "No Basic Auth Supplier configured for Conduit '"
+                    "No Auth Supplier configured for Conduit '"
                     + getConduitName() + "'");
             }
         } else {
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "HttpBasicAuthSupplier of class '" 
-                    + basicAuthSupplier.getClass().getName()
+                LOG.log(Level.FINE, "HttpAuthSupplier of class '" 
+                    + authSupplier.getClass().getName()
                     + "' with logical name of '"
-                    + basicAuthSupplier.getLogicalName()
+                    + authSupplier.getLogicalName()
                     + "' has been configured for Conduit '" 
                     + getConduitName()
                     + "'");
@@ -477,8 +477,6 @@ public class HTTPConduit
         // with the Conduit.
         URL currentURL = setupURL(message);       
         
-        HttpBasicAuthSupplier.UserPass userPass = null;
-        
         // The need to cache the request is off by default
         boolean needToCacheRequest = false;
         
@@ -519,13 +517,16 @@ public class HTTPConduit
         int chunkThreshold = 0;
         // We must cache the request if we have basic auth supplier
         // without preemptive basic auth.
-        if (basicAuthSupplier != null) {
-            userPass = basicAuthSupplier.getPreemptiveUserPass(
-                    getConduitName(), currentURL, message);
-            needToCacheRequest = userPass == null;
-            LOG.log(Level.INFO,
-                "Basic Auth Supplier, but no Premeptive User Pass." 
-                + " We must cache request.");
+        if (authSupplier != null) {
+            String auth = authSupplier.getPreemptiveAuthorization(
+                    this, currentURL, message);
+            if (auth == null) {
+                needToCacheRequest = true;
+                isChunking = false;
+                LOG.log(Level.INFO,
+                        "Auth Supplier, but no Premeptive User Pass." 
+                        + " We must cache request.");
+            }
         }
         if (getClient().isAutoRedirect()) {
             needToCacheRequest = true;
@@ -1061,7 +1062,7 @@ public class HTTPConduit
      * <p>
      * The precedence is as follows:
      * 1. AuthorizationPolicy that is set on the Message, if exists.
-     * 2. Preemptive UserPass from BasicAuthSupplier, if exists.
+     * 2. Authorization from AuthSupplier, if exists.
      * 3. AuthorizationPolicy set/configured for conduit.
      * 
      * REVISIT: Since the AuthorizationPolicy is set on the message by class, then
@@ -1077,25 +1078,28 @@ public class HTTPConduit
             Map<String, List<String>> headers
     ) {
         AuthorizationPolicy authPolicy = getAuthorization();
-        
-        HttpBasicAuthSupplier.UserPass userpass = null;
-        if (basicAuthSupplier != null) {
-            userpass = basicAuthSupplier.getPreemptiveUserPass(
-                    getConduitName(), url, message);
-        }
-        
         AuthorizationPolicy newPolicy = message.get(AuthorizationPolicy.class);
+        
+        String authString = null;
+        if (authSupplier != null 
+            && (newPolicy == null
+                || (!"Basic".equals(newPolicy.getAuthorizationType())
+                    && newPolicy.getAuthorization() == null))) {
+            authString = authSupplier.getPreemptiveAuthorization(
+                    this, url, message);
+            if (authString != null) {
+                headers.put("Authorization",
+                            createMutableList(authString));
+                return;
+            }
+        }
         String userName = null;
         String passwd = null;
         if (null != newPolicy) {
             userName = newPolicy.getUserName();
             passwd = newPolicy.getPassword();
         }
-        if (userName == null
-            && userpass != null) {
-            userName = userpass.getUserid();
-            passwd   = userpass.getPassword();
-        }
+
         if (userName == null 
             && authPolicy != null && authPolicy.isSetUserName()) {
             userName = authPolicy.getUserName();
@@ -1336,21 +1340,16 @@ public class HTTPConduit
     }
 
     /**
-     * This method gets the Basic Auth Supplier that was set/configured for this 
+     * This method gets the Auth Supplier that was set/configured for this 
      * HTTPConduit.
-     * @return The Basic Auth Supplier or null.
+     * @return The Auth Supplier or null.
      */
-    public HttpBasicAuthSupplier getBasicAuthSupplier() {
-        return this.basicAuthSupplier;
+    public HttpAuthSupplier getAuthSupplier() {
+        return this.authSupplier;
     }
     
-    /**
-     * This method sets the Trust Decider for this HTTP Conduit.
-     * Using this method overrides any trust decider configured for this 
-     * HTTPConduit.
-     */
-    public void setBasicAuthSupplier(HttpBasicAuthSupplier supplier) {
-        this.basicAuthSupplier = supplier;
+    public void setAuthSupplier(HttpAuthSupplier supplier) {
+        this.authSupplier = supplier;
     }
     
     /**
@@ -1518,8 +1517,13 @@ public class HTTPConduit
 
         // If we don't have a dynamic supply of user pass, then
         // we don't retransmit. We just die with a Http 401 response.
-        if (basicAuthSupplier == null) {
-            return connection;
+        if (authSupplier == null) {
+            String auth = connection.getHeaderField("WWW-Authenticate");
+            if (auth.startsWith("Digest ")) {
+                authSupplier = new DigestAuthSupplier();
+            } else {
+                return connection;
+            }
         }
         
         URL currentURL = connection.getURL();
@@ -1551,9 +1555,9 @@ public class HTTPConduit
                                   + "\"");
         }
         
-        HttpBasicAuthSupplier.UserPass up = 
-            basicAuthSupplier.getUserPassForRealm(
-                getConduitName(), currentURL, message, realm);
+        String up = 
+            authSupplier.getAuthorizationForRealm(
+                this, currentURL, message, realm, connection.getHeaderField("WWW-Authenticate"));
         
         // No user pass combination. We give up.
         if (up == null) {
@@ -1564,9 +1568,8 @@ public class HTTPConduit
         authURLs.add(currentURL.toString() + realm);
         
         Map<String, List<String>> headers = getSetProtocolHeaders(message);
-        
-        setBasicAuthHeader(up.getUserid(), up.getPassword(), headers);
-        
+        headers.put("Authorization",
+                    createMutableList(up));
         return retransmit(
                 connection, currentURL, message, cachedStream);
     }
@@ -1670,8 +1673,15 @@ public class HTTPConduit
         List<String> auth = headers.get("WWW-Authenticate");
         if (auth != null) {
             for (String a : auth) {
-                if (a.startsWith("Basic realm=")) {
-                    return a.substring(a.indexOf("=") + 1);
+                int idx = a.indexOf("realm=");
+                if (idx != -1) {
+                    a = a.substring(idx + 6);
+                    if (a.charAt(0) == '"') {
+                        a = a.substring(1, a.indexOf('"', 1));
+                    } else if (a.contains(",")) {
+                        a = a.substring(0, a.indexOf(','));
+                    }
+                    return a;
                 }
             }
         }

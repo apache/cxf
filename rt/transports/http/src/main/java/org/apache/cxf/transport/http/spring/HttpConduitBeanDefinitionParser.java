@@ -34,7 +34,7 @@ import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transport.http.HttpBasicAuthSupplier;
+import org.apache.cxf.transport.http.HttpAuthSupplier;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -86,7 +86,7 @@ public class HttpConduitBeanDefinitionParser
             if ("trustDecider".equals(elementName)) {                
                 mapBeanOrClassElement((Element)n, bean, MessageTrustDecider.class);
             } else if ("basicAuthSupplier".equals(elementName)) {
-                mapBeanOrClassElement((Element)n, bean, HttpBasicAuthSupplier.class);
+                mapBeanOrClassElement((Element)n, bean, HttpAuthSupplier.class);
             } else if ("tlsClientParameters".equals(elementName)) {
                 mapTLSClientParameters((Element)n, bean);
             }          
