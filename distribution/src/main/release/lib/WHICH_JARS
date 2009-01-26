@@ -29,7 +29,8 @@ For Java2WSDL and WSDL2Java:
 - The above jars
 - jaxb-xjc.jar
 - velocity.jar
-- velocity-dep.jar
+- commons-collections.jar
+- commons-lang.jar
 
 For JAX-WS support:
 - geronimo-ws-metadata.jar [6]
