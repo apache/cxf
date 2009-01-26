@@ -183,12 +183,16 @@ public class ServletController {
         
         String address = request.getPathInfo() == null ? "" : request.getPathInfo();
         
+        int len = -1;
+        ServletDestination ret = null;
         for (String path : transport.getDestinationsPaths()) {           
-            if (address.startsWith(path)) {                
-                return transport.getDestinationForPath(path);
+            if (address.startsWith(path)
+                && path.length() > len) {
+                ret = transport.getDestinationForPath(path);
+                len = path.length();
             }
         }
-        return null; 
+        return ret; 
     }
     
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
