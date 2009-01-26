@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.Holder;
@@ -35,6 +36,11 @@ import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
 @SOAPBinding(style = SOAPBinding.Style.RPC,
              use = SOAPBinding.Use.LITERAL)
 public interface RpcLitCodeFirstService {
+    
+    @WebMethod(operationName = "ConvertToString")
+    @WebResult(name = "stringNumbers")
+    String[] convertToString(@WebParam(name = "intNumbers") int[] numbers);
+    
     @WebMethod
     String[] arrayOutput();
 
@@ -104,5 +110,6 @@ public interface RpcLitCodeFirstService {
             return name;
         }
     }
+    
 
 }

@@ -113,7 +113,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     addType(genericType);
                 }
             } else {
-                addType(genericType);
+                addType(genericType, true);
             }
 
             if (isList
@@ -191,9 +191,6 @@ class JAXBContextInitializer extends ServiceModelVisitor {
 
 
     private  void addClass(Class<?> cls) {
-        if (cls.isArray() && cls.getComponentType().isPrimitive()) {
-            return;
-        }
         if (Throwable.class.isAssignableFrom(cls)) {
             if (!Throwable.class.equals(cls)
                 && !Exception.class.equals(cls)) {

@@ -431,11 +431,15 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
 
     private void runRpcLitTest(RpcLitCodeFirstService port) throws Exception {
+       
+        String ret[] = port.convertToString(new int[] {1, 2 , 3});
+        assertEquals(3, ret.length);
+
         List<String> rev = new ArrayList<String>(Arrays.asList(RpcLitCodeFirstServiceImpl.DATA));
-        Collections.reverse(rev);
+        Collections.reverse(rev);        
         
         String s;
-        
+
         String arrayOut[] = port.arrayOutput();
         assertNotNull(arrayOut);
         assertEquals(3, arrayOut.length);
@@ -524,6 +528,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(2, foos2.size());
         assertEquals(2, foos2.get(0).length);
         assertEquals(2, foos2.get(1).length);
+        
     }
       
     @Test
