@@ -45,6 +45,14 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetAll() throws Exception {
+        
+        InputStream in = getRestInputStream("http://localhost:9092/test/services/rest2/myRestService");
+        assertEquals("0", getStringFromInputStream(in));
+                
+    }
+    
+    @Test
     public void testGetBook123() throws Exception {
         
         InputStream in = getRestInputStream("http://localhost:9092/test/services/rest/bookstore/123");
@@ -105,17 +113,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     private InputStream getRestInputStream(String endpointAddress) throws Exception {
         URL url = new URL(endpointAddress);
         
-        for (int count = 0; count < 25; count++) {
-            URLConnection connect = url.openConnection();
-            connect.addRequestProperty("Accept", "application/xml");
-            try {
-                return connect.getInputStream();
-            } catch (Exception ex) {
-                // continue;
-            }
-        }
-        fail("REST endpoint can not be accessed");
-        // unreachable
-        return null;
+        URLConnection connect = url.openConnection();
+        connect.addRequestProperty("Accept", "application/xml,text/plain");
+        return connect.getInputStream();
     }
 }

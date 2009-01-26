@@ -100,7 +100,7 @@ public final class ResourceUtils {
         if (cr.getMethodDispatcher().getOperationResourceInfos().isEmpty()) {
             LOG.warning(new org.apache.cxf.common.i18n.Message("NO_RESOURCE_OP_EXC", 
                                                                BUNDLE, 
-                                                               cr.getClass().getName()).toString());
+                                                               cr.getServiceClass().getName()).toString());
             return false;
         }
         return true;
