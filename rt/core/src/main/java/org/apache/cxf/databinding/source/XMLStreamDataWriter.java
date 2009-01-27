@@ -51,17 +51,16 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
                 reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
+                StaxUtils.copy(reader, writer);
+                reader.close();
             } else {
                 Source s = (Source) obj;
                 if (s instanceof DOMSource
                     && ((DOMSource) s).getNode() == null) {
                     return;
                 }
-            
-                reader = StaxUtils.createXMLStreamReader(s);
+                StaxUtils.copy(s, writer);
             }
-            StaxUtils.copy(reader, writer);
-            reader.close();
         } catch (XMLStreamException e) {
             throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
         } catch (IOException e) {

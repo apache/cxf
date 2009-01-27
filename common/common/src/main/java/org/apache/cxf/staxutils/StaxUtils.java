@@ -48,6 +48,7 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
@@ -59,6 +60,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -286,6 +290,30 @@ public final class StaxUtils {
             }
         }
         return false;
+    }
+    public static void copy(Source source, XMLStreamWriter writer) throws XMLStreamException {
+        if (source instanceof SAXSource) {
+            InputSource src = ((SAXSource)source).getInputSource();
+            if (src.getByteStream() == null && src.getCharacterStream() == null
+                && src.getSystemId() == null && src.getPublicId() == null
+                && ((SAXSource)source).getXMLReader() != null) {
+                //OK - reader is OK.  We'll dump that out
+                StreamWriterContentHandler ch = new StreamWriterContentHandler(writer);
+                XMLReader reader = ((SAXSource)source).getXMLReader();
+                reader.setContentHandler(ch);
+                try {
+                    reader.parse(((SAXSource)source).getInputSource());
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new XMLStreamException(e);
+                }
+            }
+        }
+        
+        XMLStreamReader reader = createXMLStreamReader(source);
+        copy(reader, writer);
+        reader.close();
     }
 
     public static Document copy(Document doc) 
