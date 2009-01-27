@@ -105,8 +105,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             FrontEndProfile frontend = context.get(FrontEndProfile.class);
 
             if (frontend == null) {
-                Message msg = new Message("FOUND_NO_FRONTEND", LOG);
-                throw new ToolException(msg);
+                throw new ToolException(new Message("FOUND_NO_FRONTEND", LOG));
             }
 
             WSDLConstants.WSDLVersion version = getWSDLVersion();
@@ -133,6 +132,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     builder.validate(definition);
 
                     WSDLServiceBuilder serviceBuilder = new WSDLServiceBuilder(getBus());
+                    serviceBuilder.setIgnoreUnknownBindings(true);
                     String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
 
                     if (serviceName != null) {

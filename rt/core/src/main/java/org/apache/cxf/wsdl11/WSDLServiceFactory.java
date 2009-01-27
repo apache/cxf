@@ -45,6 +45,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
 
     private URL wsdlUrl;
     private QName serviceName;
+    private QName endpointName;
     private Definition definition;
 
     public WSDLServiceFactory(Bus b, Definition d) {
@@ -85,7 +86,9 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
 
         serviceName = sn;
     }
-
+    public void setEndpointName(QName qn) {
+        endpointName = qn;
+    }
     public Service create() {
 
         List<ServiceInfo> services;
@@ -114,7 +117,9 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 throw new ServiceConstructionException(new Message("NO_SUCH_SERVICE_EXC", LOG, serviceName));
             }
             try {
-                services = new WSDLServiceBuilder(getBus()).buildServices(definition, wsdlService);
+                services = new WSDLServiceBuilder(getBus()).buildServices(definition, 
+                                                                          wsdlService,
+                                                                          endpointName);
             } catch (XmlSchemaException ex) {
                 throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
             }

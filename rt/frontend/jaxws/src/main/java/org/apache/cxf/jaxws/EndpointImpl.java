@@ -277,6 +277,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             checkProperties();
 
             // Initialize the endpointName so we can do configureObject
+            QName origEpn = endpointName;
             if (endpointName == null) {
                 JaxWsImplementorInfo implInfo = new JaxWsImplementorInfo(getImplementorClass());
                 endpointName = implInfo.getEndpointName();
@@ -291,6 +292,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             }*/
 
             configureObject(this);
+            endpointName = origEpn;
             
             // Set up the server factory
             serverFactory.setAddress(addr);
