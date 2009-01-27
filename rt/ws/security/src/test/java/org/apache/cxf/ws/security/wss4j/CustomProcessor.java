@@ -32,6 +32,7 @@ import org.apache.ws.security.processor.Processor;
  */
 public class CustomProcessor implements Processor {
     
+    @SuppressWarnings("unchecked")
     public final void 
     handleToken(
         final org.w3c.dom.Element elem, 
