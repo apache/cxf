@@ -81,6 +81,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.workqueue.WorkQueueManager;
 
 public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>, MessageObserver {
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchImpl.class);
@@ -343,10 +344,7 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
 
     private Executor getExecutor() {
         if (executor == null) {
-            executor = getEndpoint().getService().getExecutor();
-        }
-        if (executor == null) {
-            executor = Executors.newFixedThreadPool(5);
+            executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
         }
         if (executor == null) {
             System.err.println("Can't not get executor");
