@@ -54,6 +54,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
+import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -309,6 +310,17 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
         populateFromClass = false;
         WSDLServiceFactory factory = new WSDLServiceFactory(getBus(), url, getServiceQName());
+        boolean setEPName = true;
+        if (features != null) {
+            for (AbstractFeature f : features) {
+                if (f instanceof FailoverFeature) {
+                    setEPName = false;
+                }
+            }
+        }
+        if (setEPName) {
+            factory.setEndpointName(getEndpointName(false));
+        }
         setService(factory.create());
 
         setServiceProperties();

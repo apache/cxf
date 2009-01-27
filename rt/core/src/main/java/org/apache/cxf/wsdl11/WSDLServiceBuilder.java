@@ -104,6 +104,7 @@ public class WSDLServiceBuilder {
     private Bus bus;
     private Map<String, Element> schemaList = new HashMap<String, Element>();
     private boolean recordOriginal = true;
+    private boolean ignoreUnknownBindings;
 
     public WSDLServiceBuilder(Bus bus) {
         this.bus = bus;
@@ -113,6 +114,10 @@ public class WSDLServiceBuilder {
         recordOriginal = record;
     }
 
+    public void setIgnoreUnknownBindings(boolean b) {
+        ignoreUnknownBindings = b;
+    }
+    
     private void copyExtensors(AbstractPropertiesHolder info, List<?> extList) {
         if (info != null) {
             for (ExtensibilityElement ext : cast(extList, ExtensibilityElement.class)) {
@@ -145,16 +150,22 @@ public class WSDLServiceBuilder {
         for (java.util.Iterator<QName> ite = CastUtils.cast(d.getServices().keySet().iterator()); ite
             .hasNext();) {
             QName qn = ite.next();
-            serviceList.addAll(buildServices(d, qn, description));
+            serviceList.addAll(buildServices(d, qn, null, description));
         }
         return serviceList;
     }
 
     public List<ServiceInfo> buildServices(Definition d, QName name) {
-        return buildServices(d, name, null);
+        return buildServices(d, name, null, null);
+    }
+    public List<ServiceInfo> buildServices(Definition d, QName name, QName endpointName) {
+        return buildServices(d, name, endpointName);
     }
 
-    private List<ServiceInfo> buildServices(Definition d, QName name, DescriptionInfo description) {
+    private List<ServiceInfo> buildServices(Definition d, 
+                                            QName name,
+                                            QName endpointName,
+                                            DescriptionInfo description) {
         Service service = d.getService(name);
         if (service == null) {
             org.apache.cxf.common.i18n.Message msg = 
@@ -163,11 +174,14 @@ public class WSDLServiceBuilder {
                                                        name);
             throw new WSDLRuntimeException(msg);
         }
-        return buildServices(d, service, description);
+        return buildServices(d, service, endpointName, description);
     }
 
     public List<ServiceInfo> buildServices(Definition def, Service serv) {
-        return buildServices(def, serv, null);
+        return buildServices(def, serv, null, null);
+    }
+    public List<ServiceInfo> buildServices(Definition def, Service serv, QName endpointName) {
+        return buildServices(def, serv, endpointName, null);
     }
 
     public List<ServiceInfo> buildMockServices(Definition d) {
@@ -233,7 +247,10 @@ public class WSDLServiceBuilder {
         return service;
     }
 
-    private List<ServiceInfo> buildServices(Definition def, Service serv, DescriptionInfo d) {
+    private List<ServiceInfo> buildServices(Definition def,
+                                            Service serv, 
+                                            QName endpointName, 
+                                            DescriptionInfo d) {
         Map<QName, ServiceInfo> services = new LinkedHashMap<QName, ServiceInfo>();
 
         DescriptionInfo description = d;
@@ -263,6 +280,10 @@ public class WSDLServiceBuilder {
             }
         }
         for (Port port : cast(serv.getPorts().values(), Port.class)) {
+            if (endpointName != null
+                && !endpointName.getLocalPart().equals(port.getName())) {
+                continue;
+            }
             Binding binding = port.getBinding();
             PortType bindingPt = binding.getPortType();
             if (bindingPt == null) {
@@ -395,7 +416,9 @@ public class WSDLServiceBuilder {
                 }
             }
             if (ns == null) {
-                
+                if (ignoreUnknownBindings) {
+                    return null;
+                }
                 org.apache.cxf.common.i18n.Message msg = new 
                     org.apache.cxf.common.i18n.Message("MISSING_DESTINATION_FACTORY",
                                                        LOG,
