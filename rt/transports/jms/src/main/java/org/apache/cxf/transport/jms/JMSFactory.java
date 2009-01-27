@@ -94,6 +94,14 @@ public final class JMSFactory {
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
         jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
         jmsListener.setMessageListener(listenerHandler);
+        if (jmsConfig.getRecoveryInterval() != JMSConfiguration.DEFAULT_VALUE) {
+            jmsListener.setRecoveryInterval(jmsConfig.getRecoveryInterval());
+        }
+        if (jmsConfig.getCacheLevelName() != null && (jmsConfig.getCacheLevelName().trim().length() > 0)) {
+            jmsListener.setCacheLevelName(jmsConfig.getCacheLevelName());
+        } else if (jmsConfig.getCacheLevel() != JMSConfiguration.DEFAULT_VALUE) {
+            jmsListener.setCacheLevel(jmsConfig.getCacheLevel());
+        }
         if (messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
             jmsListener.setMessageSelector("JMSCorrelationID LIKE '" + messageSelectorPrefix + "%'");
         }
@@ -107,10 +115,14 @@ public final class JMSFactory {
             taskExecutor.setConcurrencyLimit(jmsConfig.getMaxConcurrentTasks());
             jmsListener.setTaskExecutor(taskExecutor);
         }
-        JmsTemplate jmsTemplate = createJmsTemplate(jmsConfig, null);
-        Destination dest = JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName, jmsConfig
-            .isPubSubDomain());
-        jmsListener.setDestination(dest);
+        if (jmsConfig.isAutoResolveDestination()) {
+            jmsListener.setDestinationName(destinationName);
+        } else {
+            JmsTemplate jmsTemplate = createJmsTemplate(jmsConfig, null);
+            Destination dest = JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName, jmsConfig
+                .isPubSubDomain());
+            jmsListener.setDestination(dest);
+        }
         jmsListener.initialize();
         return jmsListener;
     }

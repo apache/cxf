@@ -29,6 +29,12 @@ import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class JMSConfiguration implements InitializingBean {
+    /**
+     * The use of -1 is to make easier to determine 
+     * if the setCacheLevel has been called.
+     */
+    public static final int DEFAULT_VALUE = -1;
+
     static final boolean DEFAULT_USEJMS11 = true;
     
     private boolean usingEndpointInfo = true;
@@ -61,6 +67,43 @@ public class JMSConfiguration implements InitializingBean {
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean useConduitIdSelector = true;
+    private boolean autoResolveDestination;
+    private long recoveryInterval = DEFAULT_VALUE;
+    private int cacheLevel = DEFAULT_VALUE;
+    private String cacheLevelName;
+    
+    public String getCacheLevelName() {
+        return cacheLevelName;
+    }
+
+    public void setCacheLevelName(String cacheLevelName) {
+        this.cacheLevelName = cacheLevelName;
+    }
+
+    public int getCacheLevel() {
+        return cacheLevel;
+    }
+
+    public void setCacheLevel(int cacheLevel) {
+        this.cacheLevel = cacheLevel;
+    }
+
+    public long getRecoveryInterval() {
+        return recoveryInterval;
+    }
+
+    public void setRecoveryInterval(long recoveryInterval) {
+        this.recoveryInterval = recoveryInterval;
+    }
+
+    public boolean isAutoResolveDestination() {
+        return autoResolveDestination;
+    }
+
+    public void setAutoResolveDestination(boolean autoResolveDestination) {
+        this.autoResolveDestination = autoResolveDestination;
+    }
+
 
     public boolean isUsingEndpointInfo() {
         return this.usingEndpointInfo;
