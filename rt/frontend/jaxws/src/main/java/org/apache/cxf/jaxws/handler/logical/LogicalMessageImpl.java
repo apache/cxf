@@ -246,9 +246,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             }
 
             XMLStreamWriter writer = new W3CDOMStreamWriter((Element)n);
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
-            StaxUtils.copy(reader, writer);
-            reader.close();
+            StaxUtils.copy(source, writer);
         } catch (XMLStreamException e) {
             throw new Fault(e);
         }

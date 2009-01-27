@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -56,9 +55,7 @@ public class NodeDataWriter implements DataWriter<Node> {
             }
             
             XMLStreamWriter writer = new W3CDOMStreamWriter((Element)n);
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(s);
-            StaxUtils.copy(reader, writer);
-            reader.close();
+            StaxUtils.copy(s, writer);
         } catch (XMLStreamException e) {
             throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
         }

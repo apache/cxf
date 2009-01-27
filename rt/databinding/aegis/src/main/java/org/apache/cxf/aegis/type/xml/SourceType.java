@@ -20,7 +20,6 @@ package org.apache.cxf.aegis.type.xml;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -98,8 +97,7 @@ public class SourceType extends Type {
 
             StaxUtils.writeElement(element, writer, false);
         } else {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader((Source)object);
-            StaxUtils.copy(reader, writer);
+            StaxUtils.copy((Source)object, writer);
         }
     }
 

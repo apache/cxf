@@ -43,7 +43,6 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -233,11 +232,10 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 throw new Fault(e);
             }
         } else {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader((Source)o);
             StringWriter stringWriter = new StringWriter();
             XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(stringWriter);
             try {
-                StaxUtils.copy(reader, writer);
+                StaxUtils.copy((Source)o, writer);
                 writer.flush();
                 ds = new ByteArrayDataSource(stringWriter.toString(), ct);
             } catch (XMLStreamException e1) {
