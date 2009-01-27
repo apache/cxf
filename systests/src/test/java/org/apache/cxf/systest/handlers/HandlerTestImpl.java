@@ -55,7 +55,7 @@ public class HandlerTestImpl implements HandlerTest {
             List<String> handlerInfoList = getHandlersInfo(context.getMessageContext());
             handlerInfoList.add("servant");
             context.getMessageContext().remove("handler.info");
-            System.out.println(">> servant returning list: " + handlerInfoList);
+            //System.out.println(">> servant returning list: " + handlerInfoList);
             return handlerInfoList;
 
         } catch (Exception e) {

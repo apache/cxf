@@ -252,12 +252,15 @@ public abstract class AbstractHTTPTransportFactory
             if (address == null) {
                 address = configuredConduit.getAddress();
             }
-            if (address != null 
-                && address.startsWith(HttpsURLConnectionFactory.HTTPS_URL_PROTOCOL_ID + ":/")) {
-                useHttps = true;
-            }
         } catch (MalformedURLException e) {
             //ignore, just use info based on Tls
+        }
+        if (address != null 
+            && address.startsWith(HttpsURLConnectionFactory.HTTPS_URL_PROTOCOL_ID + ":/")) {
+            useHttps = true;
+        }
+        if (address == null) {
+            useHttps = configuredConduit.getTlsClientParameters() != null;
         }
         if (useHttps) {
             TLSClientParameters params = configuredConduit.getTlsClientParameters();

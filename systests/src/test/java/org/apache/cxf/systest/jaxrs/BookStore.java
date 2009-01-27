@@ -223,7 +223,7 @@ public class BookStore {
     }
     
     private Book doGetBook(String id) throws BookNotFoundFault {
-        System.out.println("----invoking getBook with id: " + id);
+        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;

@@ -37,7 +37,7 @@ public class Book {
     
     public Book() {
         init();
-        System.out.println("----chapters: " + chapters.size());
+        //System.out.println("----chapters: " + chapters.size());
     }
     
     public Book(String name, long id) {
