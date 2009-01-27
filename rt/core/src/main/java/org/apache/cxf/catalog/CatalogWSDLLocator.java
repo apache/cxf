@@ -96,8 +96,6 @@ public class CatalogWSDLLocator implements WSDLLocator {
     }
 
     public InputSource getImportInputSource(String parent, String importLocation) {
-        this.baseUri = parent;
-
         String resolvedImportLocation = null;
         if (catalogResolver != null) {
             try {
@@ -115,7 +113,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
 
         InputSource in = null;
         if (resolvedImportLocation == null) {
-            in = this.resolver.resolve(importLocation, this.baseUri);
+            in = this.resolver.resolve(importLocation, parent);
         } else {
             in = this.resolver.resolve(resolvedImportLocation, null);
         }

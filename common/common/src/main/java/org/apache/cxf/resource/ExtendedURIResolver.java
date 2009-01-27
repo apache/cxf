@@ -52,9 +52,9 @@ public class ExtendedURIResolver {
                 }
                 InputStream in = currentResolver.getInputStream();
                 resourceOpened.addElement(in);
-                InputSource source = new InputSource(in);               
-                source.setSystemId(curUri); 
-                source.setPublicId(lastestImportUri);
+                InputSource source = new InputSource(in);
+                source.setSystemId(curUri);
+                source.setPublicId(curUri);
                 return source;
             }
         } catch (IOException e) {
