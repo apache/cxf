@@ -102,7 +102,6 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder matrixParam(String name, String value) throws IllegalArgumentException {
         matrix.putSingle(name, value);

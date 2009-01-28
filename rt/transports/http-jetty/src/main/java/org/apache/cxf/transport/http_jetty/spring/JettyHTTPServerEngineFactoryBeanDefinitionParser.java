@@ -63,7 +63,6 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
     }
     
 
-    @SuppressWarnings("deprecation")
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         //bean.setAbstract(true);        
