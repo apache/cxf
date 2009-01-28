@@ -410,20 +410,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         put.setRequestEntity(entity);
         HttpClient httpclient = new HttpClient();
-
         try {
             int result = httpclient.executeMethod(put);
             assertEquals(200, result);
-            System.out.println(put.getResponseBodyAsString());
+            String resp = put.getResponseBodyAsString();
+            InputStream expected = getClass().getResourceAsStream("resources/update_book.txt");
+            assertTrue(resp.indexOf(getStringFromInputStream(expected)) >= 0);
         } finally {
             // Release current connection to the connection pool once you are
             // done
             put.releaseConnection();
         }
-        
-        InputStream expected = getClass().getResourceAsStream("resources/update_book.txt");
-
-        assertTrue(put.getResponseBodyAsString().indexOf(getStringFromInputStream(expected)) >= 0);
     }
     
     @Test
@@ -506,7 +503,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
         InputStream expected124 = getClass().getResourceAsStream("resources/expected_get_cds124.txt");
         String result = getStringFromInputStream(in);
-        System.out.println("---" + result);
+        //System.out.println("---" + result);
         assertTrue(result.indexOf(getStringFromInputStream(expected124)) >= 0);
     }
     

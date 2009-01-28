@@ -693,9 +693,6 @@ public class HTTPConduit
                 || result.startsWith(connectionFactory.getProtocol() + ":/")) {
             
                 connectionFactory = null;
-                if (!result.startsWith("https:/")) {
-                    tlsClientParameters = null;
-                }
                 retrieveConnectionFactory(result);
             }
         }
