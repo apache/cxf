@@ -68,7 +68,9 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public MediaType getMediaType() {
-        return MediaType.valueOf((String)m.get(Message.CONTENT_TYPE));
+        String value = (String)m.get(Message.CONTENT_TYPE);
+        
+        return value == null ? null : MediaType.valueOf(value);
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {

@@ -35,9 +35,6 @@ import javax.ws.rs.ext.Providers;
  */
 public interface MessageContext {
     
-    String INBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.inbound";
-    String OUTBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.outbound";
-    
     Object get(Object key);
     void put(Object key, Object value);
     

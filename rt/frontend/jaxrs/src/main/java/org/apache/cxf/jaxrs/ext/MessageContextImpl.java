@@ -18,16 +18,20 @@
  */
 package org.apache.cxf.jaxrs.ext;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.activation.DataHandler;
+import javax.mail.internet.InternetHeaders;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
@@ -36,9 +40,10 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.attachment.AttachmentUtil;
-import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.interceptor.AttachmentInputInterceptor;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
 public class MessageContextImpl implements MessageContext {
@@ -50,8 +55,8 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public Object get(Object key) {
-        if (MessageContext.INBOUND_MESSAGE_ATTACHMENTS.equals(key.toString())) {
-            return createAttachments(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
+        if (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS.equals(key.toString())) {
+            return createAttachments(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
         }
         return m.get(key);
     }
@@ -111,19 +116,34 @@ public class MessageContextImpl implements MessageContext {
         throw new UnsupportedOperationException("MessageContext.put() is not supported yet");
     }
 
-    private Map<String, DataHandler> createAttachments(String propertyName) {
+    private MultipartBody createAttachments(String propertyName) {
         Object o = m.get(propertyName);
         if (o != null) {
-            return CastUtils.cast((Map)o);
+            return (MultipartBody)o;
         }
-        Collection<Attachment> attachments = m.getAttachments();
-        if (attachments == null) {
-            return Collections.emptyMap();
+        new AttachmentInputInterceptor().handleMessage(m);
+        
+        List<Attachment> newAttachments = new LinkedList<Attachment>();
+        try {
+            Attachment first = new Attachment(AttachmentUtil.createAttachment(
+                                     m.getContent(InputStream.class), 
+                                     (InternetHeaders)m.get(InternetHeaders.class.getName())));
+            newAttachments.add(first);
+        } catch (IOException ex) {
+            throw new WebApplicationException(500);
         }
-        attachments.size();
-        Map<String, DataHandler> dataHandlers = AttachmentUtil.getDHMap(attachments);
-        m.put(propertyName, dataHandlers);
-        return dataHandlers;
+        
+        Collection<org.apache.cxf.message.Attachment> childAttachments = m.getAttachments();
+        if (childAttachments == null) {
+            childAttachments = Collections.emptyList();
+        }
+        childAttachments.size();
+        for (org.apache.cxf.message.Attachment a : childAttachments) {
+            newAttachments.add(new Attachment(a));
+        }
+        MultipartBody body = new MultipartBody(newAttachments, getHttpHeaders().getMediaType(), false);
+        m.put(propertyName, body);
+        return body;
     }
        
 }

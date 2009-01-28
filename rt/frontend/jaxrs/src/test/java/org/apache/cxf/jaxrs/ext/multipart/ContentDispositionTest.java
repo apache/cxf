@@ -16,26 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.utils.multipart;
 
-import javax.ws.rs.core.MediaType;
+package org.apache.cxf.jaxrs.ext.multipart;
 
-public class MultipartInfo {
 
-    private Object part;
-    private MediaType contentType;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class ContentDispositionTest extends Assert {
     
-    public MultipartInfo(Object o, MediaType type) {
-        part = o;
-        contentType = type;
-    }
-    
-    public Object getPart() {
-        return part;
-    }
-    
-    public MediaType getType() {
-        return contentType;
+    @Test
+    public void testContentDisposition() {
+        ContentDisposition cd = new ContentDisposition(" attachment ; bar=foo ; baz = baz1");
+        assertEquals("attachment", cd.getType());
+        assertEquals("foo", cd.getParameter("bar"));
+        assertEquals("baz1", cd.getParameter("baz"));
     }
     
 }

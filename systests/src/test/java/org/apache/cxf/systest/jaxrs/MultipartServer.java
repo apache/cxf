@@ -31,7 +31,7 @@ public class MultipartServer extends AbstractBusTestServerBase {
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(MultipartStore.class,
                                new SingletonResourceProvider(new MultipartStore()));
-        sf.setAddress("http://localhost:9080/");
+        sf.setAddress("http://localhost:9085/");
 
         sf.create();        
     }
