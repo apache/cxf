@@ -90,7 +90,6 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.velocity.util.ClassUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
@@ -523,7 +522,8 @@ public abstract class AbstractBindingBuilder {
             handler = (CallbackHandler)o;
         } else if (o instanceof String) {
             try {
-                handler = (CallbackHandler)ClassUtils.getNewInstance(o.toString());
+                handler = (CallbackHandler)ClassLoaderUtils
+                    .loadClass((String)o, this.getClass()).newInstance();
             } catch (Exception e) {
                 handler = null;
             }
