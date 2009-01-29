@@ -21,13 +21,13 @@ package org.apache.cxf.jaxrs.model;
 import java.util.Stack;
 
 /**
- * Stack of {@link OperationResourceInfo} representing resources path when JAX-RS invocation looks for target.
+ * Stack of {@link MethodInvocationInfo} representing resources path when JAX-RS invocation looks for target.
  * Used to evaluate {@link UriInfo#getMatchedResources() UriInfo.getMatched*} methods when sub-locators are
  * involved.
  * <p>
  * Stack elements are placed in order same as java stacktrace - root resource on bottom, recent resource on
  * top.
  */
-public class OperationResourceInfoStack extends Stack<OperationResourceInfo> {
+public class OperationResourceInfoStack extends Stack<MethodInvocationInfo> {
     private static final long serialVersionUID = 1L;
 }

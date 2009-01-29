@@ -39,6 +39,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -82,11 +83,11 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
 
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
-        pushOntoStack(ori, exchange.getInMessage());
-
         ClassResourceInfo cri = ori.getClassResourceInfo();
+        
         Object resourceObject = getServiceObject(exchange, resources);
-
+        pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
+                
         Method methodToInvoke = InjectionUtils.checkProxy(
              cri.getMethodDispatcher().getMethod(ori), resourceObject);
 
@@ -235,12 +236,12 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
-    private void pushOntoStack(OperationResourceInfo ori, Message msg) {
+    private void pushOntoStack(OperationResourceInfo ori, Class<?> realClass, Message msg) {
         OperationResourceInfoStack stack = msg.get(OperationResourceInfoStack.class);
         if (stack == null) {
             stack = new OperationResourceInfoStack();
             msg.put(OperationResourceInfoStack.class, stack);
         }
-        stack.push(ori);
+        stack.push(new MethodInvocationInfo(ori, realClass));
     }
 }

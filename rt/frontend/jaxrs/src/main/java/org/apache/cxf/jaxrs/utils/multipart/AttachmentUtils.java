@@ -79,6 +79,7 @@ public final class AttachmentUtils {
                                                        id.value(),
                                                        mt.toString());
             LOG.warning(errorMsg.toString());
+            return null;
             
         }
         
