@@ -691,6 +691,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       + "class org.apache.cxf.systest.jaxrs.Chapter]", 
                       "text/plain", 200);
     }
+    
+    @Test
+    public void testUriInfoMatchedResourcesWithObject() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/"
+                      + "booksubresource/123/chaptersobject/sub/1/matched-resources", 
+                      "[class org.apache.cxf.systest.jaxrs.BookStore, " 
+                      + "class org.apache.cxf.systest.jaxrs.Book, "
+                      + "class org.apache.cxf.systest.jaxrs.Chapter]", 
+                      "text/plain", 200);
+    }
 
     @Test
     public void testUriInfoMatchedUrisDecode() throws Exception {

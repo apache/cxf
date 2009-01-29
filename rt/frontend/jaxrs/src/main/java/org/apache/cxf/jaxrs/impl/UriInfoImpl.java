@@ -33,6 +33,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -131,8 +132,8 @@ public class UriInfoImpl implements UriInfo {
     public List<Object> getAncestorResources() {
         if (stack != null) {
             List<Object> resources = new ArrayList<Object>(stack.size());
-            for (OperationResourceInfo ori : stack) {
-                resources.add(ori.getClassResourceInfo().getResourceClass());
+            for (MethodInvocationInfo invocation : stack) {
+                resources.add(invocation.getRealClass());
             }
             return resources;
         }
@@ -148,7 +149,8 @@ public class UriInfoImpl implements UriInfo {
         if (stack != null) {
             List<String> uris = new ArrayList<String>(stack.size());
             String sum = "";
-            for (OperationResourceInfo ori : stack) {
+            for (MethodInvocationInfo invocation : stack) {
+                OperationResourceInfo ori = invocation.getMethodInfo();
                 Path[] paths = {
                     (Path)AnnotationUtils.getClassAnnotation(ori.getClassResourceInfo().getResourceClass(),
                                                              Path.class),
