@@ -161,7 +161,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }
     
     private boolean isRequestor(SoapMessage message) {
-        return Boolean.TRUE.equals(message.containsKey(
+        return Boolean.TRUE.equals(message.get(
             org.apache.cxf.message.Message.REQUESTOR_ROLE));
     }  
     
