@@ -24,9 +24,15 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
@@ -34,9 +40,12 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder {
+
+    private static final Pattern DECODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
 
     private String scheme;
     private String userInfo;
@@ -46,20 +55,94 @@ public class UriBuilderImpl extends UriBuilder {
     private String fragment;
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
 
+    /**
+     * Creates builder with empty URI.
+     */
     public UriBuilderImpl() {
     }
 
-    public UriBuilderImpl(URI uri) {
+    /**
+     * Creates builder initialized with given URI.
+     * 
+     * @param uri initial value for builder
+     * @throws IllegalArgumentException when uri is null
+     */
+    public UriBuilderImpl(URI uri) throws IllegalArgumentException {
         setUriParts(uri);
     }
 
     @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
         try {
-            return new URI(scheme, userInfo, host, port, buildPath(), buildQuery(), fragment);
+            String path = buildPath();
+            path = substituteVarargs(path, values);
+            return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
+    }
+
+    private String substituteVarargs(String path, Object... values) {
+        Map<String, String> varValueMap = new HashMap<String, String>();
+        URITemplate templ = new URITemplate(path);
+        // vars in set are properly ordered due to linking in hash set
+        Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
+        if (values.length < uniqueVars.size()) {
+            throw new IllegalArgumentException("Unresolved variables; only " + values.length
+                                               + " value(s) given for " + uniqueVars.size()
+                                               + " unique variable(s)");
+        }
+        int idx = 0;
+        for (String var : uniqueVars) {
+            Object oval = values[idx++];
+            varValueMap.put(var, oval.toString());
+        }
+        return templ.substitute(varValueMap);
+    }
+
+    @Override
+    public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
+        // Problem: multi-arg URI c-tor always forces encoding, operation contract would be broken;
+        // use os single-arg URI c-tor requires unnecessary concatenate-parse roundtrip.
+        // Solution: decode back given values and pass as non-decoded to regular build() method
+        for (int i = 0; i < values.length; i++) {
+            values[i] = decodePartiallyEncoded(values[i].toString());
+        }
+        return build(values);
+    }
+
+    @Override
+    public URI buildFromMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
+        UriBuilderException {
+        try {
+            String path = buildPath();
+            path = substituteMapped(path, map);
+            return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
+        } catch (URISyntaxException ex) {
+            throw new UriBuilderException("URI can not be built", ex);
+        }
+    }
+
+    private String substituteMapped(String path, Map<String, ? extends Object> varValueMap) {
+        URITemplate templ = new URITemplate(path);
+        Set<String> uniqueVars = new HashSet<String>(templ.getVariables());
+        if (varValueMap.size() < uniqueVars.size()) {
+            throw new IllegalArgumentException("Unresolved variables; only " + varValueMap.size()
+                                               + " value(s) given for " + uniqueVars.size()
+                                               + " unique variable(s)");
+        }
+        return templ.substitute(varValueMap);
+    }
+
+    @Override
+    public URI buildFromEncodedMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
+        UriBuilderException {
+        // see buildFromEncoded() comment
+        Map<String, String> decodedMap = new HashMap<String, String>(map.size());
+        for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
+            decodedMap.put(entry.getKey(), decodePartiallyEncoded(entry.getValue().toString()));
+        }
+        return buildFromMap(decodedMap);
     }
 
     // CHECKSTYLE:OFF
@@ -96,6 +179,7 @@ public class UriBuilderImpl extends UriBuilder {
         return path(((Path)ann).value());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Class resource, String method) throws IllegalArgumentException {
         if (resource == null) {
@@ -186,6 +270,9 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private void setUriParts(URI uri) {
+        if (uri == null) {
+            throw new IllegalArgumentException("uri is null");
+        }
         scheme = uri.getScheme();
         port = uri.getPort();
         host = uri.getHost();
@@ -197,15 +284,17 @@ public class UriBuilderImpl extends UriBuilder {
 
     private String buildPath() {
         StringBuilder sb = new StringBuilder();
-        for (PathSegment ps : paths) {
-            String p = ps.getPath();
-            if (!p.startsWith("/") && (sb.length() == 0 || sb.charAt(sb.length() - 1) != '/')) {
-                sb.append('/');
+        Iterator<PathSegment> iter = paths.iterator();
+        while (iter.hasNext()) {
+            String p = iter.next().getPath();
+            if (p.length() != 0 || !iter.hasNext()) {
+                if (!p.startsWith("/")) {
+                    sb.append('/');
+                }
+                sb.append(p);
             }
-            sb.append(p);
         }
         return sb.toString();
-
     }
 
     private String buildQuery() {
@@ -218,29 +307,6 @@ public class UriBuilderImpl extends UriBuilder {
             }
         }
         return b.length() > 0 ? b.toString() : null;
-    }
-
-    @Override
-    public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
-        try {
-            return new URI(scheme, userInfo, host, port, buildPath(), buildQuery(), fragment);
-        } catch (URISyntaxException ex) {
-            throw new UriBuilderException("URI can not be built", ex);
-        }
-    }
-
-    @Override
-    public URI buildFromEncodedMap(Map<String, ? extends Object> arg0) throws IllegalArgumentException,
-        UriBuilderException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented :/");
-    }
-
-    @Override
-    public URI buildFromMap(Map<String, ? extends Object> arg0) throws IllegalArgumentException,
-        UriBuilderException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented :/");
     }
 
     @Override
@@ -297,4 +363,21 @@ public class UriBuilderImpl extends UriBuilder {
         throw new UnsupportedOperationException("Not implemented :/");
     }
 
+    /**
+     * Decode partially encoded string. Decode only values that matches patter "percent char followed by two
+     * hexadecimal digits".
+     * 
+     * @param encoded fully or partially encoded string.
+     * @return decoded string
+     */
+    private String decodePartiallyEncoded(String encoded) {
+        Matcher m = DECODE_PATTERN.matcher(encoded);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String found = m.group();
+            m.appendReplacement(sb, JAXRSUtils.uriDecode(found));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
 }

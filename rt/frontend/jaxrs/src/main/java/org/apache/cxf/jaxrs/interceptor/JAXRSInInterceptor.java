@@ -67,7 +67,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         try {
             processRequest(message, originalAddress);
         } catch (RuntimeException ex) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, originalAddress);
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, originalAddress, message);
             if (excResponse == null) {
                 ProviderFactory.getInstance(originalAddress).clearThreadLocalProxies();
                 throw ex;

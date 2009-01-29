@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     private Map<K, List<V>> m;
     
     public MetadataMap() {
-        this(new HashMap<K, List<V>>());
+        this(new LinkedHashMap<K, List<V>>());
     }
     
     public MetadataMap(Map<K, List<V>> store) {

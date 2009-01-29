@@ -21,6 +21,9 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
@@ -31,13 +34,121 @@ import org.junit.Test;
 
 public class UriBuilderImplTest extends Assert {
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testCtorNull() throws Exception {
+        new UriBuilderImpl(null);
+    }
+
+    @Test
+    public void testCtorAndBuild() throws Exception {
+        URI uri = new URI("http://foo/bar/baz?query=1#fragment");
+        URI newUri = new UriBuilderImpl(uri).build();
+        assertEquals("URI is not built correctly", uri, newUri);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUriNull() throws Exception {
+        new UriBuilderImpl().uri(null);
+    }
+
     @Test
     public void testUri() throws Exception {
         URI uri = new URI("http://foo/bar/baz?query=1#fragment");
         URI newUri = new UriBuilderImpl().uri(uri).build();
-        assertEquals("URI is not built correctly", newUri, uri);
+        assertEquals("URI is not built correctly", uri, newUri);
     }
 
+    @Test
+    public void testBuildValues() throws Exception {
+        URI uri = new URI("http://zzz");
+        URI newUri = new UriBuilderImpl(uri).path("/{b}/{a}/{b}").build("foo", "bar", "baz");
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo/bar/foo"), newUri);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBuildMissingValues() throws Exception {
+        URI uri = new URI("http://zzz");
+        new UriBuilderImpl(uri).path("/{b}/{a}/{b}").build("foo");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBuildMissingValues2() throws Exception {
+        URI uri = new URI("http://zzz");
+        new UriBuilderImpl(uri).path("/{b}").build();
+    }
+
+    @Test
+    public void testBuildValueWithBrackets() throws Exception {
+        URI uri = new URI("http://zzz");
+        URI newUri = new UriBuilderImpl(uri).path("/{a}").build("{foo}");
+        assertEquals("URI is not built correctly", new URI("http://zzz/%7Bfoo%7D"), newUri);
+    }
+    
+    @Test
+    public void testBuildValuesPct() throws Exception {
+        URI uri = new URI("http://zzz");
+        URI newUri = new UriBuilderImpl(uri).path("/{a}").build("foo%25/bar%");
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%2525/bar%25"), newUri);
+    }
+
+    @Test
+    public void testBuildValuesPctEncoded() throws Exception {
+        URI uri = new URI("http://zzz");
+        URI newUri = new UriBuilderImpl(uri).path("/{a}/{b}").buildFromEncoded("foo%25", "bar%");
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%25/bar%25"), newUri);
+    }
+
+    @Test
+    public void testBuildFromMapValues() throws Exception {
+        URI uri = new URI("http://zzz");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("b", "foo");
+        map.put("a", "bar");
+        Map<String, String> immutable = Collections.unmodifiableMap(map);
+        URI newUri = new UriBuilderImpl(uri).path("/{b}/{a}/{b}").buildFromMap(immutable);
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo/bar/foo"), newUri);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBuildFromMapMissingValues() throws Exception {
+        URI uri = new URI("http://zzz");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("b", "foo");
+        Map<String, String> immutable = Collections.unmodifiableMap(map);
+        new UriBuilderImpl(uri).path("/{b}/{a}/{b}").buildFromMap(immutable);
+    }
+
+    @Test
+    public void testBuildFromMapValueWithBrackets() throws Exception {
+        URI uri = new URI("http://zzz");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("a", "{foo}");
+        Map<String, String> immutable = Collections.unmodifiableMap(map);
+        URI newUri = new UriBuilderImpl(uri).path("/{a}").buildFromMap(immutable);
+        assertEquals("URI is not built correctly", new URI("http://zzz/%7Bfoo%7D"), newUri);
+    }
+    
+    @Test
+    public void testBuildFromMapValuesPct() throws Exception {
+        URI uri = new URI("http://zzz");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("a", "foo%25/bar%");
+        Map<String, String> immutable = Collections.unmodifiableMap(map);        
+        URI newUri = new UriBuilderImpl(uri).path("/{a}").buildFromMap(immutable);
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%2525/bar%25"), newUri);
+    }
+
+    @Test
+    public void testBuildFromMapValuesPctEncoded() throws Exception {
+        URI uri = new URI("http://zzz");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("a", "foo%25");
+        map.put("b", "bar%");
+        Map<String, String> immutable = Collections.unmodifiableMap(map);        
+        URI newUri = new UriBuilderImpl(uri).path("/{a}/{b}").buildFromEncodedMap(immutable);
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%25/bar%25"), newUri);
+    }
+    
     @Test
     public void testAddPath() throws Exception {
         URI uri = new URI("http://foo/bar");
@@ -55,10 +166,24 @@ public class UriBuilderImplTest extends Assert {
     }
 
     @Test
+    public void testAddPathSlashes2() throws Exception {
+        URI uri = new URI("http://foo/");
+        URI newUri = new UriBuilderImpl().uri(uri).path("/bar///baz").path("blah//").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar/baz/blah/"), newUri);
+    }
+
+    @Test
+    public void testAddPathSlashes3() throws Exception {
+        URI uri = new URI("http://foo/");
+        URI newUri = new UriBuilderImpl().uri(uri).path("/bar/").path("").path("baz").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar/baz"), newUri);
+    }
+
+    @Test
     public void testAddPathClass() throws Exception {
         URI uri = new URI("http://foo/");
-        URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class).path("bar").build();
-        assertEquals("URI is not built correctly", new URI("http://foo/bookstore/bar"), newUri);
+        URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class).path("/").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bookstore/"), newUri);
     }
 
     @Test(expected = IllegalArgumentException.class)

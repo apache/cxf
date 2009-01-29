@@ -703,9 +703,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testUriInfoMatchedUrisDecode() throws Exception {
-        String expected = "[/bookstore/booksubresource/{bookId}/, "
-                          + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/, "
-                          + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/matched!uris]";
+        String expected = "[/bookstore/booksubresource/123/, "
+                          + "/bookstore/booksubresource/123/chapters/sub/1/, "
+                          + "/bookstore/booksubresource/123/chapters/sub/1/matched!uris]";
         getAndCompare("http://localhost:9080/bookstore/"
                       + "booksubresource/123/chapters/sub/1/matched%21uris?decode=true", 
                       expected, 
@@ -715,9 +715,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testUriInfoMatchedUrisNoDecode() throws Exception {
         //note '%21' instead of '!'
-        String expected = "[/bookstore/booksubresource/{bookId}/, "
-            + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/, "
-            + "/bookstore/booksubresource/{bookId}/chapters/sub/{chapterid}/matched%21uris]";
+        String expected = "[/bookstore/booksubresource/123/, "
+            + "/bookstore/booksubresource/123/chapters/sub/1/, "
+            + "/bookstore/booksubresource/123/chapters/sub/1/matched%21uris]";
         getAndCompare("http://localhost:9080/bookstore/"
                       + "booksubresource/123/chapters/sub/1/matched%21uris?decode=false", 
                       expected,

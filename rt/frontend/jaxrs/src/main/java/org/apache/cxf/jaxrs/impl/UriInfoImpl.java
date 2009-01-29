@@ -146,6 +146,7 @@ public class UriInfoImpl implements UriInfo {
 
     public List<String> getMatchedURIs(boolean decode) {
         if (stack != null) {
+            List<String> objects = new ArrayList<String>();
             List<String> uris = new ArrayList<String>(stack.size());
             String sum = "";
             for (MethodInvocationInfo invocation : stack) {
@@ -162,7 +163,8 @@ public class UriInfoImpl implements UriInfo {
                     }
                 }
                 UriBuilder ub = UriBuilder.fromPath(sum);
-                uris.add(ub.build().normalize().getPath());
+                objects.addAll(invocation.getTemplateValues());
+                uris.add(ub.build(objects.toArray()).normalize().getPath());
             }
             return uris;
         }

@@ -22,7 +22,9 @@ package org.apache.cxf.jaxrs;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -116,7 +118,9 @@ public class JAXRSInvoker extends AbstractInvoker {
         try {
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), baseAddress);
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), 
+                                                                     baseAddress,
+                                                                     exchange.getInMessage());
             if (excResponse == null) {
                 ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();
                 ClassResourceInfo criRoot =
@@ -180,7 +184,9 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 return this.invoke(exchange, newParams, newResourceObjects);
             } catch (WebApplicationException ex) {
-                Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress);
+                Response excResponse = JAXRSUtils.convertFaultToResponse(ex, 
+                                                                         baseAddress,
+                                                                         exchange.getInMessage());
                 return new MessageContentsList(excResponse);
             }
         }
@@ -236,12 +242,29 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private void pushOntoStack(OperationResourceInfo ori, Class<?> realClass, Message msg) {
         OperationResourceInfoStack stack = msg.get(OperationResourceInfoStack.class);
         if (stack == null) {
             stack = new OperationResourceInfoStack();
             msg.put(OperationResourceInfoStack.class, stack);
         }
-        stack.push(new MethodInvocationInfo(ori, realClass));
+        
+        
+        MultivaluedMap<String, String> params = 
+            (MultivaluedMap)msg.get(URITemplate.TEMPLATE_PARAMETERS);
+        List<String> values = null;
+        if (params == null || params.size() == 1) {
+            values = Collections.emptyList();
+        } else {
+            values = new ArrayList<String>(params.size() - 1);
+            // if we have {bar}/{foo}/{bar} then we have a problem
+            for (Map.Entry<String, List<String>> entry : params.entrySet()) {
+                if (!entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
+                    values.addAll(entry.getValue());
+                }
+            }
+        }
+        stack.push(new MethodInvocationInfo(ori, realClass, values));
     }
 }
