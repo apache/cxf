@@ -19,17 +19,25 @@
 
 package org.apache.cxf.attachment;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.mail.Header;
+import javax.mail.internet.InternetHeaders;
 
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Attachment;
@@ -99,4 +107,59 @@ public final class AttachmentUtil {
         }
         return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
     }
+    
+    public static Attachment createAttachment(InputStream stream, InternetHeaders headers) 
+        throws IOException {
+     
+        String id = headers.getHeader("Content-ID", null);
+        if (id != null && id.startsWith("<")) {
+            id = id.substring(1, id.length() - 1);
+        } else {
+            //no Content-ID, set cxf default ID
+            id = "Content-ID: <root.message@cxf.apache.org";
+        }
+
+        id = URLDecoder.decode(id.startsWith("cid:") ? id.substring(4) : id, "UTF-8");
+
+        AttachmentImpl att = new AttachmentImpl(id);
+        
+        final String ct = headers.getHeader("Content-Type", null);
+        
+        boolean quotedPrintable = false;
+        
+        for (Enumeration<?> e = headers.getAllHeaders(); e.hasMoreElements();) {
+            Header header = (Header) e.nextElement();
+            if (header.getName().equalsIgnoreCase("Content-Transfer-Encoding")) {
+                if (header.getValue().equalsIgnoreCase("binary")) {
+                    att.setXOP(true);
+                } else if (header.getValue().equalsIgnoreCase("quoted-printable")) {
+                    quotedPrintable = true;
+                }
+            }
+            att.setHeader(header.getName(), header.getValue());
+        }
+        
+        if (quotedPrintable) {
+            DataSource source = new AttachmentDataSource(ct, new QuotedPrintableDecoderStream(stream));
+            att.setDataHandler(new DataHandler(source));
+        } else {
+            DataSource source = new AttachmentDataSource(ct, stream);
+            att.setDataHandler(new DataHandler(source));
+        }
+        
+        return att;
+    }
+    
+    public static boolean isTypeSupported(String contentType, List<String> types) {
+        if (contentType == null) {
+            return false;
+        }
+        for (String s : types) {
+            if (contentType.indexOf(s) != -1) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }

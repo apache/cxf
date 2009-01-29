@@ -1,0 +1,15 @@
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Book><name>CXF in Action - 2</name></Book>
+------=_Part_4_701508.1145579811786
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+
+foobar
+------=_Part_4_701508.1145579811786--
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Book><name>CXF in Action - 2</name></Book>
+------=_Part_4_701508.1145579811786--

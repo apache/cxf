@@ -20,9 +20,12 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.cxf.attachment.AttachmentDeserializer;
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -31,6 +34,8 @@ import org.apache.cxf.phase.Phase;
 public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AttachmentInInterceptor.class);
+
+    private static final List<String> TYPES = Collections.singletonList("multipart/related");
 
     /**
      * contruct the soap message with attachments from mime input stream
@@ -49,8 +54,8 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         
         String contentType = (String) message.get(Message.CONTENT_TYPE);
-        if (contentType != null && contentType.toLowerCase().indexOf("multipart/related") != -1) {
-            AttachmentDeserializer ad = new AttachmentDeserializer(message);
+        if (AttachmentUtil.isTypeSupported(contentType, getSupportedTypes())) {
+            AttachmentDeserializer ad = new AttachmentDeserializer(message, getSupportedTypes());
             try {
                 ad.initializeAttachments();
             } catch (IOException e) {
@@ -62,4 +67,7 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleFault(Message messageParam) {
     }
 
+    protected List<String> getSupportedTypes() {
+        return TYPES;
+    }
 }

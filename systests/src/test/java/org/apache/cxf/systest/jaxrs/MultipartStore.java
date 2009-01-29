@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs;
 
 
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -37,7 +39,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.MultipartID;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Path("/bookstore")
@@ -78,8 +81,8 @@ public class MultipartStore {
     @Path("/books/jaxb2")
     @ConsumeMime("multipart/related;type=\"text/xml\"")
     @ProduceMime("text/xml")
-    public Response addBookParts(@MultipartID("rootPart") Book b1,
-                                 @MultipartID("book2") Book b2) 
+    public Response addBookParts(@Multipart("rootPart") Book b1,
+                                 @Multipart("book2") Book b2) 
         throws Exception {
         if (b1.equals(b2)) {
             throw new WebApplicationException();
@@ -95,8 +98,8 @@ public class MultipartStore {
     @Path("/books/jaxbjson")
     @ProduceMime("text/xml")
     public Response addBookJaxbJson(
-        @MultipartID(value = "rootPart", type = "text/xml") Book2 b1,
-        @MultipartID(value = "book2", type = "application/json") Book b2) 
+        @Multipart(value = "rootPart", type = "text/xml") Book2 b1,
+        @Multipart(value = "book2", type = "application/json") Book b2) 
         throws Exception {
         if (!"CXF in Action".equals(b1.getName())
             || !"CXF in Action - 2".equals(b2.getName())) {
@@ -109,11 +112,47 @@ public class MultipartStore {
     @POST
     @Path("/books/dsource2")
     @ProduceMime("text/xml")
-    public Response addBookFromDataSource2(@MultipartID("rootPart") DataSource ds1,
-                                           @MultipartID("book2") DataSource ds2) 
+    public Response addBookFromDataSource2(@Multipart("rootPart") DataSource ds1,
+                                           @Multipart("book2") DataSource ds2) 
         throws Exception {
         Response r1 = readBookFromInputStream(ds1.getInputStream());
         Response r2 = readBookFromInputStream(ds2.getInputStream());
+        Book b1 = (Book)r1.getEntity();
+        Book b2 = (Book)r2.getEntity();
+        if (b1.equals(b2)) {
+            throw new WebApplicationException();
+        }
+        if (!b1.getName().equals(b2.getName())) {
+            throw new WebApplicationException();
+        }
+        return r1;
+    }
+    
+    @POST
+    @Path("/books/listattachments")
+    @ProduceMime("text/xml")
+    public Response addBookFromListOfAttachments(List<Attachment> atts)  
+        throws Exception {
+        Response r1 = readBookFromInputStream(atts.get(0).getDataHandler().getInputStream());
+        Response r2 = readBookFromInputStream(atts.get(2).getDataHandler().getInputStream());
+        Book b1 = (Book)r1.getEntity();
+        Book b2 = (Book)r2.getEntity();
+        if (b1.equals(b2)) {
+            throw new WebApplicationException();
+        }
+        if (!b1.getName().equals(b2.getName())) {
+            throw new WebApplicationException();
+        }
+        return r1;
+    }
+    
+    @POST
+    @Path("/books/lististreams")
+    @ProduceMime("text/xml")
+    public Response addBookFromListOfStreams(List<InputStream> atts)  
+        throws Exception {
+        Response r1 = readBookFromInputStream(atts.get(0));
+        Response r2 = readBookFromInputStream(atts.get(2));
         Book b1 = (Book)r1.getEntity();
         Book b2 = (Book)r2.getEntity();
         if (b1.equals(b2)) {
@@ -133,13 +172,33 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/attachment")
+    @ProduceMime("text/xml")
+    public Response addBookFromAttachment(Attachment a) throws Exception {
+        return readBookFromInputStream(a.getDataHandler().getInputStream());
+    }
+    
+    @POST
     @Path("/books/mchandlers")
     @ProduceMime("text/xml")
     public Response addBookFromMessageContext() throws Exception {
-        Map<String, DataHandler> handlers = AttachmentUtils.getAttachments(context);
-        for (Map.Entry<String, DataHandler> entry : handlers.entrySet()) {
+        Map<String, Attachment> handlers = AttachmentUtils.getAttachmentsMap(context);
+        for (Map.Entry<String, Attachment> entry : handlers.entrySet()) {
             if (entry.getKey().equals("book2")) {
-                return readBookFromInputStream(entry.getValue().getInputStream());
+                return readBookFromInputStream(entry.getValue().getDataHandler().getInputStream());
+            }
+        }
+        throw new WebApplicationException(500);
+    }
+    
+    @POST
+    @Path("/books/attachments")
+    @ProduceMime("text/xml")
+    public Response addBookFromAttachments() throws Exception {
+        Collection<Attachment> handlers = AttachmentUtils.getChildAttachments(context);
+        for (Attachment a : handlers) {
+            if (a.getContentId().equals("book2")) {
+                return readBookFromInputStream(a.getDataHandler().getInputStream());
             }
         }
         throw new WebApplicationException(500);
@@ -164,7 +223,7 @@ public class MultipartStore {
     @POST
     @Path("/books/mismatch2")
     @ProduceMime("text/xml")
-    public Response addBookMismatched2(@MultipartID(value = "rootPart", type = "f/b") Book b) {
+    public Response addBookMismatched2(@Multipart(value = "rootPart", type = "f/b") Book b) {
         throw new WebApplicationException();
     }
     

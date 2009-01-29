@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext;
+package org.apache.cxf.jaxrs.ext.multipart;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MultipartID {
+public @interface Multipart {
     String value() default "root";
     String type() default "*/*";
 }

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -35,11 +37,12 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
-import org.apache.cxf.jaxrs.utils.multipart.MultipartInfo;
 
 @Provider
-@ConsumeMime("multipart/related")
+@ConsumeMime({"multipart/related", "multipart/mixed" })
 public class ActivationProvider implements MessageBodyReader<Object> {
 
     @Context
@@ -47,14 +50,16 @@ public class ActivationProvider implements MessageBodyReader<Object> {
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         
-        if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)) {
+        if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)
+            || Attachment.class.isAssignableFrom(type)) {
             return true;
         }
         if (mc == null) {
             return false;
         }
         MediaType mt = mc.getHttpHeaders().getMediaType();        
-        if (mt.getType().equals("multipart") && mt.getSubtype().equals("related")) {
+        if (mt.getType().equals("multipart") 
+            && (mt.getSubtype().equals("related") || mt.getSubtype().equals("mixed"))) {
             return true;
         } 
 
@@ -64,21 +69,44 @@ public class ActivationProvider implements MessageBodyReader<Object> {
     public Object readFrom(Class<Object> c, Type t, Annotation[] anns, MediaType mt, 
                            MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
-        MultipartInfo multipart = AttachmentUtils.getMultipart(c, anns, mt, mc, is);
-        if (multipart != null) {
-            if (InputStream.class.isAssignableFrom(multipart.getPart().getClass())) {
-                MessageBodyReader<Object> r = 
-                    mc.getProviders().getMessageBodyReader(c, t, anns, multipart.getType());
-                if (r != null) {
-                    return r.readFrom(c, t, anns, multipart.getType(), headers, 
-                                           (InputStream)multipart.getPart());
-                }
-            } else {
-                // it's either DataSource or DataHandler
-                return multipart.getPart();
+        
+        if (List.class.isAssignableFrom(c)) {
+            Class<?> actual = InjectionUtils.getActualType(t);
+            List<Attachment> infos = AttachmentUtils.getAttachments(mc);
+            if (actual.isAssignableFrom(Attachment.class)) {
+                return infos;
             }
+            List<Object> objects = new ArrayList<Object>();
+            for (Attachment a : infos) {
+                objects.add(fromAttachment(a, actual, actual, anns));
+            }
+            return objects;
+        }
+        
+        Attachment multipart = AttachmentUtils.getMultipart(c, anns, mt, mc);
+        if (multipart != null) {
+            return fromAttachment(multipart, c, t, anns);
         }
         throw new WebApplicationException(404);
     }
     
+    @SuppressWarnings("unchecked")
+    private Object fromAttachment(Attachment multipart, Class<?> c, Type t, Annotation anns[]) 
+        throws IOException {
+        if (DataHandler.class.isAssignableFrom(c)) {
+            return multipart.getDataHandler();
+        } else if (DataSource.class.isAssignableFrom(c)) {
+            return multipart.getDataHandler().getDataSource();
+        } else if (Attachment.class.isAssignableFrom(c)) {
+            return multipart;
+        } else {
+            MessageBodyReader<Object> r = 
+                mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
+            if (r != null) {
+                return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), 
+                                  multipart.getDataHandler().getInputStream());
+            }
+        }
+        return null;
+    }
 }

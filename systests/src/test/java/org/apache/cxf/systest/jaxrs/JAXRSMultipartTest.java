@@ -42,74 +42,114 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/stream";
+        String address = "http://localhost:9085/bookstore/books/stream";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
+    public void testBookAsRootAttachmentStreamSourceNoContentId() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/stream";
+        doAddBook(address, "attachmentData3", 200);               
+    }
+    
+    @Test
     public void testBookAsRootAttachmentInputStream() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/istream";
+        String address = "http://localhost:9085/bookstore/books/istream";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookAsMessageContextDataHandler() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/mchandlers";
+        String address = "http://localhost:9085/bookstore/books/mchandlers";
+        doAddBook(address, "attachmentData", 200);               
+    }
+    
+    @Test
+    public void testBookAsMessageContextAttachments() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/attachments";
+        doAddBook(address, "attachmentData", 200);               
+    }
+    
+    @Test
+    public void testBookAsMessageContextAttachment() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/attachment";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsRootAttachmentJAXB() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/jaxb";
+        String address = "http://localhost:9085/bookstore/books/jaxb";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsDataSource() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/dsource";
+        String address = "http://localhost:9085/bookstore/books/dsource";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsDataSource2() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/dsource2";
+        String address = "http://localhost:9085/bookstore/books/dsource2";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsJAXB2() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/jaxb2";
+        String address = "http://localhost:9085/bookstore/books/jaxb2";
+        doAddBook(address, "attachmentData", 200);               
+    }
+    
+    @Test
+    public void testAddBookAsListOfAttachments() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/listattachments";
+        doAddBook(address, "attachmentData", 200);               
+    }
+    
+    @Test
+    public void testAddBookAsListOfStreams() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/lististreams";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsJAXBJSON() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/jaxbjson";
+        String address = "http://localhost:9085/bookstore/books/jaxbjson";
         doAddBook(address, "attachmentData2", 200);               
     }
     
     @Test
+    public void testAddBookAsJAXBJSONMixed() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/jaxbjson";
+        doAddBook("multipart/mixed", address, "attachmentData2", 200);               
+    }
+    
+    @Test
     public void testConsumesMismatch() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/mismatch1";
+        String address = "http://localhost:9085/bookstore/books/mismatch1";
         doAddBook(address, "attachmentData2", 415);               
     }
     
     @Test
     public void testConsumesMismatch2() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/mismatch2";
+        String address = "http://localhost:9085/bookstore/books/mismatch2";
         doAddBook(address, "attachmentData2", 415);               
     }
     
     @Test
     public void testAddBookAsDataHandler() throws Exception {
-        String address = "http://localhost:9080/bookstore/books/dhandler";
+        String address = "http://localhost:9085/bookstore/books/dhandler";
         doAddBook(address, "attachmentData", 200);               
     }
     
     private void doAddBook(String address, String resourceName, int status) throws Exception {
+        doAddBook("multipart/related", address, resourceName, status);
+    }
+    
+    private void doAddBook(String type, String address, String resourceName, int status) throws Exception {
         PostMethod post = new PostMethod(address);
         
-        String ct = "multipart/related; type=\"text/xml\"; " + "start=\"rootPart\"; "
+        String ct = type + "; type=\"text/xml\"; " + "start=\"rootPart\"; "
             + "boundary=\"----=_Part_4_701508.1145579811786\"";
         post.setRequestHeader("Content-Type", ct);
         InputStream is = 
