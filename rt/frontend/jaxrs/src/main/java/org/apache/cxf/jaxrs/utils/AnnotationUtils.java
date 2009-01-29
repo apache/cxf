@@ -149,14 +149,13 @@ public final class AnnotationUtils {
         return value;
     }
     
-    @SuppressWarnings("unchecked")
     public static <T> T getAnnotation(Annotation[] anns, Class<T> type) { 
         if (anns == null) {
             return null;
         }
         for (Annotation a : anns) {    
             if (a.annotationType() == type) {
-                return (T)a;
+                return type.cast(a);
             }
         }
         return null;
@@ -221,17 +220,17 @@ public final class AnnotationUtils {
         return null;
     }
     
-    public static Annotation getMethodAnnotation(Method m,
-                                                 Class<? extends Annotation> aClass) {
+    public static <A extends Annotation> A getMethodAnnotation(Method m,
+                                                 Class<A> aClass) {
         return m == null ? null : m.getAnnotation(aClass);
     }
     
-    public static Annotation getClassAnnotation(Class<?> c, 
-                                                Class<? extends Annotation> aClass) {
+    public static <A extends Annotation> A getClassAnnotation(Class<?> c,
+                                                              Class<A> aClass) { 
         if (c == null) {
             return null;
         }
-        Annotation p = c.getAnnotation(aClass);
+        A p = c.getAnnotation(aClass);
         if (p != null) {
             return p;
         }

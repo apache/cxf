@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -164,22 +163,21 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Class resource) throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }
-        Annotation ann = resource.getAnnotation(Path.class);
+        Class<?> cls = resource;
+        Path ann = cls.getAnnotation(Path.class);
         if (ann == null) {
             throw new IllegalArgumentException("Class '" + resource.getCanonicalName()
                                                + "' is not annotated with Path");
         }
         // path(String) decomposes multi-segment path when necessary
-        return path(((Path)ann).value());
+        return path(ann.value());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Class resource, String method) throws IllegalArgumentException {
         if (resource == null) {
@@ -188,10 +186,10 @@ public class UriBuilderImpl extends UriBuilder {
         if (method == null) {
             throw new IllegalArgumentException("method is null");
         }
-        Annotation foundAnn = null;
+        Path foundAnn = null;
         for (Method meth : resource.getMethods()) {
             if (meth.getName().equals(method)) {
-                Annotation ann = meth.getAnnotation(Path.class);
+                Path ann = meth.getAnnotation(Path.class);
                 if (foundAnn != null && ann != null) {
                     throw new IllegalArgumentException("Multiple Path annotations for '" + method
                                                        + "' overloaded method");
@@ -203,7 +201,7 @@ public class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException("No Path annotation for '" + method + "' method");
         }
         // path(String) decomposes multi-segment path when necessary
-        return path(((Path)foundAnn).value());
+        return path(foundAnn.value());
     }
 
     @Override
@@ -211,13 +209,13 @@ public class UriBuilderImpl extends UriBuilder {
         if (method == null) {
             throw new IllegalArgumentException("method is null");
         }
-        Annotation ann = method.getAnnotation(Path.class);
+        Path ann = method.getAnnotation(Path.class);
         if (ann == null) {
             throw new IllegalArgumentException("Method '" + method.getClass().getCanonicalName() + "."
                                                + method.getName() + "' is not annotated with Path");
         }
         // path(String) decomposes multi-segment path when necessary
-        return path(((Path)ann).value());
+        return path(ann.value());
     }
 
     @Override

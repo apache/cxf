@@ -152,9 +152,9 @@ public class UriInfoImpl implements UriInfo {
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
                 Path[] paths = {
-                    (Path)AnnotationUtils.getClassAnnotation(ori.getClassResourceInfo().getResourceClass(),
+                    AnnotationUtils.getClassAnnotation(ori.getClassResourceInfo().getResourceClass(),
                                                              Path.class),
-                    (Path)AnnotationUtils.getMethodAnnotation(ori.getAnnotatedMethod(), Path.class)
+                    AnnotationUtils.getMethodAnnotation(ori.getAnnotatedMethod(), Path.class)
                 };
                 for (Path p : paths) {
                     if (p != null) {

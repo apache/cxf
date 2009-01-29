@@ -32,13 +32,12 @@ public class RequestPreprocessor {
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     
-    @SuppressWarnings("unchecked")
     public RequestPreprocessor(Map<Object, Object> languageMappings,
                            Map<Object, Object> extensionMappings) {
-        this.languageMappings = 
-            languageMappings == null ? Collections.EMPTY_MAP : languageMappings;
+        this.languageMappings =
+            languageMappings == null ? Collections.emptyMap() : languageMappings;
         this.extensionMappings = 
-            extensionMappings == null ? Collections.EMPTY_MAP : extensionMappings;
+            extensionMappings == null ? Collections.emptyMap() : extensionMappings;
     }
 
     public String preprocess(Message m, UriInfo u) {
