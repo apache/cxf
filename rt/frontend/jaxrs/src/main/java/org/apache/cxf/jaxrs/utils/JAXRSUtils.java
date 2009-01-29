@@ -90,7 +90,6 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class JAXRSUtils {
@@ -893,11 +892,10 @@ public final class JAXRSUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static Response convertFaultToResponse(Throwable ex, String baseAddress) {
+    public static Response convertFaultToResponse(Throwable ex, String baseAddress, Message inMessage) {
         
         ExceptionMapper mapper = 
-            ProviderFactory.getInstance(baseAddress).createExceptionMapper(ex.getClass(),
-                                                                new MessageImpl());
+            ProviderFactory.getInstance(baseAddress).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
             Response excResponse = mapper.toResponse(ex);
             if (excResponse != null) {
