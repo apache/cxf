@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.Stack;
 
@@ -46,4 +47,6 @@ public interface CollectionServiceInterface {
     //CHECKSTYLE:ON
     
     void method1(List<String> headers1);
+    
+    void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam); 
 }

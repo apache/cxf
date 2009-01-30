@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.WildcardType;
 import java.util.Collection;
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
@@ -137,7 +139,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             return createObjectType();
         }
         
-        if (!Collection.class.isAssignableFrom(clazz)) {
+        if (!Collection.class.isAssignableFrom(clazz) && !Map.class.isAssignableFrom(clazz)) {
             return getTopCreator().createType(clazz);
         }
         

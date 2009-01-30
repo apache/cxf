@@ -23,8 +23,10 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
@@ -41,6 +43,7 @@ import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.collection.CollectionType;
+import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.type.java5.dto.CollectionDTO;
 import org.apache.cxf.aegis.type.java5.dto.DTOService;
 import org.apache.cxf.aegis.type.java5.dto.ObjectDTO;
@@ -216,7 +219,7 @@ public class CollectionTest extends AbstractAegisTest {
     
     /**
      * CXF-1833 complained of a bizarre schema when @@WebParaming a parameter of List<String>. This regression
-     * test captures the fact that we don't, in fact, have this problem with correct us of JAX-WS.
+     * test captures the fact that we don't, in fact, have this problem with correct use of JAX-WS.
      * @throws Exception
      */
     @Test
@@ -254,8 +257,59 @@ public class CollectionTest extends AbstractAegisTest {
         assertEquals("2", countString);
         //CHECKSTYLE:ON
     }
+    
+    @Test
+    public void testNestedMapType() throws Exception {
+        Method m = CollectionService.class.getMethod("mapOfMapWithStringAndPojo", 
+                                                     new Class[] {Map.class});
+        Type type = creator.createType(m, 0);
+        tm.register(type);
+        assertTrue(type instanceof MapType);
+        MapType mapType = (MapType) type;
+        Type valueType = mapType.getValueType();
+        assertFalse(valueType.getSchemaType().getLocalPart().contains("any"));
+    }
+    
+    /**
+     * CXF-2017
+     * @throws Exception
+     */
+    @Test
+    public void testNestedMap() throws Exception {
+        CollectionService impl = new CollectionService();
+        createService(CollectionServiceInterface.class, impl, null);
+        
+        ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
+        proxyFac.getServiceFactory().getServiceConfigurations().add(0, 
+                                                              new XFireCompatibilityServiceConfiguration());
+        proxyFac.setServiceClass(CollectionServiceInterface.class);
+        proxyFac.setDataBinding(new AegisDatabinding());
+        proxyFac.setAddress("local://CollectionServiceInterface");
+        proxyFac.setBus(getBus());
+
+        CollectionServiceInterface csi = (CollectionServiceInterface)proxyFac.create();
+        
+        Map<String, Map<String, BeanWithGregorianDate>> complexMap;
+        complexMap = new HashMap<String, Map<String, BeanWithGregorianDate>>();
+        Map<String, BeanWithGregorianDate> innerMap = new HashMap<String, BeanWithGregorianDate>();
+        BeanWithGregorianDate bean = new BeanWithGregorianDate();
+        bean.setName("shem bean");
+        bean.setId(42);
+        innerMap.put("firstBean", bean);
+        complexMap.put("firstKey", innerMap);
+        csi.mapOfMapWithStringAndPojo(complexMap);
+        
+        Map<String, Map<String, BeanWithGregorianDate>> gotMap = impl.getLastComplexMap();
+        assertTrue(gotMap.containsKey("firstKey"));
+        Map<String, BeanWithGregorianDate> v = gotMap.get("firstKey");
+        BeanWithGregorianDate b = v.get("firstBean");
+        assertNotNull(b);
+        
+    }
 
     public class CollectionService implements CollectionServiceInterface {
+        
+        private Map<String, Map<String, BeanWithGregorianDate>> lastComplexMap;
         
         /** {@inheritDoc}*/
         public Collection<String> getStrings() {
@@ -302,6 +356,14 @@ public class CollectionTest extends AbstractAegisTest {
             return strings.get(0);
         }
         //CHECKSTYLE:ON
+
+        public void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam) {
+            lastComplexMap = bigParam;
+        }
+
+        protected Map<String, Map<String, BeanWithGregorianDate>> getLastComplexMap() {
+            return lastComplexMap;
+        }
 
     }
 }
