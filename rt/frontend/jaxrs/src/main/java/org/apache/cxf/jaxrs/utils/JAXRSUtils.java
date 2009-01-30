@@ -76,6 +76,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
@@ -90,6 +91,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
@@ -531,14 +533,23 @@ public final class JAXRSUtils {
                                            Class<?> pClass, Type genericType,
                                            String defaultValue,
                                            boolean decode) {
+        
+        MessageContext mc = new MessageContextImpl(m);
+        MediaType mt = mc.getHttpHeaders().getMediaType();
+        
         MultivaluedMap<String, String> params = new MetadataMap<String, String>();
-        String body = (String)m.get("org.apache.cxf.jaxrs.provider.form.body");
-        if (body == null) {
-            body = FormUtils.readBody(m.getContent(InputStream.class));
-            m.put("org.apache.cxf.jaxrs.provider.form.body", body);
+        
+        if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
+            String body = (String)m.get("org.apache.cxf.jaxrs.provider.form.body");
+            if (body == null) {
+                body = FormUtils.readBody(m.getContent(InputStream.class));
+                m.put("org.apache.cxf.jaxrs.provider.form.body", body);
+            }
+            FormUtils.populateMapFromString(params, (String)body, decode);
+        } else {
+            MultipartBody body = AttachmentUtils.getMultipartBody(mc);
+            FormUtils.populateMapFromMultipart(params, body, decode);
         }
-        // TODO : this is done per every form parameter hence it needs to be refactored
-        FormUtils.populateMap(params, body, decode);
         
         String basePath = HttpUtils.getOriginalAddress(m);
         if ("".equals(key)) {

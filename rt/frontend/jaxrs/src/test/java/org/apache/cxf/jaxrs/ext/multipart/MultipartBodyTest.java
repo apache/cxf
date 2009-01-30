@@ -43,6 +43,17 @@ public class MultipartBodyTest extends Assert {
         assertEquals(atts.get(1), b.getChildAttachments().get(0));
     }
     
+    @Test
+    public void testGetAttachmentsById() {
+        List<Attachment> atts = new ArrayList<Attachment>();
+        atts.add(createAttachment("p1"));
+        atts.add(createAttachment("p2"));
+        MultipartBody b = new MultipartBody(atts);
+        assertEquals(atts.get(0), b.getAttachment("p1"));
+        assertEquals(atts.get(1), b.getAttachment("p2"));
+        assertNull(b.getAttachment("p3"));
+    }
+    
     private Attachment createAttachment(String id) {
         return new Attachment(id, 
                        new DataHandler(new ByteArrayDataSource(new byte[]{1}, "application/octet-stream")),

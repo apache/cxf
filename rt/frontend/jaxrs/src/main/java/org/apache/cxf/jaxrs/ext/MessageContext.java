@@ -36,7 +36,7 @@ import javax.ws.rs.ext.Providers;
 public interface MessageContext {
     
     Object get(Object key);
-    void put(Object key, Object value);
+    void put(Object key, Object value, boolean outbound);
     
     UriInfo getUriInfo();
     Request getRequest();

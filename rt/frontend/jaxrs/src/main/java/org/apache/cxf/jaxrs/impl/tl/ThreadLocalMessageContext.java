@@ -78,9 +78,9 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
         return get() != null ? get().getRequest() : null;
     }
 
-    public void put(Object key, Object value) {
+    public void put(Object key, Object value, boolean outbound) {
         if (get() != null) {
-            get().put(key, value);
+            get().put(key, value, outbound);
         }
         throw new IllegalStateException("MessageContext is not set");
         

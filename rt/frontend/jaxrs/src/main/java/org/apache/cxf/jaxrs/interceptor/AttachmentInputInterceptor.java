@@ -29,7 +29,10 @@ import org.apache.cxf.interceptor.AttachmentInInterceptor;
 public class AttachmentInputInterceptor extends AttachmentInInterceptor {
     
     private static final List<String> DEFAULT_TYPES = 
-        Arrays.asList(new String[]{"multipart/related", "multipart/mixed"});
+        Arrays.asList(new String[]{"multipart/related", 
+                                   "multipart/mixed",
+                                   "multipart/alternative",
+                                   "multipart/form-data"});
     
     private List<String> types = DEFAULT_TYPES;
     

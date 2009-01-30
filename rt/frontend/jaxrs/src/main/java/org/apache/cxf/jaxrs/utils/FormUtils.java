@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -29,9 +30,14 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 public final class FormUtils {
     
+    private static final String FORM_DATA_TYPE = "form-data";  
+        
     private FormUtils() {
         
     }
@@ -46,8 +52,8 @@ public final class FormUtils {
         }
     }
     
-    public static void populateMap(MultivaluedMap<String, String> params, 
-                                   String postBody, boolean decode) {
+    public static void populateMapFromString(MultivaluedMap<String, String> params, 
+                                             String postBody, boolean decode) {
         if (!StringUtils.isEmpty(postBody)) {
             List<String> parts = Arrays.asList(postBody.split("&"));
             for (String part : parts) {
@@ -63,6 +69,26 @@ public final class FormUtils {
                 } else {
                     params.add(keyValue[0], "");
                 }
+            }
+        }
+    }
+    
+    public static void populateMapFromMultipart(MultivaluedMap<String, String> params,
+                                                MultipartBody body, 
+                                                boolean decode) {
+        List<Attachment> atts = body.getAllAttachments();
+        for (Attachment a : atts) {
+            ContentDisposition cd = a.getContentDisposition();
+            if (cd == null || !FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())
+                || cd.getParameter("name") == null) {
+                throw new WebApplicationException(415);
+            }
+            String name = cd.getParameter("name").replace("\"", "").replace("'", "");
+            try {
+                String value = IOUtils.toString(a.getDataHandler().getInputStream());
+                params.add(name, decode ? JAXRSUtils.uriDecode(value) : value);
+            } catch (IOException ex) {
+                throw new WebApplicationException(415);
             }
         }
     }
