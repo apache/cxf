@@ -117,7 +117,6 @@ public final class AttachmentUtils {
         return data;
     }
     
-    @SuppressWarnings("unchecked")
     public static MultivaluedMap<String, String> populateFormMap(MessageContext mc) {
         return populateFormMap(mc, String.class);
     }
