@@ -23,16 +23,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.ConnectionFactory;
-import javax.naming.NamingException;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.connection.SingleConnectionFactory102;
-import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
@@ -46,43 +40,6 @@ public class JMSOldConfigHolder {
     private JMSConfiguration jmsConfig;
     private ServerConfig serverConfig;
     private ServerBehaviorPolicyType serverBehavior;
-
-    private ConnectionFactory getConnectionFactoryFromJndi(JndiTemplate jt,
-                                                           boolean pubSubDomain) {
-        
-        String connectionFactoryName = address.getJndiConnectionFactoryName();
-        String userName = address.getConnectionUserName();
-        String password = address.getConnectionPassword();
-        boolean use11 = address.isSetUseJms11() 
-            ? address.isUseJms11() : JMSConfiguration.DEFAULT_USEJMS11;
-            
-            
-        if (connectionFactoryName == null) {
-            return null;
-        }
-        try {
-            ConnectionFactory connectionFactory = (ConnectionFactory)jt.lookup(connectionFactoryName);
-            UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
-            uccf.setUsername(userName);
-            uccf.setPassword(password);
-            uccf.setTargetConnectionFactory(connectionFactory);
-
-            if (use11) {
-                SingleConnectionFactory cf = new SingleConnectionFactory(uccf);
-                if (address.isSetReconnectOnException() && address.isReconnectOnException()) {
-                    cf.setReconnectOnException(true);
-                }
-                return cf;
-            }
-            SingleConnectionFactory102 cf = new SingleConnectionFactory102(uccf, pubSubDomain);
-            if (address.isSetReconnectOnException() && address.isReconnectOnException()) {
-                cf.setReconnectOnException(true);
-            }
-            return cf;
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus,
                                                                    EndpointInfo endpointInfo,
@@ -120,8 +77,13 @@ public class JMSOldConfigHolder {
                 pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
             }
             if (jmsConfig.getConnectionFactory() == null) {
-                ConnectionFactory cf = getConnectionFactoryFromJndi(jt, pubSubDomain);
-                jmsConfig.setConnectionFactory(cf);
+                jmsConfig.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
+                jmsConfig.setJndiTemplate(jt);
+                jmsConfig.setConnectionUserName(address.getConnectionUserName());
+                jmsConfig.setConnectionPassword(address.getConnectionPassword());
+                if (address.isSetReconnectOnException()) {
+                    jmsConfig.setReconnectOnException(address.isReconnectOnException());
+                }
             }
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);
