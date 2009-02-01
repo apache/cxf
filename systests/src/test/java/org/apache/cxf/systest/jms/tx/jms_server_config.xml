@@ -78,6 +78,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
   	p:connectionFactory-ref="singleConnectionFactory"
   	p:sessionTransacted="true"
   	p:transactionManager-ref="jmsTransactionManager"  	
-  	p:usingEndpointInfo="true"/>
+  	p:usingEndpointInfo="true"
+  	p:wrapInSingleConnectionFactory="false"/>
 
 </beans>
