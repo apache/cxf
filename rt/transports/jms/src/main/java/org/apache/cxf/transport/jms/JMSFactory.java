@@ -18,13 +18,16 @@
  */
 package org.apache.cxf.transport.jms;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.QueueSession;
 import javax.jms.Session;
+import javax.naming.NamingException;
 
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.JmsTemplate102;
 import org.springframework.jms.core.SessionCallback;
@@ -36,8 +39,41 @@ import org.springframework.jms.support.destination.DestinationResolver;
  * Factory to create JmsTemplates and JmsListeners from configuration and context information
  */
 public final class JMSFactory {
-    
+
     private JMSFactory() {
+    }
+
+    /**
+     * Retreive connection factory from jndi, wrap it in a UserCredentialsConnectionFactoryAdapter,
+     * set username and password and return the ConnectionFactory
+     * 
+     * @param jmsConfig
+     * @param jndiConfig
+     * @return
+     */
+    static ConnectionFactory getConnectionFactoryFromJndi(JMSConfiguration jmsConfig) {
+        JNDIConfiguration jndiConfig = jmsConfig.getJndiConfig();
+        if (jndiConfig == null) {
+            return null;
+        }
+        String connectionFactoryName = jndiConfig.getJndiConnectionFactoryName();
+        if (connectionFactoryName == null) {
+            return null;
+        }
+        String userName = jndiConfig.getConnectionUserName();
+        String password = jndiConfig.getConnectionPassword();
+        try {
+            ConnectionFactory cf = (ConnectionFactory)jmsConfig.getJndiTemplate().
+                lookup(connectionFactoryName);
+            UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
+            uccf.setUsername(userName);
+            uccf.setPassword(password);
+            uccf.setTargetConnectionFactory(cf);
+            
+            return uccf;
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -50,7 +86,7 @@ public final class JMSFactory {
      */
     public static JmsTemplate createJmsTemplate(JMSConfiguration jmsConfig, JMSMessageHeadersType headers) {
         JmsTemplate jmsTemplate = jmsConfig.isUseJms11() ? new JmsTemplate() : new JmsTemplate102();
-        jmsTemplate.setConnectionFactory(jmsConfig.getConnectionFactory());
+        jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
         jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
         jmsTemplate.setTimeToLive(jmsConfig.getTimeToLive());
@@ -88,7 +124,7 @@ public final class JMSFactory {
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
         jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
         jmsListener.setAutoStartup(true);
-        jmsListener.setConnectionFactory(jmsConfig.getConnectionFactory());
+        jmsListener.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsListener.setMessageSelector(jmsConfig.getMessageSelector());
         jmsListener.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
