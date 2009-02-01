@@ -100,6 +100,10 @@ public class JaxbTypeTest extends AbstractAegisTest {
         assertTrue(info.isExtensibleAttributes());
     }
 
+    /**
+     * Test if attributeProperty is correctly mapped to attProp by
+     * applying the xml mapping file <className>.aegis.xml
+     */
     @Test
     public void testAegisType() {
         BeanType type = (BeanType)tm.getTypeCreator().createType(JaxbBean3.class);

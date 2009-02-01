@@ -100,6 +100,10 @@ public class XFireTypeTest extends AbstractAegisTest {
         assertTrue(info.isExtensibleAttributes());
     }
 
+    /**
+     * Test if attributeProperty is correctly mapped to attProp by
+     * applying the xml mapping file <className>.aegis.xml
+     */
     @Test
     public void testAegisType() {
         BeanType type = (BeanType)tm.getTypeCreator().createType(XFireBean3.class);
