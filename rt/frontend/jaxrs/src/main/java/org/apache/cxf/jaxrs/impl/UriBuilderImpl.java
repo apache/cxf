@@ -53,6 +53,7 @@ public class UriBuilderImpl extends UriBuilder {
     private List<PathSegment> paths = new ArrayList<PathSegment>();
     private String fragment;
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
+    private MultivaluedMap<String, String> matrix = new MetadataMap<String, String>();
 
     /**
      * Creates builder with empty URI.
@@ -149,6 +150,7 @@ public class UriBuilderImpl extends UriBuilder {
     public UriBuilder clone() {
         return new UriBuilderImpl(build());
     }
+
     // CHECKSTYLE:ON
 
     @Override
@@ -178,6 +180,7 @@ public class UriBuilderImpl extends UriBuilder {
         return path(ann.value());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Class resource, String method) throws IllegalArgumentException {
         if (resource == null) {
@@ -275,6 +278,9 @@ public class UriBuilderImpl extends UriBuilder {
         port = uri.getPort();
         host = uri.getHost();
         paths = JAXRSUtils.getPathSegments(uri.getPath(), false);
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();
+        }
         fragment = uri.getFragment();
         query = JAXRSUtils.getStructuredParams(uri.getQuery(), "&", true);
         userInfo = uri.getUserInfo();
@@ -292,47 +298,62 @@ public class UriBuilderImpl extends UriBuilder {
                 sb.append(p);
             }
         }
+        if (!matrix.isEmpty()) {
+            sb.append(';');
+            sb.append(buildParams(matrix, ';'));
+        }
         return sb.toString();
     }
 
     private String buildQuery() {
-        StringBuilder b = new StringBuilder();
-        for (Iterator<Map.Entry<String, List<String>>> it = query.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<String, List<String>> entry = it.next();
-            b.append(entry.getKey()).append('=').append(entry.getValue().get(0));
-            if (it.hasNext()) {
-                b.append('&');
-            }
-        }
-        return b.length() > 0 ? b.toString() : null;
+        return buildParams(query, '&');
     }
 
     @Override
     public UriBuilder matrixParam(String name, Object... values) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented :/");
-    }
-
-    @Override
-    public UriBuilder queryParam(String name, Object... values) throws IllegalArgumentException {
-        List<String> queryList = new ArrayList<String>();
-        for (Object value : values) {
-            queryList.add(value.toString());
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
         }
-        query.put(name, queryList);
+        List<String> list = matrix.get(name);
+        if (list == null) {
+            matrix.put(name, toStringList(values));
+        } else {
+            list.addAll(toStringList(values));
+        }
         return this;
     }
 
     @Override
-    public UriBuilder replaceMatrix(String matrix) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented :/");
+    public UriBuilder queryParam(String name, Object... values) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        List<String> list = query.get(name);
+        if (list == null) {
+            query.put(name, toStringList(values));
+        } else {
+            list.addAll(toStringList(values));
+        }
+        return this;
+    }
+
+    @Override
+    public UriBuilder replaceMatrix(String matrixValues) throws IllegalArgumentException {
+        this.matrix = JAXRSUtils.getStructuredParams(matrixValues, ";", true);
+        return this;
     }
 
     @Override
     public UriBuilder replaceMatrixParam(String name, Object... values) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented :/");
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        if (values != null && values.length >= 1 && values[0] != null) {
+            matrix.put(name, toStringList(values));
+        } else {
+            matrix.remove(name);
+        }
+        return this;
     }
 
     @Override
@@ -348,17 +369,24 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public UriBuilder segment(String... segments) throws IllegalArgumentException {
-        for (String segment : segments) {
-            path(segment);
+    public UriBuilder replaceQueryParam(String name, Object... values) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        if (values != null && values.length >= 1 && values[0] != null) {
+            query.put(name, toStringList(values));
+        } else {
+            query.remove(name);
         }
         return this;
     }
 
     @Override
-    public UriBuilder replaceQueryParam(String name, Object... values) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented :/");
+    public UriBuilder segment(String... segments) throws IllegalArgumentException {
+        for (String segment : segments) {
+            path(segment);
+        }
+        return this;
     }
 
     /**
@@ -377,5 +405,47 @@ public class UriBuilderImpl extends UriBuilder {
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    /**
+     * Query or matrix params convertion from object values vararg to list of strings. No encoding is
+     * provided.
+     * 
+     * @param values entry vararg values
+     * @return list of strings
+     * @throws IllegalArgumentException when one of values is null
+     */
+    private List<String> toStringList(Object... values) throws IllegalArgumentException {
+        List<String> list = new ArrayList<String>();
+        for (int i = 0; i < values.length; i++) {
+            Object value = values[i];
+            if (value == null) {
+                throw new IllegalArgumentException("Null value on " + i + " position");
+            }
+            list.add(value.toString());
+        }
+        return list;
+    }
+
+    /**
+     * Builds param string for query part or matrix part of URI.
+     * 
+     * @param map query or matrix multivalued map
+     * @param separator params separator, '&' for query ';' for matrix
+     * @return stringified params.
+     */
+    private String buildParams(MultivaluedMap<String, String> map, char separator) {
+        StringBuilder b = new StringBuilder();
+        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, List<String>> entry = it.next();
+            for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
+                String val = sit.next();
+                b.append(entry.getKey()).append('=').append(val);
+                if (sit.hasNext() || it.hasNext()) {
+                    b.append(separator);
+                }
+            }
+        }
+        return b.length() > 0 ? b.toString() : null;
     }
 }
