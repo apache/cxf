@@ -20,14 +20,13 @@ package org.apache.cxf.transport.jms;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Message;
-import javax.naming.NamingException;
 
+import org.apache.cxf.configuration.ConfigurationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory102;
-import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
@@ -43,11 +42,19 @@ public class JMSConfiguration implements InitializingBean {
     static final boolean DEFAULT_USEJMS11 = false;
     
     private boolean usingEndpointInfo = true;
+    
+    /**
+     * Use jndi to resolve destinations
+     */
+    private boolean useJndi;
+    private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
     private PlatformTransactionManager transactionManager;
+    private boolean wrapInSingleConnectionFactory = true;
     private TaskExecutor taskExecutor;
     private boolean useJms11 = DEFAULT_USEJMS11;
+    private boolean reconnectOnException;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
@@ -58,15 +65,6 @@ public class JMSConfiguration implements InitializingBean {
     private int priority = Message.DEFAULT_PRIORITY;
     private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
     private boolean sessionTransacted;
-
-    //Stuff for JNDI based and old configs
-    private boolean useJndi;
-    private JndiTemplate jndiTemplate;
-    private String jndiConnectionFactoryName;
-    private String connectionUserName;
-    private String connectionPassword;
-    private Boolean reconnectOnException;
-    
     
     private int concurrentConsumers = 1;
     private int maxConcurrentConsumers = 1;
@@ -85,6 +83,16 @@ public class JMSConfiguration implements InitializingBean {
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
+    
+    private ConnectionFactory wrappedConnectionFactory;
+    
+    private JNDIConfiguration jndiConfig;
+    
+    public void ensureProperlyConfigured(org.apache.cxf.common.i18n.Message msg) {
+        if (targetDestination == null || getOrCreateWrappedConnectionFactory() == null) {
+            throw new ConfigurationException(msg);
+        }
+    }
     
     public String getCacheLevelName() {
         return cacheLevelName;
@@ -228,47 +236,6 @@ public class JMSConfiguration implements InitializingBean {
         }
     }
 
-    
-    public ConnectionFactory getConnectionFactory() {
-        if (connectionFactory == null && jndiTemplate != null  && jndiConnectionFactoryName != null) {
-            connectionFactory = getConnectionFactoryFromJndi();
-        }
-        return connectionFactory;
-    }
-    private ConnectionFactory getConnectionFactoryFromJndi() {
-        
-        String connectionFactoryName = getJndiConnectionFactoryName();
-        String userName = getConnectionUserName();
-        String password = getConnectionPassword();
-            
-            
-        if (connectionFactoryName == null) {
-            return null;
-        }
-        try {
-            ConnectionFactory cf = (ConnectionFactory)jndiTemplate.lookup(connectionFactoryName);
-            UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
-            uccf.setUsername(userName);
-            uccf.setPassword(password);
-            uccf.setTargetConnectionFactory(cf);
-
-            if (this.useJms11) {
-                SingleConnectionFactory scf = new SingleConnectionFactory(uccf);
-                if (isSetReconnectOnException() && isReconnectOnException()) {
-                    scf.setReconnectOnException(true);
-                }
-                return scf;
-            }
-            SingleConnectionFactory102 scf = new SingleConnectionFactory102(uccf, pubSubDomain);
-            if (isSetReconnectOnException() && isReconnectOnException()) {
-                scf.setReconnectOnException(true);
-            }
-            return scf;
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Required
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
@@ -386,39 +353,58 @@ public class JMSConfiguration implements InitializingBean {
         return jndiTemplate;
     }
 
-    public String getJndiConnectionFactoryName() {
-        return jndiConnectionFactoryName;
+    public JNDIConfiguration getJndiConfig() {
+        return jndiConfig;
     }
 
-    public void setJndiConnectionFactoryName(String jndiConnectionFactoryName) {
-        this.jndiConnectionFactoryName = jndiConnectionFactoryName;
+    public void setJndiConfig(JNDIConfiguration jndiConfig) {
+        this.jndiConfig = jndiConfig;
     }
 
-    public String getConnectionUserName() {
-        return connectionUserName;
-    }
-
-    public void setConnectionUserName(String connectionUserName) {
-        this.connectionUserName = connectionUserName;
-    }
-
-    public String getConnectionPassword() {
-        return connectionPassword;
-    }
-
-    public void setConnectionPassword(String connectionPassword) {
-        this.connectionPassword = connectionPassword;
-    }
-
-    public boolean isSetReconnectOnException() {
-        return reconnectOnException != null;
-    }
     public boolean isReconnectOnException() {
         return reconnectOnException;
     }
 
     public void setReconnectOnException(boolean reconnectOnException) {
         this.reconnectOnException = reconnectOnException;
+    }
+
+    public ConnectionFactory getOrCreateWrappedConnectionFactory() {
+        if (wrappedConnectionFactory == null) {
+            if (connectionFactory == null) {
+                connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
+            }
+            if (wrapInSingleConnectionFactory) {
+                if (useJms11) {
+                    wrappedConnectionFactory = new SingleConnectionFactory(connectionFactory);
+                } else {
+                    wrappedConnectionFactory = new SingleConnectionFactory102(connectionFactory, 
+                                                                              pubSubDomain);
+                }
+                if (reconnectOnException) {
+                    ((SingleConnectionFactory)wrappedConnectionFactory).setReconnectOnException(true);
+                }
+            } else {
+                wrappedConnectionFactory = connectionFactory;
+            }
+        }
+        return wrappedConnectionFactory;
+    }
+
+    /**
+     * Only for tests
+     * @return
+     */
+    protected ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    public boolean isWrapInSingleConnectionFactory() {
+        return wrapInSingleConnectionFactory;
+    }
+
+    public void setWrapInSingleConnectionFactory(boolean wrapInSingleConnectionFactory) {
+        this.wrapInSingleConnectionFactory = wrapInSingleConnectionFactory;
     }
 
 }

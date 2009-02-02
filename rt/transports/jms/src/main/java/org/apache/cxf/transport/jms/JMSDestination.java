@@ -45,7 +45,6 @@ import javax.jms.TextMessage;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.CastUtils;
@@ -100,10 +99,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     public void activate() {
         getLogger().log(Level.INFO, "JMSDestination activate().... ");
         String name = endpointInfo.getName().toString() + ".jms-destination";
-        if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
-            throw new ConfigurationException(
-                new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name));
-        }
+        org.apache.cxf.common.i18n.Message msg = 
+            new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
+        jmsConfig.ensureProperlyConfigured(msg);
         jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination(), null);
     }
 

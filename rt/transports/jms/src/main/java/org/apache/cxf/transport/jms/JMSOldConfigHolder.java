@@ -76,14 +76,14 @@ public class JMSOldConfigHolder {
             if (address.isSetDestinationStyle()) {
                 pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
             }
-            if (jmsConfig.getConnectionFactory() == null) {
-                jmsConfig.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
-                jmsConfig.setJndiTemplate(jt);
-                jmsConfig.setConnectionUserName(address.getConnectionUserName());
-                jmsConfig.setConnectionPassword(address.getConnectionPassword());
-                if (address.isSetReconnectOnException()) {
-                    jmsConfig.setReconnectOnException(address.isReconnectOnException());
-                }
+            JNDIConfiguration jndiConfig = new JNDIConfiguration();
+            jndiConfig.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
+            jmsConfig.setJndiTemplate(jt);
+            jndiConfig.setConnectionUserName(address.getConnectionUserName());
+            jndiConfig.setConnectionPassword(address.getConnectionPassword());
+            jmsConfig.setJndiConfig(jndiConfig);
+            if (address.isSetReconnectOnException()) {
+                jmsConfig.setReconnectOnException(address.isReconnectOnException());
             }
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);

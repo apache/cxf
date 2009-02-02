@@ -35,7 +35,6 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -83,11 +82,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      * JMSOutputStream will then call back the sendExchange method of this class. {@inheritDoc}
      */
     public void prepare(Message message) throws IOException {
-        if (jmsConfig.getTargetDestination() == null || jmsConfig.getConnectionFactory() == null) {
-            String name =  endpointInfo.getName().toString() + ".jms-conduit";
-            throw new ConfigurationException(
-                new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_CONDUIT", LOG, name));
-        }
+        String name =  endpointInfo.getName().toString() + ".jms-conduit";
+        org.apache.cxf.common.i18n.Message msg = 
+            new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_CONDUIT", LOG, name);
+        jmsConfig.ensureProperlyConfigured(msg);
         boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
         JMSOutputStream out = new JMSOutputStream(this, message.getExchange(), isTextPayload);
         message.setContent(OutputStream.class, out);

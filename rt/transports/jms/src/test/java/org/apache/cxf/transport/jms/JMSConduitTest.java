@@ -172,7 +172,7 @@ public class JMSConduitTest extends AbstractJMSTester {
         final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset().name()); // TODO encoding
         JMSConfiguration jmsConfig = conduit.getJmsConfig();
         JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setConnectionFactory(jmsConfig.getConnectionFactory());
+        jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         javax.jms.Message message = (javax.jms.Message)jmsTemplate.execute(new SessionCallback() {
             public Object doInJms(Session session) throws JMSException {
                 return JMSUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
