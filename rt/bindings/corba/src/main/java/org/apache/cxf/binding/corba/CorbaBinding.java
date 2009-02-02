@@ -19,7 +19,6 @@
 
 package org.apache.cxf.binding.corba;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.binding.Binding;
@@ -32,17 +31,10 @@ import org.apache.cxf.service.model.BindingInfo;
 
 public class CorbaBinding extends AbstractBasicInterceptorProvider implements Binding {
 
-    private List<Interceptor> in;
-    private List<Interceptor> out;
-    private List<Interceptor> infault;
-    private List<Interceptor> outfault;
     private BindingInfo bindingInfo;
     
     public CorbaBinding() {
-        in = new ArrayList<Interceptor>();
-        out = new ArrayList<Interceptor>();
-        infault = new ArrayList<Interceptor>();
-        outfault = new ArrayList<Interceptor>();
+
     }
     
     public void setBindingInfo(BindingInfo info) {
@@ -62,19 +54,12 @@ public class CorbaBinding extends AbstractBasicInterceptorProvider implements Bi
     }
 
     public List<Interceptor> getFaultInInterceptors() {
-        return infault;
+        return this.getInFaultInterceptors();
     }
     
     public List<Interceptor> getFaultOutInterceptors() {
-        return outfault;
+        return this.getOutFaultInterceptors();
     }
 
-    public List<Interceptor> getInInterceptors() {
-        return in;
-    }
-
-    public List<Interceptor> getOutInterceptors() {
-        return out;
-    }
 
 }
