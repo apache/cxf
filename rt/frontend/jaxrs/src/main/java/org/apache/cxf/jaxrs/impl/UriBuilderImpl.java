@@ -180,7 +180,6 @@ public class UriBuilderImpl extends UriBuilder {
         return path(ann.value());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Class resource, String method) throws IllegalArgumentException {
         if (resource == null) {
