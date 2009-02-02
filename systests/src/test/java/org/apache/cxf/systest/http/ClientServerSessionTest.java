@@ -34,8 +34,14 @@ import org.junit.Test;
 public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly",
-                   launchServer(SessionServer.class));
+        // Jetty server only detects the the port of the same process in Windows box
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            assertTrue("server did not launch correctly",
+                   launchServer(SessionServer.class, true));
+        } else {
+            assertTrue("server did not launch correctly",
+                       launchServer(SessionServer.class));
+        }
     }
     
     
