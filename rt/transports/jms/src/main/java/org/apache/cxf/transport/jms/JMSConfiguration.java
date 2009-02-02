@@ -374,7 +374,7 @@ public class JMSConfiguration implements InitializingBean {
             if (connectionFactory == null) {
                 connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
             }
-            if (wrapInSingleConnectionFactory) {
+            if (wrapInSingleConnectionFactory && !(connectionFactory instanceof SingleConnectionFactory)) {
                 if (useJms11) {
                     wrappedConnectionFactory = new SingleConnectionFactory(connectionFactory);
                 } else {
