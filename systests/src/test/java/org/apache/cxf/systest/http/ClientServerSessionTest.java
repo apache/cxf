@@ -34,14 +34,10 @@ import org.junit.Test;
 public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
-        // Jetty server only detects the the port of the same process in Windows box
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            assertTrue("server did not launch correctly",
-                   launchServer(SessionServer.class, true));
-        } else {
-            assertTrue("server did not launch correctly",
+        
+        assertTrue("server did not launch correctly",
                        launchServer(SessionServer.class));
-        }
+        
     }
     
     
@@ -110,7 +106,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             Endpoint.publish(address, implementor);
             fail("Should have failed to publish as the port is busy");
         } catch (WebServiceException ex) {
-            //ignore
+            //ignore            
         }
         try {
             //CXF-1589
