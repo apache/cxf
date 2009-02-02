@@ -78,7 +78,7 @@ public class UriBuilderImplTest extends Assert {
         URI newUri = new UriBuilderImpl(uri).path("/{a}").build("{foo}");
         assertEquals("URI is not built correctly", new URI("http://zzz/%7Bfoo%7D"), newUri);
     }
-    
+
     @Test
     public void testBuildValuesPct() throws Exception {
         URI uri = new URI("http://zzz");
@@ -96,8 +96,7 @@ public class UriBuilderImplTest extends Assert {
         new UriBuilderImpl(uri).path("/{b}/{a}/{b}").build(immutable);
     }
 
-    
-    
+
     @Test
     public void testAddPath() throws Exception {
         URI uri = new URI("http://foo/bar");
@@ -204,4 +203,95 @@ public class UriBuilderImplTest extends Assert {
             .queryParam("n2", "v2").fragment("fragment").build();
         assertEquals("URI is not built correctly", uri, newUri);
     }
+
+    
+    @Test
+    public void testReplaceQuery() throws Exception {
+        URI uri = new URI("http://foo/bar?p1=v1");
+        URI newUri = new UriBuilderImpl(uri).replaceQueryParams("p1=nv1").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=nv1"), newUri);
+    }
+
+    @Test
+    public void testReplaceQuery2() throws Exception {
+        URI uri = new URI("http://foo/bar");
+        URI newUri = new UriBuilderImpl(uri).replaceQueryParams("p1=nv1").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=nv1"), newUri);
+    }
+
+    
+    @Test
+    public void testQueryParamVal() throws Exception {
+        URI uri = new URI("http://foo/bar?p1=v1");
+        URI newUri = new UriBuilderImpl(uri).queryParam("p2", "v2").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=v1&p2=v2"), newUri);
+    }
+
+    @Test
+    public void testQueryParamSameNameDiffVal() throws Exception {
+        URI uri = new URI("http://foo/bar?p1=v1");
+        URI newUri = new UriBuilderImpl(uri).queryParam("p1", "v2").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=v1&p1=v2"), newUri);
+    }
+
+        
+    @Test
+    public void testReplaceQueryParamExisting() throws Exception {
+        URI uri = new URI("http://foo/bar?p1=v1");
+        URI newUri = new UriBuilderImpl(uri).replaceQueryParams("p1=nv1").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=nv1"), newUri);
+    }
+
+    @Test
+    public void testReplaceQueryParamExistingMulti() throws Exception {
+        URI uri = new URI("http://foo/bar?p1=v1&p2=v2");
+        URI newUri = new UriBuilderImpl(uri).replaceQueryParams("p1=nv1&p1=nv2").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=nv1&p1=nv2&p2=v2"), newUri);
+    }
+
+    
+
+    @Test
+    public void testReplaceMatrix2() throws Exception {
+        URI uri = new URI("http://foo/bar/");
+        URI newUri = new UriBuilderImpl(uri).replaceMatrixParams("p1=nv1").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar/;p1=nv1"), newUri);
+    }
+
+    @Test
+    public void testMatrixParamNewNameAndVal() throws Exception {
+        URI uri = new URI("http://foo/bar;p1=v1");
+        URI newUri = new UriBuilderImpl(uri).matrixParam("p2", "v2").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=v1;p2=v2"), newUri);
+    }
+
+    @Test
+    public void testMatrixParamSameNameDiffVal() throws Exception {
+        URI uri = new URI("http://foo/bar;p1=v1");
+        URI newUri = new UriBuilderImpl(uri).matrixParam("p1", "v2").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=v1;p1=v2"), newUri);
+    }
+
+    
+    @Test
+    public void testReplaceMatrixParamExisting() throws Exception {
+        URI uri = new URI("http://foo/bar;p1=v1");
+        URI newUri = new UriBuilderImpl(uri).replaceMatrixParams("p1=nv1").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=nv1"), newUri);
+    }
+
+    @Test
+    public void testReplaceMatrixParamExistingMulti() throws Exception {
+        URI uri = new URI("http://foo/bar;p1=v1;p2=v2");
+        URI newUri = new UriBuilderImpl(uri).replaceMatrixParams("p1=nv1;p1=nv2").build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=nv1;p1=nv2;p2=v2"), newUri);
+    }
+
+    @Test
+    public void testMatrixNonFinalPathSegment() throws Exception {
+        URI uri = new URI("http://blah/foo;p1=v1/bar");
+        URI newUri = new UriBuilderImpl(uri).build();
+        assertEquals("URI is not built correctly", new URI("http://blah/foo/bar"), newUri);
+    }
+    
 }

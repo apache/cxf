@@ -48,9 +48,9 @@ public class UriBuilderImpl extends UriBuilder {
     private int port;
     private String host;
     private List<PathSegment> paths;
-    private MultivaluedMap<String, String> matrix;
     private String fragment;
-    private MultivaluedMap<String, String> query;
+    private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
+    private MultivaluedMap<String, String> matrix = new MetadataMap<String, String>();
 
     /**
      * Creates builder with empty URI.
@@ -133,6 +133,7 @@ public class UriBuilderImpl extends UriBuilder {
     public UriBuilder clone() {
         return new UriBuilderImpl(build());
     }
+
     // CHECKSTYLE:ON
 
     @Override
@@ -155,7 +156,14 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder matrixParam(String name, String value) throws IllegalArgumentException {
-        matrix.putSingle(name, value);
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        if (value != null) {
+            matrix.add(name, value);
+        } else {
+            matrix.remove(name);
+        }
         return this;
     }
 
@@ -240,22 +248,40 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder queryParam(String name, String value) throws IllegalArgumentException {
-        if (query == null) {
-            query = new MetadataMap<String, String>();
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
         }
-        query.add(name, value);
+        if (value != null) {
+            query.add(name, value);
+        } else {
+            query.remove(name);
+        }
         return this;
     }
 
     @Override
     public UriBuilder replaceMatrixParams(String m) throws IllegalArgumentException {
-        matrix = JAXRSUtils.getStructuredParams(m, ";", true);
+        if (m == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        MultivaluedMap<String, String> values = JAXRSUtils.getStructuredParams(m, ";", true);
+        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
+            matrix.put(entry.getKey(), entry.getValue());
+        }
+        
         return this;
     }
 
     @Override
     public UriBuilder replaceQueryParams(String q) throws IllegalArgumentException {
-        this.query = JAXRSUtils.getStructuredParams(q, "&", true);
+        if (q == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        MultivaluedMap<String, String> values = JAXRSUtils.getStructuredParams(q, "&", true);
+        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
+            query.put(entry.getKey(), entry.getValue());
+        }
+        
         return this;
     }
 
@@ -321,6 +347,9 @@ public class UriBuilderImpl extends UriBuilder {
         port = uri.getPort();
         host = uri.getHost();
         paths = JAXRSUtils.getPathSegments(uri.getPath(), false);
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();
+        }
         fragment = uri.getFragment();
         query = JAXRSUtils.getStructuredParams(uri.getQuery(), "&", true);
         userInfo = uri.getUserInfo();
@@ -338,25 +367,37 @@ public class UriBuilderImpl extends UriBuilder {
                 sb.append(p);
             }
         }
+        if (!matrix.isEmpty()) {
+            sb.append(';');
+            sb.append(buildParams(matrix, ';'));
+        }
         return sb.toString();
     }
 
     private String buildQuery() {
+        return buildParams(query, '&');
+    }
+
+    
+    /**
+     * Builds param string for query part or matrix part of URI.
+     * 
+     * @param map query or matrix multivalued map
+     * @param separator params separator, '&' for query ';' for matrix
+     * @return stringified params.
+     */
+    private String buildParams(MultivaluedMap<String, String> map, char separator) {
         StringBuilder b = new StringBuilder();
-        if (query == null) {
-            return null;
-        }
-        
-        for (Iterator<Map.Entry<String, List<String>>> it = query.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
-            b.append(entry.getKey()).append('=').append(entry.getValue().get(0));
-            if (it.hasNext()) {
-                b.append('&');
+            for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
+                String val = sit.next();
+                b.append(entry.getKey()).append('=').append(val);
+                if (sit.hasNext() || it.hasNext()) {
+                    b.append(separator);
+                }
             }
         }
         return b.length() > 0 ? b.toString() : null;
     }
-
-
-
 }
