@@ -38,31 +38,33 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Provider
-@ConsumeMime({"multipart/related", "multipart/mixed" })
+@ConsumeMime({"multipart/related", "multipart/mixed", "multipart/alternative" })
 public class ActivationProvider implements MessageBodyReader<Object> {
 
     @Context
     private MessageContext mc;
+    private String attachmentDir;
+    private String attachmentThreshold;
+
+    public void setAttachmentDirectory(String dir) {
+        attachmentDir = dir;
+    }
+
+    public void setAttachmentThreshold(String threshold) {
+        attachmentThreshold = threshold;
+    }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
-        
         if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)
-            || Attachment.class.isAssignableFrom(type)) {
+            || Attachment.class.isAssignableFrom(type) || MultipartBody.class.isAssignableFrom(type)
+            || mediaTypeSupported()) {
             return true;
         }
-        if (mc == null) {
-            return false;
-        }
-        MediaType mt = mc.getHttpHeaders().getMediaType();        
-        if (mt.getType().equals("multipart") 
-            && (mt.getSubtype().equals("related") || mt.getSubtype().equals("mixed"))) {
-            return true;
-        } 
-
         return false;
     }
 
@@ -70,9 +72,11 @@ public class ActivationProvider implements MessageBodyReader<Object> {
                            MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
         
+        List<Attachment> infos = 
+            AttachmentUtils.getAttachments(mc, attachmentDir, attachmentThreshold);
+        
         if (List.class.isAssignableFrom(c)) {
             Class<?> actual = InjectionUtils.getActualType(t);
-            List<Attachment> infos = AttachmentUtils.getAttachments(mc);
             if (actual.isAssignableFrom(Attachment.class)) {
                 return infos;
             }
@@ -82,8 +86,11 @@ public class ActivationProvider implements MessageBodyReader<Object> {
             }
             return objects;
         }
+        if (MultipartBody.class.isAssignableFrom(c)) {
+            return new MultipartBody(infos);
+        }
         
-        Attachment multipart = AttachmentUtils.getMultipart(c, anns, mt, mc);
+        Attachment multipart = AttachmentUtils.getMultipart(c, anns, mt, infos);
         if (multipart != null) {
             return fromAttachment(multipart, c, t, anns);
         }
@@ -108,5 +115,16 @@ public class ActivationProvider implements MessageBodyReader<Object> {
             }
         }
         return null;
+    }
+    
+    private boolean mediaTypeSupported() {
+
+        if (mc == null) {
+            return false;
+        }
+        MediaType mt = mc.getHttpHeaders().getMediaType();        
+
+        return mt.getType().equals("multipart") && (mt.getSubtype().equals("related") 
+            || mt.getSubtype().equals("mixed") || mt.getSubtype().equals("alternative"));
     }
 }

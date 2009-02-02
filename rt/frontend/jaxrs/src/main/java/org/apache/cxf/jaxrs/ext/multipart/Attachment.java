@@ -61,7 +61,8 @@ public class Attachment {
     }
     
     public ContentDisposition getContentDisposition() {
-        String header = headers.getFirst("Content-Disposition");
+        String header = getHeader("Content-Disposition");
+        
         return header == null ? null : new ContentDisposition(header);
     }
 
@@ -79,11 +80,13 @@ public class Attachment {
     }
 
     public String getHeader(String name) {
-        return headers.getFirst(name);
+        String header = headers.getFirst(name);
+        return header == null ? headers.getFirst(name.toLowerCase()) : header; 
     }
     
     public List<String> getHeaderAsList(String name) {
-        return headers.get(name);
+        List<String> header = headers.get(name);
+        return header == null ? headers.get(name.toLowerCase()) : header;
     }
 
     public MultivaluedMap<String, String> getHeaders() {

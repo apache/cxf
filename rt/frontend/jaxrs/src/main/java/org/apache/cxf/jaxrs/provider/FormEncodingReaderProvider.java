@@ -27,20 +27,37 @@ import java.lang.reflect.Type;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
-@ConsumeMime("application/x-www-form-urlencoded")
+@ConsumeMime({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
 public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
-
+    
+    private static final MediaType MULTIPART_FORM_DATA = MediaType.valueOf("multipart/form-data");
+    
     private FormValidator validator;
+    @Context private MessageContext mc;
+    private String attachmentDir;
+    private String attachmentThreshold;
+
+    public void setAttachmentDirectory(String dir) {
+        attachmentDir = dir;
+    }
+    
+    public void setAttachmentThreshold(String threshold) {
+        attachmentThreshold = threshold;
+    }
     
     public void setValidator(FormValidator formValidator) {
         validator = formValidator;
@@ -48,17 +65,22 @@ public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
     
     public boolean isReadable(Class<?> type, Type genericType, 
                               Annotation[] annotations) {
-        return MultivaluedMap.class.isAssignableFrom(type);
+        return MultivaluedMap.class.isAssignableFrom(type)
+               || mediaTypeSupported() && MultipartBody.class.isAssignableFrom(type);
     }
 
-    public MultivaluedMap<String, String> readFrom(
+    public Object readFrom(
         Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType type, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
-
+           
+            if (MultipartBody.class.isAssignableFrom(clazz)) {
+                return AttachmentUtils.getMultipartBody(mc);
+            }
+            
             MultivaluedMap<String, String> params = createMap(clazz);
-            populateMap(params, is, 
+            populateMap(params, is, type,
                         AnnotationUtils.getAnnotation(annotations, Encoded.class) == null);
             validateMap(params);
             return params;
@@ -84,14 +106,29 @@ public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
      * @return a Map of parameters.
      */
     protected void populateMap(MultivaluedMap<String, String> params, 
-                               InputStream is,
-                               boolean decode) {
-        FormUtils.populateMap(params, FormUtils.readBody(is), decode);
+                               InputStream is, MediaType mt, boolean decode) {
+        if (mt.isCompatible(MULTIPART_FORM_DATA)) {
+            MultipartBody body = 
+                AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold);
+            FormUtils.populateMapFromMultipart(params, body, decode);
+        } else {
+            FormUtils.populateMapFromString(params, FormUtils.readBody(is), decode);
+        }
     }
     
     protected void validateMap(MultivaluedMap<String, String> params) {
         if (validator != null) {
             validator.validate(params);
         }
+    }
+
+    private boolean mediaTypeSupported() {
+
+        if (mc == null) {
+            return false;
+        }
+        MediaType mt = mc.getHttpHeaders().getMediaType();        
+
+        return mt.isCompatible(MULTIPART_FORM_DATA);
     }
 }

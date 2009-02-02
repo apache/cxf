@@ -29,14 +29,18 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public final class AttachmentUtils {
@@ -45,6 +49,10 @@ public final class AttachmentUtils {
     private static final MediaType WILDCARD_TYPE = MediaType.valueOf("*/*");
     
     private AttachmentUtils() {
+    }
+    
+    public static MultipartBody getMultipartBody(MessageContext mc) {
+        return (MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
     }
     
     public static Map<String, Attachment> getChildAttachmentsMap(MessageContext mc) {
@@ -63,12 +71,27 @@ public final class AttachmentUtils {
         return ((MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS)).getAllAttachments();
     }
     
+    public static MultipartBody getMultipartBody(MessageContext mc,
+        String attachmentDir, String attachmentThreshold) {
+        if (attachmentDir != null) {
+            mc.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDir, false);
+        }
+        if (attachmentThreshold != null) {
+            mc.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, attachmentThreshold, false);
+        }
+        return (MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
+    }
+    
+    public static List<Attachment> getAttachments(MessageContext mc, 
+        String attachmentDir, String attachmentThreshold) {
+        return getMultipartBody(mc, attachmentDir, attachmentThreshold).getAllAttachments();
+    }
+    
     public static Attachment getMultipart(Class<Object> c, Annotation[] anns, 
-        MediaType mt, MessageContext mc) throws IOException {
-        List<Attachment> infos = AttachmentUtils.getAttachments(mc);
+        MediaType mt, List<Attachment> infos) throws IOException {
         Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
         if (id != null) {
-            for (Attachment a : getAttachments(mc)) {
+            for (Attachment a : infos) {
                 if (a.getContentId().equals(id.value())) {
                     checkMediaTypes(a.getContentType(), id.type());
                     return a;    
@@ -87,6 +110,19 @@ public final class AttachmentUtils {
         return infos.size() > 0 ? infos.get(0) : null; 
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> MultivaluedMap<String, T> populateFormMap(MessageContext mc, Class<T> cls) {
+        MultivaluedMap<String, T> data = new MetadataMap<String, T>();
+        FormUtils.populateMapFromMultipart((MultivaluedMap)data, 
+                                           AttachmentUtils.getMultipartBody(mc), true);
+        return data;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static MultivaluedMap<String, String> populateFormMap(MessageContext mc) {
+        return populateFormMap(mc, String.class);
+    }
+    
     private static Map<String, Attachment> fromListToMap(List<Attachment> atts) {
         Map<String, Attachment> map = new LinkedHashMap<String, Attachment>();
         for (Attachment a : atts) {

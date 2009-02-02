@@ -33,6 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -41,6 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Path("/bookstore")
@@ -62,6 +64,38 @@ public class MultipartStore {
         b.setId(124);
         return Response.ok(b).build();
     }
+    
+    @POST
+    @Path("/books/form")
+    @ConsumeMime("multipart/form-data")
+    @ProduceMime("text/xml")
+    public Response addBookFromForm(MultivaluedMap<String, String> data) throws Exception {
+        Book b = new Book();
+        b.setId(Long.valueOf(data.getFirst("id")));
+        b.setName(data.getFirst("name"));
+        return Response.ok(b).build();
+    }
+    
+    @POST
+    @Path("/books/formbody")
+    @ConsumeMime("multipart/form-data")
+    @ProduceMime("text/xml")
+    public Response addBookFromFormBody(MultipartBody body) throws Exception {
+        MultivaluedMap<String, String> data = AttachmentUtils.populateFormMap(context);
+        Book b = new Book();
+        b.setId(Long.valueOf(data.getFirst("id")));
+        b.setName(data.getFirst("name"));
+        return Response.ok(b).build();
+    }
+    
+    @POST
+    @Path("/books/formbody2")
+    @ConsumeMime("multipart/form-data")
+    @ProduceMime("text/xml")
+    public Response addBookFromFormBody2() throws Exception {
+        return addBookFromFormBody(AttachmentUtils.getMultipartBody(context));
+    }
+    
     
     @POST
     @Path("/books/istream")
@@ -144,6 +178,14 @@ public class MultipartStore {
             throw new WebApplicationException();
         }
         return r1;
+    }
+    
+    @POST
+    @Path("/books/body")
+    @ProduceMime("text/xml")
+    public Response addBookFromListOfAttachments(MultipartBody body)  
+        throws Exception {
+        return addBookFromListOfAttachments(body.getAllAttachments());
     }
     
     @POST

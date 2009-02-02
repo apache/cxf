@@ -73,5 +73,12 @@ public class MultipartBody {
         return atts.size() > 0 ? atts.get(0) : null;
     }
     
-    
+    public Attachment getAttachment(String contentId) {
+        for (Attachment a : atts) {
+            if (contentId.equalsIgnoreCase(a.getContentId())) {
+                return a;
+            }
+        }
+        return null;
+    }
 }

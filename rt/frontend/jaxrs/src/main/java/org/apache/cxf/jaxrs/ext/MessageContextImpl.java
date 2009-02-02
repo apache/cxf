@@ -112,8 +112,12 @@ public class MessageContextImpl implements MessageContext {
         return JAXRSUtils.createServletResourceValue(m, ServletContext.class);
     }
 
-    public void put(Object key, Object value) {
-        throw new UnsupportedOperationException("MessageContext.put() is not supported yet");
+    public void put(Object key, Object value, boolean outbound) {
+        if (outbound) {
+            throw new UnsupportedOperationException(
+                      "MessageContext.put() is not supported for outbound properties");
+        }
+        m.put(key.toString(), value);
     }
 
     private MultipartBody createAttachments(String propertyName) {

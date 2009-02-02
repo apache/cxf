@@ -519,7 +519,6 @@ public final class JAXRSUtils {
         return null;
     }
     
-    
     public static MultivaluedMap<String, String> getMatrixParams(String path, boolean decode) {
         int index = path.indexOf(';');
         return index == -1 ? new MetadataMap<String, String>()
