@@ -198,7 +198,7 @@ public class ServerLauncher {
             pb.redirectErrorStream(true);
             process = pb.start();
     
-            launchOutputMonitorThread(process.getInputStream(), System.out);
+            OutputMonitorThread out = launchOutputMonitorThread(process.getInputStream(), System.out);
     
             synchronized (mutex) {
                 do {
@@ -213,6 +213,10 @@ public class ServerLauncher {
                     }
                 } while (!serverIsReady && !serverLaunchFailed);
             }
+            if (serverLaunchFailed || !serverIsReady) {
+                System.err.println(out.getServerOutput());
+            }
+            
         }
         return serverIsReady && !serverLaunchFailed;
     }
@@ -228,22 +232,27 @@ public class ServerLauncher {
         return ret;
     }
 
-    private void launchOutputMonitorThread(final InputStream in, final PrintStream out) {
-        Thread t = new OutputMonitorThread(in, out);
+    private OutputMonitorThread launchOutputMonitorThread(final InputStream in, final PrintStream out) {
+        OutputMonitorThread t = new OutputMonitorThread(in, out);
         t.start();
+        return t;
     }
     private class OutputMonitorThread extends Thread {
         InputStream in;
         PrintStream out;
+        StringBuilder serverOutputAll = new StringBuilder();
+
 
         OutputMonitorThread(InputStream i, PrintStream o) {
             in = i;
             out = o;
         }
+        public String getServerOutput() {
+            return serverOutputAll.toString();
+        }
 
         public void run() {
             try {
-                StringBuilder serverOutput = new StringBuilder();
                 String outputDir = System.getProperty("server.output.dir", "target/surefire-reports/");
                 FileOutputStream fos;
                 try {
@@ -262,8 +271,10 @@ public class ServerLauncher {
                 }
                 PrintStream ps = new PrintStream(fos);
                 boolean running = true;
+                StringBuilder serverOutput = new StringBuilder();
                 for (int ch = in.read(); ch != -1; ch = in.read()) {
                     serverOutput.append((char)ch);
+                    serverOutputAll.append((char)ch);
                     if (debug) {
                         System.err.print((char)ch);
                     }
@@ -282,7 +293,7 @@ public class ServerLauncher {
                     if (ch == '\n' || !running) {
                         synchronized (out) {
                             ps.print(serverOutput.toString());
-                            serverOutput = new StringBuilder();
+                            serverOutput.setLength(0);
                             ps.flush();
                         }
                     }
