@@ -46,7 +46,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public final class AttachmentUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
-    private static final MediaType WILDCARD_TYPE = MediaType.valueOf("*/*");
     
     private AttachmentUtils() {
     }
@@ -118,7 +117,6 @@ public final class AttachmentUtils {
         return data;
     }
     
-    @SuppressWarnings("unchecked")
     public static MultivaluedMap<String, String> populateFormMap(MessageContext mc) {
         return populateFormMap(mc, String.class);
     }

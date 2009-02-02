@@ -193,7 +193,6 @@ public class UriBuilderImpl extends UriBuilder {
         return path(((Path)ann).value());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UriBuilder path(Method... methods) throws IllegalArgumentException {
         if (methods == null) {
