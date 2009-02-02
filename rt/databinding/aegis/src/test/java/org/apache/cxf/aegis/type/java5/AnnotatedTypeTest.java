@@ -100,6 +100,10 @@ public class AnnotatedTypeTest extends AbstractAegisTest {
         assertTrue(info.isExtensibleAttributes());
     }
 
+    /**
+     * Test if attributeProperty is correctly mapped to attProp by
+     * applying the xml mapping file <className>.aegis.xml
+     */
     @Test
     public void testAegisType() {
         BeanType type = (BeanType)tm.getTypeCreator().createType(AnnotatedBean3.class);
