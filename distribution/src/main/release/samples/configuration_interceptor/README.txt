@@ -1,7 +1,7 @@
 Stream GZIP Interceptor Demo 
 ============================
 
-This demo shows how to develope an user interceptor and add
+This demo shows how to develop an interceptor and add
 the interceptor into the interceptor chain through configuration.
 
 Please review the README in the samples directory before
