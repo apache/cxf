@@ -224,7 +224,15 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder path(String path) throws IllegalArgumentException {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false);
+        if (!paths.isEmpty() && !matrix.isEmpty()) {
+            PathSegment ps = paths.remove(paths.size() - 1);
+            paths.add(replacePathSegment(ps));
+        }
         paths.addAll(segments);
+        matrix.clear();
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();        
+        }
         return this;
     }
 
@@ -290,18 +298,19 @@ public class UriBuilderImpl extends UriBuilder {
         StringBuilder sb = new StringBuilder();
         Iterator<PathSegment> iter = paths.iterator();
         while (iter.hasNext()) {
-            String p = iter.next().getPath();
+            PathSegment ps = iter.next();
+            String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
                 if (!p.startsWith("/")) {
                     sb.append('/');
                 }
                 sb.append(p);
+                if (iter.hasNext()) {
+                    buildMatrix(sb, ps.getMatrixParameters());
+                }
             }
         }
-        if (!matrix.isEmpty()) {
-            sb.append(';');
-            sb.append(buildParams(matrix, ';'));
-        }
+        buildMatrix(sb, matrix);
         return sb.toString();
     }
 
@@ -434,7 +443,7 @@ public class UriBuilderImpl extends UriBuilder {
      * @param separator params separator, '&' for query ';' for matrix
      * @return stringified params.
      */
-    private String buildParams(MultivaluedMap<String, String> map, char separator) {
+    private static String buildParams(MultivaluedMap<String, String> map, char separator) {
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
@@ -447,5 +456,25 @@ public class UriBuilderImpl extends UriBuilder {
             }
         }
         return b.length() > 0 ? b.toString() : null;
+    }
+    
+    /**
+     * Builds param string for matrix part of URI.
+     * 
+     * @param sb buffer to add the matrix part to, will get ';' added if map is not empty 
+     * @param map matrix multivalued map
+     */    
+    private static void buildMatrix(StringBuilder sb, MultivaluedMap<String, String> map) {
+        if (!map.isEmpty()) {
+            sb.append(';');
+            sb.append(buildParams(map, ';'));
+        }
+    }
+    
+    private PathSegment replacePathSegment(PathSegment ps) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ps.getPath());
+        buildMatrix(sb, matrix);
+        return new PathSegmentImpl(sb.toString());
     }
 }

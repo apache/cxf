@@ -458,7 +458,21 @@ public class UriBuilderImplTest extends Assert {
     public void testMatrixNonFinalPathSegment() throws Exception {
         URI uri = new URI("http://blah/foo;p1=v1/bar");
         URI newUri = new UriBuilderImpl(uri).build();
-        assertEquals("URI is not built correctly", new URI("http://blah/foo/bar"), newUri);
+        assertEquals("URI is not built correctly", new URI("http://blah/foo;p1=v1/bar"), newUri);
+    }
+    
+    @Test
+    public void testMatrixFinalPathSegment() throws Exception {
+        URI uri = new URI("http://blah/foo;p1=v1/bar;p2=v2");
+        URI newUri = new UriBuilderImpl(uri).build();
+        assertEquals("URI is not built correctly", new URI("http://blah/foo;p1=v1/bar;p2=v2"), newUri);
+    }
+    
+    @Test
+    public void testAddPathWithMatrix() throws Exception {
+        URI uri = new URI("http://blah/foo/bar;p1=v1");
+        URI newUri = new UriBuilderImpl(uri).path("baz;p2=v2").build();
+        assertEquals("URI is not built correctly", new URI("http://blah/foo/bar;p1=v1/baz;p2=v2"), newUri);
     }
     
 }
