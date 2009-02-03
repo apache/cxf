@@ -49,8 +49,16 @@ For XML Configuration support:
 - spring.web.jar
 - FastInfoset-1.2.2.jar
 
+For JMS transport:
+- geronimo-jms_1.1_spec.jar (Or the Sun equivalent)
+- spring-jms.jar
+- commons-pool.jar
+- spring-dao.jar
+- spring-support.jar
+
+
 For standalone HTTP support:
-- geronimo-servlet.jar
+- geronimo-servlet.jar (Or the Sun equivalent)
 - jetty.jar
 - jetty-sslengine.jar
 - jetty-util.jar
@@ -59,7 +67,6 @@ For standalone HTTP support:
 For Aegis support:
 - jaxen.jar
 - jdom.jar
-- stax-utils.jar
 
 For WS-Security support:
 - bcprov-jdk15.jar
@@ -77,9 +84,6 @@ For JAX-RS support:
 - axiom*
 - jsr311-api.jar
 - jettison.jar (Needed for JSON services only)
-
-For JMS transport
-- geronimo-jms.jar (Or the Sun equivalent)
 
 For CORBA support:
 - antlr.jar
