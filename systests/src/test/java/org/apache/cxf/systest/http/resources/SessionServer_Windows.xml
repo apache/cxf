@@ -35,7 +35,10 @@
               
   <httpj:engine-factory bus="cxf">
 	 <httpj:engine port="9020">
-	     <httpj:sessionSupport>true</httpj:sessionSupport>	    
+	     <httpj:sessionSupport>true</httpj:sessionSupport>
+	     <!-- If the reuseAddress is true and running in a Windows box, 
+	     Jetty will not throw the java.net.BindException even the port is already used  -->
+	     <httpj:reuseAddress>false</httpj:reuseAddress>
 	  </httpj:engine>
    </httpj:engine-factory>  
 </beans>

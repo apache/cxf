@@ -33,8 +33,12 @@ public class SessionServer extends AbstractBusTestServerBase {
     protected void run() {
         Object implementor;
         String address;
+        String configurationFile = "resources/SessionServer.xml";
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            configurationFile = "resources/SessionServer_Windows.xml";
+        }
         URL configure =
-            SessionServer.class.getResource("resources/SessionServer.xml");
+            SessionServer.class.getResource(configurationFile);
         System.out.println("the configure is " + configure);
         Bus bus = new SpringBusFactory().createBus(configure, true);
         SpringBusFactory.setDefaultBus(bus);
