@@ -54,6 +54,49 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testSwaNoMimeCodeGen() throws Exception {
+        org.apache.cxf.swa_nomime.SwAService service = new org.apache.cxf.swa_nomime.SwAService();
+        
+        org.apache.cxf.swa_nomime.SwAServiceInterface port = service.getSwAServiceHttpPort();
+//        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+//                                                        "http://localhost:9037/swa");
+        
+        Holder<String> textHolder = new Holder<String>("Hi");
+        Holder<byte[]> data = new Holder<byte[]>("foobar".getBytes());
+
+        port.echoData(textHolder, data);
+        String string = IOUtils.newStringFromBytes(data.value);
+        assertEquals("testfoobar", string);
+        assertEquals("Hi", textHolder.value);
+        
+        if (Boolean.getBoolean("java.awt.headless")) {
+            return;
+        }
+        
+        URL url1 = this.getClass().getResource("resources/attach.text");
+        URL url2 = this.getClass().getResource("resources/attach.html");
+        URL url3 = this.getClass().getResource("resources/attach.xml");
+        URL url4 = this.getClass().getResource("resources/attach.jpeg1");
+        URL url5 = this.getClass().getResource("resources/attach.jpeg2");
+
+        Holder<String> attach1 = new Holder<String>(IOUtils.toString(url1.openStream()));
+        Holder<String> attach2 = new Holder<String>(IOUtils.toString(url2.openStream()));
+        Holder<String> attach3 = new Holder<String>(IOUtils.toString(url3.openStream()));
+        Holder<byte[]> attach4 = new Holder<byte[]>(IOUtils.readBytesFromStream(url4.openStream()));
+        Holder<byte[]> attach5 = new Holder<byte[]>(IOUtils.readBytesFromStream(url5.openStream()));
+        org.apache.cxf.swa_nomime.types.VoidRequest request 
+            = new org.apache.cxf.swa_nomime.types.VoidRequest();
+        org.apache.cxf.swa_nomime.types.OutputResponseAll response 
+            = port.echoAllAttachmentTypes(request, 
+                                          attach1, 
+                                          attach2,
+                                          attach3,
+                                          attach4,
+                                          attach5);
+        assertNotNull(response);
+    }
+    
+    @Test
     public void testSwa() throws Exception {
         SwAService service = new SwAService();
         

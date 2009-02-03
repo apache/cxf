@@ -127,9 +127,10 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             }
             return;
         }
-        
+        processAttachments(message, sbi);
+    }
+    protected void processAttachments(SoapMessage message, SoapBodyInfo sbi) {
         Collection<Attachment> atts = setupAttachmentOutput(message);
-
         List<Object> outObjects = CastUtils.cast(message.getContent(List.class));
         
         for (MessagePartInfo mpi : sbi.getAttachments()) {
@@ -198,6 +199,15 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                     ct = "application/octet-stream";
                 }
                 dh = new DataHandler(new ByteArrayDataSource((byte[])o, ct));                
+            } else if (o instanceof String) {
+                if (ct == null) {
+                    ct = "text/plain; charset=\'UTF-8\'";
+                }
+                try {
+                    dh = new DataHandler(new ByteArrayDataSource((String)o, ct));
+                } catch (IOException e) {
+                    throw new Fault(e);
+                }                
             } else {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED", 
                                                                        LOG, o.getClass()));

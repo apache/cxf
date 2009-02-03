@@ -29,8 +29,14 @@ public class Server extends AbstractBusTestServerBase {
     protected void run() {
         Object implementor = new SwAServiceImpl();
         String address = "http://localhost:9036/swa";
+        EndpointImpl ep;
         try {
-            EndpointImpl ep = (EndpointImpl) Endpoint.create(implementor);
+            ep = (EndpointImpl) Endpoint.create(new SwANoMimeServiceImpl());
+            ep.setWsdlLocation("classpath:wsdl/swa-mime-nomime.wsdl");
+            ep.publish(address + "-nomime");
+            
+            
+            ep = (EndpointImpl) Endpoint.create(implementor);
             ep.setWsdlLocation("classpath:wsdl/swa-mime.wsdl");
             ep.publish(address);
         } catch (Exception e) {
