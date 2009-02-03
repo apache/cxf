@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="SwAService"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:tns="http://cxf.apache.org/swa-nomime"
+  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+  xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd"
+  xmlns:types="http://cxf.apache.org/swa-nomime/types"
+  xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+  targetNamespace="http://cxf.apache.org/swa-nomime"
+  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+
+  <wsdl:types>
+    <xsd:schema xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+      targetNamespace="http://cxf.apache.org/swa-nomime/types">
+      <xsd:import namespace="http://ws-i.org/profiles/basic/1.1/xsd" />
+      <xsd:element name="DataStruct">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="DataRef" type="wsi:swaRef"
+              xmime:expectedContentTypes="application/octet-stream" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="text" type="xsd:string" />
+      <xsd:element name="headerText" type="xsd:string" />
+      <xsd:element name="VoidRequest" type="types:VoidRequest" />
+      <xsd:complexType name="VoidRequest">
+        <xsd:sequence />
+      </xsd:complexType>
+
+      <xsd:element name="OutputResponseAll"
+        type="types:OutputResponseAll" />
+      <xsd:complexType name="OutputResponseAll">
+        <xsd:sequence>
+          <xsd:element name="result" type="xsd:string" />
+          <xsd:element name="reason" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+    </xsd:schema>
+
+    <xsd:schema targetNamespace="http://ws-i.org/profiles/basic/1.1/xsd"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:simpleType name="swaRef">
+        <xsd:restriction base="xsd:anyURI" />
+      </xsd:simpleType>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="echoDataRefRequest">
+    <wsdl:part name="data" element="types:DataStruct" />
+  </wsdl:message>
+
+  <wsdl:message name="echoDataRefResponse">
+    <wsdl:part name="data" element="types:DataStruct" />
+  </wsdl:message>
+
+  <wsdl:message name="echoDataRequest">
+    <wsdl:part name="text" element="types:text" />
+    <wsdl:part name="data" type="xsd:base64Binary" />
+  </wsdl:message>
+
+  <wsdl:message name="echoDataResponse">
+    <wsdl:part name="text" element="types:text" />
+    <wsdl:part name="data" type="xsd:base64Binary" />
+  </wsdl:message>
+
+  <wsdl:message name="echoDataWithHeaderRequest">
+    <wsdl:part name="text" element="types:headerText" />
+    <wsdl:part name="data" type="xsd:base64Binary" />
+    <wsdl:part name="headerText" element="types:headerText" />
+  </wsdl:message>
+
+  <wsdl:message name="echoDataWithHeaderResponse">
+    <wsdl:part name="text" element="types:headerText" />
+    <wsdl:part name="data" type="xsd:base64Binary" />
+    <wsdl:part name="headerText" element="types:headerText" />
+  </wsdl:message>
+
+  <wsdl:message name="headerMessage">
+    <wsdl:part name="text" element="types:headerText" />
+  </wsdl:message>
+
+  <wsdl:message name="messageInputAllAttachmentTypes">
+    <wsdl:part name="request" element="types:VoidRequest" />
+    <wsdl:part name="attach1" type="xsd:string" />
+    <wsdl:part name="attach2" type="xsd:string" />
+    <wsdl:part name="attach3" type="xsd:string" />
+    <wsdl:part name="attach4" type="xsd:base64Binary" />
+    <wsdl:part name="attach5" type="xsd:base64Binary" />
+  </wsdl:message>
+
+  <wsdl:message name="messageOutputAllAttachmentTypes">
+    <wsdl:part name="response" element="types:OutputResponseAll" />
+    <wsdl:part name="attach1" type="xsd:string" />
+    <wsdl:part name="attach2" type="xsd:string" />
+    <wsdl:part name="attach3" type="xsd:string" />
+    <wsdl:part name="attach4" type="xsd:base64Binary" />
+    <wsdl:part name="attach5" type="xsd:base64Binary" />
+  </wsdl:message>
+
+  <wsdl:portType name="SwAServiceInterface">
+
+    <wsdl:operation name="echoDataRef">
+      <wsdl:input message="tns:echoDataRefRequest" />
+      <wsdl:output message="tns:echoDataRefResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="echoData">
+      <wsdl:input message="tns:echoDataRequest" />
+      <wsdl:output message="tns:echoDataResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="echoDataWithHeader">
+      <wsdl:input message="tns:echoDataWithHeaderRequest" />
+      <wsdl:output message="tns:echoDataWithHeaderResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="echoAllAttachmentTypes">
+      <wsdl:input message="tns:messageInputAllAttachmentTypes" />
+      <wsdl:output message="tns:messageOutputAllAttachmentTypes" />
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="SwAServiceBinding"
+    type="tns:SwAServiceInterface">
+    <soap:binding style="document"
+      transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <wsdl:operation name="echoDataRef">
+      <soap:operation soapAction="" style="literal" />
+      <wsdl:input>
+        <soap:body parts="data" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body parts="data" use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="echoData">
+      <soap:operation soapAction="" style="literal" />
+      <wsdl:input>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="text" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="data" type="application/octet-stream" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="text" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="data" type="application/octet-stream" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="echoDataWithHeader">
+      <soap:operation soapAction="" style="literal" />
+      <wsdl:input>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="text" use="literal" />
+            <soap:header use="literal" part="headerText"
+              message="tns:echoDataWithHeaderRequest" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="data" type="application/octet-stream" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="text" use="literal" />
+            <soap:header use="literal" part="headerText"
+              message="tns:echoDataWithHeaderResponse" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="data" type="application/octet-stream" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="echoAllAttachmentTypes">
+      <soap:operation />
+      <wsdl:input>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="request" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach1" type="text/plain" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach2" type="text/html" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach3" type="text/xml" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach4" type="image/jpeg" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach5" type="image/jpeg" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="response" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach1" type="text/plain" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach2" type="text/html" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach3" type="text/xml" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach4" type="image/jpeg" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attach5" type="image/jpeg" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="SwAService">
+    <wsdl:port name="SwAServiceHttpPort"
+      binding="tns:SwAServiceBinding">
+      <soap:address location="http://localhost:9036/swa-nomime" />
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

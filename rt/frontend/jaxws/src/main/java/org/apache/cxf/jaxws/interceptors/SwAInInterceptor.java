@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.MessageContentsList;
@@ -86,9 +87,22 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
                     DataHandler dh = a.getDataHandler();
                     String ct = dh.getContentType();
                     Object o = null;
-                    
-                    if (DataHandler.class.isAssignableFrom(mpi.getTypeClass())) {
+                    Class<?> typeClass = mpi.getTypeClass();
+                    if (DataHandler.class.isAssignableFrom(typeClass)) {
                         o = dh;
+                    } else if (String.class.isAssignableFrom(typeClass)) {
+                        try {
+                            //o = IOUtils.readBytesFromStream(dh.getInputStream());
+                            o = dh.getContent();
+                        } catch (IOException e) {
+                            throw new Fault(e);
+                        }
+                    } else if (byte[].class.isAssignableFrom(typeClass)) {
+                        try {
+                            o = IOUtils.readBytesFromStream(dh.getInputStream());
+                        } catch (IOException e) {
+                            throw new Fault(e);
+                        }
                     } else if (ct.startsWith("image/")) {
                         try {
                             o = ImageIO.read(dh.getInputStream());

@@ -720,7 +720,7 @@ public final class StaxUtils {
     private static boolean isDeclared(Element e, String namespaceURI, String prefix) {
         Attr att;
         if (prefix != null && prefix.length() > 0) {
-            att = e.getAttributeNodeNS(XML_NS, "xmlns:" + prefix);
+            att = e.getAttributeNodeNS(XML_NS, prefix);
         } else {
             att = e.getAttributeNode("xmlns");
         }
