@@ -223,32 +223,65 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
 
         client.setExecutor(getClient().getEndpoint().getExecutor());
         
-        final AsyncHandler<Object> handler;
+        AsyncHandler<Object> handler;
         if (params.length > 0 && params[params.length - 1] instanceof AsyncHandler) {
             handler = (AsyncHandler)params[params.length - 1];
         } else {
             handler = null;
         }
-        
-        final ClientCallback callback = new ClientCallback() {
-            boolean handlerCalled;
-            public void handleResponse(Map<String, Object> ctx, Object[] res) {
-                super.handleResponse(ctx, res);
-                if (handler != null) {
-                    handler.handleResponse(new ResponseCallback(this));
-                }
-                handlerCalled = true;
-            }
-            public boolean isDone() {
-                return handlerCalled && super.isDone();
-            }
-        };
-        
+        ClientCallback callback = new JaxwsClientCallback(handler);
+             
         Response<Object> ret = new ResponseCallback(callback);
         client.invoke(callback, oi, params);
         return ret;
     }
 
+    static class JaxwsClientCallback extends ClientCallback {
+        final AsyncHandler<Object> handler;
+        
+        public JaxwsClientCallback(final AsyncHandler<Object> handler) {
+            this.handler = handler;
+        }
+        public void handleResponse(Map<String, Object> ctx, Object[] res) {
+            context = ctx;
+            result = res;
+            if (handler != null) {
+                handler.handleResponse(new Response<Object>() {
+
+                    public Map<String, Object> getContext() {
+                        return context;
+                    }
+
+                    public boolean cancel(boolean mayInterruptIfRunning) {
+                        cancelled = true;
+                        return true;
+                    }
+
+                    public Object get() throws InterruptedException, ExecutionException {
+                        return result[0];
+                    }
+
+                    public Object get(long timeout, TimeUnit unit) throws InterruptedException,
+                        ExecutionException, TimeoutException {
+                        return result[0];
+                    }
+
+                    public boolean isCancelled() {
+                        return cancelled;
+                    }
+
+                    public boolean isDone() {
+                        return true;
+                    }
+                    
+                });
+            }
+            done = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+    }
     static class ResponseCallback implements Response<Object> {
         ClientCallback callback;
         public ResponseCallback(ClientCallback cb) {

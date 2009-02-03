@@ -580,6 +580,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {
                             // ignore
+                            ex.printStackTrace();
                         }
                     }
                 }
