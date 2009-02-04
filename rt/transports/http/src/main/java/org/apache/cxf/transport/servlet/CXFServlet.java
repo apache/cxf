@@ -70,7 +70,7 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
             loadSpringBus(servletConfig);
         } catch (ClassNotFoundException e) {                
             LOG.log(Level.SEVERE, "FAILED_TO_LOAD_SPRING_BUS", new Object[]{e});
-            new ServletException("Can't load bus with Spring context class", e);
+            throw new ServletException("Can't load bus with Spring context class", e);
         }
     }
     
