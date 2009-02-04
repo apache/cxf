@@ -25,9 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-public class SignatureToken extends AbstractSecurityAssertion implements TokenWrapper {
-
-    private Token signatureToken;
+public class SignatureToken extends TokenWrapper {
 
     public SignatureToken(SPConstants version) {
         super(version);
@@ -37,22 +35,15 @@ public class SignatureToken extends AbstractSecurityAssertion implements TokenWr
      * @return Returns the signatureToken.
      */
     public Token getSignatureToken() {
-        return signatureToken;
+        return getToken();
     }
-    public Token getToken() {
-        return signatureToken;
-    }
-
     /**
      * @param signatureToken The signatureToken to set.
      */
     public void setSignatureToken(Token signatureToken) {
-        this.signatureToken = signatureToken;
+        setToken(signatureToken);
     }
 
-    public void setToken(Token tok) {
-        this.setSignatureToken(tok);
-    }
 
     public QName getRealName() {
         return constants.getSignatureToken();
@@ -107,11 +98,11 @@ public class SignatureToken extends AbstractSecurityAssertion implements TokenWr
             writer.writeNamespace(wspPrefix, wspNamespaceURI);
         }
 
-        if (signatureToken == null) {
+        if (token == null) {
             throw new RuntimeException("EncryptionToken is not set");
         }
 
-        signatureToken.serialize(writer);
+        token.serialize(writer);
 
         // </wsp:Policy>
         writer.writeEndElement();

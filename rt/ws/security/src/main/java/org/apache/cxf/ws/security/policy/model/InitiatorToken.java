@@ -25,9 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-public class InitiatorToken extends AbstractSecurityAssertion implements TokenWrapper {
-
-    private Token initiatorToken;
+public class InitiatorToken extends TokenWrapper {
 
     public InitiatorToken(SPConstants version) {
         super(version);
@@ -37,10 +35,7 @@ public class InitiatorToken extends AbstractSecurityAssertion implements TokenWr
      * @return Returns the initiatorToken.
      */
     public Token getInitiatorToken() {
-        return initiatorToken;
-    }
-    public Token getToken() {
-        return initiatorToken;
+        return getToken();
     }
 
 
@@ -48,11 +43,7 @@ public class InitiatorToken extends AbstractSecurityAssertion implements TokenWr
      * @param initiatorToken The initiatorToken to set.
      */
     public void setInitiatorToken(Token initiatorToken) {
-        this.initiatorToken = initiatorToken;
-    }
-
-    public void setToken(Token tok) {
-        this.setInitiatorToken(tok);
+        setToken(initiatorToken);
     }
 
     public QName getRealName() {

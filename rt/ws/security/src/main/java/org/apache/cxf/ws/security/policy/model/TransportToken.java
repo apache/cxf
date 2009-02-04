@@ -24,11 +24,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
-public class TransportToken extends AbstractSecurityAssertion implements TokenWrapper {
-
-    private Token transportToken;
+public class TransportToken extends TokenWrapper {
 
     public TransportToken(SPConstants version) {
         super(version);
@@ -38,10 +35,7 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
      * @return Returns the transportToken.
      */
     public Token getTransportToken() {
-        return transportToken;
-    }
-    public Token getToken() {
-        return transportToken;
+        return getToken();
     }
 
     public QName getRealName() {
@@ -51,14 +45,6 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
         return SP12Constants.INSTANCE.getTransportToken();
     }
 
-    public boolean isOptional() {
-        return false;
-    }
-
-    public PolicyComponent normalize() {
-        return transportToken;
-    }
-    
     public short getType() {
         return org.apache.neethi.Constants.TYPE_ASSERTION;
     }
@@ -90,8 +76,8 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
                                  SPConstants.POLICY.getNamespaceURI());
 
         // serialization of the token ..
-        if (transportToken != null) {
-            transportToken.serialize(writer);
+        if (token != null) {
+            token.serialize(writer);
         }
 
         // </wsp:Policy>
@@ -99,16 +85,6 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
 
         writer.writeEndElement();
         // </sp:TransportToken>
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.apache.cxf.ws.security.policy.model.TokenWrapper#setToken(org.apache.cxf.ws.security.policy.model
-     * .Token)
-     */
-    public void setToken(Token tok) {
-        this.transportToken = tok;
     }
 
 }

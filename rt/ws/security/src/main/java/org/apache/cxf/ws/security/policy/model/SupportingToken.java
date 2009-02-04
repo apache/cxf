@@ -33,7 +33,7 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 
-public class SupportingToken extends AbstractSecurityAssertion implements AlgorithmWrapper, TokenWrapper {
+public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
 
     /**
      * Type of SupportingToken
@@ -252,10 +252,6 @@ public class SupportingToken extends AbstractSecurityAssertion implements Algori
             || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED
             || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENDORSING_ENCRYPTED
             || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED;
-    }
-
-    public PolicyComponent normalize() {
-        return this;
     }
 
     public short getType() {

@@ -104,6 +104,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         Collection<AssertionInfo> ais;
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
+        
         try {
             if (this.isRequestor()) {
                 Vector<byte[]> signatureValues = new Vector<byte[]>();

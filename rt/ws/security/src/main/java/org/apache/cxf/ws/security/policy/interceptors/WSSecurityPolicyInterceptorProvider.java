@@ -25,7 +25,6 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
-import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 
 /**
@@ -35,27 +34,16 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();
-        ASSERTION_TYPES.add(SP11Constants.LAYOUT);
-        ASSERTION_TYPES.add(SP11Constants.INCLUDE_TIMESTAMP);
-        ASSERTION_TYPES.add(SP11Constants.ALGORITHM_SUITE);
-        ASSERTION_TYPES.add(SP11Constants.WSS10);
-        ASSERTION_TYPES.add(SP11Constants.WSS11);
-        ASSERTION_TYPES.add(SP11Constants.TRUST_10);
-        ASSERTION_TYPES.add(SP11Constants.USERNAME_TOKEN);
-        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_TOKEN);
-        ASSERTION_TYPES.add(SP11Constants.SIGNED_PARTS);
-        ASSERTION_TYPES.add(SP11Constants.ENCRYPTED_PARTS);
-        ASSERTION_TYPES.add(SP11Constants.INSTANCE.getSupportingTokens());
-        ASSERTION_TYPES.add(SP11Constants.INSTANCE.getSignedSupportingTokens());
-        ASSERTION_TYPES.add(SP11Constants.INSTANCE.getEndorsingSupportingTokens());
-        ASSERTION_TYPES.add(SP11Constants.INSTANCE.getSignedEndorsingSupportingTokens());
-
         ASSERTION_TYPES.add(SP12Constants.LAYOUT);
         ASSERTION_TYPES.add(SP12Constants.INCLUDE_TIMESTAMP);
         ASSERTION_TYPES.add(SP12Constants.ALGORITHM_SUITE);
         ASSERTION_TYPES.add(SP12Constants.WSS10);
         ASSERTION_TYPES.add(SP12Constants.WSS11);
         ASSERTION_TYPES.add(SP12Constants.TRUST_13);
+        ASSERTION_TYPES.add(SP12Constants.PROTECTION_TOKEN);
+        ASSERTION_TYPES.add(SP12Constants.X509_TOKEN);
+        ASSERTION_TYPES.add(SP12Constants.ENCRYPTION_TOKEN);
+        ASSERTION_TYPES.add(SP12Constants.SIGNATURE_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.USERNAME_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.TRANSPORT_TOKEN);            
         ASSERTION_TYPES.add(SP12Constants.SIGNED_PARTS);

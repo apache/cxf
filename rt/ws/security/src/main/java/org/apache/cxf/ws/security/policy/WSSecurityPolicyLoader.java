@@ -56,6 +56,7 @@ import org.apache.cxf.ws.security.policy.builders.WSS10Builder;
 import org.apache.cxf.ws.security.policy.builders.WSS11Builder;
 import org.apache.cxf.ws.security.policy.builders.X509TokenBuilder;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
+import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
 
@@ -119,6 +120,7 @@ public class WSSecurityPolicyLoader {
         reg.register(new WSSecurityPolicyInterceptorProvider());
         reg.register(new WSSecurityInterceptorProvider());
         reg.register(new HttpsTokenInterceptorProvider());
+        reg.register(new IssuedTokenInterceptorProvider());
     }
 
 }

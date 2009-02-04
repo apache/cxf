@@ -25,9 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-public class RecipientToken extends AbstractSecurityAssertion implements TokenWrapper {
-
-    private Token recipientToken;
+public class RecipientToken extends  TokenWrapper {
 
     public RecipientToken(SPConstants version) {
         super(version);
@@ -37,26 +35,16 @@ public class RecipientToken extends AbstractSecurityAssertion implements TokenWr
      * @return Returns the receipientToken.
      */
     public Token getRecipientToken() {
-        return recipientToken;
-    }
-    public Token getToken() {
-        return recipientToken;
+        return getToken();
     }
 
     /**
      * @param receipientToken The receipientToken to set.
      */
     public void setRecipientToken(Token recipientToken) {
-        this.recipientToken = recipientToken;
+        setToken(recipientToken);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.ws.security.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
-     */
-    public void setToken(Token tok) {
-        this.setRecipientToken(tok);
-    }
 
     public QName getRealName() {
         return constants.getRecipientToken();

@@ -307,9 +307,18 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     }
                 }
                 ai.setAsserted(true);
-                policyAsserted(aim, abinding.getEncryptionToken());
-                policyAsserted(aim, abinding.getSignatureToken());
-                policyAsserted(aim, abinding.getProtectionToken());
+                if (abinding.getEncryptionToken() != null) {
+                    policyAsserted(aim, abinding.getEncryptionToken());
+                    policyAsserted(aim, abinding.getEncryptionToken().getToken());
+                }
+                if (abinding.getSignatureToken() != null) {
+                    policyAsserted(aim, abinding.getSignatureToken());
+                    policyAsserted(aim, abinding.getSignatureToken().getToken());
+                }
+                if (abinding.getProtectionToken() != null) {
+                    policyAsserted(aim, abinding.getProtectionToken());
+                    policyAsserted(aim, abinding.getProtectionToken().getToken());
+                }
                 policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);
             }
         }
@@ -364,6 +373,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             }
             assertPolicy(aim, SP12Constants.LAYOUT);
             assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
+            assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
             action = assertAsymetricBinding(aim, action, message);
             action = assertSymetricBinding(aim, action, message);
             

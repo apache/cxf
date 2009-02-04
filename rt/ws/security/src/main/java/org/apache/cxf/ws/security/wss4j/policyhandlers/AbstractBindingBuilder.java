@@ -425,9 +425,9 @@ public abstract class AbstractBindingBuilder {
     }
 
     protected SecurityToken getSecurityToken() {
-        SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TRUST_TOKEN);
+        SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
         if (st == null) {
-            String id = (String)message.getContextualProperty(SecurityConstants.TRUST_TOKEN_ID);
+            String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
             if (id != null) {
                 st = getTokenStore().getToken(id);
             }

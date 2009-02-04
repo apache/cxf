@@ -24,11 +24,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.PolicyComponent;
 
-public class ProtectionToken extends AbstractSecurityAssertion implements TokenWrapper {
-
-    private Token protectionToken;
+public class ProtectionToken extends TokenWrapper {
 
     public ProtectionToken(SPConstants version) {
         super(version);
@@ -38,36 +35,22 @@ public class ProtectionToken extends AbstractSecurityAssertion implements TokenW
      * @return Returns the protectionToken.
      */
     public Token getProtectionToken() {
-        return protectionToken;
-    }
-    public Token getToken() {
-        return protectionToken;
+        return getToken();
     }
 
     /**
      * @param protectionToken The protectionToken to set.
      */
     public void setProtectionToken(Token protectionToken) {
-        this.protectionToken = protectionToken;
+        setToken(protectionToken);
     }
 
-    public void setToken(Token tok) {
-        this.setProtectionToken(tok);
-    }
 
     public QName getRealName() {
         return constants.getProtectionToken();
     }
     public QName getName() {
         return SP12Constants.INSTANCE.getProtectionToken();
-    }
-
-    public PolicyComponent normalize() {
-        /*
-         * ProtectionToken can not contain multiple values. Hence we consider it to always be in the
-         * normalized format.
-         */
-        return this;
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
@@ -115,11 +98,11 @@ public class ProtectionToken extends AbstractSecurityAssertion implements TokenW
             writer.writeNamespace(wspPrefix, policyNamespaceURI);
         }
 
-        if (protectionToken == null) {
+        if (token == null) {
             throw new RuntimeException("ProtectionToken is not set");
         }
 
-        protectionToken.serialize(writer);
+        token.serialize(writer);
 
         // </wsp:Policy>
         writer.writeEndElement();

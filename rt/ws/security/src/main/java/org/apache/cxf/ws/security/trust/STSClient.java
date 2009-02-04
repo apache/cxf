@@ -111,6 +111,7 @@ public class STSClient implements Configurable {
     Element template;
     AlgorithmSuite algorithmSuite;
     String namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    String addressingNamespace;
     
     Map<String, Object> ctx = new HashMap<String, Object>();
 
@@ -160,6 +161,9 @@ public class STSClient implements Configurable {
         } else {
             setSoap12();
         }
+    }
+    public void setAddressingNamespace(String ad) {
+        addressingNamespace = ad;
     }
     
     public void setTrust(Trust10 trust) {
@@ -315,8 +319,14 @@ public class STSClient implements Configurable {
         writer.writeStartElement(namespace, "RequestType");
         writer.writeCharacters(namespace + "/Issue");
         writer.writeEndElement();
-        if (appliesTo != null) {
-            //TODO: AppliesTo element? 
+        if (appliesTo != null && addressingNamespace != null) {
+            writer.writeStartElement("http://schemas.xmlsoap.org/ws/2004/09/policy", "AppliesTo");
+            writer.writeStartElement(addressingNamespace, "EndpointReference");
+            writer.writeStartElement(addressingNamespace, "Address");
+            writer.writeCharacters(appliesTo);
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
         //TODO: Lifetime element?
         if (keyType == null) {
