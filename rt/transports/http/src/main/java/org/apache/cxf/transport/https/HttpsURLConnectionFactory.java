@@ -156,7 +156,19 @@ public final class HttpsURLConnectionFactory
         throws NoSuchAlgorithmException,
                NoSuchProviderException,
                KeyManagementException {
-        
+
+        // First see if an SSLSocketFactory was set.  This allows easy interop
+        // with not-yet-commons-ssl.jar, or even just people who like doing their
+        // own JSSE.
+        if (socketFactory == null) {
+            SSLSocketFactory preSetFactory = tlsClientParameters.getSSLSocketFactory();
+            if ( preSetFactory != null ) {
+                socketFactory = preSetFactory;
+            }
+        }
+
+        // Okay, no SSLSocketFactory available in TLSClientParameters.  Maybe
+        // TrustManagers, KeyManagers, etc?
         if (socketFactory == null) {
             String provider = tlsClientParameters.getJsseProvider();
             
