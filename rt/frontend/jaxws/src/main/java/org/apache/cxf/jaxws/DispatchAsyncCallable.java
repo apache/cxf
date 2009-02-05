@@ -19,20 +19,58 @@
 
 package org.apache.cxf.jaxws;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Dispatch;
+import javax.xml.ws.Response;
 
 public class DispatchAsyncCallable<T> implements Callable<T> {
     private Dispatch<T> dispatch;
     private T object;
-    public DispatchAsyncCallable(Dispatch<T> disp, T obj) {
+    private AsyncHandler callback;
+    
+    public DispatchAsyncCallable(Dispatch<T> disp, T obj, AsyncHandler c) {
         dispatch = disp;
         object = obj;
+        callback = c;
     }
 
+    @SuppressWarnings("unchecked")
     public T call() throws Exception {
-        return dispatch.invoke(object);
+        final T result = dispatch.invoke(object);
+        if (callback != null) {
+            callback.handleResponse(new Response<Object>() {
+
+                public Map<String, Object> getContext() {
+                    return dispatch.getResponseContext();
+                }
+
+                public boolean cancel(boolean mayInterruptIfRunning) {
+                    return false;
+                }
+
+                public Object get() {
+                    return result;
+                }
+
+                public boolean isCancelled() {
+                    return false;
+                }
+
+                public boolean isDone() {
+                    return true;
+                }
+
+                public Object get(long timeout, TimeUnit unit) {
+                    return result;
+                }
+                
+            });
+        }
+        return result;
     }
 
 }
