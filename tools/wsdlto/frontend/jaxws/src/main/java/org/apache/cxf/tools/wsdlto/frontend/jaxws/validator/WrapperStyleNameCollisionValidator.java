@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.validator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
@@ -116,15 +117,17 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         }
 
         if (output != null) {
-            for (WrapperElement element : ProcessorUtil.getWrappedElement(context, 
-                                                                          output.getElementQName())) {
-                if (names.containsKey(element.getElementName())
-                    &&  !(names.get(element.getElementName()) == element.getSchemaTypeName()
-                        || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
-                    handleErrors(names.get(element.getElementName()), element);
-                    return false;
-                } else {
-                    names.put(element.getElementName(), element.getSchemaTypeName());
+            List<WrapperElement> els = ProcessorUtil.getWrappedElement(context, output.getElementQName());
+            if (els.size() > 1) {
+                for (WrapperElement element : els) {
+                    if (names.containsKey(element.getElementName())
+                        &&  !(names.get(element.getElementName()) == element.getSchemaTypeName()
+                            || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
+                        handleErrors(names.get(element.getElementName()), element);
+                        return false;
+                    } else {
+                        names.put(element.getElementName(), element.getSchemaTypeName());
+                    }
                 }
             }
         }

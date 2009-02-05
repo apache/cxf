@@ -50,8 +50,8 @@ public class RemoteReferenceResolver implements ReferenceResolver {
     public Policy resolveReference(String uri) {
         int pos = uri.indexOf('#');
         String documentURI = uri.substring(0, pos);
-        
-        InputSource is = new ExtendedURIResolver().resolve(documentURI, baseURI);
+        ExtendedURIResolver resolver = new ExtendedURIResolver();
+        InputSource is = resolver.resolve(documentURI, baseURI);
         if (null == is) {
             return null;
         }
@@ -60,6 +60,8 @@ public class RemoteReferenceResolver implements ReferenceResolver {
             doc = DOMUtils.readXml(is.getByteStream());
         } catch (Exception ex) {
             throw new PolicyException(ex);
+        } finally {
+            resolver.close();
         }
 
         NodeList nl = doc.getElementsByTagNameNS(constants.getNamespace(), 
