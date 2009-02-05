@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
+import javax.xml.soap.Detail;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
@@ -52,6 +53,9 @@ import javax.xml.ws.http.HTTPBinding;
 import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -194,6 +198,16 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
                         Fault fault = (Fault)exp;
                         soapFault.setFaultCode(fault.getFaultCode());
                         soapFault.setFaultString(fault.getMessage());
+                        if (fault.getDetail() != null) {
+                            Detail det = soapFault.addDetail();
+                            Element fd = fault.getDetail();
+                            Node child = fd.getFirstChild();
+                            while (child != null) {
+                                Node next = child.getNextSibling();
+                                det.appendChild(det.getOwnerDocument().importNode(child, true));
+                                child = next;
+                            }
+                        }
                         SOAPFaultException ex = new SOAPFaultException(soapFault);
                         ex.initCause(exp);
                         throw ex;
