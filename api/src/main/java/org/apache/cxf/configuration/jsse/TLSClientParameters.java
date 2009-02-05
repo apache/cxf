@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.configuration.jsse;
 
+import javax.net.ssl.SSLSocketFactory;
+
 /**
  * This class extends {@link TLSParameterBase} with client-specific
  * SSL/TLS parameters.
@@ -25,6 +27,7 @@ package org.apache.cxf.configuration.jsse;
  */
 public class TLSClientParameters extends TLSParameterBase {
     private boolean disableCNCheck;
+    private SSLSocketFactory sslSocketFactory;    
 
     /**
      * Set whether or not JSEE should omit checking if the host name
@@ -44,4 +47,20 @@ public class TLSClientParameters extends TLSParameterBase {
     public boolean isDisableCNCheck() {
         return disableCNCheck;
     }
+
+    /**
+     * This sets the SSLSocketFactory to use, causing all other properties of
+     * this bean (and its superclass) to get ignored (this takes precendence).
+     */
+    public final void setSSLSocketFactory(SSLSocketFactory factory) {
+        sslSocketFactory = factory;
+    }
+
+
+    /**
+     * Returns the SSLSocketFactory to be used, or null if none has been set.
+     */
+    public final SSLSocketFactory getSSLSocketFactory() {
+        return sslSocketFactory;
+    }    
 }
