@@ -334,19 +334,21 @@ public class ParameterProcessor extends AbstractProcessor {
         if (outputWrapElement.size() == 1 && inputWrapElement != null) {
             QName outElement = outputWrapElement.iterator().next();
             boolean sameWrapperChild = false;
-            for (QName inElement : inputWrapElement) {
-                if (isSameWrapperChild(inElement, outElement)) {
-                    JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
-                                                              JavaType.Style.INOUT, outputPart);
-                    if (!qualified) {
-                        jp.setTargetNamespace("");
+            if (outputWrapElement.size() > 1) {
+                for (QName inElement : inputWrapElement) {
+                    if (isSameWrapperChild(inElement, outElement)) {
+                        JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
+                                                                  JavaType.Style.INOUT, outputPart);
+                        if (!qualified) {
+                            jp.setTargetNamespace("");
+                        }
+                        addParameter(method, jp);
+                        sameWrapperChild = true;
+                        if (method.getReturn() == null) {
+                            addVoidReturn(method);
+                        }
+                        break;
                     }
-                    addParameter(method, jp);
-                    sameWrapperChild = true;
-                    if (method.getReturn() == null) {
-                        addVoidReturn(method);
-                    }
-                    break;
                 }
             }
             if (!sameWrapperChild) {
@@ -638,13 +640,13 @@ public class ParameterProcessor extends AbstractProcessor {
     private boolean isSamePart(MessagePartInfo part1, MessagePartInfo part2) {
         QName qname1 = part1.getElementQName();
         QName qname2 = part2.getElementQName();
+        QName tname1 = part1.getTypeQName();
+        QName tname2 = part2.getTypeQName();
         if (qname1 != null && qname2 != null) {
-            return qname1.equals(qname2);
+            return qname1.equals(qname2) && (tname1 == null || tname1.equals(tname2));
         }
-        qname1 = part1.getTypeQName();
-        qname2 = part2.getTypeQName();
-        if (qname1 != null && qname2 != null) {
-            return qname1.equals(qname2);
+        if (tname1 != null && tname2 != null) {
+            return tname1.equals(tname2);
         }
         return false;
     }
