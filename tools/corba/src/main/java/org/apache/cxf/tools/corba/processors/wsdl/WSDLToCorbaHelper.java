@@ -422,8 +422,8 @@ public class WSDLToCorbaHelper {
         }        
         
         type = struct;
-                              
-        if (!"1".equals(seq.getMaxOccurs()) || !"1".equals(seq.getMinOccurs())) {
+
+        if (seq.getMaxOccurs() != 1 || seq.getMinOccurs() != 1) {
             QName name = createQNameTargetNamespace(type.getQName().getLocalPart() + "Array");            
             CorbaTypeImpl atype = createArray(name, type.getQName(), type.getQName(),
                                               seq.getMaxOccurs(), seq.getMinOccurs(), false);
