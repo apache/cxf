@@ -356,16 +356,14 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
     }
 
     public Future<?> invokeAsync(T obj, AsyncHandler<T> asyncHandler) {
+        FutureTask<T> f = new FutureTask<T>(new DispatchAsyncCallable<T>(this, obj, asyncHandler));
+        getExecutor().execute(f);
         
-        Response<?> r = invokeAsync(obj);
-        AsyncCallbackFuture callback = new AsyncCallbackFuture(r, asyncHandler);
-
-        getExecutor().execute(callback);
-        return callback;
+        return f;
     }
 
     public Response<T> invokeAsync(T obj) {
-        FutureTask<T> f = new FutureTask<T>(new DispatchAsyncCallable<T>(this, obj));
+        FutureTask<T> f = new FutureTask<T>(new DispatchAsyncCallable<T>(this, obj, null));
 
         getExecutor().execute(f);
         return new AsyncResponse<T>(f, cl);
