@@ -253,8 +253,12 @@ public final class JAXBEncoderDecoder {
             
             SchemaInfo sch = part.getMessageInfo().getOperation().getInterface()
                 .getService().getSchema(namespace);
-            if (!sch.isElementFormQualified()) {
-                namespace = null;
+            if (sch != null) {
+                if (!sch.isElementFormQualified()) {
+                    namespace = null;
+                }
+            } else {
+                LOG.warning("Schema associated with " + namespace + " is null");
             }
             
             for (Field f : cls.getDeclaredFields()) {
