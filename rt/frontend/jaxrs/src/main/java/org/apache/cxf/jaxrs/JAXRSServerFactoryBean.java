@@ -308,4 +308,13 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     public void setProviders(List<? extends Object> providers) {
         this.entityProviders = providers;
     }
+    
+    public void setInvoker(Invoker invoker) {
+        this.invoker = invoker;
+    }
+
+    public void setStart(boolean start) {
+        this.start = start;
+    }
+
 }
