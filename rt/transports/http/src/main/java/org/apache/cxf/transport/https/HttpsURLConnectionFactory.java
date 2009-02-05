@@ -162,7 +162,7 @@ public final class HttpsURLConnectionFactory
         // own JSSE.
         if (socketFactory == null) {
             SSLSocketFactory preSetFactory = tlsClientParameters.getSSLSocketFactory();
-            if ( preSetFactory != null ) {
+            if (preSetFactory != null) {
                 socketFactory = preSetFactory;
             }
         }
