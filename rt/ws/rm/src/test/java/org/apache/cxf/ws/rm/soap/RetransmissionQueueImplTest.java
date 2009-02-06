@@ -240,6 +240,34 @@ public class RetransmissionQueueImplTest extends Assert {
                      2,
                      sequenceList.size());
     }
+
+    @Test
+    public void testPurgeAcknowledgedAll() {
+        BigInteger[] messageNumbers = {BigInteger.TEN, BigInteger.ONE};
+        SourceSequence sequence = setUpSequence("sequence1",
+                                          messageNumbers,
+                                          new boolean[] {true, true});
+        List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
+            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+        queue.getUnacknowledged().put("sequence1", sequenceList);
+        Message message1 =
+            setUpMessage("sequence1", messageNumbers[0]);
+        setupMessagePolicies(message1);
+        Message message2 =
+            setUpMessage("sequence1", messageNumbers[1]);
+        setupMessagePolicies(message2);
+        ready(false);
+
+        sequenceList.add(queue.createResendCandidate(message1));
+        sequenceList.add(queue.createResendCandidate(message2));
+        queue.purgeAcknowledged(sequence);
+        assertEquals("unexpected unacked map size",
+                     0,
+                     queue.getUnacknowledged().size());
+        assertEquals("unexpected unacked list size",
+                     0,
+                     sequenceList.size());
+    }
     
     @Test
     public void testIsEmpty() {
@@ -382,8 +410,16 @@ public class RetransmissionQueueImplTest extends Assert {
             }
         }
         if (includesAcked) {
+            // Will be called once or twice depending on whether any more
+            // unacknowledged messages are left for this sequence
             sequence.getIdentifier();
-            EasyMock.expectLastCall().andReturn(id);
+            EasyMock.expectLastCall().andReturn(id).times(1, 2);
+
+            // Would be called only when there are no more
+            // unacknowledged messages left for this sequence
+            id.getValue();
+            EasyMock.expectLastCall().andReturn(sid).times(0, 1);
+
             RMStore store = createMock(RMStore.class);
             manager.getStore();
             EasyMock.expectLastCall().andReturn(store);
