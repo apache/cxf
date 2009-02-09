@@ -92,6 +92,10 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (encoding != null) {
             buffer.getEncoding().append(encoding);
         }
+        String ct = (String)message.get(Message.CONTENT_TYPE);
+        if (ct != null) {
+            buffer.getContentType().append(ct);
+        }
         Object headers = message.get(Message.PROTOCOL_HEADERS);
 
         if (headers != null) {

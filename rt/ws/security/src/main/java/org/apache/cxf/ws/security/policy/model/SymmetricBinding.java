@@ -102,7 +102,10 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         return SP12Constants.INSTANCE.getSymmetricBinding();
     }
     public PolicyComponent normalize() {
-        return this;
+        All all = new All();
+        all.addPolicyComponent(getPolicy().getFirstPolicyComponent());
+        all.addPolicyComponent(this);
+        return all;
     }
 
     public Policy getPolicy() {

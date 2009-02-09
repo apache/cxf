@@ -21,40 +21,50 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.neethi.All;
+import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Policy;
 
 /**
  * 
  */
-public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
+public class SecureConversationTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
-    public IssuedTokenInterceptorProvider() {
-        super(Arrays.asList(SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN));
-        this.getOutInterceptors().add(new IssuedTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
-        this.getInInterceptors().add(new IssuedTokenInInterceptor());
-        this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
+    public SecureConversationTokenInterceptorProvider() {
+        super(Arrays.asList(SP11Constants.SECURE_CONVERSATION_TOKEN,
+                            SP12Constants.SECURE_CONVERSATION_TOKEN));
+        this.getOutInterceptors().add(new SecureConversationOutInterceptor());
+        this.getOutFaultInterceptors().add(new SecureConversationOutInterceptor());
+        this.getInInterceptors().add(new SecureConversationInInterceptor());
+        this.getInFaultInterceptors().add(new SecureConversationInInterceptor());
     }
     
     
@@ -73,24 +83,25 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         if (client == null) {
             client = new STSClient(message.getExchange().get(Bus.class));
             client.setBeanName(message.getExchange().get(Endpoint.class)
-                               .getEndpointInfo().getName().toString() + ".sts-client");
+                               .getEndpointInfo().getName().toString() + ".sct-client");
         }
         return client;
     }
-    static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        public IssuedTokenOutInterceptor() {
+    static class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
+        public SecureConversationOutInterceptor() {
             super(Phase.PREPARE_SEND);
         }
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(SoapMessage message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
+                Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
                 if (ais == null || ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
-                    IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
+                    SecureConversationToken itok = (SecureConversationToken)ais.iterator()
+                        .next().getAssertion();
                     
                     SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
                     if (tok == null) {
@@ -112,14 +123,31 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                             try {
                                 client.setTrust(getTrust10(aim));
                                 client.setTrust(getTrust13(aim));
-                                client.setTemplate(itok.getRstTemplate());
+                                Policy pol = itok.getBootstrapPolicy();
+                                if (maps != null) {
+                                    Policy p = new Policy();
+                                    ExactlyOne ea = new ExactlyOne();
+                                    p.addPolicyComponent(ea);
+                                    All all = new All();
+                                    all.addPolicyComponent(getAddressingPolicy(aim));
+                                    ea.addPolicyComponent(all);
+                                    pol = p.merge(pol);
+                                }
+                                
+                                client.setPolicy(pol);
+                                client.setSoap11(message.getVersion() == Soap11.getInstance());
+                                client.setSecureConv(true);
+                                String s = message
+                                    .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+                                client.setLocation(s);
+                                
+                                Map<String, Object> ctx = client.getRequestContext();
+                                mapSecurityProps(message, ctx);
                                 if (maps == null) {
                                     tok = client.requestSecurityToken();
                                 } else {
-                                    String s = message
-                                        .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
                                     client.setAddressingNamespace(maps.getNamespaceURI());
-                                    tok = client.requestSecurityToken(s);
+                                    tok = client.requestSecurityToken();
                                 }
                             } catch (RuntimeException e) {
                                 throw e;
@@ -129,6 +157,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                 client.setTrust((Trust10)null);
                                 client.setTrust((Trust13)null);
                                 client.setTemplate(null);
+                                client.setLocation(null);
                                 client.setAddressingNamespace(null);
                             }
                         }
@@ -151,8 +180,38 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
             }
         }
+        
+        
+        private PolicyAssertion getAddressingPolicy(AssertionInfoMap aim) {
+            Collection<AssertionInfo> lst = aim.get(MetadataConstants.USING_ADDRESSING_2004_QNAME);
+            if (null != lst && !lst.isEmpty()) {
+                return lst.iterator().next().getAssertion();
+            }
+            lst = aim.get(MetadataConstants.USING_ADDRESSING_2005_QNAME);
+            if (null != lst && !lst.isEmpty()) {
+                return lst.iterator().next().getAssertion();
+            }
+            lst = aim.get(MetadataConstants.USING_ADDRESSING_2006_QNAME);
+            if (null != lst && !lst.isEmpty()) {
+                return lst.iterator().next().getAssertion();
+            }
+            return new PrimitiveAssertion(MetadataConstants.USING_ADDRESSING_2006_QNAME, 
+                                          false);
+        }
+        private void mapSecurityProps(Message message, Map<String, Object> ctx) {
+            for (String s : SecurityConstants.ALL_PROPERTIES) {
+                Object v = message.getContextualProperty(s + ".sct");
+                if (v != null) {
+                    ctx.put(s, v);
+                }
+            }
+        }
+
         private Trust10 getTrust10(AssertionInfoMap aim) {
             Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_10);
+            if (ais == null || ais.isEmpty()) {
+                ais = aim.get(SP11Constants.TRUST_10);
+            }
             if (ais == null || ais.isEmpty()) {
                 return null;
             }
@@ -167,8 +226,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         }
     }
     
-    static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
-        public IssuedTokenInInterceptor() {
+    static class SecureConversationInInterceptor extends AbstractPhaseInterceptor<Message> {
+        public SecureConversationInInterceptor() {
             super(Phase.PRE_PROTOCOL);
         }
 
@@ -176,7 +235,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
+                Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
                 if (ais == null) {
                     return;
                 }

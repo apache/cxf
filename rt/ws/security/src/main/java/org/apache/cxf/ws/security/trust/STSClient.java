@@ -113,6 +113,8 @@ public class STSClient implements Configurable {
     String namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     String addressingNamespace;
     
+    boolean isSecureConv;
+    
     Map<String, Object> ctx = new HashMap<String, Object>();
 
     private CallbackHandler cbHandler;
@@ -167,13 +169,25 @@ public class STSClient implements Configurable {
     }
     
     public void setTrust(Trust10 trust) {
-        namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+        if (trust != null) {
+            namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+        }
         trust10 = trust;
     }
     public void setTrust(Trust13 trust) {
+        if (trust != null) {
+            namespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
+        }
         trust13 = trust;        
-        namespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512"; 
     }
+    public boolean isSecureConv() {
+        return isSecureConv;
+    }
+
+    public void setSecureConv(boolean secureConv) {
+        this.isSecureConv = secureConv;
+    }
+
     public void setAlgorithmSuite(AlgorithmSuite ag) {
         algorithmSuite = ag;
     }
@@ -296,6 +310,10 @@ public class STSClient implements Configurable {
         BindingOperationInfo boi = findOperation("/RST/Issue");
         
         client.getRequestContext().putAll(ctx);
+        if (isSecureConv) {
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
+                                           namespace + "/RST/SCT");
+        }
         
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement(namespace, "RequestSecurityToken");
@@ -315,7 +333,12 @@ public class STSClient implements Configurable {
             }
         }
         
-        
+        if (isSecureConv && keyType == null) {
+            writer.writeStartElement(namespace, "TokenType");
+            writer.writeCharacters("http://schemas.xmlsoap.org/ws/2005/02/sc/sct");
+            writer.writeEndElement();
+            keyType = namespace + "/SymmetricKey";
+        }
         writer.writeStartElement(namespace, "RequestType");
         writer.writeCharacters(namespace + "/Issue");
         writer.writeEndElement();
@@ -329,13 +352,14 @@ public class STSClient implements Configurable {
             writer.writeEndElement();
         }
         //TODO: Lifetime element?
-        if (keyType == null) {
+        
+        if (keyType == null && !isSecureConv) {
             writer.writeStartElement(namespace, "KeyType");
-            //TODO: Set the KeyType?
             writer.writeCharacters(namespace + "/SymmetricKey");
             writer.writeEndElement();
             keyType = namespace + "/SymmetricKey";
         }
+        
         byte[] requestorEntropy = null;
         
         if (keyType.endsWith("SymmetricKey")) {
@@ -356,9 +380,11 @@ public class STSClient implements Configurable {
     
                 writer.writeEndElement();
                 writer.writeEndElement();
-                writer.writeStartElement(namespace, "ComputedKeyAlgorithm");
-                writer.writeCharacters(namespace + "/CK/PSHA1");
-                writer.writeEndElement();
+                if (!isSecureConv) {
+                    writer.writeStartElement(namespace, "ComputedKeyAlgorithm");
+                    writer.writeCharacters(namespace + "/CK/PSHA1");
+                    writer.writeEndElement();
+                }
             }
         } else if (keyType.endsWith("PublicKey")) {
             writer.writeStartElement(namespace, "UseKey");

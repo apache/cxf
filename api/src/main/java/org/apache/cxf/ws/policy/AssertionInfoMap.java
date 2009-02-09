@@ -54,7 +54,9 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     private void putAssertionInfo(PolicyAssertion a) {
         Policy p = a.getPolicy();
         if (p != null) {
-            for (PolicyAssertion na : getAssertions(p)) {
+            List<PolicyAssertion> pcs = new ArrayList<PolicyAssertion>();
+            getAssertions(p, pcs);
+            for (PolicyAssertion na : pcs) {
                 putAssertionInfo(na);
             }
         }
@@ -142,17 +144,21 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             }
         }
     }
-    
     private static Collection<PolicyAssertion> getAssertions(PolicyOperator p) {
+        Collection<PolicyAssertion> assertions = new ArrayList<PolicyAssertion>();
+        getAssertions(p, assertions);
+        return assertions;
+    }
+    
+    private static void getAssertions(PolicyOperator p, Collection<PolicyAssertion> assertions) {
         List<PolicyComponent> pcs = 
             CastUtils.cast(p.getPolicyComponents(), PolicyComponent.class);
-        if (pcs.size() == 0 || pcs.get(0) instanceof PolicyAssertion) {
-            return CastUtils.cast(pcs, PolicyAssertion.class);
-        }
-        Collection<PolicyAssertion> assertions = new ArrayList<PolicyAssertion>();
         for (PolicyComponent pc : pcs) {
-            assertions.addAll(getAssertions((PolicyOperator)pc));
+            if (pc instanceof PolicyAssertion) {
+                assertions.add((PolicyAssertion)pc);
+            } else {
+                getAssertions((PolicyOperator)pc, assertions);
+            }
         }
-        return assertions;   
     }
 }

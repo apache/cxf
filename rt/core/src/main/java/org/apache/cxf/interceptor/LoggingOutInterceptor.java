@@ -117,8 +117,11 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
             if (address != null) {
                 buffer.getAddress().append(address);
             }
+            String ct = (String)message.get(Message.CONTENT_TYPE);
+            if (ct != null) {
+                buffer.getContentType().append(ct);
+            }
             Object headers = message.get(Message.PROTOCOL_HEADERS);
-
             if (headers != null) {
                 buffer.getHeader().append(headers);
             }

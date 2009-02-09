@@ -20,11 +20,13 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -46,6 +48,9 @@ import org.apache.neethi.PolicyRegistry;
  * 
  */
 public class PolicyEngineImpl implements PolicyEngine, BusExtension {
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyEngineImpl.class);
+    
+    
     private static final String POLICY_INFO_REQUEST_SERVER = "policy-engine-info-serve-request";
     private static final String POLICY_INFO_FAULT_SERVER = "policy-engine-info-serve-fault";
     private static final String POLICY_INFO_RESPONSE_SERVER = "policy-engine-info-serve-response";
@@ -504,6 +509,8 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             if (!(a.isOptional() 
                 || (null != pipr.get(a.getName())) 
                 || (null != assertor && assertor.canAssert(a.getName())))) {
+                
+                LOG.fine("Alternative " + a.getName() + " is not supported");
                 return false;
             }
         }

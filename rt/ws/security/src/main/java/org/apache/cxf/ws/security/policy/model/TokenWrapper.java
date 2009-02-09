@@ -41,6 +41,12 @@ public abstract class TokenWrapper extends AbstractSecurityAssertion implements 
     }
     
     public PolicyComponent normalize() {
+        if (token != null) {
+            All all = new All();
+            all.addPolicyComponent(token.normalize());
+            all.addPolicyComponent(this);
+            return all;
+        }
         return this;
     }
     

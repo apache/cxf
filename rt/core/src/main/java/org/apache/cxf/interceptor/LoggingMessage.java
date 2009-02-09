@@ -22,6 +22,7 @@ public final class LoggingMessage {
 
     private final String heading;
     private final StringBuilder address;
+    private final StringBuilder contentType;
     private final StringBuilder encoding;
     private final StringBuilder header;
     private final StringBuilder message;
@@ -30,6 +31,7 @@ public final class LoggingMessage {
     public LoggingMessage(String h) {
         heading = h;
 
+        contentType = new StringBuilder();
         address = new StringBuilder();
         encoding = new StringBuilder();
         header = new StringBuilder();
@@ -46,6 +48,10 @@ public final class LoggingMessage {
 
     public StringBuilder getHeader() {
         return header;
+    }
+
+    public StringBuilder getContentType() {
+        return contentType;
     }
 
     public StringBuilder getMessage() {
@@ -65,6 +71,8 @@ public final class LoggingMessage {
         }
         buffer.append("\nEncoding: ");
         buffer.append(encoding);
+        buffer.append("\nContent-Type: ");
+        buffer.append(contentType);
         buffer.append("\nHeaders: ");
         buffer.append(header);
         buffer.append("\nMessages: ");

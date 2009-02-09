@@ -25,6 +25,7 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
+import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 
 /**
@@ -39,6 +40,7 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP12Constants.ALGORITHM_SUITE);
         ASSERTION_TYPES.add(SP12Constants.WSS10);
         ASSERTION_TYPES.add(SP12Constants.WSS11);
+        ASSERTION_TYPES.add(SP11Constants.TRUST_10);
         ASSERTION_TYPES.add(SP12Constants.TRUST_13);
         ASSERTION_TYPES.add(SP12Constants.PROTECTION_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.X509_TOKEN);

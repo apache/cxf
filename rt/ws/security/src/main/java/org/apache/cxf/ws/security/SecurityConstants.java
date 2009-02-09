@@ -19,6 +19,11 @@
 
 package org.apache.cxf.ws.security;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 
  */
@@ -41,6 +46,18 @@ public final class SecurityConstants {
     
     public static final String STS_CLIENT = "ws-security.sts.client";
 
+    public static final Set<String> ALL_PROPERTIES;
+    
+    static {
+        Set<String> s = new HashSet<String>(Arrays.asList(new String[] {
+            USERNAME, PASSWORD, CALLBACK_HANDLER, 
+            SIGNATURE_USERNAME, SIGNATURE_PROPERTIES, SIGNATURE_CRYPTO,
+            ENCRYPT_USERNAME, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
+            TOKEN, TOKEN_ID, STS_CLIENT
+        }));
+        ALL_PROPERTIES = Collections.unmodifiableSet(s);
+    }
+    
     private SecurityConstants() {
         //utility class
     }
