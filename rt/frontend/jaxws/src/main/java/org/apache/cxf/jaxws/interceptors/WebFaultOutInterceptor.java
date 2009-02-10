@@ -141,15 +141,13 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                             && (m.getName().startsWith("get")
                             || m.getName().startsWith("is"))) {
                             try {
-                                Method m2 = cls.getMethod(m.getName(),
-                                                          m.getParameterTypes());
                                 String name;
                                 if (m.getName().startsWith("get")) {
                                     name = "set" + m.getName().substring(3);
                                 } else {
                                     name = "set" + m.getName().substring(2);
                                 }
-                                m2 = cls.getMethod(name, m.getReturnType());
+                                Method m2 = cls.getMethod(name, m.getReturnType());
                                 m2.invoke(ret, m.invoke(cause));
                             } catch (Exception e) {
                                 //ignore

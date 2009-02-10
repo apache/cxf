@@ -20,6 +20,7 @@ package org.apache.cxf.interceptor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -148,8 +149,14 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
                     Constructor constructor = exClass.getConstructor(new Class[]{String.class});
                     e = constructor.newInstance(new Object[]{fault.getMessage()});
                 } else {
-                    Constructor constructor = getConstructor(exClass, e);
-                    e = constructor.newInstance(new Object[]{fault.getMessage(), e});
+                
+                    try {
+                        Constructor constructor = getConstructor(exClass, e);
+                        e = constructor.newInstance(new Object[]{fault.getMessage(), e});
+                    } catch (NoSuchMethodException e1) {
+                        //Use reflection to convert fault bean to exception
+                        e = convertFaultBean(exClass, e, fault);
+                    }
                 }
                 msg.setContent(Exception.class, e);
             } catch (Exception e1) {
@@ -242,5 +249,48 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             // do nothing
         }
         return null;
+    }
+    
+    private Exception convertFaultBean(Class<?> exClass, Object faultBean, Fault fault) throws Exception {
+        Constructor constructor = exClass.getConstructor(new Class[]{String.class});
+        Exception e = (Exception)constructor.newInstance(new Object[]{fault.getMessage()});
+
+        //Copy fault bean fields to exception
+        for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {   
+            Field[] fields = obj.getDeclaredFields();
+            for (Field f : fields) {
+                try {
+                    Field beanField = faultBean.getClass().getDeclaredField(f.getName());
+                    beanField.setAccessible(true);                    
+                    f.setAccessible(true);
+                    f.set(e, beanField.get(faultBean));
+                } catch (NoSuchFieldException e1) {
+                    //do nothing
+                }
+            }            
+        }
+        //also use/try public getter/setter methods
+        Method meth[] = faultBean.getClass().getMethods();
+        for (Method m : meth) {
+            if (m.getParameterTypes().length == 0
+                && (m.getName().startsWith("get")
+                || m.getName().startsWith("is"))) {
+                try {
+                    String name;
+                    if (m.getName().startsWith("get")) {
+                        name = "set" + m.getName().substring(3);
+                    } else {
+                        name = "set" + m.getName().substring(2);
+                    }
+                    Method m2 = exClass.getMethod(name, m.getReturnType());
+                    m2.invoke(e, m.invoke(faultBean));
+                } catch (Exception e1) {
+                    //ignore
+                }
+            }
+        }
+
+
+        return e;
     }
 }
