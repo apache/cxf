@@ -133,7 +133,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 }
             }
             if (sequenceCandidates.isEmpty()) {
-                candidates.remove(seq.getIdentifier());
+                candidates.remove(seq.getIdentifier().getValue());
             }
             LOG.fine("Completed purging resend candidates.");
         }
