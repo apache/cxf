@@ -678,7 +678,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         maps = ContextUtils.retrieveMAPs(message, 
                                          isProviderContext,
                                          isOutbound);
-        LOG.log(Level.INFO, "MAPs retrieved from message {0}", maps);
+        LOG.log(Level.FINE, "MAPs retrieved from message {0}", maps);
 
         if (maps == null && isProviderContext) {
             maps = new AddressingPropertiesImpl();

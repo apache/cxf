@@ -79,7 +79,8 @@ public class MAPCodecTest extends Assert {
     private Map<String, List<String>> mimeHeaders;
     private Exchange correlatedExchange;
     private boolean expectRelatesTo;
-
+    private boolean expectFaultTo;
+    
     @Before
     public void setUp() {
         codec = new MAPCodec();
@@ -295,12 +296,14 @@ public class MAPCodecTest extends Assert {
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         EasyMock.expectLastCall();
         IArgumentMatcher matcher = new JAXBEltMatcher();
-        int expectedMarshals = requestor ? expectedValues.length - 1 : expectedValues.length;
-        for (int i = 0; i < expectedMarshals; i++) {
-            EasyMock.reportMatcher(matcher);
-            EasyMock.eq(header);
-            marshaller.marshal(null, header);
-            EasyMock.expectLastCall();
+        int len = expectFaultTo ? expectedValues.length : expectedValues.length - 1;
+        for (int i = 0; i < len; i++) {
+            if (!requestor || i != 4) {
+                EasyMock.reportMatcher(matcher);
+                EasyMock.eq(header);
+                marshaller.marshal(null, header);
+                EasyMock.expectLastCall();
+            }
         }
         
         Node child = control.createMock(Node.class);
@@ -309,12 +312,15 @@ public class MAPCodecTest extends Assert {
         
         int i = 0;
         while (child != null) {
+            if (requestor && i == 4) {
+                i++;
+            }
             child.getNamespaceURI();
             EasyMock.expectLastCall().andReturn(expectedNames[i].getNamespaceURI());
             child.getLocalName();
             EasyMock.expectLastCall().andReturn(expectedNames[i].getLocalPart());
 
-            Node nextChild = ++i < expectedMarshals
+            Node nextChild = ++i < len
                              ? control.createMock(Node.class)
                              : null;
             child.getNextSibling();
@@ -346,26 +352,26 @@ public class MAPCodecTest extends Assert {
         boolean exposedAs200408 = VersionTransformer.Names200408.WSA_NAMESPACE_NAME.equals(uri);
         boolean exposedAs200403 = VersionTransformer.Names200403.WSA_NAMESPACE_NAME.equals(uri);
         assertTrue("unexpected namescape URI: " + uri, exposedAsNative || exposedAs200408 || exposedAs200403);
-        setUpHeaderDecode(headers, uri, Names.WSA_MESSAGEID_NAME, exposedAsNative
+        setUpHeaderDecode(headers, uri, Names.WSA_ACTION_NAME, exposedAsNative
             ? AttributedURIType.class : exposedAs200408 ? AttributedURI.class : exposedAs200403
                 ? org.apache.cxf.ws.addressing.v200403.AttributedURI.class : null, 0, unmarshaller);
-        setUpHeaderDecode(headers, uri, Names.WSA_TO_NAME, exposedAsNative
+        setUpHeaderDecode(headers, uri, Names.WSA_MESSAGEID_NAME, exposedAsNative
             ? AttributedURIType.class : exposedAs200408 ? AttributedURI.class : exposedAs200403
                 ? org.apache.cxf.ws.addressing.v200403.AttributedURI.class : null, 1, unmarshaller);
+        setUpHeaderDecode(headers, uri, Names.WSA_TO_NAME, exposedAsNative
+            ? AttributedURIType.class : exposedAs200408 ? AttributedURI.class : exposedAs200403
+                ? org.apache.cxf.ws.addressing.v200403.AttributedURI.class : null, 2, unmarshaller);
         setUpHeaderDecode(headers, uri, Names.WSA_REPLYTO_NAME, exposedAsNative
-            ? EndpointReferenceType.class : exposedAs200408
-                ? VersionTransformer.Names200408.EPR_TYPE : exposedAs200403
-                    ? VersionTransformer.Names200403.EPR_TYPE : null, 2, unmarshaller);
-        setUpHeaderDecode(headers, uri, Names.WSA_FAULTTO_NAME, exposedAsNative
             ? EndpointReferenceType.class : exposedAs200408
                 ? VersionTransformer.Names200408.EPR_TYPE : exposedAs200403
                     ? VersionTransformer.Names200403.EPR_TYPE : null, 3, unmarshaller);
         setUpHeaderDecode(headers, uri, Names.WSA_RELATESTO_NAME, exposedAsNative
             ? RelatesToType.class : exposedAs200408 ? Relationship.class : exposedAs200403
                 ? org.apache.cxf.ws.addressing.v200403.Relationship.class : null, 4, unmarshaller);
-        setUpHeaderDecode(headers, uri, Names.WSA_ACTION_NAME, exposedAsNative
-            ? AttributedURIType.class : exposedAs200408 ? AttributedURI.class : exposedAs200403
-                ? org.apache.cxf.ws.addressing.v200403.AttributedURI.class : null, 5, unmarshaller);
+        setUpHeaderDecode(headers, uri, Names.WSA_FAULTTO_NAME, exposedAsNative
+            ? EndpointReferenceType.class : exposedAs200408
+                ? VersionTransformer.Names200408.EPR_TYPE : exposedAs200403
+                    ? VersionTransformer.Names200403.EPR_TYPE : null, 5, unmarshaller);
     }
 
     private <T> void setUpHeaderDecode(List<Header> headers, String uri, String name, Class<T> clz,
@@ -432,56 +438,68 @@ public class MAPCodecTest extends Assert {
         expectedNamespaceURI = uri;
 
         expectedNames = new QName[] {
-            new QName(uri, Names.WSA_MESSAGEID_NAME), new QName(uri, Names.WSA_TO_NAME),
-            new QName(uri, Names.WSA_REPLYTO_NAME), new QName(uri, Names.WSA_FAULTTO_NAME),
-            new QName(uri, Names.WSA_RELATESTO_NAME), new QName(uri, Names.WSA_ACTION_NAME)
+            new QName(uri, Names.WSA_ACTION_NAME),
+            new QName(uri, Names.WSA_MESSAGEID_NAME),
+            new QName(uri, Names.WSA_TO_NAME),
+            new QName(uri, Names.WSA_REPLYTO_NAME),
+            new QName(uri, Names.WSA_RELATESTO_NAME),
+            new QName(uri, Names.WSA_FAULTTO_NAME),
         };
         if (exposeAsNative) {
             expectedValues = new Object[] {
-                id, to, replyTo, faultTo, relatesTo, action
+                action, id, to, replyTo, relatesTo, faultTo
             };
             expectedDeclaredTypes = new Class<?>[] {
+                AttributedURIType.class, 
                 AttributedURIType.class, AttributedURIType.class, EndpointReferenceType.class,
-                EndpointReferenceType.class, RelatesToType.class, AttributedURIType.class
+                RelatesToType.class, EndpointReferenceType.class,  
             };
         } else if (exposeAs200408) {
             expectedValues = new Object[] {
-                VersionTransformer.convert(id), VersionTransformer.convert(to),
-                VersionTransformer.convert(replyTo), VersionTransformer.convert(faultTo),
-                VersionTransformer.convert(relatesTo), VersionTransformer.convert(action)
+                VersionTransformer.convert(action),
+                VersionTransformer.convert(id),
+                VersionTransformer.convert(to),
+                VersionTransformer.convert(replyTo),
+                VersionTransformer.convert(relatesTo),
+                VersionTransformer.convert(faultTo),
             };
             if (!outbound) {
                 // conversion from 2004/08 to 2005/08 anonymous address
                 // occurs transparently in VersionTransformer
-                VersionTransformer.Names200408.EPR_TYPE.cast(expectedValues[2]).getAddress()
-                    .setValue(Names.WSA_ANONYMOUS_ADDRESS);
                 VersionTransformer.Names200408.EPR_TYPE.cast(expectedValues[3]).getAddress()
+                    .setValue(Names.WSA_ANONYMOUS_ADDRESS);
+                VersionTransformer.Names200408.EPR_TYPE.cast(expectedValues[5]).getAddress()
                     .setValue(Names.WSA_ANONYMOUS_ADDRESS);
             }
             expectedDeclaredTypes = new Class<?>[] {
-                AttributedURI.class, AttributedURI.class, VersionTransformer.Names200408.EPR_TYPE,
-                VersionTransformer.Names200408.EPR_TYPE, Relationship.class, AttributedURI.class
+                AttributedURI.class, AttributedURI.class, AttributedURI.class,
+                VersionTransformer.Names200408.EPR_TYPE, Relationship.class,
+                VersionTransformer.Names200408.EPR_TYPE,
             };
         } else if (exposeAs200403) {
             expectedValues = new Object[] {
-                VersionTransformer.convertTo200403(id), VersionTransformer.convertTo200403(to),
-                VersionTransformer.convertTo200403(replyTo), VersionTransformer.convertTo200403(faultTo),
-                VersionTransformer.convertTo200403(relatesTo), VersionTransformer.convertTo200403(action)
+                VersionTransformer.convertTo200403(action),
+                VersionTransformer.convertTo200403(id),
+                VersionTransformer.convertTo200403(to),
+                VersionTransformer.convertTo200403(replyTo),
+                VersionTransformer.convertTo200403(relatesTo), 
+                VersionTransformer.convertTo200403(faultTo),
             };
             if (!outbound) {
                 // conversion from 2004/03 to 2005/08 anonymous address
                 // occurs transparently in VersionTransformer
-                VersionTransformer.Names200403.EPR_TYPE.cast(expectedValues[2]).getAddress()
-                    .setValue(Names.WSA_ANONYMOUS_ADDRESS);
                 VersionTransformer.Names200403.EPR_TYPE.cast(expectedValues[3]).getAddress()
+                    .setValue(Names.WSA_ANONYMOUS_ADDRESS);
+                VersionTransformer.Names200403.EPR_TYPE.cast(expectedValues[5]).getAddress()
                     .setValue(Names.WSA_ANONYMOUS_ADDRESS);
             }
             expectedDeclaredTypes = new Class<?>[] {
                 org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
                 org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
-                VersionTransformer.Names200403.EPR_TYPE, VersionTransformer.Names200403.EPR_TYPE,
+                org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
+                VersionTransformer.Names200403.EPR_TYPE,
                 org.apache.cxf.ws.addressing.v200403.Relationship.class,
-                org.apache.cxf.ws.addressing.v200403.AttributedURI.class
+                VersionTransformer.Names200403.EPR_TYPE,
             };
         } else {
             fail("unexpected namespace URI: " + uri);
@@ -491,14 +509,14 @@ public class MAPCodecTest extends Assert {
 
     private final class JAXBEltMatcher implements IArgumentMatcher {
         public boolean matches(Object obj) {
+            if (expectedIndex == 4 && !expectRelatesTo) {
+                expectedIndex++;
+            }
             QName name = expectedNames[expectedIndex];
             Class<?> declaredType = expectedDeclaredTypes[expectedIndex];
             Object value = expectedValues[expectedIndex];
             boolean ret = false;
             expectedIndex++;
-            if (expectedIndex == 5 && !expectRelatesTo) {
-                return true;
-            }
             if (obj instanceof JAXBElement) {
                 JAXBElement other = (JAXBElement)obj;
                 ret = name.equals(other.getName()) && declaredType.isAssignableFrom(other.getDeclaredType())
@@ -568,23 +586,23 @@ public class MAPCodecTest extends Assert {
 
         if (exposedAsNative || exposedAs200408 || exposedAs200403) {
             String expectedMessageID = exposedAsNative
-                ? ((AttributedURIType)expectedValues[0]).getValue() : exposedAs200408
-                    ? ((AttributedURI)expectedValues[0]).getValue()
-                    : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[0]).getValue();
-
-            String expectedTo = exposedAsNative
                 ? ((AttributedURIType)expectedValues[1]).getValue() : exposedAs200408
                     ? ((AttributedURI)expectedValues[1]).getValue()
                     : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[1]).getValue();
 
-            String expectedReplyTo = exposedAsNative ? ((EndpointReferenceType)expectedValues[2])
+            String expectedTo = exposedAsNative
+                ? ((AttributedURIType)expectedValues[2]).getValue() : exposedAs200408
+                    ? ((AttributedURI)expectedValues[2]).getValue()
+                    : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[2]).getValue();
+
+            String expectedReplyTo = exposedAsNative ? ((EndpointReferenceType)expectedValues[3])
                 .getAddress().getValue() : exposedAs200408 ? (VersionTransformer.Names200408.EPR_TYPE
-                .cast(expectedValues[2])).getAddress().getValue() : (VersionTransformer.Names200403.EPR_TYPE
-                .cast(expectedValues[2])).getAddress().getValue();
+                .cast(expectedValues[3])).getAddress().getValue() : (VersionTransformer.Names200403.EPR_TYPE
+                .cast(expectedValues[3])).getAddress().getValue();
             String expectedAction = exposedAsNative
-                ? ((AttributedURIType)expectedValues[5]).getValue() : exposedAs200408
-                    ? ((AttributedURI)expectedValues[5]).getValue()
-                    : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[5]).getValue();
+                ? ((AttributedURIType)expectedValues[0]).getValue() : exposedAs200408
+                    ? ((AttributedURI)expectedValues[0]).getValue()
+                    : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[0]).getValue();
 
             ret = expectedMessageID.equals(other.getMessageID().getValue())
                   && expectedTo.equals(other.getTo().getValue())
@@ -606,7 +624,7 @@ public class MAPCodecTest extends Assert {
         List<?> soapAction = (List<?>)mimeHeaders.get("SOAPAction");
         assertNotNull("expected propogated action", soapAction);
         assertEquals("expected single action", 1, soapAction.size());
-        String expectedAction = "\"" + ((AttributedURIType)expectedValues[5]).getValue() + "\"";
+        String expectedAction = "\"" + ((AttributedURIType)expectedValues[0]).getValue() + "\"";
         assertEquals("expected propogated action", expectedAction, soapAction.get(0));
     }
 
@@ -614,10 +632,10 @@ public class MAPCodecTest extends Assert {
                                boolean exposedAsNative) {
         if (requestor) {
             if (outbound) {
-                String id = expectedValues[0] instanceof AttributedURIType
-                    ? ((AttributedURIType)expectedValues[0]).getValue()
-                    : expectedValues[0] instanceof AttributedURI ? ((AttributedURI)expectedValues[0])
-                        .getValue() : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[0])
+                String id = expectedValues[1] instanceof AttributedURIType
+                    ? ((AttributedURIType)expectedValues[1]).getValue()
+                    : expectedValues[0] instanceof AttributedURI ? ((AttributedURI)expectedValues[1])
+                        .getValue() : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[1])
                         .getValue();
                 // assertTrue("expected correlationID : " + id + " in map: " +
                 // codec.uncorrelatedExchanges,
@@ -630,9 +648,15 @@ public class MAPCodecTest extends Assert {
         }
         if (outbound) {
             int expectedMarshals = requestor ? expectedValues.length - 1 : expectedValues.length;
+            if (!expectFaultTo) {
+                --expectedMarshals;
+            }
             List<Header> headers = message.getHeaders();
             assertTrue("expected holders added to header list", headers.size() >= expectedMarshals);
-            for (int i = 0; i < expectedMarshals; i++) {
+            for (int i = 0; i < (expectFaultTo ? expectedValues.length : expectedValues.length - 1); i++) {
+                if (i == 4 && !expectRelatesTo) {
+                    i++;
+                }
                 assertTrue("expected " + expectedNames[i] + " added to headers", message
                     .hasHeader(expectedNames[i]));
             }

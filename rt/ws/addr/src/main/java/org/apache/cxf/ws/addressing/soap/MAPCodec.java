@@ -150,7 +150,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                         AddressingPropertiesImpl maps) {
         if (maps != null) { 
             cacheExchange(message, maps);
-            LOG.log(Level.INFO, "Outbound WS-Addressing headers");
+            LOG.log(Level.FINE, "Outbound WS-Addressing headers");
             try {
                 List<Header> header = message.getHeaders();
                 discardMAPs(header, maps);
@@ -162,6 +162,22 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 QName duplicate = maps.getDuplicate();
                 marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+                encodeAsExposed(maps,
+                                message,
+                                maps.getAction(), 
+                                Names.WSA_ACTION_QNAME,
+                                AttributedURIType.class, 
+                                hdr, 
+                                marshaller);
+                if (Names.WSA_ACTION_QNAME.equals(duplicate)) {
+                    encodeAsExposed(maps,
+                                    message,
+                                    maps.getAction(), 
+                                    Names.WSA_ACTION_QNAME,
+                                    AttributedURIType.class, 
+                                    hdr, 
+                                    marshaller);
+                }
                 encodeAsExposed(maps,
                                 message,
                                 maps.getMessageID(), 
@@ -226,22 +242,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     hdr,
                                     marshaller);
                 }
-                encodeAsExposed(maps,
-                                message,
-                                maps.getFaultTo(), 
-                                Names.WSA_FAULTTO_QNAME, 
-                                EndpointReferenceType.class,
-                                hdr,
-                                marshaller);
-                if (Names.WSA_FAULTTO_QNAME.equals(duplicate)) {
-                    encodeAsExposed(maps,
-                                    message,
-                                    maps.getFaultTo(), 
-                                    Names.WSA_FAULTTO_QNAME, 
-                                    EndpointReferenceType.class,
-                                    hdr,
-                                    marshaller);
-                }
+
                 encodeAsExposed(maps,
                                 message,
                                 maps.getRelatesTo(),
@@ -258,21 +259,27 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     hdr,
                                     marshaller);
                 }
-                encodeAsExposed(maps,
-                                message,
-                                maps.getAction(), 
-                                Names.WSA_ACTION_QNAME,
-                                AttributedURIType.class, 
-                                hdr, 
-                                marshaller);
-                if (Names.WSA_ACTION_QNAME.equals(duplicate)) {
+                if (maps.getFaultTo() != null
+                    && maps.getFaultTo().getAddress() != null
+                    && maps.getFaultTo().getAddress().getValue() != null
+                    && !maps.getFaultTo().getAddress().getValue()
+                        .equals(maps.getReplyTo().getAddress().getValue())) {
                     encodeAsExposed(maps,
                                     message,
-                                    maps.getAction(), 
-                                    Names.WSA_ACTION_QNAME,
-                                    AttributedURIType.class, 
-                                    hdr, 
+                                    maps.getFaultTo(), 
+                                    Names.WSA_FAULTTO_QNAME, 
+                                    EndpointReferenceType.class,
+                                    hdr,
                                     marshaller);
+                    if (Names.WSA_FAULTTO_QNAME.equals(duplicate)) {
+                        encodeAsExposed(maps,
+                                        message,
+                                        maps.getFaultTo(), 
+                                        Names.WSA_FAULTTO_QNAME, 
+                                        EndpointReferenceType.class,
+                                        hdr,
+                                        marshaller);
+                    }
                 }
                 encodeReferenceParameters(maps, hdr, marshaller);
                 
@@ -402,7 +409,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                      Element header,
                                      Marshaller marshaller) throws JAXBException {
         if (value != null) {
-            LOG.log(Level.INFO,
+            LOG.log(Level.FINE,
                     "{0} : {1}",
                     new Object[] {name.getLocalPart(), getLogText(value)});
             transformer.encodeAsExposed(maps.getNamespaceURI(),
@@ -432,7 +439,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
         try {
             List<Header> header = message.getHeaders();
             if (header != null) {
-                LOG.log(Level.INFO, "Inbound WS-Addressing headers");
+                LOG.log(Level.FINE, "Inbound WS-Addressing headers");
                 Unmarshaller unmarshaller = null;
                 Set<Element> referenceParameterHeaders = null;
 
@@ -548,7 +555,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                               clz,
                                               headerElement,
                                               unmarshaller));
-        LOG.log(Level.INFO,
+        LOG.log(Level.FINE,
                 "{0} : {1}",
                 new Object[] {headerElement.getLocalName(), getLogText(value)});
         return value;
@@ -661,7 +668,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 if (!(soapActionHeaders == null
                       || soapActionHeaders.size() == 0
                       || "".equals(soapActionHeaders.get(0)))) {
-                    LOG.log(Level.INFO, 
+                    LOG.log(Level.FINE, 
                             "encoding wsa:Action in SOAPAction header {0}",
                             action.getValue());
                     soapActionHeaders.clear();

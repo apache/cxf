@@ -223,7 +223,7 @@ public final class ContextUtils {
                                  boolean isProviderContext) {
         if (maps != null) {
             String mapProperty = getMAPProperty(isRequestor, isProviderContext, isOutbound);
-            LOG.log(Level.INFO,
+            LOG.log(Level.FINE,
                     "associating MAPs with context property {0}",
                     mapProperty);
             message.put(mapProperty, maps);
@@ -264,15 +264,15 @@ public final class ContextUtils {
             ContextUtils.getMAPProperty(isProviderContext, 
                                         isRequestor,
                                         isOutbound);
-        LOG.log(Level.INFO,
+        LOG.log(Level.FINE,
                 "retrieving MAPs from context property {0}",
                 mapProperty);
         AddressingPropertiesImpl maps =
             (AddressingPropertiesImpl)message.get(mapProperty);
         if (maps != null) {
-            LOG.log(Level.INFO, "current MAPs {0}", maps);
+            LOG.log(Level.FINE, "current MAPs {0}", maps);
         } else if (!isProviderContext) {
-            LogUtils.log(LOG, warnIfMissing ? Level.WARNING : Level.INFO, 
+            LogUtils.log(LOG, warnIfMissing ? Level.WARNING : Level.FINE, 
                 "MAPS_RETRIEVAL_FAILURE_MSG");         
         }
         return maps;
