@@ -239,7 +239,7 @@ public abstract class AbstractBindingBuilder {
         if (assertion == null) {
             return;
         }
-        LOG.log(Level.INFO, "Not asserting " + assertion.getName() + ": " + reason);
+        LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
         if (ais != null) {
@@ -255,7 +255,7 @@ public abstract class AbstractBindingBuilder {
         if (assertion == null) {
             return;
         }
-        LOG.log(Level.INFO, "Not asserting " + assertion.getName() + ": " + reason);
+        LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
         if (ais != null) {
@@ -271,7 +271,7 @@ public abstract class AbstractBindingBuilder {
         if (assertion == null) {
             return;
         }
-        LOG.log(Level.INFO, "Asserting " + assertion.getName());
+        LOG.log(Level.FINE, "Asserting " + assertion.getName());
         Collection<AssertionInfo> ais;
         ais = aim.get(assertion.getName());
         if (ais != null) {

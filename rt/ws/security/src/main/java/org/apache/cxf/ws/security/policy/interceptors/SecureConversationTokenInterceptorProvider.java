@@ -144,10 +144,10 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                                 Map<String, Object> ctx = client.getRequestContext();
                                 mapSecurityProps(message, ctx);
                                 if (maps == null) {
-                                    tok = client.requestSecurityToken();
+                                    tok = client.requestSecurityToken(s);
                                 } else {
                                     client.setAddressingNamespace(maps.getNamespaceURI());
-                                    tok = client.requestSecurityToken();
+                                    tok = client.requestSecurityToken(s);
                                 }
                             } catch (RuntimeException e) {
                                 throw e;

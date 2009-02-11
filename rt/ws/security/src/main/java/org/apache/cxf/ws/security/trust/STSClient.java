@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,8 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -87,6 +90,7 @@ import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 
 /**
  * 
@@ -114,6 +118,7 @@ public class STSClient implements Configurable {
     String addressingNamespace;
     
     boolean isSecureConv;
+    int ttl = 300;
     
     Map<String, Object> ctx = new HashMap<String, Object>();
 
@@ -305,6 +310,7 @@ public class STSClient implements Configurable {
     public SecurityToken requestSecurityToken() throws Exception {
         return requestSecurityToken(null);
     }
+
     public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
         createClient();
         BindingOperationInfo boi = findOperation("/RST/Issue");
@@ -316,7 +322,7 @@ public class STSClient implements Configurable {
         }
         
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        writer.writeStartElement(namespace, "RequestSecurityToken");
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         boolean wroteKeySize = false;
         String keyType = null;
         if (template != null) {
@@ -333,28 +339,21 @@ public class STSClient implements Configurable {
             }
         }
         
-        if (isSecureConv && keyType == null) {
-            writer.writeStartElement(namespace, "TokenType");
-            writer.writeCharacters("http://schemas.xmlsoap.org/ws/2005/02/sc/sct");
-            writer.writeEndElement();
-            keyType = namespace + "/SymmetricKey";
-        }
-        writer.writeStartElement(namespace, "RequestType");
+
+        writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + "/Issue");
-        writer.writeEndElement();
-        if (appliesTo != null && addressingNamespace != null) {
-            writer.writeStartElement("http://schemas.xmlsoap.org/ws/2004/09/policy", "AppliesTo");
-            writer.writeStartElement(addressingNamespace, "EndpointReference");
-            writer.writeStartElement(addressingNamespace, "Address");
-            writer.writeCharacters(appliesTo);
-            writer.writeEndElement();
-            writer.writeEndElement();
-            writer.writeEndElement();
-        }
-        //TODO: Lifetime element?
-        
-        if (keyType == null && !isSecureConv) {
-            writer.writeStartElement(namespace, "KeyType");
+        writer.writeEndElement();        
+        addAppliesTo(writer, appliesTo);
+        if (isSecureConv) {
+            addLifetime(writer);
+            if (keyType == null) {
+                writer.writeStartElement("wst", "TokenType", namespace);
+                writer.writeCharacters("http://schemas.xmlsoap.org/ws/2005/02/sc/sct");
+                writer.writeEndElement();
+                keyType = namespace + "/SymmetricKey";
+            }
+        } else if (keyType == null) {
+            writer.writeStartElement("wst", "KeyType", namespace);
             writer.writeCharacters(namespace + "/SymmetricKey");
             writer.writeEndElement();
             keyType = namespace + "/SymmetricKey";
@@ -363,31 +362,29 @@ public class STSClient implements Configurable {
         byte[] requestorEntropy = null;
         
         if (keyType.endsWith("SymmetricKey")) {
-            if (!wroteKeySize) {
-                writer.writeStartElement(namespace, "KeySize");
+            if (!wroteKeySize && !isSecureConv) {
+                writer.writeStartElement("wst", "KeySize", namespace);
                 writer.writeCharacters(Integer.toString(keySize));
                 writer.writeEndElement();
             }
         
             if ((trust10 != null && trust10.isRequireClientEntropy())
                 || (trust13 != null && trust13.isRequireClientEntropy())) {
-                writer.writeStartElement(namespace, "Entropy");
-                writer.writeStartElement(namespace, "BinarySecret");
-                writer.writeAttribute("Type", namespace + "/Nounce");
+                writer.writeStartElement("wst", "Entropy", namespace);
+                writer.writeStartElement("wst", "BinarySecret", namespace);
+                writer.writeAttribute("Type", namespace + "/Nonce");
                 requestorEntropy =
                     WSSecurityUtil.generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
                 writer.writeCharacters(Base64.encode(requestorEntropy));
     
                 writer.writeEndElement();
                 writer.writeEndElement();
-                if (!isSecureConv) {
-                    writer.writeStartElement(namespace, "ComputedKeyAlgorithm");
-                    writer.writeCharacters(namespace + "/CK/PSHA1");
-                    writer.writeEndElement();
-                }
+                writer.writeStartElement("wst", "ComputedKeyAlgorithm", namespace);
+                writer.writeCharacters(namespace + "/CK/PSHA1");
+                writer.writeEndElement();
             }
         } else if (keyType.endsWith("PublicKey")) {
-            writer.writeStartElement(namespace, "UseKey");
+            writer.writeStartElement("wst", "UseKey", namespace);
             writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
             writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyValue");
             
@@ -409,6 +406,34 @@ public class STSClient implements Configurable {
                                      new DOMSource(writer.getDocument().getDocumentElement()));
         
         return createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
+    }
+    
+    private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
+        Date creationTime = new Date();
+        Date expirationTime = new Date();
+        expirationTime.setTime(creationTime.getTime() + (ttl * 1000));
+
+        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+        writer.writeStartElement("wst", "Lifetime", namespace);
+        writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
+        writer.writeCharacters(fmt.format(creationTime));
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
+        writer.writeCharacters(fmt.format(expirationTime));
+        writer.writeEndElement();
+        writer.writeEndElement();        
+    }
+    private void addAppliesTo(XMLStreamWriter writer, String appliesTo) throws XMLStreamException {
+        if (appliesTo != null && addressingNamespace != null) {
+            writer.writeStartElement("wsp", "AppliesTo", "http://schemas.xmlsoap.org/ws/2004/09/policy");
+            writer.writeStartElement("wsa", "EndpointReference", addressingNamespace);
+            writer.writeStartElement("wsa", "Address", addressingNamespace);
+            writer.writeCharacters(appliesTo);
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeEndElement();
+        }
     }
 
     private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy) 

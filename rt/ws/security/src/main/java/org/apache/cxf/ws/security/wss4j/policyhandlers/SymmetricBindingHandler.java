@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -280,7 +281,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             SecurityToken sigTok = null;
             if (sigToken != null) {
                 if (sigToken instanceof SecureConversationToken) {
-                    //sigTokId = getSecConvTokenId();
+                    sigTok = getSecurityToken();
                 } else if (sigToken instanceof IssuedToken) {
                     sigTok = getSecurityToken();
                 } else if (sigToken instanceof X509Token) {
@@ -387,7 +388,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                          false);
         } catch (Exception e) {
             e.printStackTrace();
-            //REVISIT!!
+            throw new Fault(e);
         }
     }
     
@@ -463,9 +464,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setEncKeyId(encrTokId);
                     encr.setEphemeralKey(encrTok.getSecret());
                     Crypto crypto = getEncryptionCrypto(recToken);
-                    this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
-                    setEncryptionUser(encr, recToken, false, crypto);
-                   
+                    if (crypto != null) {
+                        this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+                        setEncryptionUser(encr, recToken, false, crypto);
+                    }
+                    
                     encr.setDocument(saaj.getSOAPPart());
                     encr.setEncryptSymmKey(false);
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());

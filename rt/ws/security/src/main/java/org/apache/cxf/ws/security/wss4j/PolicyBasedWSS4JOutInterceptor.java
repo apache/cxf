@@ -83,16 +83,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             boolean mustUnderstand = true;
             String actor = null;
             
-            WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
-            Element el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
-            try {
-                //move to end
-                saaj.getSOAPHeader().removeChild(el);
-                saaj.getSOAPHeader().appendChild(el);
-            } catch (SOAPException e) {
-                //ignore
-            }
-            
+
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
@@ -121,6 +112,17 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 
                 
                 if (transport != null) {
+                    WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
+                    Element el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
+                    try {
+                        //move to end
+                        saaj.getSOAPHeader().removeChild(el);
+                        saaj.getSOAPHeader().appendChild(el);
+                    } catch (SOAPException e) {
+                        //ignore
+                    }
+                    
+                    
                     if (transport instanceof TransportBinding) {
                         new TransportBindingHandler((TransportBinding)transport, saaj,
                                                     secHeader, aim, message).handleBinding();
@@ -130,6 +132,10 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     } else {
                         new AsymmetricBindingHandler((AsymmetricBinding)transport, saaj,
                                                      secHeader, aim, message).handleBinding();
+                    }
+                    
+                    if (el.getFirstChild() == null) {
+                        el.getParentNode().removeChild(el);
                     }
                 }
                 
