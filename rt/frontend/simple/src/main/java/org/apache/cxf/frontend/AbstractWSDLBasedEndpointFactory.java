@@ -279,15 +279,30 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
 
         setTransportId(transportId);
         
+        WSDLEndpointFactory wsdlEndpointFactory = null;
         if (destinationFactory == null) {
-            DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);
-            destinationFactory = dfm.getDestinationFactory(transportId);
+            try {
+                destinationFactory = getBus().getExtension(DestinationFactoryManager.class)
+                    .getDestinationFactory(transportId);
+            } catch (Throwable t) {
+                try {
+                    Object o = getBus().getExtension(ConduitInitiatorManager.class)
+                        .getConduitInitiator(transportId);
+                    if (o instanceof WSDLEndpointFactory) {
+                        wsdlEndpointFactory = (WSDLEndpointFactory)o;
+                    }
+                } catch (Throwable th) {
+                    //ignore
+                }
+            }
+        } 
+        if (destinationFactory instanceof WSDLEndpointFactory) {
+            wsdlEndpointFactory = (WSDLEndpointFactory)destinationFactory;
         }
         
         EndpointInfo ei;
-        if (destinationFactory instanceof WSDLEndpointFactory) {
-            ei = ((WSDLEndpointFactory)destinationFactory)
-                .createEndpointInfo(service.getServiceInfos().get(0), bindingInfo, null);
+        if (wsdlEndpointFactory != null) {
+            ei = wsdlEndpointFactory.createEndpointInfo(service.getServiceInfos().get(0), bindingInfo, null);
             ei.setTransportId(transportId);
         } else {
             ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
@@ -306,12 +321,8 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
         }
 
-        if (destinationFactory instanceof WSDLEndpointFactory) {
-            WSDLEndpointFactory we = (WSDLEndpointFactory) destinationFactory;
-            
-            we.createPortExtensors(ei, service);
-        } else {
-            // ?
+        if (wsdlEndpointFactory != null) {
+            wsdlEndpointFactory.createPortExtensors(ei, service);
         }
         service.getServiceInfos().get(0).addEndpoint(ei);
         return ei;
