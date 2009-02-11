@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.AsyncHandler;
@@ -199,11 +198,6 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
 
         } else {
-            try {
-                soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
-            } catch (SOAPException ex2) {
-                //ignore
-            }
             String msg = ex.getMessage();
             if (msg != null) {
                 soapFault.setFaultString(msg);
