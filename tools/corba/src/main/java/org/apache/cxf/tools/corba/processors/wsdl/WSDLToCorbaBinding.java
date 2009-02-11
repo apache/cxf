@@ -575,7 +575,7 @@ public class WSDLToCorbaBinding {
                         NodeList nlist = appInfo.getMarkup();
                         Node node = nlist.item(0);
                         String info = node.getNodeValue();
-                        info.trim();
+                        info = info.trim();
                         String annotationBindingName = "";
                         if ("corba:binding=".equals(info.substring(0, 14))) {
                             annotationBindingName = info.substring(14);
