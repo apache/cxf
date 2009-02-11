@@ -147,10 +147,11 @@ public abstract class AbstractInvoker implements Invoker {
         if (checked) {
             return new Fault(ex);
         } else {
-            return new Fault(new Message("EXCEPTION_INVOKING_OBJECT",
-                                         LOG,
-                                         ex.getMessage(), m.toString(), params),
-                                         ex);
+            String message = (ex == null) ? "" : ex.getMessage(); 
+            String method = (m == null) ? "<null>" : m.toString(); 
+            return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG, 
+                                         message, method, params),
+                                         ex); 
         }
     }
     
