@@ -116,8 +116,6 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
                     //large thing on disk...
                     buffer.getMessage().append("\nMessage (saved to tmp file):\n");
                     buffer.getMessage().append("Filename: " + bos.getTempFile().getAbsolutePath() + "\n");
-                } else {            
-                    buffer.getMessage().append("\nMessage:\n");
                 }
                 if (bos.size() > limit) {
                     buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
