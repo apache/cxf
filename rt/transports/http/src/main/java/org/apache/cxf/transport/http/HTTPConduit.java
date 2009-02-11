@@ -66,6 +66,7 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.version.Version;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -820,6 +821,9 @@ public class HTTPConduit
                 connection.addRequestProperty(header, value);
             }
         }
+        if (!connection.getRequestProperties().containsKey("User-Agent")) {
+            connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
+        }
     }
     
     /**
@@ -1174,7 +1178,7 @@ public class HTTPConduit
             headers.put("Accept",
                         createMutableList(policy.getAccept()));
         } else {
-            headers.put("Accept", createMutableList("*"));
+            headers.put("Accept", createMutableList("*/*"));
         }
         if (policy.isSetAcceptEncoding()) {
             headers.put("Accept-Encoding",
