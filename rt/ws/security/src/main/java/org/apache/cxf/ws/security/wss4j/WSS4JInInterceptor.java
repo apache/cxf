@@ -61,7 +61,6 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -414,22 +413,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
         }
         return cbHandler;
-    }
-    public Crypto loadSignatureCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        try {
-            return super.loadSignatureCrypto(reqData);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-    protected Crypto loadDecryptionCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        try {
-            return super.loadDecryptionCrypto(reqData);
-        } catch (Exception ex) {
-            return null;
-        }
     }
 
 
