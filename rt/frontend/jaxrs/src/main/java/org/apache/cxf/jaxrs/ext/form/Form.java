@@ -17,35 +17,23 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.jaxrs.ext.form;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.core.MultivaluedMap;
 
-@WebService
-@Path("/bookstore")
-@Consumes("application/xml")
-@Produces("application/xml")
-public interface BookStoreJaxrsJaxws {
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+
+public class Form {
+    private MultivaluedMap<String, Object> map = 
+        new MetadataMap<String, Object>();
     
-    @WebMethod
-    @GET
-    @Path("/{id}")
-    Book getBook(@PathParam("id") @WebParam(name = "id") Long id) throws BookNotFoundFault;
-
-    @WebMethod
-    @POST
-    @Path("/books")
-    Book addBook(@WebParam(name = "book") Book book);
+    public Form set(String name, Object value) {
+        map.add(name, value);
+        return this;
+    }
     
-    @Path("/books/{id}")
-    @WebMethod(exclude = true)
-    BookSubresource getBookSubresource(@PathParam("id") String id);
+    public MultivaluedMap<String, Object> getData() {
+        return new MetadataMap<String, Object>(map);
+    }
+    
 }

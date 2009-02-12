@@ -25,6 +25,10 @@ import javax.xml.ws.WebFault;
 public class BookNotFoundFault extends Exception {
     private BookNotFoundDetails details;
 
+    public BookNotFoundFault(String errorMessage) {
+        super(errorMessage);
+    }
+    
     public BookNotFoundFault(BookNotFoundDetails details) {
         super();
         this.details = details;

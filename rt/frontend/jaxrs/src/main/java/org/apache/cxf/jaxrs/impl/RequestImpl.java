@@ -23,7 +23,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.EntityTag;
@@ -33,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 /**
@@ -85,8 +85,8 @@ public class RequestImpl implements Request {
             return null;
         }
         
-        SimpleDateFormat dateFormat = 
-            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+        SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
+
         dateFormat.setLenient(false);
         Date dateSince = null;
         try {

@@ -24,8 +24,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -35,15 +33,11 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ParameterType;
 
-@Produces("text/plain")
-@Consumes("text/plain")
 public class PrimitiveTextProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
 
     private static boolean isSupported(Class<?> type) { 
-        return type.isPrimitive() 
-            || Number.class.isAssignableFrom(type)
-            || Boolean.class.isAssignableFrom(type);
+        return InjectionUtils.isPrimitive(type);
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {

@@ -21,16 +21,22 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -38,11 +44,14 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
+@Produces("application/x-www-form-urlencoded")
 @Consumes({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
-public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
+public class FormEncodingProvider implements 
+    MessageBodyReader<Object>, MessageBodyWriter<MultivaluedMap<String, String>> {
         
     private FormValidator validator;
     @Context private MessageContext mc;
@@ -118,6 +127,33 @@ public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
     protected void validateMap(MultivaluedMap<String, String> params) {
         if (validator != null) {
             validator.validate(params);
+        }
+    }
+
+    public long getSize(MultivaluedMap t, Class<?> type, Type genericType, Annotation[] annotations, 
+                        MediaType mediaType) {
+        return -1;
+    }
+
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
+                               MediaType mediaType) {
+        return MultivaluedMap.class.isAssignableFrom(type);
+    }
+
+    public void writeTo(MultivaluedMap<String, String> map, Class<?> c, Type t, Annotation[] anns, 
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+        throws IOException, WebApplicationException {
+        boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
+        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, List<String>> entry = it.next();
+            for (String value : entry.getValue()) {
+                os.write(entry.getKey().getBytes("UTF-8"));
+                os.write('=');
+                os.write(JAXRSUtils.encode(encoded, value).getBytes("UTF-8"));
+                if (it.hasNext()) {
+                    os.write('&');
+                }
+            }
         }
     }
 }

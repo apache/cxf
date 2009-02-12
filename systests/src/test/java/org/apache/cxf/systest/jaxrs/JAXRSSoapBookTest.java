@@ -23,7 +23,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -32,7 +40,14 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -60,6 +75,196 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
                 
+    }
+    
+    @Test
+    public void testGetBook123Client() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                                  BookStoreJaxrsJaxws.class);
+        Book b = proxy.getBook(new Long("123"));
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
+    public void testGetBook123WebClient() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        WebClient client = new WebClient(baseAddress);
+        client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b = client.get(Book.class);
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
+    public void testNoBookWebClient() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        WebClient client = new WebClient(baseAddress);
+        client.path("/bookstore/books/0/subresource").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b = client.get(Book.class);
+        assertNull(b);
+        assertEquals(204, client.getResponse().getStatus());
+    }
+    
+    @Test
+    public void testGetBook123WebClientResponse() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        WebClient client = new WebClient(baseAddress);
+        client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b = readBook((InputStream)client.get().getEntity());
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
+    public void testGetBook356ClientException() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                              BookStoreJaxrsJaxws.class);
+        
+        ProviderFactory.getInstance().registerUserProvider(new TestResponseExceptionMapper());
+        try {
+            proxy.getBook(356L);
+            fail();
+        } catch (BookNotFoundFault ex) {
+            assertEquals("No Book with id 356 is available", ex.getMessage());
+        }
+    }
+    
+    
+    @Test
+    public void testGetBookSubresourceClient() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                                  BookStoreJaxrsJaxws.class);
+        BookSubresource bs = proxy.getBookSubresource("125");
+        Book b = bs.getTheBook();
+        assertEquals(125, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
+    public void testGetBookSubresourceClient2() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                                  BookStoreJaxrsJaxws.class);
+        doTestSubresource(proxy);
+    }
+    
+    @Test
+    public void testGetBookSubresourceWebClientProxy() throws Exception {
+        
+        WebClient client = new WebClient("http://localhost:9092/test/services/rest");
+        client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.fromClient(client, BookStoreJaxrsJaxws.class, true);
+        
+        doTestSubresource(proxy);
+        
+        BookStoreJaxrsJaxws proxy2 = JAXRSClientFactory.fromClient(
+            WebClient.client(proxy), BookStoreJaxrsJaxws.class);
+        doTestSubresource(proxy2);
+        
+    }
+    
+    
+    @Test
+    public void testGetBookSubresourceWebClientProxy2() throws Exception {
+        
+        WebClient client = new WebClient("http://localhost:9092/test/services/rest/bookstore")
+            .path("/books/378");
+        client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
+        BookSubresource proxy = JAXRSClientFactory.fromClient(client, BookSubresource.class);
+        
+        Book b = proxy.getTheBook2("CXF ", "in ", "Action ", "- 3", "7", "8");
+        assertEquals(378, b.getId());
+        assertEquals("CXF in Action - 378", b.getName());
+        
+    }
+    
+    private void doTestSubresource(BookStoreJaxrsJaxws proxy) throws Exception {
+        BookSubresource bs = proxy.getBookSubresource("378");
+        
+        Book b = bs.getTheBook2("CXF ", "in ", "Action ", "- 3", "7", "8");
+        assertEquals(378, b.getId());
+        assertEquals("CXF in Action - 378", b.getName());
+        
+        WebClient.client(bs).reset().header("N4", "- 4");
+        b = bs.getTheBook2("CXF ", "in ", "Action ", null, "7", "8");
+        assertEquals(378, b.getId());
+        assertEquals("CXF in Action - 478", b.getName());
+    }
+    
+    @Test
+    public void testGetBookWebClientForm() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest/bookstore/books/679/subresource3";
+        WebClient wc = new WebClient(baseAddress);
+        MultivaluedMap<String, Object> map = new MetadataMap<String, Object>();
+        map.putSingle("id", "679");
+        map.putSingle("name", "CXF in Action - 679");
+        Book b = readBook((InputStream)wc.accept("application/xml")
+                          .form((Map<String, List<Object>>)map).getEntity());
+        assertEquals(679, b.getId());
+        assertEquals("CXF in Action - 679", b.getName());
+    }
+    
+    @Test
+    public void testGetBookWebClientForm2() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest/bookstore/books/679/subresource3";
+        WebClient wc = new WebClient(baseAddress);
+        Form f = new Form();
+        f.set("id", "679").set("name", "CXF in Action - 679");
+        Book b = readBook((InputStream)wc.accept("application/xml")
+                          .form(f).getEntity());
+        assertEquals(679, b.getId());
+        assertEquals("CXF in Action - 679", b.getName());
+    }
+    
+    @Test
+    public void testGetBookSubresourceClientFormParam() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                                  BookStoreJaxrsJaxws.class);
+        BookSubresource bs = proxy.getBookSubresource("679");
+        Book b = bs.getTheBook3("679", "CXF in Action - 679");
+        assertEquals(679, b.getId());
+        assertEquals("CXF in Action - 679", b.getName());
+    }
+    
+    @Test
+    public void testAddGetBook123WebClient() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        WebClient client = new WebClient(baseAddress);
+        client.path("/bookstore/books").accept(MediaType.APPLICATION_XML_TYPE)
+            .type(MediaType.APPLICATION_XML_TYPE);
+        Book b = new Book();
+        b.setId(124);
+        b.setName("CXF in Action - 2");
+        Book b2 = client.post(b, Book.class);
+        assertNotSame(b, b2);
+        assertEquals(124, b2.getId());
+        assertEquals("CXF in Action - 2", b2.getName());
+    }
+    
+    @Test
+    public void testAddGetBook123Client() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                                  BookStoreJaxrsJaxws.class);
+        Book b = new Book();
+        b.setId(124);
+        b.setName("CXF in Action - 2");
+        Book b2 = proxy.addBook(b);
+        assertNotSame(b, b2);
+        assertEquals(124, b2.getId());
+        assertEquals("CXF in Action - 2", b2.getName());
     }
     
     @Test
@@ -116,5 +321,26 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml,text/plain");
         return connect.getInputStream();
+    }
+    
+    private Book readBook(InputStream is) throws Exception {
+        JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
+        Unmarshaller u = c.createUnmarshaller();
+        return (Book)u.unmarshal(is);
+    }
+    
+    public static class TestResponseExceptionMapper implements ResponseExceptionMapper<BookNotFoundFault> {
+        
+        public TestResponseExceptionMapper() {
+        }
+        
+        public BookNotFoundFault fromResponse(Response r) {
+            Object value = r.getMetadata().getFirst("BOOK-HEADER");
+            if (value != null) {
+                return new BookNotFoundFault(value.toString());
+            }
+            throw new WebApplicationException();
+        }
+        
     }
 }

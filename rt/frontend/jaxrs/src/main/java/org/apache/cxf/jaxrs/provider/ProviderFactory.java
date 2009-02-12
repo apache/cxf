@@ -37,6 +37,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.MappingsHandler;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -75,6 +76,8 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ResponseHandler>>(1);
     private List<ProviderInfo<ParameterHandler>> jaxrsParamHandlers = 
         new ArrayList<ProviderInfo<ParameterHandler>>(1);
+    private List<ProviderInfo<ResponseExceptionMapper>> userResponseExceptionMappers = 
+        new ArrayList<ProviderInfo<ResponseExceptionMapper>>(1);
     private RequestPreprocessor requestPreprocessor;
     
     private ProviderFactory() {
@@ -91,12 +94,12 @@ public final class ProviderFactory {
                      responseHandlers,
                      defaultExceptionMappers,
                      jaxrsParamHandlers,
+                     userResponseExceptionMappers,
                      new JAXBElementProvider(),
                      new JSONProvider(),
                      new BinaryDataProvider(),
-                     new StringProvider(),
                      new SourceProvider(),
-                     new FormEncodingReaderProvider(),
+                     new FormEncodingProvider(),
                      new PrimitiveTextProvider(),
                      new ActivationProvider(),
                      new WebApplicationExceptionMapper(),
@@ -176,20 +179,7 @@ public final class ProviderFactory {
         List<ExceptionMapper<T>> candidates = new LinkedList<ExceptionMapper<T>>();
         
         for (ProviderInfo<ExceptionMapper> em : mappers) {
-            Type[] types = em.getProvider().getClass().getGenericInterfaces();
-            for (Type t : types) {
-                if (t instanceof ParameterizedType) {
-                    ParameterizedType pt = (ParameterizedType)t;
-                    Type[] args = pt.getActualTypeArguments();
-                    for (int i = 0; i < args.length; i++) {
-                        if (((Class<?>)args[i]).isAssignableFrom(exceptionType)) {
-                            InjectionUtils.injectContextFields(em.getProvider(), em, m);
-                            InjectionUtils.injectContextMethods(em.getProvider(), em, m);
-                            candidates.add(em.getProvider());
-                        }
-                    }
-                }
-            }
+            handleMapper((List)candidates, em, exceptionType, m);
         }
         if (candidates.size() == 0) {
             return null;
@@ -204,18 +194,7 @@ public final class ProviderFactory {
         List<ParameterHandler<T>> candidates = new LinkedList<ParameterHandler<T>>();
         
         for (ProviderInfo<ParameterHandler> em : jaxrsParamHandlers) {
-            Type[] types = em.getProvider().getClass().getGenericInterfaces();
-            for (Type t : types) {
-                if (t instanceof ParameterizedType) {
-                    ParameterizedType pt = (ParameterizedType)t;
-                    Type[] args = pt.getActualTypeArguments();
-                    for (int i = 0; i < args.length; i++) {
-                        if (((Class<?>)args[i]).isAssignableFrom(paramType)) {
-                            candidates.add(em.getProvider());
-                        }
-                    }
-                }
-            }
+            handleMapper((List)candidates, em, paramType, null);
         }
         if (candidates.size() == 0) {
             return null;
@@ -223,6 +202,44 @@ public final class ProviderFactory {
         Collections.sort(candidates, new ParameterHandlerComparator());
         return candidates.get(0);
     }
+    
+    @SuppressWarnings("unchecked")
+    public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
+                                 Class<?> paramType) {
+        
+        List<ResponseExceptionMapper<T>> candidates = new LinkedList<ResponseExceptionMapper<T>>();
+        
+        for (ProviderInfo<ResponseExceptionMapper> em : userResponseExceptionMappers) {
+            handleMapper((List)candidates, em, paramType, null);
+        }
+        if (candidates.size() == 0) {
+            return null;
+        }
+        Collections.sort(candidates, new ResponseExceptionMapperComparator());
+        return candidates.get(0);
+    }
+    
+    private static void handleMapper(List<Object> candidates, ProviderInfo em, 
+                                     Class<?> expectedType, Message m) {
+        Type[] types = em.getProvider().getClass().getGenericInterfaces();
+        for (Type t : types) {
+            if (t instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType)t;
+                Type[] args = pt.getActualTypeArguments();
+                for (int i = 0; i < args.length; i++) {
+                    if (((Class<?>)args[i]).isAssignableFrom(expectedType)) {
+                        if (m != null) {
+                            InjectionUtils.injectContextFields(em.getProvider(), em, m);
+                            InjectionUtils.injectContextMethods(em.getProvider(), em, m);
+                        }
+                        candidates.add(em.getProvider());
+                    }
+                }
+            }
+        }
+    }
+    
+    
     
     public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType,
                                                             Type parameterType,
@@ -296,6 +313,7 @@ public final class ProviderFactory {
                               List<ProviderInfo<ResponseHandler>> responseFilters,
                               List<ProviderInfo<ExceptionMapper>> excMappers,
                               List<ProviderInfo<ParameterHandler>> paramHandlers,
+                              List<ProviderInfo<ResponseExceptionMapper>> responseExcMappers,
                               Object... providers) {
         
         for (Object o : providers) {
@@ -321,6 +339,10 @@ public final class ProviderFactory {
             
             if (ExceptionMapper.class.isAssignableFrom(o.getClass())) {
                 excMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
+            }
+            
+            if (ResponseExceptionMapper.class.isAssignableFrom(o.getClass())) {
+                responseExcMappers.add(new ProviderInfo<ResponseExceptionMapper>((ResponseExceptionMapper)o)); 
             }
             
             if (ParameterHandler.class.isAssignableFrom(o.getClass())) {
@@ -495,6 +517,7 @@ public final class ProviderFactory {
                      responseHandlers,
                      userExceptionMappers,
                      jaxrsParamHandlers,
+                     userResponseExceptionMappers,
                      userProviders.toArray());
     }
 
@@ -594,6 +617,16 @@ public final class ProviderFactory {
 
         public int compare(ExceptionMapper<? extends Throwable> em1, 
                            ExceptionMapper<? extends Throwable> em2) {
+            return compareClasses(em1.getClass(), em2.getClass());
+        }
+        
+    }
+    
+    private static class ResponseExceptionMapperComparator implements 
+        Comparator<ResponseExceptionMapper<? extends Throwable>> {
+    
+        public int compare(ResponseExceptionMapper<? extends Throwable> em1, 
+                           ResponseExceptionMapper<? extends Throwable> em2) {
             return compareClasses(em1.getClass(), em2.getClass());
         }
         

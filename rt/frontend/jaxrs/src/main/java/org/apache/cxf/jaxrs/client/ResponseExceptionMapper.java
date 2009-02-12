@@ -16,36 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.client;
 
-package org.apache.cxf.systest.jaxrs;
+import javax.ws.rs.core.Response;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
-@WebService
-@Path("/bookstore")
-@Consumes("application/xml")
-@Produces("application/xml")
-public interface BookStoreJaxrsJaxws {
-    
-    @WebMethod
-    @GET
-    @Path("/{id}")
-    Book getBook(@PathParam("id") @WebParam(name = "id") Long id) throws BookNotFoundFault;
-
-    @WebMethod
-    @POST
-    @Path("/books")
-    Book addBook(@WebParam(name = "book") Book book);
-    
-    @Path("/books/{id}")
-    @WebMethod(exclude = true)
-    BookSubresource getBookSubresource(@PathParam("id") String id);
+public interface ResponseExceptionMapper<E extends Throwable> {
+    E fromResponse(Response r);
 }

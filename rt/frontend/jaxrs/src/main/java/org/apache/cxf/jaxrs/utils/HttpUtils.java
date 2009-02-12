@@ -22,8 +22,11 @@ package org.apache.cxf.jaxrs.utils;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.PathSegment;
@@ -41,6 +44,14 @@ public final class HttpUtils {
     
     
     private HttpUtils() {
+    }
+    
+    public static SimpleDateFormat getHttpDateFormat() {
+        SimpleDateFormat dateFormat = 
+            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        TimeZone tZone = TimeZone.getTimeZone("GMT");
+        dateFormat.setTimeZone(tZone);
+        return dateFormat;
     }
     
     public static URI toAbsoluteUri(URI u, Message message) { 
