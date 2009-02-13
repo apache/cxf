@@ -41,7 +41,7 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
         MessageContext mc = wsContext.getMessageContext();
         JMSMessageHeadersType headers =
             (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-        System.out.println("get the message headers JMSCorrelationID" + headers.getJMSCorrelationID());
+        System.out.println("get the message headers JMSCorrelationID: " + headers.getJMSCorrelationID());
         System.out.println("Reached here :" + me);
         
         // set reply header custom property

@@ -318,6 +318,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         verifyReceivedMessage(inMessage);
         // wait for a while for the jms session recycling
 
+        inMessage = null;
         // Send a second message to check for an issue
         // Where the session was closed the second time
         sendoutMessage(conduit, outMessage, false);

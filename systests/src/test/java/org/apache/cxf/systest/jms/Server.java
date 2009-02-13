@@ -26,13 +26,20 @@ public class Server extends AbstractBusTestServerBase {
 
 
     protected void run()  {
-        Object implementor = new GreeterImplTwoWayJMS();        
+        Object implementor = new GreeterImplTwoWayJMS();
         Object impl2 =  new GreeterImplQueueOneWay();
         Object impl3  = new GreeterImplTopicOneWay();
         Object impleDoc = new GreeterImplDoc();
         Object impl4 = new GreeterByteMessageImpl();
         Object impl5 =  new SoapService6SoapPort6Impl();
         Object impl6 = new JmsDestPubSubImpl();
+        Object i1 = new GreeterImplTwoWayJMSAppCorrelationIDNoPrefix();
+        Object i2 = new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixEng();
+        Object i3 = new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixSales();
+        Object i4 = new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix();
+        Object i5 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng();
+        Object i6 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales();
+        
         
         Endpoint.publish(null, impleDoc);
         String address = "http://localhost:9000/SoapContext/SoapPort";
@@ -42,6 +49,12 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint.publish("http://testaddr.not.required.byte/", impl4);
         Endpoint.publish("http://testaddr.not.required.jms/", impl5);
         Endpoint.publish("http://ignore", impl6);
+        Endpoint.publish("", i1);
+        Endpoint.publish("", i2);
+        Endpoint.publish("", i3);
+        Endpoint.publish("", i4);
+        Endpoint.publish("", i5);
+        Endpoint.publish("", i6);
     }
 
 

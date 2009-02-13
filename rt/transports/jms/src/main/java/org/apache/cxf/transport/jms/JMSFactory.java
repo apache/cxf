@@ -138,8 +138,14 @@ public final class JMSFactory {
         } else if (jmsConfig.getCacheLevel() != JMSConfiguration.DEFAULT_VALUE) {
             jmsListener.setCacheLevel(jmsConfig.getCacheLevel());
         }
+        String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
         if (messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
-            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" + messageSelectorPrefix + "%'");
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+                                            + staticSelectorPrefix 
+                                            + messageSelectorPrefix + "%'");
+        } else if (staticSelectorPrefix.length() > 0) {
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+                                            + staticSelectorPrefix +  "%'");
         }
         if (jmsConfig.getDestinationResolver() != null) {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
