@@ -55,6 +55,7 @@
         <rhino.version>1.6R7</rhino.version>
         <saaj.version>1.3</saaj.version>
         <spring.version>2.5.5</spring.version>
+        <cglib-nodep.version>2.1_3</cglib-nodep.version>
         <spring.mock>spring-test</spring.mock>
         <wsdl4j.version>1.6.2</wsdl4j.version>
         <xmlbeans.version>2.3.0</xmlbeans.version>

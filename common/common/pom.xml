@@ -121,6 +121,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>${cglib-nodep.version}</version>
+            <scope>provided</scope>
+        </dependency> 
 
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>

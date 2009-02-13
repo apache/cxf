@@ -300,7 +300,7 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
-            <version>2.1_3</version>
+            <version>${cglib-nodep.version}</version>
             <scope>test</scope>
         </dependency> 
         <dependency>
