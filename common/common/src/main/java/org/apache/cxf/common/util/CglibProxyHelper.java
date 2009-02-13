@@ -33,7 +33,7 @@ import net.sf.cglib.proxy.MethodProxy;
  */
 class CglibProxyHelper extends ProxyHelper {
     CglibProxyHelper() throws Exception {
-        Class.forName("net.sf.cglib.proxy.Proxy");
+        Class.forName("net.sf.cglib.proxy.Enhancer");
         Class.forName("net.sf.cglib.proxy.MethodInterceptor");
         Class.forName("net.sf.cglib.proxy.MethodProxy");
     }
@@ -48,7 +48,7 @@ class CglibProxyHelper extends ProxyHelper {
         for (Class c : interfaces) {
             if (!c.isInterface()) {
                 if (superClass != null) {
-                    throw new IllegalArgumentException("Only a single supreclass is supported");
+                    throw new IllegalArgumentException("Only a single superclass is supported");
                 }
                 superClass = c; 
             } else {
