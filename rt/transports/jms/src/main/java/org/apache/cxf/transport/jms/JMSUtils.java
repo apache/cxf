@@ -47,6 +47,9 @@ public final class JMSUtils {
 
     static final Logger LOG = LogUtils.getL7dLogger(JMSUtils.class);
 
+    private static final char[] CORRELATTION_ID_PADDING =  {'0', '0', '0', '0', '0', '0', '0', '0', 
+                                                            '0', '0', '0', '0', '0', '0', '0'};
+
     private JMSUtils() {
 
     }
@@ -281,5 +284,12 @@ public final class JMSUtils {
         jmsMessage.setJMSCorrelationID(correlationId);
         return jmsMessage;
     }
-
+    
+    public static String createCorrelationId(final String prefix, long i) {
+        String index = Long.toHexString(i);
+        StringBuffer id = new StringBuffer(prefix);
+        id.append(CORRELATTION_ID_PADDING, 0, 16 - index.length());
+        id.append(index);
+        return id.toString();
+    }
 }

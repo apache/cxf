@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,28 +55,25 @@ import org.springframework.jms.support.JmsUtils;
  */
 public class JMSConduit extends AbstractConduit implements JMSExchangeSender, MessageListener {
     static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
+    
     private static final String CORRELATED = JMSConduit.class.getName() + ".correlated";
+    
     private EndpointInfo endpointInfo;
     private JMSConfiguration jmsConfig;
     private Map<String, Exchange> correlationMap;
     private DefaultMessageListenerContainer jmsListener;
     private String conduitId;
-    private int messageCount;
+    private AtomicLong messageCount;
 
     public JMSConduit(EndpointInfo endpointInfo, EndpointReferenceType target, JMSConfiguration jmsConfig) {
         super(target);
         this.jmsConfig = jmsConfig;
         this.endpointInfo = endpointInfo;
         correlationMap = new ConcurrentHashMap<String, Exchange>();
-        conduitId = UUID.randomUUID().toString();
-        messageCount = 0;
+        conduitId = UUID.randomUUID().toString().replaceAll("-", "");
+        messageCount = new AtomicLong(0);
     }
     
-    private synchronized String createCorrelationId() {
-        messageCount++;
-        return conduitId + "_" + messageCount;
-    }
-
     /**
      * Prepare the message for send out. The message will be sent after the caller has written the payload to
      * the OutputStream of the message and calls the close method of the stream. In the JMS case the
@@ -117,8 +115,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         
         final javax.jms.Destination replyTo = exchange.isOneWay() ? null : jmsListener.getDestination();
 
-        final String correlationId = (headers != null && headers.isSetJMSCorrelationID()) ? headers
-            .getJMSCorrelationID() : createCorrelationId();
+        final String correlationId = (headers != null && headers.isSetJMSCorrelationID()) 
+            ? headers.getJMSCorrelationID() 
+            : JMSUtils.createCorrelationId(jmsConfig.getConduitSelectorPrefix() + conduitId, 
+                                           messageCount.incrementAndGet());
             
         MessageCreator messageCreator = new MessageCreator() {
             public javax.jms.Message createMessage(Session session) throws JMSException {

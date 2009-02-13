@@ -78,6 +78,7 @@ public class JMSConfiguration implements InitializingBean {
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean useConduitIdSelector = true;
+    private String conduitSelectorPrefix = "";
     private boolean autoResolveDestination;
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
@@ -211,6 +212,14 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setMessageSelector(String messageSelector) {
         this.messageSelector = messageSelector;
+    }
+
+    public void setConduitSelectorPrefix(String conduitSelectorPrefix) {
+        this.conduitSelectorPrefix = conduitSelectorPrefix;
+    }
+
+    public String getConduitSelectorPrefix() {
+        return conduitSelectorPrefix;
     }
 
     public boolean isSubscriptionDurable() {
