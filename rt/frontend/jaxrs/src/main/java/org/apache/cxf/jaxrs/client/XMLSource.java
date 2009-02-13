@@ -39,6 +39,10 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.CastUtils;
 
+/**
+ * Utiliity class for manipulating XML response using XPath and XSLT
+ *
+ */
 public class XMLSource {
     
     private InputSource source; 

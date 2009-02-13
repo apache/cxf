@@ -28,24 +28,54 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
+/**
+ * Factory for creating proxy clients.
+ *
+ */
 public final class JAXRSClientFactory {
     
     private JAXRSClientFactory() { 
         
     }
     
+    /**
+     * Creates a proxy
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @return typed proxy
+     */
     public static <T> T create(String baseAddress, Class<T> cls) {
         return create(URI.create(baseAddress), cls);
     }
     
+    /**
+     * Creates a proxy
+     * @param baseURI baseURI
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @return typed proxy
+     */
     public static <T> T create(URI baseURI, Class<T> cls) {
         return create(baseURI, baseURI, cls, true, false);
     }
     
+    /**
+     * Creates a proxy
+     * @param baseURI baseURI
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @return typed proxy
+     */
     public static <T> T create(URI baseURI, Class<T> cls, boolean inheritHeaders) {
         return create(baseURI, baseURI, cls, true, inheritHeaders);
     }
     
+    /**
+     * Creates a proxy
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param contentType JAXRS MediaType representing HTTP Content-Type header, can be null
+     * @param acceptTypes JAXRS MediaTypes representing HTTP Accept header, can be null
+     * @return typed proxy
+     */
     public static <T> T create(String baseAddress, Class<T> cls, MediaType contentType, 
                                MediaType... acceptTypes) {
         T proxy = create(baseAddress, cls);
@@ -53,10 +83,24 @@ public final class JAXRSClientFactory {
         return proxy;
     }
     
+    /**
+     * Creates a proxy, baseURI will be set to Client currentURI
+     * @param client Client instance
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @return typed proxy
+     */
     public static <T> T fromClient(Client client, Class<T> cls) {
         return fromClient(client, cls, false);
     }
     
+    /**
+     * Creates a proxy, baseURI will be set to Client currentURI
+     * @param client Client instance
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param inheritHeaders if existing Client headers can be inherited by new proxy 
+     *        and subresource proxies if any 
+     * @return typed proxy
+     */
     public static <T> T fromClient(Client client, Class<T> cls, boolean inheritHeaders) {
         if (client.getClass().isAssignableFrom(cls)) {
             return cls.cast(client);

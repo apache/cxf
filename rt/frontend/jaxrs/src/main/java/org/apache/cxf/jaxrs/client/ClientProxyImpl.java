@@ -50,6 +50,10 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterType;
 
+/**
+ * Proxy-based client implementation
+ *
+ */
 public class ClientProxyImpl extends AbstractClient implements InvocationHandler {
 
     private ClassResourceInfo cri;
@@ -61,6 +65,12 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         this.inheritHeaders = inheritHeaders;
     }
     
+    /**
+     * Updates the current state if Client method is invoked, otherwise 
+     * does the remote invocation or returns a new proxy if subresource 
+     * method is invoked. Can throw an expected exception if ResponseExceptionMapper
+     * is registered     
+     */
     public Object invoke(Object o, Method m, Object[] params) throws Throwable {
         
         resetResponse();

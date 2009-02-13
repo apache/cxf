@@ -42,95 +42,135 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 
-
+/**
+ * Http-centric web client
+ *
+ */
 public class WebClient extends AbstractClient {
     
+    /**
+     * Creates WebClient
+     * @param baseAddress baseAddress
+     */
     public WebClient(String baseAddress) {
         this(URI.create(baseAddress));
     }
     
+    /**
+     * Creates WebClient
+     * @param baseURI baseURI
+     */
     public WebClient(URI baseURI) {
         super(baseURI, baseURI);
     }
     
+    /**
+     * Creates WebClient, baseURI will be set to Client currentURI
+     * @param client existing client
+     */
     public WebClient(Client client) {
         this(client, false);
     }
     
+    /**
+     * Creates WebClient, baseURI will be set to Client currentURI
+     * @param client existing client
+     * @param inheritHeaders  if existing Client headers can be inherited by new proxy 
+     *        and subresource proxies if any 
+     */
     public WebClient(Client client, boolean inheritHeaders) {
         super(client, inheritHeaders);
     }
     
+    /**
+     * Does HTTP invocation
+     * @param httpMethod HTTP method
+     * @param body request body, can be null
+     * @return JAXRS Response, entity may hold a string representaion of 
+     *         error message if client or server error occured
+     */
     public Response invoke(String httpMethod, Object body) {
         return doInvoke(httpMethod, body, InputStream.class);
     }
     
-    private Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
-        HttpURLConnection conn = getConnection(httpMethod);
-        
-        MultivaluedMap<String, String> headers = getHeaders();
-        if (body != null && headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.toString());
-        }
-        if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
-            headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
-        }
-        setAllHeaders(headers, conn);
-        if (body != null) {
-            try {
-                writeBody(body, body.getClass(), body.getClass(), 
-                      new Annotation[]{}, headers, conn.getOutputStream());
-            } catch (IOException ex) {
-                throw new WebApplicationException(ex);
-            }
-        }
-        try {
-            ResponseBuilder rb = setResponseBuilder(conn).clone();
-            Response currentResponse = rb.clone().build();
-            Object entity = readBody(currentResponse, conn, responseClass, responseClass,
-                                     new Annotation[]{});
-            rb.entity(entity);
-            
-            return rb.build();
-        } catch (IOException ex) {
-            throw new WebApplicationException(ex);
-        }
+    /**
+     * Does HTTP POST invocation
+     * @param body request body, can be null
+     * @return JAXRS Response
+     */
+    public Response post(Object body) {
+        return invoke("POST", body);
     }
     
-    public Response post(Object o) {
-        return invoke("POST", o);
-    }
-    
-    public Response put(Object o) {
-        return invoke("PUT", o);
+    /**
+     * Does HTTP PUT invocation
+     * @param body request body, can be null
+     * @return JAXRS Response
+     */
+    public Response put(Object body) {
+        return invoke("PUT", body);
     }
 
+    /**
+     * Does HTTP GET invocation
+     * @return JAXRS Response
+     */
     public Response get() {
         return invoke("GET", null);
     }
-    
+
+    /**
+     * Does HTTP HEAD invocation
+     * @return JAXRS Response
+     */
     public Response head() {
         return invoke("HEAD", null);
     }
-    
+
+    /**
+     * Does HTTP OPTIONS invocation
+     * @return JAXRS Response
+     */
     public Response options() {
         return invoke("OPTIONS", null);
     }
-    
+
+    /**
+     * Does HTTP DELETE invocation
+     * @return JAXRS Response
+     */
     public Response delete() {
         return invoke("DELETE", null);
     }
-    
+
+    /**
+     * Posts form data
+     * @param values form values
+     * @return JAXRS Response
+     */
     public Response form(Map<String, List<Object>> values) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
         return doInvoke("POST", values, InputStream.class);
     }
     
+    /**
+     * Posts form data
+     * @param form form values
+     * @return JAXRS Response
+     */
     public Response form(Form form) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
         return doInvoke("POST", form.getData(), InputStream.class);
     }
     
+    /**
+     * Does HTTP invocation and returns types response object 
+     * @param httpMethod HTTP method 
+     * @param body request body, can be null
+     * @param responseClass expected type of response object
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
         Response r = doInvoke(httpMethod, body, responseClass);
         
@@ -141,29 +181,66 @@ public class WebClient extends AbstractClient {
         return responseClass.cast(r.getEntity());
     }
     
-    public <T> T post(Object o, Class<T> responseClass) {
-        return invoke("POST", o, responseClass);
+    /**
+     * Does HTTP POST invocation and returns typed response object
+     * @param body request body, can be null
+     * @param responseClass expected type of response object
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
+    public <T> T post(Object body, Class<T> responseClass) {
+        return invoke("POST", body, responseClass);
     }
     
+    /**
+     * Does HTTP GET invocation and returns typed response object
+     * @param body request body, can be null
+     * @param responseClass expected type of response object
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
     public <T> T get(Class<T> responseClass) {
         return invoke("GET", null, responseClass);
     }
     
+    /**
+     * Updates the current URI path
+     * @param path new relative path segment
+     * @return updated WebClient
+     */
     public WebClient path(String path) {
         getCurrentBuilder().path(path);
         return this;
     }
     
+    /**
+     * Updates the current URI query parameters
+     * @param name query name
+     * @param values query values
+     * @return updated WebClient
+     */
     public WebClient query(String name, Object ...values) {
         getCurrentBuilder().queryParam(name, values);
         return this;
     }
     
+    /**
+     * Updates the current URI matrix parameters
+     * @param name matrix name
+     * @param values matrix values
+     * @return updated WebClient
+     */
     public WebClient matrix(String name, Object ...values) {
         getCurrentBuilder().matrixParam(name, values);
         return this;
     }
     
+    /**
+     * Moves WebClient to a new baseURI or forwards to new currentURI  
+     * @param newAddress new URI
+     * @param forward if true then currentURI will be based on baseURI  
+     * @return updated WebClient
+     */
     public WebClient to(String newAddress, boolean forward) {
         if (forward) {
             if (!newAddress.startsWith(getBaseURI().toString())) {
@@ -176,6 +253,11 @@ public class WebClient extends AbstractClient {
         return this;
     }
     
+    /**
+     * Goes back
+     * @param fast if true then goes back to baseURI otherwise to a previous path segment 
+     * @return updated WebClient
+     */
     public WebClient back(boolean fast) {
         if (fast) {
             getCurrentBuilder().replacePath(getBaseURI().getPath());
@@ -192,6 +274,15 @@ public class WebClient extends AbstractClient {
             
         }
         return this;
+    }
+    
+    /**
+     * Converts proxy to Client
+     * @param proxy the proxy
+     * @return proxy as a Client 
+     */
+    public static Client client(Object proxy) {
+        return (Client)proxy;
     }
     
     @Override
@@ -264,13 +355,42 @@ public class WebClient extends AbstractClient {
         return (WebClient)super.reset();
     }
     
+    private Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
+        HttpURLConnection conn = getConnection(httpMethod);
+        
+        MultivaluedMap<String, String> headers = getHeaders();
+        if (body != null && headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.toString());
+        }
+        if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
+            headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
+        }
+        setAllHeaders(headers, conn);
+        if (body != null) {
+            try {
+                writeBody(body, body.getClass(), body.getClass(), 
+                      new Annotation[]{}, headers, conn.getOutputStream());
+            } catch (IOException ex) {
+                throw new WebApplicationException(ex);
+            }
+        }
+        try {
+            ResponseBuilder rb = setResponseBuilder(conn).clone();
+            Response currentResponse = rb.clone().build();
+            Object entity = readBody(currentResponse, conn, responseClass, responseClass,
+                                     new Annotation[]{});
+            rb.entity(entity);
+            
+            return rb.build();
+        } catch (IOException ex) {
+            throw new WebApplicationException(ex);
+        }
+    }
     
     protected HttpURLConnection getConnection(String methodName) {
         return createHttpConnection(getCurrentBuilder().clone().build(), methodName);
     }
     
-    public static Client client(Object proxy) {
-        return (Client)proxy;
-    }
+    
     
 }

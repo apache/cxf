@@ -23,6 +23,10 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
+/**
+ * Simple MultivaluedMap wrapper 
+ *
+ */
 public class Form {
     private MultivaluedMap<String, Object> map = 
         new MetadataMap<String, Object>();
