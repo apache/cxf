@@ -685,7 +685,7 @@ public final class StaxUtils {
             e.setPrefix(reader.getPrefix());
         }
 
-        parent.appendChild(e);
+        e = (Element)parent.appendChild(e);
 
         for (int ns = 0; ns < reader.getNamespaceCount(); ns++) {
             String uri = reader.getNamespaceURI(ns);
