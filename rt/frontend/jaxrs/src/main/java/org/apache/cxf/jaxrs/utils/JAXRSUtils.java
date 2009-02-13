@@ -594,8 +594,7 @@ public final class JAXRSUtils {
              
         
     }
-    
-    @SuppressWarnings("unchecked")
+
     private static Object processCookieParam(Message m, String cookieName, 
                               Class<?> pClass, Type genericType, String defaultValue) {
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(HttpHeaders.COOKIE);

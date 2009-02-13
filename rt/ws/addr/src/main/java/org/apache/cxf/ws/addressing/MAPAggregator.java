@@ -40,6 +40,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -89,6 +90,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      */
     public MAPAggregator() {
         super(Phase.PRE_LOGICAL);
+        addBefore(OneWayProcessorInterceptor.class.getName());
     }
     
     /**

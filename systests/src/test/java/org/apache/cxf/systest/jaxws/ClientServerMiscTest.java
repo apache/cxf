@@ -275,6 +275,10 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
+        long start = System.currentTimeMillis();
+        port.doOneWay();
+        assertTrue((System.currentTimeMillis() - start) < 500);
+        
         Set<Foo> fooSet = port.getFooSet();
         assertEquals(2, fooSet.size());
         

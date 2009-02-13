@@ -178,7 +178,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         while (it.hasNext()) {
             p = it.next();
             location.setPhase(p.getName());
-            if (Phase.INVOKE.equals(p.getName())) {
+            if (Phase.PRE_LOGICAL.equals(p.getName())) {
                 break;
             }             
             testFail(location);
@@ -226,6 +226,9 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         do {  
             location.setPhase(p.getName());
             if (Phase.INVOKE.equals(p.getName())) {
+                //faults from the PRE_LOGICAL and later phases won't make 
+                //it back to the client, the 200/202 response has already 
+                //been returned.  The server has accepted the message
                 break;
             }             
             testFail(location, true);
@@ -252,11 +255,11 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         try {
             greeter.greetMeOneWay("oneway");
             if (expectOnewayFault) {
-                fail("Oneway operation unexpectedly succeded.");
+                fail("Oneway operation unexpectedly succeded for phase " + location.getPhase());
             }
         } catch (WebServiceException ex) {
             if (!expectOnewayFault) {
-                fail("Oeway operation unexpectedly failed.");
+                fail("Oneway operation unexpectedly failed.");
             }
             Throwable cause = ex.getCause();
             Fault f = (Fault)cause;

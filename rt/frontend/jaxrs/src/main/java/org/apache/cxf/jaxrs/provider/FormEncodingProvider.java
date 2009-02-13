@@ -130,7 +130,8 @@ public class FormEncodingProvider implements
         }
     }
 
-    public long getSize(MultivaluedMap t, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(MultivaluedMap<String, String> t, Class<?> type, 
+                        Type genericType, Annotation[] annotations, 
                         MediaType mediaType) {
         return -1;
     }
@@ -156,4 +157,5 @@ public class FormEncodingProvider implements
             }
         }
     }
+
 }

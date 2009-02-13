@@ -141,9 +141,23 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         }
         
         greeter.greetMeOneWay("hello");
+        for (int count = 0; count < 10; count++) {
+            if (6 != cr.getCounters().size()) {
+                Thread.sleep(100);
+            } else {
+                break;
+            }
+        }
         assertEquals("The Counters are not create yet", 6, cr.getCounters().size());
+        for (int count = 0; count < 10; count++) {
+            if (10 > mbs.queryNames(name, null).size()) {
+                Thread.sleep(100);
+            } else {
+                break;
+            }
+        }
         counterNames = mbs.queryNames(name, null);
-        assertEquals("The Counters are not export to JMX ", 6 + 3, counterNames.size());
+        assertEquals("The Counters are not export to JMX " + counterNames, 6 + 4, counterNames.size());
         
         ObjectName greetMeOneWayCounter =  new ObjectName(
             ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"greetMeOneWay\",*");

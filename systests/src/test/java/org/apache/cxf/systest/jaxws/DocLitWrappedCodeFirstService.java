@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -45,6 +46,10 @@ import org.apache.cxf.systest.jaxws.types.Bar;
                        "org.apache.cxf.feature.FastInfosetFeature" })
 public interface DocLitWrappedCodeFirstService {
 
+    @Oneway
+    @WebMethod
+    void doOneWay();
+    
     @WebMethod
     String[] arrayOutput();
 

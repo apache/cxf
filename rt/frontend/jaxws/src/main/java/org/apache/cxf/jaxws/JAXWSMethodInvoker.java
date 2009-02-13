@@ -50,15 +50,16 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
         Map<String, Object> handlerScopedStuff = removeHandlerProperties(ctx);
         
         WebServiceContextImpl.setMessageContext(ctx);
-        
-        List<Object> res = CastUtils.cast((List)super.invoke(exchange, serviceObject, m, params));
-        
-        addHandlerProperties(ctx, handlerScopedStuff);
-                
-        //update the webservice response context
-        updateWebServiceContext(exchange, ctx);
-        //clear the WebServiceContextImpl's ThreadLocal variable
-        WebServiceContextImpl.clear();
+        List<Object> res = null;
+        try {
+            res = CastUtils.cast((List)super.invoke(exchange, serviceObject, m, params));
+            addHandlerProperties(ctx, handlerScopedStuff);
+            //update the webservice response context
+            updateWebServiceContext(exchange, ctx);
+        } finally {
+            //clear the WebServiceContextImpl's ThreadLocal variable
+            WebServiceContextImpl.clear();
+        }
         return res;
     }
     
