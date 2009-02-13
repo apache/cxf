@@ -211,7 +211,11 @@ public class AbstractClient implements Client {
     
     protected void resetBaseAddress(URI uri) {
         baseURI = uri;
-        currentBuilder = new UriBuilderImpl(baseURI);
+        resetCurrentBuilder(uri);
+    }
+    
+    protected void resetCurrentBuilder(URI uri) {
+        currentBuilder = new UriBuilderImpl(uri);
     }
     
     protected ResponseBuilder setResponseBuilder(HttpURLConnection conn) throws IOException {

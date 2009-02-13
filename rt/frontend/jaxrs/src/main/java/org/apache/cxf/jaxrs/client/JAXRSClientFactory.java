@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import java.lang.reflect.Proxy;
 import java.net.URI;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -72,7 +72,7 @@ public final class JAXRSClientFactory {
     static <T> T create(URI baseURI, URI currentURI, Class<T> cls, boolean root, boolean inheritHeaders) {
         ClassResourceInfo classResourceInfo = ResourceUtils.createClassResourceInfo(cls, cls, root, true);
         
-        return cls.cast(Proxy.newProxyInstance(cls.getClassLoader(),
+        return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(),
                         new Class[]{cls, Client.class},
                         new ClientProxyImpl(baseURI, currentURI, classResourceInfo, inheritHeaders)));
     }
