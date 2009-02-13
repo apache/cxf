@@ -154,6 +154,7 @@ public final class AttachmentUtil {
         if (contentType == null) {
             return false;
         }
+        contentType = contentType.toLowerCase();
         for (String s : types) {
             if (contentType.indexOf(s) != -1) {
                 return true;
