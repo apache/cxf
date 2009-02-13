@@ -20,7 +20,9 @@
 package org.apache.cxf.interceptor;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.FutureTask;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -37,7 +39,6 @@ import org.apache.cxf.service.invoker.Invoker;
  * @author Dan Diephouse
  */
 public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message> {
-   
     
     public ServiceInvokerInterceptor() {
         super(Phase.INVOKE);
@@ -89,7 +90,30 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             invocation.run();
         } else {
             exchange.put(Executor.class, executor);
-            executor.execute(invocation);
+            FutureTask<Object> o = new FutureTask<Object>(invocation, null);
+            synchronized (o) {
+                executor.execute(o);
+                if (!exchange.isOneWay()) {
+                    if (!o.isDone()) {
+                        try {
+                            o.wait();
+                        } catch (InterruptedException e) {
+                            //IGNORE
+                        }
+                    }
+                    try {
+                        o.get();
+                    } catch (InterruptedException e) {
+                        throw new Fault(e);
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof RuntimeException) {
+                            throw (RuntimeException)e.getCause();
+                        } else {
+                            throw new Fault(e.getCause());
+                        }
+                    }
+                }
+            }
         }
     }
     

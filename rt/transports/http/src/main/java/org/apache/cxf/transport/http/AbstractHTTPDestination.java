@@ -80,6 +80,8 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
         
+    public static final String PARTIAL_RESPONSE = AbstractMultiplexDestination.class.getName()
+        + ".partial.response";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
@@ -360,12 +362,17 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
      * @param the decoupled target
      * @return true iff partial responses are supported
      */
-    protected boolean markPartialResponse(Message partialResponse,
+    protected final boolean markPartialResponse(Message partialResponse,
                                        EndpointReferenceType decoupledTarget) {
         // setup the outbound message to for 202 Accepted
         partialResponse.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
         partialResponse.getExchange().put(EndpointReferenceType.class, decoupledTarget);
+        partialResponse.put(PARTIAL_RESPONSE, Boolean.TRUE);
         return true;
+    }
+    
+    protected boolean isPartialResponse(Message m) {
+        return Boolean.TRUE.equals(m.get(PARTIAL_RESPONSE));
     }
 
     private void initConfig() {
@@ -441,15 +448,21 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                     }
                 }
                 response.setStatus(status);
+            } else if (oneWay) {
+                response.setStatus(HttpURLConnection.HTTP_ACCEPTED);
             } else {
                 response.setStatus(HttpURLConnection.HTTP_OK);
             }
 
             copyResponseHeaders(outMessage, response);
-            responseStream = response.getOutputStream();
 
-            if (oneWay) {
+            
+            if (oneWay && !isPartialResponse(outMessage)) {
+                response.setContentLength(0);
                 response.flushBuffer();
+                response.getOutputStream().close();
+            } else {
+                responseStream = response.getOutputStream();                
             }
         } else if (null != responseObj) {
             String m = (new org.apache.cxf.common.i18n.Message("UNEXPECTED_RESPONSE_TYPE_MSG",
@@ -529,8 +542,10 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                     wrappedStream = responseStream;
                 }
             }
-            wrappedStream.close();
-            response.flushBuffer();
+            if (wrappedStream != null) {
+                wrappedStream.close();
+                response.flushBuffer();
+            }
         }
         
         public void flush() throws IOException {

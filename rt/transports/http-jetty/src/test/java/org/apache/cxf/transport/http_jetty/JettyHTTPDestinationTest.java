@@ -740,6 +740,8 @@ public class JettyHTTPDestinationTest extends Assert {
                     EasyMock.expectLastCall();
                     response.addHeader(EasyMock.isA(String.class), EasyMock.isA(String.class));
                     EasyMock.expectLastCall().anyTimes();
+                    response.setContentLength(0);
+                    EasyMock.expectLastCall().anyTimes();
                     response.getOutputStream();
                     EasyMock.expectLastCall().andReturn(os);
                     response.getStatus();

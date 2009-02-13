@@ -21,6 +21,7 @@ package org.apache.cxf.service.factory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.service.Service;
@@ -35,6 +36,7 @@ public abstract class AbstractServiceFactoryBean {
     protected void initializeDefaultInterceptors() {
         service.getInInterceptors().add(new ServiceInvokerInterceptor());
         service.getInInterceptors().add(new OutgoingChainInterceptor());
+        service.getInInterceptors().add(new OneWayProcessorInterceptor());
     }
     
     protected void initializeDataBindings() {
