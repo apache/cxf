@@ -123,9 +123,11 @@ public final class JMSFactory {
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
         jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
+        jmsListener.setPubSubNoLocal(jmsConfig.isPubSubNoLocal());
         jmsListener.setAutoStartup(true);
         jmsListener.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsListener.setMessageSelector(jmsConfig.getMessageSelector());
+        //jmsListener.setSubscriptionDurable(jmsConfig.isSubscriptionDurable());
         jmsListener.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
         jmsListener.setTransactionManager(jmsConfig.getTransactionManager());

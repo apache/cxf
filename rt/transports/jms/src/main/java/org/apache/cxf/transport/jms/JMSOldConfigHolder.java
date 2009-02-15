@@ -102,6 +102,7 @@ public class JMSOldConfigHolder {
             }
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());       
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
+            jmsConfig.setDurableSubscriptionClientId(serverConfig.getDurableSubscriptionClientId());
             if (sessionPool.isSetHighWaterMark()) {
                 jmsConfig.setMaxConcurrentTasks(sessionPool.getHighWaterMark());
             }
@@ -115,7 +116,6 @@ public class JMSOldConfigHolder {
                 jmsConfig.setSessionTransacted(serverBehavior.isTransactional());                
             }
             boolean useJndi = address.isSetJndiDestinationName();
-            jmsConfig.setUseJndi(useJndi);
             if (useJndi) {
                 // Setup Destination jndi destination resolver
                 final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();
