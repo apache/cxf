@@ -477,9 +477,9 @@ public class STSClient implements Configurable {
             throw new TrustException(new Message("NO_ID", LOG));
         }
         
-        SecurityToken token = new SecurityToken(id, rst, lte);
-        token.setAttachedReference(rar);
-        token.setUnattachedReference(rur);
+        SecurityToken token = new SecurityToken(id, copyElement(rst), copyElement(lte));
+        token.setAttachedReference(copyElement(rar));
+        token.setUnattachedReference(copyElement(rur));
         token.setIssuerAddress(location);
                 
         
@@ -541,7 +541,19 @@ public class STSClient implements Configurable {
         return token;
     }
 
-
+    private Element copyElement(Element el) {
+        if (el == null) {
+            return null;
+        }
+        try {
+            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+            writer.setNsRepairing(true);
+            StaxUtils.copy(el, writer);
+            return writer.getDocument().getDocumentElement();
+        } catch (Exception ex) {
+            return el;
+        }
+    }
     private String findID(Element rar, Element rur, Element rst) {
         String id = null;
         if (rar != null) {

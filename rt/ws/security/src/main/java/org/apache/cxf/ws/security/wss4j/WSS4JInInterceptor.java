@@ -360,7 +360,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
                 
                 String id = pc.getIdentifier();
-                if (pc.getKeyType().equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                
+                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getKeyType())) {
                     for (SecurityToken token : store.getValidTokens()) {
                         if (id.equals(token.getSHA1())) {
                             pc.setKey(token.getSecret());
@@ -375,7 +376,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     }
                 }
             }
-            internal.handle(callbacks);
+            if (internal != null) {
+                internal.handle(callbacks);
+            }
         }
         
     }
@@ -400,16 +403,26 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 cbHandler = (CallbackHandler)o;
             }
             if (cbHandler == null) {
-                cbHandler = getPasswordCB(reqData);
+                try {
+                    cbHandler = getPasswordCB(reqData);
+                } catch (WSSecurityException sec) {
+                    Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
+                    if (ep != null && ep.getEndpointInfo() != null) {
+                        TokenStore store = (TokenStore)ep.getEndpointInfo()
+                            .getProperty(TokenStore.class.getName());
+                        if (store != null) {
+                            return new TokenStoreCallbackHandler(cbHandler, store);
+                        }
+                    }                    
+                    throw sec;
+                }
             }
         }
-        if (cbHandler != null) {
-            Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
-            if (ep != null && ep.getEndpointInfo() != null) {
-                TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
-                if (store != null) {
-                    return new TokenStoreCallbackHandler(cbHandler, store);
-                }
+        Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
+        if (ep != null && ep.getEndpointInfo() != null) {
+            TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
+            if (store != null) {
+                return new TokenStoreCallbackHandler(cbHandler, store);
             }
         }
         return cbHandler;

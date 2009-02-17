@@ -40,6 +40,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     private Document document;
     private Element currentNode;
     private NamespaceContext context = new W3CNamespaceContext();
+    private boolean nsRepairing;
     private Map properties = Collections.EMPTY_MAP;
 
     public W3CDOMStreamWriter() throws ParserConfigurationException {
@@ -61,6 +62,12 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         ((W3CNamespaceContext)context).setElement(e);
     }
 
+    public void setNsRepairing(boolean b) {
+        nsRepairing = b;
+    }
+    public boolean isNsRepairing() {
+        return nsRepairing;
+    }
     public void setProperties(Map properties) {
         this.properties = properties;
     }
@@ -96,6 +103,10 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
             writeStartElement(namespace, local);
         } else {
             newChild(document.createElementNS(namespace, prefix + ":" + local));
+            if (nsRepairing
+                && !prefix.equals(getNamespaceContext().getPrefix(namespace))) {
+                writeNamespace(prefix, namespace);
+            }
         }
     }
 
@@ -138,6 +149,10 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         Attr a = document.createAttributeNS(namespace, local);
         a.setValue(value);
         currentNode.setAttributeNodeNS(a);
+        if (nsRepairing
+            && !prefix.equals(getNamespaceContext().getPrefix(namespace))) {
+            writeNamespace(prefix, namespace);
+        }
     }
 
     public void writeAttribute(String namespace, String local, String value) throws XMLStreamException {
