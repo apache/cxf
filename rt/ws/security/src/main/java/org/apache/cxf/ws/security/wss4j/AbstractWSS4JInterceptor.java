@@ -329,6 +329,11 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         }
         return action;
     }
+    void assertTransportBinding(AssertionInfoMap aim, SoapMessage message) {
+        assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
+        assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
+        policyAsserted(aim, SP12Constants.ENCRYPTED_PARTS);        
+    }
     void assertWSS11(AssertionInfoMap aim, SoapMessage message) {
         if (isRequestor(message)) {
             message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
@@ -377,10 +382,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                 action = addToAction(action, WSHandlerConstants.TIMESTAMP, true);
             }
             assertPolicy(aim, SP12Constants.LAYOUT);
-            assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
-            assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
             action = assertAsymetricBinding(aim, action, message);
             action = assertSymetricBinding(aim, action, message);
+            assertTransportBinding(aim, message);
             
             action = assertSupportingTokens(aim, message, 
                                             action, SP12Constants.SIGNED_SUPPORTING_TOKENS);
