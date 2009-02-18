@@ -35,6 +35,8 @@ import org.apache.cxf.tools.common.ToolException;
 
 public class JavaMethod implements JavaAnnotatable {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaMethod.class);
+    private static final Map<String, String> PRIMITIVE_MAP;
+    
     private String name;
     private String operationName;
     private String javaDoc;
@@ -54,6 +56,18 @@ public class JavaMethod implements JavaAnnotatable {
 
     private boolean async;
     
+    static { 
+        PRIMITIVE_MAP = new HashMap<String, String>();
+        PRIMITIVE_MAP.put("java.lang.Character", "char");
+        PRIMITIVE_MAP.put("java.lang.Boolean", "boolean");
+        PRIMITIVE_MAP.put("java.lang.Integer", "int");
+        PRIMITIVE_MAP.put("java.lang.Long", "long");
+        PRIMITIVE_MAP.put("java.lang.Short", "short");
+        PRIMITIVE_MAP.put("java.lang.Byte", "byte");
+        PRIMITIVE_MAP.put("java.lang.Float", "float");
+        PRIMITIVE_MAP.put("java.lang.Double", "double");
+    }
+
     public JavaMethod() {
         this(new JavaInterface());
     }
@@ -138,15 +152,27 @@ public class JavaMethod implements JavaAnnotatable {
         parameters.add(index, p2);
     }
 
+    private boolean isEquiv(String c1, String c2) {
+        //for the "in/out" params, we need to check if the 
+        //primitive in is being changed to an in/out
+        //which would no longer be primitive
+        String s = PRIMITIVE_MAP.get(c2);
+        if (s != null && c1.equals(s)) {
+            return true;
+        }
+        return c1.equals(c2);
+    }
     public void addParameter(JavaParameter param) {
         if (hasParameter(param.getName())) {
             JavaParameter paramInList = getParameter(param.getName());
-            if (paramInList.isIN() || paramInList.isINOUT()) {
+            if (isEquiv(paramInList.getClassName(), param.getClassName())
+                && paramInList.isIN() || paramInList.isINOUT()) {
                 //removeParameter(paramInList);
                 replaceParameter(paramInList, param);
                 return;
             } else {
-                Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName());
+                Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(), 
+                                              getName(), paramInList.getType(), param.getType());
                 throw new ToolException(message);
             }
         }
