@@ -41,11 +41,7 @@ public class JMSConfiguration implements InitializingBean {
     static final boolean DEFAULT_USEJMS11 = false;
     
     private boolean usingEndpointInfo = true;
-    
-    /**
-     * Use jndi to resolve destinations
-     */
-    private boolean useJndi;
+
     private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
@@ -71,6 +67,7 @@ public class JMSConfiguration implements InitializingBean {
 
     private volatile String messageSelector;
     private boolean subscriptionDurable;
+    private String durableSubscriptionClientId;
     private String durableSubscriptionName;
 
     private String targetDestination;
@@ -133,13 +130,6 @@ public class JMSConfiguration implements InitializingBean {
     
     public void setUsingEndpointInfo(boolean usingEndpointInfo) {
         this.usingEndpointInfo = usingEndpointInfo;
-    }
-    public boolean isUseJndi() {
-        return useJndi;
-    }
-
-    public void setUseJndi(boolean useJndi) {
-        this.useJndi = useJndi;
     }
 
     public boolean isMessageIdEnabled() {
@@ -376,22 +366,32 @@ public class JMSConfiguration implements InitializingBean {
     public void setReconnectOnException(boolean reconnectOnException) {
         this.reconnectOnException = reconnectOnException;
     }
-
+         
+    /**
+     * Tries to creates a ConnectionFactory from jndi if none was set as a property
+     * by using the jndConfig. Then it determiens if the connectionFactory should be wrapped
+     * into a SingleConnectionFactory and wraps it if necessary. After the first call the
+     * same connectionFactory will be returned for all subsequent calls
+     * 
+     * @return usable connectionFactory
+     */
     public ConnectionFactory getOrCreateWrappedConnectionFactory() {
         if (wrappedConnectionFactory == null) {
             if (connectionFactory == null) {
                 connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
             }
             if (wrapInSingleConnectionFactory && !(connectionFactory instanceof SingleConnectionFactory)) {
+                SingleConnectionFactory scf;
                 if (useJms11) {
-                    wrappedConnectionFactory = new SingleConnectionFactory(connectionFactory);
+                    scf = new SingleConnectionFactory(connectionFactory);
                 } else {
-                    wrappedConnectionFactory = new SingleConnectionFactory102(connectionFactory, 
-                                                                              pubSubDomain);
+                    scf = new SingleConnectionFactory102(connectionFactory, pubSubDomain);
                 }
-                if (reconnectOnException) {
-                    ((SingleConnectionFactory)wrappedConnectionFactory).setReconnectOnException(true);
+                if (getDurableSubscriptionClientId() != null) {
+                    scf.setClientId(getDurableSubscriptionClientId());
                 }
+                scf.setReconnectOnException(isReconnectOnException());
+                wrappedConnectionFactory = scf;
             } else {
                 wrappedConnectionFactory = connectionFactory;
             }
@@ -413,6 +413,14 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setWrapInSingleConnectionFactory(boolean wrapInSingleConnectionFactory) {
         this.wrapInSingleConnectionFactory = wrapInSingleConnectionFactory;
+    }
+
+    public String getDurableSubscriptionClientId() {
+        return durableSubscriptionClientId;
+    }
+
+    public void setDurableSubscriptionClientId(String durableSubscriptionClientId) {
+        this.durableSubscriptionClientId = durableSubscriptionClientId;
     }
 
 }
