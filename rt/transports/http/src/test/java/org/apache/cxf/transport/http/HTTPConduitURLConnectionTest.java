@@ -122,6 +122,36 @@ public class HTTPConduitURLConnectionTest extends Assert {
      */
     @Test
     public void testTLSServerParameters() throws Exception {
+        Object connection = doTestTLSServerParameters();
+        assertTrue("TLS Client Parameters should generate an HttpsURLConnection",
+                HttpsURLConnection.class.isInstance(connection));
+    }
+
+    /**
+     * This verifys that the underlying connection is an HttpsURLConnection.
+     */
+    @Test
+    public void testTLSServerParametersWithDeprecatedSunSSLProtocol() throws Exception {
+        if (!System.getProperty("java.vm.vendor").toLowerCase().contains("sun")) {
+            return;
+        }
+        String javaProtocolHandlerPkgsKey = "java.protocol.handler.pkgs";
+        String javaProtocolHandlerPkgsValue = System.getProperty(javaProtocolHandlerPkgsKey);
+        try {
+            System.setProperty(javaProtocolHandlerPkgsKey, "com.sun.net.ssl.internal.www.protocol");
+            Object connection = doTestTLSServerParameters();
+            assertTrue("TLS Client Parameters should generate an HttpsURLConnection",
+                    connection.getClass().getName().contains("HttpsURLConnection"));
+        } finally {
+            if (javaProtocolHandlerPkgsValue == null) {
+                System.clearProperty(javaProtocolHandlerPkgsKey);
+            } else {
+                System.setProperty(javaProtocolHandlerPkgsKey, javaProtocolHandlerPkgsValue);
+            }
+        }
+    }
+    
+    private Object doTestTLSServerParameters() throws Exception {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("https://secure.nowhere.null/" + "bar/foo");
@@ -135,9 +165,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
         // Test call
         conduit.prepare(message);
         
-        assertTrue("TLS Client Parameters should generate an HttpsURLConnection",
-                HttpsURLConnection.class.isInstance(
-                        message.get("http.connection")));
+        return message.get("http.connection");
     }
 
 
