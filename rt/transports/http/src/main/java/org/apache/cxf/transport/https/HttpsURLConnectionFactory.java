@@ -159,7 +159,6 @@ public final class HttpsURLConnectionFactory
      * from the TLS Client Parameters. Connection parameter is of supertype HttpURLConnection, 
      * which allows internal cast to potentially divergent subtype (https) implementations.
      */
-    @SuppressWarnings("deprecation")
     protected synchronized void decorateWithTLS(HttpURLConnection connection)
         throws NoSuchAlgorithmException,
                NoSuchProviderException,
