@@ -36,12 +36,7 @@ public final class Client {
     }
 
     private static String getStringFromInputStream(InputStream in) throws Exception {
-        CachedOutputStream bos = new CachedOutputStream();
-        IOUtils.copy(in, bos);
-        in.close();
-        bos.close();
-        //System.out.println(bos.getOut().toString());
-        return bos.getOut().toString();
+        return IOUtils.toString(in);
     }
 
 }
