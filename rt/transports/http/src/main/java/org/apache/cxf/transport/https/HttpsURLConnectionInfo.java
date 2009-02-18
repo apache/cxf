@@ -20,9 +20,12 @@
 package org.apache.cxf.transport.https;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.security.Principal;
 import java.security.cert.Certificate;
 
+import javax.imageio.IIOException;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.cxf.transport.http.HttpURLConnectionInfo;
@@ -37,47 +40,85 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
      * This field contains the cipherSuite enabled in the 
      * HTTPS URLconnection.
      */
-    protected final String enabledCipherSuite;
+    protected String enabledCipherSuite;
     
     /**
      * This field contains the certificates that were used to
      * authenticate the connection to the peer.
      */
-    protected final Certificate[] localCertificates;
+    protected Certificate[] localCertificates;
     
     /**
      * This field contains the Principal that authenticated to the
      * peer.
      */
-    protected final Principal localPrincipal;
+    protected Principal localPrincipal;
     
     /**
      * This field contains the certificates the server presented
      * to authenticate.
      */
-    protected final Certificate[] serverCertificates;
+    protected Certificate[] serverCertificates;
     
     /**
      * This field contains the Principal that represents the 
      * authenticated peer.
      */
-    protected final Principal peerPrincipal;
+    protected Principal peerPrincipal;
+
+    private Class deprecatedSunHttpsURLConnectionOldImplClass;
     
     /**
      * This constructor is used to create the info object
-     * representing the this HttpsURLConnection.
+     * representing the this HttpsURLConnection. Connection parameter is 
+     * of supertype HttpURLConnection, which allows internal cast to 
+     * potentially divergent subtype (Https) implementations.
      */
-    HttpsURLConnectionInfo(HttpsURLConnection connection)
+    HttpsURLConnectionInfo(HttpURLConnection connection)
         throws IOException {
         super(connection);
-        
-        enabledCipherSuite = connection.getCipherSuite();
-        localCertificates  = connection.getLocalCertificates();
-        localPrincipal     = connection.getLocalPrincipal();
-        serverCertificates = connection.getServerCertificates();
-        peerPrincipal      = connection.getPeerPrincipal();
+        if (connection instanceof HttpsURLConnection) {
+            HttpsURLConnection conn = (HttpsURLConnection) connection;
+            enabledCipherSuite = conn.getCipherSuite();
+            localCertificates  = conn.getLocalCertificates();
+            localPrincipal     = conn.getLocalPrincipal();
+            serverCertificates = conn.getServerCertificates();
+            peerPrincipal      = conn.getPeerPrincipal();
+        } else {
+            Exception ex = null;
+            try {
+                Class deprecatedSunClass = getDeprecatedSunHttpsURLConnectionOldImplClass();
+                Method method = null;
+                method = deprecatedSunClass.getMethod("getCipherSuite", (Class[]) null);
+                enabledCipherSuite = (String) method.invoke(connection, (Object[]) null);
+                method = deprecatedSunClass.getMethod("getLocalCertificates", (Class[]) null);
+                localCertificates = (Certificate[]) method.invoke(connection, (Object[]) null);
+                method = deprecatedSunClass.getMethod("getServerCertificates", (Class[]) null);
+                serverCertificates = (Certificate[]) method.invoke(connection, (Object[]) null);
+                
+                //TODO Obtain localPrincipal and peerPrincipal using the com.sun.net.ssl api
+            } catch (Exception e) {
+                ex = e;
+            } finally {
+                if (ex != null) {
+                    if (ex instanceof IOException) {
+                        throw (IOException) ex;
+                    }
+                    throw new IIOException("Error constructing HttpsURLConnectionInfo for connection class "
+                            + connection.getClass().getName(), ex);
+                }
+            }
+        }
     }
 
+    private Class getDeprecatedSunHttpsURLConnectionOldImplClass() throws ClassNotFoundException {
+        if (deprecatedSunHttpsURLConnectionOldImplClass == null) {
+            deprecatedSunHttpsURLConnectionOldImplClass = 
+                    Class.forName("com.sun.net.ssl.internal.www.protocol.https.HttpsURLConnectionOldImpl");
+        }
+        return deprecatedSunHttpsURLConnectionOldImplClass;
+    }
+        
     /**
      * This method returns the cipher suite employed in this
      * HttpsURLConnection.

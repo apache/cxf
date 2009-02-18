@@ -20,6 +20,8 @@
 package org.apache.cxf.transport.https;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
@@ -57,7 +59,7 @@ public final class HttpsURLConnectionFactory
     private static final long serialVersionUID = 1L;
     private static final Logger LOG =
         LogUtils.getL7dLogger(HttpsURLConnectionFactory.class);
-    
+
     /*
      *  For development and testing only
      */
@@ -88,6 +90,10 @@ public final class HttpsURLConnectionFactory
      */
     SSLSocketFactory socketFactory;
 
+    private Class deprecatedSunHttpsURLConnectionClass;
+
+    private Class deprecatedSunHostnameVerifierClass;
+    
     /**
      * This constructor initialized the factory with the configured TLS
      * Client Parameters for the HTTPConduit for which this factory is used.
@@ -122,8 +128,8 @@ public final class HttpsURLConnectionFactory
                     + " for HTTPS URLConnection Factory.");
         }
         
-        HttpsURLConnection connection =
-            (HttpsURLConnection) (proxy != null 
+        HttpURLConnection connection =
+            (HttpURLConnection) (proxy != null 
                                    ? url.openConnection(proxy)
                                    : url.openConnection());
                                    
@@ -150,9 +156,11 @@ public final class HttpsURLConnectionFactory
     
     /**
      * This method assigns the various TLS parameters on the HttpsURLConnection
-     * from the TLS Client Parameters.
+     * from the TLS Client Parameters. Connection parameter is of supertype HttpURLConnection, 
+     * which allows internal cast to potentially divergent subtype (https) implementations.
      */
-    protected synchronized void decorateWithTLS(HttpsURLConnection connection)
+    @SuppressWarnings("deprecation")
+    protected synchronized void decorateWithTLS(HttpURLConnection connection)
         throws NoSuchAlgorithmException,
                NoSuchProviderException,
                KeyManagementException {
@@ -197,12 +205,55 @@ public final class HttpsURLConnectionFactory
                                                         cipherSuites,
                                                         tlsClientParameters.getSecureSocketProtocol());
         }
-        if (tlsClientParameters.isDisableCNCheck()) {
-            connection.setHostnameVerifier(CertificateHostnameVerifier.ALLOW_ALL);
+        
+        if (connection instanceof HttpsURLConnection) {
+            // handle the expected case (javax.net.ssl)
+            HttpsURLConnection conn = (HttpsURLConnection) connection;
+            if (tlsClientParameters.isDisableCNCheck()) {
+                conn.setHostnameVerifier(CertificateHostnameVerifier.ALLOW_ALL);
+            } else {
+                conn.setHostnameVerifier(CertificateHostnameVerifier.DEFAULT);
+            }
+            conn.setSSLSocketFactory(socketFactory);
         } else {
-            connection.setHostnameVerifier(CertificateHostnameVerifier.DEFAULT);
+            // handle the deprecated sun case
+            try {
+                Class connectionClass = getDeprecatedSunHttpsURLConnectionClass();
+                Class verifierClass = getDeprecatedSunHostnameVerifierClass();
+                Method setHostnameVerifier = connectionClass.getMethod("setHostnameVerifier", verifierClass);
+                InvocationHandler handler = new InvocationHandler() {
+                    public Object invoke(Object proxy, 
+                                         Method method, 
+                                         Object[] args) throws Throwable {
+                        return true;
+                    }
+                };
+                Object proxy = java.lang.reflect.Proxy.newProxyInstance(this.getClass().getClassLoader(),
+                                                                          new Class[] {verifierClass},
+                                                                          handler);
+                setHostnameVerifier.invoke(connectionClass.cast(connection), verifierClass.cast(proxy));
+                Method setSSLSocketFactory = connectionClass.getMethod("setSSLSocketFactory", 
+                                                                       SSLSocketFactory.class);
+                setSSLSocketFactory.invoke(connectionClass.cast(connection), socketFactory);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("Error decorating connection class " 
+                        + connection.getClass().getName(), ex);
+            }
         }
-        connection.setSSLSocketFactory(socketFactory);
+    }
+
+    private Class getDeprecatedSunHttpsURLConnectionClass() throws ClassNotFoundException {
+        if (deprecatedSunHttpsURLConnectionClass == null) {
+            deprecatedSunHttpsURLConnectionClass = Class.forName("com.sun.net.ssl.HttpsURLConnection");
+        }
+        return deprecatedSunHttpsURLConnectionClass;
+    }
+
+    private Class getDeprecatedSunHostnameVerifierClass() throws ClassNotFoundException {
+        if (deprecatedSunHostnameVerifierClass == null) {
+            deprecatedSunHostnameVerifierClass = Class.forName("com.sun.net.ssl.HostnameVerifier");
+        }
+        return deprecatedSunHostnameVerifierClass;
     }
 
     /*
@@ -228,12 +279,13 @@ public final class HttpsURLConnectionFactory
      * @return The HttpsURLConnectionInfo object for the given 
      *         HttpsURLConnection.
      * @throws IOException Normal IO Exceptions.
-     * @throws ClassCastException If "connection" is not an HttpsURLConnection.
+     * @throws ClassCastException If "connection" is not an HttpsURLConnection 
+     *         (or a supported subtype of HttpURLConnection)
      */
     public HttpURLConnectionInfo getConnectionInfo(
             HttpURLConnection connection
     ) throws IOException {  
-        return new HttpsURLConnectionInfo((HttpsURLConnection)connection);
+        return new HttpsURLConnectionInfo(connection);
     }
     
     public String getProtocol() {
@@ -241,5 +293,6 @@ public final class HttpsURLConnectionFactory
     }
 
 }
+
 
 
