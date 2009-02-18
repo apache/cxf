@@ -55,9 +55,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
-				<entry key="org.apache.cxf.binding.soap.SoapVersion">
-					<bean class="org.apache.cxf.binding.soap.SoapVersionEditor"/>
-				</entry>
+				<entry key="org.apache.cxf.binding.soap.SoapVersion" 
+					value="org.apache.cxf.binding.soap.SoapVersionEditor"/>
 			</map>
 		</property>
 	</bean>
