@@ -341,7 +341,7 @@ public abstract class SPConstants {
     
     public static final String MUST_SUPPORT_REF_THUMBPRINT = "MustSupportRefThumbprint";
     
-    public static final String MUST_SUPPORT_REF_ENCRYPTED_KEY = "MustSupportRefEncryptedkey";
+    public static final String MUST_SUPPORT_REF_ENCRYPTED_KEY = "MustSupportRefEncryptedKey";
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     

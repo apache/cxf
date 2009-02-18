@@ -30,6 +30,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
 
@@ -137,6 +138,17 @@ public final class PolicyConstants {
         return null;
     }
 
+    public static Element findPolicyElement(Element parent) {
+        Node nd = parent.getFirstChild();
+        while (nd != null) {
+            if (POLICY_ELEM_NAME.equals(nd.getLocalName())
+                && SUPPORTED_NAMESPACES.contains(nd.getNamespaceURI())) {
+                return (Element)nd;
+            }
+            nd = nd.getNextSibling();
+        }
+        return null;
+    }
     public static boolean isOptionalAttribute(QName qn) {
         return OPTIONAL_ATTR_NAME.equals(qn.getLocalPart())
             && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());

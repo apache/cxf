@@ -257,7 +257,8 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
         writer.writeNamespace(prefix, namespaceURI);
 
         // <wsp:Policy>
-        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(SPConstants.POLICY.getPrefix(),
+                                 SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         //

@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -56,7 +57,7 @@ public class WSS10Builder implements AssertionBuilder {
     }
 
     private void processAlternative(Element element, Wss10 parent, SPConstants consts) {
-        Element polEl = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
+        Element polEl = PolicyConstants.findPolicyElement(element);
         if (polEl != null) {
             Element child = DOMUtils.getFirstElement(polEl);
             while (child != null) {
