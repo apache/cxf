@@ -691,7 +691,7 @@ public class HTTPConduit
             result = getURL().toString();
         } else {
             if (connectionFactory == null 
-                || result.startsWith(connectionFactory.getProtocol() + ":/")) {
+                || !result.startsWith(connectionFactory.getProtocol() + ":/")) {
             
                 connectionFactory = null;
                 retrieveConnectionFactory(result);
