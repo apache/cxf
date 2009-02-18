@@ -22,9 +22,9 @@ package org.apache.cxf.interceptor;
 import java.util.List;
 
 /**
- * The InterceptorProvider interface is implemented by objects that have
- * interceptor chains associated with them.  The methods in this interface
- * provide an ability to add and remove interceptors within the chains
+ * The <code>InterceptorProvider</code> interface is implemented by objects 
+ * that have interceptor chains associated with them. The methods in this 
+ * interface provide the ability to add and remove interceptors to the chains
  * of the InterceptorProvider.
  */
 public interface InterceptorProvider {
