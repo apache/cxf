@@ -42,10 +42,13 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
     private int limit = 100 * 1024;
     private PrintWriter writer;
     
-    public LoggingOutInterceptor() {
-        super(Phase.PRE_STREAM);
+    public LoggingOutInterceptor(String phase) {
+        super(phase);
         addBefore(StaxOutInterceptor.class.getName());
     }
+    public LoggingOutInterceptor() {
+        this(Phase.PRE_STREAM);
+    }    
     public LoggingOutInterceptor(int lim) {
         this();
         limit = lim;
