@@ -41,11 +41,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.URIParserUtil;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 public class Stax2DOM {
 

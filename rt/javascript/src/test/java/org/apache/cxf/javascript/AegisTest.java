@@ -22,8 +22,9 @@ package org.apache.cxf.javascript;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AegisServiceImpl;
@@ -62,7 +63,6 @@ public class AegisTest extends JavascriptRhinoTest {
                    true);
         implementor = (AegisServiceImpl)rawImplementor;
         implementor.reset();
-        serverFactoryBean.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
     }
     
     private Void acceptAny(Context context) {
@@ -72,7 +72,7 @@ public class AegisTest extends JavascriptRhinoTest {
                                 testUtilities.javaToJS(getAddress()));
         implementor.waitForOneWay();
         assertEquals("before items", implementor.getAcceptedString());
-        Collection<org.jdom.Element> something = implementor.getAcceptedCollection();
+        Collection<Document> something = implementor.getAcceptedCollection();
         assertNotNull(something);
         return null;
     }
@@ -106,6 +106,7 @@ public class AegisTest extends JavascriptRhinoTest {
         });
     }
     
+
     private Void returnBeanWithAnyTypeArray(Context context) {
         Notifier notifier = 
             testUtilities.rhinoCallConvert("testReturningBeanWithAnyTypeArray", Notifier.class, 
@@ -133,7 +134,7 @@ public class AegisTest extends JavascriptRhinoTest {
         assertEquals(new Float(42), new Float(intValue.toString()));
         return null;
     }
-    
+
     @Test
     public void callReturnBeanWithAnyTypeArray() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {

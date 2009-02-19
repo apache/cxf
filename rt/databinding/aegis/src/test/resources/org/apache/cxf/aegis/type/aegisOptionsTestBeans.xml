@@ -35,11 +35,17 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 
         <bean id="aegisBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-                <property name="configuration">
-                        <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
-                        <property name="defaultMinOccurs" value="3"/>
-                        <property name="defaultNillable" value="false"/>
-                        </bean>
+                <property name="aegisContext">
+                	<bean class="org.apache.cxf.aegis.AegisContext">
+                	<!--  the test that uses this uses JDOM -->
+                		<property name="enableJDOMMappings" value="true"/>
+                		<property name="configuration">
+	                        <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
+                        		<property name="defaultMinOccurs" value="3"/>
+                        		<property name="defaultNillable" value="false"/>
+                        	</bean>
+                		</property>
+                	</bean>
                 </property>
         </bean>
            

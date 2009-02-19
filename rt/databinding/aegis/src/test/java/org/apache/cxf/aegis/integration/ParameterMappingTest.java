@@ -40,6 +40,7 @@ public class ParameterMappingTest extends AbstractAegisTest {
     @Before 
     public void setUp() throws Exception {
         super.setUp();
+        setEnableJDOM(true); // there are JDOM types in here.
         createService(AddNumbers.class, "AddNumbers", null);
         createService(ArrayService.class, "ArrayService", null);
     }
@@ -70,7 +71,7 @@ public class ParameterMappingTest extends AbstractAegisTest {
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(def, sink);
         assertXPathEquals("/wsdl:definitions/wsdl:types/"
                     + "xsd:schema[@targetNamespace= 'http://services.aegis.cxf.apache.org']"
-                    + "/xsd:complexType[@name='ArrayOfString-50-2']" 
+                    + "/xsd:complexType[@name='ArrayOfString-2-50']" 
                     + "/xsd:sequence" 
                     + "/xsd:element[@name='string']/@minOccurs", "2", doc);
     }

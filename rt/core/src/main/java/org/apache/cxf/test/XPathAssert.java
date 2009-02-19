@@ -135,7 +135,10 @@ public final class XPathAssert {
         throws Exception {
         Node result = (Node)createXPath(namespaces).evaluate(xpath, node, XPathConstants.NODE);
         if (result == null) {
-            throw new AssertionFailedError("No nodes were found for expression: " + xpath);
+            throw new AssertionFailedError("No nodes were found for expression: " 
+                                           + xpath 
+                                           + " in document " 
+                                           + writeNodeToString(node));
         }
 
         String value2 = DOMUtils.getContent(result).trim();

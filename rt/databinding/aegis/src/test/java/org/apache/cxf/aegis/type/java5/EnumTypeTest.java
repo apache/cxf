@@ -19,19 +19,22 @@
 package org.apache.cxf.aegis.type.java5;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.java5.CurrencyService.Currency;
-import org.apache.cxf.aegis.xml.jdom.JDOMReader;
-import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
+import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.jdom.Element;
-import org.jdom.output.DOMOutputter;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaSerializer;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,14 +69,12 @@ public class EnumTypeTest extends AbstractAegisTest {
 
         tm.register(type);
 
-        Element root = new Element("root");
-        JDOMWriter writer = new JDOMWriter(root);
+        Element element = writeObjectToElement(type, smallEnum.VALUE1, getContext());
 
-        type.writeObject(smallEnum.VALUE1, writer, getContext());
-
-        assertEquals("VALUE1", root.getValue());
-
-        JDOMReader reader = new JDOMReader(root);
+        assertEquals("VALUE1", element.getTextContent());
+        
+        XMLStreamReader xreader = StaxUtils.createXMLStreamReader(element);
+        ElementReader reader = new ElementReader(xreader);
         Object value = type.readObject(reader, getContext());
 
         assertEquals(smallEnum.VALUE1, value);
@@ -118,12 +119,11 @@ public class EnumTypeTest extends AbstractAegisTest {
         EnumType type = new EnumType();
         type.setTypeClass(smallEnum.class);
         type.setSchemaType(new QName("urn:test", "test"));
+        XmlSchema schema = newXmlSchema("urn:test");
+        type.writeSchema(schema);
 
-        Element root = new Element("root");
-        org.jdom.Document wsdl = new org.jdom.Document(root);
-        type.writeSchema(root);
-
-        Document doc = new DOMOutputter().output(wsdl);
+        XmlSchemaSerializer ser = new XmlSchemaSerializer();
+        Document doc = ser.serializeSchema(schema, false)[0];
         addNamespace("xsd", SOAPConstants.XSD);
         assertValid("//xsd:simpleType[@name='test']/xsd:restriction[@base='xsd:string']", doc);
         assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='VALUE1']", doc);
@@ -149,12 +149,8 @@ public class EnumTypeTest extends AbstractAegisTest {
 
         tm.register(type);
 
-        Element root = new Element("root");
-        JDOMWriter writer = new JDOMWriter(root);
-
-        type.writeObject(new EnumBean(), writer, getContext());
-
-        JDOMReader reader = new JDOMReader(root);
+        Element root = writeObjectToElement(type, new EnumBean(), getContext());
+        ElementReader reader = new ElementReader(StaxUtils.createXMLStreamReader(root));
         Object value = type.readObject(reader, getContext());
 
         assertTrue(value instanceof EnumBean);

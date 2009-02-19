@@ -48,7 +48,7 @@ public class XMLStreamReaderMappingTest extends AbstractAegisTest {
 
         context = new AegisContext();
         // create a different mapping than the context creates.
-        TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false);
+        TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
         mapping = new DefaultTypeMapping(SOAPConstants.XSD, baseMapping);
         mapping.register(XMLStreamReader.class, 
                          new QName("urn:Bean", "SimpleBean"), new XMLStreamReaderType());

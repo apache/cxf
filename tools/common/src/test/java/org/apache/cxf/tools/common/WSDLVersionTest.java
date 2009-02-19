@@ -19,7 +19,8 @@
 
 package org.apache.cxf.tools.common;
 
-import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.cxf.common.WSDLConstants;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -46,11 +46,10 @@ import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.helpers.DOMUtils;
-import org.jaxen.JaxenException;
-import org.jaxen.jdom.JDOMXPath;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 /**
  * The Aegis Databinding context object. This object coordinates the data binding process: reading and writing
@@ -74,19 +73,11 @@ import org.jdom.Namespace;
 public class AegisContext {
 
     /**
-     * Namespace used for miscellaneous Aegis types.
+     * Namespace used for the miscellaneous Aegis type schema.
      */
-    public static final String SCHEMA_NS = "http://cxf.apache.org/aegisTypes";
-    private static JDOMXPath importTypesXpath;
-
-    static {
-        try {
-            importTypesXpath = new JDOMXPath("xsd:import[@namespace='" + SCHEMA_NS + "']");
-            importTypesXpath.addNamespace(SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-        } catch (JaxenException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public static final String UTILITY_TYPES_SCHEMA_NS = "http://cxf.apache.org/aegisTypes";
+    private Document aegisTypesSchemaDocument;
+    private Document xmimeSchemaDocument;
 
     private boolean writeXsiTypes;
     private boolean readXsiTypes = true;
@@ -101,9 +92,9 @@ public class AegisContext {
     private TypeCreationOptions configuration;
     private boolean mtomEnabled;
     private boolean mtomUseXmime;
+    private boolean enableJDOMMappings;
     // this URI goes into the type map.
     private String mappingNamespaceURI;
-    private Document typesSchemaDocument;
 
     /**
      * Construct a context.
@@ -150,7 +141,9 @@ public class AegisContext {
         }
         if (typeMapping == null) {
             boolean defaultNillable = configuration.isDefaultNillable();
-            TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, mtomUseXmime);
+            TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, 
+                                                                             mtomUseXmime, 
+                                                                             enableJDOMMappings);
             // The use of the XSD URI in the mapping is, MAGIC.
             if (mappingNamespaceURI == null) {
                 mappingNamespaceURI = SOAPConstants.XSD;
@@ -248,43 +241,47 @@ public class AegisContext {
         }
     }
 
-    public static boolean schemaImportsUtilityTypes(Element schemaElement) {
+    public static boolean schemaImportsUtilityTypes(XmlSchema schema) {
+        return XmlSchemaUtils.schemaImportsNamespace(schema, UTILITY_TYPES_SCHEMA_NS);
+    }
+    
+    private Document getSchemaDocument(String resourcePath) { 
         try {
-            return importTypesXpath.selectSingleNode(schemaElement) != null;
-        } catch (JaxenException e) {
+            return XMLUtils.parse(getClass().getResourceAsStream(resourcePath));
+        } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    public Document getTypesSchemaDocument() {
-        ensureTypesSchemaDocument();
-        return typesSchemaDocument;
-    }
-
-    private void ensureTypesSchemaDocument() {
-        if (typesSchemaDocument != null) {
-            return;
-        }
-        try {
-            typesSchemaDocument = DOMUtils.readXml(getClass()
-                .getResourceAsStream("/META-INF/cxf/aegisTypes.xsd"));
         } catch (SAXException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
         }
     }
-
-    public static void addUtilityTypesToSchema(Element root) {
-        if (schemaImportsUtilityTypes(root)) {
-            return;
+    
+    // could we make these documents static? What would we synchronize on?
+    private Document getAegisTypesSchemaDocument() { 
+        if (aegisTypesSchemaDocument == null) {
+            aegisTypesSchemaDocument = getSchemaDocument("/META-INF/cxf/aegisTypes.xsd");
+        } 
+        return aegisTypesSchemaDocument;
+    }
+    
+    private Document getXmimeSchemaDocument() {
+        if (xmimeSchemaDocument == null) {
+            xmimeSchemaDocument = getSchemaDocument("/schemas/wsdl/xmime.xsd");
         }
-        Element element = new Element("import", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-        root.addContent(0, element);
-        element.setAttribute("namespace", SCHEMA_NS);
-        root.addNamespaceDeclaration(Namespace.getNamespace("aegisTypes", SCHEMA_NS));
+        return xmimeSchemaDocument;
+    }
+
+    public XmlSchema addTypesSchemaDocument(XmlSchemaCollection collection) {
+        return collection.read(getAegisTypesSchemaDocument(), null);
+    }
+    
+    public XmlSchema addXmimeSchemaDocument(XmlSchemaCollection collection) {
+        return collection.read(getXmimeSchemaDocument(), null);
+    }
+
+    public static void addUtilityTypesToSchema(XmlSchema root) {
+        XmlSchemaUtils.addImportIfNeeded(root, UTILITY_TYPES_SCHEMA_NS);
     }
 
     /**
@@ -466,5 +463,17 @@ public class AegisContext {
 
     public void setMappingNamespaceURI(String mappingNamespaceURI) {
         this.mappingNamespaceURI = mappingNamespaceURI;
+    }
+
+    public boolean isEnableJDOMMappings() {
+        return enableJDOMMappings;
+    }
+    
+    /**
+     * Whether to enable JDOM as a mapping for xsd:anyType if JDOM is in the classpath. 
+     * @param enableJDOMMappings
+     */
+    public void setEnableJDOMMappings(boolean enableJDOMMappings) {
+        this.enableJDOMMappings = enableJDOMMappings;
     }
 }

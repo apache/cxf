@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
@@ -39,7 +40,7 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.helpers.CastUtils;
-import org.jdom.Element;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import static org.apache.cxf.aegis.type.encoded.SoapEncodingUtil.readAttributeValue;
 
@@ -135,7 +136,7 @@ public class SoapArrayType extends Type {
                 sparse = position != null;
             }
 
-            // nested element names can specifiy a type
+            // nested element names can specify a type
             Type compType = getTypeMapping().getType(creader.getName());
             if (compType == null) {
                 // use the type declared in the arrayType attribute
@@ -290,6 +291,9 @@ public class SoapArrayType extends Type {
         // Root component's schema type
         QName rootType = getRootType();
         String prefix = writer.getPrefixForNamespace(rootType.getNamespaceURI(), rootType.getPrefix());
+        if (prefix == null) {
+            prefix = "";
+        }
         rootType = new QName(rootType.getNamespaceURI(), rootType.getLocalPart(), prefix);
 
 
@@ -297,6 +301,9 @@ public class SoapArrayType extends Type {
         ArrayTypeInfo arrayTypeInfo = new ArrayTypeInfo(rootType,
                 getDimensions() - 1,
                 Array.getLength(values));
+        // ensure that the writer writes out this prefix...
+        writer.getPrefixForNamespace(arrayTypeInfo.getTypeName().getNamespaceURI(), 
+                                     arrayTypeInfo.getTypeName().getPrefix());
         arrayTypeInfo.writeAttribute(writer);
 
         // write each element
@@ -333,7 +340,7 @@ public class SoapArrayType extends Type {
      * Throws UnsupportedOperationException
      */
     @Override
-    public void writeSchema(Element root) {
+    public void writeSchema(XmlSchema root) {
         throw new UnsupportedOperationException();
     }
 

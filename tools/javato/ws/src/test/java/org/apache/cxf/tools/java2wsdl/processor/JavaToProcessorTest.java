@@ -27,6 +27,7 @@ import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -36,7 +37,6 @@ import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

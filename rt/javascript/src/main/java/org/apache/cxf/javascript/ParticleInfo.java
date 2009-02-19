@@ -27,6 +27,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
@@ -167,7 +168,9 @@ public final class ParticleInfo implements ItemInfo {
 
         if (particle instanceof XmlSchemaElement) {
             XmlSchemaElement element = (XmlSchemaElement)particle;
-            String elementNamespaceURI = element.getQName().getNamespaceURI();
+            QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, currentSchema);
+            String elementNamespaceURI = elementQName.getNamespaceURI(); 
+                
             boolean elementNoNamespace = "".equals(elementNamespaceURI);
 
             XmlSchema elementSchema = null;
@@ -181,11 +184,11 @@ public final class ParticleInfo implements ItemInfo {
             boolean qualified = !elementNoNamespace
                                 && XmlSchemaUtils.isElementQualified(element, true, currentSchema,
                                                                      elementSchema);
-            elementInfo.xmlName = prefixAccumulator.xmlElementString(element, qualified);
+            elementInfo.xmlName = prefixAccumulator.xmlElementString(elementQName, qualified);
             // we are assuming here that we are not dealing, in close proximity,
             // with elements with identical local names and different
             // namespaces.
-            elementInfo.javascriptName = element.getQName().getLocalPart();
+            elementInfo.javascriptName = elementQName.getLocalPart();
             elementInfo.defaultValue = element.getDefaultValue();
             factorySetupType(element, schemaCollection, elementInfo);
         } else { // any

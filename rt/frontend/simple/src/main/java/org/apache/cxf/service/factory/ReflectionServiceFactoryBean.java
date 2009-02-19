@@ -55,11 +55,12 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
 import org.apache.cxf.clustering.FailoverFeature;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaTools;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.databinding.source.mime.MimeSerializer;
@@ -95,7 +96,6 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.UnwrappedOperationInfo;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -897,7 +897,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         XmlSchema schema = si.getSchema();
 
         XmlSchemaElement el = new XmlSchemaElement();
-        XmlSchemaTools.setElementQName(el, mpi.getElementQName());
+        XmlSchemaUtils.setElementQName(el, mpi.getElementQName());
         if (!isExistSchemaElement(schema, mpi.getElementQName())) {
             SchemaCollection.addGlobalElementToSchema(schema, el);
         }
@@ -1004,7 +1004,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
 
             XmlSchemaElement el = new XmlSchemaElement();
-            XmlSchemaTools.setElementQName(el, qname);
+            XmlSchemaUtils.setElementQName(el, qname);
             el.setNillable(true);
 
             if (!isExistSchemaElement(schema, qname)) {
@@ -1098,7 +1098,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                                             QName wrapperName) {
 
         XmlSchemaElement el = new XmlSchemaElement();
-        XmlSchemaTools.setElementQName(el, wrapperName);
+        XmlSchemaUtils.setElementQName(el, wrapperName);
         SchemaCollection.addGlobalElementToSchema(schema, el);
 
         wrappedMessage.getMessageParts().get(0).setXmlSchema(el);
@@ -1117,12 +1117,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         for (MessagePartInfo mpi : unwrappedMessage.getMessageParts()) {
             el = new XmlSchemaElement();
-            XmlSchemaTools.setElementQName(el, mpi.getName());
+            XmlSchemaUtils.setElementQName(el, mpi.getName());
             Map<Class, Boolean> jaxbAnnoMap = getJaxbAnnoMap(mpi);
             if (mpi.isElement()) {
                 addImport(schema, mpi.getElementQName().getNamespaceURI());
-                XmlSchemaTools.setElementQName(el, null);
-                XmlSchemaTools.setElementRefName(el, mpi.getElementQName());
+                XmlSchemaUtils.setElementQName(el, null);
+                XmlSchemaUtils.setElementRefName(el, mpi.getElementQName());
             } else {
                 if (mpi.getTypeQName() != null && !jaxbAnnoMap.containsKey(XmlList.class)) {
                     el.setSchemaTypeName(mpi.getTypeQName());
@@ -1166,7 +1166,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     mpi.setElement(true);
                     mpi.setElementQName(newName);
                     mpi.setConcreteName(newName); 
-                    XmlSchemaTools.setElementQName(el, newName);
+                    XmlSchemaUtils.setElementQName(el, newName);
                 }
                 
                 if (Collection.class.isAssignableFrom(mpi.getTypeClass())
@@ -1190,7 +1190,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             if (Boolean.TRUE.equals(mpi.getProperty(HEADER))) {
                 QName qn = (QName)mpi.getProperty(ELEMENT_NAME);
 
-                XmlSchemaTools.setElementQName(el, qn);
+                XmlSchemaUtils.setElementQName(el, qn);
 
                 SchemaInfo headerSchemaInfo = getOrCreateSchema(serviceInfo, qn.getNamespaceURI(),
                                                                 getQualifyWrapperSchema());

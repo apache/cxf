@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 /***
  * Only public/static/final fields can be resolved

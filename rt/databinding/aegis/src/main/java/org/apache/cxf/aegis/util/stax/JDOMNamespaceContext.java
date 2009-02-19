@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -41,12 +40,12 @@ public class JDOMNamespaceContext implements NamespaceContext {
     }
 
     public String getPrefix(String uri) {
-        return NamespaceHelper.getPrefix(element, uri);
+        return rawGetPrefix(element, uri);
     }
 
     public Iterator<String> getPrefixes(String uri) {
         List<String> prefixes = new ArrayList<String>();
-        NamespaceHelper.getPrefixes(element, uri, prefixes);
+        rawGetPrefixes(element, uri, prefixes);
         return prefixes.iterator();
     }
 
@@ -56,5 +55,47 @@ public class JDOMNamespaceContext implements NamespaceContext {
 
     public void setElement(Element element) {
         this.element = element;
+    }
+    
+    public static String rawGetPrefix(Element element, String namespaceURI) {
+        if (element.getNamespaceURI().equals(namespaceURI)) {
+            return element.getNamespacePrefix();
+        }
+
+        List namespaces = element.getAdditionalNamespaces();
+
+        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
+            Namespace ns = (Namespace)itr.next();
+
+            if (ns.getURI().equals(namespaceURI)) {
+                return ns.getPrefix();
+            }
+        }
+
+        if (element.getParentElement() != null) {
+            return rawGetPrefix(element.getParentElement(), namespaceURI);
+        } else {
+            return null;
+        }
+    }
+    
+    static void rawGetPrefixes(Element element, String namespaceURI, List<String> prefixes) {
+        if (element.getNamespaceURI().equals(namespaceURI)) {
+            prefixes.add(element.getNamespacePrefix());
+        }
+
+        List namespaces = element.getAdditionalNamespaces();
+
+        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
+            Namespace ns = (Namespace)itr.next();
+
+            if (ns.getURI().equals(namespaceURI)) {
+                prefixes.add(ns.getPrefix());
+            }
+        }
+
+        if (element.getParentElement() != null) {
+            rawGetPrefixes(element.getParentElement(), namespaceURI, prefixes);
+        }
     }
 }

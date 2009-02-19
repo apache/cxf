@@ -22,6 +22,8 @@ package org.apache.cxf.javascript.fortest;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.javascript.fortest.aegis.BeanWithAnyTypeArray;
 import org.apache.cxf.javascript.fortest.aegis.Mammal;
 import org.apache.cxf.javascript.fortest.aegis.Vegetable;
@@ -31,7 +33,7 @@ import org.apache.cxf.javascript.fortest.aegis.Vegetable;
  */
 public class AegisServiceImpl implements AegisService {
     private String acceptedString;
-    private Collection<org.jdom.Element> acceptedCollection;
+    private Collection<Document> acceptedCollection;
     private Collection<String> acceptedStrings;
     private Collection<Object> acceptedObjects;
     private CountDownLatch oneWayLatch;
@@ -46,7 +48,7 @@ public class AegisServiceImpl implements AegisService {
     }
     
     /** {@inheritDoc}*/
-    public void acceptAny(String before, Collection<org.jdom.Element> anything) {
+    public void acceptAny(String before, Collection<Document> anything) {
         acceptedString = before;
         acceptedCollection = anything;
         if (oneWayLatch != null) {
@@ -57,7 +59,7 @@ public class AegisServiceImpl implements AegisService {
     /**
      * @return Returns the acceptedCollection.
      */
-    public Collection<org.jdom.Element> getAcceptedCollection() {
+    public Collection<Document> getAcceptedCollection() {
         return acceptedCollection;
     }
 

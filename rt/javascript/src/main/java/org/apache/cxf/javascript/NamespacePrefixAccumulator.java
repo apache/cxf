@@ -28,7 +28,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
-import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class NamespacePrefixAccumulator {
     private StringBuffer attributes;
@@ -76,19 +75,19 @@ public class NamespacePrefixAccumulator {
     
     /**
      * This function obtains a name, perhaps namespace-qualified, for an element.
-     * @param element the element.
+     * @param elementQName the element.
      * @param qualified whether to qualify.
      * @return
      */
-    public String xmlElementString(XmlSchemaElement element, boolean qualified) {
+    public String xmlElementString(QName elementQName, boolean qualified) {
         if (qualified) {
             // What if there were a prefix in the element's qname? This is not apparently 
             // something that happens in this environment.
-            String prefix = getPrefix(element.getQName().getNamespaceURI());
-            collect(prefix, element.getQName().getNamespaceURI());
-            return prefix + ":" + element.getName();
+            String prefix = getPrefix(elementQName.getNamespaceURI());
+            collect(prefix, elementQName.getNamespaceURI());
+            return prefix + ":" + elementQName.getLocalPart();
         }
-        return element.getName(); // use the non-qualified name.
+        return elementQName.getLocalPart(); // use the non-qualified name.
     }
     
     /**

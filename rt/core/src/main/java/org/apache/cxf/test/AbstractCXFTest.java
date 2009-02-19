@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.util.Map;
 
 import javax.wsdl.WSDLException;
+import javax.xml.namespace.NamespaceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -34,6 +35,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.helpers.MapNamespaceContext;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -155,6 +157,10 @@ public class AbstractCXFTest extends Assert {
      */
     public void addNamespace(String ns, String uri) {
         testUtilities.addNamespace(ns, uri);
+    }
+    
+    public NamespaceContext getNamespaceContext() {
+        return new MapNamespaceContext(testUtilities.getNamespaces());
     }
 
     public Map<String, String> getNamespaces() {

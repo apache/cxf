@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
@@ -45,7 +46,6 @@ import org.apache.cxf.tools.common.extensions.soap.SoapFault;
 import org.apache.cxf.tools.common.extensions.soap.SoapOperation;
 import org.apache.cxf.tools.misc.WSDLToSoap;
 import org.apache.cxf.tools.util.SOAPBindingUtil;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.junit.Before;
 import org.junit.Test;
 

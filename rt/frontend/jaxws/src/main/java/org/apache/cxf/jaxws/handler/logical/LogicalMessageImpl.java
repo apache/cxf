@@ -47,6 +47,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -55,7 +56,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.XMLMessage;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 
 public class LogicalMessageImpl implements LogicalMessage {

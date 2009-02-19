@@ -75,8 +75,8 @@ public class DepthXMLStreamReader implements XMLStreamReader {
         return reader.getAttributeValue(arg0);
     }
 
-    public String getAttributeValue(String arg0, String arg1) {
-        return reader.getAttributeValue(arg0, arg1);
+    public String getAttributeValue(String namespace, String localName) {
+        return reader.getAttributeValue(namespace, localName);
     }
 
     public String getCharacterEncodingScheme() {

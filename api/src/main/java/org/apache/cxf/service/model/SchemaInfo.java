@@ -25,13 +25,14 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
-
+import org.apache.ws.commons.schema.utils.NamespaceMap;
 
 public final class SchemaInfo extends AbstractPropertiesHolder {
   
@@ -76,7 +77,16 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
             CachedOutputStream cout = new CachedOutputStream();
             XmlSchema sch = getSchema();
             synchronized (sch) {
-                getSchema().write(cout);
+                XmlSchema schAgain = getSchema();
+                // XML Schema blows up when the context is null as opposed to empty.
+                // Some unit tests really want to see 'tns:'.
+                if (schAgain.getNamespaceContext() == null) {
+                    NamespaceMap nsMap = new NamespaceMap();
+                    nsMap.add("xsd", XmlSchemaConstants.XSD_NAMESPACE_URI);
+                    nsMap.add("tns", schAgain.getTargetNamespace());
+                    schAgain.setNamespaceContext(nsMap);
+                }
+                schAgain.write(cout);
             }
             Document sdoc = null;
             try {

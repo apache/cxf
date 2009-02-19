@@ -55,6 +55,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.source.NodeDataWriter;
@@ -72,7 +73,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.XMLMessage;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.wsdl.WSDLConstants;
 
 public class DispatchOutDatabindingInterceptor extends AbstractOutDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchOutDatabindingInterceptor.class);

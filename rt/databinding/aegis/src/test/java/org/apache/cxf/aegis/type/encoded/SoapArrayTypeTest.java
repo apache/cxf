@@ -125,12 +125,23 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
         assertArrayEquals(Arrays.asList(objects).toString(),
                           new Object[]{42, new BigDecimal("42.42"), "Forty Two"},
                           objects);
-
+    }
+    
+    @Test
+    public void testUrTypeArrayReadWriteRef1() throws Exception {
+        Object[] objects;
         // round trip tests
         objects = readWriteReadRef("arrayUrType1.xml", Object[].class);
         assertArrayEquals(new Object[]{42, new Float(42.42f), "Forty Two"}, objects);
+    }
+
+    @Test
+    public void testUrTypeArrayReadWriteRef2() throws Exception {
+        Object[] objects;
+        // round trip tests
         objects = readWriteReadRef("arrayUrType2.xml", Object[].class);
         assertArrayEquals(new Object[]{42, new BigDecimal("42.42"), "Forty Two"}, objects);
+        
     }
 
     @Test

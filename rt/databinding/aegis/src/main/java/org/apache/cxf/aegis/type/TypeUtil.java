@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.aegis.type;
 
-import java.util.List;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.logging.Log;
@@ -27,10 +25,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.helpers.CastUtils;
-import org.jdom.Attribute;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
+import org.apache.ws.commons.schema.XmlSchema;
+
 
 /**
  * Static methods/constants for Aegis.
@@ -159,26 +156,9 @@ public final class TypeUtil {
         return type;
     }
     
-    public static Attribute createTypeAttribute(String prefix, Type type, Element root) {
+    
+    public static void setAttributeAttributes(QName name, Type type, XmlSchema root) {
         String ns = type.getSchemaType().getNamespaceURI();
-        if (!ns.equals(root.getAttributeValue("targetNamespace"))
-            && !ns.equals(SOAPConstants.XSD)) {
-            //find import statement
-            List<Element> l = CastUtils.cast(root.getChildren("import", 
-                                                              Namespace.getNamespace(SOAPConstants.XSD)));
-            boolean found = false;
-            for (Element e : l) {
-                if (ns.equals(e.getAttributeValue("namespace"))) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                Element element = new Element("import", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
-                root.addContent(0, element);
-                element.setAttribute("namespace", ns);
-            }
-        }
-        return new Attribute("type", prefix + ':' + type.getSchemaType().getLocalPart()); 
+        XmlSchemaUtils.addImportIfNeeded(root, ns);
     }
-
 }

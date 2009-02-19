@@ -42,13 +42,13 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.SchemaUtil;
 
 public final class ValidatorUtil {

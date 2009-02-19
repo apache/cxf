@@ -43,6 +43,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -51,7 +52,6 @@ import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 
 public class ProviderImpl extends javax.xml.ws.spi.Provider {
