@@ -141,7 +141,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     }
     
     
-
     private void doEncryptBeforeSign() throws SOAPException, 
         WSSecurityException, ConversationException {
         
@@ -162,7 +161,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
             } else if (encryptionToken instanceof SecureConversationToken) {
-                //REVISIT - SecureConversation
+            	tok = getSecurityToken();
             } else if (encryptionToken instanceof X509Token) {
                 if (isRequestor()) {
                     tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
