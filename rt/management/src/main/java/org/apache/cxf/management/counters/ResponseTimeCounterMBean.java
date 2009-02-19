@@ -22,6 +22,6 @@ public interface ResponseTimeCounterMBean {
     Number getNumInvocations();
     Number getAvgResponseTime();
     Number getMaxResponseTime();
-    Number getMinResponseTime();   
-    
+    Number getMinResponseTime();
+    Number getTotalHandlingTime();    
 }

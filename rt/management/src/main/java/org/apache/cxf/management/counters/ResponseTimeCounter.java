@@ -79,7 +79,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         return invocations.get();
     }
 
-   
-    
-    
+    public Number getTotalHandlingTime() {
+        return totalHandlingTime;
+    }
 }
