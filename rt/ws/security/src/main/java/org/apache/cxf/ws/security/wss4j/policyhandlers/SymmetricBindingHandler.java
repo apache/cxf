@@ -161,7 +161,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
             } else if (encryptionToken instanceof SecureConversationToken) {
-            	tok = getSecurityToken();
+                tok = getSecurityToken();
             } else if (encryptionToken instanceof X509Token) {
                 if (isRequestor()) {
                     tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
