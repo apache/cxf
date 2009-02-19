@@ -74,8 +74,10 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
             
             if (fault.getSubCode() != null) {
                 writer.writeStartElement(defaultPrefix, "Subcode", ns);
+                writer.writeStartElement(defaultPrefix, "Value", ns);
                 writer.writeCharacters(fault.getSubCodeString(getFaultCodePrefix(writer, fault.getSubCode()), 
                                                               defaultPrefix));                
+                writer.writeEndElement();
                 writer.writeEndElement();
             }
             writer.writeEndElement();
