@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
 
 public final class Client {
     private Client() { }
