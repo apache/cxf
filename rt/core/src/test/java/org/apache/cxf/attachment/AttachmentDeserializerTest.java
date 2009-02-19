@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -276,5 +277,24 @@ public class AttachmentDeserializerTest extends Assert {
         assertTrue(((DelegatingInputStream) attIs).getInputStream() instanceof ByteArrayInputStream);
         assertTrue(((DelegatingInputStream) attBody).getInputStream() instanceof FileInputStream);
         
+    }
+    
+    
+    @Test
+    public void testSmallStream() throws Exception {
+        byte[] messageBytes = ("------=_Part_1\n\nJJJJ\n------=_Part_1\n\n"
+            + "Content-Transfer-Encoding: binary\n\n=3D=3D=3D\n------=_Part_1\n").getBytes();
+        PushbackInputStream pushbackStream = new PushbackInputStream(new ByteArrayInputStream(messageBytes),
+                                                                     2048);
+        pushbackStream.read(new byte[4096], 0, 4015);
+        pushbackStream.unread(messageBytes);
+        pushbackStream.read(new byte[72]);
+
+        MimeBodyPartInputStream m = new MimeBodyPartInputStream(pushbackStream, "------=_Part_1".getBytes(),
+                                                                2048);
+        
+        assertEquals(10, m.read(new byte[1000]));
+        assertEquals(-1, m.read(new byte[1000]));
+        assertEquals(-1, m.read(new byte[1000]));
     }
 }
