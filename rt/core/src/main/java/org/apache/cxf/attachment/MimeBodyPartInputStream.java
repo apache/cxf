@@ -142,7 +142,8 @@ public class MimeBodyPartInputStream extends InputStream {
                 if (initialI != off) {
                     i = 1000000000;
                 }
-                if (!hasData(buffer, initialI, i + 1, off, len)) {
+                if (initialI - off != 0 
+                    && !hasData(buffer, initialI, i + 1, off, len)) {
                     return initialI - off;
                 }
                 boundaryFound = true;
