@@ -569,6 +569,58 @@ public final class ContextUtils {
     }
 
     /**
+     * Store indication that a deferred uncorrelated message abort is
+     * supported
+     *
+     * @param message the current message
+     */
+    public static void storeDeferUncorrelatedMessageAbort(Message message) {
+        if (message.getExchange() != null) { 
+            message.getExchange().put("defer.uncorrelated.message.abort", Boolean.TRUE);
+        }
+    }
+
+    /**
+     * Retrieve indication that a deferred uncorrelated message abort is
+     * supported
+     *
+     * @param message the current message
+     * @returned the retrieved indication 
+     */
+    public static boolean retrieveDeferUncorrelatedMessageAbort(Message message) {
+        Boolean ret = message.getExchange() != null 
+                      ? (Boolean)message.getExchange().get("defer.uncorrelated.message.abort")
+                      : null;
+        return ret != null && ret.booleanValue();
+    }
+
+    /**
+     * Store indication that a deferred uncorrelated message abort should
+     * occur
+     *
+     * @param message the current message
+     */
+    public static void storeDeferredUncorrelatedMessageAbort(Message message) {
+        if (message.getExchange() != null) { 
+            message.getExchange().put("deferred.uncorrelated.message.abort", Boolean.TRUE);
+        }
+    }
+
+    /**
+     * Retrieve indication that a deferred uncorrelated message abort should
+     * occur.
+     *
+     * @param message the current message
+     * @returned the retrieved indication 
+     */
+    public static boolean retrieveDeferredUncorrelatedMessageAbort(Message message) {
+        Boolean ret = message.getExchange() != null 
+                      ? (Boolean)message.getExchange().get("deferred.uncorrelated.message.abort")
+                      : null;
+        return ret != null && ret.booleanValue();
+    }
+
+    /**
      * Retrieve indication that an async post-response service invocation
      * is required.
      * 

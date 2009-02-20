@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 
 /**
@@ -88,7 +89,12 @@ public class RMInInterceptor extends AbstractRMInterceptor {
                 processSequence(destination, message);
                 processDeliveryAssurance(rmps);
             }
-            rme.receivedApplicationMessage();
+            if (ContextUtils.retrieveDeferredUncorrelatedMessageAbort(message)) {
+                LOG.info("deferred uncorrelated message abort");
+                message.getInterceptorChain().abort();
+            } else {
+                rme.receivedApplicationMessage();
+            }
         } else {
             rme.receivedControlMessage();
             if (RMConstants.getSequenceAckAction().equals(action)) {

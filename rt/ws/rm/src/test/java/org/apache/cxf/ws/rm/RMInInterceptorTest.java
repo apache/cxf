@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -170,8 +171,19 @@ public class RMInInterceptorTest extends Assert {
     public void testAppResponse() throws SequenceFault, RMException, NoSuchMethodException {
         testAppMessage(false);
     }
+
+    @Test
+    public void testDefferedAbort() throws SequenceFault, RMException, NoSuchMethodException {
+        testAppMessage(false, true);
+    }
     
-    private void testAppMessage(boolean onServer) throws SequenceFault, RMException, NoSuchMethodException {
+    private void testAppMessage(boolean onServer) 
+        throws SequenceFault, RMException, NoSuchMethodException {
+        testAppMessage(onServer, false);
+    }
+
+    private void testAppMessage(boolean onServer, boolean deferredAbort) 
+        throws SequenceFault, RMException, NoSuchMethodException {
         Method m1 = RMInInterceptor.class.getDeclaredMethod("processAcknowledgments",
                                                             new Class[] {Source.class, RMProperties.class});
         Method m2 = RMInInterceptor.class.getDeclaredMethod("processAcknowledgmentRequests",
@@ -196,7 +208,16 @@ public class RMInInterceptorTest extends Assert {
         interceptor.processDeliveryAssurance(rmps);
         EasyMock.expectLastCall();
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
-        rme.receivedApplicationMessage();
+               
+        Exchange ex = control.createMock(Exchange.class);
+        message.getExchange();
+        EasyMock.expectLastCall().andReturn(ex).anyTimes();
+        ex.get("deferred.uncorrelated.message.abort");
+        EasyMock.expectLastCall().andReturn(Boolean.TRUE);
+        InterceptorChain chain = control.createMock(InterceptorChain.class);
+        message.getInterceptorChain();
+        EasyMock.expectLastCall().andReturn(chain);
+        chain.abort();
         EasyMock.expectLastCall();
 
         control.replay();

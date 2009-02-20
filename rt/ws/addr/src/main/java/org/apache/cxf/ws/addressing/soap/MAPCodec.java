@@ -46,7 +46,6 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -733,20 +732,16 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 uncorrelatedExchanges.remove(maps.getRelatesTo().getValue());
             if (correlatedExchange != null) {
                 synchronized (correlatedExchange) {
-                    Exchange tmpExchange = message.getExchange();
                     message.setExchange(correlatedExchange);
-                    Endpoint endpoint = correlatedExchange.get(Endpoint.class);
-                    if (Boolean.TRUE.equals(tmpExchange.get("deferred.fault.observer.notification"))
-                        && endpoint != null) {
-                        message.getInterceptorChain().abort();
-                        if (endpoint.getInFaultObserver() != null) {
-                            endpoint.getInFaultObserver().onMessage(message);                            
-                        }
-                    }
                 }
             } else {
-                LOG.log(Level.WARNING, "CORRELATION_FAILURE_MSG");
-                message.getInterceptorChain().abort();
+                if (ContextUtils.retrieveDeferUncorrelatedMessageAbort(message)) {
+                    LOG.fine("deferring uncorrelated message abort");
+                    ContextUtils.storeDeferredUncorrelatedMessageAbort(message);
+                } else {
+                    LOG.log(Level.WARNING, "CORRELATION_FAILURE_MSG");
+                    message.getInterceptorChain().abort();
+                }
             }
         } else if (maps == null && isRequestor(message)) {
             Message m = message.getExchange().getOutMessage();
