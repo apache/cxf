@@ -89,6 +89,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         if (StringUtils.isEmpty(action)) {
             return;
         }
+        message.put(SoapBindingConstants.SOAP_ACTION, action);
         
         Exchange ex = message.getExchange();
         Endpoint ep = ex.get(Endpoint.class);

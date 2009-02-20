@@ -38,8 +38,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.apache.cxf.binding.BindingFactory;
-import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.i18n.Message;
@@ -55,21 +53,14 @@ import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.service.model.InterfaceInfo;
-import org.apache.cxf.service.model.MessageInfo;
-import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.OperationInfo;
-import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.ConduitInitiator;
-import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
@@ -114,7 +105,7 @@ public class STSClient implements Configurable {
     Trust13 trust13;
     Element template;
     AlgorithmSuite algorithmSuite;
-    String namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    String namespace = STSUtils.WST_NS_05_02;
     String addressingNamespace;
     
     boolean isSecureConv;
@@ -175,13 +166,13 @@ public class STSClient implements Configurable {
     
     public void setTrust(Trust10 trust) {
         if (trust != null) {
-            namespace = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+            namespace = STSUtils.WST_NS_05_02;
         }
         trust10 = trust;
     }
     public void setTrust(Trust13 trust) {
         if (trust != null) {
-            namespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
+            namespace = STSUtils.WST_NS_05_12;
         }
         trust13 = trust;        
     }
@@ -238,54 +229,12 @@ public class STSClient implements Configurable {
             Endpoint endpoint = new EndpointImpl(bus, service, ei);
             client = new ClientImpl(bus, endpoint);
         } else {
-            Service service = null;
-            String ns = namespace + "/wsdl";
-            ServiceInfo si = new ServiceInfo();
-            
-            QName iName = new QName(ns, "SecurityTokenService");
-            si.setName(iName);
-            InterfaceInfo ii = new InterfaceInfo(si, iName);
-            OperationInfo oi = ii.addOperation(new QName(ns, "RequestSecurityToken"));
-            MessageInfo mii = oi.createMessage(new QName(ns, "RequestSecurityTokenMsg"), 
-                                               MessageInfo.Type.INPUT);
-            oi.setInput("RequestSecurityTokenMsg", mii);
-            MessagePartInfo mpi = mii.addMessagePart("request");
-            mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
-            
-            MessageInfo mio = oi.createMessage(new QName(ns, "RequestSecurityTokenResponseMsg"), 
-                                               MessageInfo.Type.OUTPUT);
-            oi.setOutput("RequestSecurityTokenResponseMsg", mio);
-            mpi = mio.addMessagePart("response");
-            mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
-            
-            si.setInterface(ii);
-            service = new ServiceImpl(si);
-            
-            BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
-            BindingFactory bindingFactory = bfm.getBindingFactory(soapVersion);
-            BindingInfo bi = bindingFactory.createBindingInfo(service, 
-                                                              soapVersion, null);
-            si.addBinding(bi);
-            ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
-            ConduitInitiator ci = cim.getConduitInitiatorForUri(location);
-            EndpointInfo ei = new EndpointInfo(si, ci.getTransportIds().get(0));
-            ei.setBinding(bi);
-            ei.setName(iName);
-            ei.setAddress(location);
-            si.addEndpoint(ei);
-            ei.addExtensor(policy);
-            
-            BindingOperationInfo boi = bi.getOperation(oi);
-            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-            if (soi == null) {
-                soi = new SoapOperationInfo();
-                boi.addExtensor(soi);
-            }
-            soi.setAction(namespace + "/RST/Issue");
-            
-    
-            service.setDataBinding(new SourceDataBinding());
-            Endpoint endpoint = new EndpointImpl(bus, service, ei);
+            Endpoint endpoint = STSUtils.createSTSEndpoint(bus, 
+                                                           namespace,
+                                                           null,
+                                                           location,
+                                                           soapVersion, 
+                                                           policy);
             
             client = new ClientImpl(bus, endpoint);
         }
@@ -348,7 +297,7 @@ public class STSClient implements Configurable {
             addLifetime(writer);
             if (keyType == null) {
                 writer.writeStartElement("wst", "TokenType", namespace);
-                writer.writeCharacters("http://schemas.xmlsoap.org/ws/2005/02/sc/sct");
+                writer.writeCharacters(STSUtils.getTokenTypeSCT(namespace));
                 writer.writeEndElement();
                 keyType = namespace + "/SymmetricKey";
             }
@@ -442,6 +391,9 @@ public class STSClient implements Configurable {
         Element el = document.getDocumentElement();
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
+        }
+        if (!"RequestSecurityTokenResponse".equals(el.getLocalName())) {
+            throw new Fault("Unexpected element " + el.getLocalName(), LOG);
         }
         el = DOMUtils.getFirstElement(el);
         
