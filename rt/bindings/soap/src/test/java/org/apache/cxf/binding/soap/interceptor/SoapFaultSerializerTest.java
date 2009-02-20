@@ -114,7 +114,7 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
                     faultDoc);
-        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode[text()='ns2:invalidsoap']", 
+        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/soap12env:Value[text()='ns2:invalidsoap']", 
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']", 
                     faultDoc);
