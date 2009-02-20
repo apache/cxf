@@ -830,7 +830,10 @@ public class JettyHTTPDestinationTest extends Assert {
         EasyMock.expectLastCall().andReturn(true);   
         wsdlQueryHandler.getResponseContentType("http://localhost/bar/foo?wsdl", "/bar/foo");
         EasyMock.expectLastCall().andReturn("text/xml");
-        wsdlQueryHandler.writeResponse("http://localhost/bar/foo?wsdl", "/bar/foo", endpointInfo, os);
+        wsdlQueryHandler.writeResponse(EasyMock.eq("http://localhost/bar/foo?wsdl"),
+                                       EasyMock.eq("/bar/foo"), 
+                                       EasyMock.eq(endpointInfo),
+                                       (OutputStream)EasyMock.anyObject());
         EasyMock.expectLastCall().once();
         EasyMock.replay(bus);
         EasyMock.replay(queryHandlerRegistry);

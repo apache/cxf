@@ -37,6 +37,7 @@ import org.apache.cxf.continuations.ContinuationInfo;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -228,26 +229,32 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                                                                        contextMatchOnExact())
                     : qh.isRecognizedQuery(requestURL, pathInfo, endpointInfo);
                 if (recognized) {
-                    //replace the endpointInfo address with request url only for get wsdl   
-                    synchronized (endpointInfo) {
-                        String oldAddress = updateEndpointAddress(reqAddr);   
-                        resp.setContentType(qh.getResponseContentType(requestURL, pathInfo));
-                        try {
-                            qh.writeResponse(requestURL, pathInfo, endpointInfo, resp.getOutputStream());
-                        } catch (Exception ex) {
-                            LOG.log(Level.WARNING, "writeResponse failed: ", ex);
+                    //replace the endpointInfo address with request url only for get wsdl
+                    String errorMsg = null;
+                    CachedOutputStream out = new CachedOutputStream();
+                    try {
+                        synchronized (endpointInfo) {
+                            String oldAddress = updateEndpointAddress(reqAddr);   
+                            resp.setContentType(qh.getResponseContentType(requestURL, pathInfo));
                             try {
-                                resp.sendError(500, ex.getMessage());
-                            } catch (IOException ioe) {
-                                //ignore
+                                qh.writeResponse(requestURL, pathInfo, endpointInfo, out);
+                            } catch (Exception ex) {
+                                LOG.log(Level.WARNING, "writeResponse failed: ", ex);
+                                errorMsg = ex.getMessage();
                             }
+                            endpointInfo.setAddress(oldAddress);
                         }
-                        endpointInfo.setAddress(oldAddress);
-                        resp.getOutputStream().flush();                     
-                        baseRequest.setHandled(true);
-                        return;    
+                        if (errorMsg != null) {
+                            resp.sendError(500, errorMsg);
+                        } else {
+                            out.writeCacheTo(resp.getOutputStream());
+                            resp.getOutputStream().flush();                     
+                        }
+                    } finally {
+                        out.close();
                     }
-                    
+                    baseRequest.setHandled(true);
+                    return;
                 }
             }
         }
