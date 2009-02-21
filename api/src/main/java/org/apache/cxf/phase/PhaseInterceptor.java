@@ -25,38 +25,42 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 
 /**
- * A phase interceptor participates in a PhaseInterceptorChain.
- * <pre>
- * The before and after properties contain a list of Ids that can control 
- * where in the chain the interceptor is placed relative to other interceptors
- * </pre> 
+ * A phase interceptor is an intercetor that participates in a 
+ * PhaseInterceptorChain.
+ * The phase property controls the phase in which the interceptor is placed.
+ * The before and after properties allow for fine grained control over where 
+ * the phase the interceptor is placed. They specify the IDs of the 
+ * interceptors that must be placed before and after the interceptor.
+ *
  * @see org.apache.cxf.phase.PhaseInterceptorChain
  * @author Dan Diephouse
  */
 public interface PhaseInterceptor<T extends Message> extends Interceptor<T> {
 
     /**
-     * Returns a set of IDs specifying the interceptors that this interceptor should 
-     * be placed after in the interceptor chain
-     * @return the ids of the interceptors
+     * Returns a set containing the IDs of the interceptors that should be 
+     * executed before this interceptor. This interceptor will be placed 
+     * in the chain after the interceptors in the set.
+     * @return the IDs of the interceptors
      */
     Set<String> getAfter();
 
     /**
-     * Returns a set of IDs specifying the interceptors that this interceptor needs 
-     * to be before in the inteceptor chain.
+     * Returns a set containing the IDs of the interceptors that should be 
+     * executed after this interceptor. This interceptor will be placed in 
+     * the inteceptor chain before the interceptors in the set.
      * @return the ids of the interceptors 
      */
     Set<String> getBefore();
 
     /**
-     * The ID of this interceptor.
-     * @return the id
+     * Returns the ID of this interceptor.
+     * @return the ID
      */
     String getId();
 
     /**
-     * The phase of this interceptor.
+     * Returns the phase in which this interceptor is excecuted.
      * @return the phase
      */
     String getPhase();
