@@ -590,7 +590,7 @@ public class BeanType extends Type {
 
     @Override
     public long getMinOccurs() {
-        return info.getMinOccurs();
+        return getTypeInfo().getMinOccurs();
     }
 
     @Override
