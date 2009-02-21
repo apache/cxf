@@ -56,8 +56,12 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 /**
  * Serializes JavaBeans.
  * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @author <a href="mailto:jack.xu.hong@gmail.com">Jack Hong</a>
+ * There's a really dangerous coding convention in this class, maintainers beware.
+ * There are two constructor. The no-args constructor defers, until later,
+ * the construction of a BeanTypeInfo. The one-arg constructor gets the BeanTypeInfo passed as a parameter.
+ * Aegis doesn't have any uniform discipline of 'construct, set properties, initialize'. Instead,
+ * each piece of code that uses the type info needs to call getTypeInfo() instead of referencing the
+ * 'info' field. 
  */
 public class BeanType extends Type {
     private BeanTypeInfo info;
@@ -66,9 +70,17 @@ public class BeanType extends Type {
 
     private boolean isException;
 
+    /**
+     * Construct a type info. Caller must pass in the type class via 
+     * setTypeClass later.
+     */
     public BeanType() {
     }
 
+    /**
+     * Construct a type info given a full BeanTypeInfo.
+     * @param info
+     */
     public BeanType(BeanTypeInfo info) {
         this.info = info;
         this.typeClass = info.getTypeClass();
@@ -80,10 +92,8 @@ public class BeanType extends Type {
         isException = Exception.class.isAssignableFrom(typeClass);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.codehaus.xfire.aegis.type.Type#readObject(org.codehaus.xfire.aegis.MessageReader,
-     * org.codehaus.xfire.MessageContext)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
@@ -447,6 +457,9 @@ public class BeanType extends Type {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTypeClass(Class typeClass) {
         super.setTypeClass(typeClass);
@@ -464,6 +477,9 @@ public class BeanType extends Type {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<Type> getDependencies() {
         Set<Type> deps = new HashSet<Type>();
@@ -526,6 +542,10 @@ public class BeanType extends Type {
         return elementTypeInfo;
     }
 
+    /**
+     * Return the Type for the superclass if this type's class, if any.
+     * @return
+     */
     public Type getSuperType() {
         BeanTypeInfo inf = getTypeInfo();
         Class c = inf.getTypeClass().getSuperclass();
@@ -550,6 +570,10 @@ public class BeanType extends Type {
         }
     }
 
+    /**
+     * Return the type info.
+     * @return
+     */
     public BeanTypeInfo getTypeInfo() {
         if (info == null) {
             info = createTypeInfo();
@@ -560,6 +584,10 @@ public class BeanType extends Type {
         return info;
     }
 
+    /**
+     * Create type info based in the type class.
+     * @return
+     */
     public BeanTypeInfo createTypeInfo() {
         BeanTypeInfo inf = new BeanTypeInfo(getTypeClass(), getSchemaType().getNamespaceURI());
 
@@ -568,6 +596,9 @@ public class BeanType extends Type {
         return inf;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -588,6 +619,9 @@ public class BeanType extends Type {
         XmlSchemaUtils.addImportIfNeeded(root, AbstractXOPType.XML_MIME_NS);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getMinOccurs() {
         return getTypeInfo().getMinOccurs();
@@ -602,6 +636,7 @@ public class BeanType extends Type {
     public void setTypeMapping(TypeMapping typeMapping) {
         super.setTypeMapping(typeMapping);
         if (info != null) {
+            // this seems dangerous .. what if the type info is later created, it won't be passed the mapping.
             info.setTypeMapping(typeMapping);
         }
     }
