@@ -23,6 +23,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
+        registerBeanDefinitionParser("client", new JAXRSClientFactoryBeanDefinitionParser());
         registerBeanDefinitionParser("server", new JAXRSServerFactoryBeanDefinitionParser());        
         registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());    
     }

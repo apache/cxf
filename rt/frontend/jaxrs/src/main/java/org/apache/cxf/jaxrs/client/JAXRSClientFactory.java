@@ -63,6 +63,8 @@ public final class JAXRSClientFactory {
      * Creates a proxy
      * @param baseURI baseURI
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param inheritHeaders if true then subresource proxies will inherit the headers
+     *        set on parent proxies 
      * @return typed proxy
      */
     public static <T> T create(URI baseURI, Class<T> cls, boolean inheritHeaders) {
@@ -82,7 +84,7 @@ public final class JAXRSClientFactory {
         if (!direct) {
             JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
             bean.setAddress(baseURI.toString());
-            bean.setResourceClass(cls);
+            bean.setServiceClass(cls);
             bean.setInheritHeaders(inheritHeaders);
             return bean.create(cls);
         } else {
@@ -112,6 +114,7 @@ public final class JAXRSClientFactory {
     
     /**
      * Creates a proxy, baseURI will be set to Client currentURI
+     *   
      * @param client Client instance
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
      * @return typed proxy
@@ -127,7 +130,7 @@ public final class JAXRSClientFactory {
      * Creates a proxy, baseURI will be set to Client currentURI
      * @param client Client instance
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
-     * @param inheritHeaders if existing Client headers can be inherited by new proxy 
+     * @param inheritHeaders if true then existing Client headers will be inherited by new proxy 
      *        and subresource proxies if any 
      * @return typed proxy
      */
@@ -139,8 +142,9 @@ public final class JAXRSClientFactory {
      * Creates a proxy, baseURI will be set to Client currentURI
      * @param client Client instance
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
-     * @param inheritHeaders if existing Client headers can be inherited by new proxy 
+     * @param inheritHeaders if true then existing Client headers will be inherited by new proxy 
      *        and subresource proxies if any 
+     * @param direct if true then no bus and chains will be created       
      * @return typed proxy
      */
     public static <T> T fromClient(Client client, Class<T> cls, boolean inheritHeaders, boolean direct) {

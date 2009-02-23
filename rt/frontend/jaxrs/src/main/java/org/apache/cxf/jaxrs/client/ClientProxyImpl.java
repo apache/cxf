@@ -55,14 +55,13 @@ import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.HTTPConduit;
 
 /**
  * Proxy-based client implementation
  *
  */
-public class ClientProxyImpl extends AbstractClient implements InvocationHandler, MessageObserver {
+public class ClientProxyImpl extends AbstractClient implements InvocationHandler {
 
     private ClassResourceInfo cri;
     private boolean inheritHeaders;
@@ -123,6 +122,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, inheritHeaders);
             proxyImpl.setBus(bus);
             proxyImpl.setConduitSelector(conduitSelector);
+            proxyImpl.setInInterceptors(inInterceptors);
+            proxyImpl.setOutInterceptors(outInterceptors);
             
             Object proxy = JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
             if (inheritHeaders) {
@@ -376,7 +377,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
                           OperationResourceInfo ori, Object[] params, int bodyIndex, 
                           MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
-        Message m = createMessage(ori.getHttpMethod(), headers, uri.toString(), this);
+        Message m = createMessage(ori.getHttpMethod(), headers, uri.toString());
         
         if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
             m.setContent(OperationResourceInfo.class, ori);
@@ -444,10 +445,6 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
     }
 
-    public void onMessage(Message message) {
-        // just do nothing for now
-    }
-    
     // TODO : what we really need to do is to refactor JAXRSOutInterceptor so that
     // it can handle both client requests and server responses - it may need to be split into
     // several interceptors - in fact we need to do the same for JAXRSInInterceptor so that we can do

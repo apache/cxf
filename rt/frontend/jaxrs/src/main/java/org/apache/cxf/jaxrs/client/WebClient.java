@@ -46,7 +46,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.HTTPConduit;
 
 
@@ -54,7 +53,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
  * Http-centric web client
  *
  */
-public class WebClient extends AbstractClient implements MessageObserver {
+public class WebClient extends AbstractClient {
     
     /**
      * Creates WebClient
@@ -406,7 +405,7 @@ public class WebClient extends AbstractClient implements MessageObserver {
     protected Response doChainedInvocation(String httpMethod, 
         MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
 
-        Message m = createMessage(httpMethod, headers, getCurrentURI().toString(), this);
+        Message m = createMessage(httpMethod, headers, getCurrentURI().toString());
         
         if (body != null) {
             MessageContentsList contents = new MessageContentsList(body);
@@ -473,7 +472,5 @@ public class WebClient extends AbstractClient implements MessageObserver {
         
     }
 
-    public void onMessage(Message message) {
-        // do nothing for now
-    }
+    
 }
