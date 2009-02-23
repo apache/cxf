@@ -33,6 +33,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultiplexDestination;
@@ -95,7 +96,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
         }
         return jmsDestination;
     }
-
+    
+    
     @Test
     public void testGetConfigurationFromSpring() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -406,5 +408,27 @@ public class JMSDestinationTest extends AbstractJMSTester {
                          "HelloWorldService", "HelloWorldPort");
         final JMSDestination destination = setupJMSDestination(true);
         assertTrue("is multiplex", destination instanceof MultiplexDestination);
+        destination.shutdown();
     }
+    
+    @Test
+    public void testSecurityContext() throws Exception {
+        inMessage = null;
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldService", "HelloWorldPort");
+        final JMSDestination destination = setupJMSDestination(true);
+        // set up the conduit send to be true
+        JMSConduit conduit = setupJMSConduit(true, false);
+        final Message outMessage = new MessageImpl();
+        setupMessageHeader(outMessage, null);
+        sendoutMessage(conduit, outMessage, true);
+        waitForReceiveDestMessage();
+        SecurityContext securityContext = destMessage.get(SecurityContext.class);
+        assertNotNull("SecurityContext should be set in message received by JMSDestination", securityContext);
+        assertEquals("Principal in SecurityContext should be", "testUser", 
+                     securityContext.getUserPrincipal().getName());
+        conduit.close();
+        destination.shutdown();
+    }
+
 }
