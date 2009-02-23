@@ -156,6 +156,7 @@
                             javax.resource*;resolution:=optional,
                             javax.xml.soap,
                             junit.framework*;resolution:=optional,
+                            net.sf.cglib*;resolution:=optional,
                             org.apache.abdera*;resolution:=optional,
                             org.apache.commons.lang*;resolution:=optional,
                             org.apache.commons.codec*;resolution:=optional,

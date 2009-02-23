@@ -119,6 +119,7 @@
                             repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
                             junit.framework*;resolution:=optional,
+                            net.sf.cglib*;resolution:=optional,
                             org.apache.abdera*;resolution:=optional,
                             org.apache.commons.lang*;resolution:=optional,
                             org.apache.commons.codec*;resolution:=optional,
