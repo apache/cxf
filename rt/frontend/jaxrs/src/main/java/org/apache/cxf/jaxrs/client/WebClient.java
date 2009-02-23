@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -37,16 +38,23 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 
 /**
  * Http-centric web client
  *
  */
-public class WebClient extends AbstractClient {
+public class WebClient extends AbstractClient implements MessageObserver {
     
     /**
      * Creates WebClient
@@ -285,6 +293,13 @@ public class WebClient extends AbstractClient {
         return (Client)proxy;
     }
     
+    public static WebClient createClient(String baseAddress) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(baseAddress);
+        return bean.createWebClient();
+    }
+    
+    
     @Override
     public WebClient type(MediaType ct) {
         return (WebClient)super.type(ct);
@@ -356,7 +371,6 @@ public class WebClient extends AbstractClient {
     }
     
     private Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
-        HttpURLConnection conn = getConnection(httpMethod);
         
         MultivaluedMap<String, String> headers = getHeaders();
         if (body != null && headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
@@ -365,6 +379,18 @@ public class WebClient extends AbstractClient {
         if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
+        if (conduitSelector == null) {
+            return doDirectInvocation(httpMethod, headers, body, responseClass);
+        } else {
+            return doChainedInvocation(httpMethod, headers, body, responseClass);
+        }
+    }
+
+    protected Response doDirectInvocation(String httpMethod, 
+        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
+        
+        HttpURLConnection conn = getConnection(httpMethod);
+        
         setAllHeaders(headers, conn);
         if (body != null) {
             try {
@@ -374,6 +400,32 @@ public class WebClient extends AbstractClient {
                 throw new WebApplicationException(ex);
             }
         }
+        return handleResponse(conn, responseClass);
+    }
+    
+    protected Response doChainedInvocation(String httpMethod, 
+        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
+
+        Message m = createMessage(httpMethod, headers, getCurrentURI().toString(), this);
+        
+        if (body != null) {
+            MessageContentsList contents = new MessageContentsList(body);
+            m.setContent(List.class, contents);
+            m.getInterceptorChain().add(new BodyWriter());
+        }
+        
+        try {
+            m.getInterceptorChain().doIntercept(m);
+        } catch (Throwable ex) {
+            // we'd like a user to get the whole Response anyway if needed
+        }
+        
+        // TODO : this needs to be done in an inbound chain instead
+        HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
+        return handleResponse(connect, responseClass);
+    }
+    
+    protected Response handleResponse(HttpURLConnection conn, Class<?> responseClass) {
         try {
             ResponseBuilder rb = setResponseBuilder(conn).clone();
             Response currentResponse = rb.clone().build();
@@ -382,7 +434,7 @@ public class WebClient extends AbstractClient {
             rb.entity(entity);
             
             return rb.build();
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             throw new WebApplicationException(ex);
         }
     }
@@ -391,6 +443,37 @@ public class WebClient extends AbstractClient {
         return createHttpConnection(getCurrentBuilder().clone().build(), methodName);
     }
     
-    
-    
+    private class BodyWriter extends AbstractOutDatabindingInterceptor {
+
+        public BodyWriter() {
+            super(Phase.WRITE);
+        }
+        
+        @SuppressWarnings("unchecked")
+        public void handleMessage(Message m) throws Fault {
+            
+            OutputStream os = m.getContent(OutputStream.class);
+            if (os == null) {
+                return;
+            }
+            MessageContentsList objs = MessageContentsList.getContentsList(m);
+            if (objs == null || objs.size() == 0) {
+                return;
+            }
+            MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
+            Object body = objs.get(0);
+            try {
+                writeBody(body, body.getClass(), body.getClass(), new Annotation[]{}, headers, os);
+                os.flush();
+            } catch (Exception ex) {
+                throw new Fault(ex);
+            }
+            
+        }
+        
+    }
+
+    public void onMessage(Message message) {
+        // do nothing for now
+    }
 }

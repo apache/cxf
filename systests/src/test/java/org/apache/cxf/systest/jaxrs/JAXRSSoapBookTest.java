@@ -99,6 +99,16 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBook123WebClientBean() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        WebClient client = WebClient.createClient(baseAddress);
+        client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b = client.get(Book.class);
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
     public void testNoBookWebClient() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
         WebClient client = new WebClient(baseAddress);
@@ -157,11 +167,30 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBookSubresourceWebClientProxy() throws Exception {
+    public void testGetBookSubresourceWebClientProxyDirect() throws Exception {
         
         WebClient client = new WebClient("http://localhost:9092/test/services/rest");
-        client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
-        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.fromClient(client, BookStoreJaxrsJaxws.class, true);
+        client.type(MediaType.TEXT_PLAIN_TYPE)
+              .accept(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE);
+        BookStoreJaxrsJaxws proxy = 
+            JAXRSClientFactory.fromClient(client, BookStoreJaxrsJaxws.class, true, true);
+        
+        doTestSubresource(proxy);
+        
+        BookStoreJaxrsJaxws proxy2 = JAXRSClientFactory.fromClient(
+            WebClient.client(proxy), BookStoreJaxrsJaxws.class);
+        doTestSubresource(proxy2);
+        
+    }
+    
+    @Test
+    public void testGetBookSubresourceWebClientProxyBean() throws Exception {
+        
+        WebClient client = new WebClient("http://localhost:9092/test/services/rest");
+        client.type(MediaType.TEXT_PLAIN_TYPE)
+            .accept(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE);
+        BookStoreJaxrsJaxws proxy = 
+            JAXRSClientFactory.fromClient(client, BookStoreJaxrsJaxws.class, true);
         
         doTestSubresource(proxy);
         

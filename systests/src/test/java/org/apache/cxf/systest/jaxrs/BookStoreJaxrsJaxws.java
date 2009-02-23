@@ -38,6 +38,7 @@ public interface BookStoreJaxrsJaxws {
     @WebMethod
     @GET
     @Path("/{id}")
+    @Consumes("*/*")
     Book getBook(@PathParam("id") @WebParam(name = "id") Long id) throws BookNotFoundFault;
 
     @WebMethod

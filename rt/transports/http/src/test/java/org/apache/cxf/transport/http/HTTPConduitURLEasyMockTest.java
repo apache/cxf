@@ -313,9 +313,14 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     private void setUpHeaders(Message message) {
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
         List<String> contentTypes = new ArrayList<String>();
-        contentTypes.add("text/xml");
-        contentTypes.add("charset=utf8");
+        contentTypes.add("text/xml;charset=utf8");
         headers.put("content-type", contentTypes);
+        
+        List<String> acceptTypes = new ArrayList<String>();
+        acceptTypes.add("text/xml;charset=utf8");
+        acceptTypes.add("text/plain");
+        headers.put("Accept", acceptTypes);
+        
         message.put(Message.PROTOCOL_HEADERS, headers);
         
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
@@ -552,14 +557,14 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         
         message.put(HTTPConduit.KEY_HTTP_CONNECTION, connection);
         if (expectHeaders) {
-            connection.addRequestProperty(EasyMock.eq("Authorization"),
+            connection.setRequestProperty(EasyMock.eq("Authorization"),
                                           EasyMock.eq("Basic Qko6dmFsdWU="));            
             EasyMock.expectLastCall();
-            connection.addRequestProperty(EasyMock.eq("content-type"),
-                                          EasyMock.eq("text/xml"));
+            connection.setRequestProperty(EasyMock.eq("content-type"),
+                                          EasyMock.eq("text/xml;charset=utf8"));
             EasyMock.expectLastCall();
-            connection.addRequestProperty(EasyMock.eq("content-type"),
-                                          EasyMock.eq("charset=utf8"));
+            connection.setRequestProperty(EasyMock.eq("Accept"),
+                                          EasyMock.eq("text/xml;charset=utf8,text/plain"));
             EasyMock.expectLastCall();
         }
         connection.getRequestProperties();

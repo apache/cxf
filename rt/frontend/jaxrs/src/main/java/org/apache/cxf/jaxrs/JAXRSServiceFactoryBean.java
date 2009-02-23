@@ -22,17 +22,16 @@ package org.apache.cxf.jaxrs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import javax.ws.rs.Path;
+
 import org.apache.cxf.common.util.ClassHelper;
-import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
@@ -46,7 +45,6 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     protected List<ClassResourceInfo> classResourceInfos = 
         new ArrayList<ClassResourceInfo>();
-    protected Map<Class, ResourceProvider> resourceProviders = new HashMap<Class, ResourceProvider>();
     
     private Invoker invoker;
     private Executor executor;
@@ -115,15 +113,32 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return Collections.unmodifiableList(classResourceInfos);
     }
     
+    public void setResourceClass(Class cls) {
+        classResourceInfos.clear();
+        boolean isRoot = AnnotationUtils.getClassAnnotation(cls, Path.class) != null;
+        createResourceInfo(cls, isRoot);
+    }
+    
+    public void setResourceClassFromBean(Object o) {
+        classResourceInfos.clear();
+        Class<?> realClass = ClassHelper.getRealClass(o);
+        boolean isRoot = AnnotationUtils.getClassAnnotation(realClass, Path.class) != null;
+        createResourceInfo(realClass, isRoot);
+    }
+    
     public void setResourceClasses(List<Class> classes) {
         for (Class resourceClass : classes) {
-            ClassResourceInfo classResourceInfo = 
-                ResourceUtils.createClassResourceInfo(resourceClass, resourceClass, true, enableStatic);
-            if (classResourceInfo != null) {
-                classResourceInfos.add(classResourceInfo);
-            }
+            createResourceInfo(resourceClass, true);
         }
-        injectContexts();
+    }
+    
+    protected ClassResourceInfo createResourceInfo(Class cls, boolean isRoot) {
+        ClassResourceInfo classResourceInfo = 
+            ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic);
+        if (classResourceInfo != null) {
+            classResourceInfos.add(classResourceInfo);
+        }
+        return classResourceInfo;
     }
 
     public void setResourceClasses(Class... classes) {
@@ -146,22 +161,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
     
-    private void injectContexts() {
-        for (ClassResourceInfo cri : classResourceInfos) {
-            if (cri.isSingleton()) {
-                InjectionUtils.injectContextProxies(cri, 
-                                                    cri.getResourceProvider().getInstance());
-            }
-        }
-    }
-    
-    public void setResourceProvider(Class c, ResourceProvider rp) {
-        resourceProviders.put(c, rp);
-    }
-    
     protected void initializeServiceModel() {
-        
-        updateClassResourceProviders();
         
         JAXRSServiceImpl service = new JAXRSServiceImpl(classResourceInfos);
 
@@ -172,29 +172,11 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
 
-    private void updateClassResourceProviders() {
-        for (ClassResourceInfo cri : classResourceInfos) {
-            if (cri.getResourceProvider() != null) {
-                continue;
-            }
-            
-            ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
-            if (rp != null) {
-                cri.setResourceProvider(rp);
-            } else {
-                //default lifecycle is per-request
-                rp = new PerRequestResourceProvider(cri.getResourceClass());
-                cri.setResourceProvider(rp);  
-            }
-        }
-        injectContexts();
-    }
-    
-    
-    
-    
     protected Invoker createInvoker() {
         return new JAXRSInvoker();
     }
 
+    public void setService(Service service) {
+        super.setService(service);
+    }
 }
