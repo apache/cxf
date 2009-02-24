@@ -66,10 +66,8 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private Invoker invoker;
     private boolean start = true;
     private List<Object> serviceBeans;
-    private List<?> entityProviders;
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
-    private List<String> schemaLocations;
     
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -77,10 +75,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
     public JAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
         super(sf);
-    }
-    
-    public void setSchemaLocations(List<String> schemas) {
-        this.schemaLocations = schemas;    
     }
     
     public void setStaticSubresourceResolution(boolean enableStatic) {
@@ -112,14 +106,17 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             } else {
                 ep.getService().setInvoker(invoker);
             }
+            
             if (entityProviders != null) {
                 ProviderFactory.getInstance(getAddress()).setUserProviders(entityProviders); 
             }
-            ProviderFactory.getInstance(getAddress()).setRequestPreprocessor(
-                new RequestPreprocessor(languageMappings, extensionMappings));
             if (schemaLocations != null) {
                 ProviderFactory.getInstance(getAddress()).setSchemaLocations(schemaLocations);
             }
+            
+            ProviderFactory.getInstance(getAddress()).setRequestPreprocessor(
+                new RequestPreprocessor(languageMappings, extensionMappings));
+            
             
             if (start) {
                 server.start();
@@ -160,14 +157,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         extensionMappings = extMaps;
     }
     
-    public JAXRSServiceFactoryBean getServiceFactory() {
-        return serviceFactory;
-    }
-
-    public void setServiceFactory(JAXRSServiceFactoryBean serviceFactory) {
-        this.serviceFactory = serviceFactory;
-    }
-    
     public List<Class> getResourceClasses() {
         return serviceFactory.getResourceClasses();
     }
@@ -199,20 +188,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         resourceProviders.put(c, rp);
     }
 
-    /**
-     * @return the entityProviders
-     */
-    public List<?> getProviders() {
-        return entityProviders;
-    }
-
-    /**
-     * @param entityProviders the entityProviders to set
-     */
-    public void setProviders(List<? extends Object> providers) {
-        this.entityProviders = providers;
-    }
-    
     public void setInvoker(Invoker invoker) {
         this.invoker = invoker;
     }

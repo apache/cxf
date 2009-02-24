@@ -175,20 +175,20 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         return index;
     }
     
-    private static void checkResponse(Method m, Response r) throws Throwable {
+    private static void checkResponse(String basePath, Method m, Response r) throws Throwable {
         
         int status = r.getStatus();
         
         if (status >= 400) {
             
-            ProviderFactory pf = ProviderFactory.getInstance();
-            for (Class<?> exType : m.getExceptionTypes()) {
-                ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
-                if (mapper != null) {
-                    Throwable t = mapper.fromResponse(r);
-                    if (t != null) {
-                        throw t;
-                    }
+            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, basePath);
+            if (mapper == null) {
+                mapper = findExceptionMapper(m, "/");
+            }
+            if (mapper != null) {
+                Throwable t = mapper.fromResponse(r);
+                if (t != null) {
+                    throw t;
                 }
             }
             
@@ -196,6 +196,16 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
     }
     
+    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, String base) {
+        ProviderFactory pf = ProviderFactory.getInstance(base);
+        for (Class<?> exType : m.getExceptionTypes()) {
+            ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
+            if (mapper != null) {
+                return mapper;
+            }
+        }
+        return null;
+    }
     
     private MultivaluedMap<String, String> setRequestHeaders(MultivaluedMap<String, String> headers,          
                                                              OperationResourceInfo ori,
@@ -355,22 +365,24 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
 
         // TODO : we need to refactor bits of HTTPConduit such that it can be reused
         
+        Message message = createSimpleMessage();
+        
         HttpURLConnection connect = createHttpConnection(uri, ori.getHttpMethod());
         setAllHeaders(headers, connect);
         Method m = ori.getMethodToInvoke();
         if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
             if (bodyIndex != -1) {
-                writeBody(params[bodyIndex], params[bodyIndex].getClass(), 
+                writeBody(params[bodyIndex], message, params[bodyIndex].getClass(), 
                           m.getGenericParameterTypes()[bodyIndex],
                           m.getParameterAnnotations()[bodyIndex], headers, connect.getOutputStream());
             } else {
                 MultivaluedMap<String, String> form = handleForm(types, params);
-                writeBody(form, form.getClass(), form.getClass(), m.getDeclaredAnnotations(),
+                writeBody(form, message, form.getClass(), form.getClass(), m.getDeclaredAnnotations(),
                           headers, connect.getOutputStream());
             }
         }
         
-        return handleResponse(connect, ori);
+        return handleResponse(connect, message, ori);
         
     }
     
@@ -378,7 +390,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                           OperationResourceInfo ori, Object[] params, int bodyIndex, 
                           MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
         Message m = createMessage(ori.getHttpMethod(), headers, uri.toString());
-        
+
         if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
             m.setContent(OperationResourceInfo.class, ori);
             m.put("BODY_INDEX", bodyIndex);
@@ -397,21 +409,20 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         // TODO : this needs to be done in an inbound chain instead
         HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        
-        return handleResponse(connect, ori);
+        return handleResponse(connect, m, ori);
         
     }
     
-    protected Object handleResponse(HttpURLConnection connect, OperationResourceInfo ori) 
+    protected Object handleResponse(HttpURLConnection connect, Message inMessage, OperationResourceInfo ori) 
         throws Throwable {
         Response r = setResponseBuilder(connect).clone().build();
         Method method = ori.getMethodToInvoke();
-        checkResponse(method, r);
+        checkResponse(getBaseURI().getPath(), method, r);
         if (method.getReturnType() == Void.class) { 
             return null;
         }
         
-        return readBody(r, connect, method.getReturnType(), 
+        return readBody(r, connect, inMessage, method.getReturnType(), 
                         method.getGenericReturnType(), method.getDeclaredAnnotations());
     }
     
@@ -474,12 +485,12 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             Object body = objs.get(0);
             try {
                 if (bodyIndex != -1) {
-                    writeBody(body, body.getClass(), 
+                    writeBody(body, m, body.getClass(), 
                           method.getGenericParameterTypes()[bodyIndex],
                           method.getParameterAnnotations()[bodyIndex], headers, os);
                 } else {
-                    writeBody(body, body.getClass(), body.getClass(), method.getDeclaredAnnotations(),
-                            headers, os);
+                    writeBody(body, m, body.getClass(), body.getClass(), 
+                              method.getDeclaredAnnotations(), headers, os);
                 }
                 os.flush();
             } catch (Exception ex) {

@@ -20,8 +20,10 @@ package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -30,12 +32,15 @@ import org.apache.cxf.endpoint.UpfrontConduitSelector;
 import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.service.Service;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     
     private boolean inheritHeaders; 
+    private MultivaluedMap<String, String> headers;
     
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -59,6 +64,18 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         serviceFactory.setResourceClass(cls);
     }
     
+    public void setHeaders(Map<String, String> map) {
+        headers = new MetadataMap<String, String>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String[] values = entry.getValue().split(",");
+            for (String v : values) {
+                if (v.length() != 0) {
+                    headers.add(entry.getKey(), v);
+                }
+            }
+        }
+    }
+    
     public WebClient createWebClient() {
         
         Service service = new JAXRSServiceImpl(getAddress());
@@ -67,10 +84,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         try {
             Endpoint ep = createEndpoint();
             WebClient client = new WebClient(getAddress());
-            client.setConduitSelector(getConduitSelector(ep));
-            client.setBus(getBus());
-            client.setOutInterceptors(getOutInterceptors());
-            client.setInInterceptors(getInInterceptors());
+            initClient(client, ep);
             
             return client;
         } catch (Exception ex) {
@@ -81,8 +95,6 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public <T> T create(Class<T> cls) {
         return cls.cast(create());
     }
-    
-    
     
     public Client create() {
         List<ClassResourceInfo> list = serviceFactory.getClassResourceInfo();
@@ -96,10 +108,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ClassResourceInfo cri = list.get(0);
             
             ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, inheritHeaders);
-            proxyImpl.setConduitSelector(getConduitSelector(ep));
-            proxyImpl.setBus(getBus());
-            proxyImpl.setOutInterceptors(getOutInterceptors());
-            proxyImpl.setInInterceptors(getInInterceptors());
+            initClient(proxyImpl, ep);    
             
             return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
                                         new Class[]{cri.getServiceClass(), Client.class}, 
@@ -118,4 +127,19 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         return cs;
     }
     
+    protected void initClient(AbstractClient client, Endpoint ep) {
+        client.setConduitSelector(getConduitSelector(ep));
+        client.setBus(getBus());
+        client.setOutInterceptors(getOutInterceptors());
+        client.setInInterceptors(getInInterceptors());
+        if (headers != null) {
+            client.headers(headers);
+        }
+        if (entityProviders != null) {
+            ProviderFactory.getInstance().setUserProviders(entityProviders); 
+        }
+        if (schemaLocations != null) {
+            ProviderFactory.getInstance().setSchemaLocations(schemaLocations);
+        }
+    }
 } 

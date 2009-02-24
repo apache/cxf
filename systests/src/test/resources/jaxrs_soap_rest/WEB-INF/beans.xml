@@ -37,7 +37,12 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
   <jaxrs:client id="restClient"
          address="http://localhost:9092/test/services/rest"
-         serviceClass="org.apache.cxf.systest.jaxrs.BookStoreJaxrsJaxws"/>
+         serviceClass="org.apache.cxf.systest.jaxrs.BookStoreJaxrsJaxws"
+         inheritHeaders="true">
+         <jaxrs:headers>
+             <entry key="Accept" value="text/xml"/>
+         </jaxrs:headers>
+  </jaxrs:client>       
          
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl"/>
 

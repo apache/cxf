@@ -49,6 +49,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
@@ -56,7 +57,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class));
+                   launchServer(BookServerRestSoap.class, true));
     }
     
     @Test
@@ -358,6 +359,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         return (Book)u.unmarshal(is);
     }
     
+    @Ignore
     public static class TestResponseExceptionMapper implements ResponseExceptionMapper<BookNotFoundFault> {
         
         public TestResponseExceptionMapper() {
