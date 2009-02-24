@@ -114,8 +114,9 @@ public class RMOutInterceptorTest extends Assert {
         Message message = control.createMock(Message.class);
         EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(false);
         Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex).times(3);
-        EasyMock.expect(ex.getOutMessage()).andReturn(message).times(1);       
+        EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
+        EasyMock.expect(ex.getOutMessage()).andReturn(message).times(1);
+        EasyMock.expect(ex.put("defer.uncorrelated.message.abort", Boolean.TRUE)).andReturn(null);       
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();        
         EasyMock.expect(message.get(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND))
             .andReturn(maps).anyTimes();
