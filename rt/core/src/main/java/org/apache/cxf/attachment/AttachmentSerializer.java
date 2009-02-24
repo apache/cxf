@@ -71,16 +71,14 @@ public class AttachmentSerializer {
             st.append("\"").append(bodyCt.substring(pos, bodyCt.length() - 1));
             bodyCt = st.toString();
         }        
-        String enc = (String) message.get(Message.ENCODING);
-        if (enc == null) {
-            enc = "UTF-8";
-        }
         
         // Set transport mime type
         StringBuilder ct = new StringBuilder();
         ct.append("multipart/related; ");
         if (xop) {
             ct.append("type=\"application/xop+xml\"; ");
+        } else {
+            ct.append("type=\"").append(bodyCt).append("\"; ");
         }
         
         ct.append("boundary=\"")
@@ -95,6 +93,7 @@ public class AttachmentSerializer {
         
         message.put(Message.CONTENT_TYPE, ct.toString());
 
+        
         // 2. write headers
         out = message.getContent(OutputStream.class);
         encoding = (String) message.get(Message.ENCODING);
@@ -108,7 +107,7 @@ public class AttachmentSerializer {
         
         StringBuilder mimeBodyCt = new StringBuilder();
         mimeBodyCt.append("application/xop+xml; charset=")
-            .append(enc)
+            .append(encoding)
             .append("; type=\"")
             .append(bodyCt)
             .append("\";");
