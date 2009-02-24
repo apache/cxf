@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -39,6 +40,7 @@ import javax.jms.Session;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.security.SecurityContext;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.SimpleMessageConverter102;
@@ -47,8 +49,9 @@ public final class JMSUtils {
 
     static final Logger LOG = LogUtils.getL7dLogger(JMSUtils.class);
 
-    private static final char[] CORRELATTION_ID_PADDING =  {'0', '0', '0', '0', '0', '0', '0', '0', 
-                                                            '0', '0', '0', '0', '0', '0', '0'};
+    private static final char[] CORRELATTION_ID_PADDING = {
+        '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'
+    };
 
     private JMSUtils() {
 
@@ -76,7 +79,7 @@ public final class JMSUtils {
      * Create a JMS of the appropriate type populated with the given payload.
      * 
      * @param payload the message payload, expected to be either of type String or byte[] depending on payload
-     *                type
+     *            type
      * @param session the JMS session
      * @param replyTo the ReplyTo destination if any
      * @return a JMS of the appropriate type populated with the given payload
@@ -102,9 +105,9 @@ public final class JMSUtils {
      * @param message the incoming message
      * @param encoding the message encoding
      * @return the message payload as byte[]
-     * @throws UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException
      */
-    public static byte[] retrievePayload(Message message, String encoding) 
+    public static byte[] retrievePayload(Message message, String encoding)
         throws UnsupportedEncodingException {
         Object converted;
         try {
@@ -116,8 +119,8 @@ public final class JMSUtils {
         }
         if (converted instanceof String) {
             if (encoding != null) {
-                return ((String)converted).getBytes(encoding); 
-            } else { 
+                return ((String)converted).getBytes(encoding);
+            } else {
                 // Using the UTF-8 encoding as default
                 return ((String)converted).getBytes("UTF-8");
             }
@@ -129,7 +132,7 @@ public final class JMSUtils {
     }
 
     public static void populateIncomingContext(javax.jms.Message message,
-                                               org.apache.cxf.message.Message inMessage, String headerType) 
+                                               org.apache.cxf.message.Message inMessage, String headerType)
         throws UnsupportedEncodingException {
         try {
             JMSMessageHeadersType headers = null;
@@ -165,35 +168,74 @@ public final class JMSUtils {
                     // set the message encoding
                     inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(val));
                 }
-                
+
             }
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
+
+            SecurityContext securityContext = buildSecurityContext(message);
+            inMessage.put(SecurityContext.class, securityContext);
         } catch (JMSException ex) {
             throw JmsUtils.convertJmsAccessException(ex);
         }
     }
 
+    /**
+     * Extract the property JMSXUserID from the jms message and create a SecurityContext from it. 
+     * For more info see Jira Issue CXF-2055
+     * {@link https://issues.apache.org/jira/browse/CXF-2055}
+     * 
+     * @param message jms message to retrieve user information from
+     * @return SecurityContext that contains the user of the producer of the message as the Principal
+     * @throws JMSException if something goes wrong
+     */
+    private static SecurityContext buildSecurityContext(javax.jms.Message message) throws JMSException {
+        final String jmsUserName = message.getStringProperty("JMSXUserID");
+        if (jmsUserName == null) {
+            return null;
+        }
+        final Principal principal = new Principal() {
+            public String getName() {
+                return jmsUserName;
+            }
+
+        };
+
+        SecurityContext securityContext = new SecurityContext() {
+
+            public Principal getUserPrincipal() {
+                return principal;
+            }
+
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+
+        };
+        return securityContext;
+    }
+
     static String getEncoding(String ct) throws UnsupportedEncodingException {
         String contentType = ct.toLowerCase();
         String enc = null;
-        
+
         String[] tokens = contentType.split(";");
         for (String token : tokens) {
             int index = token.indexOf("charset=");
             if (index >= 0) {
                 enc = token.substring(index + 8);
                 break;
-            }            
+            }
         }
-        
+
         String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
         if (normalizedEncoding == null) {
-            String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
-                                                              LOG, new Object[] {enc}).toString();
+            String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG", LOG, new Object[] {
+                enc
+            }).toString();
             LOG.log(Level.WARNING, m);
-            throw new UnsupportedEncodingException(m);   
+            throw new UnsupportedEncodingException(m);
         }
-        
+
         return normalizedEncoding;
     }
 
@@ -224,8 +266,8 @@ public final class JMSUtils {
     }
 
     public static void addContentTypeToProtocolHeader(org.apache.cxf.message.Message message) {
-        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);        
-        String enc = (String) message.get(org.apache.cxf.message.Message.ENCODING);
+        String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+        String enc = (String)message.get(org.apache.cxf.message.Message.ENCODING);
         // add the encoding information
         if (null != contentType) {
             if (enc != null && contentType.indexOf("charset=") == -1) {
@@ -244,7 +286,7 @@ public final class JMSUtils {
             headers = new HashMap<String, List<String>>();
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
-        
+
         // Add content type to the protocol headers
         List<String> ct;
         if (headers.get(JMSConstants.JMS_CONTENT_TYPE) != null) {
@@ -284,7 +326,7 @@ public final class JMSUtils {
         jmsMessage.setJMSCorrelationID(correlationId);
         return jmsMessage;
     }
-    
+
     public static String createCorrelationId(final String prefix, long i) {
         String index = Long.toHexString(i);
         StringBuffer id = new StringBuffer(prefix);

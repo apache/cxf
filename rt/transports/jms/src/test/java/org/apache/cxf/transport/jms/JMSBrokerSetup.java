@@ -80,6 +80,7 @@ class JMSBrokerSetup {
                 synchronized (this) {                                     
                     broker.setPersistenceAdapter(new MemoryPersistenceAdapter());                    
                     broker.setTmpDataDirectory(new File("./target"));
+                    broker.setPopulateJMSXUserID(true);
                     broker.addConnector(brokerUrl);
                     broker.start();
                     Thread.sleep(200);
