@@ -864,7 +864,9 @@ public class HTTPConduit
         String enc = (String) message.get(Message.ENCODING);
         
         if (null != ct) {
-            if (enc != null && ct.indexOf("charset=") == -1) {
+            if (enc != null 
+                && ct.indexOf("charset=") == -1
+                && !ct.toLowerCase().contains("multipart/related")) {
                 ct = ct + "; charset=" + enc;
             }
         } else if (enc != null) {

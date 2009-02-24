@@ -222,7 +222,8 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         
         if (null != ct 
             && null != enc
-            && ct.indexOf("charset=") == -1) {
+            && ct.indexOf("charset=") == -1
+            && !ct.toLowerCase().contains("multipart/related")) {
             ct = ct + "; charset=" + enc;
         }
 
