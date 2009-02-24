@@ -244,7 +244,7 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterCustomResolver() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new JAXBContextProvider());
-        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, null);
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, new MessageImpl());
         assertTrue("JAXBContext ContextProvider can not be found", 
                    cr instanceof JAXBContextProvider);
         
