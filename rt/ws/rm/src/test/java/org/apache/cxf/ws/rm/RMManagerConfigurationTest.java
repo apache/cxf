@@ -51,6 +51,19 @@ public class RMManagerConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         verifyManager(manager);
     }
+
+    @Test
+    public void testExactlyOnce() {
+        SpringBusFactory factory = new SpringBusFactory();
+        bus = factory.createBus("org/apache/cxf/ws/rm/exactly-once.xml", false);
+        RMManager manager = bus.getExtension(RMManager.class);
+        assertNotNull(manager.getDeliveryAssurance().getAtLeastOnce());
+        assertTrue(manager.getDeliveryAssurance().isSetAtLeastOnce());
+        assertNotNull(manager.getDeliveryAssurance().getAtMostOnce());
+        assertTrue(manager.getDeliveryAssurance().isSetAtMostOnce());
+        assertNotNull(manager.getDeliveryAssurance().getExactlyOnce());
+        assertTrue(manager.getDeliveryAssurance().isSetExactlyOnce());
+    }
     
     @Test
     public void testFeature() {
@@ -70,11 +83,9 @@ public class RMManagerConfigurationTest extends Assert {
                      .getMilliseconds().longValue());        
         TestStore store = (TestStore)manager.getStore();
         assertEquals("here", store.getLocation());     
-        assertNull(manager.getDeliveryAssurance().getAtLeastOnce());
-        assertNull(manager.getDeliveryAssurance().getAtMostOnce());
         assertNotNull(manager.getDeliveryAssurance().getInOrder());
     }
-    
+
     static class TestStore implements RMStore {
         
         private String location;

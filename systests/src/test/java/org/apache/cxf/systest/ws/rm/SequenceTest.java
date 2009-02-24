@@ -588,7 +588,17 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testTwowayAtMostOnce() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/atmostonce.xml");
+        doTestTwowayNoDuplicates("org/apache/cxf/systest/ws/rm/atmostonce.xml");
+    }
+
+    @Test
+    public void testTwowayExactlyOnce() throws Exception {
+        doTestTwowayNoDuplicates("org/apache/cxf/systest/ws/rm/exactlyonce.xml");
+    }
+
+    private void doTestTwowayNoDuplicates(String cfg) throws Exception {
+
+        init(cfg);
         
         class MessageNumberInterceptor extends AbstractPhaseInterceptor {
             public MessageNumberInterceptor() {
