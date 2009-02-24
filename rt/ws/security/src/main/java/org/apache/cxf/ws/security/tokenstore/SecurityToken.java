@@ -31,6 +31,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.message.token.Reference;
 
 
 /**
@@ -119,6 +120,12 @@ public class SecurityToken {
      * If an encrypted key, this contains the sha1 for the key
      */
     private String encrKeySha1Value;
+    
+    
+    /**
+     * The tokenType
+     */
+    private String tokenType;
     
     public SecurityToken() {
         
@@ -348,4 +355,49 @@ public class SecurityToken {
     public String getSHA1() {
         return encrKeySha1Value;
     }
+    
+    public String getTokenType() {
+        return tokenType;
+    }
+    
+    public void setTokenType(String s) {
+        tokenType = s;
+    }
+    
+    
+    public String getWsuId() {
+        Element elem = getAttachedReference();
+        if (elem != null) {
+            String t = getIdFromSTR(elem);
+            if (t != null) {
+                return t;
+            }
+        }
+        elem = getUnattachedReference();
+        if (elem != null) {
+            String t = getIdFromSTR(elem);
+            if (t != null) {
+                return t;
+            }
+        }
+        return null;
+    }   
+    
+    public static String getIdFromSTR(Element str) {
+        Element child = DOMUtils.getFirstElement(str);
+        if (child == null) {
+            return null;
+        }
+        
+        if ("KeyInfo".equals(child.getLocalName())
+            && WSConstants.SIG_NS.equals(child.getNamespaceURI())) {
+            return DOMUtils.getContent(child);
+        } else if (Reference.TOKEN.getLocalPart().equals(child.getLocalName())
+            && Reference.TOKEN.getNamespaceURI().equals(child.getNamespaceURI())) {
+            return child.getAttribute("URI").substring(1);
+        }
+        return null;
+    }
+
+
 } 

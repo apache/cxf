@@ -237,6 +237,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                                     client.setAddressingNamespace(maps.getNamespaceURI());
                                     tok = client.requestSecurityToken(s);
                                 }
+                                tok.setTokenType(WSConstants.WSC_SCT);
                             } catch (RuntimeException e) {
                                 throw e;
                             } catch (Exception e) {
@@ -303,7 +304,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                         SecurityContextToken tok
                             = (SecurityContextToken)wser
                                 .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
+                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getID());
                     }
                 }
             }
@@ -463,6 +464,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
 
                         SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
                         token.setToken(sct.getElement());
+                        token.setTokenType(WSConstants.WSC_SCT);
                         
                         writer.getCurrentNode().appendChild(sct.getElement());
                         writer.writeEndElement();        

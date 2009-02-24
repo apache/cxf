@@ -51,9 +51,12 @@ public final class STSUtils {
     public static final String WST_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     public static final String WST_NS_05_12 = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
 
-    public static final String TOKEN_TYPE_SCT_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
-    public static final String TOKEN_TYPE_SCT_05_12 
-        = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/sct";
+    public static final String SCT_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc";
+    public static final String SCT_NS_05_12 
+        = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
+    
+    public static final String TOKEN_TYPE_SCT_05_02 = SCT_NS_05_02 + "/sct";
+    public static final String TOKEN_TYPE_SCT_05_12 = SCT_NS_05_12 + "/sct";
 
     private STSUtils() {
         //utility class

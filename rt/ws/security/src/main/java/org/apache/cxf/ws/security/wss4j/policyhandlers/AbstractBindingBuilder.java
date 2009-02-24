@@ -76,7 +76,6 @@ import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
@@ -1235,20 +1234,8 @@ public abstract class AbstractBindingBuilder {
             sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         }
         
-        String sigTokId; 
-        
-        if (policyToken instanceof SecureConversationToken) {
-            Element ref = tok.getAttachedReference();
-            if (ref == null) {
-                ref = tok.getUnattachedReference();
-            }
-            
-            if (ref != null) {
-                sigTokId = MemoryTokenStore.getIdFromSTR(ref);
-            } else {
-                sigTokId = tok.getId();
-            }
-        } else {
+        String sigTokId = tok.getWsuId();
+        if (sigTokId == null) {
             sigTokId = tok.getId();
         }
                        

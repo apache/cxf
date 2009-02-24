@@ -26,12 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-import org.w3c.dom.Element;
-
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.message.token.Reference;
 
 /**
  * 
@@ -78,12 +73,7 @@ public class MemoryTokenStore implements TokenStore {
         SecurityToken token = tokens.get(id);
         if (token == null) {
             for (SecurityToken t : tokens.values()) {
-                Element elem = t.getAttachedReference();
-                if (elem != null && id.equals(getIdFromSTR(elem))) {
-                    return t;
-                }
-                elem = t.getUnattachedReference();
-                if (elem != null && id.equals(getIdFromSTR(elem))) {
+                if (id.equals(t.getWsuId())) {
                     return t;
                 }
             }
@@ -112,21 +102,6 @@ public class MemoryTokenStore implements TokenStore {
         }
     }
     
-    public static String getIdFromSTR(Element str) {
-        Element child = DOMUtils.getFirstElement(str);
-        if (child == null) {
-            return null;
-        }
-        
-        if ("KeyInfo".equals(child.getLocalName())
-            && WSConstants.SIG_NS.equals(child.getNamespaceURI())) {
-            return DOMUtils.getContent(child);
-        } else if (Reference.TOKEN.getLocalPart().equals(child.getLocalName())
-            && Reference.TOKEN.getNamespaceURI().equals(child.getNamespaceURI())) {
-            return child.getAttribute("URI").substring(1);
-        }
-        return null;
-    }
 
     
 }

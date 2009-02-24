@@ -396,7 +396,6 @@ public class STSClient implements Configurable {
             throw new Fault("Unexpected element " + el.getLocalName(), LOG);
         }
         el = DOMUtils.getFirstElement(el);
-        
         Element rst = null;
         Element rar = null;
         Element rur = null;
@@ -508,7 +507,10 @@ public class STSClient implements Configurable {
     }
     private String findID(Element rar, Element rur, Element rst) {
         String id = null;
-        if (rar != null) {
+        if (rst != null) {
+            id = this.getIDFromSTR(rst);
+        }
+        if (id == null && rar != null) {
             id = this.getIDFromSTR(rar);
         }
         if (id == null && rur != null) {
@@ -525,11 +527,15 @@ public class STSClient implements Configurable {
         if (child == null) {
             return null;
         }
-        if (DOMUtils.getElementQName(child).equals(new QName(WSConstants.SIG_NS, "KeyInfo"))
-            || DOMUtils.getElementQName(child).equals(new QName(WSConstants.WSSE_NS, "KeyIdentifier"))) {
+        QName elName = DOMUtils.getElementQName(child);
+        if (elName.equals(new QName(WSConstants.SIG_NS, "KeyInfo"))
+            || elName.equals(new QName(WSConstants.WSSE_NS, "KeyIdentifier"))) {
             return DOMUtils.getContent(child);
-        } else if (DOMUtils.getElementQName(child).equals(Reference.TOKEN)) {
+        } else if (elName.equals(Reference.TOKEN)) {
             return child.getAttribute("URI");
+        } else if (elName.equals(new QName(STSUtils.SCT_NS_05_02, "Identifier"))
+            || elName.equals(new QName(STSUtils.SCT_NS_05_12, "Identifier"))) {
+            return DOMUtils.getContent(child);
         }
         return null;        
     }
