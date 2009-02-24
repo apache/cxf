@@ -182,6 +182,11 @@
                     <xs:sequence/>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="ExactlyOnce" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="InOrder" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence/>

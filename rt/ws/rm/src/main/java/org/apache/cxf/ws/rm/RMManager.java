@@ -129,7 +129,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
 
     @PostConstruct
     public void register() {
-        if (null != bus) {
+        if (null != bus) { 
             bus.setExtension(this, RMManager.class);
         }
     }
@@ -471,10 +471,19 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             setRMAssertion(null);
         }
         org.apache.cxf.ws.rm.manager.ObjectFactory factory = new org.apache.cxf.ws.rm.manager.ObjectFactory();
+        DeliveryAssuranceType da = factory.createDeliveryAssuranceType();
         if (null == deliveryAssurance) {
-            DeliveryAssuranceType da = factory.createDeliveryAssuranceType();
             da.setAtLeastOnce(factory.createDeliveryAssuranceTypeAtLeastOnce());
             setDeliveryAssurance(da);
+        } else if (deliveryAssurance.isSetExactlyOnce()) {
+            if (!deliveryAssurance.isSetAtMostOnce()) {
+                deliveryAssurance.setAtMostOnce(
+                    factory.createDeliveryAssuranceTypeAtMostOnce());
+            }
+            if (!deliveryAssurance.isSetAtLeastOnce()) {
+                deliveryAssurance.setAtLeastOnce(
+                    factory.createDeliveryAssuranceTypeAtLeastOnce());
+            }
         }
         if (null == sourcePolicy) {
             setSourcePolicy(null);
@@ -495,7 +504,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     
     @PostConstruct
     void registerListeners() {
-        if (null == bus) { 
+        if (null == bus) {
             return;
         }
         ServerLifeCycleManager slm = bus.getExtension(ServerLifeCycleManager.class);
