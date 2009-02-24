@@ -21,7 +21,6 @@ package org.apache.cxf.cxf1332;
 
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.junit.Test;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * 
@@ -34,11 +33,6 @@ public class Cxf1332Test extends AbstractCXFSpringTest {
     public Cxf1332Test() throws Exception {
     }
 
-    /** {@inheritDoc}*/
-    @Override
-    protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
-    }
-    
     @Test
     public void tryToSendStringArray() throws Exception {
         Cxf1332 client = getBean(Cxf1332.class, "client");
@@ -52,5 +46,4 @@ public class Cxf1332Test extends AbstractCXFSpringTest {
     protected String[] getConfigLocations() {
         return new String[] {"classpath:/org/apache/cxf/cxf1332/beans.xml" };
     }
-
 }

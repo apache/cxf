@@ -19,6 +19,9 @@
 
 package org.apache.cxf.interceptor;
 
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -51,6 +54,19 @@ public class Fault extends UncheckedException {
         code = FAULT_CODE_SERVER;
     }
 
+    public Fault(String message, Logger log) {
+        this(new Message(message, log));
+    }
+    public Fault(String message, ResourceBundle b) {
+        this(new Message(message, b));
+    }
+    public Fault(String message, Logger log, Throwable t) {
+        this(new Message(message, log), t);
+    }
+    public Fault(String message, ResourceBundle b, Throwable t) {
+        this(new Message(message, b), t);
+    }
+    
     public Fault(Throwable t) {
         super(t);
         if (super.getMessage() != null) {
