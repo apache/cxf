@@ -19,12 +19,17 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -39,7 +44,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
@@ -49,6 +53,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
@@ -70,9 +75,24 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.conversation.dkalgo.P_SHA1;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.Reference;
+import org.apache.ws.security.message.token.SecurityContextToken;
+import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -260,7 +280,35 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         }
 
     }
-    
+    static class SecureConversationTokenFinderInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
+        public SecureConversationTokenFinderInterceptor() {
+            super(Phase.PRE_PROTOCOL);
+            addAfter(WSS4JInInterceptor.class.getName());
+        }
+
+        public void handleMessage(SoapMessage message) throws Fault {
+            //Find the SC token
+            Vector results = (Vector)message.get(WSHandlerConstants.RECV_RESULTS);
+            for (int i = 0; i < results.size(); i++) {
+                WSHandlerResult rResult =
+                        (WSHandlerResult) results.get(i);
+
+                Vector wsSecEngineResults = rResult.getResults();
+
+                for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                    WSSecurityEngineResult wser =
+                            (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                    Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                    if (actInt.intValue() == WSConstants.SCT) {
+                        SecurityContextToken tok
+                            = (SecurityContextToken)wser
+                                .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
+                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
+                    }
+                }
+            }
+        }
+    }
     static class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
         public SecureConversationInInterceptor() {
             super(Phase.PRE_PROTOCOL);
@@ -301,6 +349,8 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             ns = STSUtils.WST_NS_05_02;
                         }
                         recalcEffectivePolicy(message, ns, pol);
+                    } else {
+                        message.getInterceptorChain().add(new SecureConversationTokenFinderInterceptor());
                     }
                 } else {
                     //client side should be checked on the way out
@@ -321,12 +371,19 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
             }
             Destination destination = ex.getDestination();
             try {
-                Endpoint endpoint = STSUtils.createSTSEndpoint(bus, 
-                                                           namespace,
-                                                           null,
-                                                           destination.getAddress().getAddress().getValue(),
-                                                           message.getVersion().getBindingId(), 
-                                                           policy);
+                Endpoint endpoint = message.getExchange().get(Endpoint.class);
+                TokenStore store = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+                if (store == null) {
+                    store = new MemoryTokenStore();
+                    endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
+                }
+                endpoint = STSUtils.createSTSEndpoint(bus, 
+                                                      namespace,
+                                                      null,
+                                                      destination.getAddress().getAddress().getValue(),
+                                                      message.getVersion().getBindingId(), 
+                                                      policy);
+                endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
             
                 EndpointPolicy ep = pe.getServerEndpointPolicy(endpoint.getEndpointInfo(), destination);
                 List<Interceptor> interceptors = ep.getInterceptors();
@@ -366,23 +423,167 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                 } else {
                     el = (Element)nd;
                 }
-                String name = el.getLocalName();
-                if ("RequestSecurityToken".equals(name)) {
-                    XMLUtils.printDOM(el);
-                    el = DOMUtils.getFirstElement(el);
-                    while (el != null) {
+                String namespace = el.getNamespaceURI();
+                String prefix = el.getPrefix();
+                byte clientEntropy[] = null;
+                int keySize = 256;
+                int ttl = 300000;
+                String tokenType = null;
+                if ("RequestSecurityToken".equals(el.getLocalName())) {
+                    try {
+                        el = DOMUtils.getFirstElement(el);
+                        while (el != null) {
+                            String localName = el.getLocalName();
+                            if (namespace.equals(el.getNamespaceURI())) {
+                                if ("Entropy".equals(localName)) {
+                                    Element bs = DOMUtils.getFirstElement(el);
+                                    if (bs != null) {
+                                        clientEntropy = Base64.decode(bs.getTextContent());
+                                    }
+                                } else if ("KeySize".equals(localName)) {
+                                    keySize = Integer.parseInt(el.getTextContent());
+                                } else if ("TokenType".equals(localName)) {
+                                    tokenType = el.getTextContent();
+                                }
+                            }
+                            
+                            el = DOMUtils.getNextElement(el);
+                        }
                         
+                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+                        writer.setNsRepairing(true);
+                        writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
+                        writer.writeStartElement(prefix, "RequestedSecurityToken", namespace);
+                        SecurityContextToken sct =
+                            new SecurityContextToken(getWSCVersion(tokenType), writer.getDocument());
                         
-                        el = DOMUtils.getNextElement(el);
+                        Calendar created = Calendar.getInstance();
+                        Calendar expires = Calendar.getInstance();
+                        expires.setTimeInMillis(System.currentTimeMillis() + ttl);
+
+                        SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
+                        token.setToken(sct.getElement());
+                        
+                        writer.getCurrentNode().appendChild(sct.getElement());
+                        writer.writeEndElement();        
+                        
+                        writer.writeStartElement(prefix, "RequestedAttachedReference", namespace);
+                        token.setAttachedReference(writeSecurityTokenReference(writer,
+                                                                               "#" + sct.getID(), 
+                                                                               tokenType));
+                        writer.writeEndElement();
+                        
+                        writer.writeStartElement(prefix, "RequestedUnattachedReference", namespace);
+                        token.setUnattachedReference(writeSecurityTokenReference(writer,
+                                                                                 sct.getIdentifier(),
+                                                                                 tokenType));
+                        writer.writeEndElement();
+                        
+                        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+                        writer.writeStartElement(prefix, "Lifetime", namespace);
+                        writer.writeNamespace("wsu", WSConstants.WSU_NS);
+                        writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
+                        writer.writeCharacters(fmt.format(created.getTime()));
+                        writer.writeEndElement();
+                        
+                        writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
+                        writer.writeCharacters(fmt.format(expires.getTime()));
+                        writer.writeEndElement();
+                        writer.writeEndElement();
+
+                        byte[] secret = writeProofToken(prefix, 
+                                                        namespace,
+                                                        writer,
+                                                        clientEntropy, 
+                                                        keySize);
+                        token.setSecret(secret);
+                        ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+                                .getProperty(TokenStore.class.getName())).add(token);
+                        writer.writeEndElement();
+                        return new MessageContentsList(new DOMSource(writer.getDocument()));
+                    } catch (RuntimeException ex) {
+                        throw ex;
+                    } catch (Exception ex) {
+                        throw new Fault(ex);
                     }
-                    
-                    
-                    return lst;
                 } else {
-                    throw new Fault("Unknown SecureConversation request type: " + name, LOG);
+                    throw new Fault("Unknown SecureConversation request type: " + el.getLocalName(), LOG);
                 }
             }
 
         }
     }
+    private static byte[] writeProofToken(String prefix, 
+                                          String namespace,
+                                          W3CDOMStreamWriter writer,
+                                          byte[] clientEntropy,
+                                          int keySize) 
+        throws NoSuchAlgorithmException, WSSecurityException, ConversationException, XMLStreamException {
+        byte secret[] = null; 
+        writer.writeStartElement(prefix, "RequestedProofToken", namespace);
+        if (clientEntropy == null) {
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            secret = new byte[keySize / 8];
+            random.nextBytes(secret);
+            
+            writer.writeStartElement(prefix, "BinarySecret", namespace);
+            writer.writeAttribute("", namespace + "/Nonce");
+            writer.writeCharacters(Base64.encode(secret));
+            writer.writeEndElement();
+        } else {
+            byte entropy[] = WSSecurityUtil.generateNonce(keySize / 8);
+            P_SHA1 psha1 = new P_SHA1();
+            secret = psha1.createKey(clientEntropy,
+                                     entropy,
+                                     0,
+                                     keySize / 8);
+
+            writer.writeStartElement(prefix, "ComputedKey", namespace);
+            writer.writeCharacters(namespace + "/CK/PSHA1");            
+            writer.writeEndElement();
+            writer.writeEndElement();
+
+            writer.writeStartElement(prefix, "Entropy", namespace);
+            writer.writeStartElement(prefix, "BinarySecret", namespace);
+            writer.writeAttribute("Type", namespace + "/Nonce");
+            writer.writeCharacters(Base64.encode(entropy));
+            writer.writeEndElement();
+            
+        }
+        writer.writeEndElement();
+        return secret;
+    }
+    
+    private static Element writeSecurityTokenReference(W3CDOMStreamWriter writer,
+                                                    String id,
+                                                    String refValueType) {
+
+        Reference ref = new Reference(writer.getDocument());
+        ref.setURI(id);
+        if (refValueType != null) {
+            ref.setValueType(refValueType);
+        }
+        SecurityTokenReference str = new SecurityTokenReference(writer.getDocument());
+        str.setReference(ref);
+
+        writer.getCurrentNode().appendChild(str.getElement());
+        return str.getElement();
+    }
+
+    
+    private static int getWSCVersion(String tokenTypeValue) throws ConversationException {
+
+        if (tokenTypeValue == null) {
+            return ConversationConstants.DEFAULT_VERSION;
+        }
+
+        if (tokenTypeValue.startsWith(ConversationConstants.WSC_NS_05_02)) {
+            return ConversationConstants.getWSTVersion(ConversationConstants.WSC_NS_05_02);
+        } else if (tokenTypeValue.startsWith(ConversationConstants.WSC_NS_05_12)) {
+            return ConversationConstants.getWSTVersion(ConversationConstants.WSC_NS_05_12);
+        } else {
+            throw new ConversationException("unsupportedSecConvVersion");
+        }
+    }
+
 }

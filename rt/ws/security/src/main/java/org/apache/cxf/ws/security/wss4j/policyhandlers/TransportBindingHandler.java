@@ -131,7 +131,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         SignedEncryptedParts signdParts = sgndSuppTokens.getSignedParts();
 
                         for (Token token : sgndSuppTokens.getTokens()) {
-                            if (token instanceof IssuedToken) {
+                            if (token instanceof IssuedToken
+                                || token instanceof SecureConversationToken) {
                                 signatureValues.add(doIssuedTokenSignature(token, signdParts,
                                                                            sgndSuppTokens));
                             } else if (token instanceof X509Token) {
@@ -162,16 +163,14 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     
                     if (sgndSuppTokens != null) {
                         for (Token token : sgndSuppTokens.getTokens()) {
-                            if (token instanceof IssuedToken) {
+                            if (token instanceof IssuedToken
+                                || token instanceof SecureConversationToken) {
                                 signatureValues.add(doIssuedTokenSignature(token, null, 
                                                                            sgndSuppTokens));
                             } else if (token instanceof X509Token) {
                                 signatureValues.add(doX509TokenSignature(token, 
                                                                          sgndSuppTokens.getSignedParts(), 
                                                                          sgndSuppTokens));
-                            } else if (token instanceof SecureConversationToken) {
-                                signatureValues.add(doSecureConversationSignature(token,
-                                                                                  null));
                             } else if (token instanceof KeyValueToken) {
                                 //
                             }
@@ -386,12 +385,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             return sig.getSignatureValue();
         }
     }
-    
-    private byte[] doSecureConversationSignature(Token token, 
-                                                 SignedEncryptedParts signdParts) 
-        throws Exception {
-        return null;
-    }
+
 
 
 }

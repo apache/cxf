@@ -61,7 +61,11 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         currentNode = e;
         ((W3CNamespaceContext)context).setElement(e);
     }
-
+    
+    public Element getCurrentNode() {
+        return currentNode;
+    }
+    
     public void setNsRepairing(boolean b) {
         nsRepairing = b;
     }
