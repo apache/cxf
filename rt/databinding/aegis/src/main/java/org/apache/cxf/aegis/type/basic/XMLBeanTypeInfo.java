@@ -31,7 +31,9 @@ import org.w3c.dom.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.util.NamespaceHelper;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.helpers.DOMUtils;
 
 public class XMLBeanTypeInfo extends BeanTypeInfo {
@@ -102,6 +104,23 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         }
 
         if (e != null) {
+            
+            String explicitTypeName = DOMUtils.getAttributeValueEmptyNull(e, "type");
+            if (explicitTypeName != null) {
+                try {
+                    Class<?> typeClass = 
+                        ClassLoaderUtils.loadClass(explicitTypeName, XMLBeanTypeInfo.class);
+                    Type typeObject = (Type) typeClass.newInstance();
+                    mapType(mappedName, typeObject);
+                } catch (ClassNotFoundException e1) {
+                    //
+                } catch (InstantiationException e2) {
+                    //
+                } catch (IllegalAccessException e3) {
+                    //
+                }                
+            }
+            
             QName mappedType = NamespaceHelper.createQName(e, 
                                                            DOMUtils.getAttributeValueEmptyNull(e, "typeName"),
                                                            getDefaultNamespace());

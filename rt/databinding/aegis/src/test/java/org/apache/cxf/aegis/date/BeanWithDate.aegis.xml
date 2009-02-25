@@ -16,13 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  * -->
- <mappings>
-  <mapping>
-    <method name="echo" xmlns:e="urn:echo:header">
-      <parameter index="1" componentType="java.lang.String"/>
-    </method>
-    <method name="simpleEcho" xmlns:e="urn:echo:header">
-      <parameter index="0" mappedName="e:narcissus" />
-    </method>
-  </mapping>
-</mappings>
+<mappings xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<mapping>
+		<property name="fig" type="org.apache.cxf.aegis.type.basic.DateType" typeName="xsd:date" />
+	</mapping>
+</mappings> 

@@ -1,4 +1,4 @@
-<!-- 
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -15,14 +15,22 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- * -->
- <mappings>
-  <mapping>
-    <method name="echo" xmlns:e="urn:echo:header">
-      <parameter index="1" componentType="java.lang.String"/>
-    </method>
-    <method name="simpleEcho" xmlns:e="urn:echo:header">
-      <parameter index="0" mappedName="e:narcissus" />
-    </method>
-  </mapping>
-</mappings>
+ */
+
+package org.apache.cxf.aegis.date;
+
+/**
+ * class used to test remapping the schema type of date. 
+ */
+public class BeanWithDate {
+    private java.util.Date fig;
+
+    public java.util.Date getFig() {
+        return fig;
+    }
+
+    public void setFig(java.util.Date fig) {
+        this.fig = fig;
+    }
+
+}
