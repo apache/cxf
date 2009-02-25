@@ -22,16 +22,17 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
+import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
-import org.apache.cxf.helpers.DOMUtils;
-
+import org.apache.cxf.helpers.CastUtils;
+import org.jdom.Attribute;
+import org.jdom.Content;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.junit.Test;
 
 public class StructTypeTest extends AbstractEncodedTest {
@@ -81,7 +82,9 @@ public class StructTypeTest extends AbstractEncodedTest {
         reader.getXMLStreamReader().close();
 
         // Test writing
-        Element element = writeObjectToElement(addressType, address, getLocalContext()); 
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        addressType.writeObject(address, new JDOMWriter(element), getLocalContext());
         validateShippingAddress(element);
     }
 
@@ -159,9 +162,9 @@ public class StructTypeTest extends AbstractEncodedTest {
     private void validatePurchaseOrder(Element element) throws Exception {
         Element poRefElement = null;
         Map<String, Element> blocks = new TreeMap<String, Element>();
-        for (Node n = element.getFirstChild(); n != null; n = n.getNextSibling()) {
-            if (n instanceof Element) {
-                Element child = (Element) n;
+        for (Content content : CastUtils.<Content>cast(element.getContent())) {
+            if (content instanceof Element) {
+                Element child = (Element) content;
                 if (poRefElement == null) {
                     poRefElement = child;
                 } else {
@@ -173,11 +176,11 @@ public class StructTypeTest extends AbstractEncodedTest {
 
         Element po = getReferencedElement("poRef", poRefElement, blocks);
 
-        Element shippingRef = (Element)DOMUtils.getChild(po, "shipping");
+        Element shippingRef = po.getChild("shipping");
         Element shipping = getReferencedElement("shipping", shippingRef, blocks);
         validateShippingAddress(shipping);
 
-        Element billingRef = (Element)DOMUtils.getChild(po, "billing");
+        Element billingRef = po.getChild("billing");
         Element billing = getReferencedElement("billing", billingRef, blocks);
         validateBillingAddress(billing);
     }
@@ -194,22 +197,26 @@ public class StructTypeTest extends AbstractEncodedTest {
     }
 
     private static void assertChildEquals(String expected, Element element, String childName) {
-        assertEquals(expected, DOMUtils.getChild(element, childName).getTextContent());
+        assertEquals(expected, element.getChild(childName).getText());
     }
 
     private String getId(String childName, Element child) {
         assertNotNull(childName + " is null", child);
-        Attr idAttribute = child.getAttributeNode("id");
-        assertNotNull(childName + " id is null \n", idAttribute);
+        Attribute idAttribute = child.getAttribute("id");
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        assertNotNull(childName + " id is null \n" + xmlOutputter.outputString(child), idAttribute);
         String id = idAttribute.getValue();
-        assertNotNull(childName + " id is null \n", id);
+        assertNotNull(childName + " id is null \n" + xmlOutputter.outputString(child), id);
         return id;
     }
 
     private String getRef(String childName, Element child) {
         assertNotNull(childName + " is null", child);
-        String hrefAttribute = child.getAttribute("href");
-        assertNotSame("", childName + " href is null \n", hrefAttribute);
-        return hrefAttribute;
+        Attribute hrefAttribute = child.getAttribute("href");
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        assertNotNull(childName + " href is null \n" + xmlOutputter.outputString(child), hrefAttribute);
+        String href = hrefAttribute.getValue();
+        assertNotNull(childName + " href is null \n" + xmlOutputter.outputString(child), href);
+        return href;
     }
 }

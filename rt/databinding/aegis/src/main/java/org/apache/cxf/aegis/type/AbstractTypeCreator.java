@@ -34,15 +34,13 @@ import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.util.ServiceUtils;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 /**
  * @author Hani Suleiman Date: Jun 14, 2005 Time: 11:59:57 PM
  */
 public abstract class AbstractTypeCreator implements TypeCreator {
-    public static final String HTTP_CXF_APACHE_ORG_ARRAYS = "http://cxf.apache.org/arrays";
-
     protected TypeMapping tm;
 
     protected AbstractTypeCreator nextCreator;
@@ -310,7 +308,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             ns = tm.getMappingIdentifierURI();
         }
         if (WSDLConstants.NS_SCHEMA_XSD.equals(ns)) {
-            ns = HTTP_CXF_APACHE_ORG_ARRAYS;
+            ns = "http://cxf.apache.org/arrays";
         }
 
         String first = type.getSchemaType().getLocalPart().substring(0, 1);
@@ -318,12 +316,12 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         String localName = "ArrayOf" + first.toUpperCase() + last;
         if (info.nonDefaultAttributes()) {
             localName += "-";
-            if (info.getMinOccurs() >= 0) {
-                localName += info.minOccurs;
-            }
-            localName += "-";
             if (info.getMaxOccurs() >= 0) {
                 localName += info.maxOccurs;
+            }
+            localName += "-";
+            if (info.getMinOccurs() >= 0) {
+                localName += info.minOccurs;
             }
             if (info.isFlat()) {
                 localName += "Flat";

@@ -68,9 +68,9 @@ import org.apache.cxf.aegis.type.xml.JDOMElementType;
 import org.apache.cxf.aegis.type.xml.SourceType;
 import org.apache.cxf.aegis.type.xml.XMLStreamReaderType;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
+import org.jdom.Element;
 
 /**
  * Contains type mappings for java/qname pairs.
@@ -224,7 +224,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     private static void fillStandardMappings(TypeMapping tm, boolean defaultNillable, 
-                                             boolean enableMtomXmime, boolean enableJDOM) {
+                                             boolean enableMtomXmime) {
         defaultRegister(tm, defaultNillable, BigDecimal.class, XMLSchemaQNames.XSD_DECIMAL,
                         new BigDecimalType());
         defaultRegister(tm, defaultNillable, BigInteger.class, XMLSchemaQNames.XSD_INTEGER,
@@ -234,6 +234,9 @@ public class DefaultTypeMapping implements TypeMapping {
         defaultRegister(tm, defaultNillable, Calendar.class, XMLSchemaQNames.XSD_DATETIME,
                         new CalendarType());
         defaultRegister(tm, defaultNillable, Date.class, XMLSchemaQNames.XSD_DATETIME, new DateTimeType());
+        defaultRegister(tm, defaultNillable, Document.class, XMLSchemaQNames.XSD_ANY, new DocumentType());
+        defaultRegister(tm, defaultNillable, Element.class, XMLSchemaQNames.XSD_ANY,
+                        new JDOMElementType());
         defaultRegister(tm, defaultNillable, Float.class, XMLSchemaQNames.XSD_FLOAT, new FloatType());
         defaultRegister(tm, defaultNillable, Double.class, XMLSchemaQNames.XSD_DOUBLE, new DoubleType());
         defaultRegister(tm, defaultNillable, Integer.class, XMLSchemaQNames.XSD_INT, new IntType());
@@ -262,6 +265,8 @@ public class DefaultTypeMapping implements TypeMapping {
 
         defaultRegister(tm, defaultNillable, java.sql.Date.class, XMLSchemaQNames.XSD_DATETIME,
                         new SqlDateType());
+        defaultRegister(tm, defaultNillable, org.jdom.Document.class, XMLSchemaQNames.XSD_ANY,
+                        new JDOMDocumentType());
         
         QName mtomBase64 = XMLSchemaQNames.XSD_BASE64;
         if (enableMtomXmime) {
@@ -272,56 +277,13 @@ public class DefaultTypeMapping implements TypeMapping {
                         new DataSourceType(enableMtomXmime, null));
         defaultRegister(tm, defaultNillable, DataHandler.class, mtomBase64,
                         new DataHandlerType(enableMtomXmime, null));
-        
-
-        defaultRegister(tm, defaultNillable, Document.class, XMLSchemaQNames.XSD_ANY, new DocumentType());
-        if (enableJDOM) {
-            registerJDOMTypes(tm, defaultNillable);
-        }
-
-    }
-
-    private static void registerJDOMTypes(TypeMapping tm, boolean defaultNillable) {
-        try {
-            Class<?> jdomDocClass = ClassLoaderUtils.loadClass("org.jdom.Document", DefaultTypeMapping.class);
-            defaultRegister(tm, defaultNillable, jdomDocClass, XMLSchemaQNames.XSD_ANY,
-                            new JDOMDocumentType());
-
-        } catch (ClassNotFoundException e) {
-            // not available.
-        }
-        
-        try {
-            Class<?> jdomElementClass = 
-                ClassLoaderUtils.loadClass("org.jdom.Element", DefaultTypeMapping.class);
-            defaultRegister(tm, defaultNillable, jdomElementClass, XMLSchemaQNames.XSD_ANY,
-                                new JDOMElementType());
-        } catch (ClassNotFoundException e) {
-            // not available.
-        }
     }
 
     public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable, 
-     boolean enableMtomXmime) {
-        return createSoap11TypeMapping(
-                                       defaultNillable,
-                                       enableMtomXmime,
-                                       false);
-    }
-
-    /**
-     * Create a type mapping object with a stock set of mappings, including the SOAP 1.1 'encoded'
-     * types.
-     * @param defaultNillable whether elements are nillable by default.
-     * @param enableMtomXmime whether to enable XMIME annotations with MTOM.
-     * @param enableJDOM whether to add mappings for JDOM.
-     * @return
-     */
-    public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable, 
-                                                             boolean enableMtomXmime, boolean enableJDOM) {
+                                                             boolean enableMtomXmime) {
         // Create a Type Mapping for SOAP 1.1 Encoding
         DefaultTypeMapping soapTM = new DefaultTypeMapping(Soap11.SOAP_ENCODING_URI);
-        fillStandardMappings(soapTM, defaultNillable, enableMtomXmime, enableJDOM);
+        fillStandardMappings(soapTM, defaultNillable, enableMtomXmime);
 
         defaultRegister(soapTM, defaultNillable, boolean.class, Soap11.ENCODED_BOOLEAN, new BooleanType());
         defaultRegister(soapTM, defaultNillable, char.class, Soap11.ENCODED_CHAR, new CharacterType());
@@ -353,26 +315,10 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
-      boolean enableMtomXmime) {
-        return createDefaultTypeMapping(
-                                        defaultNillable,
-                                        enableMtomXmime,
-                                        false);
-    }
-
-    /**
-     * Create a set of default type mappings.
-     * @param defaultNillable whether elements are nillable by default.
-     * @param enableMtomXmime whether to enable XMIME annotations on MTOM.
-     * @param enableJDOM whether to map JDOM types.
-     * @return
-     */
-    public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
-                                                              boolean enableMtomXmime, 
-                                                              boolean enableJDOM) {
+                                                              boolean enableMtomXmime) {
         // by convention, the default mapping is against the XML schema URI.
         DefaultTypeMapping tm = new DefaultTypeMapping(SOAPConstants.XSD);
-        fillStandardMappings(tm, defaultNillable, enableMtomXmime, enableJDOM);
+        fillStandardMappings(tm, defaultNillable, enableMtomXmime);
         defaultRegister(tm, defaultNillable, Character.class, 
                         CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
                         new CharacterAsStringType());

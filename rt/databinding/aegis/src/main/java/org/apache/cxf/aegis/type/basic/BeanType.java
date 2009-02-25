@@ -26,36 +26,31 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
-
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
+import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
+import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaAny;
-import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
-import org.apache.ws.commons.schema.XmlSchemaAttribute;
-import org.apache.ws.commons.schema.XmlSchemaComplexContent;
-import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
-import org.apache.ws.commons.schema.XmlSchemaComplexType;
-import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.jaxen.JaxenException;
+import org.jdom.Attribute;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * Serializes JavaBeans.
- * 
+ *
  * There's a really dangerous coding convention in this class, maintainers beware.
  * There are two constructor. The no-args constructor defers, until later,
  * the construction of a BeanTypeInfo. The one-arg constructor gets the BeanTypeInfo passed as a parameter.
@@ -110,7 +105,7 @@ public class BeanType extends Type {
 
                 if (impl == null) {
                     InvocationHandler handler = new InterfaceInvocationHandler();
-                    object = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[] {
+                    object = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] {
                         clazz
                     }, handler);
                     target = handler;
@@ -163,7 +158,7 @@ public class BeanType extends Type {
                         writeProperty(name, target, writeObj, clazz, propertyTypeInfo);
                     } else {
                         if (!propertyTypeInfo.isNillable(name)) {
-                            throw new DatabindingException(name.getLocalPart() 
+                            throw new DatabindingException(name.getLocalPart()
                                                            + " is nil, but not nillable.");
 
                         }
@@ -188,9 +183,11 @@ public class BeanType extends Type {
         }
     }
 
-    protected Type getElementType(QName name, BeanTypeInfo beanTypeInfo, 
-                                  MessageReader reader, Context context) {
-
+    protected Type getElementType(QName name,
+            BeanTypeInfo beanTypeInfo,
+            MessageReader reader,
+            Context context) {
+        
         Type type = beanTypeInfo.getType(name);
 
         // Type can be overriden with a xsi:type attribute
@@ -199,10 +196,11 @@ public class BeanType extends Type {
     }
 
     /**
-     * If the class is an exception, this will try and instantiate it with information from the XFireFault (if
-     * it exists).
+     * If the class is an exception, this will try and instantiate it with
+     * information from the XFireFault (if it exists).
      */
-    protected Object createFromFault(Context context) throws SecurityException, InstantiationException,
+    protected Object createFromFault(Context context)
+        throws SecurityException, InstantiationException,
         IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<?> clazz = getTypeClass();
         Constructor ctr;
@@ -211,28 +209,16 @@ public class BeanType extends Type {
         Fault fault = context.getFault();
 
         try {
-            ctr = clazz.getConstructor(new Class[] {
-                String.class, Throwable.class
-            });
-            o = ctr.newInstance(new Object[] {
-                fault.getMessage(), fault
-            });
+            ctr = clazz.getConstructor(new Class[] {String.class, Throwable.class});
+            o = ctr.newInstance(new Object[] {fault.getMessage(), fault});
         } catch (NoSuchMethodException e) {
             try {
-                ctr = clazz.getConstructor(new Class[] {
-                    String.class, Exception.class
-                });
-                o = ctr.newInstance(new Object[] {
-                    fault.getMessage(), fault
-                });
+                ctr = clazz.getConstructor(new Class[] {String.class, Exception.class});
+                o = ctr.newInstance(new Object[] {fault.getMessage(), fault});
             } catch (NoSuchMethodException e1) {
                 try {
-                    ctr = clazz.getConstructor(new Class[] {
-                        String.class
-                    });
-                    o = ctr.newInstance(new Object[] {
-                        fault.getMessage()
-                    });
+                    ctr = clazz.getConstructor(new Class[] {String.class});
+                    o = ctr.newInstance(new Object[] {fault.getMessage()});
                 } catch (NoSuchMethodException e2) {
                     return clazz.newInstance();
                 }
@@ -249,7 +235,7 @@ public class BeanType extends Type {
         throws DatabindingException {
 
         if (object instanceof InterfaceInvocationHandler) {
-            InterfaceInvocationHandler delegate = (InterfaceInvocationHandler)object;
+            InterfaceInvocationHandler delegate = (InterfaceInvocationHandler) object;
             delegate.writeProperty(name.getLocalPart(), property);
             return;
         }
@@ -272,9 +258,7 @@ public class BeanType extends Type {
 
             Class propertyType = desc.getPropertyType();
             if ((property == null && !propertyType.isPrimitive()) || (property != null)) {
-                m.invoke(object, new Object[] {
-                    property
-                });
+                m.invoke(object, new Object[] {property});
             }
         } catch (Exception e) {
             if (e instanceof DatabindingException) {
@@ -287,20 +271,18 @@ public class BeanType extends Type {
     }
 
     /**
-     * This is a hack to get the write method from the implementation class for an interface.
+     * This is a hack to get the write method from the implementation class for
+     * an interface.
      */
     private Method getWriteMethodFromImplClass(Class<?> impl, PropertyDescriptor pd) throws Exception {
         String name = pd.getName();
         name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
 
-        return impl.getMethod(name, new Class[] {
-            pd.getPropertyType()
-        });
+        return impl.getMethod(name, new Class[] {pd.getPropertyType()});
     }
-
+    
     /**
      * To avoid double-writing xsi:type attributes, ObjectType uses this special entrypoint.
-     * 
      * @param object
      * @param writer
      * @param context
@@ -310,33 +292,38 @@ public class BeanType extends Type {
                                    Context context, boolean wroteXsiType) {
         writeObjectInternal(object, writer, context, wroteXsiType);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void writeObject(Object object, MessageWriter writer, 
-                            Context context) throws DatabindingException {
+    public void writeObject(Object object, MessageWriter writer, Context context)
+        throws DatabindingException {
         writeObjectInternal(object, writer, context, false);
     }
 
-    private void writeObjectInternal(Object object, MessageWriter writer, Context context,
-                                     boolean wroteXsiType) throws DatabindingException {
+    private void writeObjectInternal(Object object, MessageWriter writer, Context context, 
+                                     boolean wroteXsiType)
+        throws DatabindingException {
         if (object == null) {
             return;
         }
 
         BeanTypeInfo inf = getTypeInfo();
 
-        if (!wroteXsiType && object.getClass() == getTypeClass() && context.isWriteXsiTypes()) {
+        if (!wroteXsiType 
+            && object.getClass() == getTypeClass()
+            && context.isWriteXsiTypes()) {
             writer.writeXsiType(getSchemaType());
         }
 
         /*
-         * TODO: Replace this method with one split into two pieces so that we can front-load the attributes
-         * and traverse down the list of super classes.
+         * TODO: Replace this method with one split into two pieces so that we
+         * can front-load the attributes and traverse down the list of super
+         * classes.
          */
-        for (QName name : inf.getAttributes()) {
+        for (Iterator itr = inf.getAttributes(); itr.hasNext();) {
+            QName name = (QName)itr.next();
 
             Object value = readProperty(object, name);
             if (value != null) {
@@ -355,7 +342,8 @@ public class BeanType extends Type {
             }
         }
 
-        for (QName name : inf.getElements()) {
+        for (Iterator itr = inf.getElements(); itr.hasNext();) {
+            QName name = (QName)itr.next();
 
             if (inf.isExtension()
                 && inf.getPropertyDescriptorFromMappedName(name).getReadMethod().getDeclaringClass() != inf
@@ -427,6 +415,163 @@ public class BeanType extends Type {
         }
     }
 
+    /**
+     * @see org.apache.cxf.aegis.type.Type#writeSchema(org.jdom.Element)
+     */
+    @Override
+    public void writeSchema(Element root) {
+        BeanTypeInfo inf = getTypeInfo();
+        Element complex = new Element("complexType", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        complex.setAttribute(new Attribute("name", getSchemaType().getLocalPart()));
+        root.addContent(complex);
+
+        Type sooperType = getSuperType();
+
+        /*
+         * See Java Virtual Machine specification:
+         * http://java.sun.com/docs/books/vmspec/2nd-edition/html/ClassFile.doc.html#75734
+         */
+        if (((inf.getTypeClass().getModifiers() & Modifier.ABSTRACT) != 0)
+            && !inf.getTypeClass().isInterface()) {
+            complex.setAttribute(new Attribute("abstract", "true"));
+        }
+
+        if (inf.isExtension() && sooperType != null) {
+            Element complexContent = new Element("complexContent",
+                                                 SOAPConstants.XSD_PREFIX,
+                                                 SOAPConstants.XSD);
+            complex.addContent(complexContent);
+            complex = complexContent;
+        }
+
+        /*
+         * Decide if we're going to extend another type. If we are going to
+         * defer, then make sure that we extend the type for our superclass.
+         */
+        boolean isExtension = inf.isExtension();
+
+        Element dummy = complex;
+
+        if (isExtension && sooperType != null) {
+
+            Element extension = new Element("extension", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+            complex.addContent(extension);
+            QName baseType = sooperType.getSchemaType();
+            extension.setAttribute(new Attribute("base", getNameWithPrefix2(root, baseType
+                .getNamespaceURI(), baseType.getLocalPart())));
+
+            dummy = extension;
+        }
+
+        Element seq = null;
+        boolean needXmime = false;
+        boolean needUtilityTypes = false;
+        
+        // Write out schema for elements
+        for (Iterator itr = inf.getElements(); itr.hasNext();) {
+
+            QName name = (QName)itr.next();
+
+            if (isExtension) {
+                PropertyDescriptor pd = inf.getPropertyDescriptorFromMappedName(name);
+
+                assert pd.getReadMethod() != null && pd.getWriteMethod() != null;
+                if (pd.getReadMethod().getDeclaringClass() != inf.getTypeClass()) {
+                    continue;
+                }
+            }
+
+            if (seq == null) {
+                seq = new Element("sequence", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+                dummy.addContent(seq);
+            }
+
+            Element element = new Element("element", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+            seq.addContent(element);
+
+            Type type = getType(inf, name);
+
+            String nameNS = name.getNamespaceURI();
+            String nameWithPrefix = getNameWithPrefix(root, nameNS, name.getLocalPart());
+
+            String prefix = NamespaceHelper.getUniquePrefix(root, type.getSchemaType().getNamespaceURI());
+
+            writeTypeReference(name, nameWithPrefix, element, type, prefix, root);
+            needXmime |= type.usesXmime();
+            needUtilityTypes |= type.usesUtilityTypes();
+        }
+        
+        if (needXmime) {
+            addXmimeToSchema(root);
+        }
+        
+        if (needUtilityTypes) {
+            AegisContext.addUtilityTypesToSchema(root);
+        }
+
+        /**
+         * if future proof then add <xsd:any/> element
+         */
+        if (inf.isExtensibleElements()) {
+            if (seq == null) {
+                seq = new Element("sequence", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+                dummy.addContent(seq);
+            }
+            seq.addContent(createAnyElement());
+        }
+
+        // Write out schema for attributes
+        for (Iterator itr = inf.getAttributes(); itr.hasNext();) {
+            QName name = (QName)itr.next();
+
+            Element element = new Element("attribute", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+            dummy.addContent(element);
+
+            Type type = getType(inf, name);
+
+            String nameNS = name.getNamespaceURI();
+            String nameWithPrefix = getNameWithPrefix(root, nameNS, name.getLocalPart());
+
+            String prefix = NamespaceHelper.getUniquePrefix(root, type.getSchemaType().getNamespaceURI());
+            element.setAttribute(new Attribute("name", nameWithPrefix));
+            element.setAttribute(TypeUtil.createTypeAttribute(prefix, type, root));
+        }
+
+        /**
+         * If extensible attributes then add <xsd:anyAttribute/>
+         */
+        if (inf.isExtensibleAttributes()) {
+            dummy.addContent(createAnyAttribute());
+        }
+    }
+
+    private String getNameWithPrefix(Element root, String nameNS, String localName) {
+        if (!"".equals(nameNS) && !nameNS.equals(getSchemaType().getNamespaceURI())) {
+            Element rootElement = (Element)root.getParent();
+            String prefix = null;
+            if (rootElement != null) { // can happen with doc/lit/bare
+                prefix = NamespaceHelper.getUniquePrefix(rootElement, nameNS);
+            }
+
+            if (prefix == null || prefix.length() == 0) {
+                prefix = NamespaceHelper.getUniquePrefix(root, nameNS);
+            }
+
+            return prefix + ":" + localName;
+        }
+        return localName;
+    }
+
+    private String getNameWithPrefix2(Element root, String nameNS, String localName) {
+        String prefix = NamespaceHelper.getUniquePrefix(root, nameNS);
+
+        if (prefix == null || prefix.length() == 0) {
+            prefix = NamespaceHelper.getUniquePrefix(root, nameNS);
+        }
+
+        return prefix + ":" + localName;
+    }
+
     private Type getType(BeanTypeInfo inf, QName name) {
         Type type = inf.getType(name);
 
@@ -438,22 +583,23 @@ public class BeanType extends Type {
         return type;
     }
 
-    private void writeTypeReference(QName name, XmlSchemaElement element, Type type) {
+    private void writeTypeReference(QName name, String nameWithPrefix, 
+                                    Element element, Type type, String prefix,
+                                    Element root) {
         if (type.isAbstract()) {
-            element.setName(name.getLocalPart());
-            element.setSchemaTypeName(type.getSchemaType());
+            element.setAttribute(new Attribute("name", nameWithPrefix));
+            element.setAttribute(TypeUtil.createTypeAttribute(prefix, type, root));
 
             int minOccurs = getTypeInfo().getMinOccurs(name);
-            /*
-             * Old code had ridiculous '!=0' here, which cannot have been right.
-             */
-            if (minOccurs != -1) {
-                element.setMinOccurs(minOccurs);
+            if (minOccurs == 0) {
+                element.setAttribute(new Attribute("minOccurs", Integer.valueOf(minOccurs).toString()));
             }
 
-            element.setNillable(getTypeInfo().isNillable(name));
+            if (getTypeInfo().isNillable(name)) {
+                element.setAttribute(new Attribute("nillable", "true"));
+            }
         } else {
-            element.setRefName(type.getSchemaType());
+            element.setAttribute(new Attribute("ref", prefix + ':' + type.getSchemaType().getLocalPart()));
         }
     }
 
@@ -469,7 +615,7 @@ public class BeanType extends Type {
 
     /**
      * We need to write a complex type schema for Beans, so return true.
-     * 
+     *
      * @see org.apache.cxf.aegis.type.Type#isComplex()
      */
     @Override
@@ -486,11 +632,13 @@ public class BeanType extends Type {
 
         BeanTypeInfo inf = getTypeInfo();
 
-        for (QName name : inf.getAttributes()) {
+        for (Iterator itr = inf.getAttributes(); itr.hasNext();) {
+            QName name = (QName)itr.next();
             deps.add(inf.getType(name));
         }
 
-        for (QName name : inf.getElements()) {
+        for (Iterator itr = inf.getElements(); itr.hasNext();) {
+            QName name = (QName)itr.next();
             if (inf.isExtension()
                 && inf.getPropertyDescriptorFromMappedName(name).getReadMethod().getDeclaringClass() != inf
                     .getTypeClass()) {
@@ -500,7 +648,7 @@ public class BeanType extends Type {
         }
 
         /*
-         * Automagically add chain of superclassesif this is an an extension.
+         * Automagically add chain of superclasses *if* this is an an extension.
          */
         if (inf.isExtension()) {
             Type sooperType = getSuperType();
@@ -520,12 +668,11 @@ public class BeanType extends Type {
             type = beanType.getTypeInfo().getType(name);
 
             if (type == null) {
-                Type superType = beanType.getSuperType(); /*
-                                                           * The class might inherit from, say, 'Integer'. In
-                                                           * which case we've got no BeanType to work with.
-                                                           */
+                Type superType = beanType.getSuperType(); /* The class might inherit from, say, 'Integer'.
+                                                             In which case we've got no BeanType 
+                                                             to work with. */
                 if (superType instanceof BeanType) {
-                    beanType = (BeanType)superType;
+                    beanType = (BeanType) superType;
                 } else {
                     break; // give up.
                 }
@@ -597,6 +744,19 @@ public class BeanType extends Type {
     }
 
     /**
+     * Create an element to represent any future elements that might get added
+     * to the schema <xsd:any minOccurs="0" maxOccurs="unbounded"/>
+     *
+     * @return
+     */
+    private Element createAnyElement() {
+        Element result = new Element("any", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        result.setAttribute(new Attribute("minOccurs", "0"));
+        result.setAttribute(new Attribute("maxOccurs", "unbounded"));
+        return result;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -615,8 +775,29 @@ public class BeanType extends Type {
         return sb.toString();
     }
 
-    private void addXmimeToSchema(XmlSchema root) {
-        XmlSchemaUtils.addImportIfNeeded(root, AbstractXOPType.XML_MIME_NS);
+    /**
+     * Create an element to represent any future attributes that might get added
+     * to the schema <xsd:anyAttribute/>
+     * 
+     * @return
+     */
+    private Element createAnyAttribute() {
+        return new Element("anyAttribute", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+    }
+    
+    private void addXmimeToSchema(Element root) {
+        try {
+            Object node = AbstractXOPType.getXmimeXpathImport().selectSingleNode(root);
+            if (node != null) {
+                return;
+            }
+        } catch (JaxenException e) {
+            throw new RuntimeException(e);
+        }
+        Element element = new Element("import", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        root.addContent(0, element);
+        element.setAttribute("namespace", AbstractXOPType.XML_MIME_NS);
+        root.addNamespaceDeclaration(Namespace.getNamespace("xmime", AbstractXOPType.XML_MIME_NS));
     }
 
     /**
@@ -640,113 +821,4 @@ public class BeanType extends Type {
             info.setTypeMapping(typeMapping);
         }
     }
-    
-    @Override
-    public void writeSchema(XmlSchema root) {
-        BeanTypeInfo inf = getTypeInfo();
-        XmlSchemaComplexType complex = new XmlSchemaComplexType(root);
-        complex.setName(getSchemaType().getLocalPart());
-        root.addType(complex);
-        root.getItems().add(complex);
-
-        Type sooperType = getSuperType();
-
-        /*
-         * See Java Virtual Machine specification:
-         * http://java.sun.com/docs/books/vmspec/2nd-edition/html/ClassFile.doc.html#75734
-         */
-        if (((inf.getTypeClass().getModifiers() & Modifier.ABSTRACT) != 0)
-            && !inf.getTypeClass().isInterface()) {
-            complex.setAbstract(true);
-        }
-
-        XmlSchemaSequence sequence = new XmlSchemaSequence();
-        /*
-         * Decide if we're going to extend another type. If we are going to defer, then make sure that we
-         * extend the type for our superclass.
-         */
-        boolean isExtension = inf.isExtension();
-
-        if (isExtension && sooperType != null) {
-            // if sooperType is null, things are confused.
-            XmlSchemaComplexContent content = new XmlSchemaComplexContent();
-            complex.setContentModel(content);
-            XmlSchemaComplexContentExtension extension = new XmlSchemaComplexContentExtension();
-            content.setContent(extension);
-            extension.setBaseTypeName(sooperType.getSchemaType());
-            extension.setParticle(sequence);
-        } else {
-            complex.setParticle(sequence);
-        }
-
-        boolean needXmime = false;
-        boolean needUtilityTypes = false;
-
-        // Write out schema for elements
-        for (QName name : inf.getElements()) {
-
-            if (isExtension) {
-                PropertyDescriptor pd = inf.getPropertyDescriptorFromMappedName(name);
-
-                // assert pd.getReadMethod() != null && pd.getWriteMethod() != null;
-
-                if (pd.getReadMethod().getDeclaringClass() != inf.getTypeClass()) {
-                    continue;
-                }
-            }
-
-            XmlSchemaElement element = new XmlSchemaElement();
-            element.setName(name.getLocalPart());
-            sequence.getItems().add(element);
-
-            Type type = getType(inf, name);
-            if (AbstractTypeCreator.
-                HTTP_CXF_APACHE_ORG_ARRAYS.equals(type.getSchemaType().getNamespaceURI())) {
-                XmlSchemaUtils.addImportIfNeeded(root, AbstractTypeCreator.HTTP_CXF_APACHE_ORG_ARRAYS);
-            }
-
-            writeTypeReference(name, element, type);
-            needXmime |= type.usesXmime();
-            needUtilityTypes |= type.usesUtilityTypes();
-        }
-
-        if (needXmime) {
-            addXmimeToSchema(root);
-        }
-
-        if (needUtilityTypes) {
-            AegisContext.addUtilityTypesToSchema(root);
-        }
-
-        /**
-         * if future proof then add <xsd:any/> element
-         */
-        if (inf.isExtensibleElements()) {
-            XmlSchemaAny any = new XmlSchemaAny();
-            any.setMinOccurs(0);
-            any.setMaxOccurs(Long.MAX_VALUE);
-            sequence.getItems().add(any);
-        }
-
-        // Write out schema for attributes
-        for (QName name : inf.getAttributes()) {
-            XmlSchemaAttribute attribute = new XmlSchemaAttribute();
-            complex.getAttributes().add(attribute);
-            attribute.setName(name.getLocalPart());
-            Type type = getType(inf, name);
-            attribute.setSchemaTypeName(type.getSchemaType());
-            String ns = name.getNamespaceURI();
-            if (!ns.equals(root.getTargetNamespace())) {
-                XmlSchemaUtils.addImportIfNeeded(root, ns);
-            }
-        }
-
-        /**
-         * If extensible attributes then add <xsd:anyAttribute/>
-         */
-        if (inf.isExtensibleAttributes()) {
-            sequence.getItems().add(new XmlSchemaAnyAttribute());
-        }
-    }
-
 }

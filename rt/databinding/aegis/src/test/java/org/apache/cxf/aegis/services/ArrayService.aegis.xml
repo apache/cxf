@@ -20,7 +20,7 @@
 <mappings>
     <mapping name="ArrayService">
         <method name="submitStringArray">
-            <parameter index="0" minOccurs='2' maxOccurs='50' nillable='false' />
+            <parameter index="0" minOccurs='2' maxOccurs='50' />
         </method>
     </mapping>
 </mappings>

@@ -38,12 +38,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.xpath.XPathConstants;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -56,8 +50,12 @@ import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.XMLBeanTypeInfo;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XPathUtils;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.DOMBuilder;
+import org.jdom.xpath.XPath;
 
 /**
  * Deduce mapping information from an xml file. The xml file should be in the
@@ -115,7 +113,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         if (is != null) {
             try {
                 aegisDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
-                aegisDocumentBuilderFactory.setNamespaceAware(true);
+
                 
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 aegisSchema = schemaFactory.newSchema(new StreamSource(is));
@@ -134,8 +132,6 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             }
         }
     }
-    
-    private XPathUtils xpathUtils = new XPathUtils();
 
     private Document readAegisFile(InputStream is, final String path) throws IOException {
         DocumentBuilder documentBuilder;
@@ -188,7 +184,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
                                                         // above.
             return null;
         }
-        return doc;
+        return new DOMBuilder().build(doc);
     }
 
     protected Document getDocument(Class clazz) {
@@ -325,17 +321,17 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         if (mapping != null || mappings.size() > 0) {
             String typeNameAtt = null;
             if (mapping != null) {
-                typeNameAtt = DOMUtils.getAttributeValueEmptyNull(mapping, "name");
+                typeNameAtt = mapping.getAttributeValue("name");
             }
 
             String extensibleElements = null;
             if (mapping != null) {
-                extensibleElements = mapping.getAttribute("extensibleElements");
+                extensibleElements = mapping.getAttributeValue("extensibleElements");
             }
 
             String extensibleAttributes = null;
             if (mapping != null) {
-                extensibleAttributes = mapping.getAttribute("extensibleAttributes");
+                extensibleAttributes = mapping.getAttributeValue("extensibleAttributes");
             }
 
             String defaultNS = NamespaceHelper.makeNamespaceFromClassName(info.getTypeClass().getName(),
@@ -440,7 +436,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             }
             info.setTypeClass(m.getReturnType());
             // info.setAnnotations(m.getAnnotations());
-            Element rtElement = DOMUtils.getFirstChildWithName(bestMatch, "", "return-type");
+            Element rtElement = bestMatch.getChild("return-type");
             readMetadata(info, mapping, rtElement);
         }
 
@@ -448,25 +444,24 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     protected void readMetadata(TypeClassInfo info, Element mapping, Element parameter) {
-        info.setTypeName(createQName(parameter, DOMUtils.getAttributeValueEmptyNull(parameter, "typeName")));
-        info.setMappedName(createQName(parameter, 
-                                       DOMUtils.getAttributeValueEmptyNull(parameter, "mappedName")));
+        info.setTypeName(createQName(parameter, parameter.getAttributeValue("typeName")));
+        info.setMappedName(createQName(parameter, parameter.getAttributeValue("mappedName")));
         setComponentType(info, mapping, parameter);
         setKeyType(info, mapping, parameter);
         setValueType(info, mapping, parameter);
         setType(info, parameter);
 
-        String min = DOMUtils.getAttributeValueEmptyNull(parameter, "minOccurs");
+        String min = parameter.getAttributeValue("minOccurs");
         if (min != null) {
             info.setMinOccurs(Long.parseLong(min));
         }
 
-        String max = DOMUtils.getAttributeValueEmptyNull(parameter, "maxOccurs");
+        String max = parameter.getAttributeValue("maxOccurs");
         if (max != null) {
             info.setMaxOccurs(Long.parseLong(max));
         }
 
-        String flat = DOMUtils.getAttributeValueEmptyNull(parameter, "flat");
+        String flat = parameter.getAttributeValue("flat");
         if (flat != null) {
             info.setFlat(Boolean.valueOf(flat.toLowerCase()).booleanValue());
         }
@@ -525,7 +520,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     protected void setComponentType(TypeClassInfo info, Element mapping, Element parameter) {
-        String componentType = DOMUtils.getAttributeValueEmptyNull(parameter, "componentType");
+        String componentType = parameter.getAttributeValue("componentType");
         if (componentType != null) {
             info.setGenericType(loadGeneric(info, mapping, componentType));
         }
@@ -543,7 +538,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             TypeClassInfo componentInfo = new TypeClassInfo();
             componentInfo.setDescription("generic component " + componentInfo.getDescription());
             readMetadata(componentInfo, mapping, propertyEl);
-            String className = DOMUtils.getAttributeValueEmptyNull(propertyEl, "class");
+            String className = propertyEl.getAttributeValue("class");
             if (className == null) {
                 throw new DatabindingException("A 'class' attribute must be specified for <component> "
                                                + name);
@@ -566,7 +561,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     protected void setType(TypeClassInfo info, Element parameter) {
-        String type = DOMUtils.getAttributeValueEmptyNull(parameter, "type");
+        String type = parameter.getAttributeValue("type");
         if (type != null) {
             try {
                 info.setType(ClassLoaderUtils.loadClass(type, getClass()));
@@ -577,14 +572,14 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     protected void setKeyType(TypeClassInfo info, Element mapping, Element parameter) {
-        String componentType = DOMUtils.getAttributeValueEmptyNull(parameter, "keyType");
+        String componentType = parameter.getAttributeValue("keyType");
         if (componentType != null) {
             info.setKeyType(loadGeneric(info, mapping, componentType));
         }
     }
 
     private void setValueType(TypeClassInfo info, Element mapping, Element parameter) {
-        String componentType = DOMUtils.getAttributeValueEmptyNull(parameter, "valueType");
+        String componentType = parameter.getAttributeValue("valueType");
         if (componentType != null) {
             info.setValueType(loadGeneric(info, mapping, componentType));
         }
@@ -617,10 +612,10 @@ public class XMLTypeCreator extends AbstractTypeCreator {
                 Element match = getMatch(element, "parameter[@index='" + i + "']");
                 if (match != null
                 // we check if the type is specified and matches
-                    && DOMUtils.getAttributeValueEmptyNull(match, "class") != null
+                    && match.getAttributeValue("class") != null
                     // if it doesn't match, then we can definitely rule out
                     // this result
-                    && !DOMUtils.getAttributeValueEmptyNull(match, "class").equals(parameterType.getName())) {
+                    && !match.getAttributeValue("class").equals(parameterType.getName())) {
 
                     iterator.remove();
                 }
@@ -637,9 +632,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         int highestSpecified = 0;
         for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
             Element element = (Element)iterator.next();
-
-            List<Element> params = DOMUtils.getChildrenWithName(element, "", "parameter");
-            int availableParameters = params.size();
+            int availableParameters = element.getChildren("parameter").size();
             if (availableParameters > highestSpecified) {
                 bestCandidate = element;
                 highestSpecified = availableParameters;
@@ -648,17 +641,23 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         return bestCandidate;
     }
 
-    private Element getMatch(Node doc, String xpath) {
-        return (Element)xpathUtils.getValue(xpath, doc, XPathConstants.NODE);
+    private Element getMatch(Object doc, String xpath) {
+        try {
+            XPath path = XPath.newInstance(xpath);
+            return (Element)path.selectSingleNode(doc);
+        } catch (JDOMException e) {
+            throw new DatabindingException("Error evaluating xpath " + xpath, e);
+        }
     }
 
-    private List<Element> getMatches(Node doc, String xpath) {
-        NodeList nl = (NodeList)xpathUtils.getValue(xpath, doc, XPathConstants.NODESET);
-        List<Element> r = new ArrayList<Element>();
-        for (int x = 0; x < nl.getLength(); x++) {
-            r.add((Element)nl.item(x));
+    @SuppressWarnings("unchecked")
+    private List<Element> getMatches(Object doc, String xpath) {
+        try {
+            XPath path = XPath.newInstance(xpath);
+            return path.selectNodes(doc);
+        } catch (JDOMException e) {
+            throw new DatabindingException("Error evaluating xpath " + xpath, e);
         }
-        return r;
     }
 
     /**
@@ -677,12 +676,12 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
         String prefix = value.substring(0, index);
         String localName = value.substring(index + 1);
-        String ns = DOMUtils.getNamespace(e, prefix);
+        Namespace ns = e.getNamespace(prefix);
 
         if (ns == null || localName == null) {
             throw new DatabindingException("Invalid QName in mapping: " + value);
         }
 
-        return new QName(ns, localName, prefix);
+        return new QName(ns.getURI(), localName, prefix);
     }
 }

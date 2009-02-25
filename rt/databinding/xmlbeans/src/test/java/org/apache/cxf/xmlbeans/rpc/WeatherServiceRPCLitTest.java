@@ -28,8 +28,8 @@ import org.w3c.dom.Node;
 
 import net.webservicex.WeatherData;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.xmlbeans.AbstractXmlBeansTest;
 import org.junit.Before;
 import org.junit.Test;

@@ -19,7 +19,6 @@
 package org.apache.cxf.aegis.type.encoded;
 
 import java.util.Set;
-
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
@@ -28,7 +27,7 @@ import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.jdom.Element;
 
 /**
  * SoapRefType reads and writes SoapRef objects.
@@ -78,9 +77,8 @@ public class SoapRefType extends Type {
         SoapEncodingUtil.writeRef(writer, refId);
     }
 
-    @Override
-    public void writeSchema(XmlSchema schema) {
-        baseType.writeSchema(schema);
+    public void writeSchema(Element root) {
+        baseType.writeSchema(root);
     }
 
     public TypeMapping getTypeMapping() {

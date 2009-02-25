@@ -27,8 +27,7 @@ import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
-import org.apache.ws.commons.schema.XmlSchema;
-
+import org.jdom.Element;
 import org.junit.Test;
 
 /**
@@ -45,9 +44,8 @@ public class CustomMappingTest extends AbstractAegisTest {
         TypeMapping mapping = context.getTypeMapping();
         // we are replacing the default mapping.
         mapping.register(beanType);
-        XmlSchema schema = newXmlSchema("http://util.java");
-        beanType.writeSchema(schema);
-        // well, test?
+        Element root = new Element("dummySchema");
+        beanType.writeSchema(root);
     }
 
 }
