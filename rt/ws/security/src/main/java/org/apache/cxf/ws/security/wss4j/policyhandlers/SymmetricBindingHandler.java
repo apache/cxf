@@ -196,6 +196,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else if (encryptionToken instanceof X509Token && isRequestor()) {
                 Element el = tok.getToken();
                 this.addEncyptedKeyElement(cloneElement(el));
+                attached = true;
             }
             
             WSSecBase encr = doEncryption(encryptionWrapper, tok, attached, encrParts, true);
