@@ -27,6 +27,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -42,6 +44,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -63,6 +67,9 @@ import org.apache.cxf.transport.http.HTTPConduit;
  */
 public class ClientProxyImpl extends AbstractClient implements InvocationHandler {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(ClientProxyImpl.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ClientProxyImpl.class);
+    
     private ClassResourceInfo cri;
     private boolean inheritHeaders;
     
@@ -89,15 +96,14 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(m);
         if (ori == null) {
-            throw new WebApplicationException(400);
+            reportInvalidResourceMethod(m, "INVALID_RESOURCE_METHOD");
         }
-        
         
         MultivaluedMap<ParameterType, Parameter> types = 
             getParametersInfo(ori, m, params);
         List<Object> pathParams = getParamValues(types, params, ParameterType.PATH);
         
-        int bodyIndex = getBodyIndex(types, ori.isSubResourceLocator());
+        int bodyIndex = getBodyIndex(types, ori);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
         if (cri.isRoot()) {
@@ -117,7 +123,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         if (ori.isSubResourceLocator()) {
             ClassResourceInfo subCri = cri.getSubResource(m.getReturnType(), m.getReturnType());
             if (subCri == null) {
-                throw new WebApplicationException();
+                reportInvalidResourceMethod(m, "INVALID_SUBRESOURCE");
             }
             ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, inheritHeaders);
             proxyImpl.setBus(bus);
@@ -157,20 +163,21 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         if (map.containsKey(ParameterType.REQUEST_BODY)) {
             if (map.get(ParameterType.REQUEST_BODY).size() > 1) {
-                throw new WebApplicationException();
+                reportInvalidResourceMethod(m, "SINGLE_BODY_ONLY");
             }
             if (map.containsKey(ParameterType.FORM)) {
-                throw new WebApplicationException();
+                reportInvalidResourceMethod(m, "ONLY_FORM_ALLOWED");
             }
         }
         return map;
     }
     
-    private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, boolean subresource) {
+    private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, 
+                                    OperationResourceInfo ori) {
         List<Parameter> list = map.get(ParameterType.REQUEST_BODY);
         int index  = list == null ? -1 : list.get(0).getIndex(); 
-        if (subresource && index != -1) {
-            throw new WebApplicationException();
+        if (ori.isSubResourceLocator() && index != -1) {
+            reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_BODY_IN_SUBRESOURCE");
         }
         return index;
     }
@@ -318,7 +325,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         Context ctx = AnnotationUtils.getAnnotation(anns, Context.class);
         if (ctx != null) {
-            throw new WebApplicationException();
+            reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_CONTEXT_PARAMETERS");
         }
         
         boolean isEncoded = AnnotationUtils.isEncoded(anns, ori);
@@ -389,7 +396,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
                           OperationResourceInfo ori, Object[] params, int bodyIndex, 
                           MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
-        Message m = createMessage(ori.getHttpMethod(), headers, uri.toString());
+        Message m = createMessage(ori.getHttpMethod(), headers, uri);
 
         if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
             m.setContent(OperationResourceInfo.class, ori);
@@ -424,6 +431,16 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         return readBody(r, connect, inMessage, method.getReturnType(), 
                         method.getGenericReturnType(), method.getDeclaredAnnotations());
+    }
+
+    protected static void reportInvalidResourceMethod(Method m, String name) {
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message(name, 
+                                                   BUNDLE,
+                                                   m.getDeclaringClass().getName(), 
+                                                   m.getName());
+        LOG.severe(errorMsg.toString());
+        throw new WebApplicationException(405);
     }
     
     private static class Parameter {
@@ -500,4 +517,5 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         
     }
+    
 }

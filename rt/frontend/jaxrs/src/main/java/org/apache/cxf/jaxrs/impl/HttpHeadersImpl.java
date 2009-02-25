@@ -49,11 +49,19 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
     
     public List<MediaType> getAcceptableMediaTypes() {
-        return JAXRSUtils.sortMediaTypes((String)m.get(Message.ACCEPT_CONTENT_TYPE)); 
+        String lValues = headers.getFirst(HttpHeaders.ACCEPT);
+        if (lValues == null) {
+            return Collections.emptyList();
+        }
+        return JAXRSUtils.sortMediaTypes(lValues); 
     }
 
     public Map<String, Cookie> getCookies() {
-        List<String> cs = headers.get(HttpHeaders.COOKIE);
+        List<String> values = headers.get(HttpHeaders.COOKIE);
+        if (values == null || values.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        String[] cs =  values.get(0).split(",");
         Map<String, Cookie> cl = new HashMap<String, Cookie>(); 
         for (String c : cs) {
             Cookie cookie = Cookie.valueOf(c);

@@ -23,13 +23,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,6 +117,20 @@ public class HttpHeadersImplTest extends Assert {
         List<Locale> languages = h.getAcceptableLanguages();
         assertEquals(1, languages.size());
         assertEquals(new Locale("en"), languages.get(0));
+    }
+    
+    @Test
+    public void testGetCookies() throws Exception {
+        
+        Message m = new MessageImpl();
+        MetadataMap<String, String> headers = createHeaders();
+        headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        Map<String, Cookie> cookies = h.getCookies();
+        assertEquals(2, cookies.size());
+        assertEquals("b", cookies.get("a").getValue());
+        assertEquals("d", cookies.get("c").getValue());
     }
     
     @Test

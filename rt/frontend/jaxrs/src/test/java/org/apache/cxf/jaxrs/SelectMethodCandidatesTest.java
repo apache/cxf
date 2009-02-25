@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,7 +65,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "unlimitedPath", 
+        assertEquals("listMethod needs to be selected", "readMethod", 
                      ori.getMethodToInvoke().getName());
         
         

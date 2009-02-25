@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -40,6 +41,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
@@ -62,7 +66,9 @@ public class BookStore {
     private String currentBookId;
     @PathParam("CDId")
     private String currentCdId;
-
+    @Context
+    private HttpHeaders httpHeaders;
+    
     public BookStore() {
         init();
     }
@@ -148,6 +154,18 @@ public class BookStore {
     @GET
     @Path("/bookheaders/")
     public Book getBookByHeader(@HeaderParam("BOOK") List<String> ids) throws Exception {
+        List<MediaType> types = httpHeaders.getAcceptableMediaTypes();
+        if (types.size() != 2 
+            || !"text/xml".equals(types.get(0).toString())
+            || !MediaType.APPLICATION_XML_TYPE.isCompatible(types.get(1))) {
+            throw new WebApplicationException();
+        }
+        List<Locale> locales = httpHeaders.getAcceptableLanguages();
+        if (locales.size() != 2 
+            || !"en".equals(locales.get(0).getLanguage())
+            || !"da".equals(locales.get(1).getLanguage())) {
+            throw new WebApplicationException();
+        }
         
         return doGetBook(ids.get(0) + ids.get(1) + ids.get(2));
     }

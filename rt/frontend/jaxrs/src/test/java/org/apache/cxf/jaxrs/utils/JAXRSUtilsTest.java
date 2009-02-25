@@ -405,9 +405,9 @@ public class JAXRSUtilsTest extends Assert {
         List<MediaType> types = 
             JAXRSUtils.sortMediaTypes("text/*,text/plain;q=.2,text/xml,TEXT/BAR");
         assertTrue(types.size() == 4
-                   && "text/bar".equals(types.get(0).toString())
-                   && "text/plain;q=.2".equals(types.get(1).toString())
-                   && "text/xml".equals(types.get(2).toString())
+                   && "text/xml".equals(types.get(0).toString())
+                   && "text/bar".equals(types.get(1).toString())
+                   && "text/plain;q=.2".equals(types.get(2).toString())
                    && "text/*".equals(types.get(3).toString()));
     }
     
@@ -424,10 +424,10 @@ public class JAXRSUtilsTest extends Assert {
         assertTrue("text/* should be equal to itself", 
                    JAXRSUtils.compareMediaTypes(m2, new MediaType("text", "*")) == 0);
         
-        assertTrue("text/plain is alphabetically earlier than text/xml", 
-                   JAXRSUtils.compareMediaTypes(MediaType.valueOf("text/plain"), m1) < 0);
-        assertTrue("text/xml is alphabetically later than text/plain", 
-                   JAXRSUtils.compareMediaTypes(m1, MediaType.valueOf("text/plain")) > 0);
+        assertTrue("text/plain and text/xml are just two specific media types", 
+                   JAXRSUtils.compareMediaTypes(MediaType.valueOf("text/plain"), m1) == 0);
+        assertTrue("text/xml and text/plain are just two specific media types", 
+                   JAXRSUtils.compareMediaTypes(m1, MediaType.valueOf("text/plain")) == 0);
         assertTrue("*/* is less specific than text/xml", 
                    JAXRSUtils.compareMediaTypes(JAXRSUtils.ALL_TYPES, m1) > 0);
         assertTrue("*/* is less specific than text/xml", 

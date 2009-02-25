@@ -330,14 +330,6 @@ public final class JAXRSUtils {
     
     public static int compareMediaTypes(MediaType mt1, MediaType mt2) {
         
-        if (mt1.getType().equals(mt2.getType())
-            && mt1.getSubtype().equals(mt2.getSubtype())) {
-            float q1 = getMediaTypeQualityFactor(mt1.getParameters().get("q"));
-            float q2 = getMediaTypeQualityFactor(mt2.getParameters().get("q"));
-            int result = Float.compare(q1, q2);
-            return result == 0 ? result : result * -1;
-        }
-        
         if (mt1.isWildcardType() && !mt2.isWildcardType()) {
             return 1;
         }
@@ -353,7 +345,15 @@ public final class JAXRSUtils {
                 return -1;
             }       
         }
-        return mt1.toString().compareTo(mt2.toString());
+        
+        float q1 = getMediaTypeQualityFactor(mt1.getParameters().get("q"));
+        float q2 = getMediaTypeQualityFactor(mt2.getParameters().get("q"));
+        int result = Float.compare(q1, q2);
+        if (result != 0) {
+            return result * -1;
+        }
+        
+        return 0;
         
     }
 

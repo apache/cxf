@@ -71,6 +71,9 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testMultipleFactories() {
         assertSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
+        assertSame(ProviderFactory.getInstance("/"), ProviderFactory.getInstance("/"));
+        assertSame(ProviderFactory.getInstance(), ProviderFactory.getInstance("/"));
+        assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getSharedInstance());
         assertSame(ProviderFactory.getInstance("/bar"), ProviderFactory.getInstance("/bar"));
         assertNotSame(ProviderFactory.getInstance("/bar"), ProviderFactory.getInstance("/"));
     }
@@ -150,10 +153,11 @@ public class ProviderFactoryTest extends Assert {
     public void testSortEntityProvidersWithConfig() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         JSONProvider json1 = new JSONProvider();
+        json1.setConsumeMediaTypes(Collections.singletonList("application/json;q=0.9"));
         pf.registerUserProvider(json1);
         JSONProvider json2 = new JSONProvider();
-        json2.setConsumeMediaTypes(Collections.singletonList("application/abc"));
-        json2.setProduceMediaTypes(Collections.singletonList("application/sbc"));
+        json2.setConsumeMediaTypes(Collections.singletonList("application/json"));
+        json2.setProduceMediaTypes(Collections.singletonList("application/sbc;q=0.9"));
         pf.registerUserProvider(json2);
         
         List<ProviderInfo<MessageBodyReader>> readers = pf.getMessageReaders();

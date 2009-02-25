@@ -20,11 +20,18 @@ package org.apache.cxf.jaxrs;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -48,6 +55,9 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  * This will start a server for you and register it with the ServerManager.
  */
 public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXRSFactoryBean.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXRSFactoryBean.class);
     
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
@@ -190,4 +200,13 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         setProviders(Collections.singletonList(provider));
     }
 
+    protected void checkResources() {
+        if (!serviceFactory.resourcesAvailable()) {
+            org.apache.cxf.common.i18n.Message msg = 
+                new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
+                                                       BUNDLE);
+            LOG.severe(msg.toString());
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
 }

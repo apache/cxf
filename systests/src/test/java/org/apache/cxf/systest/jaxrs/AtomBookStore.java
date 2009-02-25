@@ -77,7 +77,7 @@ public class AtomBookStore {
     
     @GET
     @Path("/books/feed")
-    @Produces({"application/json", "application/atom+xml" })
+    @Produces({"application/atom+xml", "application/json" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
         
         MediaType mt = headers.getMediaType();

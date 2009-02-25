@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
@@ -46,6 +48,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
@@ -70,6 +74,9 @@ import org.apache.cxf.transport.MessageObserver;
  */
 public class AbstractClient implements Client {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
+    
     protected List<Interceptor> inInterceptors = new ModCountCopyOnWriteArrayList<Interceptor>();
     protected List<Interceptor> outInterceptors = new ModCountCopyOnWriteArrayList<Interceptor>();
     protected ConduitSelector conduitSelector;
@@ -347,7 +354,7 @@ public class AbstractClient implements Client {
             }
              
         } else {
-            throw new WebApplicationException();
+            reportNoMessageHandler("NO_MSG_WRITER", cls);
         }
                                                                                  
     }
@@ -381,9 +388,18 @@ public class AbstractClient implements Client {
             }
              
         } else {
-            throw new WebApplicationException();
+            reportNoMessageHandler("NO_MSG_READER", cls);
         }
-                                                                                 
+        return null;                                                
+    }
+    
+    protected static void reportNoMessageHandler(String name, Class<?> cls) {
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message(name, 
+                                                   BUNDLE,
+                                                   cls);
+        LOG.severe(errorMsg.toString());
+        throw new WebApplicationException(415);
     }
     
     private static MediaType getResponseContentType(Response r) {
@@ -457,14 +473,16 @@ public class AbstractClient implements Client {
     
     protected Message createMessage(String httpMethod, 
                                     MultivaluedMap<String, String> headers,
-                                    String address) {
+                                    URI currentURI) {
         Message m = conduitSelector.getEndpoint().getBinding().createMessage();
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
         
         m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         m.put(Message.PROTOCOL_HEADERS, headers);
-        m.put(Message.ENDPOINT_ADDRESS, address);
+        m.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
+        m.put(Message.REQUEST_URI, currentURI.toString());
+        
         m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         
         
