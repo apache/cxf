@@ -58,14 +58,14 @@ public class SelectMethodCandidatesTest extends Assert {
                      ori.getMethodToInvoke().getName());
         
         
-        acceptContentTypes = "*/*";
+        acceptContentTypes = "application/xml,application/json";
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values);
         ori = JAXRSUtils.findTargetMethod(resource, 
                                         values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
                                         "GET", values, contentTypes, 
-                                        Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
+                                        JAXRSUtils.parseMediaTypes(acceptContentTypes));
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "readMethod", 
+        assertEquals("readMethod needs to be selected", "readMethod", 
                      ori.getMethodToInvoke().getName());
         
         
@@ -77,7 +77,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "readMethod", 
+        assertEquals("readMethod needs to be selected", "readMethod", 
                      ori.getMethodToInvoke().getName());
         
         contentTypes = "application/json";
@@ -88,7 +88,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "readMethod2", 
+        assertEquals("readMethod2 needs to be selected", "readMethod2", 
                      ori.getMethodToInvoke().getName());
         
         contentTypes = "application/json";
@@ -99,7 +99,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "unlimitedPath", 
+        assertEquals("unlimitedPath needs to be selected", "unlimitedPath", 
                      ori.getMethodToInvoke().getName());
         
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1/2", values);
@@ -108,7 +108,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "limitedPath", 
+        assertEquals("limitedPath needs to be selected", "limitedPath", 
                      ori.getMethodToInvoke().getName());
         
     }
