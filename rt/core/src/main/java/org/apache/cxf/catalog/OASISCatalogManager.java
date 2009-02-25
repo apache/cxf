@@ -55,12 +55,12 @@ public class OASISCatalogManager {
 
     public OASISCatalogManager() {
         CatalogManager catalogManager = new CatalogManager();
+        if (DEBUG_LEVEL != null) {
+            catalogManager.debug.setDebug(Integer.parseInt(DEBUG_LEVEL));
+        }
         catalogManager.setUseStaticCatalog(false);
         catalogManager.setIgnoreMissingProperties(true);
         CatalogResolver catalogResolver = new CatalogResolver(catalogManager);
-        if (DEBUG_LEVEL != null) {
-            catalogManager.debug.setDebug(Integer.parseInt(DEBUG_LEVEL));            
-        }
         this.resolver = catalogResolver.getCatalog();
     }
 
