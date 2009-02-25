@@ -76,6 +76,9 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                             //expected.getCause().printStackTrace();
                             MalformedURLException mue = (MalformedURLException)expected
                                 .getCause().getCause();
+                            if (mue == null || mue.getMessage() == null) {
+                                throw expected;
+                            }
                             assertTrue("protocol contains thread id from context", mue.getMessage()
                                 .indexOf(protocol) != 0);
                         }
