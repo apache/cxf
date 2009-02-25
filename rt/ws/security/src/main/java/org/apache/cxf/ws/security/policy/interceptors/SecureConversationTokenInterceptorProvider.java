@@ -56,6 +56,9 @@ import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -325,7 +328,15 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                 }
                 if (!isRequestor(message)) {
                     String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
-                    
+                    if (s == null) {
+                        //MS/WCF doesn't put a soap action out for this, must check the headers
+                        AddressingProperties inProps = (AddressingProperties)message
+                            .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+                        if (inProps != null) {
+                            s = inProps.getAction().getValue();
+                        }
+                    }
+
                     if (s != null 
                         && s.contains("/RST/SCT")
                         && (s.startsWith(STSUtils.WST_NS_05_02)
@@ -415,6 +426,17 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         public class STSInvoker implements Invoker {
 
             public Object invoke(Exchange exchange, Object o) {
+                AddressingProperties inProps = (AddressingProperties)exchange.getInMessage()
+                    .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+                if (inProps != null) {
+                    AddressingProperties props = new AddressingPropertiesImpl();
+                    AttributedURIType action = new AttributedURIType();
+                    action.setValue(inProps.getAction().getValue().replace("/RST/", "/RSTR/"));
+                    props.setAction(action);
+                    exchange.getOutMessage().put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND,
+                                                 props);
+                }
+                
                 MessageContentsList lst = (MessageContentsList)o;
                 DOMSource src = (DOMSource)lst.get(0);
                 Node nd = src.getNode();
