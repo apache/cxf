@@ -29,7 +29,9 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.util.NamespaceHelper;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.jdom.Element;
 
 public class XMLBeanTypeInfo extends BeanTypeInfo {
@@ -100,12 +102,43 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         }
 
         if (e != null) {
-            QName mappedType = NamespaceHelper.createQName(e, e.getAttributeValue("typeName"),
+            QName mappedType = NamespaceHelper.createQName(e, 
+                                                           e.getAttributeValue("typeName"),
                                                            getDefaultNamespace());
             if (mappedType != null) {
                 mapTypeName(mappedName, mappedType);
-            }
+            } 
+            
+            /*
+             * Whenever we create a type object, it has to have a schema type. If we created a custom type
+             * object out of thin air here, we've may have a problem. If "typeName" was specified, then then
+             * we know the mapping. But if mappedName was not specified, then the typeName will come from the
+             * type mapping, so we have to ask it. And if some other type creator has something to say about
+             * it, we'll get it wrong.
+             */
 
+            
+            String explicitTypeName = e.getAttributeValue("type");
+            if (explicitTypeName != null) {
+                try {
+                    Class<?> typeClass = 
+                        ClassLoaderUtils.loadClass(explicitTypeName, XMLBeanTypeInfo.class);
+                    Type customTypeObject = (Type) typeClass.newInstance();
+                    mapType(mappedName, customTypeObject);
+                    QName schemaType = mappedType;
+                    if (schemaType == null) {
+                        schemaType = getTypeMapping().getTypeQName(pd.getPropertyType());
+                    }
+                    customTypeObject.setSchemaType(schemaType);
+                } catch (ClassNotFoundException e1) {
+                    //
+                } catch (InstantiationException e2) {
+                    //
+                } catch (IllegalAccessException e3) {
+                    //
+                }                
+            }
+            
             String nillableVal = e.getAttributeValue("nillable");
             if (nillableVal != null && nillableVal.length() > 0) {
                 ensurePropertyInfo(mappedName).setNillable(Boolean.valueOf(nillableVal).booleanValue());
