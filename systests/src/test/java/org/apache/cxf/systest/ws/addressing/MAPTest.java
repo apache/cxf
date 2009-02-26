@@ -21,6 +21,7 @@ package org.apache.cxf.systest.ws.addressing;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -67,6 +68,7 @@ public class MAPTest extends MAPTestBase {
     }
 
     @Test
+    @Ignore("move to separate test")
     public void testFallbackThreadPoolConfig() throws Exception { 
         Runnable r = new Runnable() {
             public void run() {
