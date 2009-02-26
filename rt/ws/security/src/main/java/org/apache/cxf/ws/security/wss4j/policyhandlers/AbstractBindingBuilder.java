@@ -76,6 +76,7 @@ import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
@@ -290,19 +291,15 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected PolicyAssertion findPolicy(QName n) {
+    protected Collection<PolicyAssertion> findAndAssertPolicy(QName n) {
         Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
         if (ais != null && !ais.isEmpty()) {
-            return ais.iterator().next().getAssertion();
-        }
-        return null;
-    } 
-    protected PolicyAssertion findAndAssertPolicy(QName n) {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            AssertionInfo ai = ais.iterator().next();
-            ai.setAsserted(true);
-            return ai.getAssertion();
+            List<PolicyAssertion> p = new ArrayList<PolicyAssertion>(ais.size());
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+                p.add(ai.getAssertion());
+            }
+            return p;
         }
         return null;
     } 
@@ -362,16 +359,36 @@ public abstract class AbstractBindingBuilder {
         }
         return timestamp;
     }
-    protected void assertSupportingTokens(PolicyAssertion suppTokens) {
-        if (suppTokens instanceof SupportingToken) {
-            for (Token token : ((SupportingToken)suppTokens).getTokens()) {
-                this.policyAsserted(token);
-            }        
+    protected void assertSupportingTokens(Collection<PolicyAssertion> suppTokens) {
+        if (suppTokens == null) {
+            return;
+        }
+        for (PolicyAssertion pa : suppTokens) {
+            if (pa instanceof SupportingToken) {
+                for (Token token : ((SupportingToken)suppTokens).getTokens()) {
+                    this.policyAsserted(token);
+                }        
+            }
         }
     }
-    
-    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens, boolean endorse) {
+    protected Map<Token, WSSecBase> handleSupportingTokens(Collection<PolicyAssertion> tokens, 
+                                                           boolean endorse) {
         Map<Token, WSSecBase> ret = new HashMap<Token, WSSecBase>();
+        if (tokens != null) {
+            for (PolicyAssertion pa : tokens) {
+                if (pa instanceof SupportingToken) {
+                    handleSupportingTokens((SupportingToken)pa, endorse, ret);
+                }
+            }
+        }
+        return ret;
+    }    
+    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens, boolean endorse) {
+        return handleSupportingTokens(suppTokens, endorse, new HashMap<Token, WSSecBase>());
+    }
+    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens, 
+                                                           boolean endorse,
+                                                           Map<Token, WSSecBase> ret) {
         if (suppTokens == null) {
             return ret;
         }
@@ -386,8 +403,10 @@ public abstract class AbstractBindingBuilder {
                     //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
                     encryptedTokensIdList.add(utBuilder.getId());
                 }
-            } else if (token instanceof IssuedToken && isRequestor()) {
-                //ws-trust stuff.......
+            } else if (isRequestor() 
+                && (token instanceof IssuedToken
+                    || token instanceof SecureConversationToken)) {
+                //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
                     policyNotAsserted(token, "Could not find IssuedToken");
@@ -1229,8 +1248,12 @@ public abstract class AbstractBindingBuilder {
             }
             
         } else {
-            sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                  + WSConstants.SAML_ASSERTION_ID);
+            if (tok.getTokenType() != null) {
+                sig.setCustomTokenValueType(tok.getTokenType());
+            } else {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                            + WSConstants.SAML_ASSERTION_ID);
+            }
             sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         }
         
@@ -1273,42 +1296,41 @@ public abstract class AbstractBindingBuilder {
     }    
     protected void addSupportingTokens(Vector<WSEncryptionPart> sigs) {
         
-        SupportingToken sgndSuppTokens = 
-            (SupportingToken)findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> sgndSuppTokens = 
+            findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         
         Map<Token, WSSecBase> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens, false);           
         
-        SupportingToken endSuppTokens = 
-            (SupportingToken)findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> endSuppTokens = 
+            findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
 
         endSuppTokMap = this.handleSupportingTokens(endSuppTokens, true);
 
-        SupportingToken sgndEndSuppTokens 
-            = (SupportingToken)findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> sgndEndSuppTokens 
+            = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true);
         
-        SupportingToken sgndEncryptedSuppTokens 
-            = (SupportingToken)findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> sgndEncryptedSuppTokens 
+            = findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         Map<Token, WSSecBase> sgndEncSuppTokMap 
             = this.handleSupportingTokens(sgndEncryptedSuppTokens, false);
         
-        SupportingToken endorsingEncryptedSuppTokens 
-            = (SupportingToken)findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> endorsingEncryptedSuppTokens 
+            = findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         endEncSuppTokMap 
             = this.handleSupportingTokens(endorsingEncryptedSuppTokens, true);
 
-        SupportingToken sgndEndEncSuppTokens 
-            = (SupportingToken)findAndAssertPolicy(SP12Constants
-                                                       .SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> sgndEndEncSuppTokens 
+            = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         sgndEndEncSuppTokMap 
             = this.handleSupportingTokens(sgndEndEncSuppTokens, true);
 
-        SupportingToken supportingToks 
-            = (SupportingToken)findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> supportingToks 
+            = findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
         this.handleSupportingTokens(supportingToks, false);
 
-        SupportingToken encryptedSupportingToks 
-            = (SupportingToken)findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+        Collection<PolicyAssertion> encryptedSupportingToks 
+            = findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
         this.handleSupportingTokens(encryptedSupportingToks, false);
 
         //Setup signature parts

@@ -259,15 +259,25 @@ public class STSClient implements Configurable {
     public SecurityToken requestSecurityToken() throws Exception {
         return requestSecurityToken(null);
     }
-
     public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
+        String action = null;
+        if (isSecureConv) {
+            action = namespace + "/RST/SCT";
+        }
+        return requestSecurityToken(appliesTo, action, "/Issue", null);
+    }
+    
+    public SecurityToken requestSecurityToken(String appliesTo,
+                                              String action,
+                                              String requestType,
+                                              SecurityToken target) throws Exception {
         createClient();
         BindingOperationInfo boi = findOperation("/RST/Issue");
         
         client.getRequestContext().putAll(ctx);
-        if (isSecureConv) {
+        if (action != null) {
             client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
-                                           namespace + "/RST/SCT");
+                                           action);
         }
         
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
@@ -290,7 +300,7 @@ public class STSClient implements Configurable {
         
 
         writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + "/Issue");
+        writer.writeCharacters(namespace + requestType);
         writer.writeEndElement();        
         addAppliesTo(writer, appliesTo);
         if (isSecureConv) {
@@ -349,6 +359,15 @@ public class STSClient implements Configurable {
             writer.writeEndElement();
             writer.writeEndElement();
         }
+        if (target != null) {
+            writer.writeStartElement("wst", "RenewTarget", namespace);
+            Element el = target.getUnattachedReference();
+            if (el == null) {
+                el = target.getAttachedReference();
+            }
+            StaxUtils.copy(el, writer);
+            writer.writeEndElement();
+        }
         writer.writeEndElement();
         
         Object obj[] = client.invoke(boi,
@@ -356,7 +375,14 @@ public class STSClient implements Configurable {
         
         return createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
     }
-    
+    public void renewSecurityToken(SecurityToken tok) throws Exception {
+        String action = null;
+        if (isSecureConv) {
+            action = namespace + "/RST/SCT/Renew";
+        }
+        requestSecurityToken(tok.getIssuerAddress(), action, "/Renew", tok);
+    }
+
     private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
         Date creationTime = new Date();
         Date expirationTime = new Date();
@@ -543,5 +569,6 @@ public class STSClient implements Configurable {
     public void setTemplate(Element rstTemplate) {
         template = rstTemplate;
     }
+
 
 }

@@ -70,11 +70,13 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.ProtectionToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
+import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
@@ -173,6 +175,48 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         return assertion;
     }
 
+    static String setupClient(STSClient client,
+                            SoapMessage message,
+                            AssertionInfoMap aim,
+                            SecureConversationToken itok,
+                            boolean endorse) {
+        client.setTrust(getTrust10(aim));
+        client.setTrust(getTrust13(aim));
+        Policy pol = itok.getBootstrapPolicy();
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        all.addPolicyComponent(getAddressingPolicy(aim, false));
+        ea.addPolicyComponent(all);
+        
+        if (endorse) {
+            SupportingToken st = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING,
+                                                     SP12Constants.INSTANCE);
+            st.addToken(itok);
+            all.addPolicyComponent(st);
+        }
+        pol = p.merge(pol);
+        
+        client.setPolicy(pol);
+        client.setSoap11(message.getVersion() == Soap11.getInstance());
+        client.setSecureConv(true);
+        String s = message
+            .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+        client.setLocation(s);
+        
+        Map<String, Object> ctx = client.getRequestContext();
+        mapSecurityProps(message, ctx);
+        return s;
+    }
+    private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
+        for (String s : SecurityConstants.ALL_PROPERTIES) {
+            Object v = message.getContextualProperty(s + ".sct");
+            if (v != null) {
+                ctx.put(s, v);
+            }
+        }
+    }
     static STSClient getClient(Message message) {
         STSClient client = (STSClient)message
             .getContextualProperty(SecurityConstants.STS_CLIENT);
@@ -207,59 +251,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                         }
                     }
                     if (tok == null) {
-                        STSClient client = getClient(message);
-                        AddressingProperties maps =
-                            (AddressingProperties)message
-                                .get("javax.xml.ws.addressing.context.outbound");
-                        if (maps == null) {
-                            maps = (AddressingProperties)message
-                                .get("javax.xml.ws.addressing.context");
-                        }
-                        synchronized (client) {
-                            try {
-                                client.setTrust(getTrust10(aim));
-                                client.setTrust(getTrust13(aim));
-                                Policy pol = itok.getBootstrapPolicy();
-                                if (maps != null) {
-                                    Policy p = new Policy();
-                                    ExactlyOne ea = new ExactlyOne();
-                                    p.addPolicyComponent(ea);
-                                    All all = new All();
-                                    all.addPolicyComponent(getAddressingPolicy(aim, false));
-                                    ea.addPolicyComponent(all);
-                                    pol = p.merge(pol);
-                                }
-                                
-                                client.setPolicy(pol);
-                                client.setSoap11(message.getVersion() == Soap11.getInstance());
-                                client.setSecureConv(true);
-                                String s = message
-                                    .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
-                                client.setLocation(s);
-                                
-                                Map<String, Object> ctx = client.getRequestContext();
-                                mapSecurityProps(message, ctx);
-                                if (maps == null) {
-                                    tok = client.requestSecurityToken(s);
-                                } else {
-                                    client.setAddressingNamespace(maps.getNamespaceURI());
-                                    tok = client.requestSecurityToken(s);
-                                }
-                                tok.setTokenType(WSConstants.WSC_SCT);
-                            } catch (RuntimeException e) {
-                                throw e;
-                            } catch (Exception e) {
-                                throw new Fault(e);
-                            } finally {
-                                client.setTrust((Trust10)null);
-                                client.setTrust((Trust13)null);
-                                client.setTemplate(null);
-                                client.setLocation(null);
-                                client.setAddressingNamespace(null);
-                            }
-                        }
+                        tok = issueToken(message, aim, itok);
                     } else {
-                        //renew token?
+                        renewToken(message, aim, tok, itok);
                     }
                     if (tok != null) {
                         for (AssertionInfo ai : ais) {
@@ -279,11 +273,83 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         }
         
         
-        private void mapSecurityProps(Message message, Map<String, Object> ctx) {
-            for (String s : SecurityConstants.ALL_PROPERTIES) {
-                Object v = message.getContextualProperty(s + ".sct");
-                if (v != null) {
-                    ctx.put(s, v);
+        private void renewToken(SoapMessage message,
+                                AssertionInfoMap aim, 
+                                SecurityToken tok,
+                                SecureConversationToken itok) {
+            if (tok.getState() != SecurityToken.State.EXPIRED) {
+                return;
+            }
+            
+            STSClient client = getClient(message);
+            AddressingProperties maps =
+                (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context.outbound");
+            if (maps == null) {
+                maps = (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context");
+            } else if (maps.getAction().getValue().endsWith("Renew")) {
+                return;
+            }
+            synchronized (client) {
+                try {
+                    setupClient(client, message, aim, itok, true);
+
+                    String s = message
+                        .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+                    client.setLocation(s);
+                    
+                    Map<String, Object> ctx = client.getRequestContext();
+                    ctx.put(SecurityConstants.TOKEN, tok);
+                    if (maps != null) {
+                        client.setAddressingNamespace(maps.getNamespaceURI());
+                    }
+                    client.renewSecurityToken(tok);
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new Fault(e);
+                } finally {
+                    client.setTrust((Trust10)null);
+                    client.setTrust((Trust13)null);
+                    client.setTemplate(null);
+                    client.setLocation(null);
+                    client.setAddressingNamespace(null);
+                }
+            }            
+        }
+        private SecurityToken issueToken(SoapMessage message,
+                                         AssertionInfoMap aim,
+                                         SecureConversationToken itok) {
+            STSClient client = getClient(message);
+            AddressingProperties maps =
+                (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context.outbound");
+            if (maps == null) {
+                maps = (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context");
+            }
+            synchronized (client) {
+                try {
+                    String s = setupClient(client, message, aim, itok, false);
+
+                    SecurityToken tok = null;
+                    if (maps != null) {
+                        client.setAddressingNamespace(maps.getNamespaceURI());
+                    }
+                    tok = client.requestSecurityToken(s);
+                    tok.setTokenType(WSConstants.WSC_SCT);
+                    return tok;
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new Fault(e);
+                } finally {
+                    client.setTrust((Trust10)null);
+                    client.setTrust((Trust13)null);
+                    client.setTemplate(null);
+                    client.setLocation(null);
+                    client.setAddressingNamespace(null);
                 }
             }
         }

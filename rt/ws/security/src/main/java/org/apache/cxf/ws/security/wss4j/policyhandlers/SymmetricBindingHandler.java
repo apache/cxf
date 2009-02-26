@@ -25,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Vector;
 
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
@@ -109,12 +108,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         }
         
         if (sbinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-            try {
-                doEncryptBeforeSign();
-            } catch (Exception e) {
-                e.printStackTrace();
-                //REVISIT - exception
-            }
+            doEncryptBeforeSign();
         } else {
             doSignBeforeEncrypt();
         }
@@ -140,132 +134,126 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     }
     
     
-    private void doEncryptBeforeSign() throws SOAPException, 
-        WSSecurityException, ConversationException {
-        
-        TokenWrapper encryptionWrapper = getEncryptionToken();
-        Token encryptionToken = encryptionWrapper.getToken();
-        Vector<WSEncryptionPart> encrParts = getEncryptedParts();
-        Vector<WSEncryptionPart> sigParts = getSignedParts();
-        
-        if (encryptionToken == null && encrParts.size() > 0) {
-            //REVISIT - nothing to encrypt?
-        }
-        
-        if (encryptionToken != null && encrParts.size() > 0) {
-            //The encryption token can be an IssuedToken or a 
-             //SecureConversationToken
-            String tokenId = null;
-            SecurityToken tok = null;
-            if (encryptionToken instanceof IssuedToken) {
-                tok = getSecurityToken();
-            } else if (encryptionToken instanceof SecureConversationToken) {
-                tok = getSecurityToken();
-            } else if (encryptionToken instanceof X509Token) {
-                if (isRequestor()) {
-                    tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
-                } else {
-                    tokenId = getEncryptedKey();
-                }
-            }
-            if (tok == null) {
-                if (tokenId == null || tokenId.length() == 0) {
-                    //REVISIT - no tokenId?   Exception?
-                }
-                if (tokenId.startsWith("#")) {
-                    tokenId = tokenId.substring(1);
-                }
-                
-                /*
-                 * Get hold of the token from the token storage
-                 */
-                tok = tokenStore.getToken(tokenId);
-            }
-
-            boolean attached = false;
+    private void doEncryptBeforeSign() {
+        try {
+            TokenWrapper encryptionWrapper = getEncryptionToken();
+            Token encryptionToken = encryptionWrapper.getToken();
+            Vector<WSEncryptionPart> encrParts = getEncryptedParts();
+            Vector<WSEncryptionPart> sigParts = getSignedParts();
             
-            if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == encryptionToken.getInclusion()
-                || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == encryptionToken.getInclusion()
-                || (isRequestor() 
-                    && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                        == encryptionToken.getInclusion())) {
-                
-                Element el = tok.getToken();
-                this.addEncyptedKeyElement(cloneElement(el));
-                attached = true;
-            } else if (encryptionToken instanceof X509Token && isRequestor()) {
-                Element el = tok.getToken();
-                this.addEncyptedKeyElement(cloneElement(el));
-                attached = true;
+            if (encryptionToken == null && encrParts.size() > 0) {
+                //REVISIT - nothing to encrypt?
             }
             
-            WSSecBase encr = doEncryption(encryptionWrapper, tok, attached, encrParts, true);
-            
-            handleEncryptedSignedHeaders(encrParts, sigParts);
-            
-            
-            if (timestampEl != null) {
-                sigParts.add(new WSEncryptionPart(addWsuIdToElement(timestampEl.getElement())));
-            }
-            
-            if (isRequestor()) {
-                this.addSupportingTokens(sigParts);
-            } else {
-                addSignatureConfirmation(sigParts);
-            }
-                
-            
-            //Sign the message
-            //We should use the same key in the case of EncryptBeforeSig
-            if (sigParts.size() > 0) {
-                signatures.add(this.doSignature(sigParts, encryptionWrapper, encryptionToken, tok, attached));
-            }
-            
-            if (isRequestor()) {
-                this.doEndorse();
-            }
-            
-            
-            //Check for signature protection and encryption of UsernameToken
-            if (sbinding.isSignatureProtection() && this.mainSigId != null 
-                || encryptedTokensIdList.size() > 0 && isRequestor()) {
-                Vector<WSEncryptionPart> secondEncrParts = new Vector<WSEncryptionPart>();
-                
-                //Now encrypt the signature using the above token
-                if (sbinding.isSignatureProtection()) {
-                    secondEncrParts.add(new WSEncryptionPart(this.mainSigId, "Element"));
-                }
-                
-                if (isRequestor()) {
-                    for (String s : encryptedTokensIdList) {
-                        secondEncrParts.add(new WSEncryptionPart(s, "Element"));
+            if (encryptionToken != null && encrParts.size() > 0) {
+                //The encryption token can be an IssuedToken or a 
+                 //SecureConversationToken
+                String tokenId = null;
+                SecurityToken tok = null;
+                if (encryptionToken instanceof IssuedToken) {
+                    tok = getSecurityToken();
+                } else if (encryptionToken instanceof SecureConversationToken) {
+                    tok = getSecurityToken();
+                } else if (encryptionToken instanceof X509Token) {
+                    if (isRequestor()) {
+                        tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
+                    } else {
+                        tokenId = getEncryptedKey();
                     }
                 }
+                if (tok == null) {
+                    if (tokenId == null || tokenId.length() == 0) {
+                        //REVISIT - no tokenId?   Exception?
+                    }
+                    if (tokenId.startsWith("#")) {
+                        tokenId = tokenId.substring(1);
+                    }
+                    
+                    /*
+                     * Get hold of the token from the token storage
+                     */
+                    tok = tokenStore.getToken(tokenId);
+                }
+    
+                boolean attached = false;
                 
-                Element secondRefList = null;
+                if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == encryptionToken.getInclusion()
+                    || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == encryptionToken.getInclusion()
+                    || (isRequestor() 
+                        && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                            == encryptionToken.getInclusion())) {
+                    
+                    Element el = tok.getToken();
+                    this.addEncyptedKeyElement(cloneElement(el));
+                    attached = true;
+                } else if (encryptionToken instanceof X509Token && isRequestor()) {
+                    Element el = tok.getToken();
+                    this.addEncyptedKeyElement(cloneElement(el));
+                    attached = true;
+                }
                 
-                if (encryptionToken.isDerivedKeys()) {
-                    try {
+                WSSecBase encr = doEncryption(encryptionWrapper, tok, attached, encrParts, true);
+                
+                handleEncryptedSignedHeaders(encrParts, sigParts);
+                
+                
+                if (timestampEl != null) {
+                    sigParts.add(new WSEncryptionPart(addWsuIdToElement(timestampEl.getElement())));
+                }
+                
+                if (isRequestor()) {
+                    this.addSupportingTokens(sigParts);
+                } else {
+                    addSignatureConfirmation(sigParts);
+                }
+                    
+                
+                //Sign the message
+                //We should use the same key in the case of EncryptBeforeSig
+                if (sigParts.size() > 0) {
+                    signatures.add(this.doSignature(sigParts, encryptionWrapper, encryptionToken, 
+                                                    tok, attached));
+                }
+                
+                if (isRequestor()) {
+                    this.doEndorse();
+                }
+                
+                
+                //Check for signature protection and encryption of UsernameToken
+                if (sbinding.isSignatureProtection() && this.mainSigId != null 
+                    || encryptedTokensIdList.size() > 0 && isRequestor()) {
+                    Vector<WSEncryptionPart> secondEncrParts = new Vector<WSEncryptionPart>();
+                    
+                    //Now encrypt the signature using the above token
+                    if (sbinding.isSignatureProtection()) {
+                        secondEncrParts.add(new WSEncryptionPart(this.mainSigId, "Element"));
+                    }
+                    
+                    if (isRequestor()) {
+                        for (String s : encryptedTokensIdList) {
+                            secondEncrParts.add(new WSEncryptionPart(s, "Element"));
+                        }
+                    }
+                    
+                    Element secondRefList = null;
+                    
+                    if (encryptionToken.isDerivedKeys()) {
                         secondRefList = ((WSSecDKEncrypt)encr).encryptForExternalRef(null, 
                                 secondEncrParts);
                         this.addDerivedKeyElement(secondRefList);
-                    } catch (WSSecurityException e) {
-                        //REVISIT - exception
-                    }
-                } else {
-                    try {
+                    } else {
                         //Encrypt, get hold of the ref list and add it
                         secondRefList = ((WSSecEncrypt)encr).encryptForExternalRef(null,
                                 encrParts);
                         this.addDerivedKeyElement(secondRefList);
-                    } catch (WSSecurityException e) {
-                        //REVISIT - exception
-                    }    
+                    }
                 }
             }
-           
-        } else {
-            //REVISIT - nothing to do?!?
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new Fault(ex);
         }
     }
     private void doSignBeforeEncrypt() {
@@ -389,7 +377,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                          enc,
                          false);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new Fault(e);
         }
     }
