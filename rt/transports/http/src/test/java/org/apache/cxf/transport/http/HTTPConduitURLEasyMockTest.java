@@ -93,6 +93,10 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         protected void retrieveConnectionFactory() {
             // do nothing. i.e do not change the connectionFactory field.
         }
+        protected void retrieveConnectionFactory(String s) {
+            // do nothing. i.e do not change the connectionFactory field.
+        }
+        
     }
     /**
      * @throws java.lang.Exception
