@@ -21,7 +21,6 @@ package org.apache.cxf.systest.ws.addressing;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -66,29 +65,5 @@ public class MAPTest extends MAPTestBase {
             }
         }
     }
-
-    @Test
-    @Ignore("move to separate test")
-    public void testFallbackThreadPoolConfig() throws Exception { 
-        Runnable r = new Runnable() {
-            public void run() {
-                greeter.greetMeLater(5 * 1000);
-            }
-        };
-        Thread[] invokers = new Thread[5];
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < invokers.length; i++) {
-            invokers[i] = new Thread(r);
-            invokers[i].setDaemon(true);
-            invokers[i].start();
-        }
-        for (int i = 0; i < invokers.length; i++) {
-            invokers[i].join(15 * 1000);
-        }
-        long end = System.currentTimeMillis();
-        assertTrue("unexpected duration: " + (end - start),
-                   end - start > 9 * 1000L);
-    }
-
 }
 
