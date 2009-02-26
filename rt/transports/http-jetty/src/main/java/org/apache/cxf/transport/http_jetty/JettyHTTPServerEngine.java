@@ -305,7 +305,6 @@ public class JettyHTTPServerEngine
                 server.start();
                
                 AbstractConnector aconn = (AbstractConnector) connector;
-                System.out.println("\n\n ** pool: " + aconn.getThreadPool() + " *** \n\n");
                 if (isSetThreadingParameters()) {
                     if (aconn.getThreadPool() instanceof BoundedThreadPool) {
                         BoundedThreadPool pool = (BoundedThreadPool)aconn.getThreadPool();

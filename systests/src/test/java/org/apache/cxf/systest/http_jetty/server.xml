@@ -19,9 +19,16 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http-jetty="http://cxf.apache.org/transports/http-jetty/configuration"
        xsi:schemaLocation="
+http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
-    <import resource="wsa_interceptors.xml"/>
+    <http-jetty:engine-factory bus="cxf">
+        <http-jetty:engine port="0">
+	    <http-jetty:threadingParameters minThreads="1" maxThreads="3"/>   
+        </http-jetty:engine>
+    </http-jetty:engine-factory>
+
 </beans>
 
