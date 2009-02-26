@@ -23,6 +23,14 @@ public class Header {
     private String name;
     private String namespace;
 
+    public Header() {
+    }
+    
+    public Header(String nm, String ns) {
+        name = nm;
+        namespace = ns;
+    }
+    
     /**
      * @return Returns the name.
      */

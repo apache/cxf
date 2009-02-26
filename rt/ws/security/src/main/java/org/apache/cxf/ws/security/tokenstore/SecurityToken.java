@@ -38,7 +38,7 @@ import org.apache.ws.security.message.token.Reference;
  * 
  */
 public class SecurityToken {
-    enum State {
+    public enum State {
         UNKNOWN,
         ISSUED, 
         EXPIRED, 

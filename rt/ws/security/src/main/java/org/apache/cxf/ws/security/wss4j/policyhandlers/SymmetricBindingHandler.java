@@ -669,7 +669,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             
             sig.setCustomTokenId(sigTokId);
             sig.setSecretKey(tok.getSecret());
-            sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getAsymmetricSignature());
             sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
             Crypto crypto = null;
             if (sbinding.getProtectionToken() != null) {
