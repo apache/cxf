@@ -471,10 +471,11 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
             }
         }
         private void unmapSecurityProps(Message message) {
+            Exchange ex = message.getExchange();
             for (String s : SecurityConstants.ALL_PROPERTIES) {
                 Object v = message.getContextualProperty(s + ".sct");
                 if (v != null) {
-                    message.put(s, v);
+                    ex.put(s, v);
                 }
             }
         }
