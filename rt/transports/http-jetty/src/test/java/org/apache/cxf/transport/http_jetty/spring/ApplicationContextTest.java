@@ -148,6 +148,16 @@ public class ApplicationContextTest extends Assert {
         engine = (JettyHTTPServerEngine)jd4.getEngine();
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), false);
+
+        JettyHTTPDestination jd5 = 
+            (JettyHTTPDestination)factory.getDestination(
+                getEndpointInfo("sna", "foo", "http://localhost:9100"));
+        
+        engine = (JettyHTTPServerEngine)jd5.getEngine();
+        String r = "expected fallback thread parameters configured for port 0";
+        assertNotNull(r, engine.getThreadingParameters());
+        assertEquals(r, 21, engine.getThreadingParameters().getMinThreads());
+        assertEquals(r, 389, engine.getThreadingParameters().getMaxThreads());
     }
     
     private EndpointInfo getEndpointInfo(String serviceNS, 

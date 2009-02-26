@@ -66,5 +66,25 @@ public class MAPTest extends MAPTestBase {
         }
     }
 
+    @Test
+    public void testFallbackThreadPoolConfig() throws Exception { 
+        Runnable r = new Runnable() {
+            public void run() {
+                greeter.greetMeLater(10 * 1000);
+            }
+        };
+        Thread[] invokers = new Thread[4];
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < invokers.length; i++) {
+            invokers[i] = new Thread(r);
+            invokers[i].start();
+        }
+        for (int i = 0; i < invokers.length; i++) {
+            invokers[i].join();
+        }
+        long end = System.currentTimeMillis();
+        assertTrue(end - start > 20 * 1000L);
+    }
+
 }
 

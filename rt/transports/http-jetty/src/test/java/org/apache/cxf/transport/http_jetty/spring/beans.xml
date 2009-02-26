@@ -62,7 +62,7 @@
 	   </hj:engine>
 	   
 	   <hj:engine port="0">
-	      <hj:threadingParameters minThreads="99" maxThreads="777"/>
+	      <hj:threadingParameters minThreads="21" maxThreads="389"/>
 	   </hj:engine>
 	   
 	   <hj:engine port="9001">
