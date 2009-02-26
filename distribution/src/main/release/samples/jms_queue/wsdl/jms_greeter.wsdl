@@ -141,6 +141,7 @@
                    <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
                    
               </jms:address>
+              <jms:clientConfig useConduitIdSelector="false"/>
            </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
