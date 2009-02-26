@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.aegis.date;
+package org.apache.cxf.aegis.xmlconfig;
 
 import java.io.StringWriter;
 import java.util.HashSet;
@@ -30,6 +30,7 @@ import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,5 +66,21 @@ public class TestDateMapping {
         xmlWriter.close();
         // an absence of exception is success here.
     }
-
+    
+    @Test
+    public void testWriteCustomTypeSchemaType() throws Exception {
+        context = new AegisContext();
+        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+        rootClasses.add(BeanWithDate.class);
+        context.setRootClasses(rootClasses);
+        context.initialize();
+        BeanWithDate bean = new BeanWithDate();
+        java.sql.Date date = new java.sql.Date(0);
+        bean.setFig(date);
+        Type sbType = context.getTypeMapping().getType(bean.getClass());
+        XmlSchema root = new XmlSchema(); // dummy to put schema in.
+     /* will explode if the type object created for the custom mapping isn't fully initialized.
+      */
+        sbType.writeSchema(root); 
+    }
 }

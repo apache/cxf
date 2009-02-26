@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.aegis.date;
+package org.apache.cxf.aegis.xmlconfig;
 
 /**
  * class used to test remapping the schema type of date. 
