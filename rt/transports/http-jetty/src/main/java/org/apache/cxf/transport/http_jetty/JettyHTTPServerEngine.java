@@ -52,7 +52,7 @@ import org.mortbay.jetty.servlet.HashSessionIdManager;
 import org.mortbay.jetty.servlet.HashSessionManager;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.thread.BoundedThreadPool;
-
+import org.mortbay.thread.QueuedThreadPool;
 
 /**
  * This class is the Jetty HTTP Server Engine that is configured to
@@ -305,14 +305,24 @@ public class JettyHTTPServerEngine
                 server.start();
                
                 AbstractConnector aconn = (AbstractConnector) connector;
-                if (aconn.getThreadPool() instanceof BoundedThreadPool
-                    && isSetThreadingParameters()) {
-                    BoundedThreadPool pool = (BoundedThreadPool)aconn.getThreadPool();
-                    if (getThreadingParameters().isSetMinThreads()) {
-                        pool.setMinThreads(getThreadingParameters().getMinThreads());
-                    }
-                    if (getThreadingParameters().isSetMaxThreads()) {
-                        pool.setMaxThreads(getThreadingParameters().getMaxThreads());
+                System.out.println("\n\n ** pool: " + aconn.getThreadPool() + " *** \n\n");
+                if (isSetThreadingParameters()) {
+                    if (aconn.getThreadPool() instanceof BoundedThreadPool) {
+                        BoundedThreadPool pool = (BoundedThreadPool)aconn.getThreadPool();
+                        if (getThreadingParameters().isSetMinThreads()) {
+                            pool.setMinThreads(getThreadingParameters().getMinThreads());
+                        }
+                        if (getThreadingParameters().isSetMaxThreads()) {
+                            pool.setMaxThreads(getThreadingParameters().getMaxThreads());
+                        }
+                    } else if (aconn.getThreadPool() instanceof QueuedThreadPool) {
+                        QueuedThreadPool pool = (QueuedThreadPool)aconn.getThreadPool();
+                        if (getThreadingParameters().isSetMinThreads()) {
+                            pool.setMinThreads(getThreadingParameters().getMinThreads());
+                        }
+                        if (getThreadingParameters().isSetMaxThreads()) {
+                            pool.setMaxThreads(getThreadingParameters().getMaxThreads());
+                        }
                     }
                 }
             } catch (Exception e) {

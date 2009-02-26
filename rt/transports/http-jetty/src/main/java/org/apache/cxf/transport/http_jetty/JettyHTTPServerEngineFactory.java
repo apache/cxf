@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +49,8 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPServerEngineFactory.class);    
     
+    private static final int FALLBACK_THREADING_PARAMS_KEY = 0;
+
     /**
      * This map holds references for allocated ports.
      */
@@ -63,6 +66,8 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      */
     private Map<String, ThreadingParameters> threadingParametersMap =
         new TreeMap<String, ThreadingParameters>();
+
+    private ThreadingParameters fallbackThreadingParameters;
     
     /**
      * This map holds TLS Server Parameters that are to be used to
@@ -134,7 +139,10 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     }
     
     public void setEnginesList(List<JettyHTTPServerEngine> enginesList) {
-        for (JettyHTTPServerEngine engine : enginesList) { 
+        for (JettyHTTPServerEngine engine : enginesList) {
+            if (engine.getPort() == FALLBACK_THREADING_PARAMS_KEY) {
+                fallbackThreadingParameters = engine.getThreadingParameters();
+            }
             portMap.put(engine.getPort(), engine);
         }    
     }
@@ -215,6 +223,18 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
             throw new IOException("Protocol mismatch for port " + port + ": "
                         + "engine's protocol is " + ref.getProtocol()
                         + ", the url protocol is " + protocol);
+        }
+
+        if (!(ref.isSetThreadingParameters()
+              || null == fallbackThreadingParameters)) {
+            if (LOG.isLoggable(Level.INFO)) {
+                final int min = fallbackThreadingParameters.getMinThreads();
+                final int max = fallbackThreadingParameters.getMaxThreads();
+                LOG.log(Level.INFO,
+                        "FALLBACK_THREADING_PARAMETERS_MSG",
+                        new Object[] {port, min, max});
+            }
+            ref.setThreadingParameters(fallbackThreadingParameters);
         }
                 
         return ref;

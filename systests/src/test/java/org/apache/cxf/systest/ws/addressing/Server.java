@@ -40,7 +40,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
     protected void run()  {
 
         SpringBusFactory factory = new SpringBusFactory();
-        Bus bus = factory.createBus("org/apache/cxf/systest/ws/addressing/wsa_interceptors.xml");
+        Bus bus = factory.createBus("org/apache/cxf/systest/ws/addressing/server.xml");
         BusFactory.setDefaultBus(bus);
         setBus(bus);
 
