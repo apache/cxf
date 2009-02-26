@@ -106,6 +106,11 @@ public final class JAXRSUtils {
     }
     
     public static List<PathSegment> getPathSegments(String thePath, boolean decode) {
+        return getPathSegments(thePath, decode, true);
+    }
+    
+    public static List<PathSegment> getPathSegments(String thePath, boolean decode, 
+                                                    boolean ignoreLastSlash) {
         String[] segments = thePath.split("/");
         List<PathSegment> theList = new ArrayList<PathSegment>();
         for (String path : segments) {
@@ -114,8 +119,9 @@ public final class JAXRSUtils {
             }
         }
         int len = thePath.length();
-        if (len > 1 && thePath.charAt(len - 1) == '/') {
-            theList.add(new PathSegmentImpl("", false));
+        if (len > 0 && thePath.charAt(len - 1) == '/') {
+            String value = ignoreLastSlash ? "" : "/";
+            theList.add(new PathSegmentImpl(value, false));
         }
         return theList;
     }
@@ -248,6 +254,7 @@ public final class JAXRSUtils {
         int consumeMatched = 0;
         int produceMatched = 0;
         
+        boolean subresourcesOnly = true;
         for (MediaType acceptType : acceptContentTypes) {
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
                 URITemplate uriTemplate = ori.getURITemplate();
@@ -264,6 +271,7 @@ public final class JAXRSUtils {
                             boolean cMatched = matchConsumeTypes(requestType, ori);
                             boolean pMatched = matchProduceTypes(acceptType, ori);
                             if (mMatched && cMatched && pMatched) {
+                                subresourcesOnly = false;
                                 candidateList.put(ori, map);    
                             } else {
                                 methodMatched = mMatched ? methodMatched + 1 : methodMatched;
@@ -274,15 +282,18 @@ public final class JAXRSUtils {
                     }
                 }
             }
-            if (!candidateList.isEmpty()) {
-                Map.Entry<OperationResourceInfo, MultivaluedMap<String, String>> firstEntry = 
-                    candidateList.entrySet().iterator().next();
-                values.clear();
-                values.putAll(firstEntry.getValue());
-                return firstEntry.getKey();
+            if (!candidateList.isEmpty() && !subresourcesOnly) {
+                break;
             }
         }
-
+        if (!candidateList.isEmpty()) {
+            Map.Entry<OperationResourceInfo, MultivaluedMap<String, String>> firstEntry = 
+                candidateList.entrySet().iterator().next();
+            values.clear();
+            values.putAll(firstEntry.getValue());
+            return firstEntry.getKey();
+        }
+        
         int status = pathMatched == 0 ? 404 : methodMatched == 0 ? 405 
                      : consumeMatched == 0 ? 415 : produceMatched == 0 ? 406 : 404;
         String name = resource.isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
@@ -337,14 +348,14 @@ public final class JAXRSUtils {
             return -1;
         }
          
-        if (mt1.getType().equals(mt2.getType())) {
-            if (mt1.isWildcardSubtype() && !mt2.isWildcardSubtype()) {
-                return 1;
-            }
-            if (!mt1.isWildcardSubtype() && mt2.isWildcardSubtype()) {
-                return -1;
-            }       
+        
+        if (mt1.isWildcardSubtype() && !mt2.isWildcardSubtype()) {
+            return 1;
         }
+        if (!mt1.isWildcardSubtype() && mt2.isWildcardSubtype()) {
+            return -1;
+        }       
+        
         
         float q1 = getMediaTypeQualityFactor(mt1.getParameters().get("q"));
         float q2 = getMediaTypeQualityFactor(mt2.getParameters().get("q"));

@@ -90,7 +90,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         resetResponse();
         
         Class<?> declaringClass = m.getDeclaringClass();
-        if (Client.class == declaringClass) {
+        if (Client.class == declaringClass || Object.class == declaringClass) {
             return m.invoke(this, params);
         }
         

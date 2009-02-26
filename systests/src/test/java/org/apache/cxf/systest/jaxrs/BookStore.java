@@ -180,6 +180,7 @@ public class BookStore {
 
     @GET
     @Path("/books/{bookId}/")
+    @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
     }
@@ -235,7 +236,7 @@ public class BookStore {
     
     @GET
     @Path("/books/{bookId}/")
-    @Produces("application/json")
+    @Produces("application/json;q=0.9")
     public Book getBookAsJSON() throws BookNotFoundFault {
         return doGetBook(currentBookId);
     }

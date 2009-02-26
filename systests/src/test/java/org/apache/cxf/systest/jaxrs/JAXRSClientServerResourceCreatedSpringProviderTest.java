@@ -37,7 +37,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServerResourceCreatedSpringProviders.class));
+                   launchServer(BookServerResourceCreatedSpringProviders.class, true));
     }
     
     @Test
@@ -65,10 +65,10 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBookNotFound() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/bookstore/books/12345"; 
+            "http://localhost:9081/webapp/bookstore/books/12345"; 
         URL url = new URL(endpointAddress);
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();
-        connect.addRequestProperty("Accept", "text/plain");
+        connect.addRequestProperty("Accept", "text/plain,application/xml");
         assertEquals(500, connect.getResponseCode());
         InputStream in = connect.getErrorStream();
         assertNotNull(in);           

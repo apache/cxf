@@ -47,6 +47,34 @@ public class UriBuilderImplTest extends Assert {
     }
 
     @Test
+    public void testTrailingSlash() throws Exception {
+        URI uri = new URI("http://bar/");
+        URI newUri = new UriBuilderImpl(uri).build();
+        assertEquals("URI is not built correctly", "http://bar/", newUri.toString());
+    }
+    
+    @Test
+    public void testPathTrailingSlash() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri).path("/").build();
+        assertEquals("URI is not built correctly", "http://bar/", newUri.toString());
+    }
+    
+    @Test
+    public void testPathTrailingSlash2() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri).path("/").path("/").build();
+        assertEquals("URI is not built correctly", "http://bar/", newUri.toString());
+    }
+    
+    @Test
+    public void testSchemeSpecificPart() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri).scheme("https").schemeSpecificPart("foo/bar").build();
+        assertEquals("URI is not built correctly", "https://foo/bar", newUri.toString());
+    }
+    
+    @Test
     public void testReplacePath() throws Exception {
         URI uri = new URI("http://foo/bar/baz;m1=m1value");
         URI newUri = new UriBuilderImpl(uri).replacePath("/newpath").build();

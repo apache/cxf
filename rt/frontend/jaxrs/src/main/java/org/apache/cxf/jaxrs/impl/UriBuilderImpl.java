@@ -222,7 +222,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder path(String path) throws IllegalArgumentException {
-        List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false);
+        List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty() && !matrix.isEmpty()) {
             PathSegment ps = paths.remove(paths.size() - 1);
             paths.add(replacePathSegment(ps));
@@ -252,13 +252,11 @@ public class UriBuilderImpl extends UriBuilder {
         // scheme-specific part is whatever after ":" of URI
         // see: http://en.wikipedia.org/wiki/URI_scheme
         try {
-            URI uri = new URI("whatever://" + ssp);
-            port = uri.getPort();
-            host = uri.getHost();
-            paths = JAXRSUtils.getPathSegments(uri.getPath(), false);
-            fragment = uri.getFragment();
-            query = JAXRSUtils.getStructuredParams(uri.getQuery(), "&", true);
-            userInfo = uri.getUserInfo();
+            if (scheme == null) {
+                scheme = "http";
+            }
+            URI uri = new URI(scheme + "://" + ssp);
+            setUriParts(uri);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Wrong syntax of scheme-specific part", e);
         }
@@ -291,7 +289,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private void setPathAndMatrix(String path) {
-        paths = JAXRSUtils.getPathSegments(path, false);
+        paths = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty()) {
             matrix = paths.get(paths.size() - 1).getMatrixParameters();
         } else {
