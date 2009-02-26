@@ -442,13 +442,22 @@ public class HTTPConduit
      * UnitTest that will of course break, should the calls to the URL Connection
      * Factory get altered.
      */
-    protected void retrieveConnectionFactory() {
+    protected synchronized void retrieveConnectionFactory() {
         connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this);
     }
-    protected void retrieveConnectionFactory(String url) {
+    protected synchronized void retrieveConnectionFactory(String url) {
         connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this, url);
     }
     
+    
+    protected synchronized HttpURLConnectionFactory getConnectionFactory(URL url) {
+        if (connectionFactory == null 
+            || !url.getProtocol().equals(connectionFactory.getProtocol())) {
+            retrieveConnectionFactory(url.toString());
+        }
+
+        return connectionFactory;
+    }
     /**
      * Prepare to send an outbound HTTP message over this http conduit to a 
      * particular endpoint.
@@ -481,9 +490,8 @@ public class HTTPConduit
         // The need to cache the request is off by default
         boolean needToCacheRequest = false;
         
-        HttpURLConnection connection = 
-            connectionFactory.createConnection(
-                      getProxy(clientSidePolicy), currentURL);
+        HttpURLConnection connection = getConnectionFactory(currentURL)
+            .createConnection(getProxy(clientSidePolicy), currentURL);
         connection.setDoOutput(true);  
         
         //TODO using Message context to decided HTTP send properties 
@@ -632,7 +640,7 @@ public class HTTPConduit
                 connection.connect();
                 trustDecider.establishTrust(
                     getConduitName(), 
-                    connectionFactory.getConnectionInfo(connection),
+                    getConnectionFactory(connection.getURL()).getConnectionInfo(connection),
                     message);
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "Trust Decider "
@@ -689,13 +697,6 @@ public class HTTPConduit
                 return getURL();
             }
             result = getURL().toString();
-        } else {
-            if (connectionFactory == null 
-                || !result.startsWith(connectionFactory.getProtocol() + ":/")) {
-            
-                connectionFactory = null;
-                retrieveConnectionFactory(result);
-            }
         }
         
         // REVISIT: is this really correct?
@@ -1606,15 +1607,7 @@ public class HTTPConduit
         // Disconnect the old, and in with the new.
         connection.disconnect();
         
-        if (connectionFactory.getProtocol().equals(newURL.getProtocol())) {
-            connection = 
-                connectionFactory.createConnection(
-                          getProxy(clientSidePolicy), newURL);            
-        } else {
-            connection = AbstractHTTPTransportFactory.getConnectionFactory(this, newURL.toString())
-                .createConnection(getProxy(clientSidePolicy), newURL);
-        }
-
+        connection = getConnectionFactory(newURL).createConnection(getProxy(clientSidePolicy), newURL);
         connection.setDoOutput(true);        
         // TODO: using Message context to deceided HTTP send properties        
         connection.setConnectTimeout((int)getClient().getConnectionTimeout());
