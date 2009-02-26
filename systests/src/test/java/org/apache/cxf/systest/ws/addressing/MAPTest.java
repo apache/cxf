@@ -66,7 +66,6 @@ public class MAPTest extends MAPTestBase {
         }
     }
 
-    @Test
     public void testFallbackThreadPoolConfig() throws Exception { 
         Runnable r = new Runnable() {
             public void run() {
