@@ -70,20 +70,22 @@ public class MAPTest extends MAPTestBase {
     public void testFallbackThreadPoolConfig() throws Exception { 
         Runnable r = new Runnable() {
             public void run() {
-                greeter.greetMeLater(10 * 1000);
+                greeter.greetMeLater(5 * 1000);
             }
         };
-        Thread[] invokers = new Thread[4];
+        Thread[] invokers = new Thread[5];
         long start = System.currentTimeMillis();
         for (int i = 0; i < invokers.length; i++) {
             invokers[i] = new Thread(r);
+            invokers[i].setDaemon(true);
             invokers[i].start();
         }
         for (int i = 0; i < invokers.length; i++) {
-            invokers[i].join();
+            invokers[i].join(15 * 1000);
         }
         long end = System.currentTimeMillis();
-        assertTrue(end - start > 20 * 1000L);
+        assertTrue("unexpected duration: " + (end - start),
+                   end - start > 9 * 1000L);
     }
 
 }
