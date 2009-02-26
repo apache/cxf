@@ -143,7 +143,9 @@
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${pom.version}</Specification-Version>
                         <DynamicImport-Package>
-                            com.ctc.wstx.*
+                            com.ctc.wstx.*,
+                            com.sun.xml.bind.api.*,
+                            com.sun.xml.internal.bind.api.*,
                         </DynamicImport-Package>
                         <Import-Package>
                             org.apache.cxf.tools.*;version=${pom.version};resolution:=optional,
