@@ -41,7 +41,6 @@
   
   <xsd:complexType name="propertyType">
     <xsd:attributeGroup ref="mappedType" />
-    <xsd:anyAttribute namespace='##other' processContents='lax' />
   </xsd:complexType>
 
   <xsd:complexType name="methodType">
@@ -54,20 +53,17 @@
 
   <xsd:complexType name="return-typeType">
     <xsd:attributeGroup ref="mappedType" />
-    <xsd:anyAttribute namespace='##other' processContents='lax' />
   </xsd:complexType>
 
   <xsd:complexType name="parameterType">
     <xsd:attribute name="index" type="xsd:int" />
     <xsd:attribute name="class" type="xsd:string" />
     <xsd:attributeGroup ref="mappedType" />
-    <xsd:anyAttribute namespace='##other' processContents='lax' />
   </xsd:complexType>
 
   <xsd:complexType name="componentTypeType">
     <xsd:attribute name="class" type="xsd:string" />
     <xsd:attributeGroup ref="mappedType" />
-    <xsd:anyAttribute namespace='##other' processContents='lax' />
   </xsd:complexType>
 
   <xsd:attributeGroup name="mappedType">
@@ -91,6 +87,5 @@
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
-    <xsd:anyAttribute namespace='##other' processContents='lax' />
   </xsd:attributeGroup>
 </xsd:schema>
