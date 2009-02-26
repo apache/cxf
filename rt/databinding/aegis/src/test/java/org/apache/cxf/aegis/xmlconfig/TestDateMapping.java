@@ -30,7 +30,6 @@ import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.test.TestUtilities;
-import org.apache.ws.commons.schema.XmlSchema;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,9 +77,8 @@ public class TestDateMapping {
         java.sql.Date date = new java.sql.Date(0);
         bean.setFig(date);
         Type sbType = context.getTypeMapping().getType(bean.getClass());
-        XmlSchema root = new XmlSchema(); // dummy to put schema in.
      /* will explode if the type object created for the custom mapping isn't fully initialized.
       */
-        sbType.writeSchema(root); 
+        sbType.writeSchema(null);
     }
 }
