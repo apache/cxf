@@ -24,6 +24,8 @@ import java.net.URI;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -72,10 +74,30 @@ public final class JAXRSClientFactory {
         return create(baseURI, cls, inheritHeaders, false);
     }
     
+    
     /**
      * Creates a proxy
      * @param baseURI baseURI
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param config Spring configuration file location
+     * @return typed proxy
+     */
+    public static <T> T create(URI baseURI, Class<T> cls, String configLocation) {
+        SpringBusFactory bf = new SpringBusFactory();
+        Bus bus = bf.createBus(configLocation);
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(baseURI.toString());
+        bean.setServiceClass(cls);
+        bean.setBus(bus);
+        return bean.create(cls);
+    }
+    
+    /**
+     * Creates a proxy
+     * @param baseURI baseURI
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param inheritHeaders if true then existing proxy headers will be inherited by 
+     *        subresource proxies if any
      * @param direct if true then no bus and chains will be created
      * @return typed proxy
      */

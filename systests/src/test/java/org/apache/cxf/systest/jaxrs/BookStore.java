@@ -47,6 +47,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -68,6 +69,8 @@ public class BookStore {
     private String currentCdId;
     @Context
     private HttpHeaders httpHeaders;
+    @Context 
+    private SecurityContext securityContext;
     
     public BookStore() {
         init();
@@ -178,6 +181,16 @@ public class BookStore {
         return doGetBook(url2.substring(index + 1));
     } 
 
+    @GET
+    @Path("/securebooks/{bookId}/")
+    @Produces("application/xml")
+    public Book getSecureBook(@PathParam("bookId") String id) throws BookNotFoundFault {
+        if (!securityContext.isSecure()) {
+            throw new WebApplicationException(Response.status(403).entity("Unsecure link").build());
+        }
+        return doGetBook(id);
+    }
+    
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/xml")
