@@ -74,7 +74,8 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         if (op == null || opName == null || op.getName() == null
             || StringUtils.isEmpty(op.getName().getLocalPart())
             || !opName.equals(op.getName().getLocalPart())) {
-            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OPERATION", LOG, opName));
+            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OPERATION_PATH", LOG, opName,
+                                                                   message.get(Message.PATH_INFO)));
         }
         message.getExchange().put(BindingOperationInfo.class, op);
         MessageContentsList params = getParameters(message, op);
