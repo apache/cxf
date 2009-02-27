@@ -102,7 +102,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         org.apache.cxf.common.i18n.Message msg = 
             new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
         jmsConfig.ensureProperlyConfigured(msg);
-        jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getTargetDestination(), null);
+        jmsListener = JMSFactory.createJmsListener(jmsConfig, this, 
+                                                   jmsConfig.getTargetDestination(), null, true);
     }
 
     public void deactivate() {
@@ -196,6 +197,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     }
 
     public void sendExchange(Exchange exchange, final Object replyObj) {
+        if (exchange.isOneWay()) {
+            //Don't need to send anything
+            return;
+        }
         Message inMessage = exchange.getInMessage();
         final Message outMessage = exchange.getOutMessage();
         if (jmsConfig.isPubSubDomain()) {

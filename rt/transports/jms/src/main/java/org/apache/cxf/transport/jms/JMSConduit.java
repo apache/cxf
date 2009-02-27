@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,9 @@ import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -54,6 +58,7 @@ import org.springframework.jms.support.JmsUtils;
  * Message. This is then provided in the Exchange and also sent to the incomingObserver
  */
 public class JMSConduit extends AbstractConduit implements JMSExchangeSender, MessageListener {
+
     static final Logger LOG = LogUtils.getL7dLogger(JMSConduit.class);
     
     private static final String CORRELATED = JMSConduit.class.getName() + ".correlated";
@@ -62,8 +67,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private JMSConfiguration jmsConfig;
     private Map<String, Exchange> correlationMap;
     private DefaultMessageListenerContainer jmsListener;
+    private DefaultMessageListenerContainer allListener;
     private String conduitId;
     private AtomicLong messageCount;
+    private JMSBusLifeCycleListener listener;
 
     public JMSConduit(EndpointInfo endpointInfo, EndpointReferenceType target, JMSConfiguration jmsConfig) {
         super(target);
@@ -108,12 +115,32 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
 
         JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, headers);
-        if (!exchange.isOneWay() && jmsListener == null) {
-            jmsListener = JMSFactory.createJmsListener(jmsConfig, this, jmsConfig.getReplyDestination(), 
-                                                       conduitId);
+        String userCID = headers != null ? headers.getJMSCorrelationID() : null;
+        DefaultMessageListenerContainer jmsList = jmsListener;
+        if (!exchange.isOneWay()) {
+            if (userCID == null || !jmsConfig.isUseConduitIdSelector()) { 
+                if (jmsListener == null) {
+                    jmsListener = JMSFactory.createJmsListener(jmsConfig, this, 
+                                                               jmsConfig.getReplyDestination(), 
+                                                               conduitId, 
+                                                               false);
+                    addBusListener(exchange.get(Bus.class));
+                }
+                jmsList = jmsListener;
+            } else {
+                if (allListener == null) {
+                    allListener = JMSFactory.createJmsListener(jmsConfig, 
+                                                               this, 
+                                                               null, 
+                                                               null, 
+                                                               true);
+                    addBusListener(exchange.get(Bus.class));
+                }
+                jmsList = allListener;
+            }
         }
         
-        final javax.jms.Destination replyTo = exchange.isOneWay() ? null : jmsListener.getDestination();
+        final javax.jms.Destination replyTo = exchange.isOneWay() ? null : jmsList.getDestination();
 
         final String correlationId = (headers != null && headers.isSetJMSCorrelationID()) 
             ? headers.getJMSCorrelationID() 
@@ -154,12 +181,50 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                         throw new RuntimeException("Timeout receiving message with correlationId "
                                                    + correlationId);
                     }
-                    
-                    
                 }
             }
         } else {
             jmsTemplate.send(jmsConfig.getTargetDestination(), messageCreator);
+        }
+    }
+
+    static class JMSBusLifeCycleListener implements BusLifeCycleListener {
+        final WeakReference<JMSConduit> ref;
+        BusLifeCycleManager blcm;
+        JMSBusLifeCycleListener(JMSConduit c, BusLifeCycleManager b) {
+            ref = new WeakReference<JMSConduit>(c);
+            blcm = b;
+            blcm.registerLifeCycleListener(this);
+        }
+        
+        public void initComplete() {
+        }
+
+        public void postShutdown() {
+        }
+
+        public void preShutdown() {
+            unreg();
+            blcm = null;
+            JMSConduit c = ref.get();
+            if (c != null) {
+                c.listener = null;
+                c.close();
+            }
+        }
+        public void unreg() {
+            if (blcm != null) {
+                blcm.unregisterLifeCycleListener(this);
+            }
+        }
+    }
+    private synchronized void addBusListener(Bus bus) {
+        if (listener == null && bus != null) {
+            BusLifeCycleManager blcm = bus.getExtension(BusLifeCycleManager.class);
+            if (blcm != null) {
+                listener = new JMSBusLifeCycleListener(this,
+                                                       blcm);
+            }
         }
     }
 
@@ -208,8 +273,15 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
 
     public void close() {
+        if (listener != null) {
+            listener.unreg();
+            listener = null;
+        }
         if (jmsListener != null) {
             jmsListener.shutdown();
+        }
+        if (allListener != null) {
+            allListener.shutdown();
         }
         LOG.log(Level.FINE, "JMSConduit closed ");
     }
@@ -228,8 +300,15 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
     @Override
     protected void finalize() throws Throwable {
+        if (listener != null) {
+            listener.unreg();
+            listener = null;
+        }
         if (jmsListener != null) {
             jmsListener.shutdown();
+        }
+        if (allListener != null) {
+            allListener.shutdown();
         }
         super.finalize();
     }
