@@ -74,7 +74,7 @@ public class JMSConfiguration implements InitializingBean {
     private String replyDestination;
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
-    private boolean useConduitIdSelector = true;
+    private Boolean useConduitIdSelector;
     private String conduitSelectorPrefix = "";
     private boolean autoResolveDestination;
     private long recoveryInterval = DEFAULT_VALUE;
@@ -332,9 +332,15 @@ public class JMSConfiguration implements InitializingBean {
     }
 
     public boolean isUseConduitIdSelector() {
+        if (useConduitIdSelector == null) {
+            return true;
+        }
         return useConduitIdSelector;
     }
-
+    public boolean isSetUseConduitIdSelector() {
+        return useConduitIdSelector != null;
+    }
+    
     public int getMaxConcurrentTasks() {
         return maxConcurrentTasks;
     }

@@ -117,7 +117,8 @@ public final class JMSFactory {
     public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
                                                                     String destinationName, 
-                                                                    String messageSelectorPrefix) {
+                                                                    String messageSelectorPrefix,
+                                                                    boolean userCID) {
         DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
             ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
@@ -141,13 +142,15 @@ public final class JMSFactory {
             jmsListener.setCacheLevel(jmsConfig.getCacheLevel());
         }
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
-        if (messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
-            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+        if (!userCID || jmsConfig.isSetUseConduitIdSelector()) {
+            if (messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
+                jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
                                             + staticSelectorPrefix 
                                             + messageSelectorPrefix + "%'");
-        } else if (staticSelectorPrefix.length() > 0) {
-            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+            } else if (staticSelectorPrefix.length() > 0) {
+                jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
                                             + staticSelectorPrefix +  "%'");
+            }
         }
         if (jmsConfig.getDestinationResolver() != null) {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());

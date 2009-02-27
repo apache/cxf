@@ -96,7 +96,9 @@ public class JMSOldConfigHolder {
             //if (clientConfig.isSetClientReceiveTimeout()) {
             jmsConfig.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
             //}
-            jmsConfig.setUseConduitIdSelector(clientConfig.isUseConduitIdSelector());
+            if (clientConfig.isSetUseConduitIdSelector()) {
+                jmsConfig.setUseConduitIdSelector(clientConfig.isUseConduitIdSelector());
+            }
             if (clientConfig.isSetConduitSelectorPrefix()) {
                 jmsConfig.setConduitSelectorPrefix(clientConfig.getConduitSelectorPrefix());
             }
