@@ -173,7 +173,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         String reason = (String) xu.getValue("//s:Reason//text()", 
                                              doc, 
                                              XPathConstants.STRING);
-        assertEquals("No such operation: greetMe", reason);        
+        assertTrue(reason.contains("No such operation: greetMe"));        
     }
     
 
