@@ -152,7 +152,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         private Trust10 getTrust10(AssertionInfoMap aim) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_10);
+            Collection<AssertionInfo> ais = aim.get(SP11Constants.TRUST_10);
             if (ais == null || ais.isEmpty()) {
                 return null;
             }
