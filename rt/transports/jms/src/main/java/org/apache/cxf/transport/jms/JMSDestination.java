@@ -103,7 +103,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
         jmsConfig.ensureProperlyConfigured(msg);
         jmsListener = JMSFactory.createJmsListener(jmsConfig, this, 
-                                                   jmsConfig.getTargetDestination(), null, true);
+                                                   jmsConfig.getTargetDestination(), null, false);
     }
 
     public void deactivate() {
