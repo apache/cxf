@@ -103,8 +103,8 @@
             <artifactId>saaj-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>wstx-asl</artifactId>
+	    <groupId>${stax.impl.groupId}</groupId>
+	    <artifactId>${stax.impl.artifactId}</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
