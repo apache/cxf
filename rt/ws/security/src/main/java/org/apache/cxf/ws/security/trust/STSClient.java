@@ -234,7 +234,8 @@ public class STSClient implements Configurable {
                                                            null,
                                                            location,
                                                            soapVersion, 
-                                                           policy);
+                                                           policy,
+                                                           endpointName);
             
             client = new ClientImpl(bus, endpoint);
         }

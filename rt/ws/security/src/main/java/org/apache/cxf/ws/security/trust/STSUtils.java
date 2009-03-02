@@ -75,7 +75,8 @@ public final class STSUtils {
                                              String transportId,
                                              String location,
                                              String soapVersion,
-                                             Policy policy) throws BusException, EndpointException {
+                                             Policy policy,
+                                             QName epName) throws BusException, EndpointException {
         Service service = null;
         String ns = namespace + "/wsdl";
         ServiceInfo si = new ServiceInfo();
@@ -111,7 +112,7 @@ public final class STSUtils {
         } 
         EndpointInfo ei = new EndpointInfo(si, transportId);
         ei.setBinding(bi);
-        ei.setName(iName);
+        ei.setName(epName == null ? iName : epName);
         ei.setAddress(location);
         si.addEndpoint(ei);
         ei.addExtensor(policy);

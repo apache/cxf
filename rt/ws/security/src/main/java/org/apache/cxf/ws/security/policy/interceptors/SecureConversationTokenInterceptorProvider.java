@@ -222,8 +222,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
             .getContextualProperty(SecurityConstants.STS_CLIENT);
         if (client == null) {
             client = new STSClient(message.getExchange().get(Bus.class));
-            client.setBeanName(message.getExchange().get(Endpoint.class)
-                               .getEndpointInfo().getName().toString() + ".sct-client");
+            Endpoint ep = message.getExchange().get(Endpoint.class);
+            client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sct-client");
+            client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sct-client");
         }
         return client;
     }
@@ -516,7 +517,8 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                                                       null,
                                                       destination.getAddress().getAddress().getValue(),
                                                       message.getVersion().getBindingId(), 
-                                                      policy);
+                                                      policy,
+                                                      null);
                 endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
             
                 EndpointPolicy ep = pe.getServerEndpointPolicy(endpoint.getEndpointInfo(), destination);

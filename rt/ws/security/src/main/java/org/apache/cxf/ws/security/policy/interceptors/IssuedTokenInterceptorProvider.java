@@ -72,8 +72,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             .getContextualProperty(SecurityConstants.STS_CLIENT);
         if (client == null) {
             client = new STSClient(message.getExchange().get(Bus.class));
-            client.setBeanName(message.getExchange().get(Endpoint.class)
-                               .getEndpointInfo().getName().toString() + ".sts-client");
+            Endpoint ep = message.getExchange().get(Endpoint.class);
+            client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sts-client");
+            client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sts-client");
         }
         return client;
     }
