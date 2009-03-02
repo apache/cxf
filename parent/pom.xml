@@ -467,6 +467,10 @@
                         <groupId>mx4j</groupId>
                         <artifactId>mx4j</artifactId>
                     </exclusion>
+		    <exclusion>
+		      <groupId>org.codehaus.woodstox</groupId>
+		      <artifactId>wstx-asl</artifactId>
+		    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -499,6 +503,11 @@
                         <groupId>woodstox</groupId>
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
+                   <exclusion>
+                        <groupId>org.codehaus.woodstox</groupId>
+                        <artifactId>wstx-asl</artifactId>
+                    </exclusion>
+ 
                 </exclusions>
             </dependency>
             <dependency>
@@ -527,6 +536,11 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
+<!-- this one comes from sjsxp -->
+		    <exclusion>
+		      <groupId>javax.xml.stream</groupId>
+		      <artifactId>stax-api</artifactId>
+		    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -920,6 +934,10 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
+		    <exclusion>
+		      <groupId>org.codehaus.woodstox</groupId>
+		      <artifactId>wstx-asl</artifactId>
+		    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -939,6 +957,10 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
+		    <exclusion>
+		      <groupId>org.codehaus.woodstox</groupId>
+		      <artifactId>wstx-asl</artifactId>
+		    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
