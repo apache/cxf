@@ -131,7 +131,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 if (allListener == null) {
                     allListener = JMSFactory.createJmsListener(jmsConfig, 
                                                                this, 
-                                                               null, 
+                                                               jmsConfig.getReplyDestination(), 
                                                                null, 
                                                                true);
                     addBusListener(exchange.get(Bus.class));

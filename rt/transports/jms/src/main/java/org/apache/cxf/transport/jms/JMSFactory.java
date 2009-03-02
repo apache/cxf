@@ -142,15 +142,13 @@ public final class JMSFactory {
             jmsListener.setCacheLevel(jmsConfig.getCacheLevel());
         }
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
-        if (!userCID || jmsConfig.isSetUseConduitIdSelector()) {
-            if (messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
-                jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
-                                            + staticSelectorPrefix 
-                                            + messageSelectorPrefix + "%'");
-            } else if (staticSelectorPrefix.length() > 0) {
-                jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
-                                            + staticSelectorPrefix +  "%'");
-            }
+        if (!userCID && messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+                                        + staticSelectorPrefix 
+                                        + messageSelectorPrefix + "%'");
+        } else if (staticSelectorPrefix.length() > 0) {
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+                                        + staticSelectorPrefix +  "%'");
         }
         if (jmsConfig.getDestinationResolver() != null) {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
