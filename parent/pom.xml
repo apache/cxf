@@ -1043,6 +1043,15 @@
 	    <stax.impl.version>1.0.1</stax.impl.version>
 	  </properties>
 	</profile>
+        <profile>
+	  <id>woodstox4</id>
+	  <properties>
+	    <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
+	    <stax.impl.artifactId>wstx-asl</stax.impl.artifactId>
+	    <stax.impl.version>3.9.9-3</stax.impl.version>
+	  </properties>
+	</profile>
+
 	<profile>
 	  <id>axis2-saaj</id>
 	  <properties>

@@ -36,6 +36,9 @@ public class AttributeWriter extends AbstractMessageWriter {
     public AttributeWriter(XMLStreamWriter writer, String name, String namespace) {
         this.writer = writer;
         this.name = name;
+        if (namespace == null) {
+            namespace = ""; // otherwise, sjsxp is unhappy.
+        }
         this.namespace = namespace;
 
         try {
