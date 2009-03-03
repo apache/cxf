@@ -30,7 +30,6 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,7 +58,7 @@ import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -300,7 +299,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     }
 
     protected ElementWriter getElementWriter(Element element, NamespaceContext namespaceContext) {
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(new DOMResult(element));
+        XMLStreamWriter writer = new W3CDOMStreamWriter(element);
         try {
             writer.setNamespaceContext(namespaceContext);
         } catch (XMLStreamException e) {
