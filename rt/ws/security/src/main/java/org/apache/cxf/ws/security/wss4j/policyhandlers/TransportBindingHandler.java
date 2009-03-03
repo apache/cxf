@@ -365,13 +365,18 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             return dkSign.getSignatureValue();
         } else {
             WSSecSignature sig = new WSSecSignature();
-            sig.setCustomTokenId(secTok.getId().substring(1));
-            sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                        + WSConstants.SAML_ASSERTION_ID);
+            sig.setCustomTokenId(secTok.getId());
+            if (secTok.getTokenType() == null) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                            + WSConstants.SAML_ASSERTION_ID);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+            } else {
+                sig.setCustomTokenValueType(secTok.getTokenType());
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+            }
             sig.setSecretKey(secTok.getSecret());
             sig.setSignatureAlgorithm(algorithmSuite.getAsymmetricSignature());
             sig.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
-            sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             sig.prepare(doc, getSignatureCrypto(wrapper), secHeader);
 
             sig.setParts(sigParts);

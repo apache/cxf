@@ -19,11 +19,14 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -35,11 +38,13 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -54,6 +59,7 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -64,6 +70,7 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
@@ -75,9 +82,11 @@ import org.apache.neethi.PolicyComponent;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
 import org.apache.ws.security.message.token.Reference;
+import org.apache.ws.security.processor.EncryptedDataProcessor;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -113,10 +122,6 @@ public class STSClient implements Configurable {
     
     Map<String, Object> ctx = new HashMap<String, Object>();
 
-    private CallbackHandler cbHandler;
-
-    private Crypto crypto;
-    
     public STSClient(Bus b) {
         bus = b;
     }
@@ -449,15 +454,21 @@ public class STSClient implements Configurable {
             }
             el = DOMUtils.getNextElement(el);
         }
+        Element rstDec = rst;
+        try {
+            rstDec = decrypt(rst);
+        } catch (IOException e1) {
+            throw new TrustException(e1);
+        }
         
         String id = findID(rar, rur, rst);
         if (StringUtils.isEmpty(id)) {
             throw new TrustException(new Message("NO_ID", LOG));
         }
         
-        SecurityToken token = new SecurityToken(id, copyElement(rst), copyElement(lte));
-        token.setAttachedReference(copyElement(rar));
-        token.setUnattachedReference(copyElement(rur));
+        SecurityToken token = new SecurityToken(id, rstDec, lte);
+        token.setAttachedReference(rar);
+        token.setUnattachedReference(rur);
         token.setIssuerAddress(location);
                 
         
@@ -476,12 +487,12 @@ public class STSClient implements Configurable {
 
                     EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
 
-                    processor.handleToken(child, null, crypto,
-                                          cbHandler, null, new Vector(),
+                    processor.handleToken(child, null, createCrypto(),
+                                          createHandler(), null, new Vector(),
                                           null);
 
                     secret = processor.getDecryptedBytes();
-                } catch (WSSecurityException e) {
+                } catch (IOException e) {
                     throw new TrustException(new Message("ENCRYPTED_KEY_ERROR", LOG), e);
                 }
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
@@ -519,19 +530,92 @@ public class STSClient implements Configurable {
         return token;
     }
 
-    private Element copyElement(Element el) {
-        if (el == null) {
-            return null;
+    protected Element decrypt(Element firstElement) throws IOException {
+        if ("EncryptedData".equals(firstElement.getLocalName())
+            && "http://www.w3.org/2001/04/xmlenc#".equals(firstElement.getNamespaceURI())) {
+            
+            Node parent = firstElement.getParentNode();
+            Node prev = firstElement.getPreviousSibling();
+            
+            //encrypted even more.  WCF seems to do this periodically
+            EncryptedDataProcessor processor = new EncryptedDataProcessor();
+
+            processor.handleToken(firstElement, null, createCrypto(),
+                                  createHandler(), null, new Vector(),
+                                  null);
+            
+            if (prev == null) {
+                firstElement = (Element)parent.getFirstChild();
+            } else {
+                firstElement = (Element)prev.getNextSibling();
+            }
+
         }
-        try {
-            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-            writer.setNsRepairing(true);
-            StaxUtils.copy(el, writer);
-            return writer.getDocument().getDocumentElement();
-        } catch (Exception ex) {
-            return el;
-        }
+        return firstElement;
     }
+
+    private CallbackHandler createHandler() {
+        Object o = getProperty(SecurityConstants.CALLBACK_HANDLER);
+        if (o instanceof String) {
+            try {
+                Class<?> cls = ClassLoaderUtils.loadClass((String)o, this.getClass());
+                o = cls.newInstance();
+            } catch (Exception e) {
+                throw new Fault(e);
+            }
+        }
+        return (CallbackHandler)o;
+    }
+
+    private Object getProperty(String s) {
+        Object o = ctx.get(s);
+        if (o == null) {
+            o = client.getEndpoint()
+                .getEndpointInfo().getProperty(s);
+        }
+        if (o == null) {
+            o = client.getEndpoint().getEndpointInfo().getBinding().getProperty(s);
+        }
+        if (o == null) {
+            o = client.getEndpoint().getService().get(s);
+        }
+        return o;
+    }
+    
+    private Crypto createCrypto() throws IOException {
+        Crypto crypto = (Crypto)getProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        if (crypto != null) {
+            return crypto;
+        }
+        
+        
+        Object o = getProperty(SecurityConstants.ENCRYPT_PROPERTIES); 
+        Properties properties = null;
+        if (o instanceof Properties) {
+            properties = (Properties)o;
+        } else if (o instanceof String) {
+            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            URL url = rm.resolveResource((String)o, URL.class);
+            if (url == null) {
+                url = ClassLoaderUtils.getResource((String)o, this.getClass());
+            }
+            if (url != null) {
+                properties = new Properties();
+                properties.load(url.openStream());
+            } else {
+                throw new Fault("Could not find properties file " + url, LOG);
+            }
+        } else if (o instanceof URL) {
+            properties = new Properties();
+            properties.load(((URL)o).openStream());
+        }
+        
+        if (properties != null) {
+            return CryptoFactory.getInstance(properties);
+        }
+        return null;
+    }
+
     private String findID(Element rar, Element rur, Element rst) {
         String id = null;
         if (rst != null) {
