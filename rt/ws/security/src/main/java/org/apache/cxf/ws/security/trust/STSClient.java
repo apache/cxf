@@ -461,7 +461,7 @@ public class STSClient implements Configurable {
             throw new TrustException(e1);
         }
         
-        String id = findID(rar, rur, rst);
+        String id = findID(rar, rur, rstDec);
         if (StringUtils.isEmpty(id)) {
             throw new TrustException(new Message("NO_ID", LOG));
         }
@@ -583,13 +583,13 @@ public class STSClient implements Configurable {
     }
     
     private Crypto createCrypto() throws IOException {
-        Crypto crypto = (Crypto)getProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO);
         if (crypto != null) {
             return crypto;
         }
         
         
-        Object o = getProperty(SecurityConstants.ENCRYPT_PROPERTIES); 
+        Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES); 
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;

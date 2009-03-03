@@ -45,6 +45,15 @@ public final class SecurityConstants {
     public static final String TOKEN_ID = "ws-security.token.id";
     
     public static final String STS_CLIENT = "ws-security.sts.client";
+    
+    /**
+     * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
+     * the full security on the message. These properties control the way the STS client
+     * will decrypt the EncryptedData elements in the response
+     */
+    public static final String STS_TOKEN_CRYPTO = "ws-security.sts.token.crypto";
+    public static final String STS_TOKEN_PROPERTIES = "ws-security.sts.token.properties";
+    
 
     public static final Set<String> ALL_PROPERTIES;
     
@@ -53,7 +62,7 @@ public final class SecurityConstants {
             USERNAME, PASSWORD, CALLBACK_HANDLER, 
             SIGNATURE_USERNAME, SIGNATURE_PROPERTIES, SIGNATURE_CRYPTO,
             ENCRYPT_USERNAME, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
-            TOKEN, TOKEN_ID, STS_CLIENT
+            TOKEN, TOKEN_ID, STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

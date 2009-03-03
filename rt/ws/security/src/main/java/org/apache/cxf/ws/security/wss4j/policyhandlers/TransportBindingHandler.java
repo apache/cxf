@@ -166,7 +166,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             if (token instanceof IssuedToken
                                 || token instanceof SecureConversationToken) {
                                 signatureValues.add(doIssuedTokenSignature(token, 
-                                                                           sgndSuppTokens.getSignedParts(), 
+                                                                           null, 
                                                                            sgndSuppTokens));
                             } else if (token instanceof X509Token) {
                                 signatureValues.add(doX509TokenSignature(token, 
@@ -304,12 +304,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         if (timestampEl != null) {
             sigParts.add(new WSEncryptionPart(timestampEl.getId()));                          
         }
-        
-        /*
-        if (tbinding.isTokenProtection() && tokenIncluded) {
-            sigParts.add(new WSEncryptionPart(secTok.getId()));
-        }
-        */
         
         if (signdParts != null) {
             if (signdParts.isBody()) {
