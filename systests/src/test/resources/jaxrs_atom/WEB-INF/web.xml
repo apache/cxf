@@ -44,7 +44,13 @@
 
 	<servlet-mapping>
 		<servlet-name>CXFServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/bookstore/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/atom/*</url-pattern>
+	</servlet-mapping>
+	
 </web-app>
 <!-- END SNIPPET: webxml -->

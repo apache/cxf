@@ -47,10 +47,10 @@ import org.apache.abdera.model.Feed;
 import org.apache.cxf.customer.book.BookNotFoundDetails;
 import org.apache.cxf.customer.book.BookNotFoundFault;
 
-@Path("/bookstore/")
+@Path("/")
 public class AtomBookStore {
 
-    @Context private UriInfo uField;
+    @Context protected UriInfo uField;
     private HttpHeaders headers;
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private Map<Long, CD> cds = new HashMap<Long, CD>();
@@ -124,7 +124,7 @@ public class AtomBookStore {
             // this code is broken as Response does not
             
             URI uri = 
-                uField.getBaseUriBuilder().path("bookstore").path("books").path("entries") 
+                uField.getBaseUriBuilder().path("books").path("entries") 
                                                 .path(Long.toString(b.getId())).build();
             return Response.created(uri).entity(e).build();
         } catch (Exception ex) {

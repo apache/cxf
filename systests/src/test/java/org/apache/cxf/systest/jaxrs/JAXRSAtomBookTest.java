@@ -38,6 +38,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.codehaus.jettison.json.JSONObject;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -54,17 +55,17 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBooks() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/feed"; 
+            "http://localhost:9080/bookstore/bookstore/books/feed"; 
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:9080/bookstore/books/feed", 
+        assertEquals("http://localhost:9080/bookstore/bookstore/books/feed", 
                      feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
         
-        getAndCompareJson("http://localhost:9080/bookstore/books/feed",
+        getAndCompareJson("http://localhost:9080/bookstore/bookstore/books/feed",
                                "resources/expected_atom_books_json.txt",
                                "application/json");
         
-        getAndCompareJson("http://localhost:9080/bookstore/books/jsonfeed",
+        getAndCompareJson("http://localhost:9080/bookstore/bookstore/books/jsonfeed",
                           "resources/expected_atom_books_jsonfeed.txt",
                           "application/json, text/html, application/xml;q=0.9,"
                           + " application/xhtml+xml, image/png, image/jpeg, image/gif,"
@@ -97,25 +98,25 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         
         
         endpointAddress =
-            "http://localhost:9080/bookstore/books/subresources/123"; 
+            "http://localhost:9080/bookstore/bookstore/books/subresources/123"; 
         entry = getEntry(endpointAddress, null);
         assertEquals("CXF in Action", entry.getTitle());
         
-        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123",
+        getAndCompareJson("http://localhost:9080/bookstore/bookstore/books/entries/123",
                                "resources/expected_atom_book_json.txt",
                                "application/json");
         
-        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123?_type="
+        getAndCompareJson("http://localhost:9080/bookstore/bookstore/books/entries/123?_type="
                                + "application/json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
-        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123?_type="
+        getAndCompareJson("http://localhost:9080/bookstore/bookstore/books/entries/123?_type="
                                + "json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
         
         // do the same using extension mappings
-        getAndCompareJson("http://localhost:9080/bookstore/books/entries/123.json",
+        getAndCompareJson("http://localhost:9080/bookstore/bookstore/books/entries/123.json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
         
@@ -125,11 +126,22 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBooks2() throws Exception {
         String endpointAddress =
-            "http://localhost:9080"; 
+            "http://localhost:9080/bookstore/sub/"; 
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:9080/", 
+        assertEquals("http://localhost:9080/bookstore/sub/", 
                      feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
+        
+        getAndCompareJson("http://localhost:9080/bookstore/sub/books/entries/123.json",
+                        "resources/expected_atom_book_json2.txt",
+                        "*/*");
+    }
+    
+    @Test
+    public void testGetBooks3() throws Exception {
+        getAndCompareJson("http://localhost:9080/atom/atom/books/entries/123.json",
+                        "resources/expected_atom_book_json3.txt",
+                        "*/*");
     }
     
     private void getAndCompareJson(String address, 

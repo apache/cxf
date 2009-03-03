@@ -24,15 +24,17 @@ import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
-public class MappingsHandler implements RequestHandler {
+public class SystemQueryHandler implements RequestHandler {
 
     private static final String CONTENT_QUERY = "_type";
+    private static final String METHOD_QUERY = "_method";
+    
+    
     private static final Map<String, String> SHORTCUTS;
     static {
         SHORTCUTS = new HashMap<String, String>();
@@ -44,24 +46,28 @@ public class MappingsHandler implements RequestHandler {
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         
-        UriInfo uriInfo = new UriInfoImpl(m, null);
-        handleTypeQuery(m, uriInfo.getQueryParameters());
-        
+        MultivaluedMap<String, String> queries = new UriInfoImpl(m, null).getQueryParameters();
+        handleTypeQuery(m, queries);
+        handleMethodQuery(m, queries);
         
         return null;
     }
 
-    private boolean handleTypeQuery(Message m, 
-                                    MultivaluedMap<String, String> queries) {
+    private void handleMethodQuery(Message m, MultivaluedMap<String, String> queries) {
+        String method = queries.getFirst(METHOD_QUERY);
+        if (method != null) {
+            m.put(Message.HTTP_REQUEST_METHOD, method);
+        }
+    }
+    
+    private void handleTypeQuery(Message m, MultivaluedMap<String, String> queries) {
         String type = queries.getFirst(CONTENT_QUERY);
         if (type != null) {
             if (SHORTCUTS.containsKey(type)) {
                 type = SHORTCUTS.get(type);
             }
             updateAcceptTypeHeader(m, type);
-            return true;
         }
-        return false;
     }
     
     private void updateAcceptTypeHeader(Message m, String anotherValue) {

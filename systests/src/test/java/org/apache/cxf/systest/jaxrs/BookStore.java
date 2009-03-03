@@ -174,6 +174,14 @@ public class BookStore {
     }
     
     @GET
+    @Path("/bookheaders2/")
+    public Book getBookByHeader(@DefaultValue("123") @HeaderParam("BOOK2") String id) 
+        throws Exception {
+        return doGetBook(id);
+    }
+    
+    
+    @GET
     @Path("/bookquery")
     public Book getBookByURLQuery(@QueryParam("urlid") String urlValue) throws Exception {
         String url2 = new URL(urlValue).toString();

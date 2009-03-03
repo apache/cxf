@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -93,27 +94,13 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
 
     public String toString(CacheControl c) {
         StringBuilder sb = new StringBuilder();
-        if (!c.isPrivate()) {
-            sb.append(PUBLIC).append(';');
-        } else {
-            sb.append(PRIVATE).append('=');
-            for (Iterator<String> it = c.getPrivateFields().iterator(); it.hasNext();) {
-                sb.append('\"').append(it.next()).append('\"');
-                if (it.hasNext()) {
-                    sb.append(',');
-                }
-            }
-            sb.append(';');
+        if (c.isPrivate()) {
+            sb.append(PRIVATE);
+            handleFields(c.getPrivateFields(), sb);
         }
         if (c.isNoCache()) {
-            sb.append(NO_CACHE).append('=');
-            for (Iterator<String> it = c.getNoCacheFields().iterator(); it.hasNext();) {
-                sb.append('\"').append(it.next()).append('\"');
-                if (it.hasNext()) {
-                    sb.append(',');
-                }
-            }
-            sb.append(';');
+            sb.append(NO_CACHE);
+            handleFields(c.getNoCacheFields(), sb);
         }
         if (c.isNoStore()) {
             sb.append(NO_STORE).append(';');
@@ -132,6 +119,20 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         }
         if (c.getSMaxAge() != -1) {
             sb.append(SMAX_AGE).append('=').append(c.getSMaxAge()).append(';');
+        }
+        Map<String, String> exts = c.getCacheExtension();
+        for (Map.Entry<String, String> entry : exts.entrySet()) {
+            sb.append(entry.getKey());
+            String v = entry.getValue();
+            if (v != null) {
+                sb.append("=");
+                if (v.indexOf(' ') != -1) {
+                    sb.append('\"').append(v).append('\"');
+                } else {
+                    sb.append(v);
+                }
+            }
+            sb.append(';');
         }
         String s = sb.toString();
         return s.endsWith(";") ? s.substring(0, s.length() - 1) : s; 
@@ -153,4 +154,16 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         }
     }
 
+    private static void handleFields(List<String> fields, StringBuilder sb) {
+        if (!fields.isEmpty()) {
+            sb.append('=');
+        }
+        for (Iterator<String> it = fields.iterator(); it.hasNext();) {
+            sb.append('\"').append(it.next()).append('\"');
+            if (it.hasNext()) {
+                sb.append(',');
+            }
+        }
+        sb.append(';');
+    }
 }
