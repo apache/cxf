@@ -64,6 +64,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -93,6 +94,15 @@ public final class StaxUtils {
     }
     
     private StaxUtils() {
+    }
+    
+    public static boolean isWoodstox() {
+        try {
+            ClassLoaderUtils.loadClass("org.codehaus.stax2.XMLStreamReader2", StaxUtils.class);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

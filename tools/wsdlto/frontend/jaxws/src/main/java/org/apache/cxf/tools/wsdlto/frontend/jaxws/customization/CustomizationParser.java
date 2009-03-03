@@ -56,7 +56,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.util.StAXUtil;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
 import org.apache.xml.resolver.Catalog;
@@ -459,7 +458,7 @@ public final class CustomizationParser {
             throw new ToolException(msg, e1);
         }
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(root);
-        StAXUtil.toStartTag(reader);
+        StaxUtils.toNextTag(reader);
         if (isValidJaxwsBindingFile(bindingFile, reader)) {
 
             String wsdlLocation = root.getAttribute("wsdlLocation");

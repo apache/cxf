@@ -23,58 +23,19 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.xml.sax.InputSource;
-
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.Tag;
-import org.apache.cxf.tools.common.ToolException;
 
-public final class StAXUtil {
-    private static final Logger LOG = LogUtils.getL7dLogger(StAXUtil.class);
-    private static final XMLInputFactory XML_INPUT_FACTORY;
-    static {
-        XML_INPUT_FACTORY = XMLInputFactory.newInstance();
-        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE);
-    }
-
-    private StAXUtil() {
-    }
-
-    public static void toStartTag(XMLStreamReader r) throws XMLStreamException {
-        while (!r.isStartElement() && r.hasNext()) {
-            r.next();
-        }
-    }
-
-    public static XMLStreamReader createFreshXMLStreamReader(InputSource source) {
-        try {
-            if (source.getCharacterStream() != null) {
-                return XML_INPUT_FACTORY.createXMLStreamReader(source.getSystemId(),
-                                                             source.getCharacterStream());
-            }
-            if (source.getByteStream() != null) {
-                return XML_INPUT_FACTORY.createXMLStreamReader(source.getSystemId(),
-                                                             source.getByteStream());
-            }
-            return XML_INPUT_FACTORY.createXMLStreamReader(source.getSystemId(),
-                                                         new URL(source.getSystemId()).openStream());
-        } catch (Exception e) {
-            Message msg = new Message("FAIL_TO_CREATE_STAX", LOG);
-            throw new ToolException(msg, e);
-        }
+public final class ToolsStaxUtils {
+   
+    private ToolsStaxUtils() {
     }
 
     public static List<Tag> getTags(final File source) throws Exception {
