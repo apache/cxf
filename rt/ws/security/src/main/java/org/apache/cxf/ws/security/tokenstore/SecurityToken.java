@@ -156,6 +156,7 @@ public class SecurityToken {
     private static Element cloneElement(Element el) {
         try {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+            writer.setNsRepairing(true);
             StaxUtils.copy(el, writer);
             return writer.getDocument().getDocumentElement();
         } catch (Exception ex) {
