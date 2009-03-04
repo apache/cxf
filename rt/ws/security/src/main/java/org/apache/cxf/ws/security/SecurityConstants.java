@@ -43,16 +43,21 @@ public final class SecurityConstants {
 
     public static final String TOKEN = "ws-security.token";
     public static final String TOKEN_ID = "ws-security.token.id";
-    
+
     public static final String STS_CLIENT = "ws-security.sts.client";
     
     /**
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client
      * will decrypt the EncryptedData elements in the response
+     * 
+     * These are also used by the STSClient to send/process any RSA/DSAKeyValue tokens 
+     * used if the KeyType is "PublicKey" 
      */
     public static final String STS_TOKEN_CRYPTO = "ws-security.sts.token.crypto";
     public static final String STS_TOKEN_PROPERTIES = "ws-security.sts.token.properties";
+    public static final String STS_TOKEN_USERNAME = "ws-security.sts.token.username";
+    
     
 
     public static final Set<String> ALL_PROPERTIES;

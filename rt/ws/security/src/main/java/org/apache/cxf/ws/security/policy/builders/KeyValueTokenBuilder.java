@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -36,21 +37,30 @@ import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 
 
 public class KeyValueTokenBuilder implements AssertionBuilder {
+    private static final String MS_NS = "http://schemas.microsoft.com/ws/2005/07/securitypolicy";
     private static final List<QName> KNOWN_ELEMENTS 
-        = Arrays.asList(SP12Constants.KEYVALUE_TOKEN);
+        = Arrays.asList(SP12Constants.KEYVALUE_TOKEN,
+                        new QName(MS_NS, "RsaToken"));
 
     public KeyValueTokenBuilder() {
     }
     
     public PolicyAssertion build(Element element) {
         
-        SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
+        SPConstants consts = MS_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         KeyValueToken token = new KeyValueToken(consts);
 
         String attribute = element.getAttributeNS(element.getNamespaceURI(), SPConstants.ATTR_INCLUDE_TOKEN);
-        if (attribute != null) {
+        if (StringUtils.isEmpty(attribute)) {
+            attribute = element.getAttributeNS(consts.getNamespace(), SPConstants.ATTR_INCLUDE_TOKEN);
+        }
+        if (StringUtils.isEmpty(attribute)) {
+            attribute = element.getAttributeNS(SP11Constants.INSTANCE.getNamespace(),
+                                               SPConstants.ATTR_INCLUDE_TOKEN);
+        }
+        if (!StringUtils.isEmpty(attribute)) {
             token.setInclusion(consts.getInclusionFromAttributeValue(attribute));
         }
 

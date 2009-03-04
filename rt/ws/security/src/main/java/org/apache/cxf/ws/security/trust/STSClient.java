@@ -21,7 +21,10 @@ package org.apache.cxf.ws.security.trust;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -80,6 +83,7 @@ import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -91,6 +95,8 @@ import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 
 /**
  * 
@@ -309,22 +315,11 @@ public class STSClient implements Configurable {
         writer.writeCharacters(namespace + requestType);
         writer.writeEndElement();        
         addAppliesTo(writer, appliesTo);
-        if (isSecureConv) {
-            addLifetime(writer);
-            if (keyType == null) {
-                writer.writeStartElement("wst", "TokenType", namespace);
-                writer.writeCharacters(STSUtils.getTokenTypeSCT(namespace));
-                writer.writeEndElement();
-                keyType = namespace + "/SymmetricKey";
-            }
-        } else if (keyType == null) {
-            writer.writeStartElement("wst", "KeyType", namespace);
-            writer.writeCharacters(namespace + "/SymmetricKey");
-            writer.writeEndElement();
-            keyType = namespace + "/SymmetricKey";
-        }
+        keyType = writeKeyType(writer, keyType);
         
         byte[] requestorEntropy = null;
+        X509Certificate cert = null;
+        Crypto crypto = null;
         
         if (keyType.endsWith("SymmetricKey")) {
             if (!wroteKeySize && !isSecureConv) {
@@ -352,14 +347,17 @@ public class STSClient implements Configurable {
             writer.writeStartElement("wst", "UseKey", namespace);
             writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
             writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyValue");
-            
-            /*
-            //REVISIT - KeyValueToken support - how to get the key?
-            RSAPublicKey key = getPublicKey();
-            
-            RSAKeyValue value = new RSAKeyValue(writer.getDocument(), key);
-            StaxUtils.copy(value.getElement(), writer);
-            */
+            crypto = createCrypto(false);
+            cert = getCert(crypto);
+            PublicKey key = cert.getPublicKey();
+            String pubKeyAlgo = key.getAlgorithm();
+            if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
+                DSAKeyValue dsaKeyValue = new DSAKeyValue(writer.getDocument(), key);
+                writer.getCurrentNode().appendChild(dsaKeyValue.getElement());
+            } else if ("RSA".equalsIgnoreCase(pubKeyAlgo)) {
+                RSAKeyValue rsaKeyValue = new RSAKeyValue(writer.getDocument(), key);
+                writer.getCurrentNode().appendChild(rsaKeyValue.getElement());
+            }
             
             writer.writeEndElement();
             writer.writeEndElement();
@@ -379,7 +377,11 @@ public class STSClient implements Configurable {
         Object obj[] = client.invoke(boi,
                                      new DOMSource(writer.getDocument().getDocumentElement()));
         
-        return createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
+        SecurityToken token = createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
+        if (cert != null) {
+            token.setX509Certificate(cert, crypto);
+        }
+        return token;
     }
     public void renewSecurityToken(SecurityToken tok) throws Exception {
         String action = null;
@@ -388,7 +390,40 @@ public class STSClient implements Configurable {
         }
         requestSecurityToken(tok.getIssuerAddress(), action, "/Renew", tok);
     }
-
+    
+    private String writeKeyType(W3CDOMStreamWriter writer, String keyType) throws XMLStreamException {
+        if (isSecureConv) {
+            addLifetime(writer);
+            if (keyType == null) {
+                writer.writeStartElement("wst", "TokenType", namespace);
+                writer.writeCharacters(STSUtils.getTokenTypeSCT(namespace));
+                writer.writeEndElement();
+                keyType = namespace + "/SymmetricKey";
+            }
+        } else if (keyType == null) {
+            writer.writeStartElement("wst", "KeyType", namespace);
+            writer.writeCharacters(namespace + "/SymmetricKey");
+            writer.writeEndElement();
+            keyType = namespace + "/SymmetricKey";
+        }
+        return keyType;
+    }
+    private X509Certificate getCert(Crypto crypto) throws Exception {
+        String alias = (String)getProperty(SecurityConstants.STS_TOKEN_USERNAME);
+        if (alias == null) {
+            alias = crypto.getDefaultX509Alias();
+        }
+        if (alias == null) {
+            Enumeration<String> as = crypto.getKeyStore().aliases();
+            if (as.hasMoreElements()) {
+                alias = as.nextElement();
+            }
+            if (as.hasMoreElements()) {
+                throw new Fault("No alias specified for retrieving PublicKey", LOG);
+            }
+        }
+        return crypto.getCertificates(alias)[0];
+    }
     private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
         Date creationTime = new Date();
         Date expirationTime = new Date();
@@ -417,7 +452,8 @@ public class STSClient implements Configurable {
         }
     }
 
-    private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy) 
+    private SecurityToken createSecurityToken(Document document, 
+                                              byte[] requestorEntropy) 
         throws WSSecurityException {
         
         Element el = document.getDocumentElement();
@@ -460,17 +496,14 @@ public class STSClient implements Configurable {
         } catch (IOException e1) {
             throw new TrustException(e1);
         }
-        
         String id = findID(rar, rur, rstDec);
         if (StringUtils.isEmpty(id)) {
             throw new TrustException(new Message("NO_ID", LOG));
-        }
-        
+        }        
         SecurityToken token = new SecurityToken(id, rstDec, lte);
         token.setAttachedReference(rar);
         token.setUnattachedReference(rur);
         token.setIssuerAddress(location);
-                
         
         byte[] secret = null;
 
@@ -487,7 +520,7 @@ public class STSClient implements Configurable {
 
                     EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
 
-                    processor.handleToken(child, null, createCrypto(),
+                    processor.handleToken(child, null, createCrypto(true),
                                           createHandler(), null, new Vector(),
                                           null);
 
@@ -526,21 +559,20 @@ public class STSClient implements Configurable {
             secret = requestorEntropy;
         }
         token.setSecret(secret);
-        
+
         return token;
     }
 
     protected Element decrypt(Element firstElement) throws IOException {
         if ("EncryptedData".equals(firstElement.getLocalName())
             && "http://www.w3.org/2001/04/xmlenc#".equals(firstElement.getNamespaceURI())) {
-            
             Node parent = firstElement.getParentNode();
             Node prev = firstElement.getPreviousSibling();
             
             //encrypted even more.  WCF seems to do this periodically
             EncryptedDataProcessor processor = new EncryptedDataProcessor();
 
-            processor.handleToken(firstElement, null, createCrypto(),
+            processor.handleToken(firstElement, null, createCrypto(true),
                                   createHandler(), null, new Vector(),
                                   null);
             
@@ -549,7 +581,6 @@ public class STSClient implements Configurable {
             } else {
                 firstElement = (Element)prev.getNextSibling();
             }
-
         }
         return firstElement;
     }
@@ -582,14 +613,15 @@ public class STSClient implements Configurable {
         return o;
     }
     
-    private Crypto createCrypto() throws IOException {
-        Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO);
+    private Crypto createCrypto(boolean decrypt) throws IOException {
+        WSSConfig.getDefaultWSConfig();
+        Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO + (decrypt ? ".decrypt" : ""));
         if (crypto != null) {
             return crypto;
         }
         
         
-        Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES); 
+        Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES + (decrypt ? ".decrypt" : "")); 
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
@@ -612,6 +644,9 @@ public class STSClient implements Configurable {
         
         if (properties != null) {
             return CryptoFactory.getInstance(properties);
+        }
+        if (decrypt) {
+            return createCrypto(false);
         }
         return null;
     }

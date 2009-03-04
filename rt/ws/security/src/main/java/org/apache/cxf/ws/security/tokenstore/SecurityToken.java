@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -31,6 +32,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Reference;
 
 
@@ -126,6 +128,10 @@ public class SecurityToken {
      * The tokenType
      */
     private String tokenType;
+
+    private X509Certificate x509cert;
+
+    private Crypto crypto;
     
     public SecurityToken() {
         
@@ -398,6 +404,16 @@ public class SecurityToken {
             return child.getAttribute("URI").substring(1);
         }
         return null;
+    }
+    public void setX509Certificate(X509Certificate cert, Crypto cpt) {
+        x509cert = cert;
+        crypto = cpt;
+    }
+    public X509Certificate getX509Certificate() {
+        return x509cert;
+    }
+    public Crypto getCrypto() {
+        return crypto;
     }
 
 

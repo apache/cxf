@@ -61,6 +61,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -75,6 +76,7 @@ import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
@@ -417,8 +419,49 @@ public abstract class AbstractBindingBuilder {
                     this.encryptedTokensIdList.add(secToken.getId());
                 }
         
-                //Add the extracted token
-                ret.put(token, new WSSecurityTokenHolder(secToken));
+                if (secToken.getX509Certificate() == null) {
+                    //Add the extracted token
+                    ret.put(token, new WSSecurityTokenHolder(secToken));
+                } else {
+                    WSSecSignature sig = new WSSecSignature();                    
+                    sig.setX509Certificate(secToken.getX509Certificate());
+                    sig.setCustomTokenId(secToken.getId());
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                    if (secToken.getTokenType() == null) {
+                        sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                                    + WSConstants.SAML_ASSERTION_ID);
+                    } else {
+                        sig.setCustomTokenValueType(secToken.getTokenType());
+                    }
+                    sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+                    sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
+                    
+                    Crypto crypto = secToken.getCrypto();
+                    String uname = null;
+                    try {
+                        uname = crypto.getKeyStore().getCertificateAlias(secToken.getX509Certificate());
+                    } catch (KeyStoreException e1) {
+                        throw new Fault(e1);
+                    }
+
+                    String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+                    if (password == null) {
+                        password = "";
+                    }
+                    sig.setUserInfo(uname, password);
+                    try {
+                        sig.prepare(saaj.getSOAPPart(),
+                                    secToken.getCrypto(), 
+                                    secHeader);
+                    } catch (WSSecurityException e) {
+                        throw new Fault(e);
+                    }
+                    
+                    if (suppTokens.isEncryptedToken()) {
+                        encryptedTokensIdList.add(sig.getBSTTokenId());
+                    }
+                    ret.put(token, sig);                
+                }
 
             } else if (token instanceof X509Token) {
                 //We have to use a cert
@@ -432,7 +475,13 @@ public abstract class AbstractBindingBuilder {
                     encryptedTokensIdList.add(sig.getBSTTokenId());
                 }
                 ret.put(token, sig);
-            }         
+            } else if (token instanceof KeyValueToken) {
+                WSSecSignature sig = getSignatureBuider(suppTokens, token, endorse);
+                if (suppTokens.isEncryptedToken()) {
+                    encryptedTokensIdList.add(sig.getBSTTokenId());
+                }
+                ret.put(token, sig);                
+            }
             
         }
         return ret;
@@ -880,7 +929,10 @@ public abstract class AbstractBindingBuilder {
                     secBase.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
                     tokenTypeSet = true;
                 }
-            } 
+            } else if (token instanceof KeyValueToken) {
+                secBase.setKeyIdentifierType(WSConstants.KEY_VALUE);
+                tokenTypeSet = true;
+            }
             
             if (!tokenTypeSet) {
                 policyAsserted(token);
@@ -1104,7 +1156,8 @@ public abstract class AbstractBindingBuilder {
     }
 
     protected void doEndorsedSignatures(Map<Token, WSSecBase> tokenMap,
-                                          boolean isTokenProtection) {
+                                          boolean isTokenProtection,
+                                          boolean isSigProtect) {
         
         for (Map.Entry<Token, WSSecBase> ent : tokenMap.entrySet()) {
             WSSecBase tempTok = ent.getValue();
@@ -1123,6 +1176,9 @@ public abstract class AbstractBindingBuilder {
                     sig.appendToHeader(secHeader);
                     
                     signatures.add(sig.getSignatureValue());
+                    if (isSigProtect) {
+                        encryptedTokensIdList.add(sig.getId());
+                    }
                 } catch (WSSecurityException e) {
                     policyNotAsserted(ent.getKey(), e);
                 }
@@ -1344,20 +1400,23 @@ public abstract class AbstractBindingBuilder {
 
     protected void doEndorse() {
         boolean tokenProtect = false;
+        boolean sigProtect = false;
         if (binding instanceof AsymmetricBinding) {
             tokenProtect = ((AsymmetricBinding)binding).isTokenProtection();
+            sigProtect = ((AsymmetricBinding)binding).isSignatureProtection();            
         } else if (binding instanceof SymmetricBinding) {
             tokenProtect = ((SymmetricBinding)binding).isTokenProtection();
+            sigProtect = ((SymmetricBinding)binding).isSignatureProtection();            
         }
         // Adding the endorsing encrypted supporting tokens to endorsing supporting tokens
         endSuppTokMap.putAll(endEncSuppTokMap);
         // Do endorsed signatures
-        doEndorsedSignatures(endSuppTokMap, tokenProtect);
+        doEndorsedSignatures(endSuppTokMap, tokenProtect, sigProtect);
 
         //Adding the signed endorsed encrypted tokens to signed endorsed supporting tokens
         sgndEndSuppTokMap.putAll(sgndEndEncSuppTokMap);
         // Do signed endorsing signatures
-        doEndorsedSignatures(sgndEndSuppTokMap, tokenProtect);
+        doEndorsedSignatures(sgndEndSuppTokMap, tokenProtect, sigProtect);
     } 
 
     protected void addSignatureConfirmation(Vector<WSEncryptionPart> sigParts) {
