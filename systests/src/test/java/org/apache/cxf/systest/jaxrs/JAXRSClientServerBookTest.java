@@ -357,11 +357,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddBook() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/books";
-
+        doAddBook("http://localhost:9080/bookstore/books");               
+    }
+    
+    @Test
+    public void testAddBookXmlAdapter() throws Exception {
+        doAddBook("http://localhost:9080/bookstore/booksinfo");               
+    }
+    
+    private void doAddBook(String address) throws Exception {
         File input = new File(getClass().getResource("resources/add_book.txt").toURI());         
-        PostMethod post = new PostMethod(endpointAddress);
+        PostMethod post = new PostMethod(address);
         post.setRequestHeader("Content-Type", "application/xml");
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         post.setRequestEntity(entity);
@@ -377,8 +383,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
-        }               
-    }  
+        }
+    }
     
     @Test
     public void testUpdateBook() throws Exception {

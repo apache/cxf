@@ -315,6 +315,15 @@ public class BookStore {
 
         return Response.ok(book).build();
     }
+    
+    @POST
+    @Path("/booksinfo")
+    @Produces("text/xml")
+    @Consumes("application/xml")
+    public Response addBook(@XmlJavaTypeAdapter(BookInfoAdapter.class) 
+                            BookInfo bookInfo) {
+        return Response.ok(bookInfo.asBook()).build();
+    }
 
     @POST
     @Path("/binarybooks")
@@ -455,9 +464,16 @@ public class BookStore {
         private String name;
         private long id;
         
+        public BookInfo() {
+            
+        }
+        
         public BookInfo(Book b) {
             this.name = b.getName();
             this.id = b.getId();
+            if (id == 0) {
+                id = 124;
+            }
         }
         
         public String getName() {
@@ -466,6 +482,13 @@ public class BookStore {
         
         public long getId() {
             return id;
+        }
+       
+        public Book asBook() {
+            Book b = new Book();
+            b.setId(id);
+            b.setName(name);
+            return b;
         }
     }
     
@@ -477,9 +500,8 @@ public class BookStore {
         }
 
         @Override
-        public BookInfo unmarshal(Book v) throws Exception {
-            // TODO Auto-generated method stub
-            return null;
+        public BookInfo unmarshal(Book b) throws Exception {
+            return new BookInfo(b);
         }
         
     }

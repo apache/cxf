@@ -70,12 +70,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return isSupported(type, genericType, anns)
-               || AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class) != null;
+        return isSupported(type, genericType, anns);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return isSupported(type, genericType, annotations);
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        return isSupported(type, genericType, anns);
     }
 
     public void setSchemaLocations(List<String> locations) {
@@ -133,7 +132,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
-    private JAXBContext getPackageContext(Class<?> type) {
+    protected JAXBContext getPackageContext(Class<?> type) {
         if (type == null) {
             return null;
         }
@@ -144,27 +143,38 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                 try {
                     context = JAXBContext.newInstance(packageName, type.getClassLoader());
                     packageContexts.put(packageName, context);
-                    return context;
                 } catch (JAXBException ex) {
                     LOG.fine("Error creating a JAXBContext using ObjectFactory : " 
                                 + ex.getMessage());
                     return null;
                 }
             }
+            return context;
         }
-        return null;
     }
     
-    protected boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations) {
+    protected boolean isSupported(Class<?> type, Type genericType, Annotation[] anns) {
+        // TODO : Shall we just return true and let readFrom/writeTo 
+        // fail if JAXB can't handle a given type ?
+        
+        // TODO: still not checked : 
+        // - XmlJavaTypeAdapter at package level
+        // - anything else ?
         
         return type.getAnnotation(XmlRootElement.class) != null
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryForClass(type)
-            || (type != genericType && objectFactoryForType(genericType));
+            || (type != genericType && objectFactoryForType(genericType))
+            || adapterAvailable(type, anns);
     
     }
     
-    private boolean objectFactoryForClass(Class<?> type) {
+    protected boolean adapterAvailable(Class<?> type, Annotation[] anns) {
+        return AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class) != null
+               || type.getAnnotation(XmlJavaTypeAdapter.class) != null;
+    }
+    
+    protected boolean objectFactoryForClass(Class<?> type) {
         try {
             return type.getClassLoader().loadClass(PackageUtils.getPackageName(type) 
                                         + ".ObjectFactory") != null;
@@ -201,24 +211,39 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return marshaller;
     }
     
-    protected Class<?> getActualType(Class<?> type, Type genericType) {
+    protected Class<?> getActualType(Class<?> type, Type genericType, Annotation[] anns) {
         Class<?> theType = null;
         if (JAXBElement.class.isAssignableFrom(type)) {
             theType = InjectionUtils.getActualType(genericType);
         } else {
             theType = type;
         }
+        XmlJavaTypeAdapter adapter = getAdapter(theType, anns);
+        if (adapter != null) {
+            if (adapter.type() != XmlJavaTypeAdapter.DEFAULT.class) {
+                theType = adapter.type();
+            } else {
+                Type[] types = InjectionUtils.getActualTypes(adapter.value().getGenericSuperclass());
+                if (types != null && types.length == 2) {
+                    theType = (Class)types[0];
+                }
+            }
+        }
         
         return theType;
     }
     
     @SuppressWarnings("unchecked")
-    protected Object checkAdapter(Object obj, Annotation[] anns) {
-        XmlJavaTypeAdapter typeAdapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
+    protected Object checkAdapter(Object obj, Annotation[] anns, boolean marshal) {
+        XmlJavaTypeAdapter typeAdapter = getAdapter(obj.getClass(), anns); 
         if (typeAdapter != null) {
             try {
                 XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
-                return xmlAdapter.marshal(obj);
+                if (marshal) {
+                    return xmlAdapter.marshal(obj);
+                } else {
+                    return xmlAdapter.unmarshal(obj);
+                }
             } catch (Exception ex) {
                 LOG.warning("Problem using the XmlJavaTypeAdapter");
                 ex.printStackTrace();
@@ -227,8 +252,23 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return obj;
     }
     
+    protected XmlJavaTypeAdapter getAdapter(Class<?> type, Annotation[] anns) {
+        XmlJavaTypeAdapter typeAdapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
+        if (typeAdapter == null) {
+            typeAdapter = type.getAnnotation(XmlJavaTypeAdapter.class);
+        }
+        return typeAdapter;
+    }
+    
+    
     protected Schema getSchema() {
         return schema;
+    }
+
+    
+    static void clearContexts() {
+        classContexts.clear();
+        packageContexts.clear();
     }
     
     protected static void handleJAXBException(JAXBException e) {
