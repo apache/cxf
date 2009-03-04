@@ -48,6 +48,8 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.message.WSSecDKSign;
 import org.apache.ws.security.message.WSSecEncryptedKey;
@@ -132,10 +134,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
                         for (Token token : sgndSuppTokens.getTokens()) {
                             if (token instanceof IssuedToken
-                                || token instanceof SecureConversationToken) {
+                                || token instanceof SecureConversationToken
+                                || token instanceof KeyValueToken) {
                                 signatureValues.add(doIssuedTokenSignature(token, signdParts,
                                                                            sgndSuppTokens));
-                            } else if (token instanceof X509Token) {
+                            } else if (token instanceof X509Token
+                                || token instanceof KeyValueToken) {
                                 signatureValues.add(doX509TokenSignature(token, signdParts, sgndSuppTokens));
                             }
                         }
@@ -166,14 +170,13 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             if (token instanceof IssuedToken
                                 || token instanceof SecureConversationToken) {
                                 signatureValues.add(doIssuedTokenSignature(token, 
-                                                                           null, 
+                                                                           sgndSuppTokens.getSignedParts(), 
                                                                            sgndSuppTokens));
-                            } else if (token instanceof X509Token) {
+                            } else if (token instanceof X509Token
+                                || token instanceof KeyValueToken) {
                                 signatureValues.add(doX509TokenSignature(token, 
                                                                          sgndSuppTokens.getSignedParts(), 
                                                                          sgndSuppTokens));
-                            } else if (token instanceof KeyValueToken) {
-                                //
                             }
                         }
                     }
@@ -201,7 +204,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
     }
     
-    
+
     private byte[] doX509TokenSignature(Token token, SignedEncryptedParts signdParts,
                                         TokenWrapper wrapper) 
         throws Exception {
@@ -263,12 +266,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         } else {
             WSSecSignature sig = getSignatureBuider(wrapper, token, false);
             sig.prependBSTElementToHeader(secHeader);
-            /*
-            if (isTokenProtection()
-                && !(SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER == token.getInclusion())) {
-                sigParts.add(new WSEncryptionPart(sig.getBSTTokenId()));
-            }
-            */
             
             sig.addReferencesToSign(sigParts, secHeader);
             insertBeforeBottomUp(sig.getSignatureElement());
@@ -309,12 +306,17 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             if (signdParts.isBody()) {
                 sigParts.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody())));
             }
-    
-            for (Header header : signdParts.getHeaders()) {
-                WSEncryptionPart wep = new WSEncryptionPart(header.getName(), 
-                        header.getNamespace(),
-                        "Content");
-                sigParts.add(wep);
+            if (secTok.getX509Certificate() != null) {
+                //the "getX509Certificate" this is to workaround an issue in WCF
+                //In WCF, for TransportBinding, in most cases, it doesn't wan't any of
+                //the headers signed even if the policy sais so.   HOWEVER, for KeyValue
+                //IssuedTokends, it DOES want them signed
+                for (Header header : signdParts.getHeaders()) {
+                    WSEncryptionPart wep = new WSEncryptionPart(header.getName(), 
+                            header.getNamespace(),
+                            "Content");
+                    sigParts.add(wep);
+                }
             }
         }
         
@@ -368,10 +370,26 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 sig.setCustomTokenValueType(secTok.getTokenType());
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             }
-            sig.setSecretKey(secTok.getSecret());
-            sig.setSignatureAlgorithm(algorithmSuite.getAsymmetricSignature());
-            sig.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
-            sig.prepare(doc, getSignatureCrypto(wrapper), secHeader);
+            Crypto crypto = null;
+            if (secTok.getSecret() == null) {
+                sig.setX509Certificate(secTok.getX509Certificate());
+                
+                crypto = secTok.getCrypto();
+                String uname = crypto.getKeyStore().getCertificateAlias(secTok.getX509Certificate());
+                String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+                if (password == null) {
+                    password = "";
+                }
+                sig.setUserInfo(uname, password);
+                sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+            } else {
+                crypto = getSignatureCrypto(wrapper);
+                sig.setSecretKey(secTok.getSecret());
+                sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+            }
+            sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
+
+            sig.prepare(doc, crypto, secHeader);
 
             sig.setParts(sigParts);
             sig.addReferencesToSign(sigParts, secHeader);
