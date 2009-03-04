@@ -84,6 +84,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "application/xml", 404);
     }
     
+    @Test
+    public void testWriteAndFailEarly() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/books/stream",
+                      "This is supposed to go on the wire",
+                      "application/xml, text/plain", 410);
+    }
+    
     
     @Test
     public void testAcceptTypeMismatch() throws Exception {

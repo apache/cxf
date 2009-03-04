@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.jaxrs;
 
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -48,6 +50,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.StreamingOutput;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -262,8 +265,14 @@ public class BookStore {
         return doGetBook(currentBookId);
     }
     
+    @GET
+    @Path("/books/stream")
+    @Produces("application/xml")
+    public StreamingOutput writeToStreamAndFail() {
+        return new StreamingOutputImpl();
+    }
+    
     private Book doGetBook(String id) throws BookNotFoundFault {
-        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
@@ -510,6 +519,17 @@ public class BookStore {
         public BadBook(String s) {
             throw new RuntimeException("The bad book");
         }
+    }
+    
+    private static class StreamingOutputImpl implements StreamingOutput {
+
+        public void write(OutputStream output) throws IOException, WebApplicationException {
+            //output.write("This is not supposed to go on the wire".getBytes());
+            throw new WebApplicationException(
+                 Response.status(410).type("text/plain")
+                 .entity("This is supposed to go on the wire").build());
+        } 
+        
     }
 }
 
