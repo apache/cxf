@@ -21,10 +21,13 @@ package org.apache.cxf.systest.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
@@ -43,6 +46,9 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import org.xml.sax.InputSource;
+
+import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 //The following wsdl file is used.
@@ -65,13 +71,12 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
             factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
             Document sayHiDocument = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
-            sayHiInputSource = new InputSource(getSOAPBodyStream(sayHiDocument));
+            sayHiInputSource = new InputSource(getSOAPBodyFile(sayHiDocument).toURI().toString());
             
             InputStream is2 = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
             Document greetMeDocument = 
                 factory.createMessage(null, is2).getSOAPBody().extractContentAsDocument();
-            greetMeInputSource = new InputSource(getSOAPBodyStream(greetMeDocument));
-
+            greetMeInputSource = new InputSource(getSOAPBodyFile(greetMeDocument).toURI().toString());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -101,27 +106,13 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
         return response;
     }
     
-    private InputStream getSOAPBodyStream(Document doc) throws Exception {
-        // Try to get the DOMImplementation from the doc before
-        // defaulting to the sun implementation class (which uses
-        // sun internal xerces classes not found in the ibm jdk).
-        DOMImplementationLS impl = null;
-        DOMImplementation docImpl = doc.getImplementation();
-        if (docImpl != null && docImpl.hasFeature("LS", "3.0")) {
-            impl = (DOMImplementationLS)docImpl.getFeature("LS", "3.0");
-        } else {
-            System.setProperty(DOMImplementationRegistry.PROPERTY,
-                "com.sun.org.apache.xerces.internal.dom.DOMImplementationSourceImpl");
-            DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
-            impl = (DOMImplementationLS)registry.getDOMImplementation("LS");
-        }
-        LSOutput output = impl.createLSOutput();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        output.setByteStream(byteArrayOutputStream);
-        LSSerializer writer = impl.createLSSerializer();
-        writer.write(doc, output);
-        byte[] buf = byteArrayOutputStream.toByteArray();
-        return new ByteArrayInputStream(buf);
+    private File getSOAPBodyFile(Document doc) throws Exception {
+        File file = FileUtils.createTempFile("cxf-systest", "xml");
+        FileOutputStream out = new FileOutputStream(file);
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+        StaxUtils.writeDocument(doc, writer, true);
+        writer.close();
+        return file;
     }
 
 }

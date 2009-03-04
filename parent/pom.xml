@@ -283,10 +283,10 @@
                                 <name>spring.validation.mode</name>
                                 <value>${spring.validation.mode}</value>
                             </property>
-			    <property>
-			        <name>surefire.fork.vmargs</name>
-				<value>${surefire.fork.vmargs}</value>
-		            </property>
+                            <property>
+                                <name>surefire.fork.vmargs</name>
+                                <value>${surefire.fork.vmargs}</value>
+                            </property>
                             <property>
                                 <!-- If we close the port after a client in the same JVM has opened a keep-alive
                                 connection, on some Linux's, the socket remains consumed until
@@ -1036,30 +1036,43 @@
 
     <profiles>
         <profile>
-	  <id>sjsxp</id>
-	  <properties>
-	    <stax.impl.groupId>com.sun.xml.stream</stax.impl.groupId>
-	    <stax.impl.artifactId>sjsxp</stax.impl.artifactId>
-	    <stax.impl.version>1.0.1</stax.impl.version>
-	  </properties>
-	</profile>
+            <!-- sjsxp is really the precursor to the jaxp-ri jars.   However, getting the jaxp-ri  jar to work on 
+            Java 5 requires endorsing it which is non-trivial in maven  :-(.
+            -->
+            <id>sjsxp</id>
+            <properties>
+                <stax.impl.groupId>com.sun.xml.stream</stax.impl.groupId>
+                <stax.impl.artifactId>sjsxp</stax.impl.artifactId>
+                <stax.impl.version>1.0.1</stax.impl.version>
+            </properties>
+        </profile>
         <profile>
-	  <id>woodstox4</id>
-	  <properties>
-	    <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
-	    <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
-	    <stax.impl.version>4.0.2</stax.impl.version>
-	  </properties>
-	</profile>
+            <!-- This really only works with Java 6 as the classes are identically named with the same classes in the Java 5 JDK
+            and the Java 5 versions get picked up instead -->
+            <id>jaxpri</id>
+            <properties>
+                <stax.impl.groupId>com.sun.xml.parsers</stax.impl.groupId>
+                <stax.impl.artifactId>jaxp-ri</stax.impl.artifactId>
+                <stax.impl.version>1.4.2</stax.impl.version>
+            </properties>
+	        </profile>
+        <profile>
+            <id>woodstox4</id>
+            <properties>
+                <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
+                <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
+                <stax.impl.version>4.0.2</stax.impl.version>
+            </properties>
+        </profile>
 
-	<profile>
-	  <id>axis2-saaj</id>
-	  <properties>
-	    <saaj.impl.groupId>org.apache.axis2</saaj.impl.groupId>
-	    <saaj.impl.artifactId>axis2-saaj</saaj.impl.artifactId>
-	    <saaj.impl.version>1.4.1</saaj.impl.version>
-	  </properties>
-	</profile>
+        <profile>
+            <id>axis2-saaj</id>
+            <properties>
+                <saaj.impl.groupId>org.apache.axis2</saaj.impl.groupId>
+                <saaj.impl.artifactId>axis2-saaj</saaj.impl.artifactId>
+                <saaj.impl.version>1.4.1</saaj.impl.version>
+            </properties>
+        </profile>
 
         <profile>
             <id>fastinstall</id>
