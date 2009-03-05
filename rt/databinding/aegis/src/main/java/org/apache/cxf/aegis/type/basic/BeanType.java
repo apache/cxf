@@ -332,10 +332,6 @@ public class BeanType extends Type {
             writer.writeXsiType(getSchemaType());
         }
 
-        /*
-         * TODO: Replace this method with one split into two pieces so that we can front-load the attributes
-         * and traverse down the list of super classes.
-         */
         for (QName name : inf.getAttributes()) {
 
             Object value = readProperty(object, name);
@@ -352,6 +348,13 @@ public class BeanType extends Type {
                 type.writeObject(value, cwriter, context);
 
                 cwriter.close();
+            }
+        }
+        
+        if (inf.isExtension()) {
+            Type t = getSuperType();
+            if (t != null) {
+                t.writeObject(object, writer, context);
             }
         }
 
@@ -384,12 +387,7 @@ public class BeanType extends Type {
                 cwriter.close();
             }
         }
-        if (inf.isExtension()) {
-            Type t = getSuperType();
-            if (t != null) {
-                t.writeObject(object, writer, context);
-            }
-        }
+       
     }
 
     protected void writeElement(QName name, Object value, Type type, MessageWriter writer, Context context) {
