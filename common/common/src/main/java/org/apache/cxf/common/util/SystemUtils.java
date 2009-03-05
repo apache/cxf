@@ -25,29 +25,12 @@ package org.apache.cxf.common.util;
  */
 public final class SystemUtils {
     
-    public static final String OUT_BUFFERING = "org.apache.cxf.output.buffering";
     public static final String SPRING_VALIDATION_MODE = "org.apache.cxf.spring.validation.mode";
     
     private SystemUtils() {
         
     }
 
-    /**
-     * Checks org.apache.cxf.output.buffering property value, defaults to false 
-     * @return true if output buffering is enabled
-     */
-    public static boolean isBufferingEnabled() { 
-        return Boolean.getBoolean(System.getProperty(OUT_BUFFERING, "false"));    
-    }
-    
-    /**
-     * Checks if org.apache.cxf.output.buffering property was explicitly set 
-     * @return true if it was set
-     */
-    public static boolean isBufferingSet() { 
-        return System.getProperty(OUT_BUFFERING) != null;    
-    }
-    
     /**
      * Gets org.apache.cxf.spring.validation.mode property value if available 
      * @return Spring validation mode

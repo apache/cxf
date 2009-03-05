@@ -38,7 +38,6 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.SystemUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
@@ -202,8 +201,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (!firstTry) {
             return false;
         }
-        boolean enabled = SystemUtils.isBufferingEnabled();
-        if (!enabled && !SystemUtils.isBufferingSet()) {
+        Object outBuf = m.getContextualProperty(OUT_BUFFERING);
+        boolean enabled = Boolean.TRUE.equals(outBuf) || "true".equals(outBuf);
+        if (!enabled && outBuf == null) {
             enabled = InjectionUtils.invokeBooleanGetter(w, "getEnableBuffering");
         }
         if (enabled) {

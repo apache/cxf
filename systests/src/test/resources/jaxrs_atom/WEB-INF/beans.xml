@@ -80,6 +80,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <jaxrs:extensionMappings>
       <entry key="json" value="application/json"/>
     </jaxrs:extensionMappings>	
+    <jaxrs:properties>
+       <entry key="org.apache.cxf.output.buffering" value="true"/>
+    </jaxrs:properties>
   </jaxrs:server>
   
   <bean id="atomstore" class="org.apache.cxf.systest.jaxrs.AtomBookStore"/>
