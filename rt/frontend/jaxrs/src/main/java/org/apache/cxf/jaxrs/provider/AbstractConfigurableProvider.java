@@ -25,8 +25,9 @@ public abstract class AbstractConfigurableProvider {
 
     private List<String> consumeMediaTypes;
     private List<String> produceMediaTypes;
+    private boolean enableBuffering;
     
-    protected void setConsumeMediaTypes(List<String> types) {
+    public void setConsumeMediaTypes(List<String> types) {
         consumeMediaTypes = types;
     }
     
@@ -34,11 +35,19 @@ public abstract class AbstractConfigurableProvider {
         return consumeMediaTypes;    
     }
     
-    protected void setProduceMediaTypes(List<String> types) {
+    public void setProduceMediaTypes(List<String> types) {
         produceMediaTypes = types;
     }
     
     public List<String> getProduceMediaTypes() {
         return produceMediaTypes;    
+    }
+    
+    public void setEnableBuffering(boolean enableBuf) {
+        enableBuffering = enableBuf;
+    }
+    
+    public boolean getEnableBuffering() {
+        return enableBuffering;
     }
 }

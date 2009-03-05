@@ -73,10 +73,10 @@ public final class AttachmentUtils {
     public static MultipartBody getMultipartBody(MessageContext mc,
         String attachmentDir, String attachmentThreshold) {
         if (attachmentDir != null) {
-            mc.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDir, false);
+            mc.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDir);
         }
         if (attachmentThreshold != null) {
-            mc.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, attachmentThreshold, false);
+            mc.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, attachmentThreshold);
         }
         return (MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
     }

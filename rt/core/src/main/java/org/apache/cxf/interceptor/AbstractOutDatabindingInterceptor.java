@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.common.util.SystemUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Attachment;
@@ -72,8 +73,9 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         XMLStreamWriter xmlWriter = origXmlWriter;
         CachingXmlEventWriter cache = null;
         
-        if (shouldValidate(message) && !isRequestor(message)) {
-            //need to cache the events in case validation fails
+        // need to cache the events in case validation fails or buffering is enabled
+        if (shouldValidate(message) && !isRequestor(message)
+            || SystemUtils.isBufferingEnabled()) {
             cache = new CachingXmlEventWriter();
             try {
                 cache.setNamespaceContext(origXmlWriter.getNamespaceContext());

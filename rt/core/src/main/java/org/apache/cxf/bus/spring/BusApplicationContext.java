@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
@@ -227,10 +228,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         }
         reader.setNamespaceHandlerResolver(nsHandlerResolver);
         
-        String mode = System.getProperty("org.apache.cxf.spring.validation.mode");
-        if (mode == null) {
-            mode = System.getProperty("spring.validation.mode");
-        }
+        String mode = SystemUtils.getSpringValidationMode();
         if (null != mode) {
             reader.setValidationModeName(mode);
         }

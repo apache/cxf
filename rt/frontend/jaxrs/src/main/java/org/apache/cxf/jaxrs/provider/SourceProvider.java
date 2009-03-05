@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,6 +46,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 
 @Provider
+@Produces({"application/xml", "text/xml" })
+@Consumes({"application/xml", "text/xml" })
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 

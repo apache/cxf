@@ -87,6 +87,16 @@ public final class InjectionUtils {
         
     }
 
+    public static boolean invokeBooleanGetter(Object o, String name) {
+        try {
+            Method method = o.getClass().getMethod(name, new Class[]{});
+            return (Boolean)method.invoke(o, new Object[]{});
+        } catch (Exception ex) {
+            LOG.finest("Can not invoke method " + name + " on object of class " + o.getClass().getName());
+        }
+        return false;
+    }
+    
     public static Method checkProxy(Method methodToInvoke, Object resourceObject) {
         if (Proxy.class.isInstance(resourceObject)) {
             for (Class<?> c : resourceObject.getClass().getInterfaces()) {

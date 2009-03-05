@@ -303,7 +303,7 @@ public final class JAXRSUtils {
                                                    path,
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
-        LOG.severe(errorMsg.toString());
+        LOG.warning(errorMsg.toString());
         
         throw new WebApplicationException(status);
         
@@ -630,24 +630,25 @@ public final class JAXRSUtils {
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
  
+        Message inbound = m.getExchange() != null ? m.getExchange().getInMessage() : m;
         Object o = null;
         if (UriInfo.class.isAssignableFrom(clazz)) {
-            o = createUriInfo(m);
+            o = createUriInfo(inbound);
         } else if (HttpHeaders.class.isAssignableFrom(clazz)) {
-            o = new HttpHeadersImpl(m);
+            o = new HttpHeadersImpl(inbound);
         } else if (Request.class.isAssignableFrom(clazz)) {
-            o = new RequestImpl(m);
+            o = new RequestImpl(inbound);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
-            o = new SecurityContextImpl(m);
+            o = new SecurityContextImpl(inbound);
         } else if (Providers.class.isAssignableFrom(clazz)) {
-            o = new ProvidersImpl(m);
+            o = new ProvidersImpl(inbound);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
-            o = createContextResolver(genericType, m);
+            o = createContextResolver(genericType, inbound);
         } else if (MessageContext.class.isAssignableFrom(clazz)) {
             o = new MessageContextImpl(m);
         }
         
-        o = o == null ? createServletResourceValue(m, clazz) : o;
+        o = o == null ? createServletResourceValue(inbound, clazz) : o;
         return clazz.cast(o);
     }
     
@@ -809,14 +810,18 @@ public final class JAXRSUtils {
                                           + targetTypeClass.getSimpleName() 
                                            + ", content type : " + contentType;
                     LOG.severe(errorMessage);
-                    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-                }    
+                    throw new WebApplicationException(e);
+                } catch (WebApplicationException ex) {
+                    throw ex;
+                } catch (Exception ex) {
+                    throw new WebApplicationException(ex);
+                }
             } else {
                 String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
                                                        BUNDLE,
                                                        targetTypeClass.getSimpleName(),
                                                        contentType).toString();
-                LOG.severe(errorMessage);
+                LOG.warning(errorMessage);
                 throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
             }
         }

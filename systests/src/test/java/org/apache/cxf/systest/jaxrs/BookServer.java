@@ -19,8 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer extends AbstractBusTestServerBase {
@@ -29,6 +35,13 @@ public class BookServer extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
         //default lifecycle is per-request, change it to singleton
+        BinaryDataProvider p = new BinaryDataProvider();
+        p.setProduceMediaTypes(Collections.singletonList("application/bar"));
+        p.setEnableBuffering(true);
+        sf.setProvider(p);
+        List<Interceptor> ints = new ArrayList<Interceptor>();
+        ints.add(new CustomOutInterceptor());
+        sf.setOutInterceptors(ints);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore()));
         sf.setAddress("http://localhost:9080/");
