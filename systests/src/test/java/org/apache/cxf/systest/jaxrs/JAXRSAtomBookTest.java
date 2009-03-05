@@ -85,7 +85,8 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
             int result = httpclient.executeMethod(post);
             assertEquals(201, result);
             location = post.getResponseHeader("Location").getValue();
-            Document<Entry> entryDoc = abdera.getParser().parse(post.getResponseBodyAsStream());
+            InputStream ins = post.getResponseBodyAsStream();
+            Document<Entry> entryDoc = abdera.getParser().parse(copyIn(ins));
             assertEquals(entryDoc.getRoot().toString(), e.toString());
         } finally {
             post.releaseConnection();
@@ -201,7 +202,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         HttpClient httpClient = new HttpClient();
         try {
             httpClient.executeMethod(get);           
-            Document<Feed> doc = abdera.getParser().parse(get.getResponseBodyAsStream());
+            Document<Feed> doc = abdera.getParser().parse(copyIn(get.getResponseBodyAsStream()));
             return doc.getRoot();
         } finally {
             get.releaseConnection();
@@ -217,18 +218,22 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         HttpClient httpClient = new HttpClient();
         try {
             httpClient.executeMethod(get);           
-            Document<Entry> doc = abdera.getParser().parse(get.getResponseBodyAsStream());
+            Document<Entry> doc = abdera.getParser().parse(copyIn(get.getResponseBodyAsStream()));
             return doc.getRoot();
         } finally {
             get.releaseConnection();
         }
     }
     
-    private String getStringFromInputStream(InputStream in) throws Exception {        
+    private InputStream copyIn(InputStream in) throws Exception {
         CachedOutputStream bos = new CachedOutputStream();
         IOUtils.copy(in, bos);
         in.close();
+        in = bos.getInputStream();
         bos.close();
-        return bos.getOut().toString();        
+        return in;
+    }
+    private String getStringFromInputStream(InputStream in) throws Exception {
+        return IOUtils.toString(in);
     }
 }
