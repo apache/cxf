@@ -367,7 +367,7 @@ public abstract class AbstractBindingBuilder {
         }
         for (PolicyAssertion pa : suppTokens) {
             if (pa instanceof SupportingToken) {
-                for (Token token : ((SupportingToken)suppTokens).getTokens()) {
+                for (Token token : ((SupportingToken)pa).getTokens()) {
                     this.policyAsserted(token);
                 }        
             }
