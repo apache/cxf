@@ -51,9 +51,11 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -2130,7 +2132,19 @@ public class HTTPConduit
             inMessage.remove(AbstractHTTPDestination.HTTP_RESPONSE);
             inMessage.remove(Message.ASYNC_POST_RESPONSE_DISPATCH);
 
-            incomingObserver.onMessage(inMessage);
+            //cache this inputstream since it's defer to use in case of async
+            try {
+                InputStream in = inMessage.getContent(InputStream.class);
+                if (in != null) {
+                    CachedOutputStream cos = new CachedOutputStream();
+                    IOUtils.copy(in, cos);
+                    inMessage.setContent(InputStream.class, cos.getInputStream());
+                }
+                incomingObserver.onMessage(inMessage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
     
