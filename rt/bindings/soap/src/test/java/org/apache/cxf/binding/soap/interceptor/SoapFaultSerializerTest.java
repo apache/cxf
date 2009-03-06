@@ -32,6 +32,8 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11FaultOutInterceptorInternal;
+import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12FaultOutInterceptorInternal;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
@@ -58,8 +60,7 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
 
         m.setContent(XMLStreamWriter.class, writer);
 
-        Soap11FaultOutInterceptor interceptor = new Soap11FaultOutInterceptor();
-        interceptor.handleMessage(m);
+        Soap11FaultOutInterceptorInternal.INSTANCE.handleMessage(m);
 
         writer.writeEndElement();
         writer.writeEndDocument();
@@ -103,8 +104,7 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
 
         m.setContent(XMLStreamWriter.class, writer);
 
-        Soap12FaultOutInterceptor interceptor = new Soap12FaultOutInterceptor();
-        interceptor.handleMessage(m);
+        Soap12FaultOutInterceptorInternal.INSTANCE.handleMessage(m);
 
         writer.writeEndElement();
         writer.writeEndDocument();
