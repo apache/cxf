@@ -32,6 +32,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.helpers.XMLUtils;
 
 public class W3CDOMStreamWriter implements XMLStreamWriter {
@@ -117,7 +118,11 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         } else {
             currentNode = null;
         }
-        ((W3CNamespaceContext)context).setElement(currentNode);
+        if (context instanceof W3CNamespaceContext) {
+            ((W3CNamespaceContext)context).setElement(currentNode);
+        } else if (context instanceof MapNamespaceContext) {
+            ((MapNamespaceContext) context).setTargetNode(currentNode);
+        }
     }
 
     public void writeEndDocument() throws XMLStreamException {
