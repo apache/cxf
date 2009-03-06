@@ -424,6 +424,9 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         // Test request-response
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq.xml");
         InputSource inputSource = new InputSource(is);
+        inputSource.setPublicId(getClass()
+                                    .getResource("resources/GreetMeDocLiteralSOAPBodyReq.xml").toString());
+        inputSource.setSystemId(inputSource.getPublicId());
         SAXSource saxSourceReq = new SAXSource(inputSource);
         assertNotNull(saxSourceReq);
         SAXSource saxSourceResp = disp.invoke(saxSourceReq);
@@ -434,6 +437,9 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         // Test oneway
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq1.xml");
         InputSource inputSource1 = new InputSource(is1);
+        inputSource1.setPublicId(getClass()
+                                 .getResource("resources/GreetMeDocLiteralSOAPBodyReq1.xml").toString());
+        inputSource1.setSystemId(inputSource1.getPublicId());
         SAXSource saxSourceReq1 = new SAXSource(inputSource1);
         assertNotNull(saxSourceReq1);
         disp.invokeOneWay(saxSourceReq1);
@@ -441,6 +447,9 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         // Test async polling
         InputStream is2 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq2.xml");
         InputSource inputSource2 = new InputSource(is2);
+        inputSource2.setPublicId(getClass()
+                                 .getResource("resources/GreetMeDocLiteralSOAPBodyReq2.xml").toString());
+        inputSource2.setSystemId(inputSource2.getPublicId());
         SAXSource saxSourceReq2 = new SAXSource(inputSource2);
         assertNotNull(saxSourceReq2);
         Response response = disp.invokeAsync(saxSourceReq2);
@@ -452,6 +461,9 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq3.xml");
         InputSource inputSource3 = new InputSource(is3);
+        inputSource3.setPublicId(getClass()
+                                 .getResource("resources/GreetMeDocLiteralSOAPBodyReq3.xml").toString());
+        inputSource3.setSystemId(inputSource3.getPublicId());
         SAXSource saxSourceReq3 = new SAXSource(inputSource3);
         assertNotNull(saxSourceReq3);
 
