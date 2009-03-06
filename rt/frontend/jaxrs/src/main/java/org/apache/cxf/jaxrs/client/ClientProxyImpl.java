@@ -72,10 +72,13 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     
     private ClassResourceInfo cri;
     private boolean inheritHeaders;
+    private boolean isRoot;
     
-    public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean inheritHeaders) {
+    public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean isRoot, 
+                           boolean inheritHeaders) {
         super(baseURI, currentURI);
         this.cri = cri;
+        this.isRoot = isRoot;
         this.inheritHeaders = inheritHeaders;
     }
     
@@ -106,7 +109,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         int bodyIndex = getBodyIndex(types, ori);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
-        if (cri.isRoot()) {
+        if (isRoot) {
             builder.path(ori.getClassResourceInfo().getServiceClass());
         }
         builder.path(m);
@@ -125,7 +128,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             if (subCri == null) {
                 reportInvalidResourceMethod(m, "INVALID_SUBRESOURCE");
             }
-            ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, inheritHeaders);
+            ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, false, inheritHeaders);
             proxyImpl.setBus(bus);
             proxyImpl.setConduitSelector(conduitSelector);
             proxyImpl.setInInterceptors(inInterceptors);

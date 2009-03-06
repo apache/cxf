@@ -40,7 +40,7 @@ public interface BookSubresource {
     Book getTheBook() throws BookNotFoundFault;
     
     @POST
-    @Path("/subresource2/{n1}")
+    @Path("/subresource2/{n1:.*}")
     @Consumes("text/plain")
     @Produces("application/xml")
     Book getTheBook2(@PathParam("n1") String name1,

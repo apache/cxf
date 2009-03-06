@@ -115,7 +115,7 @@ public final class JAXRSClientFactory {
             
             return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(),
                             new Class[]{cls, Client.class}, 
-                            new ClientProxyImpl(baseURI, baseURI, cri, inheritHeaders)));
+                            new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders)));
         }
     }
     
@@ -180,7 +180,6 @@ public final class JAXRSClientFactory {
     
     static <T> T create(Class<T> cls, InvocationHandler handler) {
         
-        return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(),
-                        new Class[]{cls, Client.class}, handler));
+        return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(), new Class[]{cls, Client.class}, handler));
     }
 }

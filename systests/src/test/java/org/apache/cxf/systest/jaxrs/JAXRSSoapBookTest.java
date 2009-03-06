@@ -165,6 +165,10 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                                   BookStoreJaxrsJaxws.class);
         doTestSubresource(proxy);
+        BookStoreJaxrsJaxws proxy2 = proxy.getBookStore("number1");
+        doTestSubresource(proxy2);
+        BookStoreJaxrsJaxws proxy3 = proxy2.getBookStore("number1");
+        doTestSubresource(proxy3);
     }
     
     @Test
@@ -227,6 +231,9 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         b = bs.getTheBook2("CXF ", "in ", "Action ", null, "7", "8");
         assertEquals(378, b.getId());
         assertEquals("CXF in Action - 478", b.getName());
+        
+        
+        
     }
     
     @Test
