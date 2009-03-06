@@ -19,6 +19,8 @@
 package org.apache.cxf.aegis.type.basic;
 
 import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
+import java.io.IOException;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -80,20 +82,14 @@ public class Base64Type extends Type {
                 return new byte[0];
             }
 
-            int length = reader.getTextLength();
-
-            char[] myBuffer = new char[length];
-            for (int sourceStart = 0;; sourceStart += length) {
-                int nCopied = reader.getTextCharacters(sourceStart, myBuffer, 0, length);
-
-                if (nCopied > 0) {
-                    Base64Utility.decode(myBuffer, 0, nCopied, bos);
-                }
-
-                if (nCopied < length) {
-                    break;
-                }
+            CharArrayWriter writer = new CharArrayWriter(2048);
+            while (reader.isCharacters()) {
+                writer.write(reader.getTextCharacters(),
+                             reader.getTextStart(),
+                             reader.getTextLength());
+                reader.next();
             }
+            Base64Utility.decode(writer.toCharArray(), 0, writer.size(), bos);
 
             while (reader.getEventType() != XMLStreamConstants.END_ELEMENT) {
                 reader.next();
