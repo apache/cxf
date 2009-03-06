@@ -27,7 +27,8 @@ import java.lang.annotation.Target;
 
 /**
  * Specifies a list of classes that are added to the outbound 
- * interceptor chain.
+ * interceptor chain. This annotation effects SEI classes and service 
+ * implementation classes.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
