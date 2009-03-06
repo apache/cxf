@@ -436,19 +436,36 @@ public class BeanType extends Type {
         return type;
     }
 
-    private void writeTypeReference(QName name, XmlSchemaElement element, Type type) {
+    private void writeTypeReference(QName name, XmlSchemaElement element, Type type, 
+                                    XmlSchema schemaRoot) {
         if (type.isAbstract()) {
             element.setName(name.getLocalPart());
             element.setSchemaTypeName(type.getSchemaType());
+            XmlSchemaUtils.addImportIfNeeded(schemaRoot, type.getSchemaType().getNamespaceURI());
 
-            int minOccurs = getTypeInfo().getMinOccurs(name);
+            /*
+             * This seems to bespeak some sort of confusion. The problem is that
+             * no one ever implemented getMinOccurs(name) to even look at the per-element data.
+             */
+            long minOccurs = -1;
+            long maxOccurs = -1;
+            if (type instanceof ArrayType) {
+                ArrayType arrayType = (ArrayType) type;
+                minOccurs = arrayType.getMinOccurs();
+                maxOccurs = arrayType.getMaxOccurs();
+            } else {
+                minOccurs = getTypeInfo().getMinOccurs(name);
+            }
             /*
              * Old code had ridiculous '!=0' here, which cannot have been right.
              */
             if (minOccurs != -1) {
                 element.setMinOccurs(minOccurs);
             }
-
+            if (maxOccurs != -1) {
+                element.setMaxOccurs(maxOccurs);
+            }
+            
             element.setNillable(getTypeInfo().isNillable(name));
         } else {
             element.setRefName(type.getSchemaType());
@@ -703,7 +720,7 @@ public class BeanType extends Type {
                 XmlSchemaUtils.addImportIfNeeded(root, AbstractTypeCreator.HTTP_CXF_APACHE_ORG_ARRAYS);
             }
 
-            writeTypeReference(name, element, type);
+            writeTypeReference(name, element, type, root);
             needXmime |= type.usesXmime();
             needUtilityTypes |= type.usesUtilityTypes();
         }
