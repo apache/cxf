@@ -243,10 +243,6 @@ public class JAXBDataBinding implements DataBindingProfile {
         for (String key : schemaLists.keySet()) {
             Element ele = schemaLists.get(key);
             ele = removeImportElement(ele);
-            String tns = ele.getAttribute("targetNamespace");
-            if (StringUtils.isEmpty(tns)) {
-                continue;
-            }
             if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
                 validateSchema(ele);
             }           
