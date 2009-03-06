@@ -95,7 +95,14 @@ public final class StaxUtils {
     
     private StaxUtils() {
     }
-    
+
+    /**
+     * CXF works with multiple STaX parsers. When we can't find any other way to work 
+     * against the different parsers, this can be used to condition code. Note: if you've got
+     * Woodstox in the class path without being the default provider, this will return
+     * the wrong answer.
+     * @return true if Woodstox is in the classpath. 
+     */
     public static boolean isWoodstox() {
         try {
             ClassLoaderUtils.loadClass("org.codehaus.stax2.XMLStreamReader2", StaxUtils.class);
@@ -104,7 +111,7 @@ public final class StaxUtils {
         }
         return true;
     }
-
+    
     /**
      * Return a cached, namespace-aware, factory.
      * @return

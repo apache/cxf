@@ -1064,7 +1064,6 @@
                 <stax.impl.version>4.0.2</stax.impl.version>
             </properties>
         </profile>
-
         <profile>
             <id>axis2-saaj</id>
             <properties>

@@ -264,7 +264,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
      * Sets the bean implementing the service. If this is set a
      * <code>BeanInvoker</code> is created for the provided bean.
      *
-     * @param serviceBean an instantiated implementaiton object
+     * @param serviceBean an instantiated implementation object
      */
     public void setServiceBean(Object serviceBean) {
         this.serviceBean = serviceBean;

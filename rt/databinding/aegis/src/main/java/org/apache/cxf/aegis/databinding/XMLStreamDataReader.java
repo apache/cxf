@@ -24,19 +24,26 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.AegisXMLStreamDataReader;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.databinding.DataReader;
+import org.apache.cxf.databinding.DataReaderValidation2;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.StaxValidationManager;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
-public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
+public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataReaderValidation2 {
 
     private AegisDatabinding databinding;
     private AegisXMLStreamDataReader reader;
-
-    public XMLStreamDataReader(AegisDatabinding databinding) {
+    private Bus bus;
+    private XmlSchemaCollection schemas;
+    
+    public XMLStreamDataReader(AegisDatabinding databinding, Bus bus) {
+        this.bus = bus;
         this.databinding = databinding;
         reader = new AegisXMLStreamDataReader(databinding.getAegisContext());
     }
@@ -44,6 +51,12 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     public Object read(MessagePartInfo part, XMLStreamReader input) {
         Type type = databinding.getType(part);
         try {
+            if (schemas != null) {
+                StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
+                if (mgr != null) {
+                    mgr.setupValidation(input, schemas);
+                }
+            }
             return reader.read(input, type); 
         } catch (Exception e) {
             throw new Fault(e);
@@ -74,4 +87,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         reader.setSchema(s);
     }
 
+    public void setSchema(XmlSchemaCollection validationSchemas) {
+        this.schemas = validationSchemas; 
+    }
 }

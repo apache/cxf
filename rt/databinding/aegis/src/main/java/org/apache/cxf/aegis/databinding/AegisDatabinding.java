@@ -147,7 +147,7 @@ public class AegisDatabinding
     public <T> DataReader<T> createReader(Class<T> cls) {
         ensureInitialized();
         if (cls.equals(XMLStreamReader.class)) {
-            return (DataReader<T>)new XMLStreamDataReader(this);
+            return (DataReader<T>)new XMLStreamDataReader(this, getBus());
         } else if (cls.equals(Node.class)) {
             return (DataReader<T>)new ElementDataReader(this);
         } else {
