@@ -32,7 +32,7 @@ public class StAXUtilTest extends ProcessorTestBase {
         File file = new File(getClass().getResource("resources/test.wsdl").toURI());
 
         file = getResource("resources/test2.wsdl");
-        Tag tag1 = StAXUtil.getTagTree(file);
+        Tag tag1 = ToolsStaxUtils.getTagTree(file);
         assertEquals(1, tag1.getTags().size());
         Tag def1 = tag1.getTags().get(0);
         assertEquals(6, def1.getTags().size());
@@ -41,7 +41,7 @@ public class StAXUtilTest extends ProcessorTestBase {
         assertEquals(4, schema1.getTags().size());
 
         file = getResource("resources/test3.wsdl");
-        Tag tag2 = StAXUtil.getTagTree(file);
+        Tag tag2 = ToolsStaxUtils.getTagTree(file);
         assertEquals(1, tag2.getTags().size());
         Tag def2 = tag2.getTags().get(0);
         assertEquals(6, def2.getTags().size());

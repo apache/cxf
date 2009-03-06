@@ -22,6 +22,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Enumeration;
 
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,8 +84,12 @@ public class WSDLValidationTest extends ToolTestBase {
         String[] args = new String[] {"-verbose",
                                       getLocation("/validator_wsdl/hello_world_error_reference.wsdl")};
         WSDLValidator.main(args);
-        assertTrue(getStdErr().indexOf("[147,3]") != -1);
-        assertTrue(getStdErr().indexOf("Caused by {http://apache.org/hello_world_soap_http}"
+        String error = getStdErr();
+        if (StaxUtils.isWoodstox()) {
+            // sjsxp doesn't report locations.
+            assertTrue(error.indexOf("[147,3]") != -1);
+        }
+        assertTrue(error.indexOf("Caused by {http://apache.org/hello_world_soap_http}"
                                        + "[binding:Greeter_SOAPBinding1] not exist.") != -1);
     }
 

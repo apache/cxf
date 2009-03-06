@@ -42,7 +42,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.tools.util.StAXUtil;
+import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -195,8 +195,8 @@ public class ProcessorTestBase extends Assert {
 
     public boolean assertXmlEquals(final File expected, final File source, 
                                    final List<String> ignoreAttr) throws Exception {
-        List<Tag> expectedTags = StAXUtil.getTags(expected);
-        List<Tag> sourceTags = StAXUtil.getTags(source);
+        List<Tag> expectedTags = ToolsStaxUtils.getTags(expected);
+        List<Tag> sourceTags = ToolsStaxUtils.getTags(source);
 
         Iterator<Tag> iterator = sourceTags.iterator();
 
@@ -304,8 +304,8 @@ public class ProcessorTestBase extends Assert {
 
     public void assertWsdlEquals(final File expected, final File source, List<String> attr, List<String> tag) 
         throws Exception {
-        Tag expectedTag = StAXUtil.getTagTree(expected, attr);
-        Tag sourceTag = StAXUtil.getTagTree(source, attr);
+        Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr);
+        Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr);
         assertTagEquals(expectedTag, sourceTag, attr, tag);
     }
 
@@ -316,8 +316,8 @@ public class ProcessorTestBase extends Assert {
     public void assertWsdlEquals(final InputStream expected, final InputStream source,
                                  List<String> attr, List<String> tag) 
         throws Exception {
-        Tag expectedTag = StAXUtil.getTagTree(expected, attr);
-        Tag sourceTag = StAXUtil.getTagTree(source, attr);
+        Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr);
+        Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr);
         assertTagEquals(expectedTag, sourceTag, attr, tag);
     }
 
