@@ -20,7 +20,6 @@ package org.apache.cxf.aegis.type.basic;
 
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
-import java.io.IOException;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
