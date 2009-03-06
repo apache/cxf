@@ -96,8 +96,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
 
                 if (!st.isDocumentType()) {
                     if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) {
-                        output.writeStartElement(part.getConcreteName().getNamespaceURI(),
-                                                 part.getConcreteName().getLocalPart());
+                        output.writeStartElement(part.getConcreteName().getLocalPart());
                         
                     } else {
                         String pfx = output.getPrefix(part.getConcreteName().getNamespaceURI());
