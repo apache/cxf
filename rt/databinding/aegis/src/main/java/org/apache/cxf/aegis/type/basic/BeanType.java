@@ -444,27 +444,21 @@ public class BeanType extends Type {
             XmlSchemaUtils.addImportIfNeeded(schemaRoot, type.getSchemaType().getNamespaceURI());
 
             /*
-             * This seems to bespeak some sort of confusion. The problem is that
-             * no one ever implemented getMinOccurs(name) to even look at the per-element data.
+             * Here we have a semi-giant mess. If a parameter has a minOccurs > 1, it ends
+             * up in the type info. However, it really got used in the array type.
+             * All we really want to do here is manage 'optional' elements. If we 
+             * ever implement flat arrays, this will change. For now, we ignore
+             * maxOccurs and we only look for 0's in the minOccurs. 
              */
-            long minOccurs = -1;
-            long maxOccurs = -1;
-            if (type instanceof ArrayType) {
-                ArrayType arrayType = (ArrayType) type;
-                minOccurs = arrayType.getMinOccurs();
-                maxOccurs = arrayType.getMaxOccurs();
-            } else {
-                minOccurs = getTypeInfo().getMinOccurs(name);
-            }
-            /*
-             * Old code had ridiculous '!=0' here, which cannot have been right.
+            long minOccurs = getTypeInfo().getMinOccurs(name);
+            /* If it is 1, that's the default, and if it's greater than one, it means
+             * that there is a real array at work here. So the only value we want to pay
+             * attention to is 0.
              */
-            if (minOccurs != -1) {
+            if (minOccurs == 0) {
                 element.setMinOccurs(minOccurs);
             }
-            if (maxOccurs != -1) {
-                element.setMaxOccurs(maxOccurs);
-            }
+
             
             element.setNillable(getTypeInfo().isNillable(name));
         } else {

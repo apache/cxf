@@ -379,8 +379,26 @@ public class BeanTypeInfo {
         return nillable;
     }
 
+    /**
+     * Return the minOccurs value. When there is no XML file or annotation (the situation
+     * if we are running from the base class here), there is no source for the 
+     * minOccurs parameter except the default, which is supplied from the overall Aegis options.
+     * @param name Element QName
+     * @return
+     */
     public int getMinOccurs(QName name) {
         return minOccurs;
+    }
+    
+    /**
+     * Return the maxOccurs value. When there is no XML file or annotation (the situation
+     * if we are in the base class here), there is no per-element source for this item,
+     * and the value is always 1.
+     * @param name Element QName
+     * @return 1
+     */
+    public int getMaxOccurs(QName name) {
+        return 1;
     }
     
     public long getMinOccurs() {

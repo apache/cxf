@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.w3c.dom.NamedNodeMap;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -74,7 +75,7 @@ public class JsNamedNodeMap extends ScriptableObject {
     }
     
     public static JsNamedNodeMap wrapMap(Scriptable scope, NamedNodeMap map) {
-        Context cx = Context.enter();
+        Context cx = ContextFactory.getGlobal().enterContext();
         JsNamedNodeMap newObject = (JsNamedNodeMap)cx.newObject(scope, "NamedNodeMap");
         newObject.initialize(map);
         return newObject;

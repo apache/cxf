@@ -135,7 +135,6 @@ public class AegisTest extends JavascriptRhinoTest {
         return null;
     }
 
-    @org.junit.Ignore
     @Test
     public void callReturnBeanWithAnyTypeArray() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {

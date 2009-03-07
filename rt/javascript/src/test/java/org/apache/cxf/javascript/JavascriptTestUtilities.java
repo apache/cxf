@@ -22,11 +22,14 @@ package org.apache.cxf.javascript;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.javascript.service.ServiceJavascriptBuilder;
 import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
@@ -41,7 +44,6 @@ import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.tools.debugger.Main;
 
 /**
  * Test utilities class with some Javascript capability included.
@@ -170,11 +172,22 @@ public class JavascriptTestUtilities extends TestUtilities {
 
         rhinoContextFactory = new ContextFactory();
         if (System.getProperty("cxf.jsdebug") != null && !rhinoDebuggerUp) {
-            Main.mainEmbedded(rhinoContextFactory, rhinoScope, "Debug embedded JavaScript.");
-            rhinoDebuggerUp = true;
+            try {
+                Class<?> debuggerMain = 
+                            ClassLoaderUtils.loadClass("org.mozilla.javascript.tools.debugger.Main",
+                                                                   getClass());
+                if (debuggerMain != null) {
+                    Method mainMethod = debuggerMain.getMethod("mainEmbedded", ContextFactory.class,
+                                                               Scriptable.class, String.class);
+                    mainMethod.invoke(null, rhinoContextFactory, rhinoScope, "Debug embedded JavaScript.");
+                    rhinoDebuggerUp = true;
+                }
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to launch Rhino debugger", e);
+            }
         }
 
-        rhinoContext = rhinoContextFactory.enter();
+        rhinoContext = rhinoContextFactory.enterContext();
         rhinoScope = rhinoContext.initStandardObjects();
 
         try {
@@ -192,7 +205,7 @@ public class JavascriptTestUtilities extends TestUtilities {
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         } finally {
-            rhinoContextFactory.exit();
+            Context.exit();
         }
         JsSimpleDomNode.register(rhinoScope);
         JsSimpleDomParser.register(rhinoScope);
@@ -202,21 +215,21 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     public void readResourceIntoRhino(String resourceClasspath) throws IOException {
         Reader js = getResourceAsReader(resourceClasspath);
-        rhinoContextFactory.enter(rhinoContext);
+        rhinoContextFactory.enterContext(rhinoContext);
         try {
             rhinoContext.evaluateReader(rhinoScope, js, resourceClasspath, 1, null);
         } finally {
-            rhinoContextFactory.exit();
+            Context.exit();
         }
     }
 
     public void readStringIntoRhino(String js, String sourceName) {
         LOG.fine(sourceName + ":\n" + js);
-        rhinoContextFactory.enter(rhinoContext);
+        rhinoContextFactory.enterContext(rhinoContext);
         try {
             rhinoContext.evaluateString(rhinoScope, js, sourceName, 1, null);
         } finally {
-            rhinoContextFactory.exit();
+            Context.exit();
         }
     }
 
@@ -233,11 +246,11 @@ public class JavascriptTestUtilities extends TestUtilities {
     }
 
     public <T> T runInsideContext(Class<T> clazz, JSRunnable<?> runnable) {
-        rhinoContextFactory.enter(rhinoContext);
+        rhinoContextFactory.enterContext(rhinoContext);
         try {
             return clazz.cast(runnable.run(rhinoContext));
         } finally {
-            rhinoContextFactory.exit();
+            Context.exit();
         }
     }
 

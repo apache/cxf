@@ -57,6 +57,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ScriptableObject;
@@ -325,7 +326,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             new Thread() {
                 public void run() {
                     try {
-                        Context cx = Context.enter();
+                        Context cx = ContextFactory.getGlobal().enterContext();
                         communicate(cx);
                     } finally {
                         Context.exit();

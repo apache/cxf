@@ -152,6 +152,10 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
             if (minOccurs != null && minOccurs.length() > 0) {
                 ensurePropertyInfo(mappedName).setMinOccurs(Integer.parseInt(minOccurs));
             }
+            String maxOccurs = DOMUtils.getAttributeValueEmptyNull(e, "maxOccurs");
+            if (maxOccurs != null && maxOccurs.length() > 0) {
+                ensurePropertyInfo(mappedName).setMinOccurs(Integer.parseInt(maxOccurs));
+            }
         }
 
         try {
@@ -202,8 +206,8 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
     }
 
     /**
-     * Grab Min Occurs by looking in PropertyInfo map if no entry found, revert
-     * to parent class
+     * Return minOccurs if specified in the XML, otherwise from the defaults
+     * in the base class.
      */
     @Override
     public int getMinOccurs(QName name) {
@@ -212,6 +216,19 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
             return info.getMinOccurs();
         }
         return super.getMinOccurs(name);
+    }
+
+    /**
+     * Return maxOccurs if specified in the XML, otherwise from the
+     * default in the base class.
+     */
+    @Override
+    public int getMaxOccurs(QName name) {
+        BeanTypePropertyInfo info = getPropertyInfo(name);
+        if (info != null) {
+            return info.getMaxOccurs();
+        }
+        return super.getMaxOccurs(name);
     }
 
     /**

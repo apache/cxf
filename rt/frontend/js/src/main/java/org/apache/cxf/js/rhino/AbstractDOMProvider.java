@@ -36,6 +36,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -152,7 +153,7 @@ public abstract class AbstractDOMProvider {
 
     public DOMSource invoke(DOMSource request) {
         DOMSource response = new DOMSource();
-        Context cx = Context.enter();
+        Context cx = ContextFactory.getGlobal().enterContext();
         try {
             Scriptable scope = cx.newObject(scriptScope);
             scope.setPrototype(scriptScope);

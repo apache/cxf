@@ -83,7 +83,7 @@ public class ProviderFactory {
         }
         String scriptStr = sb.toString();
 
-        Context cx = Context.enter();
+        Context cx = ContextFactory.getGlobal().enterContext();
         boolean providerFound = false;
         try {
             Scriptable scriptScope = cx.initStandardObjects(null, true);
