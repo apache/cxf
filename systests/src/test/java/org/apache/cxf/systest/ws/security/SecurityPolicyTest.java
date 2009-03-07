@@ -129,10 +129,11 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             pt.doubleIt(BigInteger.valueOf(25));
         } catch (Exception ex) {
             String msg = ex.getMessage();
-            if (!msg.contains("UsernameToken: No user")) {
+            if (!msg.contains("UsernameToken")) {
                 throw ex;
             }
         }
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "bob");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "bob");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.PASSWORD, "pwd");
         pt.doubleIt(BigInteger.valueOf(25));

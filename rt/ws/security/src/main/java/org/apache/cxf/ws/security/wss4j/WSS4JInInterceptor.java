@@ -127,6 +127,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return doc;
     }
     
+    
     public void handleMessage(SoapMessage msg) throws Fault {
         SOAPMessage doc = getSOAPMessage(msg);
         
@@ -154,8 +155,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         try {
             reqData.setMsgContext(msg);
-            checkPolicies(msg, reqData);
-
+            computeAction(msg, reqData);
             Vector actions = new Vector();
             String action = getAction(msg, version);
 
@@ -257,7 +257,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 LOG.warning("Security processing failed (actions mismatch)");
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
             }
-
+            
             doResults(msg, actor, doc, wsResult);
 
             if (doTimeLog) {
@@ -286,7 +286,17 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    private void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
+    /**
+     * Do whatever is necessary to determine the action for the incoming message and 
+     * do whatever other setup work is necessary.
+     * 
+     * @param msg
+     * @param reqData
+     */
+    protected void computeAction(SoapMessage msg, RequestData reqData) {
+        
+    }
+    protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
         throws SOAPException, XMLStreamException {
         /*
          * All ok up to this point. Now construct and setup the security result

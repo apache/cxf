@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-public class RecipientToken extends  TokenWrapper {
+public class RecipientToken extends TokenWrapper {
 
     public RecipientToken(SPConstants version) {
         super(version);

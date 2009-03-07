@@ -364,6 +364,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
 
         public void handleMessage(SoapMessage message) throws Fault {
             //Find the SC token
+            boolean found = false;
             Vector results = (Vector)message.get(WSHandlerConstants.RECV_RESULTS);
             for (int i = 0; i < results.size(); i++) {
                 WSHandlerResult rResult =
@@ -380,7 +381,19 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             = (SecurityContextToken)wser
                                 .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                         message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getID());
+                        found = true;
                     }
+                }
+            }
+            if (!found) {
+                AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                // extract Assertion information
+                if (aim != null) {
+                    Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
+                    if (ais == null || ais.isEmpty()) {
+                        return;
+                    }
+                    ais.iterator().next().setNotAsserted("No SecureConversation token found in message.");
                 }
             }
         }

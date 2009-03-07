@@ -67,17 +67,12 @@ public class EncryptedPartsBuilder implements AssertionBuilder {
     private void processElement(Element element, SignedEncryptedParts parent) {
 
         if ("Header".equals(element.getLocalName())) {
-            Header header = new Header();
-
             String nameAttribute = element.getAttribute(SPConstants.NAME);
-            if (nameAttribute != null) {
-                header.setName(nameAttribute);
+            if (nameAttribute == null) {
+                nameAttribute = "";
             }
-
             String namespaceAttribute = element.getAttribute(SPConstants.NAMESPACE);
-            header.setNamespace(namespaceAttribute);
-
-            parent.addHeader(header);
+            parent.addHeader(new Header(nameAttribute, namespaceAttribute));
 
         } else if ("Body".equals(element.getLocalName())) {
             parent.setBody(true);

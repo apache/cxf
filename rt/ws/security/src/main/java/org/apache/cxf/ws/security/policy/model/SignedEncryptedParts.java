@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.PolicyComponent;
@@ -140,7 +141,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
             // <sp:Header Name=".." Namespace=".." />
             writer.writeStartElement(prefix, SPConstants.HEADER, namespaceURI);
             // Name attribute is optional
-            if (header.getName() != null) {
+            if (!StringUtils.isEmpty(header.getName())) {
                 writer.writeAttribute("Name", header.getName());
             }
             writer.writeAttribute("Namespace", header.getNamespace());

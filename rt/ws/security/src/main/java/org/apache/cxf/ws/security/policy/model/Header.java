@@ -18,45 +18,37 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import javax.xml.namespace.QName;
+
+import org.apache.cxf.common.util.StringUtils;
+
 public class Header {
 
-    private String name;
-    private String namespace;
+    private QName name;
 
-    public Header() {
-    }
     
     public Header(String nm, String ns) {
-        name = nm;
-        namespace = ns;
+        name = new QName(ns, nm);
+    }
+    
+    public QName getQName() {
+        return name;
     }
     
     /**
      * @return Returns the name.
      */
     public String getName() {
-        return name;
+        if (StringUtils.isEmpty(name.getLocalPart())) {
+            return null;
+        }
+        return name.getLocalPart();
     }
-
-    /**
-     * @param name The name to set.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
     /**
      * @return Returns the namespace.
      */
     public String getNamespace() {
-        return namespace;
-    }
-
-    /**
-     * @param namespace The namespace to set.
-     */
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+        return name.getNamespaceURI();
     }
 
 }

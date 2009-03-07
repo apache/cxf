@@ -24,8 +24,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -115,20 +117,25 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
                 return;
             }
         }
-        StringBuilder error = new StringBuilder("\n");
+        
+        Set<String> msgs = new LinkedHashSet<String>();
+        
         for (QName name : errors) {
             Collection<AssertionInfo> ais = getAssertionInfo(name);
             for (AssertionInfo ai : ais) {
                 if (!ai.isAsserted()) {
-                    error.append("\n      ");
-                    error.append(name.toString());
+                    String s = name.toString();
                     if (ai.getErrorMessage() != null) {
-                        error.append(": ").append(ai.getErrorMessage());
+                        s += ": " + ai.getErrorMessage();
                     }
+                    msgs.add(s);
                 }
             }
         }
-        
+        StringBuilder error = new StringBuilder("\n");
+        for (String msg : msgs) {
+            error.append("\n").append(msg);
+        }
         
         throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, error.toString()));
     }

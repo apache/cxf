@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Vector;
 
 
 import org.apache.cxf.Bus;
@@ -43,6 +44,9 @@ import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
 
 /**
  * 
@@ -171,6 +175,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenInInterceptor() {
             super(Phase.PRE_PROTOCOL);
+            addAfter(WSS4JInInterceptor.class.getName());
         }
 
         public void handleMessage(Message message) throws Fault {
@@ -182,7 +187,25 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     return;
                 }
                 if (!isRequestor(message)) {
-                    //TODO
+                    boolean found = false;
+                    Vector results = (Vector)message.get(WSHandlerConstants.RECV_RESULTS);
+                    for (int i = 0; i < results.size(); i++) {
+                        WSHandlerResult rResult =
+                                (WSHandlerResult) results.get(i);
+
+                        Vector wsSecEngineResults = rResult.getResults();
+
+                        for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                            //WSSecurityEngineResult wser =
+                            //        (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                            //Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                            //how to find if it's due to an IssuedToken?
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        ais.iterator().next().setAsserted(false);
+                    }
                 } else {
                     //client side should be checked on the way out
                     for (AssertionInfo ai : ais) {

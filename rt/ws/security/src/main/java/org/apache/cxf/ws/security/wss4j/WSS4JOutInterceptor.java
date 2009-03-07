@@ -131,7 +131,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             RequestData reqData = new RequestData();
     
             reqData.setMsgContext(mc);
-            checkPolicies(mc, reqData);
             
             /*
              * The overall try, just to have a finally at the end to perform some

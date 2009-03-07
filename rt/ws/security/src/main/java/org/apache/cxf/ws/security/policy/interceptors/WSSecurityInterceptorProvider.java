@@ -27,8 +27,8 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
-import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 
 /**
  * 
@@ -52,7 +52,7 @@ public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProv
         super(ASSERTION_TYPES);
         this.getOutInterceptors().add(new PolicyBasedWSS4JOutInterceptor());
         this.getOutFaultInterceptors().add(new PolicyBasedWSS4JOutInterceptor());
-        this.getInInterceptors().add(new WSS4JInInterceptor(true));
-        this.getInFaultInterceptors().add(new WSS4JInInterceptor());
+        this.getInInterceptors().add(new PolicyBasedWSS4JInInterceptor());
+        this.getInFaultInterceptors().add(new PolicyBasedWSS4JInInterceptor());
     }
 }
