@@ -26,6 +26,7 @@
 <project name="cxf wsdltojava" default="build" basedir=".">
 
     <property environment="env"/>
+    <property name="home.dir" location="${basedir}"/>
     <property name="build.dir" location ="${basedir}/build"/>
     <property name="build.classes.dir" location ="${build.dir}/classes"/>
     <property name="build.src.dir" location ="${basedir}"/>
@@ -88,6 +89,7 @@
     <property name="cxf.etc.dir" location="${cxf.home}/etc"/>
 
     <path id="cxf.classpath">
+        <pathelement location="${home.dir}" /> 
         <pathelement location="${build.classes.dir}"/>
         <pathelement location="${cxf-manifest.jar.file}"/>
     </path>
