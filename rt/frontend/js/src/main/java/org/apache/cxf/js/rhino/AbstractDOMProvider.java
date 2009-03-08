@@ -32,8 +32,6 @@ import javax.xml.ws.Endpoint;
 
 import org.w3c.dom.Node;
 
-import org.apache.xmlbeans.XmlObject;
-
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
@@ -177,9 +175,6 @@ public abstract class AbstractDOMProvider {
             }
             if (jsResp instanceof XMLObject) {
                 jsResp = org.mozilla.javascript.xmlimpl.XMLLibImpl.toDomNode(jsResp);
-            }
-            if (jsResp instanceof XmlObject) {
-                jsResp = ((XmlObject)jsResp).getDomNode();
             }
             if (jsResp instanceof Node) {
                 node = (Node)jsResp;
