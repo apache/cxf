@@ -32,15 +32,14 @@ import javax.xml.ws.Endpoint;
 
 import org.w3c.dom.Node;
 
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Wrapper;
+import org.mozilla.javascript.xml.XMLObject;
 
 
 public abstract class AbstractDOMProvider {
@@ -162,19 +161,9 @@ public abstract class AbstractDOMProvider {
             Object inDoc = null;
             if (isE4X) {
                 try {
-                    XmlObject xo = XmlObject.Factory.parse(node);
-                    XmlCursor cursor = xo.newCursor();
-                    // strip comments out, as xmlbeans doesn't
-                    // seem to like them
-                    do {
-                        if (cursor.isComment()) {
-                            cursor.removeXml();
-                        }
-                    } while (cursor.toNextToken() != XmlCursor.TokenType.NONE);
-                    cursor.dispose();           
-                    inDoc = Context.toObject(xo, scope);
+                    inDoc = Context.toObject(node, scope);
                     Object[] args = {inDoc};
-                    inDoc = cx.newObject(scriptScope, "XML", args);
+                    inDoc = cx.newObject(scope, "XML", args);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -183,25 +172,18 @@ public abstract class AbstractDOMProvider {
             }
             Object[] args = {inDoc};
             Object jsResp = invokeFunc.call(cx, scope, scope, args);
-            if (isE4X) {
-                // need to check return type and throw exception
-                // if wrong type
-                Scriptable s = (Scriptable)jsResp;
-                Object out = ScriptableObject.callMethod(s,
-                                                         "getXmlObject",
-                                                         Context.emptyArgs);
-                Wrapper wrapped = (Wrapper)out;
-                XmlObject xml = (XmlObject)wrapped.unwrap();
-                node = xml.getDomNode();
-                response.setNode(node.getOwnerDocument());
-            } else {
-                if (jsResp instanceof Wrapper) {
-                    jsResp = ((Wrapper)jsResp).unwrap();
-                }
-                if (jsResp instanceof Node) {
-                    node = (Node)jsResp;
-                    response.setNode(node);
-                }
+            if (jsResp instanceof Wrapper) {
+                jsResp = ((Wrapper)jsResp).unwrap();
+            }
+            if (jsResp instanceof XMLObject) {
+                jsResp = org.mozilla.javascript.xmlimpl.XMLLibImpl.toDomNode(jsResp);
+            }
+            if (jsResp instanceof XmlObject) {
+                jsResp = ((XmlObject)jsResp).getDomNode();
+            }
+            if (jsResp instanceof Node) {
+                node = (Node)jsResp;
+                response.setNode(node);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

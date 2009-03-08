@@ -934,6 +934,26 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
+            		<exclusion>
+            		  <artifactId>xmlParserAPIs</artifactId>
+            		  <groupId>xerces</groupId>
+            		</exclusion>
+            		<exclusion>
+            		  <artifactId>xercesImpl</artifactId>
+            		  <groupId>xerces</groupId>
+            		</exclusion>
+            		<exclusion>
+            		  <artifactId>xom</artifactId>
+            		  <groupId>xom</groupId>
+            		</exclusion>
+            		<exclusion>
+            		  <artifactId>xalan</artifactId>
+            		  <groupId>xalan</groupId>
+            		</exclusion>
+            		<exclusion>
+            		  <artifactId>xml-apis</artifactId>
+            		  <groupId>xml-apis</groupId>
+            		</exclusion>
 		    <exclusion>
 		      <groupId>org.codehaus.woodstox</groupId>
 		      <artifactId>wstx-asl</artifactId>
@@ -957,10 +977,30 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
-		    <exclusion>
-		      <groupId>org.codehaus.woodstox</groupId>
-		      <artifactId>wstx-asl</artifactId>
-		    </exclusion>
+                    <exclusion>
+                      <artifactId>xmlParserAPIs</artifactId>
+                      <groupId>xerces</groupId>
+                    </exclusion>
+                    <exclusion>
+                      <artifactId>xercesImpl</artifactId>
+                      <groupId>xerces</groupId>
+                    </exclusion>
+                    <exclusion>
+                      <artifactId>xom</artifactId>
+                      <groupId>xom</groupId>
+                    </exclusion>
+                    <exclusion>
+                      <artifactId>xalan</artifactId>
+                      <groupId>xalan</groupId>
+                    </exclusion>
+                    <exclusion>
+                      <artifactId>xml-apis</artifactId>
+                      <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.woodstox</groupId>
+                        <artifactId>wstx-asl</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
