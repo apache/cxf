@@ -68,6 +68,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     public PolicyEngineImpl() { 
         init();
     }
+    public PolicyEngineImpl(boolean en) {
+        enabled = en;
+        init();
+    }
 
     // configuration
 
@@ -332,6 +336,9 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }  
 
     Policy getAggregatedServicePolicy(ServiceInfo si) {
+        if (si == null) {
+            return new Policy();
+        }
         Policy aggregated = null;
         for (PolicyProvider pp : getPolicyProviders()) {
             Policy p = pp.getEffectivePolicy(si);

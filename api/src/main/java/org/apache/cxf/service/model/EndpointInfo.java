@@ -52,6 +52,9 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     }
     
     public InterfaceInfo getInterface() {
+        if (service == null) {
+            return null;
+        }
         return service.getInterface();
     }
     

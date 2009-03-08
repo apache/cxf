@@ -82,7 +82,7 @@ public class PolicyEngineTest extends Assert {
     
     @Test
     public void testAccessors() throws Exception {
-        engine = new PolicyEngineImpl();
+        engine = new PolicyEngineImpl(false);
         assertNotNull(engine.getRegistry());
         assertNull(engine.getBus());
         assertNull(engine.getPolicyProviders()); 

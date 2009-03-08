@@ -148,13 +148,14 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
     }
     
     Policy getElementPolicy(AbstractDescriptionElement adh, boolean includeAttributes) {
+        if (adh == null) {
+            return null;
+        }
         return getElementPolicy(adh, includeAttributes, adh.getDescription());
     }
   
     Policy getElementPolicy(Extensible ex, boolean includeAttributes, DescriptionInfo di) {
-        
         Policy elementPolicy = new Policy();
-        
         if (null == ex || null == di) {
             return elementPolicy;
         }
