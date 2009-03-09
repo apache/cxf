@@ -41,7 +41,7 @@ import org.apache.cxf.transport.Destination;
  * 
  */
 public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
-
+    public static final ServerPolicyOutFaultInterceptor INSTANCE = new ServerPolicyOutFaultInterceptor();
     private static final Logger LOG = LogUtils.getL7dLogger(ServerPolicyOutFaultInterceptor.class);
     
     public ServerPolicyOutFaultInterceptor() {

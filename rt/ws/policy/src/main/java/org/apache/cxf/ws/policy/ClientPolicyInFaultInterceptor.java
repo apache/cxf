@@ -39,7 +39,8 @@ import org.apache.cxf.transport.Conduit;
  * 
  */
 public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
-
+    public static final ClientPolicyInFaultInterceptor INSTANCE = new ClientPolicyInFaultInterceptor();
+    
     private static final Logger LOG = LogUtils.getL7dLogger(ClientPolicyInFaultInterceptor.class);
     
     public ClientPolicyInFaultInterceptor() {

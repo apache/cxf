@@ -111,9 +111,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     public synchronized void setEnabled(boolean e) {
         enabled = e;
-    
-        if (!addedBusInterceptors) {
+        if (enabled && !addedBusInterceptors) {
             addBusInterceptors();
+        } else if (!enabled && addedBusInterceptors) {
+            removeBusInterceptors();
         }
     }
 
@@ -292,9 +293,17 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }
 
 
+    public synchronized void removeBusInterceptors() {
+        bus.getInInterceptors().remove(PolicyInInterceptor.INSTANCE);
+        bus.getOutInterceptors().remove(PolicyOutInterceptor.INSTANCE);
+        bus.getInFaultInterceptors().remove(ClientPolicyInFaultInterceptor.INSTANCE);
+        bus.getOutFaultInterceptors().remove(ServerPolicyOutFaultInterceptor.INSTANCE);
+        bus.getInFaultInterceptors().add(PolicyVerificationInFaultInterceptor.INSTANCE);
+        addedBusInterceptors = false;
+    }
 
     @PostConstruct
-    public void addBusInterceptors() {
+    public synchronized void addBusInterceptors() {
     
         if (null == alternativeSelector) {
             alternativeSelector = new MinimalAlternativeSelector();
@@ -309,18 +318,11 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             abr.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
         }
 
-        PolicyInInterceptor serverIn = new PolicyInInterceptor();
-        bus.getInInterceptors().add(serverIn);
-        PolicyOutInterceptor serverOut = new PolicyOutInterceptor();
-        bus.getOutInterceptors().add(serverOut);
-        
-        
-        ClientPolicyInFaultInterceptor clientInFault = new ClientPolicyInFaultInterceptor();
-        bus.getInFaultInterceptors().add(clientInFault);
-        ServerPolicyOutFaultInterceptor serverOutFault = new ServerPolicyOutFaultInterceptor();
-        bus.getOutFaultInterceptors().add(serverOutFault);
-        PolicyVerificationInFaultInterceptor verifyInFault = new PolicyVerificationInFaultInterceptor();
-        bus.getInFaultInterceptors().add(verifyInFault);
+        bus.getInInterceptors().add(PolicyInInterceptor.INSTANCE);
+        bus.getOutInterceptors().add(PolicyOutInterceptor.INSTANCE);
+        bus.getInFaultInterceptors().add(ClientPolicyInFaultInterceptor.INSTANCE);
+        bus.getOutFaultInterceptors().add(ServerPolicyOutFaultInterceptor.INSTANCE);
+        bus.getInFaultInterceptors().add(PolicyVerificationInFaultInterceptor.INSTANCE);
     
         addedBusInterceptors = true;
     }  

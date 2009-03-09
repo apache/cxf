@@ -62,6 +62,7 @@
       <xsd:attribute name="ignoreUnknownAssertions" type="xsd:boolean" default="false"/>
       <xsd:attribute name="namespace" type="xsd:string"/>
       <xsd:attribute name="id" type="xsd:string"/>
+      <xsd:attribute name="enabled" type="xsd:boolean"/>
     </xsd:complexType>
   </xsd:element>
   

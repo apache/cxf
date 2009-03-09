@@ -36,7 +36,8 @@ import org.apache.cxf.service.model.EndpointInfo;
  * 
  */
 public class PolicyVerificationInFaultInterceptor extends AbstractPolicyInterceptor {
-
+    public static final PolicyVerificationInFaultInterceptor INSTANCE 
+        = new PolicyVerificationInFaultInterceptor();
     private static final Logger LOG 
         = LogUtils.getL7dLogger(PolicyVerificationInFaultInterceptor.class);
 

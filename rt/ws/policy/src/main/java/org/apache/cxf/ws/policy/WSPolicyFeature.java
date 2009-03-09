@@ -62,8 +62,10 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
     private boolean ignoreUnknownAssertions;
     private AlternativeSelector alternativeSelector; 
     private ApplicationContext context;
+    private boolean enabled = true;
   
        
+
     public WSPolicyFeature() {
         super();
     }
@@ -72,6 +74,14 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         super();
         policies = new ArrayList<Policy>();
         Collections.addAll(policies, ps);
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
     
     public void setApplicationContext(ApplicationContext c) throws BeansException {
@@ -87,7 +97,7 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         
         synchronized (pe) {
-            pe.setEnabled(true);
+            pe.setEnabled(enabled);
             pe.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
             if (null != alternativeSelector) {
                 pe.setAlternativeSelector(alternativeSelector);

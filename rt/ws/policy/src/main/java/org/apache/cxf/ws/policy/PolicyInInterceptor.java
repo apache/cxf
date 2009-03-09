@@ -41,7 +41,8 @@ import org.apache.cxf.transport.Destination;
  * 
  */
 public class PolicyInInterceptor extends AbstractPolicyInterceptor {
-
+    public static final PolicyInInterceptor INSTANCE = new PolicyInInterceptor();
+    
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyInInterceptor.class);
     
     public PolicyInInterceptor() {
