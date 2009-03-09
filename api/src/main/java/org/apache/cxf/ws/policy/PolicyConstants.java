@@ -120,7 +120,14 @@ public final class PolicyConstants {
         }
     }
 
-    
+    public static boolean isOptional(Element e) {
+        Attr at = findOptionalAttribute(e);
+        if (at != null) {
+            String v = at.getValue();
+            return "true".equalsIgnoreCase(v) || "1".equals(v);
+        }
+        return false;
+    }
     public static Attr findOptionalAttribute(Element e) {
         NamedNodeMap atts = e.getAttributes();
         for (int x = 0; x < atts.getLength(); x++) {

@@ -116,11 +116,10 @@ public class STSClient implements Configurable {
     Policy policy;
     String soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
     int keySize = 256;
-    Trust10 trust10;
-    Trust13 trust13;
+    boolean requiresEntropy = true;
     Element template;
     AlgorithmSuite algorithmSuite;
-    String namespace = STSUtils.WST_NS_05_02;
+    String namespace = STSUtils.WST_NS_05_12;
     String addressingNamespace;
     
     boolean isSecureConv;
@@ -178,15 +177,23 @@ public class STSClient implements Configurable {
     public void setTrust(Trust10 trust) {
         if (trust != null) {
             namespace = STSUtils.WST_NS_05_02;
+            requiresEntropy = trust.isRequireClientEntropy();
         }
-        trust10 = trust;
     }
     public void setTrust(Trust13 trust) {
         if (trust != null) {
             namespace = STSUtils.WST_NS_05_12;
+            requiresEntropy = trust.isRequireClientEntropy();
         }
-        trust13 = trust;        
     }
+    public boolean isRequiresEntropy() {
+        return requiresEntropy;
+    }
+
+    public void setRequiresEntropy(boolean requiresEntropy) {
+        this.requiresEntropy = requiresEntropy;
+    }
+
     public boolean isSecureConv() {
         return isSecureConv;
     }
@@ -328,8 +335,7 @@ public class STSClient implements Configurable {
                 writer.writeEndElement();
             }
         
-            if ((trust10 != null && trust10.isRequireClientEntropy())
-                || (trust13 != null && trust13.isRequireClientEntropy())) {
+            if (requiresEntropy) {
                 writer.writeStartElement("wst", "Entropy", namespace);
                 writer.writeStartElement("wst", "BinarySecret", namespace);
                 writer.writeAttribute("Type", namespace + "/Nonce");
@@ -390,7 +396,34 @@ public class STSClient implements Configurable {
         }
         requestSecurityToken(tok.getIssuerAddress(), action, "/Renew", tok);
     }
-    
+    public void cancelSecurityToken(SecurityToken token) throws Exception {
+        createClient();
+        
+        client.getRequestContext().putAll(ctx);
+        client.getRequestContext().put(SecurityConstants.STS_TOKEN_CONTEXT_TOKEN, token);
+        BindingOperationInfo boi = findOperation("/RST/Cancel");
+        
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Cancel");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "CancelTarget", namespace);
+        Element el = token.getUnattachedReference();
+        if (el == null) {
+            el = token.getAttachedReference();
+        }
+        StaxUtils.copy(el, writer);
+
+        writer.writeEndElement();
+        writer.writeEndElement();
+        
+        Object obj[] = client.invoke(boi,
+                                     new DOMSource(writer.getDocument().getDocumentElement()));
+        System.out.println(obj);
+    }
+
     private String writeKeyType(W3CDOMStreamWriter writer, String keyType) throws XMLStreamException {
         if (isSecureConv) {
             addLifetime(writer);
@@ -689,6 +722,7 @@ public class STSClient implements Configurable {
     public void setTemplate(Element rstTemplate) {
         template = rstTemplate;
     }
+
 
 
 }

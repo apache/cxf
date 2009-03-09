@@ -51,7 +51,8 @@ public class KeyValueTokenBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         KeyValueToken token = new KeyValueToken(consts);
-
+        token.setOptional(PolicyConstants.isOptional(element));
+        
         String attribute = element.getAttributeNS(element.getNamespaceURI(), SPConstants.ATTR_INCLUDE_TOKEN);
         if (StringUtils.isEmpty(attribute)) {
             attribute = element.getAttributeNS(consts.getNamespace(), SPConstants.ATTR_INCLUDE_TOKEN);

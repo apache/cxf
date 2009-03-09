@@ -57,6 +57,7 @@ public class SecureConversationTokenBuilder implements AssertionBuilder {
         
         
         SecureConversationToken conversationToken = new SecureConversationToken(consts);
+        conversationToken.setOptional(PolicyConstants.isOptional(element));
 
         String attribute = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (attribute == null) {

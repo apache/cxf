@@ -27,12 +27,16 @@ import javax.xml.soap.SOAPMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.ibm.wsdl.util.xml.DOMUtils;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
@@ -101,7 +105,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
     }
-    
+    private static void addSig(Vector<byte[]> signatureValues, byte[] val) {
+        if (val != null) {
+            signatureValues.add(val);
+        }
+    }
     public void handleBinding() {
         Collection<AssertionInfo> ais;
         WSSecTimestamp timestamp = createTimestamp();
@@ -136,11 +144,14 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             if (token instanceof IssuedToken
                                 || token instanceof SecureConversationToken
                                 || token instanceof KeyValueToken) {
-                                signatureValues.add(doIssuedTokenSignature(token, signdParts,
-                                                                           sgndSuppTokens));
+                                addSig(signatureValues, doIssuedTokenSignature(token, signdParts,
+                                                                               sgndSuppTokens,
+                                                                               null));
                             } else if (token instanceof X509Token
                                 || token instanceof KeyValueToken) {
-                                signatureValues.add(doX509TokenSignature(token, signdParts, sgndSuppTokens));
+                                addSig(signatureValues, doX509TokenSignature(token,
+                                                                             signdParts,
+                                                                             sgndSuppTokens));
                             }
                         }
                     }
@@ -159,30 +170,62 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 
                 ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
                 if (ais != null) {
-                    SupportingToken sgndSuppTokens = null;
+                    SupportingToken endSuppTokens = null;
                     for (AssertionInfo ai : ais) {
-                        sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                        endSuppTokens = (SupportingToken)ai.getAssertion();
                         ai.setAsserted(true);
                     } 
                     
-                    if (sgndSuppTokens != null) {
-                        for (Token token : sgndSuppTokens.getTokens()) {
+                    if (endSuppTokens != null) {
+                        for (Token token : endSuppTokens.getTokens()) {
                             if (token instanceof IssuedToken
                                 || token instanceof SecureConversationToken) {
-                                signatureValues.add(doIssuedTokenSignature(token, 
-                                                                           sgndSuppTokens.getSignedParts(), 
-                                                                           sgndSuppTokens));
+                                addSig(signatureValues, doIssuedTokenSignature(token, 
+                                                                               endSuppTokens
+                                                                                   .getSignedParts(), 
+                                                                               endSuppTokens,
+                                                                               null));
                             } else if (token instanceof X509Token
                                 || token instanceof KeyValueToken) {
-                                signatureValues.add(doX509TokenSignature(token, 
-                                                                         sgndSuppTokens.getSignedParts(), 
-                                                                         sgndSuppTokens));
+                                addSig(signatureValues, doX509TokenSignature(token, 
+                                                                             endSuppTokens.getSignedParts(), 
+                                                                             endSuppTokens));
                             }
                         }
                     }
-                    
                 }
-                
+                SecurityToken token = (SecurityToken)message
+                    .getContextualProperty(SecurityConstants.STS_TOKEN_CONTEXT_TOKEN);
+                if (token != null) {
+                    SupportingToken endSuppTokens 
+                        = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING,
+                                                            SP12Constants.INSTANCE);
+                    SignedEncryptedParts signedParts = new SignedEncryptedParts(true, 
+                                                                                SP12Constants.INSTANCE);
+                    signedParts.setBody(true);
+                    endSuppTokens.setSignedParts(signedParts);
+                    //need to endorse everything
+                    Element el = DOMUtils.getFirstChildElement(saaj.getSOAPHeader());
+                    while (el != null) {
+                        if (el != this.secHeader.getSecurityHeader()) {
+                            signedParts.addHeader(new Header(el.getLocalName(),
+                                                             el.getNamespaceURI()));
+                        }
+                        el = DOMUtils.getNextSiblingElement(el);
+                    }
+                    el = DOMUtils.getFirstChildElement(secHeader.getSecurityHeader());
+                    while (el != null) {
+                        if (timestamp != null && el != timestamp.getElement()) {
+                            signedParts.addHeader(new Header(el.getLocalName(),
+                                                             el.getNamespaceURI()));
+                        }
+                        el = DOMUtils.getNextSiblingElement(el);
+                    }
+                    addSig(signatureValues, doIssuedTokenSignature(new IssuedToken(SP12Constants.INSTANCE), 
+                                                                   endSuppTokens.getSignedParts(), 
+                                                                   endSuppTokens,
+                                                                   token));
+                }
                 ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
                 if (ais != null) {
                     SupportingToken suppTokens = null;
@@ -265,38 +308,53 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             return dkSig.getSignatureValue();
         } else {
             WSSecSignature sig = getSignatureBuider(wrapper, token, false);
-            sig.prependBSTElementToHeader(secHeader);
+            if (sig != null) {
+                sig.prependBSTElementToHeader(secHeader);
             
-            sig.addReferencesToSign(sigParts, secHeader);
-            insertBeforeBottomUp(sig.getSignatureElement());
+                sig.addReferencesToSign(sigParts, secHeader);
+                insertBeforeBottomUp(sig.getSignatureElement());
             
-            sig.computeSignature();
+                sig.computeSignature();
             
-            return sig.getSignatureValue();    
+                return sig.getSignatureValue();
+            } else {
+                return null;
+            }
         }
     }
 
-    private byte[] doIssuedTokenSignature(Token token, SignedEncryptedParts signdParts,
-                                          TokenWrapper wrapper) throws Exception {
+    private byte[] doIssuedTokenSignature(Token token, 
+                                          SignedEncryptedParts signdParts,
+                                          TokenWrapper wrapper,
+                                          SecurityToken securityTok) throws Exception {
         Document doc = saaj.getSOAPPart();
         
         //Get the issued token
-        SecurityToken secTok = getSecurityToken();
+        SecurityToken secTok = securityTok;
+        if (secTok == null) {
+            secTok = getSecurityToken();
+        }
    
         SPConstants.IncludeTokenType inclusion = token.getInclusion();
         boolean tokenIncluded = false;
         
+        Vector<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
         if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS
             || ((inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
                 || inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE) 
                 && isRequestor())) {
           
             //Add the token
-            addEncyptedKeyElement(cloneElement(secTok.getToken()));
+            Element el = cloneElement(secTok.getToken());
+            if (securityTok != null) {
+                //do we need to sign this as well?
+                //String id = addWsuIdToElement(el);
+                //sigParts.add(new WSEncryptionPart(id));                          
+            }
+            
+            addEncyptedKeyElement(el);
             tokenIncluded = true;
         }
-
-        Vector<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
         
         if (timestampEl != null) {
             sigParts.add(new WSEncryptionPart(timestampEl.getId()));                          
@@ -306,7 +364,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             if (signdParts.isBody()) {
                 sigParts.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody())));
             }
-            if (secTok.getX509Certificate() != null) {
+            if (secTok.getX509Certificate() != null
+                || securityTok != null) {
                 //the "getX509Certificate" this is to workaround an issue in WCF
                 //In WCF, for TransportBinding, in most cases, it doesn't wan't any of
                 //the headers signed even if the policy sais so.   HOWEVER, for KeyValue

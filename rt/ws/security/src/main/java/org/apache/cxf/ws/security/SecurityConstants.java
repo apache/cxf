@@ -59,6 +59,7 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_USERNAME = "ws-security.sts.token.username";
     
     
+    public static final String STS_TOKEN_CONTEXT_TOKEN = "ws-security.sts.token.context.token";
 
     public static final Set<String> ALL_PROPERTIES;
     

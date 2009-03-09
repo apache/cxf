@@ -84,18 +84,9 @@ public final class STSUtils {
         QName iName = new QName(ns, "SecurityTokenService");
         si.setName(iName);
         InterfaceInfo ii = new InterfaceInfo(si, iName);
-        OperationInfo oi = ii.addOperation(new QName(ns, "RequestSecurityToken"));
-        MessageInfo mii = oi.createMessage(new QName(ns, "RequestSecurityTokenMsg"), 
-                                           MessageInfo.Type.INPUT);
-        oi.setInput("RequestSecurityTokenMsg", mii);
-        MessagePartInfo mpi = mii.addMessagePart("request");
-        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
         
-        MessageInfo mio = oi.createMessage(new QName(ns, "RequestSecurityTokenResponseMsg"), 
-                                           MessageInfo.Type.OUTPUT);
-        oi.setOutput("RequestSecurityTokenResponseMsg", mio);
-        mpi = mio.addMessagePart("response");
-        mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
+        OperationInfo ioi = addIssueOperation(ii, namespace, ns);
+        OperationInfo coi = addCancelOperation(ii, namespace, ns);
         
         si.setInterface(ii);
         service = new ServiceImpl(si);
@@ -117,7 +108,7 @@ public final class STSUtils {
         si.addEndpoint(ei);
         ei.addExtensor(policy);
         
-        BindingOperationInfo boi = bi.getOperation(oi);
+        BindingOperationInfo boi = bi.getOperation(ioi);
         SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
         if (soi == null) {
             soi = new SoapOperationInfo();
@@ -125,8 +116,51 @@ public final class STSUtils {
         }
         soi.setAction(namespace + "/RST/Issue");
         
-
+        boi = bi.getOperation(coi);
+        soi = boi.getExtensor(SoapOperationInfo.class);
+        if (soi == null) {
+            soi = new SoapOperationInfo();
+            boi.addExtensor(soi);
+        }
+        soi.setAction(namespace + "/RST/Cancel");
         service.setDataBinding(new SourceDataBinding());
         return new EndpointImpl(bus, service, ei);
+    }
+    
+    private static OperationInfo addIssueOperation(InterfaceInfo ii, 
+                                                   String namespace,
+                                                   String servNamespace) {
+        OperationInfo oi = ii.addOperation(new QName(servNamespace, "RequestSecurityToken"));
+        MessageInfo mii = oi.createMessage(new QName(servNamespace, "RequestSecurityTokenMsg"), 
+                                           MessageInfo.Type.INPUT);
+        oi.setInput("RequestSecurityTokenMsg", mii);
+        MessagePartInfo mpi = mii.addMessagePart("request");
+        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
+        
+        MessageInfo mio = oi.createMessage(new QName(servNamespace, 
+                                                     "RequestSecurityTokenResponseMsg"), 
+                                           MessageInfo.Type.OUTPUT);
+        oi.setOutput("RequestSecurityTokenResponseMsg", mio);
+        mpi = mio.addMessagePart("response");
+        mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
+        return oi;
+    }
+    private static OperationInfo addCancelOperation(InterfaceInfo ii, 
+                                                    String namespace,
+                                                    String servNamespace) {
+        OperationInfo oi = ii.addOperation(new QName(servNamespace, "CancelSecurityToken"));
+        MessageInfo mii = oi.createMessage(new QName(servNamespace, "CancelSecurityTokenMsg"), 
+                                           MessageInfo.Type.INPUT);
+        oi.setInput("CancelSecurityTokenMsg", mii);
+        MessagePartInfo mpi = mii.addMessagePart("request");
+        mpi.setElementQName(new QName(namespace, "CancelSecurityToken"));
+        
+        MessageInfo mio = oi.createMessage(new QName(servNamespace, 
+                                                     "CancelSecurityTokenResponseMsg"), 
+                                           MessageInfo.Type.OUTPUT);
+        oi.setOutput("CancelSecurityTokenResponseMsg", mio);
+        mpi = mio.addMessagePart("response");
+        mpi.setElementQName(new QName(namespace, "CancelSecurityTokenResponse"));
+        return oi;
     }
 }

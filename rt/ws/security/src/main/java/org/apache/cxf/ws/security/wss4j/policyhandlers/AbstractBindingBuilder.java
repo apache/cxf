@@ -267,7 +267,9 @@ public abstract class AbstractBindingBuilder {
                 }
             }
         }
-        throw new PolicyException(new Message(reason, LOG));
+        if (!assertion.isOptional()) {
+            throw new PolicyException(new Message(reason, LOG));
+        }
     }
     protected void policyAsserted(PolicyAssertion assertion) {
         if (assertion == null) {
@@ -1134,6 +1136,7 @@ public abstract class AbstractBindingBuilder {
         }
         if (StringUtils.isEmpty(user)) {
             policyNotAsserted(token, "No " + type + " username found.");
+            return null;
         }
 
         String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
@@ -1156,8 +1159,8 @@ public abstract class AbstractBindingBuilder {
     }
 
     protected void doEndorsedSignatures(Map<Token, WSSecBase> tokenMap,
-                                          boolean isTokenProtection,
-                                          boolean isSigProtect) {
+                                        boolean isTokenProtection,
+                                        boolean isSigProtect) {
         
         for (Map.Entry<Token, WSSecBase> ent : tokenMap.entrySet()) {
             WSSecBase tempTok = ent.getValue();

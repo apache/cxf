@@ -30,6 +30,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -62,6 +63,7 @@ public class IssuedTokenBuilder implements AssertionBuilder {
     
 
         IssuedToken issuedToken = new IssuedToken(consts);
+        issuedToken.setOptional(PolicyConstants.isOptional(element));
 
         String includeAttr = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (includeAttr != null) {
