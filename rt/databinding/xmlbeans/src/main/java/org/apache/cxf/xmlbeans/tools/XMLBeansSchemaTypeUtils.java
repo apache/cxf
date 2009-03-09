@@ -25,58 +25,62 @@ import java.util.Map;
 import org.apache.xmlbeans.SchemaType;
 
 /**
- * This class will help us to map the XMLBeansBuildinType into Natural Java Type
+ * This class will help us to map the 
+ * <a href="http://xmlbeans.apache.org/docs/2.0.0/guide/conXMLBeansSupportBuiltInSchemaTypes.html">
+ * XMLBeans Builtin Type</a> into Natural Java Type
+ *
+ * 
  */
 public final class XMLBeansSchemaTypeUtils {
-    private static final Map<String, String> BUILDIN_TYPES_MAP;
+    private static final Map<String, String> BUILTIN_TYPES_MAP;
     static {
-        BUILDIN_TYPES_MAP = new HashMap<String, String>();
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlObject", "org.apache.xmlbeans.XmlObject");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlAnySimpleType", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlAnyURI", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlBase64Binary", "byte[]");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlBoolean", "boolean");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlByte", "byte");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDate", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDateTime", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDecimal", "java.math.BigDecimal");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDouble", "double");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDuration", "org.apache.xmlbeans.GDuration");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlENTITIES", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlENTITY", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlFloat", "float");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGDay", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGMonth", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGMonthDay", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGYear", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlHexBinary", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlHexBinary", "byte[]");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlID", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlIDREF", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlIDREFS", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlInt", "int");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlInteger", "java.math.BigInteger");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlLanguage", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlLong", "long");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlName", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNCNAME", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNegativeInteger", "java.math.BigInteger");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNMTOKEN", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNMTOKENS", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNonNegativeInteger", "java.math.BigInteger");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNonPositiveInteger", "java.math.BigInteger");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNormalizedString", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNOTATION", "org.apache.xmlbeans.XmlNOTATION");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlPositiveInteger", "java.math.BigInteger");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlQName", "javax.xml.namespace.QName");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlShort", "short");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlString", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlTime", "java.util.Calendar");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlToken", "String");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedByte", "short");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedInt", "long");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedLong", "java.math.BigInteger");
-        BUILDIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedShort", "int");
+        BUILTIN_TYPES_MAP = new HashMap<String, String>();
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlObject", "org.apache.xmlbeans.XmlObject");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlAnySimpleType", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlAnyURI", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlBase64Binary", "byte[]");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlBoolean", "boolean");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlByte", "byte");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDate", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDateTime", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDecimal", "java.math.BigDecimal");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDouble", "double");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlDuration", "org.apache.xmlbeans.GDuration");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlENTITIES", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlENTITY", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlFloat", "float");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGDay", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGMonth", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGMonthDay", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGYear", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlGYearMonth", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlHexBinary", "byte[]");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlID", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlIDREF", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlIDREFS", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlInt", "int");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlInteger", "java.math.BigInteger");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlLanguage", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlLong", "long");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlName", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNCNAME", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNegativeInteger", "java.math.BigInteger");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNMTOKEN", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNMTOKENS", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNonNegativeInteger", "java.math.BigInteger");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNonPositiveInteger", "java.math.BigInteger");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNormalizedString", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlNOTATION", "org.apache.xmlbeans.XmlNOTATION");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlPositiveInteger", "java.math.BigInteger");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlQName", "javax.xml.namespace.QName");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlShort", "short");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlString", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlTime", "java.util.Calendar");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlToken", "String");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedByte", "short");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedInt", "long");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedLong", "java.math.BigInteger");
+        BUILTIN_TYPES_MAP.put("org.apache.xmlbeans.XmlUnsignedShort", "int");
     }
     
     private XMLBeansSchemaTypeUtils() {
@@ -93,7 +97,7 @@ public final class XMLBeansSchemaTypeUtils {
             }
         }
         if (schemaType.isBuiltinType()) {
-            result = BUILDIN_TYPES_MAP.get(schemaType.getFullJavaName());
+            result = BUILTIN_TYPES_MAP.get(schemaType.getFullJavaName());
         } else {
             result = schemaType.getFullJavaName().replace('$', '.');
         }        
