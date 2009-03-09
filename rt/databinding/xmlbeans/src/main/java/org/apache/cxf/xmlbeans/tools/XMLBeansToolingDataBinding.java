@@ -74,9 +74,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     static {
         MAP_COMPATIBILITY_CONFIG_URIS = new HashMap<String, String>();
         MAP_COMPATIBILITY_CONFIG_URIS.put(COMPATIBILITY_CONFIG_URI, CONFIG_URI);
-    }
-
-    
+    }    
     
     SchemaTypeSystem typeSystem;
     Map<String, String> sourcesToCopyMap = new HashMap<String, String>();
@@ -127,9 +125,10 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         return ret.replace('$', '.');
     }
 
-    public String getWrappedElementType(QName wrapperElement, QName item) {
+    public String getWrappedElementType(QName wrapperElement, QName item) {        
         SchemaType st = typeSystem.findElement(wrapperElement).getType();
-        return st.getElementProperty(item).getType().getFullJavaName().replace('$', '.');
+        SchemaType partType = st.getElementProperty(item).getType();        
+        return XMLBeansSchemaTypeUtils.getNaturalJavaClassName(partType);        
     }
 
     public void generate(ToolContext context) throws ToolException {
