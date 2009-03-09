@@ -65,7 +65,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     private Bus bus;
     private PolicyRegistry registry;
     private Collection<PolicyProvider> policyProviders = new CopyOnWriteArrayList<PolicyProvider>();
-    private boolean enabled;
+    private boolean enabled = true;
     private boolean ignoreUnknownAssertions = true;
     private boolean addedBusInterceptors;
     private AlternativeSelector alternativeSelector;
