@@ -45,10 +45,48 @@ public abstract class WrapperHelper {
 
     public abstract String getSignature();
     
+    private static Class<?> getXMLBeansValueType(Class<?> wrapperType)  {
+        Class<?> result = wrapperType;
+        for (Method method : wrapperType.getMethods()) {
+            if (method.getName().startsWith("addNew")) {                
+                result = method.getReturnType();
+                break;
+            }
+        }
+        return result;
+    }
+    
+    private static Object createXMLBeansValueObject(Class<?> wrapperType) 
+        throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException {
+        
+        Class<?> cls[] = wrapperType.getDeclaredClasses();
+        Method newType = null;
+        for (Method method : wrapperType.getMethods()) {
+            if (method.getName().startsWith("addNew")) {
+                newType = method;                            
+            }
+        }                     
+        Object obj = null;
+        for (Class<?> c : cls) {                        
+            if ("Factory".equals(c.getSimpleName())) {                            
+                Method method = c.getMethod("newInstance", NO_PARAMS); 
+                // create the instance of document type
+                obj = method.invoke(null, NO_PARAMS);
+                // create the value object
+                obj = newType.invoke(obj, NO_PARAMS);
+                break;
+            }
+        }
+        
+        return obj;
+    }
+       
     public static WrapperHelper createWrapperHelper(Class<?> wrapperType,
                                                     List<String> partNames,
                                                     List<String> elTypeNames,
                                                     List<Class<?>> partClasses) {
+       
         List<Method> getMethods = new ArrayList<Method>(partNames.size());
         List<Method> setMethods = new ArrayList<Method>(partNames.size());
         List<Method> jaxbMethods = new ArrayList<Method>(partNames.size());
@@ -78,7 +116,7 @@ public abstract class WrapperHelper {
         }
         
         for (int x = 0; x < partNames.size(); x++) {
-            String partName = partNames.get(x);
+            String partName = partNames.get(x);            
             if (partName == null) {
                 getMethods.add(null);
                 setMethods.add(null);
@@ -93,13 +131,18 @@ public abstract class WrapperHelper {
             String setAccessor = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.SETTER);
             Method getMethod = null;
             Method setMethod = null;
-            try {
-                getMethod = wrapperType.getMethod(getAccessor, NO_PARAMS); 
+            Class<?> valueClass = wrapperType;
+            try {               
+                if (wrapperType.isInterface()) {
+                    valueClass = getXMLBeansValueType(wrapperType);
+                    allMethods = valueClass.getMethods();
+                }
+                getMethod = valueClass.getMethod(getAccessor, NO_PARAMS); 
             } catch (NoSuchMethodException ex) {
                 //ignore for now
             }
 
-            Field elField = getElField(partName, wrapperType);
+            Field elField = getElField(partName, valueClass);
             if (getMethod == null
                 && elementType != null
                 && "boolean".equals(elementType.toLowerCase())
@@ -118,10 +161,10 @@ public abstract class WrapperHelper {
                 && "return".equals(partName)) {
                 //RI generated code uses this
                 try {
-                    getMethod = wrapperType.getMethod("get_return", NO_PARAMS);
+                    getMethod = valueClass.getMethod("get_return", NO_PARAMS);
                 } catch (NoSuchMethodException ex) {
                     try {
-                        getMethod = wrapperType.getMethod("is_return",
+                        getMethod = valueClass.getMethod("is_return",
                                                           new Class[0]);
                     } catch (NoSuchMethodException ex2) {
                         //ignore for now
@@ -204,7 +247,7 @@ public abstract class WrapperHelper {
         if ("javax.xml.bind.JAXBElement".equals(method.getReturnType().getCanonicalName())) {
             JAXBElement je = (JAXBElement)method.invoke(in);
             return je == null ? je : je.getValue();
-        } else {
+        } else {            
             return method.invoke(in);
         }
     }
@@ -272,10 +315,13 @@ public abstract class WrapperHelper {
         }
         public Object createWrapperObject(List<?> lst) 
             throws Fault {
-            
             try {
-                Object ret = wrapperType.newInstance();
-
+                Object value = null;
+                if (wrapperType.isInterface()) {
+                    value = createXMLBeansValueObject(wrapperType);
+                } else {
+                    value = wrapperType.newInstance();
+                }
                 for (int x = 0; x < setMethods.length; x++) {
                     if (getMethods[x] == null
                         && setMethods[x] == null 
@@ -289,38 +335,46 @@ public abstract class WrapperHelper {
                         o = jaxbObjectMethods[x].invoke(objectFactory, o);
                     }
                     if (o instanceof List) {
-                        List<Object> col = CastUtils.cast((List)getMethods[x].invoke(ret));
+                        List<Object> col = CastUtils.cast((List)getMethods[x].invoke(value));
                         if (col == null) {
                             //broken generated java wrappers
                             if (setMethods[x] != null) {
-                                setMethods[x].invoke(ret, o);
+                                setMethods[x].invoke(value, o);
                             } else {
-                                fields[x].set(ret, lst.get(x));
+                                fields[x].set(value, lst.get(x));
                             }
                         } else {
                             List<Object> olst = CastUtils.cast((List)o);
                             col.addAll(olst);
                         }
-                    } else if (setMethods[x] != null) {
-                        setMethods[x].invoke(ret, o);
+                    } else if (setMethods[x] != null) {                        
+                        setMethods[x].invoke(value, o);
                     } else if (fields[x] != null) {
-                        fields[x].set(ret, lst.get(x));
+                        fields[x].set(value, lst.get(x));
                     }
                 }
-                return ret;
+                return value;
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
         }
         
         public List<Object> getWrapperParts(Object o) throws Fault {
+            Object valueObject = o;
             try {
+                if (wrapperType.isInterface()) {                    
+                    Class<?> valueClass = getXMLBeansValueType(wrapperType);
+                    // we need get the real Object first
+                    Method method = wrapperType.getMethod("get" + valueClass.getSimpleName(), NO_PARAMS);
+                    valueObject = method.invoke(o, NO_PARAMS);
+                }
+            
                 List<Object> ret = new ArrayList<Object>(getMethods.length);
                 for (int x = 0; x < getMethods.length; x++) {
                     if (getMethods[x] != null) {
-                        ret.add(getValue(getMethods[x], o));
+                        ret.add(getValue(getMethods[x], valueObject));                        
                     } else if (fields[x] != null) {
-                        ret.add(fields[x].get(o));
+                        ret.add(fields[x].get(valueObject));
                     } else {
                         //placeholder
                         ret.add(null);

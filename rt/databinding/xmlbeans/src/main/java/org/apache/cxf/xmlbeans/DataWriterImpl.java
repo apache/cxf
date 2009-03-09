@@ -94,7 +94,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                 }
                 SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
 
-                if (!st.isDocumentType()) {
+                if (st != null && !st.isDocumentType()) {
                     if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) {
                         output.writeStartElement(part.getConcreteName().getLocalPart());
                         

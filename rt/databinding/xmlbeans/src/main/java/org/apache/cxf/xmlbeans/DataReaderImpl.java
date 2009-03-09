@@ -70,7 +70,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
                 try {
                     SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
                     XmlOptions options = new XmlOptions();
-                    if (!st.isDocumentType() && !isOutClass) {
+                    if (st != null && !st.isDocumentType() && !isOutClass) {
                         options.setLoadReplaceDocumentElement(null);
                     }
                     Method meth = c.getMethod("parse", XMLStreamReader.class, XmlOptions.class);
@@ -124,7 +124,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
         return obj;
     }
 
-    public Object read(QName name, XMLStreamReader input, Class type) {
+    public Object read(QName name, XMLStreamReader input, Class type) {        
         return null;
     }
 
