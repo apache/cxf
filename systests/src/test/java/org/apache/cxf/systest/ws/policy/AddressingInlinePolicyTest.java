@@ -35,8 +35,8 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.ws.policy.ServerPolicyInInterceptor;
-import org.apache.cxf.ws.policy.ServerPolicyOutInterceptor;
+import org.apache.cxf.ws.policy.PolicyInInterceptor;
+import org.apache.cxf.ws.policy.PolicyOutInterceptor;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -128,14 +128,14 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
         boolean hasServerOut = false;
         List<Interceptor> inInterceptors = b.getInInterceptors();
         for (Interceptor i : inInterceptors) {
-            if (i instanceof ServerPolicyInInterceptor) {
+            if (i instanceof PolicyInInterceptor) {
                 hasServerIn = true;
             }
         }
         assertTrue(hasServerIn);
         
         for (Interceptor i : b.getOutInterceptors()) {
-            if (i instanceof ServerPolicyOutInterceptor) {
+            if (i instanceof PolicyOutInterceptor) {
                 hasServerOut = true;
             }
         }

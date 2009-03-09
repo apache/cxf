@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -52,6 +53,11 @@ public class PolicyVerificationInFaultInterceptor extends AbstractPolicyIntercep
      */
     protected void handle(Message message) {
         
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        if (null == aim) {
+            return;
+        }        
+        
         if (!MessageUtils.isRequestor(message)) {
             LOG.fine("Not a requestor.");
             return; 
@@ -73,15 +79,11 @@ public class PolicyVerificationInFaultInterceptor extends AbstractPolicyIntercep
         }
         EndpointInfo ei = e.getEndpointInfo();
         
+        Bus bus = exchange.get(Bus.class);
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
         }
-        
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        if (null == aim) {
-            return;
-        }        
         
         Exception ex = message.getContent(Exception.class);
         if (null == ex) {

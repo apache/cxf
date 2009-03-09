@@ -59,17 +59,12 @@ public final class PolicyConstants {
     public static final String WSU_ID_ATTR_NAME = "Id";
 
     
-    public static final String CLIENT_POLICY_OUT_INTERCEPTOR_ID
-        = "org.apache.cxf.ws.policy.ClientPolicyOutInterceptor";
-    public static final String CLIENT_POLICY_IN_INTERCEPTOR_ID
-        = "org.apache.cxf.ws.policy.ClientPolicyInInterceptor";
+    public static final String POLICY_IN_INTERCEPTOR_ID
+        = "org.apache.cxf.ws.policy.PolicyInInterceptor";
+    public static final String POLICY_OUT_INTERCEPTOR_ID
+        = "org.apache.cxf.ws.policy.PolicyOutInterceptor";
     public static final String CLIENT_POLICY_IN_FAULT_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.ClientPolicyInFaultInterceptor";
-
-    public static final String SERVER_POLICY_IN_INTERCEPTOR_ID
-        = "org.apache.cxf.ws.policy.ServerPolicyInInterceptor";
-    public static final String SERVER_POLICY_OUT_INTERCEPTOR_ID
-        = "org.apache.cxf.ws.policy.ServerPolicyOutInterceptor";
     public static final String SERVER_POLICY_OUT_FAULT_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.ServerPolicyOutFaultInterceptor";
     

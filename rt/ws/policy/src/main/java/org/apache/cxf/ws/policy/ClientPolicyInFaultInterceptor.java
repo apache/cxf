@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
@@ -61,6 +62,7 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         }
         EndpointInfo ei = e.getEndpointInfo();
         
+        Bus bus = exchange.get(Bus.class);
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
@@ -85,7 +87,7 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         // insert assertions of endpoint's fault vocabulary into message
         
         Collection<PolicyAssertion> assertions = ep.getFaultVocabulary();
-        if (null != assertions) {
+        if (null != assertions && !assertions.isEmpty()) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }
     }

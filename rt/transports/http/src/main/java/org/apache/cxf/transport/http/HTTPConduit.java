@@ -2126,6 +2126,7 @@ public class HTTPConduit
         public void onMessage(Message inMessage) {
             // disposable exchange, swapped with real Exchange on correlation
             inMessage.setExchange(new ExchangeImpl());
+            inMessage.getExchange().put(Bus.class, bus);
             inMessage.put(DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
             // REVISIT: how to get response headers?
             //inMessage.put(Message.PROTOCOL_HEADERS, req.getXXX());

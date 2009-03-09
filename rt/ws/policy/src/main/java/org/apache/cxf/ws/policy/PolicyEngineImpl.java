@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -63,7 +64,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     
     private Bus bus;
     private PolicyRegistry registry;
-    private Collection<PolicyProvider> policyProviders;
+    private Collection<PolicyProvider> policyProviders = new CopyOnWriteArrayList<PolicyProvider>();
     private boolean enabled;
     private boolean ignoreUnknownAssertions = true;
     private boolean addedBusInterceptors;
@@ -93,7 +94,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }
 
     public void setPolicyProviders(Collection<PolicyProvider> p) {
-        policyProviders = p;
+        policyProviders = new CopyOnWriteArrayList<PolicyProvider>(p);
     }
    
     public Collection<PolicyProvider> getPolicyProviders() {
@@ -308,34 +309,17 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             abr.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
         }
 
-        ClientPolicyOutInterceptor clientOut = new ClientPolicyOutInterceptor();
-        clientOut.setBus(bus);
-        bus.getOutInterceptors().add(clientOut);
-        ClientPolicyInInterceptor clientIn = new ClientPolicyInInterceptor();
-        clientIn.setBus(bus);
-        bus.getInInterceptors().add(clientIn);
-        ClientPolicyInFaultInterceptor clientInFault = new ClientPolicyInFaultInterceptor();
-        clientInFault.setBus(bus);
-        bus.getInFaultInterceptors().add(clientInFault);
-    
-        ServerPolicyInInterceptor serverIn = new ServerPolicyInInterceptor();
-        serverIn.setBus(bus);
+        PolicyInInterceptor serverIn = new PolicyInInterceptor();
         bus.getInInterceptors().add(serverIn);
-        ServerPolicyOutInterceptor serverOut = new ServerPolicyOutInterceptor();
-        serverOut.setBus(bus);
+        PolicyOutInterceptor serverOut = new PolicyOutInterceptor();
         bus.getOutInterceptors().add(serverOut);
+        
+        
+        ClientPolicyInFaultInterceptor clientInFault = new ClientPolicyInFaultInterceptor();
+        bus.getInFaultInterceptors().add(clientInFault);
         ServerPolicyOutFaultInterceptor serverOutFault = new ServerPolicyOutFaultInterceptor();
-        serverOutFault.setBus(bus);
         bus.getOutFaultInterceptors().add(serverOutFault);
-    
-        PolicyVerificationOutInterceptor verifyOut = new PolicyVerificationOutInterceptor();
-        verifyOut.setBus(bus);
-        bus.getOutInterceptors().add(verifyOut);
-        PolicyVerificationInInterceptor verifyIn = new PolicyVerificationInInterceptor();
-        verifyIn.setBus(bus);
-        bus.getInInterceptors().add(verifyIn);
         PolicyVerificationInFaultInterceptor verifyInFault = new PolicyVerificationInFaultInterceptor();
-        verifyInFault.setBus(bus);
         bus.getInFaultInterceptors().add(verifyInFault);
     
         addedBusInterceptors = true;

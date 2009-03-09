@@ -30,7 +30,8 @@ import org.apache.cxf.phase.Phase;
  * 
  */
 public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor {
-
+    public static final PolicyVerificationOutInterceptor INSTANCE = new PolicyVerificationOutInterceptor();
+    
     private static final Logger LOG 
         = LogUtils.getL7dLogger(PolicyVerificationOutInterceptor.class);
     public PolicyVerificationOutInterceptor() {
@@ -46,7 +47,6 @@ public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor 
      * @throws PolicyException if none of the alternatives is supported
      */
     protected void handle(Message message) {
-        
         if (MessageUtils.isPartialResponse(message)) {
             LOG.fine("Not verifying policies on outbound partial response.");
             return;

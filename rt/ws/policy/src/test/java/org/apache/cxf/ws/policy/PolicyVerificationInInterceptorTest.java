@@ -59,7 +59,6 @@ public class PolicyVerificationInInterceptorTest extends Assert {
     public void testHandleMessageNoOp() throws NoSuchMethodException {
         
         PolicyVerificationInInterceptor interceptor = new PolicyVerificationInInterceptor();
-        interceptor.setBus(bus);        
         
         setupMessage(false, false, false, false);
         control.replay();
@@ -82,15 +81,7 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         control.replay();
         interceptor.handleMessage(message);
         control.verify();
-        
-        /*
-        control.reset();
-        setupMessage(true, true, true, true);
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.TRUE);
-        control.replay();
-        interceptor.handleMessage(message);
-        control.verify();
-        */
+
     }
     
     @Test
@@ -101,7 +92,6 @@ public class PolicyVerificationInInterceptorTest extends Assert {
             new Class[] {Message.class});
         PolicyVerificationInInterceptor interceptor = 
             control.createMock(PolicyVerificationInInterceptor.class, new Method[] {m});
-        interceptor.setBus(bus);
         setupMessage(true, true, true, true);
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE);
         interceptor.getTransportAssertions(message);
@@ -144,6 +134,15 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         if (null == exchange) {
             exchange = control.createMock(Exchange.class);            
         }
+        if (setupAssertionInfoMap && null == aim) {
+            aim = control.createMock(AssertionInfoMap.class);
+        }
+        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
+        if (aim == null) {
+            return;
+        }
+        
+        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         if (setupBindingOperationInfo && null == boi) {
             boi = control.createMock(BindingOperationInfo.class);
@@ -169,10 +168,6 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         if (!setupPolicyEngine) {
             return;           
         }
-        if (setupAssertionInfoMap && null == aim) {
-            aim = control.createMock(AssertionInfoMap.class);
-        }
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
     }
 
 }
