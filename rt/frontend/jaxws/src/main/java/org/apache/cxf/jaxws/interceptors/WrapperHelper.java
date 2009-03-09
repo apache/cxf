@@ -35,7 +35,8 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBUtils;
 
 public abstract class WrapperHelper {
-    private static final Class NO_PARAMS[] = new Class[0];
+    private static final Class NO_CLASSES[] = new Class[0];
+    private static final Object NO_PARAMS[] = new Object[0];
 
     
     public abstract Object createWrapperObject(List<?> lst) 
@@ -70,7 +71,7 @@ public abstract class WrapperHelper {
         Object obj = null;
         for (Class<?> c : cls) {                        
             if ("Factory".equals(c.getSimpleName())) {                            
-                Method method = c.getMethod("newInstance", NO_PARAMS); 
+                Method method = c.getMethod("newInstance", NO_CLASSES); 
                 // create the instance of document type
                 obj = method.invoke(null, NO_PARAMS);
                 // create the value object
@@ -137,7 +138,7 @@ public abstract class WrapperHelper {
                     valueClass = getXMLBeansValueType(wrapperType);
                     allMethods = valueClass.getMethods();
                 }
-                getMethod = valueClass.getMethod(getAccessor, NO_PARAMS); 
+                getMethod = valueClass.getMethod(getAccessor, NO_CLASSES); 
             } catch (NoSuchMethodException ex) {
                 //ignore for now
             }
@@ -152,7 +153,7 @@ public abstract class WrapperHelper {
         
                 try {
                     String newAcc = getAccessor.replaceFirst("get", "is");
-                    getMethod = wrapperType.getMethod(newAcc, NO_PARAMS); 
+                    getMethod = wrapperType.getMethod(newAcc, NO_CLASSES); 
                 } catch (NoSuchMethodException ex) {
                     //ignore for now
                 }            
@@ -161,7 +162,7 @@ public abstract class WrapperHelper {
                 && "return".equals(partName)) {
                 //RI generated code uses this
                 try {
-                    getMethod = valueClass.getMethod("get_return", NO_PARAMS);
+                    getMethod = valueClass.getMethod("get_return", NO_CLASSES);
                 } catch (NoSuchMethodException ex) {
                     try {
                         getMethod = valueClass.getMethod("is_return",
@@ -365,7 +366,7 @@ public abstract class WrapperHelper {
                 if (wrapperType.isInterface()) {                    
                     Class<?> valueClass = getXMLBeansValueType(wrapperType);
                     // we need get the real Object first
-                    Method method = wrapperType.getMethod("get" + valueClass.getSimpleName(), NO_PARAMS);
+                    Method method = wrapperType.getMethod("get" + valueClass.getSimpleName(), NO_CLASSES);
                     valueObject = method.invoke(o, NO_PARAMS);
                 }
             
