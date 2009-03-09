@@ -54,7 +54,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
     /**
      * @parameter expression="${cxf.sourceRoot}" 
-     *             default-value="${project.build.directory}/generated/src/main/java"
+     *             default-value="${project.build.directory}/generated-sources/cxf"
      * @required
      */
     File sourceRoot;
