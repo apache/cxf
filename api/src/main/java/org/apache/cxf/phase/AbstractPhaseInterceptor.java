@@ -43,48 +43,48 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     private final Set<String> after = new SortedArraySet<String>();
 
     /**
-	 * Instantiates the interceptor to live in a specified phase. The 
-	 * interceptor's id will be set to the name of the implementing class.
-	 *
-	 * @param phase the interceptor's phase
-	 */
-	public AbstractPhaseInterceptor(String phase) {
+     * Instantiates the interceptor to live in a specified phase. The 
+     * interceptor's id will be set to the name of the implementing class.
+     *
+     * @param phase the interceptor's phase
+     */
+    public AbstractPhaseInterceptor(String phase) {
         this(null, phase, false);
     }
 
     /**
-	 * Instantiates the interceptor with a specified id.
-	 *
-	 * @param i the interceptor's id
-	 * @param p the interceptor's phase
-	 */
+     * Instantiates the interceptor with a specified id.
+     *
+     * @param i the interceptor's id
+     * @param p the interceptor's phase
+     */
     public AbstractPhaseInterceptor(String i, String p) {
         this(i, p, false);
     }
 
     /**
-	 * Instantiates the interceptor and specifies if it gets a system 
-	 * determined unique id. If <code>uniqueId</code> is set to true the 
-	 * interceptor's id will be determined by the runtime. If 
-	 * <code>uniqueId</code> is set to false, the implementing class' name 
-	 * is used as the id.
-	 *
-	 * @param p the interceptor's phase
-	 * @param uniqueId
-	 */
+     * Instantiates the interceptor and specifies if it gets a system 
+     * determined unique id. If <code>uniqueId</code> is set to true the 
+     * interceptor's id will be determined by the runtime. If 
+     * <code>uniqueId</code> is set to false, the implementing class' name 
+     * is used as the id.
+     *
+     * @param p the interceptor's phase
+     * @param uniqueId
+     */
     public AbstractPhaseInterceptor(String phase, boolean uniqueId) {
         this(null, phase, uniqueId);
     }
 
     /**
-	 * Instantiates the interceptor with a specified id or with a system 
-	 * determined unique id. The specified id will be used unless 
-	 * <code>uniqueId</code> is set to true.
-	 *
-	 * @param i the interceptor's id
-	 * @param p the interceptor's phase
-	 * @param uniqueId
-	 */
+     * Instantiates the interceptor with a specified id or with a system 
+     * determined unique id. The specified id will be used unless 
+     * <code>uniqueId</code> is set to true.
+     *
+     * @param i the interceptor's id
+     * @param p the interceptor's phase
+     * @param uniqueId
+     */
     public AbstractPhaseInterceptor(String i, String p, boolean uniqueId) {
         if (i == null) {
             i = getClass().getName();
@@ -151,7 +151,7 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
      * @param message the current Message
      * @return true if the current messaging role is that of requestor
      */
-	protected boolean isRequestor(T message) {
+    protected boolean isRequestor(T message) {
         return MessageUtils.isRequestor(message);
     }  
 
