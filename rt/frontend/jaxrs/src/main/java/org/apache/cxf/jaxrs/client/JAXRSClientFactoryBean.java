@@ -26,6 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.ProxyHelper;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.UpfrontConduitSelector;
@@ -40,6 +41,8 @@ import org.apache.cxf.service.Service;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     
+    private String username;
+    private String password;
     private boolean inheritHeaders; 
     private MultivaluedMap<String, String> headers;
     
@@ -51,6 +54,22 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         super(serviceFactory);
         serviceFactory.setEnableStaticResolution(true);
         
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
     
     public void setInheritHeaders(boolean ih) {
@@ -109,7 +128,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             initClient(proxyImpl, ep);    
             
             return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
-                                        new Class[]{cri.getServiceClass(), Client.class}, 
+                                        new Class[]{cri.getServiceClass(), Client.class, 
+                                                    InvocationHandlerAware.class}, 
                                         proxyImpl);
         } catch (Exception ex) {
             throw new WebApplicationException();
@@ -126,6 +146,15 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     protected void initClient(AbstractClient client, Endpoint ep) {
+        
+        if (username != null) {
+            AuthorizationPolicy authPolicy = new AuthorizationPolicy();
+            authPolicy.setUserName(username);
+            authPolicy.setPassword(password);
+            ep.getEndpointInfo().addExtensor(authPolicy);
+        }
+        
+        
         client.setConduitSelector(getConduitSelector(ep));
         client.setBus(getBus());
         client.setOutInterceptors(getOutInterceptors());

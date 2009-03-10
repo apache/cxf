@@ -72,7 +72,7 @@ import org.apache.cxf.transport.MessageObserver;
  * Common proxy and http-centric client implementation
  *
  */
-public class AbstractClient implements Client {
+public class AbstractClient implements Client, InvocationHandlerAware {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
@@ -91,14 +91,6 @@ public class AbstractClient implements Client {
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
         this.currentBuilder = new UriBuilderImpl(currentURI);
-    }
-    
-    protected AbstractClient(Client client, boolean inheritHeaders) {
-        this.baseURI = client.getCurrentURI();
-        this.currentBuilder = new UriBuilderImpl(client.getCurrentURI());
-        if (inheritHeaders) {
-            this.requestHeaders = client.getHeaders();
-        }
     }
     
     /**
@@ -251,11 +243,9 @@ public class AbstractClient implements Client {
      */
     public Response getResponse() {
         if (responseBuilder == null) {
-            throw new IllegalStateException();
+            return null;
         }
-        Response r = responseBuilder.build();
-        responseBuilder = null;
-        return r;
+        return responseBuilder.build();
     }
     
     /**
@@ -531,5 +521,9 @@ public class AbstractClient implements Client {
             }
         }
         
+    }
+
+    public Object getInvocationHandler() {
+        return this;
     }
 }

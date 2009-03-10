@@ -154,7 +154,6 @@ public interface Client {
     /**
      * Gets the response state if any
      * @return JAXRS Response response
-     * @throws IllegalStateException if no request has been made or this method called more than once 
      */
     Response getResponse();
 }
