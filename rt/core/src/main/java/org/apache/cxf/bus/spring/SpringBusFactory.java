@@ -101,6 +101,7 @@ public class SpringBusFactory extends BusFactory {
         try {      
             return new BusApplicationContext(cfgFiles, includeDefaults, context);
         } catch (BeansException ex) {
+            LogUtils.log(LOG, Level.WARNING, "INITIAL_APP_CONTEXT_CREATION_FAILED_MSG", ex, (Object[])null);
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             if (contextLoader != BusApplicationContext.class.getClassLoader()) {
                 Thread.currentThread().setContextClassLoader(
