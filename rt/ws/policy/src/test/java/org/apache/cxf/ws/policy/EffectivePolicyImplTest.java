@@ -91,7 +91,7 @@ public class EffectivePolicyImplTest extends Assert {
         effectivePolicy.initialiseInterceptors(pe, false);
         EasyMock.expectLastCall();
         control.replay();
-        effectivePolicy.initialise(endpointPolicy, pe);
+        effectivePolicy.initialise(endpointPolicy, pe, false);
         control.verify();    
     }
     

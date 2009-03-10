@@ -27,6 +27,9 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class ProtectionToken extends TokenWrapper {
 
+    public ProtectionToken() {
+        super(SP12Constants.INSTANCE);
+    }
     public ProtectionToken(SPConstants version) {
         super(version);
     }

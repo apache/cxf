@@ -38,9 +38,13 @@ public class SecureConversationToken extends SecurityContextToken {
 
     private Element issuerEpr;
 
+    public SecureConversationToken() {
+        super(SP12Constants.INSTANCE);
+    }
     public SecureConversationToken(SPConstants version) {
         super(version);
     }
+
 
     /**
      * @return Returns the bootstrapPolicy.

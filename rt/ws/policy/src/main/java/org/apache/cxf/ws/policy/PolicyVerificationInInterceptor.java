@@ -84,11 +84,13 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
         
         getTransportAssertions(message);  
         
-        EffectivePolicy effectivePolicy = null;
-        if (MessageUtils.isRequestor(message)) {
-            effectivePolicy = pe.getEffectiveClientResponsePolicy(ei, boi);
-        } else {
-            effectivePolicy = pe.getEffectiveServerRequestPolicy(ei, boi);
+        EffectivePolicy effectivePolicy = message.get(EffectivePolicy.class);
+        if (effectivePolicy == null) {
+            if (MessageUtils.isRequestor(message)) {
+                effectivePolicy = pe.getEffectiveClientResponsePolicy(ei, boi);
+            } else {
+                effectivePolicy = pe.getEffectiveServerRequestPolicy(ei, boi);
+            }
         }
                 
         aim.checkEffectivePolicy(effectivePolicy.getPolicy());

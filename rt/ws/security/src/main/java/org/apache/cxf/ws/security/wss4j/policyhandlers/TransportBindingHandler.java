@@ -27,16 +27,13 @@ import javax.xml.soap.SOAPMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.ibm.wsdl.util.xml.DOMUtils;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
@@ -193,38 +190,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             }
                         }
                     }
-                }
-                SecurityToken token = (SecurityToken)message
-                    .getContextualProperty(SecurityConstants.STS_TOKEN_CONTEXT_TOKEN);
-                if (token != null) {
-                    SupportingToken endSuppTokens 
-                        = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING,
-                                                            SP12Constants.INSTANCE);
-                    SignedEncryptedParts signedParts = new SignedEncryptedParts(true, 
-                                                                                SP12Constants.INSTANCE);
-                    signedParts.setBody(true);
-                    endSuppTokens.setSignedParts(signedParts);
-                    //need to endorse everything
-                    Element el = DOMUtils.getFirstChildElement(saaj.getSOAPHeader());
-                    while (el != null) {
-                        if (el != this.secHeader.getSecurityHeader()) {
-                            signedParts.addHeader(new Header(el.getLocalName(),
-                                                             el.getNamespaceURI()));
-                        }
-                        el = DOMUtils.getNextSiblingElement(el);
-                    }
-                    el = DOMUtils.getFirstChildElement(secHeader.getSecurityHeader());
-                    while (el != null) {
-                        if (timestamp != null && el != timestamp.getElement()) {
-                            signedParts.addHeader(new Header(el.getLocalName(),
-                                                             el.getNamespaceURI()));
-                        }
-                        el = DOMUtils.getNextSiblingElement(el);
-                    }
-                    addSig(signatureValues, doIssuedTokenSignature(new IssuedToken(SP12Constants.INSTANCE), 
-                                                                   endSuppTokens.getSignedParts(), 
-                                                                   endSuppTokens,
-                                                                   token));
                 }
                 ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
                 if (ais != null) {

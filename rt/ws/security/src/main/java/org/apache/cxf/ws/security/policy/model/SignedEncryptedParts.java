@@ -45,6 +45,10 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
         super(version);
         this.signedParts = signedParts;
     }
+    public SignedEncryptedParts(boolean signedParts) {
+        super(SP12Constants.INSTANCE);
+        this.signedParts = signedParts;
+    }
 
     /**
      * @return Returns the body.

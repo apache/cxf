@@ -64,6 +64,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     public EndpointPolicyImpl() {
         
     }
+    public EndpointPolicyImpl(Policy p) {
+        policy = p;
+    }
     
     public EndpointPolicyImpl(EndpointInfo ei,
                               PolicyEngineImpl engine, 

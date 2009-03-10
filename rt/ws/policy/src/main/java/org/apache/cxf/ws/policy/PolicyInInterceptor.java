@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.neethi.Policy;
 
 /**
  * 
@@ -65,8 +66,28 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
         }
         
         if (MessageUtils.isRequestor(msg)) {
+            
             BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
-            if (boi == null) {
+            Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
+            if (p != null) {
+                EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
+                EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
+                effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true);
+                msg.put(EffectivePolicy.class, effectivePolicy);
+                PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
+                                      effectivePolicy.getPolicy());
+                
+                List<Interceptor> interceptors = effectivePolicy.getInterceptors();
+                for (Interceptor i : interceptors) {            
+                    msg.getInterceptorChain().add(i);
+                    LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+                }
+                Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
+                if (null != assertions && !assertions.isEmpty()) {
+                    msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
+                    msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
+                }
+            } else if (boi == null) {
                 Conduit conduit = exchange.getConduit(msg);
             
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);

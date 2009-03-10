@@ -36,6 +36,9 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
     private SignatureToken signatureToken;
     private ProtectionToken protectionToken;
 
+    public SymmetricBinding() {
+        super(SP12Constants.INSTANCE);
+    }
     public SymmetricBinding(SPConstants version) {
         super(version);
     }

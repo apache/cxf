@@ -58,7 +58,9 @@ public final class PolicyConstants {
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String WSU_ID_ATTR_NAME = "Id";
 
-    
+    public static final String POLICY_OVERRIDE 
+        = "org.apache.cxf.ws.policy.override";
+        
     public static final String POLICY_IN_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.PolicyInInterceptor";
     public static final String POLICY_OUT_INTERCEPTOR_ID

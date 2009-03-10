@@ -79,6 +79,12 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
 
 
 
+    public AlgorithmSuite() {
+        super(SP12Constants.INSTANCE);
+    }
+
+
+
     /**
      * @return Returns the asymmetricKeyWrap.
      */

@@ -69,10 +69,13 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     }
     
     
-    void initialise(EndpointPolicyImpl epi, PolicyEngineImpl engine) {
+    void initialise(EndpointPolicyImpl epi, PolicyEngineImpl engine, boolean inbound) {
         policy = epi.getPolicy();
         chosenAlternative = epi.getChosenAlternative();
-        initialiseInterceptors(engine, false);  
+        if (chosenAlternative == null) {
+            chooseAlternative(engine, null);
+        }
+        initialiseInterceptors(engine, inbound);  
     }
     
     void initialise(EndpointInfo ei, 

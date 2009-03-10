@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -72,14 +73,23 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Binding;
+import org.apache.cxf.ws.security.policy.model.Header;
+import org.apache.cxf.ws.security.policy.model.ProtectionToken;
+import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
+import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
+import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
+import org.apache.neethi.All;
+import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.security.WSConstants;
@@ -103,16 +113,16 @@ import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
  */
 public class STSClient implements Configurable {
     private static final Logger LOG = LogUtils.getL7dLogger(STSClient.class);
-    
+
     Bus bus;
     String name = "default.sts-client";
     Client client;
     String location;
-    
+
     String wsdlLocation;
     QName serviceName;
     QName endpointName;
-    
+
     Policy policy;
     String soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
     int keySize = 256;
@@ -121,10 +131,10 @@ public class STSClient implements Configurable {
     AlgorithmSuite algorithmSuite;
     String namespace = STSUtils.WST_NS_05_12;
     String addressingNamespace;
-    
+
     boolean isSecureConv;
     int ttl = 300;
-    
+
     Map<String, Object> ctx = new HashMap<String, Object>();
 
     public STSClient(Bus b) {
@@ -134,12 +144,15 @@ public class STSClient implements Configurable {
     public String getBeanName() {
         return name;
     }
+
     public void setBeanName(String s) {
         name = s;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
+
     public void setPolicy(Policy policy) {
         this.policy = policy;
         if (algorithmSuite == null) {
@@ -154,15 +167,19 @@ public class STSClient implements Configurable {
             }
         }
     }
+
     public void setPolicy(Element policy) {
         setPolicy(bus.getExtension(PolicyBuilder.class).getPolicy(policy));
     }
+
     public void setSoap12() {
         soapVersion = SoapBindingConstants.SOAP12_BINDING_ID;
     }
+
     public void setSoap11() {
         soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
     }
+
     public void setSoap11(boolean b) {
         if (b) {
             setSoap11();
@@ -170,22 +187,25 @@ public class STSClient implements Configurable {
             setSoap12();
         }
     }
+
     public void setAddressingNamespace(String ad) {
         addressingNamespace = ad;
     }
-    
+
     public void setTrust(Trust10 trust) {
         if (trust != null) {
             namespace = STSUtils.WST_NS_05_02;
             requiresEntropy = trust.isRequireClientEntropy();
         }
     }
+
     public void setTrust(Trust13 trust) {
         if (trust != null) {
             namespace = STSUtils.WST_NS_05_12;
             requiresEntropy = trust.isRequireClientEntropy();
         }
     }
+
     public boolean isRequiresEntropy() {
         return requiresEntropy;
     }
@@ -205,38 +225,45 @@ public class STSClient implements Configurable {
     public void setAlgorithmSuite(AlgorithmSuite ag) {
         algorithmSuite = ag;
     }
-    
+
     public Map<String, Object> getRequestContext() {
         return ctx;
     }
+
     public void setProperties(Map<String, Object> p) {
         ctx.putAll(p);
     }
+
     public Map<String, Object> getProperties() {
         return ctx;
     }
-    
+
     public void setWsdlLocation(String wsdl) {
         wsdlLocation = wsdl;
     }
+
     public void setServiceName(QName qn) {
         serviceName = qn;
     }
+
     public void setServiceName(String qn) {
         serviceName = QName.valueOf(qn);
     }
+
     public void setEndpointName(QName qn) {
         endpointName = qn;
     }
+
     public void setEndpointName(String qn) {
         endpointName = QName.valueOf(qn);
     }
+
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
             return;
         }
         bus.getExtension(Configurer.class).configureBean(name, this);
-        
+
         if (wsdlLocation != null) {
             WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlLocation, serviceName);
             SourceDataBinding dataBinding = new SourceDataBinding();
@@ -247,17 +274,13 @@ public class STSClient implements Configurable {
             Endpoint endpoint = new EndpointImpl(bus, service, ei);
             client = new ClientImpl(bus, endpoint);
         } else {
-            Endpoint endpoint = STSUtils.createSTSEndpoint(bus, 
-                                                           namespace,
-                                                           null,
-                                                           location,
-                                                           soapVersion, 
-                                                           policy,
-                                                           endpointName);
-            
+            Endpoint endpoint = STSUtils.createSTSEndpoint(bus, namespace, null, location, soapVersion,
+                                                           policy, endpointName);
+
             client = new ClientImpl(bus, endpoint);
         }
     }
+
     private BindingOperationInfo findOperation(String suffix) {
         BindingInfo bi = client.getEndpoint().getBinding().getBindingInfo();
         for (BindingOperationInfo boi : bi.getOperations()) {
@@ -265,9 +288,8 @@ public class STSClient implements Configurable {
             if (soi != null && soi.getAction() != null && soi.getAction().endsWith(suffix)) {
                 PolicyEngine pe = bus.getExtension(PolicyEngine.class);
                 Conduit conduit = client.getConduit();
-                EffectivePolicy effectivePolicy 
-                    = pe.getEffectiveClientRequestPolicy(client.getEndpoint().getEndpointInfo(),
-                                                         boi, conduit);
+                EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(client.getEndpoint()
+                    .getEndpointInfo(), boi, conduit);
                 setPolicy(effectivePolicy.getPolicy());
                 return boi;
             }
@@ -278,6 +300,7 @@ public class STSClient implements Configurable {
     public SecurityToken requestSecurityToken() throws Exception {
         return requestSecurityToken(null);
     }
+
     public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
         String action = null;
         if (isSecureConv) {
@@ -285,20 +308,17 @@ public class STSClient implements Configurable {
         }
         return requestSecurityToken(appliesTo, action, "/Issue", null);
     }
-    
-    public SecurityToken requestSecurityToken(String appliesTo,
-                                              String action,
-                                              String requestType,
+
+    public SecurityToken requestSecurityToken(String appliesTo, String action, String requestType,
                                               SecurityToken target) throws Exception {
         createClient();
         BindingOperationInfo boi = findOperation("/RST/Issue");
-        
+
         client.getRequestContext().putAll(ctx);
         if (action != null) {
-            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
-                                           action);
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, action);
         }
-        
+
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         boolean wroteKeySize = false;
@@ -316,33 +336,32 @@ public class STSClient implements Configurable {
                 tl = DOMUtils.getNextElement(tl);
             }
         }
-        
 
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + requestType);
-        writer.writeEndElement();        
+        writer.writeEndElement();
         addAppliesTo(writer, appliesTo);
         keyType = writeKeyType(writer, keyType);
-        
+
         byte[] requestorEntropy = null;
         X509Certificate cert = null;
         Crypto crypto = null;
-        
+
         if (keyType.endsWith("SymmetricKey")) {
             if (!wroteKeySize && !isSecureConv) {
                 writer.writeStartElement("wst", "KeySize", namespace);
                 writer.writeCharacters(Integer.toString(keySize));
                 writer.writeEndElement();
             }
-        
+
             if (requiresEntropy) {
                 writer.writeStartElement("wst", "Entropy", namespace);
                 writer.writeStartElement("wst", "BinarySecret", namespace);
                 writer.writeAttribute("Type", namespace + "/Nonce");
-                requestorEntropy =
-                    WSSecurityUtil.generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                requestorEntropy = WSSecurityUtil
+                    .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
                 writer.writeCharacters(Base64.encode(requestorEntropy));
-    
+
                 writer.writeEndElement();
                 writer.writeEndElement();
                 writer.writeStartElement("wst", "ComputedKeyAlgorithm", namespace);
@@ -364,7 +383,7 @@ public class STSClient implements Configurable {
                 RSAKeyValue rsaKeyValue = new RSAKeyValue(writer.getDocument(), key);
                 writer.getCurrentNode().appendChild(rsaKeyValue.getElement());
             }
-            
+
             writer.writeEndElement();
             writer.writeEndElement();
             writer.writeEndElement();
@@ -379,16 +398,16 @@ public class STSClient implements Configurable {
             writer.writeEndElement();
         }
         writer.writeEndElement();
-        
-        Object obj[] = client.invoke(boi,
-                                     new DOMSource(writer.getDocument().getDocumentElement()));
-        
+
+        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+
         SecurityToken token = createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
         if (cert != null) {
             token.setX509Certificate(cert, crypto);
         }
         return token;
     }
+
     public void renewSecurityToken(SecurityToken tok) throws Exception {
         String action = null;
         if (isSecureConv) {
@@ -396,19 +415,64 @@ public class STSClient implements Configurable {
         }
         requestSecurityToken(tok.getIssuerAddress(), action, "/Renew", tok);
     }
+
+    private PrimitiveAssertion getAddressingAssertion() {
+        String ns = "http://schemas.xmlsoap.org/ws/2004/08/addressing/policy";
+        return new PrimitiveAssertion(new QName(ns, "UsingAddressing"));
+    }
     public void cancelSecurityToken(SecurityToken token) throws Exception {
         createClient();
+
+        if (isSecureConv) {
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
+                                           namespace + "/RST/SCT/Cancel");
+        }
+
+        if (addressingNamespace == null) {
+            addressingNamespace = "http://www.w3.org/2005/08/addressing";
+        }
+        Policy cancelPolicy = new Policy();
+        ExactlyOne one = new ExactlyOne();
+        cancelPolicy.addPolicyComponent(one);
+        All all = new All();
+        one.addPolicyComponent(all);
+        SymmetricBinding binding = new SymmetricBinding();
+        all.addAssertion(binding);
+        all.addAssertion(getAddressingAssertion());
+        ProtectionToken ptoken = new ProtectionToken();
+        binding.setProtectionToken(ptoken);
+        binding.setIncludeTimestamp(true);
+        binding.setEntireHeadersAndBodySignatures(true);
+        binding.setTokenProtection(false);
+        AlgorithmSuite suite = new AlgorithmSuite();
+        binding.setAlgorithmSuite(suite);
+        SecureConversationToken sct = new SecureConversationToken();
+        sct.setOptional(true);
+        ptoken.setToken(sct);
         
+        SignedEncryptedParts parts = new SignedEncryptedParts(true);
+        parts.setBody(true);
+        parts.addHeader(new Header("To", addressingNamespace));
+        parts.addHeader(new Header("From", addressingNamespace));
+        parts.addHeader(new Header("FaultTo", addressingNamespace));
+        parts.addHeader(new Header("ReplyTo", addressingNamespace));
+        parts.addHeader(new Header("Action", addressingNamespace));
+        parts.addHeader(new Header("MessageID", addressingNamespace));
+        parts.addHeader(new Header("RelatesTo", addressingNamespace));
+        all.addPolicyComponent(parts);
+        
+
         client.getRequestContext().putAll(ctx);
-        client.getRequestContext().put(SecurityConstants.STS_TOKEN_CONTEXT_TOKEN, token);
+        client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, cancelPolicy);
+        client.getRequestContext().put(SecurityConstants.TOKEN, token);
         BindingOperationInfo boi = findOperation("/RST/Cancel");
-        
+
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + "/Cancel");
         writer.writeEndElement();
-        
+
         writer.writeStartElement("wst", "CancelTarget", namespace);
         Element el = token.getUnattachedReference();
         if (el == null) {
@@ -418,10 +482,13 @@ public class STSClient implements Configurable {
 
         writer.writeEndElement();
         writer.writeEndElement();
-        
-        Object obj[] = client.invoke(boi,
-                                     new DOMSource(writer.getDocument().getDocumentElement()));
-        System.out.println(obj);
+
+        try {
+            client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+            token.setState(SecurityToken.State.CANCELLED);
+        } catch (Exception ex) {
+            LOG.log(Level.WARNING, "Problem cancelling token", ex);
+        }
     }
 
     private String writeKeyType(W3CDOMStreamWriter writer, String keyType) throws XMLStreamException {
@@ -441,6 +508,7 @@ public class STSClient implements Configurable {
         }
         return keyType;
     }
+
     private X509Certificate getCert(Crypto crypto) throws Exception {
         String alias = (String)getProperty(SecurityConstants.STS_TOKEN_USERNAME);
         if (alias == null) {
@@ -457,6 +525,7 @@ public class STSClient implements Configurable {
         }
         return crypto.getCertificates(alias)[0];
     }
+
     private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
         Date creationTime = new Date();
         Date expirationTime = new Date();
@@ -467,12 +536,13 @@ public class STSClient implements Configurable {
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
         writer.writeCharacters(fmt.format(creationTime));
         writer.writeEndElement();
-        
+
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
         writer.writeCharacters(fmt.format(expirationTime));
         writer.writeEndElement();
-        writer.writeEndElement();        
+        writer.writeEndElement();
     }
+
     private void addAppliesTo(XMLStreamWriter writer, String appliesTo) throws XMLStreamException {
         if (appliesTo != null && addressingNamespace != null) {
             writer.writeStartElement("wsp", "AppliesTo", "http://schemas.xmlsoap.org/ws/2004/09/policy");
@@ -485,10 +555,9 @@ public class STSClient implements Configurable {
         }
     }
 
-    private SecurityToken createSecurityToken(Document document, 
-                                              byte[] requestorEntropy) 
+    private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy)
         throws WSSecurityException {
-        
+
         Element el = document.getDocumentElement();
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
@@ -503,7 +572,7 @@ public class STSClient implements Configurable {
         Element rpt = null;
         Element lte = null;
         Element entropy = null;
-        
+
         while (el != null) {
             String ln = el.getLocalName();
             if (namespace.equals(el.getNamespaceURI())) {
@@ -532,63 +601,57 @@ public class STSClient implements Configurable {
         String id = findID(rar, rur, rstDec);
         if (StringUtils.isEmpty(id)) {
             throw new TrustException(new Message("NO_ID", LOG));
-        }        
+        }
         SecurityToken token = new SecurityToken(id, rstDec, lte);
         token.setAttachedReference(rar);
         token.setUnattachedReference(rur);
         token.setIssuerAddress(location);
-        
+
         byte[] secret = null;
 
         if (rpt != null) {
             Element child = DOMUtils.getFirstElement(rpt);
             QName childQname = DOMUtils.getElementQName(child);
             if (childQname.equals(new QName(namespace, "BinarySecret"))) {
-                //First check for the binary secret
+                // First check for the binary secret
                 String b64Secret = DOMUtils.getContent(child);
                 secret = Base64.decode(b64Secret);
             } else if (childQname.equals(new QName(namespace, WSConstants.ENC_KEY_LN))) {
                 try {
 
-
                     EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
 
-                    processor.handleToken(child, null, createCrypto(true),
-                                          createHandler(), null, new Vector(),
-                                          null);
+                    processor.handleToken(child, null, createCrypto(true), createHandler(), null,
+                                          new Vector(), null);
 
                     secret = processor.getDecryptedBytes();
                 } catch (IOException e) {
                     throw new TrustException(new Message("ENCRYPTED_KEY_ERROR", LOG), e);
                 }
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
-                //Handle the computed key
-                Element binSecElem = entropy == null ? null 
-                    : DOMUtils.getFirstElement(entropy);
-                String content = binSecElem == null ? null
-                    : DOMUtils.getContent(binSecElem);
+                // Handle the computed key
+                Element binSecElem = entropy == null ? null : DOMUtils.getFirstElement(entropy);
+                String content = binSecElem == null ? null : DOMUtils.getContent(binSecElem);
                 if (content != null && !StringUtils.isEmpty(content.trim())) {
 
                     byte[] serviceEntr = Base64.decode(content);
 
-                    //Right now we only use PSHA1 as the computed key algo                    
+                    // Right now we only use PSHA1 as the computed key algo
                     P_SHA1 psha1 = new P_SHA1();
 
-                    int length = (keySize > 0) ? keySize
-                                 : algorithmSuite
-                                     .getMaximumSymmetricKeyLength();
+                    int length = (keySize > 0) ? keySize : algorithmSuite.getMaximumSymmetricKeyLength();
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
                     } catch (ConversationException e) {
                         throw new TrustException(new Message("DERIVED_KEY_ERROR", LOG), e);
                     }
                 } else {
-                    //Service entropy missing
+                    // Service entropy missing
                     throw new TrustException(new Message("NO_ENTROPY", LOG));
                 }
             }
         } else if (requestorEntropy != null) {
-            //Use requester entropy as the key
+            // Use requester entropy as the key
             secret = requestorEntropy;
         }
         token.setSecret(secret);
@@ -601,14 +664,13 @@ public class STSClient implements Configurable {
             && "http://www.w3.org/2001/04/xmlenc#".equals(firstElement.getNamespaceURI())) {
             Node parent = firstElement.getParentNode();
             Node prev = firstElement.getPreviousSibling();
-            
-            //encrypted even more.  WCF seems to do this periodically
+
+            // encrypted even more. WCF seems to do this periodically
             EncryptedDataProcessor processor = new EncryptedDataProcessor();
 
-            processor.handleToken(firstElement, null, createCrypto(true),
-                                  createHandler(), null, new Vector(),
-                                  null);
-            
+            processor.handleToken(firstElement, null, createCrypto(true), createHandler(), null,
+                                  new Vector(), null);
+
             if (prev == null) {
                 firstElement = (Element)parent.getFirstChild();
             } else {
@@ -634,8 +696,7 @@ public class STSClient implements Configurable {
     private Object getProperty(String s) {
         Object o = ctx.get(s);
         if (o == null) {
-            o = client.getEndpoint()
-                .getEndpointInfo().getProperty(s);
+            o = client.getEndpoint().getEndpointInfo().getProperty(s);
         }
         if (o == null) {
             o = client.getEndpoint().getEndpointInfo().getBinding().getProperty(s);
@@ -645,16 +706,15 @@ public class STSClient implements Configurable {
         }
         return o;
     }
-    
+
     private Crypto createCrypto(boolean decrypt) throws IOException {
         WSSConfig.getDefaultWSConfig();
         Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO + (decrypt ? ".decrypt" : ""));
         if (crypto != null) {
             return crypto;
         }
-        
-        
-        Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES + (decrypt ? ".decrypt" : "")); 
+
+        Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES + (decrypt ? ".decrypt" : ""));
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
@@ -674,7 +734,7 @@ public class STSClient implements Configurable {
             properties = new Properties();
             properties.load(((URL)o).openStream());
         }
-        
+
         if (properties != null) {
             return CryptoFactory.getInstance(properties);
         }
@@ -694,13 +754,13 @@ public class STSClient implements Configurable {
         }
         if (id == null && rur != null) {
             id = this.getIDFromSTR(rur);
-        } 
+        }
         if (id == null) {
             id = rst.getAttributeNS(WSConstants.WSU_NS, "Id");
         }
         return id;
     }
-   
+
     private String getIDFromSTR(Element el) {
         Element child = DOMUtils.getFirstElement(el);
         if (child == null) {
@@ -713,16 +773,14 @@ public class STSClient implements Configurable {
         } else if (elName.equals(Reference.TOKEN)) {
             return child.getAttribute("URI");
         } else if (elName.equals(new QName(STSUtils.SCT_NS_05_02, "Identifier"))
-            || elName.equals(new QName(STSUtils.SCT_NS_05_12, "Identifier"))) {
+                   || elName.equals(new QName(STSUtils.SCT_NS_05_12, "Identifier"))) {
             return DOMUtils.getContent(child);
         }
-        return null;        
+        return null;
     }
 
     public void setTemplate(Element rstTemplate) {
         template = rstTemplate;
     }
-
-
 
 }
