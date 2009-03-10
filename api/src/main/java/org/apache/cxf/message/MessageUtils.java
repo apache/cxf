@@ -37,7 +37,7 @@ public final class MessageUtils {
      * Determine if message is outbound.
      * 
      * @param message the current Message
-     * @return true iff the message direction is outbound
+     * @return true if the message direction is outbound
      */
     public static boolean isOutbound(Message message) {
         Exchange exchange = message.getExchange();
@@ -49,7 +49,7 @@ public final class MessageUtils {
      * Determine if message is fault.
      * 
      * @param message the current Message
-     * @return true iff the message is a fault
+     * @return true if the message is a fault
      */
     public static boolean isFault(Message message) {
         return message != null
@@ -83,7 +83,7 @@ public final class MessageUtils {
      * Determine if current messaging role is that of requestor.
      * 
      * @param message the current Message
-     * @return true iff the current messaging role is that of requestor
+     * @return true if the current messaging role is that of requestor
      */
     public static boolean isRequestor(Message message) {
         Boolean requestor = (Boolean)message.get(Message.REQUESTOR_ROLE);
@@ -94,7 +94,7 @@ public final class MessageUtils {
      * Determine if the current message is a partial response.
      * 
      * @param message the current message
-     * @return true iff the current messags is a partial response
+     * @return true if the current messags is a partial response
      */
     public static boolean isPartialResponse(Message message) {
         return Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE));
@@ -103,7 +103,7 @@ public final class MessageUtils {
     /**
      * Returns true if a value is either the String "true" (regardless of case)  or Boolean.TRUE.
      * @param value
-     * @return true iff value is either the String "true" or Boolean.TRUE
+     * @return true if value is either the String "true" or Boolean.TRUE
      */
     public static boolean isTrue(Object value) {
         if (value == null) {
