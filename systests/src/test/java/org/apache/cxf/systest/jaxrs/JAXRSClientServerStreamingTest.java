@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -51,7 +53,9 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             p.setEnableStreaming(true);
             sf.setProvider(p);
             sf.setAddress("http://localhost:9080/");
-
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put("org.apache.cxf.serviceloader-context", "true");
+            sf.setProperties(properties);
             sf.create();
 
         }
