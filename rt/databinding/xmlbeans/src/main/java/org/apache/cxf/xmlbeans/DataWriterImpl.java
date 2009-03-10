@@ -47,6 +47,7 @@ import org.apache.xmlbeans.impl.values.XmlObjectBase;
 
 public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
+    private Schema schema;
     
     public DataWriterImpl() {
     }
@@ -67,6 +68,9 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                         try {
                             SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
                             XmlOptions options = new XmlOptions();
+                            if (schema != null) {
+                                options.setValidateOnSet();
+                            }
                             if (!st.isDocumentType()) {
                                 options.setLoadReplaceDocumentElement(null);
                             }
@@ -84,6 +88,9 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
             if (obj != null
                 || !(part.getXmlSchema() instanceof XmlSchemaElement)) {
                 XmlOptions options = new XmlOptions();
+                if (schema != null) {
+                    options.setValidateOnSet();
+                }
                 XMLStreamReader reader;
                 if (obj instanceof XmlObjectBase) {
                     XmlObjectBase source = (XmlObjectBase)obj;
@@ -140,6 +147,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
     public void setProperty(String key, Object value) {
     }
 
-    public void setSchema(Schema s) {
+    public void setSchema(Schema schema) {
+        this.schema = schema;
     }
 }

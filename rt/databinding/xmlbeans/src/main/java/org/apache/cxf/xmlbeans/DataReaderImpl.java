@@ -31,17 +31,20 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
+import org.apache.cxf.databinding.DataReaderValidation2;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 
 
-public class DataReaderImpl implements DataReader<XMLStreamReader> {
+public class DataReaderImpl implements DataReader<XMLStreamReader> , DataReaderValidation2 {
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
+    private XmlSchemaCollection schemas;
     
     public DataReaderImpl() {
     }
@@ -68,13 +71,17 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
         for (Class<?> c : cls) {
             if ("Factory".equals(c.getSimpleName())) {
                 try {
+                    
                     SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
                     XmlOptions options = new XmlOptions();
+                    if (schemas != null) {
+                        options.setValidateOnSet();
+                    }
                     if (st != null && !st.isDocumentType() && !isOutClass) {
                         options.setLoadReplaceDocumentElement(null);
                     }
                     Method meth = c.getMethod("parse", XMLStreamReader.class, XmlOptions.class);
-                    obj = meth.invoke(null, reader, options);
+                    obj = meth.invoke(null, reader, options);                    
                     break;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -136,6 +143,10 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
     }
 
     public void setSchema(Schema s) {
+    }
+
+    public void setSchema(XmlSchemaCollection validationSchemas) {
+        this.schemas = validationSchemas; 
     }
 
 }
