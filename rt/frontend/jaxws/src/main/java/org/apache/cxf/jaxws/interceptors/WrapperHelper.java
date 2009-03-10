@@ -258,12 +258,15 @@ public abstract class WrapperHelper {
                                                       Method jaxbMethods[],
                                                       Field fields[],
                                                       Object objectFactory) {
-        WrapperHelper wh = compileWrapperHelper(wrapperType,
-                                                setMethods,
-                                                getMethods,
-                                                jaxbMethods,
-                                                fields,
-                                                objectFactory);
+        WrapperHelper wh = null;        
+        if (!wrapperType.isInterface()) {
+            wh = compileWrapperHelper(wrapperType,
+                                                    setMethods,
+                                                    getMethods,
+                                                    jaxbMethods,
+                                                    fields,
+                                                    objectFactory);
+        }        
         if (wh == null) {
             wh = new ReflectWrapperHelper(wrapperType,
                                           setMethods,
@@ -286,6 +289,7 @@ public abstract class WrapperHelper {
                                                               jaxbMethods, fields, objectFactory);
         } catch (ClassNotFoundException e) {
             //ASM not found, just use reflection based stuff
+            e.printStackTrace();
         }
         return null;
     }    
@@ -356,7 +360,7 @@ public abstract class WrapperHelper {
                 }
                 return value;
             } catch (Exception ex) {
-                throw new Fault(ex);
+                throw new Fault(ex.getCause());
             }
         }
         
@@ -384,7 +388,7 @@ public abstract class WrapperHelper {
                 
                 return ret;
             } catch (Exception ex) {
-                throw new Fault(ex);
+                throw new Fault(ex.getCause());
             }
         }
     }
