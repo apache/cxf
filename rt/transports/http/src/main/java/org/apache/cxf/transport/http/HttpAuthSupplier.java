@@ -78,6 +78,12 @@ public abstract class HttpAuthSupplier {
         return logicalName;
     }
     
+    /**
+     * If the supplier requires the request to be cached to be resent, return true
+     */
+    public boolean requiresRequestCaching() {
+        return false;
+    }
     
     /**
      * The HTTPConduit makes a call to this method before connecting
