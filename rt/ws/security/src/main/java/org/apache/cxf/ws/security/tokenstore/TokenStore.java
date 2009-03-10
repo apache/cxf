@@ -39,6 +39,11 @@ public interface TokenStore {
     void update(SecurityToken token);
     
     /**
+     * Remove an existing token.
+     */
+    void remove(SecurityToken token);
+    
+    /**
      * Return the list of all token identifiers.
      * @return As array of token identifiers
      */
@@ -76,4 +81,25 @@ public interface TokenStore {
      * @return The requested <code>Token</code> identified by the give id
      */
     SecurityToken getToken(String id);
+    
+    
+    
+    /**
+     * Removes all expired tokens.  
+     */
+    void removeExpiredTokens();
+    
+    /**
+     * Removes all cancelled tokens.
+     */
+    void removeCancelledTokens();
+    
+    /**
+     * Controls whether the store will automatically remove cancelled and expired 
+     * tokens.  If true, calls to getCancelledTokens() and getExpiredTokens() 
+     * will never return value;
+     * @param auto
+     */
+    void setAutoRemoveTokens(boolean auto);
+    
 }

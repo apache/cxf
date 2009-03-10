@@ -124,9 +124,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 
                 Object s = message.getContextualProperty(SecurityConstants.STS_TOKEN_DO_CANCEL);
                 if (s != null && (Boolean.TRUE.equals(s) || "true".equalsIgnoreCase(s.toString()))) {
-                    SecureConversationToken tok = (SecureConversationToken)ais.iterator()
-                        .next().getAssertion();
-                    doCancel(message, aim, tok);
+                    message.getInterceptorChain().add(SecureConversationCancelInterceptor.INSTANCE);
                 }
                 return;
             }
@@ -209,50 +207,6 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
         }
-    }
-    private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok) {
-        Message m2 = message.getExchange().getOutMessage();
-        
-        SecurityToken tok = (SecurityToken)m2.getContextualProperty(SecurityConstants.TOKEN);
-        if (tok == null) {
-            String tokId = (String)m2.getContextualProperty(SecurityConstants.TOKEN_ID);
-            if (tokId != null) {
-                tok = SecureConversationTokenInterceptorProvider
-                    .getTokenStore(m2).getToken(tokId);
-            }
-        }
-
-        STSClient client = SecureConversationTokenInterceptorProvider.getClient(m2);
-        AddressingProperties maps =
-            (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.inbound");
-        if (maps == null) {
-            maps = (AddressingProperties)m2
-                .get("javax.xml.ws.addressing.context");
-        }
-        
-        synchronized (client) {
-            try {
-                SecureConversationTokenInterceptorProvider
-                    .setupClient(client, message, aim, itok, true);
-
-                if (maps != null) {
-                    client.setAddressingNamespace(maps.getNamespaceURI());
-                }
-                client.cancelSecurityToken(tok);
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new Fault(e);
-            } finally {
-                client.setTrust((Trust10)null);
-                client.setTrust((Trust13)null);
-                client.setTemplate(null);
-                client.setLocation(null);
-                client.setAddressingNamespace(null);
-            }
-        }
-
     }
     private void recalcEffectivePolicy(SoapMessage message, 
                                        String namespace,
@@ -530,6 +484,83 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
     }
+    
+    static class SecureConversationCancelInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
+        static final SecureConversationCancelInterceptor INSTANCE = new SecureConversationCancelInterceptor();
+        
+        public SecureConversationCancelInterceptor() {
+            super(Phase.POST_LOGICAL);
+        }
+        
+        public void handleMessage(SoapMessage message) throws Fault {
+            // TODO Auto-generated method stub
+            
+            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+            // extract Assertion information
+            if (aim == null) {
+                return;
+            }
+            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
+            if (ais == null || ais.isEmpty()) {
+                return;
+            }
+            
+            SecureConversationToken tok = (SecureConversationToken)ais.iterator()
+                .next().getAssertion();
+            doCancel(message, aim, tok);
+
+        }
+        private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok) {
+            Message m2 = message.getExchange().getOutMessage();
+            
+            SecurityToken tok = (SecurityToken)m2.getContextualProperty(SecurityConstants.TOKEN);
+            if (tok == null) {
+                String tokId = (String)m2.getContextualProperty(SecurityConstants.TOKEN_ID);
+                if (tokId != null) {
+                    tok = SecureConversationTokenInterceptorProvider
+                        .getTokenStore(m2).getToken(tokId);
+                }
+            }
+
+            STSClient client = SecureConversationTokenInterceptorProvider.getClient(m2);
+            AddressingProperties maps =
+                (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context.inbound");
+            if (maps == null) {
+                maps = (AddressingProperties)m2
+                    .get("javax.xml.ws.addressing.context");
+            }
+            
+            synchronized (client) {
+                try {
+                    SecureConversationTokenInterceptorProvider
+                        .setupClient(client, message, aim, itok, true);
+
+                    if (maps != null) {
+                        client.setAddressingNamespace(maps.getNamespaceURI());
+                    }
+                    
+                    client.cancelSecurityToken(tok);
+                    SecureConversationTokenInterceptorProvider
+                        .getTokenStore(m2).remove(tok);
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new Fault(e);
+                } finally {
+                    client.setTrust((Trust10)null);
+                    client.setTrust((Trust13)null);
+                    client.setTemplate(null);
+                    client.setLocation(null);
+                    client.setAddressingNamespace(null);
+                }
+            }
+
+        }
+
+        
+    }
+    
 
     
 }

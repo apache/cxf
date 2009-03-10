@@ -27,12 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken.State;
 
 /**
  * 
  */
 public class MemoryTokenStore implements TokenStore {
-
+    boolean autoRemove = true;
+    
     Map<String, SecurityToken> tokens = new ConcurrentHashMap<String, SecurityToken>();
     
     /** {@inheritDoc}*/
@@ -44,7 +46,18 @@ public class MemoryTokenStore implements TokenStore {
 
     /** {@inheritDoc}*/
     public void update(SecurityToken token) {
-        add(token);
+        if (autoRemove 
+            && (token.getState() == State.EXPIRED
+                || token.getState() == State.CANCELLED)) {
+            remove(token);
+        } else {
+            add(token);
+        }
+    }
+    public void remove(SecurityToken token) {
+        if (token != null && !StringUtils.isEmpty(token.getId())) {
+            tokens.remove(token.getId());
+        }
     }
 
     public Collection<SecurityToken> getCancelledTokens() {
@@ -57,6 +70,7 @@ public class MemoryTokenStore implements TokenStore {
         return getTokens(SecurityToken.State.RENEWED);
     }
     public Collection<String> getTokenIdentifiers() {
+        processTokenExpiry();        
         return tokens.keySet();
     }
 
@@ -94,14 +108,43 @@ public class MemoryTokenStore implements TokenStore {
     }
 
     protected void processTokenExpiry() {
+        long time = System.currentTimeMillis();
         for (SecurityToken token : tokens.values()) {
-            if (token.getExpires() != null 
-                && token.getExpires().getTimeInMillis() < System.currentTimeMillis()) {
+            if (token.getState() == State.EXPIRED
+                || token.getState() == State.CANCELLED) {
+                if (autoRemove) {
+                    remove(token);
+                }
+            } else if (token.getExpires() != null 
+                && token.getExpires().getTimeInMillis() < time) {
                 token.setState(SecurityToken.State.EXPIRED);
+                if (autoRemove) {
+                    remove(token);
+                }
             }            
         }
     }
-    
 
+
+    public void removeCancelledTokens() {
+        for (SecurityToken token : tokens.values()) {
+            if (token.getState() == State.CANCELLED) {
+                remove(token);
+            }
+        }
+    }
+
+    public void removeExpiredTokens() {
+        processTokenExpiry();
+        for (SecurityToken token : tokens.values()) {
+            if (token.getState() == State.EXPIRED) {
+                remove(token);
+            }
+        }
+    }
+
+    public void setAutoRemoveTokens(boolean auto) {
+        autoRemove = auto;
+    }
     
 }
