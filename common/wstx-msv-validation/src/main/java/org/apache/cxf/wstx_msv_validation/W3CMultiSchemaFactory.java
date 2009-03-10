@@ -23,11 +23,12 @@
 
 package org.apache.cxf.wstx_msv_validation;
 
+import java.util.Map;
+
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
 
 import com.ctc.wstx.msv.BaseSchemaFactory;
 import com.ctc.wstx.msv.W3CSchema;
@@ -37,31 +38,6 @@ import com.sun.msv.reader.xmlschema.XMLSchemaReader;
 
 import org.codehaus.stax2.validation.XMLValidationSchema;
 
-final class MyGrammarController extends com.sun.msv.reader.util.IgnoreController {
-    private String mErrorMsg;
-
-    public MyGrammarController() {
-    }
-
-    // public void warning(Locator[] locs, String errorMessage) { }
-
-    public void error(Locator[] locs, String msg, Exception nestedException) {
-        if (getMErrorMsg() == null) {
-            setMErrorMsg(msg);
-        } else {
-            setMErrorMsg(getMErrorMsg() + "; " + msg);
-        }
-    }
-
-    public void setMErrorMsg(String mErrorMsg) {
-        this.mErrorMsg = mErrorMsg;
-    }
-
-    public String getMErrorMsg() {
-        return mErrorMsg;
-    }
-}
-
 /**
  * 
  */
@@ -70,23 +46,24 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
     private MultiSchemaReader multiSchemaReader;  
     private SAXParserFactory parserFactory;
     private XMLSchemaReader xmlSchemaReader;
-    private MyGrammarController ctrl = new MyGrammarController();
 
     public W3CMultiSchemaFactory() {
-        super(XMLValidationSchema.SCHEMA_ID_RELAXNG);
+        super(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
     }
     
-    public XMLValidationSchema loadSchemas(InputSource[] sources) throws XMLStreamException {
+    public XMLValidationSchema loadSchemas(Map<String, InputSource> sources) throws XMLStreamException {
         parserFactory = getSaxFactory();
+        
+        ResolvingGrammarReaderController ctrl = new ResolvingGrammarReaderController(sources);
         xmlSchemaReader = new XMLSchemaReader(ctrl, parserFactory);
         multiSchemaReader = new MultiSchemaReader(xmlSchemaReader);
-        for (InputSource source : sources) {
+        for (InputSource source : sources.values()) {
             multiSchemaReader.parse(source);
         }
         
         XMLSchemaGrammar grammar = multiSchemaReader.getResult();
         if (grammar == null) {
-            throw new XMLStreamException("Failed to load schemas: " + ctrl.getMErrorMsg());
+            throw new XMLStreamException("Failed to load schemas");
         }
         return new W3CSchema(grammar); 
     }

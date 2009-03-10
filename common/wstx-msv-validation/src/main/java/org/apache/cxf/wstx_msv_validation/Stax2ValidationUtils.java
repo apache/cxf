@@ -22,8 +22,9 @@ package org.apache.cxf.wstx_msv_validation;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -35,10 +36,13 @@ import org.w3c.dom.Document;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
 import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
+import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.codehaus.stax2.validation.XMLValidationSchema;
 
@@ -47,11 +51,21 @@ import org.codehaus.stax2.validation.XMLValidationSchema;
  * fallback.
  */
 class Stax2ValidationUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(Stax2ValidationUtils.class);
+    
+    public Stax2ValidationUtils() {
+        throw new RuntimeException("Not ready");
+    }
     
     /** {@inheritDoc}
      * @throws XMLStreamException */
     public void setupValidation(XMLStreamReader reader, 
                                 XmlSchemaCollection schemas) throws XMLStreamException {
+        // Gosh, this is bad, but I don't know a better solution, unless we're willing 
+        // to require the stax2 API no matter what.
+        if (reader instanceof DepthXMLStreamReader) {
+            reader = ((DepthXMLStreamReader)reader).getReader();
+        }
         XMLStreamReader2 reader2 = (XMLStreamReader2)reader;
         XMLValidationSchema vs = getValidator(schemas);
         reader2.validateAgainst(vs);
@@ -77,9 +91,16 @@ class Stax2ValidationUtils {
      * @throws XMLStreamException
      */
     private XMLValidationSchema getValidator(XmlSchemaCollection schemas) throws XMLStreamException {
-        List<InputSource> sources = new ArrayList<InputSource>();
+        Map<String, InputSource> sources = new TreeMap<String, InputSource>();
         XmlSchemaSerializer serializer = new XmlSchemaSerializer();
+        NamespaceMap namespaceContext = new NamespaceMap();
         for (XmlSchema sch : schemas.getXmlSchemas()) {
+            String uri = sch.getTargetNamespace();
+            LOG.info(uri);
+
+            if (sch.getNamespaceContext() == null) {
+                sch.setNamespaceContext(namespaceContext);
+            }
             Document[] serialized;
             try {
                 serialized = serializer.serializeSchema(sch, false);
@@ -89,13 +110,17 @@ class Stax2ValidationUtils {
             DOMSource domSource = new DOMSource(serialized[0]);
             Reader schemaReader = getSchemaAsStream(domSource);
             InputSource inputSource = new InputSource(schemaReader);
-            inputSource.setSystemId(sch.getSourceURI());
-            sources.add(inputSource);
+            String schemaSystemId = sch.getSourceURI();
+            if (null == schemaSystemId) {
+                schemaSystemId = sch.getTargetNamespace();
+            }
+            inputSource.setSystemId(schemaSystemId);
+            sources.put(schemaSystemId, inputSource);
         }
         
         W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
         XMLValidationSchema vs;
-        vs = factory.loadSchemas(sources.toArray(new InputSource[sources.size()]));
+        vs = factory.loadSchemas(sources);
         return vs;
     }
 

@@ -21,7 +21,6 @@
                    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
  <soap-env:Body xmlns:jns0='urn:Array' >
   <jns0:submitW3CArray>
-   <jns0:whoops/>
    <jns0:before>before items</jns0:before>
    <jns0:anything>
        <jns0:anyType><walrus xmlns='uri:iam'>tusks</walrus></jns0:anyType>

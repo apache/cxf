@@ -35,6 +35,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.DOMUtils;
@@ -61,6 +62,9 @@ public abstract class AbstractDataBinding implements DataBinding {
     private boolean hackAroundEmptyNamespaceIssue;
     
     protected Bus getBus() {
+        if (bus == null) {
+            return BusFactory.getDefaultBus();
+        }
         return bus;
     }
     

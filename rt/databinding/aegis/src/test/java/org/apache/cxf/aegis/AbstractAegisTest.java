@@ -106,6 +106,9 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         extension.registerConduitInitiator(SoapBindingConstants.SOAP11_BINDING_ID, localTransport);
 
         bus.setExtension(new WSDLManagerImpl(), WSDLManager.class);
+        //WoodstoxValidationImpl wstxVal = new WoodstoxValidationImpl();
+        
+        
 
         addNamespace("wsdl", SOAPConstants.WSDL11_NS);
         addNamespace("wsdlsoap", SOAPConstants.WSDL11_SOAP_NS);
@@ -210,6 +213,8 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
                 context.setEnableJDOMMappings(true);
             }
             binding = new AegisDatabinding();
+            // perhaps the data binding needs to do this for itself?
+            binding.setBus(BusFactory.getDefaultBus());
             if (enableJDOM) { // this preserves pre-2.1 behavior.
                 binding.setAegisContext(context);
             }
