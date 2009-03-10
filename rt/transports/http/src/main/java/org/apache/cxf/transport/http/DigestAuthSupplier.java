@@ -50,6 +50,15 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
     }
 
     Map<URL, DigestInfo> authInfo = new ConcurrentHashMap<URL, DigestInfo>(); 
+
+    /**
+     * {@inheritDoc}
+     * With digest, the nonce could expire and thus a rechallenge will be issued.
+     * Thus, we need requests cached to be able to handle that
+     */
+    public boolean requiresRequestCaching() {
+        return true;
+    }
     
     @Override
     public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL,
@@ -105,20 +114,16 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
     }
 
     private String getPassword(HTTPConduit conduit, Message message) {
-        AuthorizationPolicy policy 
-            = (AuthorizationPolicy)message.getContextualProperty(AuthorizationPolicy.class.getName());
-        if (policy == null) {
-            policy = conduit.getAuthorization();
-        }
-        if (policy != null
-            && (!policy.isSetAuthorizationType()
-                || "Digest".equals(policy.getAuthorizationType()))) {
-            return policy.getUserName();            
-        }
-        return null;
+        AuthorizationPolicy policy = getPolicy(conduit, message);
+        return policy != null ? policy.getPassword() : null;
     }
 
     private String getUsername(HTTPConduit conduit, Message message) {
+        AuthorizationPolicy policy = getPolicy(conduit, message);
+        return policy != null ? policy.getUserName() : null;
+    }
+
+    private AuthorizationPolicy getPolicy(HTTPConduit conduit, Message message) {
         AuthorizationPolicy policy 
             = (AuthorizationPolicy)message.getContextualProperty(AuthorizationPolicy.class.getName());
         if (policy == null) {
@@ -127,12 +132,11 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         if (policy != null
             && (!policy.isSetAuthorizationType()
                 || "Digest".equals(policy.getAuthorizationType()))) {
-            return policy.getPassword();            
+            return policy;
         }
         return null;
     }
 
-    
     class DigestInfo {
         String qop;
         String realm;
@@ -183,12 +187,17 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                 serverDigestValue = encode(digester.digest(serverDigestValue.getBytes("US-ASCII")));
                 StringBuilder builder = new StringBuilder("Digest ");
                 if (qop != null) {
-                    builder.append("qop=auth, ");
+                    builder.append("qop=\"auth\", ");
                 }  
                 builder.append("realm=\"")
-                    .append(realm).append("\", opaque=\"")
-                    .append(opaque)
-                    .append("\", nonce=\"")
+                    .append(realm);
+
+                if (opaque != null) {
+                    builder.append("\", opaque=\"")
+                        .append(opaque);
+                }
+
+                builder.append("\", nonce=\"")
                     .append(nonce)
                     .append("\", uri=\"")
                     .append(uri)

@@ -531,18 +531,18 @@ public class HTTPConduit
         if (authSupplier != null) {
             String auth = authSupplier.getPreemptiveAuthorization(
                     this, currentURL, message);
-            if (auth == null) {
+            if (auth == null || authSupplier.requiresRequestCaching()) {
                 needToCacheRequest = true;
                 isChunking = false;
-                LOG.log(Level.INFO,
-                        "Auth Supplier, but no Premeptive User Pass." 
+                LOG.log(Level.FINE,
+                        "Auth Supplier, but no Premeptive User Pass or Digest auth (nonce may be stale)"
                         + " We must cache request.");
             }
             message.put("AUTH_VALUE", auth);
         }
         if (getClient().isAutoRedirect()) {
             needToCacheRequest = true;
-            LOG.log(Level.INFO, "AutoRedirect is turned on.");
+            LOG.log(Level.FINE, "AutoRedirect is turned on.");
         }
         if (!connection.getRequestMethod().equals("GET")
             && getClient().isAllowChunking()) {
@@ -654,8 +654,8 @@ public class HTTPConduit
             } catch (UntrustedURLConnectionIOException untrustedEx) {
                 // This cast covers HttpsURLConnection as well.
                 ((HttpURLConnection)connection).disconnect();
-                if (LOG.isLoggable(Level.INFO)) {
-                    LOG.log(Level.INFO, "Trust Decider "
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Trust Decider "
                         + trustDecider.getLogicalName()
                         + " considers Conduit "
                         + getConduitName() 
@@ -954,7 +954,7 @@ public class HTTPConduit
     
     private synchronized void releaseDecoupledDestination() {
         if (--decoupledDestinationRefCount == 0) {
-            LOG.log(Level.INFO, "shutting down decoupled destination");
+            LOG.log(Level.FINE, "shutting down decoupled destination");
             decoupledDestination.shutdown();
 
             //this way we can release the port of decoupled destination
@@ -1108,8 +1108,8 @@ public class HTTPConduit
             if (authString != null) {
                 headers.put("Authorization",
                             createMutableList(authString));
-                return;
             }
+            return;
         }
         String userName = null;
         String passwd = null;
@@ -2168,5 +2168,3 @@ public class HTTPConduit
     }
     
 }
-
-

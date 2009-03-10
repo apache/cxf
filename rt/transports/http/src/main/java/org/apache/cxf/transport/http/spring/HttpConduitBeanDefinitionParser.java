@@ -85,6 +85,8 @@ public class HttpConduitBeanDefinitionParser
             // Schema should require that no more than one each of these exist.
             if ("trustDecider".equals(elementName)) {                
                 mapBeanOrClassElement((Element)n, bean, MessageTrustDecider.class);
+            } else if ("authSupplier".equals(elementName)) {
+                mapBeanOrClassElement((Element)n, bean, HttpAuthSupplier.class);
             } else if ("basicAuthSupplier".equals(elementName)) {
                 mapBeanOrClassElement((Element)n, bean, HttpAuthSupplier.class);
             } else if ("tlsClientParameters".equals(elementName)) {
