@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -143,7 +145,9 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                 resources.add(cpr);
             } else {
                 if (!usingDefault) {
-                    LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_NOT_FOUND_MSG", cfgFile);
+                    LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_NOT_LOADED", cfgFile);
+                    String message = (new Message("USER_CFG_FILE_NOT_LOADED", LOG, cfgFile)).toString();
+                    throw new ApplicationContextException(message);
                 } else {
                     LogUtils.log(LOG, Level.INFO, "USER_CFG_FILE_NOT_SPECIFIED_MSG", cfgFile);
                 }

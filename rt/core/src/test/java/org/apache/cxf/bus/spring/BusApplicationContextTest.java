@@ -22,16 +22,23 @@ package org.apache.cxf.bus.spring;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.beans.BeansException;
+
 public class BusApplicationContextTest extends Assert {
        
     @Test
     public void testGetResources() {
-        BusApplicationContext ctx = new BusApplicationContext("nowhere.xml", false);
-        assertNull("Unexpected number of resources", ctx.getConfigResources());
+        BusApplicationContext ctx = null;
+
+        try { 
+            ctx = new BusApplicationContext("nowhere.xml", false);
+            fail("Bus creation should have thrown exception.");
+        } catch (BeansException bex) {
+            //Expected
+        }
+
         String cfgFile = "/org/apache/cxf/bus/spring/resources/bus-overwrite.xml";
         ctx = new BusApplicationContext(cfgFile, false);
-        assertEquals("Unexpected number of resources", 1, ctx.getConfigResources().length);
-        ctx = new BusApplicationContext("nowhere.xml", true);
         assertEquals("Unexpected number of resources", 1, ctx.getConfigResources().length);
         ctx = new BusApplicationContext(cfgFile, true);
         assertEquals("Unexpected number of resources", 2, ctx.getConfigResources().length);
