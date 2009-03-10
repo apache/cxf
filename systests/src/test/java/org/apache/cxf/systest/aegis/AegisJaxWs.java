@@ -21,7 +21,6 @@ package org.apache.cxf.systest.aegis;
 
 import java.util.Map;
 
-import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -34,7 +33,6 @@ import org.apache.cxf.systest.aegis.bean.Item;
 @WebService(name = "AegisJaxWs")
 public interface AegisJaxWs {
     @WebMethod
-    @Oneway
     void addItem(@WebParam(name = "item")
                  Item item);
 
