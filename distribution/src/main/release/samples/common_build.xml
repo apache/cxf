@@ -193,6 +193,7 @@
         <attribute name="file"/>
         <attribute name="servicename.arg" default=""/>
         <attribute name="bindingfile" default=""/>
+        <attribute name="databinding" default=""/>
         <attribute name="dir" default="${wsdl.dir}"/>
         <attribute name="package" default="NOT_SPECIFIED"/>
         <sequential>
@@ -210,6 +211,12 @@
                 </not>
             </condition>
             <property name="binding.arg" value=""/>
+            <condition property="databinding.arg" value='-db "@{databinding}"'>
+                <not>
+                    <equals arg1="@{databinding}" arg2=""/>
+                </not>
+            </condition>
+            <property name="databinding.arg" value=""/>
             <java failonerror="true" classname="org.apache.cxf.tools.wsdlto.WSDLToJava" fork="yes">
                 <classpath>
                     <path refid="cxf.classpath" />
@@ -218,7 +225,8 @@
                 <sysproperty key="exitOnFinish" value="true"/>
                 <arg line="@{servicename.arg}"/>
                 <arg line="${package.arg.@{file}}"/>
-                <arg line="${binding.arg}"/>
+                <arg line="${databinding.arg}"/>
+                <arg line="${binding.arg}"/>                
                 <arg value="-verbose"/>
                 <arg value="-d"/>
                 <arg value="@{srcdestdir}"/>
