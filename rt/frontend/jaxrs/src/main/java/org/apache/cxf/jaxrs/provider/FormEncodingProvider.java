@@ -44,7 +44,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Produces("application/x-www-form-urlencoded")
@@ -150,7 +150,8 @@ public class FormEncodingProvider implements
             for (String value : entry.getValue()) {
                 os.write(entry.getKey().getBytes("UTF-8"));
                 os.write('=');
-                os.write(JAXRSUtils.encode(encoded, value).getBytes("UTF-8"));
+                String data = encoded ? value : HttpUtils.urlEncode(value); 
+                os.write(data.getBytes("UTF-8"));
                 if (it.hasNext()) {
                     os.write('&');
                 }

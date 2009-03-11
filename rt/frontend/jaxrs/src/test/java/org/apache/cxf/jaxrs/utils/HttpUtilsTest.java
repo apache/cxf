@@ -31,6 +31,31 @@ import org.junit.Test;
 public class HttpUtilsTest extends Assert {
 
     @Test
+    public void testUrlDecode() {
+        assertEquals("+ ", HttpUtils.urlDecode("%2B+"));
+    }
+    
+    @Test
+    public void testUrlEncode() {
+        assertEquals("%2B+", HttpUtils.urlEncode("+ "));
+    }
+     
+    @Test
+    public void testPathEncode() {
+        assertEquals("%2B%20", HttpUtils.pathEncode("+ "));
+    }
+    
+    @Test
+    public void testUrlDecodeReserved() {
+        assertEquals("!$&'()*,;=", HttpUtils.urlDecode("!$&'()*,;="));
+    }
+    
+    @Test
+    public void testPathDecode() {
+        assertEquals("+++", HttpUtils.pathDecode("+%2B+"));
+    }
+    
+    @Test
     public void testPathToMatch() {
         assertEquals("/", HttpUtils.getPathToMatch("/", "/", true));
         assertEquals("/", HttpUtils.getPathToMatch("/", "/bar", true));

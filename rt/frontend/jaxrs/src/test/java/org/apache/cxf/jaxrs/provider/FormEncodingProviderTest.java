@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -121,7 +121,7 @@ public class FormEncodingProviderTest extends Assert {
         assertEquals(1,  mvMap.get("baz").size());
         assertEquals("Wrong entry for foo", "1 2", mvMap.getFirst("foo"));
         assertEquals("Wrong entry line for bar", 
-            JAXRSUtils.uriDecode("line1%0D%0Aline+2"), mvMap.get("bar").get(0));
+            HttpUtils.urlDecode("line1%0D%0Aline+2"), mvMap.get("bar").get(0));
         assertEquals("Wrong entry for baz", "4", mvMap.getFirst("baz"));
 
     }

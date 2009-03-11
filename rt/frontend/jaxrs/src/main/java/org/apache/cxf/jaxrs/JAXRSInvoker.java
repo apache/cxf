@@ -116,9 +116,10 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
 
         Object result = null;
-        ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader contextLoader = null;
         try {
             if (setServiceLoaderAsContextLoader(exchange.getInMessage())) {
+                contextLoader = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(resourceObject.getClass().getClassLoader());
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
@@ -137,7 +138,9 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             return new MessageContentsList(excResponse);
         } finally {
-            Thread.currentThread().setContextClassLoader(contextLoader);
+            if (contextLoader != null) {
+                Thread.currentThread().setContextClassLoader(contextLoader);
+            }
         }
 
         if (ori.isSubResourceLocator()) {

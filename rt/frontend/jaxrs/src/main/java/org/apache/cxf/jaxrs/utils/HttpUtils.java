@@ -19,9 +19,11 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Destination;
@@ -39,11 +42,41 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.servlet.ServletDestination;
 
 public final class HttpUtils {
+    
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
     private static final String LOCAL_HOST = "localhost";
     
     
     private HttpUtils() {
+    }
+    
+    public static String urlDecode(String value) {
+        return UrlUtils.urlDecode(value);
+    }
+    
+    public static String pathDecode(String value) {
+        return UrlUtils.pathDecode(value);
+    }
+    
+    public static String urlEncode(String value) {
+            
+        try {
+            value = URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            // unlikely to happen
+        }
+        
+        return value;
+    }
+    
+    public static String pathEncode(String value) {
+        
+        String result = urlEncode(value);
+        // URLEncoder will encode '+' to %2B but will turn ' ' into '+'
+        if (result.indexOf('+') != -1) {
+            result = result.replace("+", "%20");
+        }
+        return result;
     }
     
     public static SimpleDateFormat getHttpDateFormat() {

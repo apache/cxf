@@ -21,7 +21,6 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -39,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -277,15 +277,16 @@ public class ServletController {
         //fix for CXF-898
         if (!"/".equals(pathInfo) || reqPrefix.endsWith("/")) {
             // needs to be done given that pathInfo is decoded
-            // TODO :
-            // it's unlikely servlet path will contain encoded values so we're most likely safe
-            // however we need to ensure if it happens then thsi code works propely too
-            try {
-                reqPrefix = URLDecoder.decode(reqPrefix, "UTF-8");
-            } catch (Exception ex) {
-                // unlikey to happen
+            // TODO : it's unlikely servlet path will contain encoded values so we're most 
+            // likely safe however we need to ensure if it happens then this code works properly too
+            reqPrefix = UrlUtils.pathDecode(reqPrefix);
+            // pathInfo drops matrix parameters attached to a last path segment
+            int offset = 0;
+            int index = reqPrefix.lastIndexOf(';');
+            if (index >= pathInfo.length()) {
+                offset = reqPrefix.length() - index;
             }
-            reqPrefix = reqPrefix.substring(0, reqPrefix.length() - pathInfo.length());
+            reqPrefix = reqPrefix.substring(0, reqPrefix.length() - pathInfo.length() - offset);
         }
         return reqPrefix;
     }

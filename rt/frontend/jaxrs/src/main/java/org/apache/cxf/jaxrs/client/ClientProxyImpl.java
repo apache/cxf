@@ -53,8 +53,8 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
@@ -115,7 +115,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         handleMatrixes(types, params, builder);
         handleQueries(types, params, builder);
         
-        URI uri = builder.build(pathParams.toArray()).normalize();
+        URI uri = builder.buildFromEncoded(pathParams.toArray()).normalize();
         
         MultivaluedMap<String, String> headers = getHeaders();
         MultivaluedMap<String, String> paramHeaders = new MetadataMap<String, String>();
@@ -251,7 +251,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> indexList =  getParameters(map, key);
         List<Object> list = new ArrayList<Object>(indexList.size());
         for (Parameter p : indexList) {
-            list.add(JAXRSUtils.encode(p.isEncoded(), params[p.getIndex()].toString()));
+            list.add(encode(p, params[p.getIndex()].toString()));
         }
         return list;
     }
@@ -268,8 +268,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> qs = getParameters(map, ParameterType.QUERY);
         for (Parameter p : qs) {
             if (params[p.getIndex()] != null) {
-                ub.queryParam(p.getValue(), 
-                               JAXRSUtils.encode(p.isEncoded(), params[p.getIndex()].toString()));
+                ub.queryParam(p.getValue(), encode(p, params[p.getIndex()].toString()));
             }
         }
     }
@@ -279,8 +278,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> mx = getParameters(map, ParameterType.MATRIX);
         for (Parameter p : mx) {
             if (params[p.getIndex()] != null) {
-                ub.matrixParam(p.getValue(), 
-                                JAXRSUtils.encode(p.isEncoded(), params[p.getIndex()].toString()));
+                ub.matrixParam(p.getValue(), encode(p, params[p.getIndex()].toString()));
             }
         }
     }
@@ -363,6 +361,17 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         return p;
         
+    }
+    
+    private static String encode(Parameter p, String value) {
+        if (p.isEncoded()) {
+            return value;
+        }
+        if (p.getType() == ParameterType.PATH || p.getType() == ParameterType.MATRIX) {
+            return HttpUtils.pathEncode(value);
+        } else {
+            return HttpUtils.urlEncode(value); 
+        }
     }
     
     private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
@@ -489,5 +498,6 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         
     }
+
     
 }

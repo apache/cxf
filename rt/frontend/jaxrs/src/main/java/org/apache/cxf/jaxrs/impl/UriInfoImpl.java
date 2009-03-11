@@ -122,7 +122,7 @@ public class UriInfoImpl implements UriInfo {
             if (entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
                 continue;
             }
-            values.add(entry.getKey(), decode ? JAXRSUtils.uriDecode(entry.getValue().get(0)) : entry
+            values.add(entry.getKey(), decode ? HttpUtils.pathDecode(entry.getValue().get(0)) : entry
                 .getValue().get(0));
         }
         return values;
@@ -159,7 +159,7 @@ public class UriInfoImpl implements UriInfo {
                 for (Path p : paths) {
                     if (p != null) {
                         String v = p.value();
-                        sum += "/" + (decode ? JAXRSUtils.uriDecode(v) : v);
+                        sum += "/" + (decode ? HttpUtils.pathDecode(v) : v);
                     }
                 }
                 UriBuilder ub = UriBuilder.fromPath(sum);
@@ -174,7 +174,7 @@ public class UriInfoImpl implements UriInfo {
 
     private String doGetPath(boolean decode, boolean addSlash) {
         String path = HttpUtils.getPathToMatch(message, addSlash);
-        return decode ? JAXRSUtils.uriDecode(path) : path;
+        return decode ? HttpUtils.pathDecode(path) : path;
     }
 
     private String getAbsolutePathAsString() {

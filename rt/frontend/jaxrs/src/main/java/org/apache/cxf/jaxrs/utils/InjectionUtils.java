@@ -310,10 +310,9 @@ public final class InjectionUtils {
         values = checkPathSegment(values, realType, pathParam);
         List theValues = new ArrayList();
         for (String r : values) {
-            if (decoded) {
-                r = JAXRSUtils.uriDecode(r);
-            }
-            Object o = InjectionUtils.handleParameter(r, realType, pathParam, basePath);
+            String value = decodeValue(r, decoded, pathParam);
+            
+            Object o = InjectionUtils.handleParameter(value, realType, pathParam, basePath);
             if (o != null) {
                 theValues.add(o);
             }
@@ -334,10 +333,8 @@ public final class InjectionUtils {
         
         Set theValues = sorted ? new TreeSet() : new HashSet();
         for (String r : values) {
-            if (decoded) {
-                r = JAXRSUtils.uriDecode(r);
-            }
-            Object o = InjectionUtils.handleParameter(r, realType, pathParam, basePath);
+            String value = decodeValue(r, decoded, pathParam);
+            Object o = InjectionUtils.handleParameter(value, realType, pathParam, basePath);
             if (o != null) {
                 theValues.add(o);
             }
@@ -403,9 +400,7 @@ public final class InjectionUtils {
                                 : paramValues.get(0);
             }
             if (result != null) {
-                if (decoded) {
-                    result = JAXRSUtils.uriDecode(result);
-                }
+                result = decodeValue(result, decoded, pathParam);
                 return InjectionUtils.handleParameter(result, paramType, pathParam, basePath);
             } else {
                 return null;
@@ -527,5 +522,16 @@ public final class InjectionUtils {
             || Number.class.isAssignableFrom(type)
             || Boolean.class.isAssignableFrom(type)
             || String.class == type;
+    }
+    
+    private static String decodeValue(String value, boolean decode, ParameterType param) {
+        if (!decode) {
+            return value;
+        }
+        if (param == ParameterType.PATH || param == ParameterType.MATRIX) {
+            return HttpUtils.pathDecode(value);
+        } else {
+            return HttpUtils.urlDecode(value);
+        }
     }
 }

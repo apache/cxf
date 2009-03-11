@@ -136,8 +136,9 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testBuildValuesPctEncoded() throws Exception {
         URI uri = new URI("http://zzz");
-        URI newUri = new UriBuilderImpl(uri).path("/{a}/{b}").buildFromEncoded("foo%25", "bar%");
-        assertEquals("URI is not built correctly", new URI("http://zzz/foo%25/bar%25"), newUri);
+        URI newUri = new UriBuilderImpl(uri).path("/{a}/{b}/{c}")
+            .buildFromEncoded("foo%25", "bar%", "baz%20");
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%25/bar%25/baz%20"), newUri);
     }
 
     @Test
@@ -461,6 +462,13 @@ public class UriBuilderImplTest extends Assert {
         URI uri = new URI("http://foo/bar;p1=v1");
         URI newUri = new UriBuilderImpl(uri).matrixParam("p1", "v2", "v3").build();
         assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=v1;p1=v2;p1=v3"), newUri);
+    }
+    
+    @Test
+    public void testPctEncodedMatrixParam() throws Exception {
+        URI uri = new URI("http://foo/bar");
+        URI newUri = new UriBuilderImpl(uri).matrixParam("p1", "v1%20").buildFromEncoded();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=v1%20"), newUri);
     }
 
     @Test(expected = IllegalArgumentException.class)

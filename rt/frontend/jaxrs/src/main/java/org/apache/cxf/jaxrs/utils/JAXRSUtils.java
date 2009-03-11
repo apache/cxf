@@ -21,14 +21,11 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -764,20 +761,19 @@ public final class JAXRSUtils {
             List<String> parts = Arrays.asList(query.split(sep));
             for (String part : parts) {
                 String[] values = part.split("=");
-                queries.add(values[0], values.length == 1 ? "" 
-                    : decode ? uriDecode(values[1]) : values[1]);
+                String value = null;
+                if (values.length == 1) {
+                    value = "";
+                } else if (decode) {
+                    value = "&".equals(sep) ? HttpUtils.urlDecode(values[1]) 
+                                            : HttpUtils.pathDecode(values[1]); 
+                } else {
+                    value = values[1];
+                }
+                queries.add(values[0], value);
             }
         }
         return queries;
-    }
-
-    public static String uriDecode(String query) {
-        try {
-            query = URLDecoder.decode(query, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            //Swallow unsupported decoding exception          
-        }
-        return query;
     }
 
     @SuppressWarnings("unchecked")
@@ -975,15 +971,6 @@ public final class JAXRSUtils {
         
     }
     
-    public static String encode(boolean encoded, String value) {
-        if (!encoded) {
-            try {
-                value = URLEncoder.encode(value, "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                // unlikely to happen
-            }
-        }
-        return value;
-    }
+    
         
 }
