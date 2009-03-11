@@ -27,15 +27,15 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.AegisXMLStreamDataReader;
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
-import org.apache.cxf.databinding.DataReaderValidation2;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxValidationManager;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
-public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataReaderValidation2 {
+public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataBindingValidation2 {
 
     private AegisDatabinding databinding;
     private AegisXMLStreamDataReader reader;

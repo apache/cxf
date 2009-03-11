@@ -25,7 +25,7 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
  * If a DataReader<T> implements this interface, it prefers to be supplied with schema
  * for validation via an XmlSchemaCollection instead of via a packaged Schema object.
  */
-public interface DataReaderValidation2 {
+public interface DataBindingValidation2 {
     /**
      * 
      * @param schema

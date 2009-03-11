@@ -30,8 +30,8 @@ import javax.xml.validation.Schema;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
-import org.apache.cxf.databinding.DataReaderValidation2;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -42,7 +42,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 
 
-public class DataReaderImpl implements DataReader<XMLStreamReader> , DataReaderValidation2 {
+public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBindingValidation2 {
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
     private XmlSchemaCollection schemas;
     

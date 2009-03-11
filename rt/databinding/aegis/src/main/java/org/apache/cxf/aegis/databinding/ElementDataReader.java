@@ -28,15 +28,17 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.AegisElementDataReader;
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 /**
  * 
  */
-public class ElementDataReader implements DataReader<Element> {
+public class ElementDataReader implements DataReader<Element>, DataBindingValidation2 {
     
     private AegisElementDataReader reader;
     private AegisDatabinding databinding;
@@ -90,5 +92,10 @@ public class ElementDataReader implements DataReader<Element> {
 
     public void setSchema(Schema s) {
         reader.setSchema(s);
+    }
+
+    public void setSchema(XmlSchemaCollection schema) {
+        // TODO Auto-generated method stub
+        
     }
 }

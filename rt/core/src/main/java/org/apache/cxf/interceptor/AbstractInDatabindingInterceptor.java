@@ -30,8 +30,8 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
-import org.apache.cxf.databinding.DataReaderValidation2;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -107,8 +107,8 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             /* This might be a reader that wants to grab the schema from the
              * service info. 
              */
-            if (reader instanceof DataReaderValidation2) {
-                ((DataReaderValidation2)reader).setSchema(service.getServiceInfos().get(0)
+            if (reader instanceof DataBindingValidation2) {
+                ((DataBindingValidation2)reader).setSchema(service.getServiceInfos().get(0)
                                                           .getXmlSchemaCollection().getXmlSchemaCollection());
             }
         }

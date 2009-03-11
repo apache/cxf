@@ -36,13 +36,15 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
-public class ElementDataWriter implements DataWriter<Element> {
+public class ElementDataWriter implements DataWriter<Element>, DataBindingValidation2 {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
 
@@ -110,6 +112,11 @@ public class ElementDataWriter implements DataWriter<Element> {
             return null;
         }
         return properties.get(key);
+    }
+
+    public void setSchema(XmlSchemaCollection schema) {
+        // TODO Auto-generated method stub
+        
     }
 
 

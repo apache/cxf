@@ -19,28 +19,33 @@
 
 package org.apache.cxf.databinding;
 
-import org.apache.cxf.service.model.MessagePartInfo;
+import java.util.Collection;
+
+import javax.xml.validation.Schema;
+
+import org.apache.cxf.message.Attachment;
 
 /**
- * The 'write' side of the data binding abstraction of CXF. A DataWriter&lt;T&gt; serializes
- * objects to a 'sink' of type T.
- * @param <T> The type of sink. Each data binding defines the set of sink types that it supports.
+ * The 'write' side of the data binding abstraction of CXF.
  */
-public interface DataWriter<T> extends BaseDataWriter {
+public interface BaseDataWriter {
     String ENDPOINT = DataWriter.class.getName() + "Endpoint";
     
     /**
-     * Write an object to an output sink.
-     * @param obj the object to write.
-     * @param output the output sink.
+     * Attach a schema to the writer. If the binding supports validation, it will
+     * validate the XML that it produces (assuming that it produces XML). 
+     * @param s the schema.
      */
-    void write(Object obj, T output);
+    void setSchema(Schema s);
     /**
-     * Write an object to an output sink, including extra processing based on the WSDL 
-     * service model for a particular message part.
-     * @param obj The object to write.
-     * @param part the message part. 
-     * @param output the output sink.
+     * Attach a collection of attachments to this writer.
+     * @param attachments
      */
-    void write(Object obj, MessagePartInfo part, T output);
+    void setAttachments(Collection<Attachment> attachments);
+    /**
+     * Set a property for the writer.
+     * @param key property key 
+     * @param value property value.
+     */
+    void setProperty(String key, Object value);
 }
