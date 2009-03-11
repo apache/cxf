@@ -154,6 +154,7 @@
                             com.sun*;resolution:=optional,
                             javax.jms*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
+                            com.ctc.wstx.msv*;resolution:=optional,
                             repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
                             javax.xml.soap,

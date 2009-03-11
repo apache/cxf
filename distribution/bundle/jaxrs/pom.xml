@@ -115,6 +115,7 @@
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
+                            com.ctc.wstx.msv*;resolution:=optional,
                             javax.ws.rs*,
                             repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
