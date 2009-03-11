@@ -96,25 +96,66 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
         phase = p;
     }
     
+    /**
+     * Specifies that the current interceptor needs to be added to the 
+     * interceptor chain before the specified collection of interceptors. 
+     * This method replaces any existing list with the provided list.
+     * 
+     * @param i a collection of interceptor ids
+     */
     public void setBefore(Collection<String> i) {
         before.clear();
         before.addAll(i);
     }
-    public void setAfter(Collection<String> i) {
+
+    /**
+     * Specifies that the current interceptor needs to be added to the 
+     * interceptor chain after the specified collection of interceptors.
+     * This method replaces any existing list with the provided list.
+     * 
+     * @param i a collection of interceptor ids
+     */
+   public void setAfter(Collection<String> i) {
         after.clear();
         after.addAll(i);
     }
-    public void addBefore(Collection<String> i) {
+
+    /**
+     * Specifies that the current interceptor needs to be added to the 
+     * interceptor chain before the specified collection of interceptors.
+     * 
+     * @param i a collection of interceptor ids
+     */
+     public void addBefore(Collection<String> i) {
         before.addAll(i);
     }
+
+    /**
+     * Specifies that the current interceptor needs to be added to the 
+     * interceptor chain after the specified collection of interceptors.
+     * 
+     * @param i a collection of interceptor ids
+     */
     public void addAfter(Collection<String> i) {
         after.addAll(i);
     }
     
+    /**
+     * Specifies that the current interceptor needs to be added to the 
+     * interceptor chain before the specified interceptor.
+     * 
+     * @param i an interceptor id
+     */
     public void addBefore(String i) {
         before.add(i);
     }
 
+    /**
+     * Specifies that the current interceptor needs to be added to the 
+     * interceptor chain after the specified interceptor.
+     * 
+     * @param i an interceptor id
+     */
     public void addAfter(String i) {
         after.add(i);
     }
