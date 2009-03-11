@@ -19,8 +19,8 @@
 
 package org.apache.cxf.buslifecycle;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -35,7 +35,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     private boolean postShutdownCalled;
     
     public CXFBusLifeCycleManager() {
-        listeners = new ArrayList<BusLifeCycleListener>();
+        listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
     }
     
     @Resource
