@@ -61,15 +61,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleMessage(Message message) {
         
-        
-        String originalAddress = HttpUtils.getOriginalAddress(message);
-        
         try {
-            processRequest(message, originalAddress);
+            processRequest(message);
         } catch (RuntimeException ex) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, originalAddress, message);
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse == null) {
-                ProviderFactory.getInstance(originalAddress).clearThreadLocalProxies();
+                ProviderFactory.getInstance(message).clearThreadLocalProxies();
                 throw ex;
             }
             message.getExchange().put(Response.class, excResponse);
@@ -78,15 +75,14 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
     }
     
-    private void processRequest(Message message, String originalAddress) {
+    private void processRequest(Message message) {
         
         if (message.getExchange().get(OperationResourceInfo.class) != null) {
             // it's a suspended invocation;
             return;
         }
         
-        RequestPreprocessor rp = 
-            ProviderFactory.getInstance(originalAddress).getRequestPreprocessor();
+        RequestPreprocessor rp = ProviderFactory.getInstance(message).getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
         }
@@ -129,8 +125,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         OperationResourceInfo ori = null;     
         
-        List<ProviderInfo<RequestHandler>> shs = 
-            ProviderFactory.getInstance(originalAddress).getRequestHandlers();
+        List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(message).getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
             String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
             if (!acceptTypes.equals(newAcceptTypes) || ori == null) {

@@ -46,6 +46,7 @@ import javax.xml.validation.Schema;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
@@ -54,7 +55,11 @@ import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.easymock.classextension.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,12 +75,23 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testMultipleFactories() {
-        assertSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
-        assertSame(ProviderFactory.getInstance("/"), ProviderFactory.getInstance("/"));
-        assertSame(ProviderFactory.getInstance(), ProviderFactory.getInstance("/"));
         assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getSharedInstance());
-        assertSame(ProviderFactory.getInstance("/bar"), ProviderFactory.getInstance("/bar"));
-        assertNotSame(ProviderFactory.getInstance("/bar"), ProviderFactory.getInstance("/"));
+        assertSame(ProviderFactory.getSharedInstance(), ProviderFactory.getSharedInstance());
+        assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
+    }
+    
+    @Test
+    public void testGetFactoryInboundMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory);
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        assertSame(ProviderFactory.getInstance(m), factory);
     }
     
     @Test
@@ -186,25 +202,26 @@ public class ProviderFactoryTest extends Assert {
         assertTrue(BinaryDataProvider.class == writer.getClass());
     }
     
-    private void verifyProvider(Class<?> type, Class<?> provider, String mediaType,
-                                String errorMessage) 
+    private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType) 
         throws Exception {
+        
+        if (pf == null) {
+            pf = ProviderFactory.getInstance();
+        }
         
         MediaType mType = MediaType.valueOf(mediaType);
         
-        MessageBodyReader reader = ProviderFactory.getInstance()
-            .createMessageBodyReader(type, null, null, mType, new MessageImpl());
-        assertSame(errorMessage, provider, reader.getClass());
+        MessageBodyReader reader = pf.createMessageBodyReader(type, null, null, mType, new MessageImpl());
+        assertSame("Unexpected provider found", provider, reader.getClass());
     
-        MessageBodyWriter writer = ProviderFactory.getInstance()
-            .createMessageBodyWriter(type, null, null, mType, new MessageImpl());
-        assertTrue(errorMessage, provider == writer.getClass());
+        MessageBodyWriter writer = pf.createMessageBodyWriter(type, null, null, mType, new MessageImpl());
+        assertTrue("Unexpected provider found", provider == writer.getClass());
     }
     
     
     private void verifyProvider(Class<?> type, Class<?> provider, String mediaType) 
         throws Exception {
-        verifyProvider(type, provider, mediaType, "Unexpected provider found");
+        verifyProvider(null, type, provider, mediaType);
         
     }
        
@@ -215,18 +232,19 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetAtomProvider() throws Exception {
-        ProviderFactory.getInstance().setUserProviders(
+        ProviderFactory factory = ProviderFactory.getInstance();
+        factory.setUserProviders(
              Arrays.asList(
                   new Object[]{new AtomEntryProvider(), new AtomFeedProvider()}));
-        verifyProvider(Entry.class, AtomEntryProvider.class, "application/atom+xml");
-        verifyProvider(Feed.class, AtomFeedProvider.class, "application/atom+xml");
+        verifyProvider(factory, Entry.class, AtomEntryProvider.class, "application/atom+xml");
+        verifyProvider(factory, Feed.class, AtomFeedProvider.class, "application/atom+xml");
     }
     
     @Test
     public void testGetStringProviderUsingProviderDeclaration() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
-        verifyProvider(String.class, TestStringProvider.class, "text/html");
+        verifyProvider(pf, String.class, TestStringProvider.class, "text/html");
     }    
     
     @Test
@@ -239,8 +257,8 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterCustomJSONEntityProvider() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new CustomJSONProvider());
-        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, CustomJSONProvider.class, 
-                       "application/json", "User-registered provider was not returned first");
+        verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomJSONProvider.class, 
+                       "application/json");
     }
     
     
@@ -259,8 +277,8 @@ public class ProviderFactoryTest extends Assert {
         ProviderFactory pf = (ProviderFactory)ProviderFactory.getInstance();
         pf.registerUserProvider(new CustomWidgetProvider());
         
-        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class, 
-                       "application/widget", "User-registered provider was not returned first");
+        verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class, 
+                       "application/widget");
     }
     
     private int indexOf(List<? extends Object> providerInfos, Class providerType) {

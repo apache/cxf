@@ -329,7 +329,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type")); 
         
-        MessageBodyWriter mbw = ProviderFactory.getInstance(baseURI.getPath()).createMessageBodyWriter(
+        MessageBodyWriter mbw = ProviderFactory.getInstance(m).createMessageBodyWriter(
             cls, type, anns, contentType, m);
         if (mbw == null) {
             mbw = ProviderFactory.getInstance().createMessageBodyWriter(
@@ -364,7 +364,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader mbr = ProviderFactory.getInstance(baseURI.getPath()).createMessageBodyReader(
+        MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
             cls, type, anns, contentType, inMessage);
         if (mbr == null) {
             ProviderFactory.getInstance().createMessageBodyReader(
@@ -481,6 +481,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         exchange.setOutMessage(m);
         exchange.put(Bus.class, bus);
         exchange.put(MessageObserver.class, new ClientMessageObserver());
+        exchange.put(Endpoint.class, conduitSelector.getEndpoint());
         exchange.setOneWay(false);
         m.setExchange(exchange);
         

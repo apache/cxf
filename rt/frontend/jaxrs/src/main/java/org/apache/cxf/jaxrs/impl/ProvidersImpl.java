@@ -41,23 +41,22 @@ public class ProvidersImpl implements Providers {
     
     public <T> MessageBodyReader<T> getMessageBodyReader(
          Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createMessageBodyReader(
+        return ProviderFactory.getInstance(m).createMessageBodyReader(
             type, genericType, annotations, mediaType, m);
     }
 
     public <T> MessageBodyWriter<T> getMessageBodyWriter(
         Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createMessageBodyWriter(
+        return ProviderFactory.getInstance(m).createMessageBodyWriter(
                    type, genericType, annotations, mediaType, m);
     }
 
     public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH))
-            .createContextResolver(contextType, m, mediaType);
+        return ProviderFactory.getInstance(m).createContextResolver(contextType, m, mediaType);
     }
 
     public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createExceptionMapper(type, m);
+        return ProviderFactory.getInstance(m).createExceptionMapper(type, m);
     }
 
 }

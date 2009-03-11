@@ -181,16 +181,13 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         return index;
     }
     
-    private static void checkResponse(String basePath, Method m, Response r) throws Throwable {
+    private static void checkResponse(Method m, Response r, Message message) throws Throwable {
         
         int status = r.getStatus();
         
         if (status >= 400) {
             
-            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, basePath);
-            if (mapper == null) {
-                mapper = findExceptionMapper(m, "/");
-            }
+            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, message);
             if (mapper != null) {
                 Throwable t = mapper.fromResponse(r);
                 if (t != null) {
@@ -202,8 +199,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
     }
     
-    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, String base) {
-        ProviderFactory pf = ProviderFactory.getInstance(base);
+    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
+        ProviderFactory pf = ProviderFactory.getInstance(message);
         for (Class<?> exType : m.getExceptionTypes()) {
             ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
             if (mapper != null) {
@@ -405,7 +402,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         throws Throwable {
         Response r = setResponseBuilder(connect).clone().build();
         Method method = ori.getMethodToInvoke();
-        checkResponse(getBaseURI().getPath(), method, r);
+        checkResponse(method, r, inMessage);
         if (method.getReturnType() == Void.class) { 
             return null;
         }

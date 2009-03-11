@@ -35,7 +35,6 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.service.Service;
 
@@ -162,11 +161,6 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         if (headers != null) {
             client.headers(headers);
         }
-        if (entityProviders != null) {
-            ProviderFactory.getInstance().setUserProviders(entityProviders); 
-        }
-        if (schemaLocations != null) {
-            ProviderFactory.getInstance().setSchemaLocations(schemaLocations);
-        }
+        setupFactory(ep);
     }
 } 

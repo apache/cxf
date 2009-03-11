@@ -167,7 +167,7 @@ public final class InjectionUtils {
     public static Object handleParameter(String value, 
                                          Class<?> pClass, 
                                          ParameterType pType,
-                                         String basePath) {
+                                         Message message) {
         
         if (value == null) {
             return null;
@@ -209,8 +209,8 @@ public final class InjectionUtils {
             result = evaluateFactoryMethod(value, pClass, pType, methodNames[1]);
         }
         
-        if (basePath != null) {
-            ParameterHandler<?> pm = ProviderFactory.getInstance(basePath)
+        if (message != null) {
+            ParameterHandler<?> pm = ProviderFactory.getInstance(message)
                 .createParameterHandler(pClass);
             if (pm != null) {
                 result = pm.fromString(value);
@@ -260,7 +260,7 @@ public final class InjectionUtils {
     }
     
     public static Object handleBean(Class<?> paramType, MultivaluedMap<String, String> values,
-                                    ParameterType pType, String basePath) {
+                                    ParameterType pType, Message message) {
         Object bean = null;
         try {
             bean = paramType.newInstance();
@@ -277,7 +277,7 @@ public final class InjectionUtils {
                     && m.getParameterTypes().length == 1) {
                     Object paramValue = handleParameter(entry.getValue().get(0), 
                                                         m.getParameterTypes()[0],
-                                                        pType, basePath);
+                                                        pType, message);
                     if (paramValue != null) {
                         injectThroughMethod(bean, m, paramValue);
                         injected = true;
@@ -291,7 +291,7 @@ public final class InjectionUtils {
             for (Field f : paramType.getFields()) {
                 if (f.getName().equalsIgnoreCase(entry.getKey())) {
                     Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                        f.getType(), pType, basePath);
+                                                        f.getType(), pType, message);
                     if (paramValue != null) {
                         injectFieldValue(f, bean, paramValue);
                         break;
@@ -305,14 +305,14 @@ public final class InjectionUtils {
     
     @SuppressWarnings("unchecked")
     public static Object injectIntoList(Type genericType, List<String> values,
-                                        boolean decoded, ParameterType pathParam, String basePath) {
+                                        boolean decoded, ParameterType pathParam, Message message) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
         values = checkPathSegment(values, realType, pathParam);
         List theValues = new ArrayList();
         for (String r : values) {
             String value = decodeValue(r, decoded, pathParam);
             
-            Object o = InjectionUtils.handleParameter(value, realType, pathParam, basePath);
+            Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
             if (o != null) {
                 theValues.add(o);
             }
@@ -326,7 +326,7 @@ public final class InjectionUtils {
     public static Object injectIntoSet(Type genericType, List<String> values, 
                                        boolean sorted, 
                                        boolean decoded, 
-                                       ParameterType pathParam, String basePath) {
+                                       ParameterType pathParam, Message message) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
         
         values = checkPathSegment(values, realType, pathParam);
@@ -334,7 +334,7 @@ public final class InjectionUtils {
         Set theValues = sorted ? new TreeSet() : new HashSet();
         for (String r : values) {
             String value = decodeValue(r, decoded, pathParam);
-            Object o = InjectionUtils.handleParameter(value, realType, pathParam, basePath);
+            Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
             if (o != null) {
                 theValues.add(o);
             }
@@ -368,7 +368,7 @@ public final class InjectionUtils {
                                                String defaultValue,
                                                boolean decoded,
                                                ParameterType pathParam,
-                                               String basePath) {
+                                               Message message) {
         
         if (paramValues == null) {
             if (defaultValue != null) {
@@ -385,13 +385,13 @@ public final class InjectionUtils {
         
         if (List.class.isAssignableFrom(paramType)) {
             return InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam,
-                                                 basePath);
+                                                 message);
         } else if (Set.class.isAssignableFrom(paramType)) {
             return InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam,
-                                                basePath);
+                                                message);
         } else if (SortedSet.class.isAssignableFrom(paramType)) {
             return InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam,
-                                                basePath);
+                                                message);
         } else {
             String result = null;
             if (paramValues.size() > 0) {
@@ -401,7 +401,7 @@ public final class InjectionUtils {
             }
             if (result != null) {
                 result = decodeValue(result, decoded, pathParam);
-                return InjectionUtils.handleParameter(result, paramType, pathParam, basePath);
+                return InjectionUtils.handleParameter(result, paramType, pathParam, message);
             } else {
                 return null;
             }
