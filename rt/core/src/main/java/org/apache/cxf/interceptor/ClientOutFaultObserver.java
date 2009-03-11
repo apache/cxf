@@ -19,29 +19,41 @@
 
 package org.apache.cxf.interceptor;
 
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.ClientCallback;
+import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseManager;
 
 public class ClientOutFaultObserver extends AbstractFaultChainInitiatorObserver {
 
-    
     public ClientOutFaultObserver(Bus bus) {
         super(bus);
     }
-    
+
     @Override
     protected SortedSet<Phase> getPhases() {
         return getBus().getExtension(PhaseManager.class).getOutPhases();
     }
+
     /**
      * override the super class method
      */
     public void onMessage(Message m) {
-        // do nothing for exception occurred during client sending out request
+        Exception ex = m.getContent(Exception.class);
+        ClientCallback callback = m.getExchange().get(ClientCallback.class);
+
+        if (callback != null) {
+            Map<String, Object> resCtx = CastUtils.cast((Map<?, ?>) m.getExchange().getOutMessage().get(
+                    Message.INVOCATION_CONTEXT));
+            resCtx = CastUtils.cast((Map<?, ?>) resCtx.get(ClientImpl.RESPONSE_CONTEXT));
+            callback.handleException(resCtx, ex);
+        }
     }
 
     protected boolean isOutboundObserver() {

@@ -275,6 +275,48 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 notifyAll();
             }
         }
+
+        @Override
+        public void handleException(Map<String, Object> ctx, final Throwable ex) {
+            context = ctx;
+            exception = ex;
+            if (handler != null) {
+                handler.handleResponse(new Response<Object>() {
+
+                    public Map<String, Object> getContext() {
+                        return context;
+                    }
+
+                    public boolean cancel(boolean mayInterruptIfRunning) {
+                        cancelled = true;
+                        return true;
+                    }
+
+                    public Object get() throws InterruptedException, ExecutionException {
+                        throw new ExecutionException(ex);
+                    }
+
+                    public Object get(long timeout, TimeUnit unit) 
+                        throws InterruptedException, ExecutionException, TimeoutException {
+                        
+                        throw new ExecutionException(ex);
+                    }
+
+                    public boolean isCancelled() {
+                        return cancelled;
+                    }
+
+                    public boolean isDone() {
+                        return true;
+                    }
+
+                });
+            }
+            done = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
     }
     static class ResponseCallback implements Response<Object> {
         ClientCallback callback;
