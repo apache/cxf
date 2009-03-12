@@ -99,7 +99,8 @@ public class TypedefVisitor extends VisitorBase {
                 
                 while (identifierNode != null) {
                     if (ArrayVisitor.accept(identifierNode)) {
-                        ArrayVisitor arrayVisitor = new ArrayVisitor(getScope(),
+                        ArrayVisitor arrayVisitor = new ArrayVisitor(new Scope(getScope(),
+                                                                               identifierNode.getText()),
                                                                      definition,
                                                                      schema,
                                                                      wsdlVisitor,
