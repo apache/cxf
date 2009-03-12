@@ -114,7 +114,7 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
      * 
      * @param i a collection of interceptor ids
      */
-   public void setAfter(Collection<String> i) {
+    public void setAfter(Collection<String> i) {
         after.clear();
         after.addAll(i);
     }
@@ -125,7 +125,7 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
      * 
      * @param i a collection of interceptor ids
      */
-     public void addBefore(Collection<String> i) {
+    public void addBefore(Collection<String> i) {
         before.addAll(i);
     }
 
