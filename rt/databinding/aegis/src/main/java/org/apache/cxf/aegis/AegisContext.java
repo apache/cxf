@@ -151,9 +151,8 @@ public class AegisContext {
         if (typeMapping == null) {
             boolean defaultNillable = configuration.isDefaultNillable();
             TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, mtomUseXmime);
-            // The use of the XSD URI in the mapping is, MAGIC.
             if (mappingNamespaceURI == null) {
-                mappingNamespaceURI = SOAPConstants.XSD;
+                mappingNamespaceURI = DefaultTypeMapping.DEFAULT_MAPPING_URI;
             }
             DefaultTypeMapping defaultTypeMapping = new DefaultTypeMapping(mappingNamespaceURI, baseTM);
             defaultTypeMapping.setTypeCreator(createTypeCreator());
@@ -466,5 +465,8 @@ public class AegisContext {
 
     public void setMappingNamespaceURI(String mappingNamespaceURI) {
         this.mappingNamespaceURI = mappingNamespaceURI;
+        if (typeMapping != null) {
+            typeMapping.setMappingIdentifierURI(mappingNamespaceURI);
+        }
     }
 }
