@@ -152,8 +152,17 @@ public class CachedOutputStream extends OutputStream {
      * @throws IOException
      */
     public void lockOutputStream() throws IOException {
+        if (outputLocked) {
+            return;
+        }
         currentStream.flush();
         outputLocked = true;
+        if (null != callbacks) {
+            for (CachedOutputStreamCallback cb : callbacks) {
+                cb.onClose(this);
+            }
+        }
+        doClose();
         streamList.remove(currentStream);
     }
     
@@ -430,6 +439,14 @@ public class CachedOutputStream extends OutputStream {
     private void maybeDeleteTempFile(Object stream) {
         streamList.remove(stream);
         if (!inmem && tempFile != null && streamList.isEmpty()) {
+            if (currentStream != null) {
+                try {
+                    currentStream.close();
+                    postClose();
+                } catch (Exception e) {
+                    //ignore
+                }
+            }
             tempFile.delete();
             tempFile = null;
             currentStream = new LoadingByteArrayOutputStream(1024);
