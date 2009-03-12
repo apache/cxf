@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
@@ -45,8 +46,6 @@ import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Node;
-
-import com.sun.corba.se.impl.orbutil.closure.Future;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.i18n.Message;
