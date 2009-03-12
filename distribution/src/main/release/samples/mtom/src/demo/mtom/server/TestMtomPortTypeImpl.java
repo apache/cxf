@@ -47,6 +47,7 @@ public class TestMtomPortTypeImpl implements TestMtomPortType {
             long fileSize = 0;
             System.out.println("The image data size is " + mtomIn.available());
             name.value = "Hello " + name.value;
+            mtomIn.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
