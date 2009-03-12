@@ -31,15 +31,19 @@ public class DispatchAsyncCallable<T> implements Callable<T> {
     private Dispatch<T> dispatch;
     private T object;
     private AsyncHandler callback;
+    private Map<String, Object> ctx;
     
     public DispatchAsyncCallable(Dispatch<T> disp, T obj, AsyncHandler c) {
         dispatch = disp;
         object = obj;
         callback = c;
+        ctx = disp.getRequestContext();
     }
 
     @SuppressWarnings("unchecked")
     public T call() throws Exception {
+        dispatch.getRequestContext().clear();
+        dispatch.getRequestContext().putAll(ctx);
         final T result = dispatch.invoke(object);
         if (callback != null) {
             callback.handleResponse(new Response<Object>() {

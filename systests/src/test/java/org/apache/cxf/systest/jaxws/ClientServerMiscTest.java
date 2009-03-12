@@ -279,6 +279,8 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         port.doOneWay();
         assertTrue((System.currentTimeMillis() - start) < 500);
         
+        assertEquals("Hello", port.echoStringNotReallyAsync("Hello"));
+        
         Set<Foo> fooSet = port.getFooSet();
         assertEquals(2, fooSet.size());
         

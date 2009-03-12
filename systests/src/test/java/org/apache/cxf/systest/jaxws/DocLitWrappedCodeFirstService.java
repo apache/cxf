@@ -60,6 +60,9 @@ public interface DocLitWrappedCodeFirstService {
     @WebMethod
     Vector<String> listOutput();
     
+    @WebMethod 
+    String echoStringNotReallyAsync(String s);
+    
     @WebMethod
     int[] echoIntArray(int[] ar, Exchange ex);
     
