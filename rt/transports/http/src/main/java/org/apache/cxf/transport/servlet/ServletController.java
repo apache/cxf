@@ -126,7 +126,14 @@ public class ServletController {
                     || StringUtils.isEmpty(request.getPathInfo())
                     || "/".equals(request.getPathInfo())) {
                     updateDests(request);
-                    generateServiceList(request, res);
+                    
+                    if (request.getParameter("stylesheet") != null) {
+                        renderStyleSheet(request, res);
+                    } else if ("false".equals(request.getParameter("formatted"))) {
+                        generateUnformattedServiceList(request, res);
+                    } else {
+                        generateServiceList(request, res);
+                    }
                 } else {
                     d = checkRestfulRequest(request);
                     if (d == null || d.getMessageObserver() == null) {                        
@@ -196,16 +203,7 @@ public class ServletController {
     }
     
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-        
-        if (request.getParameter("stylesheet") != null) {
-            URL url = this.getClass().getResource("servicelist.css");
-            if (url != null) {
-                IOUtils.copy(url.openStream(), response.getOutputStream());
-            }
-            return;
-        }
-        
+        throws IOException {        
         response.setContentType("text/html; charset=UTF-8");        
         
         response.getWriter().write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" " 
@@ -224,15 +222,7 @@ public class ServletController {
         response.getWriter().write("<title>CXF - Service list</title>");
         response.getWriter().write("</head><body>");
         if (!isHideServiceList) {
-            List<ServletDestination> destinations 
-                = new LinkedList<ServletDestination>(transport.getDestinations());
-            Collections.sort(destinations, new Comparator<ServletDestination>() {
-                public int compare(ServletDestination o1, ServletDestination o2) {
-                    return o1.getEndpointInfo().getInterface().getName()
-                         .getLocalPart().compareTo(o2.getEndpointInfo()
-                                                       .getInterface().getName().getLocalPart());
-                }
-            });
+            List<ServletDestination> destinations = getServletDestinations();
                 
             if (destinations.size() > 0) {  
                 response.getWriter().write("<span class=\"heading\">Available services:</span><br/>");
@@ -270,6 +260,46 @@ public class ServletController {
         response.getWriter().write("</body></html>");
     }
 
+    private void renderStyleSheet(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        response.setContentType("text/css; charset=UTF-8");
+
+        URL url = this.getClass().getResource("servicelist.css");
+        if (url != null) {
+            IOUtils.copy(url.openStream(), response.getOutputStream());
+        }
+    }
+
+    private List<ServletDestination> getServletDestinations() {
+        List<ServletDestination> destinations = new LinkedList<ServletDestination>(
+                transport.getDestinations());
+        Collections.sort(destinations, new Comparator<ServletDestination>() {
+            public int compare(ServletDestination o1, ServletDestination o2) {
+                return o1.getEndpointInfo().getInterface().getName()
+                        .getLocalPart().compareTo(
+                                o2.getEndpointInfo().getInterface().getName()
+                                        .getLocalPart());
+            }
+        });
+
+        return destinations;
+    }
+
+    protected void generateUnformattedServiceList(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        response.setContentType("text/plain; charset=UTF-8");
+
+        if (!isHideServiceList) {
+            List<ServletDestination> destinations = getServletDestinations();
+
+            for (ServletDestination sd : destinations) {
+                String address = sd.getEndpointInfo().getAddress();
+                response.getWriter().write(address);
+                response.getWriter().write('\n');
+            }
+        }
+    }
+    
     private String getBaseURL(HttpServletRequest request) {
         String reqPrefix = request.getRequestURL().toString();        
         String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();

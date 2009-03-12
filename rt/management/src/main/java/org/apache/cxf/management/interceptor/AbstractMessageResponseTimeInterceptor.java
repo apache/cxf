@@ -41,7 +41,7 @@ import org.apache.cxf.service.model.OperationInfo;
 public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractMessageResponseTimeInterceptor.class);
     
-    AbstractMessageResponseTimeInterceptor(String phase) {
+    public AbstractMessageResponseTimeInterceptor(String phase) {
         super(phase);
     }
     

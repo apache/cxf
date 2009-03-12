@@ -533,6 +533,7 @@ public class ServiceWSDLBuilder {
                 this.addExtensibilityAttributes(input, getInputExtensionAttributes(operationInfo));
                 input.setMessage(message);
                 operation.setInput(input);
+                operation.setParameterOrdering(operationInfo.getParameterOrdering());
                 
                 if (operationInfo.getOutput() != null) {
                     Output output = def.createOutput();
