@@ -68,6 +68,47 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testClone() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri).clone().build();   
+        assertEquals("URI is not built correctly", "http://bar", newUri.toString());
+    }
+    
+    @Test
+    public void testClonePctEncodedFromUri() throws Exception {
+        URI uri = new URI("http://bar/foo%20");
+        URI newUri = new UriBuilderImpl(uri).clone().buildFromEncoded();   
+        assertEquals("URI is not built correctly", "http://bar/foo%20", newUri.toString());
+    }
+    
+    @Test
+    public void testClonePctEncoded() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri)
+            .path("{a}").path("{b}")
+            .matrixParam("m", "m1 ", "m2+%20")
+            .queryParam("q", "q1 ", "q2+q3%20").clone().buildFromEncoded("a+ ", "b%2B%20 ");   
+        assertEquals("URI is not built correctly", 
+                     "http://bar/a+%20/b%2B%20%20;m=m1%20;m=m2+%20?q=q1+&q=q2%2Bq3%20", 
+                     newUri.toString());
+    }
+    
+    @Test
+    public void testEncodedPathQueryFromExistingURI() throws Exception {
+        URI uri = new URI("http://bar/foo+%20%2B?q=a+b%20%2B");
+        URI newUri = new UriBuilderImpl(uri).buildFromEncoded();   
+        assertEquals("URI is not built correctly", 
+                     "http://bar/foo+%20%2B?q=a%2Bb%20%2B", newUri.toString());
+    }
+    
+    @Test
+    public void testEncodedAddedQuery() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri).queryParam("q", "a+b%20%2B").buildFromEncoded();   
+        assertEquals("URI is not built correctly", "http://bar?q=a%2Bb%20%2B", newUri.toString());
+    }
+    
+    @Test
     public void testSchemeSpecificPart() throws Exception {
         URI uri = new URI("http://bar");
         URI newUri = new UriBuilderImpl(uri).scheme("https").schemeSpecificPart("foo/bar").build();
@@ -457,6 +498,7 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=v1;p1=v2"), newUri);
     }
 
+    
     @Test
     public void testMatrixParamMultiSameNameNewVals() throws Exception {
         URI uri = new URI("http://foo/bar;p1=v1");

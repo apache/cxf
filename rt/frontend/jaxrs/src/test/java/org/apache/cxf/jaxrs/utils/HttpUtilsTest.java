@@ -42,7 +42,12 @@ public class HttpUtilsTest extends Assert {
      
     @Test
     public void testPathEncode() {
-        assertEquals("%2B%20", HttpUtils.pathEncode("+ "));
+        assertEquals("+%20", HttpUtils.pathEncode("+ "));
+    }
+    
+    @Test
+    public void testURLEncode() {
+        assertEquals("%2B+", HttpUtils.urlEncode("+ "));
     }
     
     @Test

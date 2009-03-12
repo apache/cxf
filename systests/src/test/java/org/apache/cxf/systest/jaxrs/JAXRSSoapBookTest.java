@@ -44,6 +44,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.client.XMLSource;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -100,11 +101,11 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBook123WebClientBean() throws Exception {
+    public void testGetBook123XMLSource() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
         WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
-        Book b = client.get(Book.class);
+        Book b = client.get(XMLSource.class).getNode("/Book", Book.class);
         assertEquals(123, b.getId());
         assertEquals("CXF in Action", b.getName());
     }

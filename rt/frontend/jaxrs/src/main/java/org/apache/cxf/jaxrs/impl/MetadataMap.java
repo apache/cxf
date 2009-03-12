@@ -33,11 +33,17 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     private Map<K, List<V>> m;
     
     public MetadataMap() {
-        this(new LinkedHashMap<K, List<V>>());
+        this.m = new LinkedHashMap<K, List<V>>();
     }
     
     public MetadataMap(Map<K, List<V>> store) {
-        this.m = store;
+        
+        this.m = new LinkedHashMap<K, List<V>>();
+        if (store != null) {
+            for (Map.Entry<K, List<V>> entry : store.entrySet()) {
+                m.put(entry.getKey(), new ArrayList<V>(entry.getValue()));
+            }
+        }
     }
     
     public void add(K key, V value) {

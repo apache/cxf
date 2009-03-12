@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.PathSegment;
@@ -45,7 +47,7 @@ public final class HttpUtils {
     
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
     private static final String LOCAL_HOST = "localhost";
-    
+    private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     
     private HttpUtils() {
     }
@@ -73,10 +75,40 @@ public final class HttpUtils {
         
         String result = urlEncode(value);
         // URLEncoder will encode '+' to %2B but will turn ' ' into '+'
+        // We need to retain '+' and encode ' ' as %20
         if (result.indexOf('+') != -1) {
             result = result.replace("+", "%20");
         }
+        if (result.indexOf("%2B") != -1) {
+            result = result.replace("%2B", "+");
+        }
+
         return result;
+    }
+    
+    /**
+     * Encodes partially encoded string. Encode all values but those matching pattern 
+     * "percent char followed by two hexadecimal digits".
+     * 
+     * @param encoded fully or partially encoded string.
+     * @return fully encoded string
+     */
+    public static String encodePartiallyEncoded(String encoded, boolean query) {
+        if (encoded.length() == 0) {
+            return encoded;
+        }
+        Matcher m = ENCODE_PATTERN.matcher(encoded);
+        StringBuffer sb = new StringBuffer();
+        int i = 0;
+        while (m.find()) {
+            String before = encoded.substring(i, m.start());
+            sb.append(query ? HttpUtils.urlEncode(before) : HttpUtils.pathEncode(before));
+            sb.append(m.group());
+            i = m.end();            
+        }
+        String tail = encoded.substring(i, encoded.length());
+        sb.append(query ? HttpUtils.urlEncode(tail) : HttpUtils.pathEncode(tail));
+        return sb.toString();
     }
     
     public static SimpleDateFormat getHttpDateFormat() {

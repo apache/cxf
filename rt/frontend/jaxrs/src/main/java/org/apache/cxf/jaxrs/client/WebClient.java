@@ -259,6 +259,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
+        
         Response r = doInvoke(httpMethod, body, responseClass);
         
         if (r.getStatus() >= 400) {
@@ -308,6 +309,7 @@ public class WebClient extends AbstractClient {
      */
     public WebClient query(String name, Object ...values) {
         getCurrentBuilder().queryParam(name, values);
+        
         return this;
     }
     
@@ -473,6 +475,7 @@ public class WebClient extends AbstractClient {
         try {
             ResponseBuilder rb = setResponseBuilder(conn).clone();
             Response currentResponse = rb.clone().build();
+            
             Object entity = readBody(currentResponse, conn, m, responseClass, responseClass,
                                      new Annotation[]{});
             rb.entity(entity);
@@ -484,7 +487,7 @@ public class WebClient extends AbstractClient {
     }
     
     protected HttpURLConnection getConnection(String methodName) {
-        return createHttpConnection(getCurrentBuilder().clone().build(), methodName);
+        return createHttpConnection(getCurrentBuilder().clone().buildFromEncoded(), methodName);
     }
     
     private class BodyWriter extends AbstractOutDatabindingInterceptor {

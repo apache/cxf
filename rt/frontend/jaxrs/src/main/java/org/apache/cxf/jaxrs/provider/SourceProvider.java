@@ -45,6 +45,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.jaxrs.client.XMLSource;
+
 @Provider
 @Produces({"application/xml", "text/xml" })
 @Consumes({"application/xml", "text/xml" })
@@ -56,7 +58,7 @@ public class SourceProvider implements
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return Source.class.isAssignableFrom(type);
+        return Source.class.isAssignableFrom(type) || XMLSource.class.isAssignableFrom(type);
     }
     
     public Object readFrom(Class<Object> source, Type genericType, Annotation[] annotations, MediaType m,  
@@ -79,6 +81,8 @@ public class SourceProvider implements
         } else if (StreamSource.class.isAssignableFrom(source)
                    || Source.class.isAssignableFrom(source)) {
             return new StreamSource(is);
+        } else if (XMLSource.class.isAssignableFrom(source)) {
+            return new XMLSource(is);
         }
         
         throw new IOException("Unrecognized source");

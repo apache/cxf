@@ -81,13 +81,15 @@ public class AbstractClient implements Client, InvocationHandlerAware {
     protected List<Interceptor> outInterceptors = new ModCountCopyOnWriteArrayList<Interceptor>();
     protected ConduitSelector conduitSelector;
     protected Bus bus;
-    
+
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
     private ResponseBuilder responseBuilder;
     
     private URI baseURI;
     private UriBuilder currentBuilder;
 
+    
+    
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
         this.currentBuilder = new UriBuilderImpl(currentURI);
@@ -235,7 +237,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
      * {@inheritDoc}
      */
     public URI getCurrentURI() {
-        return getCurrentBuilder().clone().build();
+        return getCurrentBuilder().clone().buildFromEncoded();
     }
 
     /**
