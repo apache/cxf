@@ -39,7 +39,7 @@
     
     <target name="generate.ws.code">
         <echo level="info" message="Generating ws code using wsdl2java..."/>
-        <wsdl2java dir="${basedir}" file="BankWS-corba.wsdl" package="cxf.common"/>
+        <wsdl2java dir="${basedir}" file="BankWS-corba.wsdl" package="http://cxf.apache.org/schemas/cxf/idl/Bank=cxf.common"/>
     </target>
 
     <target name="generate.corba.code">

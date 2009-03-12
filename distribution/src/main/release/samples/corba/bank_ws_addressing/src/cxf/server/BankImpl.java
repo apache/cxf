@@ -81,7 +81,8 @@ public class BankImpl implements Bank {
     }
     
     // TODO: What is the correct implementation for this operation?
-    public void findAccount(javax.xml.ws.Holder<Object> accountDetails) {
+    public Object findAccount(Object accountDetails) {
+        return null;
     }
 
     public void removeAccount(String accountName) {
