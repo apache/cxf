@@ -45,7 +45,6 @@ import org.apache.cxf.aegis.type.XMLTypeCreator;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -144,9 +143,8 @@ public class AegisContext {
             TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, 
                                                                              mtomUseXmime, 
                                                                              enableJDOMMappings);
-            // The use of the XSD URI in the mapping is, MAGIC.
             if (mappingNamespaceURI == null) {
-                mappingNamespaceURI = SOAPConstants.XSD;
+                mappingNamespaceURI = DefaultTypeMapping.DEFAULT_MAPPING_URI;
             }
             DefaultTypeMapping defaultTypeMapping = new DefaultTypeMapping(mappingNamespaceURI, baseTM);
             defaultTypeMapping.setTypeCreator(createTypeCreator());
@@ -463,6 +461,9 @@ public class AegisContext {
 
     public void setMappingNamespaceURI(String mappingNamespaceURI) {
         this.mappingNamespaceURI = mappingNamespaceURI;
+        if (typeMapping != null) {
+            typeMapping.setMappingIdentifierURI(mappingNamespaceURI);
+        }
     }
 
     public boolean isEnableJDOMMappings() {

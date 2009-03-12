@@ -73,4 +73,9 @@ public interface TypeMapping {
      * @return the URI.
      */
     String getMappingIdentifierURI();
+    /**
+     * This exists only to deal with an initialization order problem.
+     * @param uri
+     */
+    void setMappingIdentifierURI(String uri);
 }

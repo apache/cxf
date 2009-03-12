@@ -76,6 +76,7 @@ import org.apache.cxf.common.util.XMLSchemaQNames;
  * Contains type mappings for java/qname pairs.
  */
 public class DefaultTypeMapping implements TypeMapping {
+    public  static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
     private static final Log LOG = LogFactory.getLog(DefaultTypeMapping.class);
     private Map<Class, Type> class2Type;
     private Map<QName, Type> xml2Type;
@@ -91,7 +92,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
     
     public DefaultTypeMapping() {
-        this(SOAPConstants.XSD);
+        this(DEFAULT_MAPPING_URI);
     }
 
     public DefaultTypeMapping(String identifierURI) {
@@ -413,5 +414,10 @@ public class DefaultTypeMapping implements TypeMapping {
 
     public String getMappingIdentifierURI() {
         return identifierURI;
+    }
+
+    public void setMappingIdentifierURI(String uri) {
+        identifierURI = uri;
+        
     }
 }
