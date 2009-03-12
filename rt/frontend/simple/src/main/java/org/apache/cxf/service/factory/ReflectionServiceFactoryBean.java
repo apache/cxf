@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1302,8 +1303,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
             if (isInParam(method, j)) {
                 final QName q = getInParameterName(op, method, j);
-                final QName q2 = getInPartName(op, method, j);
-                MessagePartInfo part = inMsg.addMessagePart(q2);
+                MessagePartInfo part = inMsg.addMessagePart(getInPartName(op, method, j));
                 initializeParameter(part, paramClasses[j], method.getGenericParameterTypes()[j]);
                 //TODO:remove method param annotations
                 part.setProperty(METHOD_PARAM_ANNOTATIONS, method.getParameterAnnotations());
@@ -1398,11 +1398,40 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     }
                 }
             }
-
         }
+        
+        //setting the parameterOrder that
+        //allows preservation of method signatures
+        //when doing java->wsdl->java
+        setParameterOrder(method, paramClasses, op);
 
         initializeFaults(intf, op, method);
     }
+    
+    private void setParameterOrder(Method method, Class[] paramClasses, OperationInfo op) {
+        if (isRPC(method)) {
+            List<String> paramOrdering = new LinkedList<String>();
+            boolean hasOut = false;
+            for (int j = 0; j < paramClasses.length; j++) {
+                if (Exchange.class.equals(paramClasses[j])) {
+                    continue;
+                }
+                if (isInParam(method, j)) {
+                    paramOrdering.add(getInPartName(op, method, j).getLocalPart());
+                    if (isOutParam(method, j)) {
+                        hasOut = true;
+                    }
+                } else if (isOutParam(method, j)) {
+                    hasOut = true;
+                    paramOrdering.add(getOutPartName(op, method, j).getLocalPart());
+                }
+            }
+            if (!paramOrdering.isEmpty() && hasOut) {
+                op.setParameterOrdering(paramOrdering);
+            }
+        }
+    }
+    
 
     protected void createInputWrappedMessageParts(OperationInfo op, Method method, MessageInfo inMsg) {
         MessagePartInfo part = inMsg.addMessagePart("parameters");

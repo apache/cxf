@@ -58,6 +58,9 @@ public class Compiler {
         // This code doesn't honor java.home
         // list.add("javac");
 
+        //fix for CXF-2081, set maximum heap of this VM to javac.
+        list.add("-J-Xmx" + Runtime.getRuntime().maxMemory());
+
         if (outputDir != null) {
             list.add("-d");
             list.add(outputDir.getAbsolutePath().replace(File.pathSeparatorChar, '/'));

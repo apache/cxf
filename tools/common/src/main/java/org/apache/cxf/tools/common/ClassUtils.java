@@ -42,6 +42,9 @@ public class ClassUtils {
     public void compile(ToolContext context) throws ToolException {        
         List<String> argList = new ArrayList<String>();
         
+        //fix for CXF-2081, set maximum heap of current VM to javac.
+        argList.add("-J-Xmx" + Runtime.getRuntime().maxMemory());
+
         String javaClasspath = System.getProperty("java.class.path");
         // hard code cxf.jar
         boolean classpathSetted = javaClasspath != null ? true : false;
