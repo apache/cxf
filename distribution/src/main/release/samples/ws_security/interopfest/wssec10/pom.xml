@@ -5,7 +5,7 @@
     <artifactId>ws-sec10</artifactId>
     <version>1.0</version>
     <properties>
-        <cxf.version>2.2-SNAPSHOT</cxf.version>
+        <cxf.version>[2,)</cxf.version>
         <test.method>MutualCertificate10SignEncryptRsa15TripleDes</test.method>
     </properties>
     <build>

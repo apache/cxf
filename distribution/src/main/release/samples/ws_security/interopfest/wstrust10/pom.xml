@@ -5,7 +5,7 @@
     <artifactId>ws-trust10</artifactId>
     <version>1.0</version>
     <properties>
-        <cxf.version>2.2-SNAPSHOT</cxf.version>
+        <cxf.version>[2,)</cxf.version>
         <test.method>ALL</test.method>
 
         <wsdl.host>131.107.72.15</wsdl.host>

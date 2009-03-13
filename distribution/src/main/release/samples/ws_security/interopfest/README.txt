@@ -1,19 +1,11 @@
-**** About this project:
+About these samples:
 
-This CXF sandbox project is being used to help implement 
-WS-SecurityPolicy and WS-Trust within CXF 2.2.
-
-This project is available from SVN at 
-https://svn.apache.org/repos/asf/cxf/sandbox/interopfest.
+This CXF sample is being used to help implement WS-SecurityPolicy,
+WS-SecureConversation, and WS-Trust within CXF.
 
 CXF is presently relying on the test web services used by Microsoft's Web Services
-Interoperability Plug-Fest[1].  The WSDL for these services is located at:
-http://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity11.svc?wsdl
-
-The main scenario document[2] listed in the second column of the 
-table at the top of [1] describes each test case, however, there appears to be no
-immediate mapping between test case given in that document and its
-corresponding port element in the wsdl:service section of the WSDL above.
+Interoperability Plug-Fest[1].  The main scenario document[2] listed in the second 
+column of the table at the top of [1] describes each test case.
 
 [1] http://mssoapinterop.org/ilab/
 [2] http://131.107.72.15/ilab/WSSecurity/WCFInteropPlugFest_Security.doc

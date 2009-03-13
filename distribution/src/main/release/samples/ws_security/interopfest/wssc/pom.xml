@@ -5,7 +5,7 @@
     <artifactId>ws-sc</artifactId>
     <version>1.0</version>
     <properties>
-        <cxf.version>2.2-SNAPSHOT</cxf.version>
+        <cxf.version>[2,)</cxf.version>
         <test.method></test.method>
         <baseLocation>http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc</baseLocation>
     </properties>
