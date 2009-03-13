@@ -51,7 +51,6 @@ import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.HashSessionIdManager;
 import org.mortbay.jetty.servlet.HashSessionManager;
 import org.mortbay.jetty.servlet.SessionHandler;
-import org.mortbay.thread.BoundedThreadPool;
 import org.mortbay.thread.QueuedThreadPool;
 
 
@@ -274,6 +273,7 @@ public class JettyHTTPServerEngine
      * @param url the URL associated with the servant
      * @param handler notified on incoming HTTP requests
      */
+    @SuppressWarnings("deprecation")
     public synchronized void addServant(URL url, JettyHTTPHandler handler) {
         if (server == null) {
             DefaultHandler defaultHandler = null;
@@ -307,8 +307,9 @@ public class JettyHTTPServerEngine
                
                 AbstractConnector aconn = (AbstractConnector) connector;
                 if (isSetThreadingParameters()) {
-                    if (aconn.getThreadPool() instanceof BoundedThreadPool) {
-                        BoundedThreadPool pool = (BoundedThreadPool)aconn.getThreadPool();
+                    if (aconn.getThreadPool() instanceof org.mortbay.thread.BoundedThreadPool) {
+                        org.mortbay.thread.BoundedThreadPool pool 
+                            = (org.mortbay.thread.BoundedThreadPool)aconn.getThreadPool();
                         if (getThreadingParameters().isSetMinThreads()) {
                             pool.setMinThreads(getThreadingParameters().getMinThreads());
                         }
