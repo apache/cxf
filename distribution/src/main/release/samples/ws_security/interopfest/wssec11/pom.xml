@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.interopfest</groupId>
+    <groupId>org.apache.cxf.samples.interopfest</groupId>
     <artifactId>ws-sec11</artifactId>
     <version>1.0</version>
     <properties>
@@ -70,7 +70,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.version}</version>
+                <version>LATEST</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
