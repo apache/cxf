@@ -194,6 +194,14 @@ public class WSDLServiceBuilder {
                 PortType portType = def.getPortType((QName)entry.getKey());
                 ServiceInfo serviceInfo = this.buildMockService(def, portType);
                 serviceList.add(serviceInfo);
+                
+                for (Iterator it2 = d.getAllBindings().values().iterator(); it2.hasNext();) {
+                    Binding b = (Binding)it2.next();
+                    if (b.getPortType() == portType) {
+                        this.buildBinding(serviceInfo, b);
+                        break;
+                    }
+                }
             }
 
             if (def.getPortTypes().size() == 0) {

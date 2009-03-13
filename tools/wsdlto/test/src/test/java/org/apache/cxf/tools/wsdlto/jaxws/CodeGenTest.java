@@ -1309,5 +1309,21 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertEquals(1, sei.getMethods().length);
         assertFalse(Void.TYPE.equals(sei.getMethods()[0].getReturnType()));
     }
+    @Test
+    public void testCXF1950()  throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/helloworld-noservice-header.wsdl"));
+
+        processor.setContext(env);
+        processor.execute();
+
+        File seif = new File(output, "org/apache/cxf/helloworld/HelloWorldServiceImpl.java");
+        assertTrue(seif.exists());
+        Class sei =  classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
+        Method m[] = sei.getDeclaredMethods();
+        assertEquals(1, m.length);
+        assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);
+        WebParam wp = (WebParam)m[0].getParameterAnnotations()[1][0];
+        assertTrue(wp.header());
+    }
 
 }

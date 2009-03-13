@@ -93,11 +93,12 @@ public class ServiceProcessor extends AbstractProcessor {
     }
 
     public void process(ServiceInfo si) throws ToolException {
-        if (si.getName() == null) {
-            return;
-        }
         this.service = si;
-        processService(context.get(JavaModel.class));
+        if (si.getName() == null) {
+            processBindings(context.get(JavaModel.class));
+        } else {
+            processService(context.get(JavaModel.class));
+        }
 
     }
 
@@ -281,6 +282,25 @@ public class ServiceProcessor extends AbstractProcessor {
         }
         return jport;
     }
+    private void processBindings(JavaModel model) {
+        for (BindingInfo binding : service.getBindings()) {
+            bindingType = getBindingType(binding);
+
+            if (bindingType == null) {
+                org.apache.cxf.common.i18n.Message msg =
+                    new org.apache.cxf.common.i18n.Message("BINDING_SPECIFY_ONE_PROTOCOL",
+                                                           LOG,
+                                                           binding.getName());
+                throw new ToolException(msg);
+            }
+
+            Collection<BindingOperationInfo> operations = binding.getOperations();
+            for (BindingOperationInfo bop : operations) {
+                processOperation(model, bop, binding);
+            }
+        }
+    }
+
 
     private void processOperation(JavaModel model, BindingOperationInfo bop, BindingInfo binding)
         throws ToolException {
