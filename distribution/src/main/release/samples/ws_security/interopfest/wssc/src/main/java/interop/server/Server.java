@@ -21,10 +21,11 @@ package interop.server;
 
 import javax.xml.ws.Endpoint;
 
+import interop.client.KeystorePasswordCallback;
+
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.security.SecurityConstants;
 
-import interop.client.KeystorePasswordCallback;
 
 public class Server {
     protected Server(String baseUrl) throws Exception {

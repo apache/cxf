@@ -25,12 +25,13 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import interopbaseaddress.interop.IPingService;
+
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.tempuri.AsymmetricFederatedService;
 import org.tempuri.SymmetricFederatedService;
 
 
-import interopbaseaddress.interop.IPingService;
 
 public final class Client {
     

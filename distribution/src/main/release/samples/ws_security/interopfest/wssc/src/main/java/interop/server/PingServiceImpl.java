@@ -19,14 +19,15 @@
 package interop.server;
 
 
-import org.xmlsoap.ping.PingResponseBody;
-
 import interopbaseaddress.interop.EchoDataSet.Request;
 import interopbaseaddress.interop.EchoDataSetResponse.EchoDataSetResult;
 import interopbaseaddress.interop.EchoXmlResponse.EchoXmlResult;
 import interopbaseaddress.interop.IPingService;
 import interopbaseaddress.interop.PingRequest;
 import interopbaseaddress.interop.PingResponse;
+
+import org.xmlsoap.ping.PingResponseBody;
+
 
 
 /**
