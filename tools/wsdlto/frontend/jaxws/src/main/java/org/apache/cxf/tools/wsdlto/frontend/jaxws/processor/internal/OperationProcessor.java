@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -178,7 +177,9 @@ public class OperationProcessor  extends AbstractProcessor {
     }
 
     private boolean isAsyncMethod(JavaMethod method) {
-        if (method.getName().endsWith(ToolConstants.ASYNC_METHOD_SUFFIX)) {
+        if (method.getName().endsWith(ToolConstants.ASYNC_METHOD_SUFFIX)
+            && method.getReturn() != null
+            && method.getReturn().getClassName() != null) {
             if (method.getReturn().getClassName().startsWith("Response<")) {
                 return true;
             } else if (method.getParameterCount() > 0
@@ -217,15 +218,40 @@ public class OperationProcessor  extends AbstractProcessor {
         callbackMethod.addAnnotation("RequestWrapper", method.getAnnotationMap().get("RequestWrapper"));
         callbackMethod.addAnnotation("SOAPBinding", method.getAnnotationMap().get("SOAPBinding"));
 
-        for (Iterator iter = method.getParameters().iterator(); iter.hasNext();) {
-            callbackMethod.addParameter((JavaParameter)iter.next());
+        boolean convertOutToAsync = !method.isWrapperStyle() 
+            && "void".equals(method.getReturn().getClassName());
+        String asyncCname = null;
+        for (JavaParameter param : method.getParameters()) {
+            if (convertOutToAsync) {
+                if (param.isHolder()) {
+                    if (param.isINOUT()) {
+                        JavaParameter p2 = new JavaParameter();
+                        
+                        p2.setName(param.getName());
+                        p2.setClassName(param.getHolderName());
+                        p2.setStyle(JavaType.Style.IN);
+                        callbackMethod.addParameter(p2);
+                        for (String s : param.getAnnotationTags()) {
+                            JAnnotation ann = param.getAnnotation(s);
+                            p2.addAnnotation(s, ann);
+                        }
+                    } else if (!param.isHeader() && asyncCname == null) {
+                        asyncCname = param.getClassName();
+                    }
+                } else {
+                    callbackMethod.addParameter(param);
+                }
+            } else {
+                callbackMethod.addParameter(param);
+            }
         }
-
         JavaParameter asyncHandler = new JavaParameter();
         
         asyncHandler.setName("asyncHandler");
         asyncHandler.setCallback(true);
-        asyncHandler.setClassName(getAsyncClassName(method, "AsyncHandler"));
+        asyncHandler.setClassName(getAsyncClassName(method, 
+                                                    "AsyncHandler",
+                                                    asyncCname));
         asyncHandler.setStyle(JavaType.Style.IN);
         
         callbackMethod.addParameter(asyncHandler);
@@ -248,8 +274,37 @@ public class OperationProcessor  extends AbstractProcessor {
         pollingMethod.setSoapAction(method.getSoapAction());
         pollingMethod.setOperationName(method.getOperationName());
 
+
+        boolean convertOutToAsync = !method.isWrapperStyle() 
+            && "void".equals(method.getReturn().getClassName());
+        String asyncCname = null;
+        for (JavaParameter param : method.getParameters()) {
+            if (convertOutToAsync) {
+                if (param.isHolder()) {
+                    if (param.isINOUT()) {
+                        JavaParameter p2 = new JavaParameter();
+                        
+                        p2.setName(param.getName());
+                        p2.setClassName(param.getHolderName());
+                        p2.setStyle(JavaType.Style.IN);
+                        pollingMethod.addParameter(p2);
+                        for (String s : param.getAnnotationTags()) {
+                            JAnnotation ann = param.getAnnotation(s);
+                            p2.addAnnotation(s, ann);
+                        }
+                    } else if (!param.isHeader() && asyncCname == null) {
+                        asyncCname = param.getClassName();
+                    }
+                } else {
+                    pollingMethod.addParameter(param);
+                }
+            } else {
+                pollingMethod.addParameter(param);
+            }
+        }
+
         JavaReturn response = new JavaReturn();
-        response.setClassName(getAsyncClassName(method, "Response"));
+        response.setClassName(getAsyncClassName(method, "Response", asyncCname));
         pollingMethod.setReturn(response);
 
         // REVISIT: test the operation name in the annotation
@@ -258,25 +313,22 @@ public class OperationProcessor  extends AbstractProcessor {
         pollingMethod.addAnnotation("ResponseWrapper", method.getAnnotationMap().get("ResponseWrapper"));
         pollingMethod.addAnnotation("SOAPBinding", method.getAnnotationMap().get("SOAPBinding"));
 
-        for (Iterator iter = method.getParameters().iterator(); iter.hasNext();) {
-            pollingMethod.addParameter((JavaParameter)iter.next());
-        }
-
         method.getInterface().addMethod(pollingMethod);
     }
 
-    private String getAsyncClassName(JavaMethod method, String clzName) {
-        String response;
-        if (wrapperResponse != null) {
-            response = wrapperResponse.getClassName();
-        } else {
-            response = method.getReturn().getClassName();
+    private String getAsyncClassName(JavaMethod method, String clzName, String name) {
+        String response = name;
+        if (response == null) {
+            if (wrapperResponse != null) {
+                response = wrapperResponse.getClassName();
+            } else {
+                response = method.getReturn().getClassName();
+            }
+            Class<?> mappedClass = JAXBUtils.holderClass(response);
+            if (mappedClass != null) {
+                response = mappedClass.getName();
+            }
         }
-        Class<?> mappedClass = JAXBUtils.holderClass(response);
-        if (mappedClass != null) {
-            response = mappedClass.getName();
-        }
-
         StringBuffer sb = new StringBuffer();
         sb.append(clzName);
         sb.append("<");

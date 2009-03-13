@@ -56,8 +56,8 @@ public class CatalogWSDLLocator implements WSDLLocator {
     }
 
     public InputSource getBaseInputSource() {
-        InputSource result = resolver.resolve(baseUri, null);
-        if (result == null && catalogResolver != null) {
+        InputSource result = null;
+        if (catalogResolver != null) {
             try {
                 String s = catalogResolver.resolveSystem(baseUri);
                 if (s != null) {
@@ -68,6 +68,9 @@ public class CatalogWSDLLocator implements WSDLLocator {
             } catch (IOException e) {
                 //ignore
             }
+        }
+        if (result == null) {
+            result = resolver.resolve(baseUri, null);
         }
         if (wsdlUrl == null
             && result != null) {

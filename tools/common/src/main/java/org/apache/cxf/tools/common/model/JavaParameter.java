@@ -71,7 +71,9 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
     public JAnnotation getAnnotation(String tag) {
         return annotations.get(tag);
     }
-    
+    public Collection<String> getAnnotationTags() {
+        return this.annotations.keySet();
+    }
 
     public Collection<JAnnotation> getAnnotations() {
         return this.annotations.values();

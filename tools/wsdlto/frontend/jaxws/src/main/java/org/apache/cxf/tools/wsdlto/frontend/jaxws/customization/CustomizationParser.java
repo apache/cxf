@@ -130,6 +130,9 @@ public final class CustomizationParser {
     }
 
     public Element getTargetNode(String uri) {
+        if (uri.equals(wsdlURL) && wsdlNode != null) {
+            return wsdlNode;
+        }
         Document doc = null;
         InputStream ins = null;
 
