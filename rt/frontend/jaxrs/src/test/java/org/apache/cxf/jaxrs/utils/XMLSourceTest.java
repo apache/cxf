@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.client;
+package org.apache.cxf.jaxrs.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -81,6 +82,55 @@ public class XMLSourceTest extends Assert {
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
         assertNotNull(bar);
+    }
+
+    @Test
+    public void testGetNodesNoNamespace() {
+        InputStream is = new ByteArrayInputStream("<foo><bar/><bar/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        Bar[] bars = xp.getNodes("/foo/bar", Bar.class);
+        assertNotNull(bars);
+        assertEquals(2, bars.length);
+        assertNotSame(bars[0], bars[1]);
+    }
+    
+    @Test
+    public void testGetNodesNamespace() {
+        String data = "<x:foo xmlns:x=\"http://baz\"><x:bar/><x:bar/></x:foo>"; 
+        InputStream is = new ByteArrayInputStream(data.getBytes());
+        XMLSource xp = new XMLSource(is);
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("x", "http://baz");
+        Bar2[] bars = xp.getNodes("/x:foo/x:bar", map, Bar2.class);
+        assertNotNull(bars);
+        assertNotNull(bars);
+        assertEquals(2, bars.length);
+        assertNotSame(bars[0], bars[1]);
+    }
+    
+    @Test
+    public void testGetStringValue() {
+        InputStream is = new ByteArrayInputStream("<foo><bar/><bar id=\"2\"/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        String value = xp.getValue("/foo/bar/@id");
+        assertEquals("2", value);
+    }
+    
+    @Test
+    public void testGetRelativeLink() {
+        InputStream is = new ByteArrayInputStream("<foo><bar/><bar href=\"/2\"/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        URI value = xp.getLink("/foo/bar/@href");
+        assertEquals("/2", value.toString());
+    }
+    
+    @Test
+    public void testBaseURI() {
+        InputStream is = new ByteArrayInputStream(
+            "<foo xml:base=\"http://bar\"><bar/><bar href=\"/2\"/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        URI value = xp.getBaseURI();
+        assertEquals("http://bar", value.toString());
     }
     
     @XmlRootElement
