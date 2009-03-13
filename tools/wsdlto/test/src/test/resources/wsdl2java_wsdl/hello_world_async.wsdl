@@ -17,92 +17,164 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_async_soap_http" 
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_async_soap_http/types" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+<wsdl:definitions
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:http-conf="http://schemas.iona.com/transports/http/configuration"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://cxf.apache.org/w2j/hello_world_async_soap_http"
+    xmlns:x1="http://cxf.apache.org/w2j/hello_world_async_soap_http/types"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_async_soap_http" 
+    targetNamespace="http://cxf.apache.org/w2j/hello_world_async_soap_http"
     name="HelloWorld">
     <jaxws:bindings>
-	<jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping>
+        <jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping>
     </jaxws:bindings>
     <wsdl:types>
-	<schema 
-	    targetNamespace="http://cxf.apache.org/w2j/hello_world_async_soap_http/types" 
-	    xmlns="http://www.w3.org/2001/XMLSchema" 
-	    xmlns:x1="http://cxf.apache.org/w2j/hello_world_async_soap_http/types" 
-	    elementFormDefault="qualified">
-	    <element name="greetMeSometime">
-		<complexType>
-		    <sequence>
-			<element name="requestType" type="xsd:string"/>
-		    </sequence>
-		</complexType>
-	    </element>
-	    <element name="greetMeSometimeResponse">
-		<complexType>
-		    <sequence>
-			<element name="responseType" type="xsd:string"/>
-		    </sequence>
-		</complexType>
-	    </element>		
-      	<element name="testInt" type="xsd:int"/>
-        <element name="testIntResponse" type="xsd:int"/>
-	</schema>
+        <schema
+            targetNamespace="http://cxf.apache.org/w2j/hello_world_async_soap_http/types"
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:x1="http://cxf.apache.org/w2j/hello_world_async_soap_http/types"
+            elementFormDefault="qualified">
+            <element name="greetMeSometime">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeSometimeResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeWithHeader">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeWithHeaderResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeAsync">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeAsyncResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="header" type="xsd:int"/>
+            <element name="testInt" type="xsd:int"/>
+            <element name="testIntResponse" type="xsd:int"/>
+        </schema>
     </wsdl:types>
     <wsdl:message name="greetMeSometimeRequest">
-	<wsdl:part name="in" element="x1:greetMeSometime"/>
+        <wsdl:part name="in" element="x1:greetMeSometime"/>
     </wsdl:message>
     <wsdl:message name="greetMeSometimeResponse">
-	<wsdl:part name="out" element="x1:greetMeSometimeResponse"/>
+        <wsdl:part name="out" element="x1:greetMeSometimeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeWithHeaderRequest">
+        <wsdl:part name="in" element="x1:greetMeWithHeader"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeWithHeaderResponse">
+        <wsdl:part name="out" element="x1:greetMeWithHeaderResponse"/>
+        <wsdl:part name="header" element="x1:header"/>
+    </wsdl:message>
+    <wsdl:message name="HEADER">
+        <wsdl:part name="header" element="x1:header"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeAsync">
+        <wsdl:part name="in" element="x1:greetMeAsync"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeAsyncResponse">
+        <wsdl:part name="out" element="x1:greetMeAsyncResponse"/>
     </wsdl:message>
     <wsdl:message name="testIntRequest">
-    	<wsdl:part name="parameters" element="x1:testInt"></wsdl:part>
+        <wsdl:part name="parameters" element="x1:testInt"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="testIntResponse">
-    	<wsdl:part name="parameters" element="x1:testIntResponse"></wsdl:part>
+        <wsdl:part name="parameters" element="x1:testIntResponse"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="GreeterAsync">
-	<wsdl:operation name="greetMeSometime">
-	    <wsdl:input name="greetMeSometimeRequest" message="tns:greetMeSometimeRequest"/>
-	    <wsdl:output name="greetMeSometimeResponse" message="tns:greetMeSometimeResponse"/>
-	</wsdl:operation>
-	<wsdl:operation name="testInt">
-		<wsdl:input message="tns:testIntRequest"></wsdl:input>
-		<wsdl:output message="tns:testIntResponse"></wsdl:output>
-	</wsdl:operation>
+        <wsdl:operation name="greetMeSometime">
+            <wsdl:input name="greetMeSometimeRequest" message="tns:greetMeSometimeRequest"/>
+            <wsdl:output name="greetMeSometimeResponse" message="tns:greetMeSometimeResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="testInt">
+            <wsdl:input message="tns:testIntRequest"></wsdl:input>
+            <wsdl:output message="tns:testIntResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="greetMeWithHeader">
+            <wsdl:input message="tns:greetMeWithHeaderRequest"></wsdl:input>
+            <wsdl:output message="tns:greetMeWithHeaderResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="greetMeAsync">
+            <wsdl:input message="tns:greetMeAsync"></wsdl:input>
+            <wsdl:output message="tns:greetMeAsyncResponse"></wsdl:output>
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="GreeterAsync_SOAPBinding" type="tns:GreeterAsync">
-	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-	<wsdl:operation name="greetMeSometime">
-	    <soap:operation style="document"/>
-	    <wsdl:input>
-		<soap:body use="literal"/>
-	    </wsdl:input>
-	    <wsdl:output>
-		<soap:body use="literal"/>
-	    </wsdl:output>
-	</wsdl:operation>
-	<wsdl:operation name="testInt">
-	    <soap:operation style="document"/>
-	    <wsdl:input>
-		<soap:body use="literal"/>
-	    </wsdl:input>
-	    <wsdl:output>
-		<soap:body use="literal"/>
-	    </wsdl:output>
-	</wsdl:operation>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="greetMeSometime">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testInt">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="greetMeWithHeader">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="in"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="out"/>
+                <soap:header message="tns:greetMeWithHeaderResponse" part="header" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="greetMeAsync">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SOAPService">
-	<wsdl:port name="SoapPort" binding="tns:GreeterAsync_SOAPBinding">
-	    <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
-	    <http-conf:client/>
-	    <http-conf:server/>
-	</wsdl:port>
+        <wsdl:port name="SoapPort" binding="tns:GreeterAsync_SOAPBinding">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+            <http-conf:client/>
+            <http-conf:server/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
