@@ -371,7 +371,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         getDataBinding().initialize(service);
 
-        boolean isWrapped = isWrapped();
+        boolean isWrapped = isWrapped() || hasWrappedMethods(serviceInfo.getInterface());
         if (isWrapped) {
             initializeWrappedSchema(serviceInfo);
         }
@@ -408,6 +408,14 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 LOG.fine(validationComplaints);
             }
         }
+    }
+    public boolean hasWrappedMethods(InterfaceInfo interfaceInfo) {
+        for (OperationInfo opInfo : interfaceInfo.getOperations()) {
+            if (opInfo.isUnwrappedCapable()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected boolean isFromWsdl() {
