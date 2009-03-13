@@ -26,7 +26,7 @@ public class WsdlOption extends Option {
      * The WSDL file to process.
      */
     String wsdl;
-	
+
     public String getWsdl() {
         return wsdl;
     }

@@ -36,98 +36,100 @@ public class Option {
      * 
      */
     protected List<String> packagenames;
-	
+
     /**
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to 
      * specify any extra flags not addressed by other parameters
      */
     protected List<String> extraargs = new ArrayList<String>();
-	
+
     /**
      * Directory where generated java classes will be created. Defaults to plugin 'sourceRoot' parameter
      */
     protected File outputDir;
-	
+
     /**
      * Ignore the specified WSDL schema namespace when generating code.
-     * Also, optionally specifies the Java package name used by types described in the excluded namespace(s) using
-     * schema-namespace[=java-packagename]
+     * Also, optionally specifies the Java package name used by types described in the excluded 
+     * namespace(s) using schema-namespace[=java-packagename]
      */
     List<String> namespaceExcludes;
-	
+
     /**
      * Enables or disables the loading of the default excludes namespace mapping. Default is true.
      */
     Boolean defaultExcludesNamespace;
-	
+
     /**
      * Enables or disables the loading of the default namespace package name mapping. Default is true and 
-     * <a href=""http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressingnamespace</a> 
-     * package mapping will be enabled.	 
+     * <a href=""http://www.w3.org/2005/08/addressing">
+     * http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressingnamespace</a> 
+     * package mapping will be enabled.
      */
     Boolean defaultNamespacePackageMapping;
-	
+
     /**
-     * A set of dependent files used to detect the generator must process WSDL, even if generator marker files are up to date.
+     * A set of dependent files used to detect the generator must process WSDL, even 
+     * if generator marker files are up to date.
      */
     File dependencies[];
-	
+
     /**
      * Redundant directories to be deleted after code generation
      */
     File redundantDirs[];
-	
+
     /**
      * Specifies JAXWS or JAXB binding files. Use spaces to separate multiple entries.
      */
     String bindingFiles[] = new String[0];
-	
+
     /**
      * Specifies the value of the @WebServiceClient annotation's wsdlLocation property. 
      */
     String wsdlLocation = DEFAULT_WSDL_LOCATION;
-	
+
     /**
      * Specifies the frontend. Default is JAXWS. Currently supports only JAXWS frontend.
      */
     String frontEnd;
-	
+
     /**
      * Specifies the databinding. Default is JAXB. Currently supports only JAXB databinding.
      */
     String dataBinding;
-	
+
     /**
      * Specifies the wsdl version .Default is WSDL1.1. Currently suppports only WSDL1.1 version.
      */
     String wsdlVersion;
-	
+
     /**
      * Specify catalog file to map the imported wsdl/schema
      */
     String catalog;
-	
+
     /**
      * Enables or disables processing of implicit SOAP headers (i.e. SOAP headers defined in the 
      * wsdl:binding but not wsdl:portType section.) Default is false.
      */
     boolean extendedSoapHeaders;
-	
+
     /**
      * Enables validating the WSDL before generating the code. 
      */
     boolean validateWsdl;
-	
+
     /**
      * The WSDL service name to use for the generated code
      */
     String serviceName;
-	
+
     /**
      * Automatically resolve naming conflicts without requiring the use of binding customizations
      */
     boolean autoNameResolution;
-	
+
     /**
      * Disable generation of service address binding in the generated Java classes
      */
