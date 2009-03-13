@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -->
+<!-- Copyright (c) 1993-2007 IONA Technologies PLC. -->
+<!--            All Rights Reserved. -->
+<!-- -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:p="http://cxf.apache.org/policy"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
+          http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
+          http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
+          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+          http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
+>
+    <cxf:bus>
+        <cxf:features>
+            <p:policies/>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+    
+    
+    <!-- -->
+    <!-- Scenario 3.1 -->
+    <!-- -->
+    <jaxws:client name="{http://InteropBaseAddress/interop}UserNameOverTransport_IPingService" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="interop.client.UTPasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:client>
+    <http:conduit name="https://.*/UserNameOverTransport.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="password">
+                <sec:keyStore type="pkcs12" password="password" resource="certs/alice.pfx"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="pkcs12" password="password" resource="certs/bob.pfx"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>    
+    
+    <!-- -->
+    <!-- Scenario 3.3 -->
+    <!-- -->
+    <jaxws:client name="{http://InteropBaseAddress/interop}MutualCertificate10SignEncrypt_IPingService" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="etc/alice.properties"/>
+            <entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+        </jaxws:properties>
+    </jaxws:client>
+
+    
+    <!-- -->
+    <!-- Scenario 3.4 -->
+    <!-- -->
+    <jaxws:client name="{http://InteropBaseAddress/interop}MutualCertificate10SignEncryptRsa15TripleDes_IPingService" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="etc/alice.properties"/>
+            <entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+        </jaxws:properties>
+    </jaxws:client>
+
+</beans>

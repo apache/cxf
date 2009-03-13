@@ -1,0 +1,40 @@
+<project name="wssec11" default="download">
+    <property name="build.dir" location="target"/>
+    <property name="service.host" value="131.107.153.205"/>
+    <property name="trust.host" value="131.107.153.205"/>
+
+    <target name="download.internal" if="needsToDownload">
+        <mkdir dir="${build.dir}/generated/src/main/resources/certs"/>
+        <mkdir dir="${build.dir}/wsdl"/>
+        <get src="http://131.107.72.15/ilab/Certs/Certs.zip" dest="${build.dir}/Certs.zip"/>
+        <get src="http://${service.host}/PingService?wsdl" dest="${build.dir}/wsdl/PingService.wsdl"/>
+
+        <get src="http://${trust.host}/trust?wsdl" dest="${build.dir}/wsdl/trust.wsdl"/>
+        <get src="http://${trust.host}/trust?wsdl=wsdl0" dest="${build.dir}/wsdl/trust2.wsdl"/>
+        <get src="http://${trust.host}/trust?xsd=xsd0" dest="${build.dir}/wsdl/trust0.xsd"/>
+        <get src="http://${trust.host}/trust?xsd=xsd1" dest="${build.dir}/wsdl/trust1.xsd"/>
+        <get src="http://${trust.host}/trust?xsd=xsd2" dest="${build.dir}/wsdl/trust2.xsd"/>
+
+        <antcall target="transform"/>
+        <unzip src="${build.dir}/Certs.zip" dest="${build.dir}/generated/src/main/resources/certs"/>
+    </target>
+
+    <target name="transform">
+        <mkdir dir="${build.dir}/wsdl2"/>
+        <xslt basedir="${build.dir}/wsdl" destdir="${build.dir}/wsdl2"
+            style="src/style/makelocal.xsl" extension=".xml">
+            <mapper type="identity"/>
+        </xslt>
+    </target>
+
+
+    <target name="download">
+        <mkdir dir="${build.dir}"/>
+        <condition property="needsToDownload">
+          <not>
+            <available file="${build.dir}/Certs.zip"/>
+          </not>
+        </condition>
+        <antcall target="download.internal"/>
+    </target>
+</project>
