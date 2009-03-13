@@ -93,6 +93,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-wstx-msv-validation</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
