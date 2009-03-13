@@ -351,10 +351,10 @@
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/wsdl.plugin.xml</resource>
-                                </transformer>                     
+                                </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/tools.service.validator.xml</resource>
-                                </transformer>                                           
+                                </transformer>
                                 <transformer implementation="org.apache.cxf.maven.PluginTransformer">
                                     <resource>META-INF/tools-plugin.xml</resource>
                                 </transformer>
@@ -373,7 +373,39 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-plugin-sources</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.cxf</groupId>
+                                            <artifactId>cxf-codegen-plugin</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>sources</classifier>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${project.build.directory}/sources</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/all</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/all</developerConnection>

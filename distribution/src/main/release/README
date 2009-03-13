@@ -10,7 +10,8 @@ areas:
 
     * Web Services Standards Support: CXF supports a variety of web service 
       standards including SOAP, the Basic Profile, WSDL, WS-Addressing, 
-      WS-Policy, WS-ReliableMessaging, and WS-Security.
+      WS-Policy, WS-ReliableMessaging, WS-Security, WS-SecurityPolicy,
+      WS-SecureConversation, and WS-Trust.
     * Frontends: CXF supports a variety of "frontend" programming models. CXF
       implements the JAX-WS APIs. It also includes a "simple frontend" which 
       allows creation of clients and endpoints without annotations. CXF supports 
@@ -19,7 +20,7 @@ areas:
       providing REST support.
     * Ease of use: CXF is designed to be intuitive and easy to use. There 
       are simple APIs to quickly build code-first services, Maven plug-ins to 
-      make tooling integration easy, JAX-WS API support, Spring 2.0 XML support 
+      make tooling integration easy, JAX-WS API support, Spring 2.x XML support 
       to make configuration a snap, and much more.
     * Binary and Legacy Protocol Support: CXF has been designed to provide a 
       pluggable architecture that supports not only XML but also non-XML type 
