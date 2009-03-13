@@ -289,7 +289,6 @@
                         </Import-Package>
                         <Export-Package>
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
-                            org.codehaus.xfire.aegis.type.java5.*,
                             '=META-INF.cxf'
                         </Export-Package>
                         <_failok>true</_failok>

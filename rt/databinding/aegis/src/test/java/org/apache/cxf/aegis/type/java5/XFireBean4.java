@@ -18,14 +18,13 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-@SuppressWarnings("deprecation")
-@org.codehaus.xfire.aegis.type.java5.XmlType(extensibleElements = false, extensibleAttributes = false)
+@XmlType(extensibleElements = false, extensibleAttributes = false)
 public class XFireBean4 {
     private String nillableProperty;
 
     private String minOccursProperty;
 
-    @org.codehaus.xfire.aegis.type.java5.XmlElement(nillable = false)
+    @XmlElement(nillable = false)
     public String getNillableProperty() {
         return nillableProperty;
     }
@@ -34,7 +33,7 @@ public class XFireBean4 {
         this.nillableProperty = nillableProperty;
     }
 
-    @org.codehaus.xfire.aegis.type.java5.XmlElement(minOccurs = "1")
+    @XmlElement(minOccurs = "1")
     public String getMinOccursProperty() {
         return minOccursProperty;
     }

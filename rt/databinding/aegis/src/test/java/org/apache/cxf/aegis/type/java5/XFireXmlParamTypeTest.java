@@ -23,18 +23,17 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
-import org.apache.cxf.aegis.type.Configuration;
 import org.apache.cxf.aegis.type.DefaultTypeCreator;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.Type;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings("deprecation")
 public class XFireXmlParamTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
     private Java5TypeCreator creator;
 
+    @SuppressWarnings("deprecation")
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -42,7 +41,7 @@ public class XFireXmlParamTypeTest extends AbstractAegisTest {
         tm = new DefaultTypeMapping();
         creator = new Java5TypeCreator();
         creator.setNextCreator(new DefaultTypeCreator());
-        creator.setConfiguration(new Configuration());
+        creator.setConfiguration(new org.apache.cxf.aegis.type.Configuration());
         tm.setTypeCreator(creator);
     }
 
@@ -71,10 +70,9 @@ public class XFireXmlParamTypeTest extends AbstractAegisTest {
 
     public class CustomTypeService {
 
-        @org.codehaus.xfire.aegis.type.java5.XmlReturnType(type = CustomStringType.class, 
-                                                           namespace = "urn:xfire:foo", name = "custom")
+        @XmlReturnType(type = CustomStringType.class, namespace = "urn:xfire:foo", name = "custom")
         public String doFoo(
-                            @org.codehaus.xfire.aegis.type.java5.XmlParamType(type = CustomStringType.class,
+                            @XmlParamType(type = CustomStringType.class,
                                           namespace = "urn:xfire:foo", name = "custom")
                             String s) {
             return null;

@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 
 import org.apache.cxf.aegis.type.Type;
 
-@SuppressWarnings("deprecation")
 public class AnnotationReader {
     private static final Class<? extends Annotation> WEB_PARAM = load("javax.jws.WebParam");
     private static final Class<? extends Annotation> WEB_RESULT = load("javax.jws.WebResult");
@@ -38,12 +37,26 @@ public class AnnotationReader {
             load("javax.xml.bind.annotation.XmlType");
     private static final Class<? extends Annotation> XML_TRANSIENT =
             load("javax.xml.bind.annotation.XmlTransient");
-
+    
+    private static final Class<? extends Annotation> XFIRE_IGNORE_PROPERTY =
+            load("org.codehaus.xfire.aegis.type.java5.IgnoreProperty");            
+    private static final Class<? extends Annotation> XFIRE_XML_ATTRIBUTE =
+        load("org.codehaus.xfire.aegis.type.java5.XmlAttribute");            
+    private static final Class<? extends Annotation> XFIRE_XML_ELEMENT =
+        load("org.codehaus.xfire.aegis.type.java5.XmlElement");            
+    private static final Class<? extends Annotation> XFIRE_XML_TYPE =
+        load("org.codehaus.xfire.aegis.type.java5.XmlType");
+    private static final Class<? extends Annotation> XFIRE_XML_PARAM_TYPE =
+        load("org.codehaus.xfire.aegis.type.java5.XmlParamType");
+    private static final Class<? extends Annotation> XFIRE_XML_RETURN_TYPE =
+        load("org.codehaus.xfire.aegis.type.java5.XmlReturnType");
+    
+    
     @SuppressWarnings("unchecked")
     public boolean isIgnored(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 IgnoreProperty.class,
-                org.codehaus.xfire.aegis.type.java5.IgnoreProperty.class,
+                XFIRE_IGNORE_PROPERTY,
                 XML_TRANSIENT);
     }
 
@@ -51,7 +64,7 @@ public class AnnotationReader {
     public boolean isAttribute(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 XmlAttribute.class,
-                org.codehaus.xfire.aegis.type.java5.XmlAttribute.class,
+                XFIRE_XML_ATTRIBUTE,
                 XML_ATTRIBUTE);
     }
 
@@ -59,7 +72,7 @@ public class AnnotationReader {
     public boolean isElement(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 XmlElement.class,
-                org.codehaus.xfire.aegis.type.java5.XmlElement.class,
+                XFIRE_XML_ELEMENT,
                 XML_ELEMENT);
     }
 
@@ -70,7 +83,7 @@ public class AnnotationReader {
                 element,
                 Boolean.FALSE,
                 XmlElement.class,
-                org.codehaus.xfire.aegis.type.java5.XmlElement.class,
+                XFIRE_XML_ELEMENT,
                 XML_ELEMENT));
     }
 
@@ -81,8 +94,8 @@ public class AnnotationReader {
                 Type.class,
                 XmlAttribute.class,
                 XmlElement.class,
-                org.codehaus.xfire.aegis.type.java5.XmlAttribute.class,
-                org.codehaus.xfire.aegis.type.java5.XmlElement.class);
+                XFIRE_XML_ATTRIBUTE,
+                XFIRE_XML_ELEMENT);
         // jaxb uses a different default value
         if (value == null) {
             value = (Class) getAnnotationValue("type",
@@ -101,7 +114,7 @@ public class AnnotationReader {
                 index,
                 Type.class,
                 XmlParamType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlParamType.class);
+                XFIRE_XML_PARAM_TYPE);
     }
 
     @SuppressWarnings("unchecked")
@@ -110,7 +123,7 @@ public class AnnotationReader {
                 element,
                 Type.class,
                 XmlReturnType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlReturnType.class);
+                XFIRE_XML_RETURN_TYPE);
     }
 
     @SuppressWarnings("unchecked")
@@ -119,11 +132,11 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlType.class,
+                XFIRE_XML_TYPE,
                 XmlAttribute.class,
-                org.codehaus.xfire.aegis.type.java5.XmlAttribute.class,
+                XFIRE_XML_ATTRIBUTE,
                 XmlElement.class,
-                org.codehaus.xfire.aegis.type.java5.XmlElement.class);
+                XFIRE_XML_ELEMENT);
 
         // jaxb uses a different default value
         if (name == null) {
@@ -144,7 +157,7 @@ public class AnnotationReader {
                 index,
                 Type.class,
                 XmlParamType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlParamType.class,
+                XFIRE_XML_PARAM_TYPE,
                 WEB_PARAM);
     }
 
@@ -154,7 +167,7 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlReturnType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlReturnType.class,
+                XFIRE_XML_RETURN_TYPE,
                 WEB_RESULT);
     }
 
@@ -169,11 +182,11 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlType.class,
+                XFIRE_XML_TYPE,
                 XmlAttribute.class,
-                org.codehaus.xfire.aegis.type.java5.XmlAttribute.class,
+                XFIRE_XML_ATTRIBUTE,
                 XmlElement.class,
-                org.codehaus.xfire.aegis.type.java5.XmlElement.class,
+                XFIRE_XML_ELEMENT,
                 XML_SCHEMA);
 
         // jaxb uses a different default value
@@ -196,7 +209,7 @@ public class AnnotationReader {
                 index,
                 "",
                 XmlParamType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlParamType.class);
+                XFIRE_XML_PARAM_TYPE);
 
         // JWS annotation field is named targetNamespace
         if (namespace == null) {
@@ -211,7 +224,7 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlReturnType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlReturnType.class);
+                XFIRE_XML_RETURN_TYPE);
 
         // JWS annotation field is named targetNamespace
         if (namespace == null) {
@@ -226,7 +239,7 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlElement.class,
-                org.codehaus.xfire.aegis.type.java5.XmlElement.class);
+                XFIRE_XML_ELEMENT);
         if (minOccurs != null) {
             return Integer.parseInt(minOccurs);
         }
@@ -246,7 +259,7 @@ public class AnnotationReader {
                 element,
                 Boolean.TRUE,
                 XmlType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlType.class);
+                XFIRE_XML_TYPE);
 
         if (extensibleElements == null) {
             return defaultValue;
@@ -260,7 +273,7 @@ public class AnnotationReader {
                 element,
                 Boolean.TRUE,
                 XmlType.class,
-                org.codehaus.xfire.aegis.type.java5.XmlType.class);
+                XFIRE_XML_TYPE);
 
         if (extensibleAttributes == null) {
             return defaultValue;

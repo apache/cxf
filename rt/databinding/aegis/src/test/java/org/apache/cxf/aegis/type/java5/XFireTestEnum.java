@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-@SuppressWarnings("deprecation")
-@org.codehaus.xfire.aegis.type.java5.XmlType(namespace = "urn:xfire:foo")
+@XmlType(namespace = "urn:xfire:foo")
 public enum XFireTestEnum {
     VALUE1, VALUE2
 }

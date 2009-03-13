@@ -18,11 +18,10 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-@SuppressWarnings("deprecation")
 public class XFireBean3 {
     private String attributeProperty;
 
-    @org.codehaus.xfire.aegis.type.java5.XmlAttribute(name = "attribute")
+    @XmlAttribute(name = "attribute")
     public String getAttributeProperty() {
         return attributeProperty;
     }

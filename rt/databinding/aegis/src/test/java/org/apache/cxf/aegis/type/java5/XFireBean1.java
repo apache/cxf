@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-@SuppressWarnings("deprecation")
 public class XFireBean1 {
     private String elementProperty;
     private String attributeProperty;
     private String bogusProperty;
 
-    @org.codehaus.xfire.aegis.type.java5.XmlAttribute
+    @XmlAttribute
     public String getAttributeProperty() {
         return attributeProperty;
     }
@@ -41,7 +40,7 @@ public class XFireBean1 {
         this.bogusProperty = bogusProperty;
     }
 
-    @org.codehaus.xfire.aegis.type.java5.XmlElement(type = CustomStringType.class)
+    @XmlElement(type = CustomStringType.class)
     public String getElementProperty() {
         return elementProperty;
     }
