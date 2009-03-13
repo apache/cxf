@@ -21,7 +21,12 @@ package org.apache.cxf.maven_plugin;
 
 
 public class WsdlOption extends Option {
+
+    /**
+     * The WSDL file to process.
+     */
     String wsdl;
+	
     public String getWsdl() {
         return wsdl;
     }
