@@ -44,7 +44,7 @@ import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Provider
 @Consumes({"multipart/related", "multipart/mixed", "multipart/alternative" })
-public class ActivationProvider implements MessageBodyReader<Object> {
+public class MultipartProvider implements MessageBodyReader<Object> {
 
     @Context
     private MessageContext mc;

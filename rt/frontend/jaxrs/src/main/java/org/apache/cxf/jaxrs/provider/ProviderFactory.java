@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -35,6 +36,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
@@ -49,17 +51,26 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public final class ProviderFactory {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     
     static {
+        // TODO : do dynamic instantiation of JSON and few other default providers
+        JSONProvider jsonProvider = null;
+        try {
+            jsonProvider = new JSONProvider();
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            LOG.fine("Problem with instantiating the default JSON provider");
+        }
+        
         SHARED_FACTORY.setProviders(new JAXBElementProvider(),
-                                    new JSONProvider(),
+                                    jsonProvider,
                                     new BinaryDataProvider(),
                                     new SourceProvider(),
                                     new FormEncodingProvider(),
                                     new PrimitiveTextProvider(),
-                                    new ActivationProvider(),
+                                    new MultipartProvider(),
                                     new WebApplicationExceptionMapper(),
                                     new SystemQueryHandler());
     }
@@ -272,6 +283,9 @@ public final class ProviderFactory {
     private void setProviders(Object... providers) {
         
         for (Object o : providers) {
+            if (o == null) {
+                continue;
+            }
             if (MessageBodyReader.class.isAssignableFrom(o.getClass())) {
                 messageReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)o)); 
             }

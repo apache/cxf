@@ -28,6 +28,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +69,16 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         
     }
 
+    @Test
+    public void testSubresourcesOnlyDynamicResolution() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly.class);
+        sf.create();
+        
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        assertEquals(1, resources.size());
+    }
+    
     @Test
     public void testSubResources() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();

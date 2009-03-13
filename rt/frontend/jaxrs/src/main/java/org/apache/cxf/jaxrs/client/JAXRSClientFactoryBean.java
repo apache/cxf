@@ -111,11 +111,15 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
     
-    public <T> T create(Class<T> cls) {
-        return cls.cast(create());
+    public <T> T create(Class<T> cls, Object... varValues) {
+        return cls.cast(createWithValues(varValues));
     }
     
-    public Client create() {
+    public Client create() { 
+        return createWithValues();
+    }
+    
+    public Client createWithValues(Object... varValues) {
         checkResources();
         
         try {
@@ -123,7 +127,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             URI baseURI = URI.create(getAddress());
             ClassResourceInfo cri = serviceFactory.getClassResourceInfo().get(0);
             boolean isRoot = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Path.class) != null;
-            ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders);
+            ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders,
+                                                            varValues);
             initClient(proxyImpl, ep);    
             
             return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
