@@ -20,10 +20,10 @@
 package demo.hw.server;
 
 import java.util.logging.Logger;
-import org.apache.hello_world_soap_http.Greeter;
-import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.helloWorldSoapHttp.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttp.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http.Greeter;
+import org.apache.hello_world_soap_http.PingMeFault;
 
 @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
                       targetNamespace = "http://apache.org/hello_world_soap_http", 
@@ -64,7 +64,8 @@ public class GreeterImpl implements Greeter {
     
     public void pingMe() throws PingMeFault {
         // here we need to put the FaultDetail into the FaultDetailDocument
-        FaultDetailDocument faultDocument = org.apache.helloWorldSoapHttp.types.FaultDetailDocument.Factory.newInstance();        
+        FaultDetailDocument faultDocument 
+            = org.apache.helloWorldSoapHttp.types.FaultDetailDocument.Factory.newInstance();
         FaultDetail faultDetail = faultDocument.addNewFaultDetail();
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
