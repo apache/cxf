@@ -51,7 +51,7 @@ public class KeystorePasswordCallback implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
 
-            String pass = passwords.get(pc.getIdentifer());
+            String pass = passwords.get(pc.getIdentifier());
             if (pass != null) {
                 pc.setPassword(pass);
                 return;
