@@ -47,7 +47,20 @@ public final class Client {
      */
     public static void main(String argv[])
         throws Exception {
-        if (argv.length < 1) {
+        
+        boolean local = false;
+
+        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])) {
+            local = true;
+        }
+        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])
+            || "ms".equalsIgnoreCase(argv[0])) {        
+            String tmp[] = new String[argv.length - 1];
+            System.arraycopy(argv, 1, tmp, 0, tmp.length);
+            argv = tmp;
+        }
+
+        if (argv.length < 1 || "ALL".equalsIgnoreCase(argv[0])) {
             argv = new String[] {
                 "UserNameOverTransport",
                 "MutualCertificate10SignEncrypt",
@@ -62,8 +75,7 @@ public final class Client {
         for (String portPrefix : argv) {
             try {
                 PingService10 svc = null; 
-                boolean isLocal = false;
-                if (isLocal) {
+                if (local) {
                     wsdlLocation = getWsdlLocation(portPrefix); 
                     svc = new PingService10(wsdlLocation);
                 } else {

@@ -62,7 +62,6 @@ public final class Client {
             System.arraycopy(argv, 1, tmp, 0, tmp.length);
             argv = tmp;
         }
-        System.out.println(argv[0] + "    " + local);
 
         if (argv.length < 1 || "".equals(argv[0]) 
             || argv[0] == null || "ALL".equals(argv[0])) {
