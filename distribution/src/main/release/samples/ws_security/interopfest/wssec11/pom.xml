@@ -24,7 +24,8 @@
     <version>1.0</version>
     <properties>
         <cxf.version>[2,)</cxf.version>
-        <test.method>A</test.method>
+        <test.method>ALL</test.method>
+        <test.server>MS</test.server>
     </properties>
     <build>
         <resources>
@@ -62,7 +63,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <ant inheritRefs="true" antfile="${basedir}/build.xml">
+                                <ant inheritRefs="true" antfile="${basedir}/download_wsdl.xml">
                                     <property value="${basedir}/target" name="build.dir" />
                                     <target name="download" />
                                 </ant>
@@ -124,7 +125,8 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.hw.server.Server</mainClass>
+                                    <classpathScope>test</classpathScope>
+                                    <mainClass>interop.server.Server</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
@@ -150,6 +152,7 @@
                                     <classpathScope>test</classpathScope>
                                     <mainClass>interop.client.Client</mainClass>
                                     <arguments>
+                                        <argument>${test.server}</argument>
                                         <argument>${test.method}</argument>
                                     </arguments>
                                 </configuration>
