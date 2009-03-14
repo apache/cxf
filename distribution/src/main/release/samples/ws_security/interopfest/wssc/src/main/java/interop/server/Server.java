@@ -25,11 +25,12 @@ import interop.client.KeystorePasswordCallback;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.ws.security.WSSConfig;
 
 
 public class Server {
     protected Server(String baseUrl) throws Exception {
-        
+        WSSConfig.getDefaultWSConfig();
         new SpringBusFactory().createBus("etc/server.xml");
         
         //"SecureConversation_UserNameOverTransport_IPingService",

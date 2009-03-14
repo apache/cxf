@@ -51,8 +51,21 @@ public final class Client {
         throws Exception {
 
         boolean useLocalWCFServices = false;
+        boolean local = false;
 
-        if (argv.length < 1 || "".equals(argv[0]) || argv[0] == null) {
+        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])) {
+            local = true;
+        }
+        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])
+            || "ms".equalsIgnoreCase(argv[0])) {        
+            String tmp[] = new String[argv.length - 1];
+            System.arraycopy(argv, 1, tmp, 0, tmp.length);
+            argv = tmp;
+        }
+        System.out.println(argv[0] + "    " + local);
+
+        if (argv.length < 1 || "".equals(argv[0]) 
+            || argv[0] == null || "ALL".equals(argv[0])) {
             argv = new String[] {
                 //"SecureConversation_UserNameOverTransport_IPingService", 
                              //service not running on the https port
@@ -98,6 +111,7 @@ public final class Client {
         //argv = new String[] {argv[4]};
         //argv = new String[] {"_X10_IPingService"};
         
+        
         new SpringBusFactory().createBus("etc/client.xml");
         List<String> results = new ArrayList<String>(argv.length);
         URL wsdlLocation = null;
@@ -105,7 +119,9 @@ public final class Client {
         for (String portPrefix : argv) {
             try {
                 PingService svc;
-                //wsdlLocation = new URL("http://localhost:9001/" + portPrefix + "?wsdl");
+                if (local) {
+                    wsdlLocation = new URL("http://localhost:9001/" + portPrefix + "?wsdl");
+                }
                 boolean isLocal = false;
                 try {
                     if (wsdlLocation != null) {
