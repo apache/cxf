@@ -356,7 +356,6 @@
         </http:tlsClientParameters>
     </http:conduit>
     
-    <!--
     <http:conduit name="https://131.107.153.205/.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
@@ -374,12 +373,12 @@
                 <sec:keyStore type="pkcs12" password="password" resource="certs/alice.pfx"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="certs/WssIP.pfx"/>
+                <sec:keyStore type="pkcs12" password="password" resource="certs/alice.pfx"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
         <http:client Connection="close" AllowChunking="false"/>
     </http:conduit>
-    
+    <!--
     <http:conduit name="{http://tempuri.org/}CustomBinding_IPingServiceContract.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
@@ -391,9 +390,8 @@
         </http:tlsClientParameters>
         <http:client Connection="close" AllowChunking="false"/>
     </http:conduit>
-    -->
     
-    <http:conduit name="*.http-conduit">
+    <http:conduit name="https://131.107.153.205/.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                 <sec:keyStore type="pkcs12" password="password" resource="certs/alice.pfx"/>
@@ -405,5 +403,6 @@
         <http:client Connection="close" AllowChunking="false" ConnectionTimeout="0"
             ReceiveTimeout="0"/>
     </http:conduit>    
+    -->
     
 </beans>

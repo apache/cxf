@@ -55,16 +55,18 @@ public final class Client {
                 "CustomBinding_IPingServiceContract2", 
 //                "CustomBinding_IPingServiceContract3", //NOT WORKING - [1]
                 "CustomBinding_IPingServiceContract4", 
-//                "CustomBinding_IPingServiceContract6", //NOT WORKING
-//                "CustomBinding_IPingServiceContract5", //NOT WORKING -[2]
+//                "CustomBinding_IPingServiceContract6", //NOT WORKING - [1]
+//                "CustomBinding_IPingServiceContract5", //NOT WORKING - [2]
 //                "CustomBinding_IPingServiceContract7", //NOT WORKING - service not running on given port
 //                "CustomBinding_IPingServiceContract8", //Hanging?
-//                "CustomBinding_IPingServiceContract9", //NOT WORKING
+//                "CustomBinding_IPingServiceContract9", //NOT WORKING - [3]
                 "CustomBinding_IPingServiceContract10",
             };
         }
         //argv = new String[] {argv[3]};
-
+        //argv = new String[] {"CustomBinding_IPingServiceContract8"};
+            
+            
         new SpringBusFactory().createBus("etc/client.xml");
         List<String> results = new ArrayList<String>(argv.length);
         
@@ -107,7 +109,11 @@ public final class Client {
      <trust:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey</trust:KeyType>
     but the "sample" produced from their online tool sends SymetricKey
 
-[2] OasisScenario9/10 (CustomBinding_IPingServiceContract4/5) isn't working yet due to WSS4J 
+[2] OasisScenario9/10 (CustomBinding_IPingServiceContract5) isn't working yet due to WSS4J 
     not supporting using RSAKeyValue (KeyInfo, WS-SecurityPolicy/KeyValueToken) things for 
-    creating signatures
+    creating signatures in version 1.5.5 which was the current version when writing this
+    sample.  1.5.6 does support RSAKeyValue, but this sample hasn't been updated yet.
+ 
+[3] The trust token is being retrieved sucessfully.  It's not able to negotiate the https 
+    connection with the final endpoint.  Not sure which exact keys to use yet. 
  */
