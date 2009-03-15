@@ -36,8 +36,7 @@ Building
 
 Building kit
 ------------
-1) Change to the "distribution" directory of Apache CXF source distribution.
-2) Run 
-         $> mvn
+1) From top level, run
+         $> mvn -Pfastinstall,everything
    This will build an Apache CXF distribution kit under "distribution/target"
    directory.

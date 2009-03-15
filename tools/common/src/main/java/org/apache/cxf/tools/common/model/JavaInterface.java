@@ -202,12 +202,14 @@ public class JavaInterface implements JavaAnnotatable {
             && getPackageName().equals(i.substring(0, i.lastIndexOf(".")))) {
             return;
         }
-        imports.add(i);
+        // replace "$" with "." to correctly deal with member classes
+        imports.add(i.replaceAll("\\$", "\\."));
     }
     
     public void addImports(Collection<String> ii) {
         for (String i : ii) {
-            imports.add(i);
+            // replace "$" with "." to correctly deal with member classes
+            imports.add(i.replaceAll("\\$", "\\."));
         }
     }
 
