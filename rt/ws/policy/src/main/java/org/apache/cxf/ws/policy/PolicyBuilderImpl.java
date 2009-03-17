@@ -100,10 +100,11 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
         if (!Constants.ELEM_POLICY_REF.equals(element.getLocalName())) {
             throw new PolicyException(new Message("NOT_A_POLICYREF_ELEMENT_EXC", BUNDLE));
         }
-
-        PolicyReference reference = new PolicyReference();
-        reference.setURI(element.getAttribute("URI"));
-        return reference;
+        synchronized (element) {
+            PolicyReference reference = new PolicyReference();
+            reference.setURI(element.getAttribute("URI"));
+            return reference;
+        }
     }
     
     /**
@@ -141,57 +142,59 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
     }
 
     private PolicyOperator processOperationElement(Element operationElement, PolicyOperator operator) {
-
-        if (Constants.TYPE_POLICY == operator.getType()) {
-            Policy policyOperator = (Policy)operator;
-            QName key;
-
-            NamedNodeMap nnm = operationElement.getAttributes();
-            for (int i = 0; i < nnm.getLength(); i++) {
-                Node n = nnm.item(i);
-                if (Node.ATTRIBUTE_NODE == n.getNodeType()) {
-                    String namespace = n.getNamespaceURI();    
-                    if (namespace == null) {
-                        key = new QName(n.getLocalName());
-
-                    } else if (n.getPrefix() == null) {
-                        key = new QName(namespace, n.getLocalName());
-
-                    } else {
-                        key = new QName(namespace, n.getLocalName(), n.getPrefix());
+        synchronized (operationElement) {
+    
+            if (Constants.TYPE_POLICY == operator.getType()) {
+                Policy policyOperator = (Policy)operator;
+                QName key;
+    
+                NamedNodeMap nnm = operationElement.getAttributes();
+                for (int i = 0; i < nnm.getLength(); i++) {
+                    Node n = nnm.item(i);
+                    if (Node.ATTRIBUTE_NODE == n.getNodeType()) {
+                        String namespace = n.getNamespaceURI();    
+                        if (namespace == null) {
+                            key = new QName(n.getLocalName());
+    
+                        } else if (n.getPrefix() == null) {
+                            key = new QName(namespace, n.getLocalName());
+    
+                        } else {
+                            key = new QName(namespace, n.getLocalName(), n.getPrefix());
+                        }
+                        policyOperator.addAttribute(key, n.getNodeValue());
                     }
-                    policyOperator.addAttribute(key, n.getNodeValue());
-                }
-            }            
-        }
-
-        
-        Element childElement;
-        for (Node n = operationElement.getFirstChild(); n != null; n = n.getNextSibling()) {
-            if (Node.ELEMENT_NODE != n.getNodeType()) {
-                continue;
+                }            
             }
-            childElement = (Element)n;
-            String namespaceURI = childElement.getNamespaceURI();
-            String localName = childElement.getLocalName();
-
-            QName qn = new QName(namespaceURI, localName);
-            if (PolicyConstants.isPolicyElem(qn)) {
-                operator.addPolicyComponent(getPolicyOperator(childElement));
-            } else if (PolicyConstants.isAll(qn)) {
-                operator.addPolicyComponent(getAllOperator(childElement));
-            } else if (PolicyConstants.isExactlyOne(qn)) {
-                operator.addPolicyComponent(getExactlyOneOperator(childElement));
-            } else if (PolicyConstants.isPolicyRefElem(qn)) {
-                operator.addPolicyComponent(getPolicyReference(childElement));                
-            } else if (null != assertionBuilderRegistry) {
-                PolicyAssertion a = assertionBuilderRegistry.build(childElement);
-                if (null != a) {
-                    operator.addPolicyComponent(a);
+    
+            
+            Element childElement;
+            for (Node n = operationElement.getFirstChild(); n != null; n = n.getNextSibling()) {
+                if (Node.ELEMENT_NODE != n.getNodeType()) {
+                    continue;
+                }
+                childElement = (Element)n;
+                String namespaceURI = childElement.getNamespaceURI();
+                String localName = childElement.getLocalName();
+    
+                QName qn = new QName(namespaceURI, localName);
+                if (PolicyConstants.isPolicyElem(qn)) {
+                    operator.addPolicyComponent(getPolicyOperator(childElement));
+                } else if (PolicyConstants.isAll(qn)) {
+                    operator.addPolicyComponent(getAllOperator(childElement));
+                } else if (PolicyConstants.isExactlyOne(qn)) {
+                    operator.addPolicyComponent(getExactlyOneOperator(childElement));
+                } else if (PolicyConstants.isPolicyRefElem(qn)) {
+                    operator.addPolicyComponent(getPolicyReference(childElement));                
+                } else if (null != assertionBuilderRegistry) {
+                    PolicyAssertion a = assertionBuilderRegistry.build(childElement);
+                    if (null != a) {
+                        operator.addPolicyComponent(a);
+                    }
                 }
             }
+            return operator;
         }
-        return operator;
     }
     
 }

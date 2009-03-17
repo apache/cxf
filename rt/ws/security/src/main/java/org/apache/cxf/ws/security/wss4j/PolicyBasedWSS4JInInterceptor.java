@@ -20,12 +20,15 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -37,9 +40,11 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -64,6 +69,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
  * 
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
+    public static final String PROPERTIES_CACHE = "ws-security.properties.cache";
 
     /**
      * 
@@ -72,9 +78,24 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         super(true);
     }
     
-    
+    protected static Map<Object, Properties> getPropertiesCache(SoapMessage message) {
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            Map<Object, Properties> o = CastUtils.cast((Map<?, ?>)message
+                                                       .getContextualProperty(PROPERTIES_CACHE));
+            if (o == null) {
+                o = new ConcurrentHashMap<Object, Properties>();
+                info.setProperty(PROPERTIES_CACHE, o);
+            }
+            return o;
+        }
+    }
+
     private static Properties getProps(Object o, SoapMessage message) {
-        Properties properties = null;
+        Properties properties = getPropertiesCache(message).get(o);
+        if (properties != null) {
+            return properties;
+        }
         if (o instanceof Properties) {
             properties = (Properties)o;
         } else if (o instanceof String) {
@@ -86,7 +107,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 if (url != null) {
                     properties = new Properties();
-                    properties.load(url.openStream());
+                    InputStream ins = url.openStream();
+                    properties.load(ins);
+                    ins.close();
                 }
             } catch (IOException e) {
                 properties = null;
@@ -94,12 +117,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         } else if (o instanceof URL) {
             properties = new Properties();
             try {
-                properties.load(((URL)o).openStream());
+                InputStream ins = ((URL)o).openStream();
+                properties.load(ins);
+                ins.close();
             } catch (IOException e) {
                 properties = null;
             }            
         }
-        
+        if (properties != null) {
+            getPropertiesCache(message).put(o, properties);
+        }
         return properties;
     }
     

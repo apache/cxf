@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,11 +61,13 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -119,7 +123,9 @@ import org.apache.ws.security.util.WSSecurityUtil;
  * 
  */
 public abstract class AbstractBindingBuilder {
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractBindingBuilder.class); 
+    public static final String CRYPTO_CACHE = "ws-security.crypto.cache";
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractBindingBuilder.class);
+    
     
     protected SPConstants.ProtectionOrder protectionOrder = SPConstants.ProtectionOrder.SignBeforeEncrypting;
     
@@ -308,14 +314,27 @@ public abstract class AbstractBindingBuilder {
         return null;
     } 
     
-    protected final TokenStore getTokenStore() {
-        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-        if (tokenStore == null) {
-            tokenStore = new MemoryTokenStore();
-            message.getExchange().get(Endpoint.class).getEndpointInfo()
-                .setProperty(TokenStore.class.getName(), tokenStore);
+    protected final Map<Object, Crypto> getCryptoCache() {
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            Map<Object, Crypto> o = CastUtils.cast((Map<?, ?>)message.getContextualProperty(CRYPTO_CACHE));
+            if (o == null) {
+                o = new ConcurrentHashMap<Object, Crypto>();
+                info.setProperty(CRYPTO_CACHE, o);
+            }
+            return o;
         }
-        return tokenStore;
+    }
+    protected final TokenStore getTokenStore() {
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            if (tokenStore == null) {
+                tokenStore = new MemoryTokenStore();
+                info.setProperty(TokenStore.class.getName(), tokenStore);
+            }
+            return tokenStore;
+        }
     }
     protected WSSecTimestamp createTimestamp() {
         Collection<AssertionInfo> ais;
@@ -879,7 +898,15 @@ public abstract class AbstractBindingBuilder {
         }
         
         
-        Object o = message.getContextualProperty(propKey); 
+        Object o = message.getContextualProperty(propKey);
+        if (o == null) {
+            return null;
+        }
+        
+        crypto = getCryptoCache().get(o);
+        if (crypto != null) {
+            return crypto;
+        }
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
@@ -891,8 +918,10 @@ public abstract class AbstractBindingBuilder {
                     url = ClassLoaderUtils.getResource((String)o, this.getClass());
                 }
                 if (url != null) {
+                    InputStream ins = url.openStream();
                     properties = new Properties();
-                    properties.load(url.openStream());
+                    properties.load(ins);
+                    ins.close();
                 } else {
                     policyNotAsserted(wrapper, "Could not find properties file " + o);
                 }
@@ -902,16 +931,19 @@ public abstract class AbstractBindingBuilder {
         } else if (o instanceof URL) {
             properties = new Properties();
             try {
-                properties.load(((URL)o).openStream());
+                InputStream ins = ((URL)o).openStream();
+                properties.load(ins);
+                ins.close();
             } catch (IOException e) {
                 policyNotAsserted(wrapper, e);
             }            
         }
         
         if (properties != null) {
-            return CryptoFactory.getInstance(properties);
+            crypto = CryptoFactory.getInstance(properties);
+            getCryptoCache().put(o, crypto);
         }
-        return null;
+        return crypto;
     }
     
     public void setKeyIdentifierType(WSSecBase secBase, TokenWrapper wrapper, Token token) {

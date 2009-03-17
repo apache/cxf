@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.trust;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -794,13 +795,17 @@ public class STSClient implements Configurable {
             }
             if (url != null) {
                 properties = new Properties();
-                properties.load(url.openStream());
+                InputStream ins = url.openStream();
+                properties.load(ins);
+                ins.close();
             } else {
                 throw new Fault("Could not find properties file " + url, LOG);
             }
         } else if (o instanceof URL) {
             properties = new Properties();
-            properties.load(((URL)o).openStream());
+            InputStream ins = ((URL)o).openStream();
+            properties.load(ins);
+            ins.close();
         }
 
         if (properties != null) {

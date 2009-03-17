@@ -21,10 +21,10 @@ package org.apache.cxf.ws.security.wss4j;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
@@ -57,7 +57,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     private Set<String> after = new HashSet<String>();
     private String phase;
     private String id;
-    private Map<String, Crypto> cryptoTable = new Hashtable<String, Crypto>();
+    private Map<String, Crypto> cryptoTable = new ConcurrentHashMap<String, Crypto>();
     
     public AbstractWSS4JInterceptor() {
         super();
@@ -160,13 +160,13 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
          */
         String sigPropFile = getString(WSHandlerConstants.SIG_PROP_FILE,
                    reqData.getMsgContext());
+        String refId = null;
         if (sigPropFile != null) {
-            if (cryptoTable.get(sigPropFile) == null) {
+            crypto = cryptoTable.get(sigPropFile);
+            if (crypto == null) {
                 crypto = CryptoFactory.getInstance(sigPropFile, this
                         .getClassLoader(reqData.getMsgContext()));
                 cryptoTable.put(sigPropFile, crypto);
-            } else {
-                crypto = cryptoTable.get(sigPropFile);
             }
         } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData
             .getMsgContext()) != null) {
@@ -174,19 +174,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
              * If the property file is missing then 
              * look for the Properties object 
              */
-            String refId = getString(WSHandlerConstants.SIG_PROP_REF_ID,
+            refId = getString(WSHandlerConstants.SIG_PROP_REF_ID,
                 reqData.getMsgContext());
             if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
                 if (propObj instanceof Properties) {
-                    if (cryptoTable.get(refId) == null) {
+                    crypto = cryptoTable.get(refId);
+                    if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptoTable.put(refId, crypto);
-                    } else {
-                        crypto = cryptoTable.get(refId);
                     }
-                } else {
-                    return crypto;
                 }
             }
         } 
@@ -198,13 +195,13 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         Crypto crypto = null;
         String decPropFile = getString(WSHandlerConstants.DEC_PROP_FILE,
                  reqData.getMsgContext());
+        String refId = null;
         if (decPropFile != null) {
-            if (cryptoTable.get(decPropFile) == null) {
+            crypto = cryptoTable.get(decPropFile);
+            if (crypto == null) {
                 crypto = CryptoFactory.getInstance(decPropFile, this
                         .getClassLoader(reqData.getMsgContext()));
                 cryptoTable.put(decPropFile, crypto);
-            } else {
-                crypto = cryptoTable.get(decPropFile);
             }
         } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData
             .getMsgContext()) != null) {
@@ -212,19 +209,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
              * If the property file is missing then 
              * look for the Properties object 
              */
-            String refId = getString(WSHandlerConstants.DEC_PROP_REF_ID,
+            refId = getString(WSHandlerConstants.DEC_PROP_REF_ID,
                 reqData.getMsgContext());
             if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
                 if (propObj instanceof Properties) {
-                    if (cryptoTable.get(refId) == null) {
+                    crypto = cryptoTable.get(refId);
+                    if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptoTable.put(refId, crypto);
-                    } else {
-                        crypto = cryptoTable.get(refId);
                     }
-                } else {
-                    return crypto;
                 }
             }
         } 
@@ -240,13 +234,13 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         */
         String encPropFile = getString(WSHandlerConstants.ENC_PROP_FILE,
                        reqData.getMsgContext());
+        String refId = null;
         if (encPropFile != null) {
-            if (cryptoTable.get(encPropFile) == null) {
+            crypto = cryptoTable.get(encPropFile);
+            if (crypto == null) {
                 crypto = CryptoFactory.getInstance(encPropFile, this
                         .getClassLoader(reqData.getMsgContext()));
                 cryptoTable.put(encPropFile, crypto);
-            } else {
-                crypto = cryptoTable.get(encPropFile);
             }
         } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData
                 .getMsgContext()) != null) {
@@ -254,19 +248,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
              * If the property file is missing then 
              * look for the Properties object 
              */
-            String refId = getString(WSHandlerConstants.ENC_PROP_REF_ID,
+            refId = getString(WSHandlerConstants.ENC_PROP_REF_ID,
                     reqData.getMsgContext());
             if (refId != null) {
                 Object propObj = getProperty(reqData.getMsgContext(), refId);
                 if (propObj instanceof Properties) {
-                    if (cryptoTable.get(refId) == null) {
+                    crypto = cryptoTable.get(refId);
+                    if (crypto == null) {
                         crypto = CryptoFactory.getInstance((Properties)propObj);
                         cryptoTable.put(refId, crypto);
-                    } else {
-                        crypto = cryptoTable.get(encPropFile);
                     }
-                } else {
-                    return crypto;
                 }
             }
         } else if (reqData.getSigCrypto() == null) {
