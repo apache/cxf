@@ -19,6 +19,10 @@
 
 package org.apache.cxf.xmlbeans;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,20 +32,25 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
+import org.apache.cxf.databinding.AbstractWrapperHelper;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.databinding.WrapperCapableDatabinding;
+import org.apache.cxf.databinding.WrapperHelper;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.ServiceInfo;
+
+
 
 
 /**
  * 
  */
-public class XmlBeansDataBinding extends AbstractDataBinding {
+public class XmlBeansDataBinding extends AbstractDataBinding implements WrapperCapableDatabinding {
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
 
     private static final Class<?> SUPPORTED_READER_FORMATS[] = new Class<?>[] {XMLStreamReader.class};
@@ -101,6 +110,58 @@ public class XmlBeansDataBinding extends AbstractDataBinding {
                 = new XmlBeansSchemaInitializer(serviceInfo, col, this);
             schemaInit.walk();
         }
+    }
+
+    public WrapperHelper createWrapperHelper(Class<?> wrapperType, List<String> partNames,
+                                             List<String> elTypeNames, List<Class<?>> partClasses) {
+        
+        List<Method> getMethods = new ArrayList<Method>(partNames.size());
+        List<Method> setMethods = new ArrayList<Method>(partNames.size());        
+        List<Field> fields = new ArrayList<Field>(partNames.size());
+        
+        Method allMethods[] = wrapperType.getMethods();
+                        
+        for (int x = 0; x < partNames.size(); x++) {
+            String partName = partNames.get(x);            
+            if (partName == null) {
+                getMethods.add(null);
+                setMethods.add(null);
+                fields.add(null);
+                continue;
+            }
+                                   
+            String getAccessor = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.GETTER);
+            String setAccessor = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.SETTER);
+            Method getMethod = null;
+            Method setMethod = null;
+            Class<?> valueClass = XmlBeansWrapperHelper.getXMLBeansValueType(wrapperType);
+            allMethods = valueClass.getMethods();
+            
+            try {
+                getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES);
+            } catch (NoSuchMethodException ex) {
+                //ignore for now
+            }
+                        
+            for (Method method : allMethods) {
+                if (method.getParameterTypes() != null && method.getParameterTypes().length == 1
+                    && (setAccessor.equals(method.getName()))) {                        
+                    setMethod = method;
+                    break;
+                }
+            }
+            
+            getMethods.add(getMethod);
+            setMethods.add(setMethod);
+            // There is no filed in the XMLBeans type class
+            fields.add(null);
+            
+        }
+        
+        return new XmlBeansWrapperHelper(wrapperType,
+                                 setMethods.toArray(new Method[setMethods.size()]),
+                                 getMethods.toArray(new Method[getMethods.size()]),
+                                 fields.toArray(new Field[fields.size()]));
     }
 
 }

@@ -26,18 +26,23 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.databinding.WrapperCapableDatabinding;
+import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.ServiceModelUtil;
 
 public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message> {
 
@@ -113,8 +118,15 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
             
             WrapperHelper helper = wrapperPart.getProperty("WRAPPER_CLASS", WrapperHelper.class);
             if (helper == null) {
-                helper = createWrapperHelper(messageInfo, wrappedMessageInfo, wrapperClass);
-                wrapperPart.setProperty("WRAPPER_CLASS", helper);
+                Service service = ServiceModelUtil.getService(message.getExchange());
+                DataBinding dataBinding = service.getDataBinding();
+                if (dataBinding instanceof WrapperCapableDatabinding) {
+                    helper = createWrapperHelper((WrapperCapableDatabinding)dataBinding,
+                                                 messageInfo, wrappedMessageInfo, wrapperClass);
+                    wrapperPart.setProperty("WRAPPER_CLASS", helper);
+                } else {
+                    return;
+                }                
             }            
             
             MessageContentsList newParams;
@@ -150,7 +162,8 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
         }
     }
     
-    private WrapperHelper createWrapperHelper(MessageInfo messageInfo,
+    private WrapperHelper createWrapperHelper(WrapperCapableDatabinding dataBinding, 
+                                              MessageInfo messageInfo,
                                               MessageInfo wrappedMessageInfo,
                                               Class<?> wrapperClass) {
         List<String> partNames = new ArrayList<String>();
@@ -184,7 +197,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 partNames.set(idx, p.getName().getLocalPart());
             }
         }
-        return WrapperHelper.createWrapperHelper(wrapperClass,
+        return dataBinding.createWrapperHelper(wrapperClass,
                                                   partNames,
                                                   elTypeNames,
                                                   partClasses);

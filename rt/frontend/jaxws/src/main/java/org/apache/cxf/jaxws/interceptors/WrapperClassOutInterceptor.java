@@ -19,21 +19,27 @@
 
 package org.apache.cxf.jaxws.interceptors;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.databinding.WrapperCapableDatabinding;
+import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.ServiceModelUtil;
 
 public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public WrapperClassOutInterceptor() {
@@ -68,37 +74,32 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
 
             WrapperHelper helper = parts.get(0).getProperty("WRAPPER_CLASS", WrapperHelper.class);
             if (helper == null) {
-                List<String> partNames = new ArrayList<String>();
-                List<String> elTypeNames = new ArrayList<String>();
-                List<Class<?>> partClasses = new ArrayList<Class<?>>();
-                
-                for (MessagePartInfo p : messageInfo.getMessageParts()) {
-                    ensureSize(partNames, p.getIndex());
-                    ensureSize(elTypeNames, p.getIndex());
-                    ensureSize(partClasses, p.getIndex());
-                    
-                    partNames.set(p.getIndex(), p.getName().getLocalPart());
-                    
-                    String elementType = null;
-                    if (p.getTypeQName() == null) {
-                        // handling anonymous complex type
-                        elementType = null;
-                    } else {
-                        elementType = p.getTypeQName().getLocalPart();
-                    }
-                    
-                    elTypeNames.set(p.getIndex(), elementType);
-                    partClasses.set(p.getIndex(), p.getTypeClass());
+                Service service = ServiceModelUtil.getService(message.getExchange());
+                DataBinding dataBinding = service.getDataBinding();
+                if (dataBinding instanceof WrapperCapableDatabinding) {
+                    helper = createWrapperHelper((WrapperCapableDatabinding)dataBinding,
+                                                 messageInfo, wrappedMsgInfo, wrapped);
+                    parts.get(0).setProperty("WRAPPER_CLASS", helper);
+                } else {
+                    return;
                 }
-                helper = WrapperHelper.createWrapperHelper(wrapped,
-                                                           partNames,
-                                                           elTypeNames,
-                                                           partClasses);
-
-                parts.get(0).setProperty("WRAPPER_CLASS", helper);
             }
             try {
-                MessageContentsList newObjs = new MessageContentsList(); 
+                MessageContentsList newObjs = new MessageContentsList();
+                Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+                // set the validate option for XMLBeans Wrapper Helper
+                if (Boolean.TRUE.equals(en) || "true".equals(en)) {
+                    try {                        
+                        Class xmlBeanWrapperHelperClass = 
+                            Class.forName("org.apache.cxf.xmlbeans.XmlBeansWrapperHelper");
+                        if (xmlBeanWrapperHelperClass.isInstance(helper)) {
+                            Method method = xmlBeanWrapperHelperClass.getMethod("setValidate", boolean.class);
+                            method.invoke(helper, true);
+                        }
+                    } catch (Exception exception) {
+                        // do nothing there
+                    }
+                }
                 Object o2 = helper.createWrapperObject(objs);
                 newObjs.put(parts.get(0), o2);
                 
@@ -113,6 +114,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
 
                 message.setContent(List.class, newObjs);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new Fault(e);
             }
             
@@ -135,5 +137,37 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         while (idx >= lst.size()) {
             lst.add(null);
         }
+    }
+    
+    private WrapperHelper createWrapperHelper(WrapperCapableDatabinding dataBinding, 
+                                              MessageInfo messageInfo,
+                                              MessageInfo wrappedMessageInfo,
+                                              Class<?> wrapperClass) {
+        List<String> partNames = new ArrayList<String>();
+        List<String> elTypeNames = new ArrayList<String>();
+        List<Class<?>> partClasses = new ArrayList<Class<?>>();
+        
+        for (MessagePartInfo p : messageInfo.getMessageParts()) {
+            ensureSize(partNames, p.getIndex());
+            ensureSize(elTypeNames, p.getIndex());
+            ensureSize(partClasses, p.getIndex());
+            
+            partNames.set(p.getIndex(), p.getName().getLocalPart());
+            
+            String elementType = null;
+            if (p.getTypeQName() == null) {
+                // handling anonymous complex type
+                elementType = null;
+            } else {
+                elementType = p.getTypeQName().getLocalPart();
+            }
+            
+            elTypeNames.set(p.getIndex(), elementType);
+            partClasses.set(p.getIndex(), p.getTypeClass());
+        }
+        return dataBinding.createWrapperHelper(wrapperClass,
+                                                 partNames,
+                                                 elTypeNames,
+                                                 partClasses);
     }
 }

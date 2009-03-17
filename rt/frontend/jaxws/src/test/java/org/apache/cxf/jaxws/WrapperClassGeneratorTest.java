@@ -27,7 +27,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxws.interceptors.WrapperHelper;
+import org.apache.cxf.databinding.WrapperHelper;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -69,7 +70,7 @@ public class WrapperClassGeneratorTest extends Assert {
         String className = requestClass.getName();
         className = className.substring(0, className.lastIndexOf(".") + 1);
         
-        WrapperHelper wh = WrapperHelper.createWrapperHelper(requestClass,
+        WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass,
                                                              partNames, elTypeNames, partClasses);        
         
         List<Object> paraList = new ArrayList<Object>();
@@ -88,7 +89,7 @@ public class WrapperClassGeneratorTest extends Assert {
         className = responseClass.getName();
         className = className.substring(0, className.lastIndexOf(".") + 1);
         
-        wh = WrapperHelper.createWrapperHelper(responseClass,
+        wh = new JAXBDataBinding().createWrapperHelper(responseClass,
                                                              partNames, elTypeNames, partClasses);        
         List<Object> resPara = new ArrayList<Object>();
         List<Integer> intValueList = new ArrayList<Integer>();
