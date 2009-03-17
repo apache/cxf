@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxws;
+package org.apache.cxf.jaxb;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +28,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.cxf.jaxws.interceptors.WrapperHelper;
+import org.apache.cxf.databinding.WrapperHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class WrapperHelperTest extends Assert {
+public class JAXBWrapperHelperTest extends Assert {
 
 
     @Test
@@ -63,7 +63,7 @@ public class WrapperHelperTest extends Assert {
             List.class,
         });
         
-        WrapperHelper wh = WrapperHelper.createWrapperHelper(SetIsOK.class,
+        WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(SetIsOK.class,
                                           partNames,
                                           elTypeNames,
                                           partClasses);

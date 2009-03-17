@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxws.interceptors;
+package org.apache.cxf.jaxb;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.databinding.WrapperHelper;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
