@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -28,7 +29,7 @@ public class BookExceptionMapper implements ExceptionMapper<BookNotFoundFault> {
     public Response toResponse(BookNotFoundFault ex) {
         // status is 200 just to simplify the test client code
         if (toHandle) {
-            return Response.status(200)     
+            return Response.status(500).type(MediaType.TEXT_PLAIN_TYPE)     
                       .entity("No book found at all : " + ex.getFaultInfo().getId()).build();
         }
         return null;

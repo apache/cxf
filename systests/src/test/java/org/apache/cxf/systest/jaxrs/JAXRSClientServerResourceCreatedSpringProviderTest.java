@@ -65,11 +65,12 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBookNotFound() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/bookstore/books/12345"; 
+            "http://localhost:9081/webapp/bookstore/books/12345"; 
         URL url = new URL(endpointAddress);
-        URLConnection connect = url.openConnection();
-        connect.addRequestProperty("Accept", "application/json");
-        InputStream in = connect.getInputStream();
+        HttpURLConnection connect = (HttpURLConnection)url.openConnection();
+        connect.addRequestProperty("Accept", "text/plain");
+        assertEquals(500, connect.getResponseCode());
+        InputStream in = connect.getErrorStream();
         assertNotNull(in);           
 
         InputStream expected = getClass()
