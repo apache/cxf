@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +76,6 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
-
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
@@ -801,7 +801,7 @@ public class HTTPConduit
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
-            headers = new HashMap<String, List<String>>();
+            headers = new LinkedHashMap<String, List<String>>();
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         return headers;
@@ -813,16 +813,20 @@ public class HTTPConduit
      * from the PROTOCOL_HEADERS in the message.
      */
     private void transferProtocolHeadersToURLConnection(
-        Message       message,
+        Message message,
         URLConnection connection
     ) {
-        Map<String, List<String>> headers =
-            getSetProtocolHeaders(message);
+        Map<String, List<String>> headers = getSetProtocolHeaders(message);
         for (String header : headers.keySet()) {
             List<String> headerList = headers.get(header);
-            for (String value : headerList) {
-                connection.addRequestProperty(header, value);
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < headerList.size(); i++) {
+                b.append(headerList.get(i));
+                if (i + 1 < headerList.size()) {
+                    b.append(',');
+                }
             }
+            connection.setRequestProperty(header, b.toString());
         }
         if (!connection.getRequestProperties().containsKey("User-Agent")) {
             connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
@@ -834,14 +838,13 @@ public class HTTPConduit
      * Message at the specified logging level.
      * 
      * @param level   The Logging Level.
-     * @param message The Message.
+     * @param headers The Message protocol headers.
      */
     private void logProtocolHeaders(
         Level   level,
         Message message
     ) {
-        Map<String, List<String>> headers =
-            getSetProtocolHeaders(message);
+        Map<String, List<String>> headers = getSetProtocolHeaders(message);
         for (String header : headers.keySet()) {
             List<String> headerList = headers.get(header);
             for (String value : headerList) {
@@ -1182,7 +1185,7 @@ public class HTTPConduit
         if (policy.isSetAccept()) {
             headers.put("Accept",
                         createMutableList(policy.getAccept()));
-        } else {
+        } else if (!headers.containsKey("Accept")) {
             headers.put("Accept", createMutableList("*/*"));
         }
         if (policy.isSetAcceptEncoding()) {
@@ -1860,7 +1863,7 @@ public class HTTPConduit
             // Trust is okay, set up for writing the request.
             
             // If this is a GET method we must not touch the output
-            // stream as this automagically turns the reqest into a POST.
+            // stream as this automagically turns the request into a POST.
             if ("GET".equals(connection.getRequestMethod())) {
                 return;
             }
@@ -2094,9 +2097,8 @@ public class HTTPConduit
                    : connection.getErrorStream()
                  : in;
                    
-            if (in == null) {
-                LOG.log(Level.WARNING, "Input Stream is null!");
-            }
+            // if (in == null) : it's perfectly ok for non-soap http services
+            // have no response body : those interceptors which do need it will check anyway        
             inMessage.setContent(InputStream.class, in);
             
             

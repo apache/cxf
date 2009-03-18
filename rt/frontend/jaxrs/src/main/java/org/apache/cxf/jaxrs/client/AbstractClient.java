@@ -44,23 +44,37 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.ConduitSelector;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseChainCache;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.phase.PhaseManager;
+import org.apache.cxf.transport.MessageObserver;
 
 public class AbstractClient implements Client {
-    
+
     protected static final MediaType WILDCARD = MediaType.valueOf("*/*");
+        
+    protected ConduitSelector conduitSelector;
+    protected Bus bus;
     
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
     private ResponseBuilder responseBuilder;
     
     private URI baseURI;
     private UriBuilder currentBuilder;
-    
+
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
         this.currentBuilder = new UriBuilderImpl(currentURI);
@@ -157,29 +171,12 @@ public class AbstractClient implements Client {
         return this;
     }
     
-    protected List<MediaType> getAccept() {
-        List<String> headers = requestHeaders.get(HttpHeaders.ACCEPT);
-        if (headers == null || headers.size() == 0) {
-            return null;
-        }
-        List<MediaType> types = new ArrayList<MediaType>();
-        for (String s : headers) {
-            types.add(MediaType.valueOf(s));
-        }
-        return types;
-    }
-
     public MultivaluedMap<String, String> getHeaders() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putAll(requestHeaders);
         return map;
     }
     
-    protected MediaType getType() {
-        String type = requestHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
-        return type == null ? null : MediaType.valueOf(type);
-    }
-
     public URI getBaseURI() {
         return baseURI;
     }
@@ -188,10 +185,6 @@ public class AbstractClient implements Client {
         return getCurrentBuilder().clone().build();
     }
     
-    protected UriBuilder getCurrentBuilder() {
-        return currentBuilder;
-    }
-
     public Response getResponse() {
         if (responseBuilder == null) {
             throw new IllegalStateException();
@@ -207,6 +200,81 @@ public class AbstractClient implements Client {
         return this;
     }
     
+    public void setConduitSelector(ConduitSelector cs) {
+        this.conduitSelector = cs;
+    }
+    
+    public void setBus(Bus bus) {
+        this.bus = bus;
+    }
+    
+    protected void prepareConduitSelector(Message message) {
+        conduitSelector.prepare(message);
+        message.getExchange().put(ConduitSelector.class, conduitSelector);
+    }
+    
+    protected PhaseInterceptorChain setupInterceptorChain(Endpoint endpoint) { 
+        PhaseManager pm = bus.getExtension(PhaseManager.class);
+        List<Interceptor> i1 = bus.getOutInterceptors();
+        // TODO : make sure we don't forget the out interceptors of this client
+        List<Interceptor> i2 = endpoint.getOutInterceptors();
+        return new PhaseChainCache().get(pm.getOutPhases(), i1, i2);
+    }
+    
+    protected Message createMessage(String httpMethod, 
+                                    MultivaluedMap<String, String> headers,
+                                    String address,
+                                    MessageObserver observer) {
+        Message m = conduitSelector.getEndpoint().getBinding().createMessage();
+        m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+        m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
+        
+        m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        m.put(Message.ENDPOINT_ADDRESS, address);
+        m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
+        
+        
+        Exchange exchange = new ExchangeImpl();
+        exchange.setSynchronous(true);
+        exchange.setOutMessage(m);
+        exchange.put(Bus.class, bus);
+        exchange.put(MessageObserver.class, observer);
+        exchange.setOneWay(false);
+        m.setExchange(exchange);
+        
+        PhaseInterceptorChain chain = setupInterceptorChain(conduitSelector.getEndpoint());
+        m.setInterceptorChain(chain);
+        
+        //setup conduit selector
+        prepareConduitSelector(m);
+        
+        return m;
+    }
+    
+    protected List<MediaType> getAccept() {
+        List<String> headers = requestHeaders.get(HttpHeaders.ACCEPT);
+        if (headers == null || headers.size() == 0) {
+            return null;
+        }
+        List<MediaType> types = new ArrayList<MediaType>();
+        for (String s : headers) {
+            types.add(MediaType.valueOf(s));
+        }
+        return types;
+    }
+
+    
+    protected MediaType getType() {
+        String type = requestHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
+        return type == null ? null : MediaType.valueOf(type);
+    }
+
+    protected UriBuilder getCurrentBuilder() {
+        return currentBuilder;
+    }
+
+
     protected void resetResponse() {
         responseBuilder = null;
     }
@@ -220,7 +288,12 @@ public class AbstractClient implements Client {
         currentBuilder = new UriBuilderImpl(uri);
     }
     
-    protected ResponseBuilder setResponseBuilder(HttpURLConnection conn) throws IOException {
+    protected ResponseBuilder setResponseBuilder(HttpURLConnection conn) throws Throwable {
+        
+        if (conn == null) {
+            throw new WebApplicationException(); 
+        }
+        
         int status = conn.getResponseCode();
         responseBuilder = Response.status(status);
         for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {

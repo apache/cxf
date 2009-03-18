@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -40,6 +41,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -48,11 +51,16 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterType;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.HTTPConduit;
 
-public class ClientProxyImpl extends AbstractClient implements InvocationHandler {
+public class ClientProxyImpl extends AbstractClient implements InvocationHandler, MessageObserver {
 
     private ClassResourceInfo cri;
-    private boolean inheritHeaders; 
+    private boolean inheritHeaders;
     
     public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean inheritHeaders) {
         super(baseURI, currentURI);
@@ -97,8 +105,15 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         handleCookies(paramHeaders, types, params);
                 
         if (ori.isSubResourceLocator()) {
-            Object proxy = 
-                JAXRSClientFactory.create(getBaseURI(), uri, m.getReturnType(), false, inheritHeaders);
+            ClassResourceInfo subCri = cri.getSubResource(m.getReturnType(), m.getReturnType());
+            if (subCri == null) {
+                throw new WebApplicationException();
+            }
+            ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, inheritHeaders);
+            proxyImpl.setBus(bus);
+            proxyImpl.setConduitSelector(conduitSelector);
+            
+            Object proxy = JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
             if (inheritHeaders) {
                 WebClient.client(proxy).headers(headers);
             }
@@ -107,31 +122,14 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         } 
         
         headers.putAll(paramHeaders);
-        
-        HttpURLConnection connect = createHttpConnection(uri, ori.getHttpMethod());
-        setRequestHeaders(connect, headers, ori, types.containsKey(ParameterType.FORM), 
+        setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
             bodyIndex == -1 ? null : params[bodyIndex].getClass(), m.getReturnType());
-        if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
-            if (bodyIndex != -1) {
-                writeBody(params[bodyIndex], params[bodyIndex].getClass(), 
-                          m.getGenericParameterTypes()[bodyIndex],
-                          m.getParameterAnnotations()[bodyIndex], headers, connect.getOutputStream());
-            } else {
-                MultivaluedMap<String, String> form = handleForm(types, params);
-                writeBody(form, form.getClass(), form.getClass(), m.getDeclaredAnnotations(),
-                          headers, connect.getOutputStream());
-            }
+        
+        if (conduitSelector == null) {
+            return doDirectInvocation(uri, headers, ori, params, bodyIndex, types);
+        } else {
+            return doChainedInvocation(uri, headers, ori, params, bodyIndex, types);
         }
-        
-        Response r = setResponseBuilder(connect).clone().build();
-        
-        checkResponse(m, r);
-        if (m.getReturnType() == Void.class) { 
-            return null;
-        }
-        
-        return readBody(r, connect, m.getReturnType(), 
-                        m.getGenericReturnType(), m.getDeclaredAnnotations());
     }
 
     private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(OperationResourceInfo ori, 
@@ -187,42 +185,37 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     }
     
     
-    private MultivaluedMap<String, String> setRequestHeaders(HttpURLConnection conn,
-                                                             MultivaluedMap<String, String> headers,          
+    private MultivaluedMap<String, String> setRequestHeaders(MultivaluedMap<String, String> headers,          
                                                              OperationResourceInfo ori,
                                                              boolean formParams,
                                                              Class<?> bodyClass,
                                                              Class<?> responseClass) {
-        try {
-            if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
-                if (formParams || bodyClass != null && MultivaluedMap.class.isAssignableFrom(bodyClass)) {
-                    headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
-                } else {
-                    String cType = 
-                        bodyClass != null && InjectionUtils.isPrimitive(bodyClass) 
-                            ? MediaType.TEXT_PLAIN : ori.getConsumeTypes().isEmpty() 
-                        || ori.getConsumeTypes().get(0).equals(WILDCARD) 
-                        ? MediaType.APPLICATION_XML : ori.getConsumeTypes().get(0).toString();   
-                    headers.putSingle(HttpHeaders.CONTENT_TYPE, cType);
-                }
-            }
-            
-            List<MediaType> accepts = getAccept();
-            if (accepts == null) {
-                accepts = InjectionUtils.isPrimitive(responseClass) 
-                    ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
-                    : ori.getProduceTypes().size() == 0 
+        if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
+            if (formParams || bodyClass != null && MultivaluedMap.class.isAssignableFrom(bodyClass)) {
+                headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+            } else {
+                String cType = 
+                    bodyClass != null && InjectionUtils.isPrimitive(bodyClass) 
+                        ? MediaType.TEXT_PLAIN : ori.getConsumeTypes().isEmpty() 
                     || ori.getConsumeTypes().get(0).equals(WILDCARD) 
-                    ? Collections.singletonList(MediaType.APPLICATION_XML_TYPE) : ori.getProduceTypes();
-                for (MediaType mt : accepts) {
-                    headers.add(HttpHeaders.ACCEPT, mt.toString());
-                }
+                    ? MediaType.APPLICATION_XML : ori.getConsumeTypes().get(0).toString();   
+                headers.putSingle(HttpHeaders.CONTENT_TYPE, cType);
             }
-            setAllHeaders(headers, conn);
-            
-        } catch (Exception ex) {
-            throw new WebApplicationException();
         }
+            
+        
+        List<MediaType> accepts = getAccept();
+        if (accepts == null) {
+            accepts = InjectionUtils.isPrimitive(responseClass) 
+                ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
+                : ori.getProduceTypes().size() == 0 
+                || ori.getConsumeTypes().get(0).equals(WILDCARD) 
+                ? Collections.singletonList(MediaType.APPLICATION_XML_TYPE) : ori.getProduceTypes();
+            for (MediaType mt : accepts) {
+                headers.add(HttpHeaders.ACCEPT, mt.toString());
+            }
+        }
+            
         return headers;
     }
     
@@ -340,6 +333,71 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
     }
     
+    protected Object doDirectInvocation(URI uri, MultivaluedMap<String, String> headers, 
+        OperationResourceInfo ori, Object[] params, int bodyIndex, 
+        MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
+
+        // TODO : we need to refactor bits of HTTPConduit such that it can be reused
+        
+        HttpURLConnection connect = createHttpConnection(uri, ori.getHttpMethod());
+        setAllHeaders(headers, connect);
+        Method m = ori.getMethodToInvoke();
+        if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
+            if (bodyIndex != -1) {
+                writeBody(params[bodyIndex], params[bodyIndex].getClass(), 
+                          m.getGenericParameterTypes()[bodyIndex],
+                          m.getParameterAnnotations()[bodyIndex], headers, connect.getOutputStream());
+            } else {
+                MultivaluedMap<String, String> form = handleForm(types, params);
+                writeBody(form, form.getClass(), form.getClass(), m.getDeclaredAnnotations(),
+                          headers, connect.getOutputStream());
+            }
+        }
+        
+        return handleResponse(connect, ori);
+        
+    }
+    
+    private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
+                          OperationResourceInfo ori, Object[] params, int bodyIndex, 
+                          MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
+        Message m = createMessage(ori.getHttpMethod(), headers, uri.toString(), this);
+        
+        if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
+            m.setContent(OperationResourceInfo.class, ori);
+            m.put("BODY_INDEX", bodyIndex);
+            Object body = bodyIndex != -1 ? params[bodyIndex] : handleForm(types, params); 
+            MessageContentsList contents = new MessageContentsList(new Object[]{body});
+            m.setContent(List.class, contents);
+            m.getInterceptorChain().add(new BodyWriter());
+        }
+        
+        // execute chain        
+        try {
+            m.getInterceptorChain().doIntercept(m);
+        } catch (Throwable ex) {
+            // we'd like a user to get the whole Response anyway if needed
+        }
+        
+        // TODO : this needs to be done in an inbound chain instead
+        HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
+        
+        return handleResponse(connect, ori);
+        
+    }
+    
+    protected Object handleResponse(HttpURLConnection connect, OperationResourceInfo ori) 
+        throws Throwable {
+        Response r = setResponseBuilder(connect).clone().build();
+        Method method = ori.getMethodToInvoke();
+        checkResponse(method, r);
+        if (method.getReturnType() == Void.class) { 
+            return null;
+        }
+        
+        return readBody(r, connect, method.getReturnType(), 
+                        method.getGenericReturnType(), method.getDeclaredAnnotations());
+    }
     
     private static class Parameter {
         private ParameterType type;
@@ -369,5 +427,54 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         public boolean isEncoded() {
             return isEncoded;
         }
+    }
+
+    public void onMessage(Message message) {
+        // just do nothing for now
+    }
+    
+    // TODO : what we really need to do is to refactor JAXRSOutInterceptor so that
+    // it can handle both client requests and server responses - it may need to be split into
+    // several interceptors - in fact we need to do the same for JAXRSInInterceptor so that we can do
+    // on onMessage() properly
+    
+    private class BodyWriter extends AbstractOutDatabindingInterceptor {
+
+        public BodyWriter() {
+            super(Phase.WRITE);
+        }
+        
+        @SuppressWarnings("unchecked")
+        public void handleMessage(Message m) throws Fault {
+            
+            OperationResourceInfo ori = m.getContent(OperationResourceInfo.class);
+            OutputStream os = m.getContent(OutputStream.class);
+            if (os == null || ori == null) {
+                return;
+            }
+            MessageContentsList objs = MessageContentsList.getContentsList(m);
+            if (objs == null || objs.size() == 0) {
+                return;
+            }
+            MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
+            Method method = ori.getMethodToInvoke();
+            int bodyIndex = (Integer)m.get("BODY_INDEX");
+            Object body = objs.get(0);
+            try {
+                if (bodyIndex != -1) {
+                    writeBody(body, body.getClass(), 
+                          method.getGenericParameterTypes()[bodyIndex],
+                          method.getParameterAnnotations()[bodyIndex], headers, os);
+                } else {
+                    writeBody(body, body.getClass(), body.getClass(), method.getDeclaredAnnotations(),
+                            headers, os);
+                }
+                os.flush();
+            } catch (Exception ex) {
+                throw new Fault(ex);
+            }
+            
+        }
+        
     }
 }

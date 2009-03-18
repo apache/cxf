@@ -20,34 +20,28 @@ package org.apache.cxf.jaxrs;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import org.apache.cxf.BusException;
-import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.binding.BindingFactory;
-import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
-import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
+import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.service.Service;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Invoker;
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
 
 
 /**
@@ -61,16 +55,16 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  * </pre>
  * This will start a server for you and register it with the ServerManager.
  */
-public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
+public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServerFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSServerFactoryBean.class);
     
-    protected boolean doInit;
+    protected Map<Class, ResourceProvider> resourceProviders = new HashMap<Class, ResourceProvider>();
+    
     private Server server;
     private Invoker invoker;
     private boolean start = true;
-    private JAXRSServiceFactoryBean serviceFactory;
     private List<Object> serviceBeans;
     private List<?> entityProviders;
     private Map<Object, Object> languageMappings;
@@ -82,9 +76,7 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     }
 
     public JAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
-        this.serviceFactory = sf;
-        doInit = true;
-        setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
+        super(sf);
     }
     
     public void setSchemaLocations(List<String> schemas) {
@@ -104,6 +96,11 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
                 LOG.severe(msg.toString());
                 throw new EndpointException(msg);
             }
+            if (serviceFactory.getService() == null) {
+                serviceFactory.create();
+                updateClassResourceProviders();
+            }
+            
             Endpoint ep = createEndpoint();
             server = new ServerImpl(getBus(), 
                                     ep, 
@@ -155,99 +152,6 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
         }
     }
 
-    protected Endpoint createEndpoint() throws BusException, EndpointException {
-        Service service = serviceFactory.getService();
-
-        if (service == null) {
-            service = serviceFactory.create();
-        }
-
-        EndpointInfo ei = createEndpointInfo();
-        Endpoint ep = new EndpointImpl(getBus(), getServiceFactory().getService(), ei);
-        
-        if (properties != null) {
-            ep.putAll(properties);
-        }
-        
-        if (getInInterceptors() != null) {
-            ep.getInInterceptors().addAll(getInInterceptors());
-        }
-        if (getOutInterceptors() != null) {
-            ep.getOutInterceptors().addAll(getOutInterceptors());
-        }
-        if (getInFaultInterceptors() != null) {
-            ep.getInFaultInterceptors().addAll(getInFaultInterceptors());
-        }
-        if (getOutFaultInterceptors() != null) {
-            ep.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
-        }
-        return ep;
-    }
-
-    /*
-     * EndpointInfo contains information form WSDL's physical part such as
-     * endpoint address, binding, transport etc. For JAX-RS based EndpointInfo,
-     * as there is no WSDL, these information are set manually, eg, default
-     * transport is http, binding is JAX-RS binding, endpoint address is from
-     * server mainline.
-     */    
-    protected EndpointInfo createEndpointInfo() throws BusException {
-        String transportId = getTransportId();
-        if (transportId == null && getAddress() != null) {
-            DestinationFactory df = getDestinationFactory();
-            if (df == null) {
-                DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);
-                df = dfm.getDestinationFactoryForUri(getAddress());
-            }
-
-            if (df != null) {
-                transportId = df.getTransportIds().get(0);
-            }
-        }
-
-        //default to http transport
-        if (transportId == null) {
-            transportId = "http://schemas.xmlsoap.org/wsdl/soap/http";
-        }
-
-        setTransportId(transportId);
-
-        EndpointInfo ei = new EndpointInfo();
-        ei.setTransportId(transportId);
-        ei.setName(serviceFactory.getService().getName());
-        ei.setAddress(getAddress());        
-
-        BindingInfo bindingInfo = createBindingInfo();
-        ei.setBinding(bindingInfo);
-
-        return ei;
-    }
-
-    protected BindingInfo createBindingInfo() {
-        BindingFactoryManager mgr = getBus().getExtension(BindingFactoryManager.class);
-        String binding = getBindingId();
-        BindingConfiguration bindingConfig = getBindingConfig();
-
-        if (binding == null && bindingConfig != null) {
-            binding = bindingConfig.getBindingId();
-        }
-
-        if (binding == null) {
-            binding = JAXRSBindingFactory.JAXRS_BINDING_ID;
-        }
-
-        try {
-            BindingFactory bindingFactory = mgr.getBindingFactory(binding);
-            setBindingFactory(bindingFactory);
-            return bindingFactory.createBindingInfo(serviceFactory.getService(),
-                                                    binding, bindingConfig);
-        } catch (BusException ex) {
-            ex.printStackTrace();
-            //do nothing
-        }
-        return null;
-    }
-
     public void setLanguageMappings(Map<Object, Object> lMaps) {
         languageMappings = lMaps;
     }
@@ -292,7 +196,7 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
     }
     
     public void setResourceProvider(Class c, ResourceProvider rp) {
-        serviceFactory.setResourceProvider(c, rp);
+        resourceProviders.put(c, rp);
     }
 
     /**
@@ -317,4 +221,30 @@ public class JAXRSServerFactoryBean extends AbstractEndpointFactory {
         this.start = start;
     }
 
+    private void injectContexts() {
+        for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
+            if (cri.isSingleton()) {
+                InjectionUtils.injectContextProxies(cri, 
+                                                    cri.getResourceProvider().getInstance());
+            }
+        }
+    }
+    
+    private void updateClassResourceProviders() {
+        for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
+            if (cri.getResourceProvider() != null) {
+                continue;
+            }
+            
+            ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
+            if (rp != null) {
+                cri.setResourceProvider(rp);
+            } else {
+                //default lifecycle is per-request
+                rp = new PerRequestResourceProvider(cri.getResourceClass());
+                cri.setResourceProvider(rp);  
+            }
+        }
+        injectContexts();
+    }
 }

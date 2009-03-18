@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executor;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
@@ -43,8 +45,13 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
     private Executor executor;
     private Invoker invoker;
     private Map<QName, Endpoint> endpoints = new HashMap<QName, Endpoint>();
+    private String address;
     
     public JAXRSServiceImpl() {
+    }
+    
+    public JAXRSServiceImpl(String address) {
+        this.address = address;
     }
 
     public JAXRSServiceImpl(List<ClassResourceInfo> cri) {
@@ -56,9 +63,14 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         return getName().toString();
     }
 
-    public QName getName() {    
-        Class primaryClass = classResourceInfos.get(0).getServiceClass();
-        return new QName("jaxrs", primaryClass.getSimpleName());
+    public QName getName() {
+        if (address == null) {
+            Class primaryClass = classResourceInfos.get(0).getServiceClass();
+            String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
+            return new QName(ns + "/jaxrs", primaryClass.getSimpleName());
+        } else {
+            return new QName(address, "WebResource");
+        }
     }
 
     public List<ClassResourceInfo> getClassResourceInfos() {
@@ -66,8 +78,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
     }
     
     public List<ServiceInfo> getServiceInfos() {
-        //NOT APPLICABLE
-        return null;
+        return Collections.emptyList();
     }
     
     public EndpointInfo getEndpointInfo(QName endpoint) {        
