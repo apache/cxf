@@ -38,9 +38,23 @@ public class WebClientTest extends Assert {
         WebClient wc = new WebClient("http://foo");
         assertEquals(URI.create("http://foo"), wc.getBaseURI());
         assertEquals(URI.create("http://foo"), wc.getCurrentURI());
-        wc.to("http://bar");
+        wc.to("http://bar", false);
         assertEquals(URI.create("http://bar"), wc.getBaseURI());
         assertEquals(URI.create("http://bar"), wc.getCurrentURI());
+    }
+    
+    @Test 
+    public void testForward() {
+        WebClient wc = new WebClient("http://foo");
+        wc.to("http://foo/bar", true);
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar"), wc.getCurrentURI());
+    }
+    
+    @Test(expected = IllegalArgumentException.class) 
+    public void testWrongForward() {
+        WebClient wc = new WebClient("http://foo");
+        wc.to("http://bar", true);
     }
     
     @Test 

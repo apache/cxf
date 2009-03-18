@@ -33,7 +33,10 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -204,6 +207,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/books/custom/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBook123WebClient() throws Exception {
+        BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        // just to verify the interface call goes through CGLIB proxy too
+        assertEquals("http://localhost:9080", WebClient.client(bs).getBaseURI().toString());
+        Book b = bs.getBook("123");
+        assertEquals(b.getId(), 123);
     }
     
     @Test
