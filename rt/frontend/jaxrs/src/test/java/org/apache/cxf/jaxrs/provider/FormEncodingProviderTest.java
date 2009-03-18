@@ -37,13 +37,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FormEncodingReaderProviderTest extends Assert {
+public class FormEncodingProviderTest extends Assert {
 
-    private FormEncodingReaderProvider ferp;
+    private FormEncodingProvider ferp;
 
     @Before
     public void setUp() {
-        ferp = new FormEncodingReaderProvider();
+        ferp = new FormEncodingProvider();
     }
 
     @SuppressWarnings("unchecked")

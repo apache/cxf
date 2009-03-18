@@ -335,6 +335,11 @@ public class UriBuilderImpl extends UriBuilder {
         for (String p : path) {
             paths = JAXRSUtils.getPathSegments(p, false);
         }
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();
+        } else {
+            matrix.clear();
+        }
         return this;
     }
 
@@ -345,15 +350,21 @@ public class UriBuilderImpl extends UriBuilder {
         scheme = uri.getScheme();
         port = uri.getPort();
         host = uri.getHost();
-        paths = JAXRSUtils.getPathSegments(uri.getPath(), false);
-        if (!paths.isEmpty()) {
-            matrix = paths.get(paths.size() - 1).getMatrixParameters();
-        }
+        setPathAndMatrix(uri.getPath());
         fragment = uri.getFragment();
         query = JAXRSUtils.getStructuredParams(uri.getQuery(), "&", true);
         userInfo = uri.getUserInfo();
     }
 
+    private void setPathAndMatrix(String path) {
+        paths = JAXRSUtils.getPathSegments(path, false);
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();
+        } else {
+            matrix.clear();
+        }
+    }
+    
     private String buildPath() {
         StringBuilder sb = new StringBuilder();
         Iterator<PathSegment> iter = paths.iterator();
@@ -377,7 +388,6 @@ public class UriBuilderImpl extends UriBuilder {
         return buildParams(query, '&');
     }
 
-    
     /**
      * Builds param string for query part or matrix part of URI.
      * 

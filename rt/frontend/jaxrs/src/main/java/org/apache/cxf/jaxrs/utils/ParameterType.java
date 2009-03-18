@@ -28,5 +28,6 @@ public enum ParameterType {
     FORM,
     
     REQUEST_BODY,
+    CONTEXT,
     UNKNOWN
 }

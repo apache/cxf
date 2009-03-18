@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -236,7 +237,7 @@ public final class JAXRSUtils {
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
                 new OperationResourceInfoComparator());
-        MediaType requestType = requestContentType == null 
+        MediaType requestType = requestContentType == null
                                 ? ALL_TYPES : MediaType.valueOf(requestContentType);
         
         int pathMatched = 0;
@@ -547,24 +548,21 @@ public final class JAXRSUtils {
     @SuppressWarnings("unchecked")
     private static Object processCookieParam(Message m, String cookieName, 
                               Class<?> pClass, Type genericType, String defaultValue) {
-        Map<String, List<String>> headers = 
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS);
-        // get the cookie with this name...
-        List<String> values = headers.get("Cookie");
-        String value = "";
-        if (values != null && values.get(0).contains(cookieName + '=')) {
-            value = values.get(0);
+        List<String> values = new HttpHeadersImpl(m).getRequestHeader(HttpHeaders.COOKIE);
+        String value = values != null && values.get(0).contains(cookieName + '=') ? values.get(0) 
+                       : defaultValue != null ? cookieName + '=' + defaultValue : null;
+        
+        if (value == null) {
+            return null;
         }
+        
+        Cookie c = Cookie.valueOf(value);
         if (pClass.isAssignableFrom(Cookie.class)) {
-            return Cookie.valueOf(value.length() == 0 ? defaultValue : value);
+            return c;
         }
         
         String basePath = HttpUtils.getOriginalAddress(m);
-        return value.length() > 0 ? InjectionUtils.handleParameter(value, 
-                                                                   pClass, 
-                                                                   ParameterType.COOKIE,
-                                                                   basePath) 
-                                  : defaultValue;
+        return InjectionUtils.handleParameter(c.getValue(), pClass, ParameterType.COOKIE, basePath);
     }
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
@@ -907,6 +905,17 @@ public final class JAXRSUtils {
         
         return null;
         
+    }
+    
+    public static String encode(boolean encoded, String value) {
+        if (!encoded) {
+            try {
+                value = URLEncoder.encode(value, "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                // unlikely to happen
+            }
+        }
+        return value;
     }
         
 }

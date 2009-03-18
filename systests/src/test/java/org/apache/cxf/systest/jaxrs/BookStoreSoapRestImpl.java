@@ -23,7 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.jws.WebMethod;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -42,6 +45,11 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     }
     
     public Book getBook(Long id) {
+        if (books.get(id) == null) {
+            Response r = Response.status(404).header("BOOK-HEADER", 
+                "No Book with id " + id + " is available").build();
+            throw new WebApplicationException(r);
+        }
         System.out.println(getContentType());
         return books.get(id);
     }
@@ -69,6 +77,11 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
                  javax.xml.ws.handler.MessageContext.SERVLET_REQUEST);
         }
         return request.getContentType();
+    }
+
+    @WebMethod(exclude = true)
+    public BookSubresource getBookSubresource(String id) {
+        return new BookSubresourceImpl(Long.valueOf(id));
     }
     
 }

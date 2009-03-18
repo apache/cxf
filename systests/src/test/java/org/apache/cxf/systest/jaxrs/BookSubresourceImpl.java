@@ -19,14 +19,48 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.customer.book.BookNotFoundFault;
 
 public class BookSubresourceImpl implements BookSubresource {
 
+    private Long id;
+    
+    public BookSubresourceImpl() {
+        id = 123L;
+    }
+    
+    public BookSubresourceImpl(Long id) {
+        this.id = id;
+    }
+    
     public Book getTheBook() throws BookNotFoundFault {
+        
+        if (id == 0) {
+            return null;
+        }
+        
         Book b = new Book();
-        b.setId(123);
+        b.setId(id);
         b.setName("CXF in Action");
+        return b;
+    }
+
+    public Book getTheBook2(String n1, String n2, String n3, String n4, String n5, String n6) 
+        throws BookNotFoundFault {
+        
+        Book b = new Book();
+        b.setId(id); 
+        b.setName(n1 + n2 + n3 + n4 + n5 + n6);
+        return b;
+    }
+    
+    public Book getTheBook3(MultivaluedMap<String, String> form) throws BookNotFoundFault {
+        Book b = new Book();
+        
+        b.setId(Long.valueOf(form.getFirst("id"))); 
+        b.setName(form.getFirst("name"));
         return b;
     }
 

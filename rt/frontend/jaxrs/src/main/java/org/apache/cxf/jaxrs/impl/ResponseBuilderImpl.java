@@ -43,10 +43,8 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
 
     private ResponseBuilderImpl(ResponseBuilderImpl copy) {
         status = copy.status;
-        if (entity != null) {
-            entity = copy.entity;
-            metadata.putAll(copy.metadata);
-        }
+        metadata.putAll(copy.metadata);
+        entity = copy.entity;
     }
        
     public Response build() {

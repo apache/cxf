@@ -21,16 +21,22 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -38,13 +44,16 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
+@ProduceMime("application/x-www-form-urlencoded")
 @ConsumeMime({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
-public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
+public class FormEncodingProvider implements 
+    MessageBodyReader<Object>, MessageBodyWriter<MultivaluedMap<String, String>> {
     
-    private static final MediaType MULTIPART_FORM_DATA = MediaType.valueOf("multipart/form-data");
+    private static final MediaType MULTIPART_FORM_DATA_TYPE = MediaType.valueOf("multipart/form-data");
     
     private FormValidator validator;
     @Context private MessageContext mc;
@@ -66,7 +75,7 @@ public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
     public boolean isReadable(Class<?> type, Type genericType, 
                               Annotation[] annotations) {
         return MultivaluedMap.class.isAssignableFrom(type)
-               || mediaTypeSupported() && MultipartBody.class.isAssignableFrom(type);
+               || multipartSupported() && MultipartBody.class.isAssignableFrom(type);
     }
 
     public Object readFrom(
@@ -107,7 +116,7 @@ public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
      */
     protected void populateMap(MultivaluedMap<String, String> params, 
                                InputStream is, MediaType mt, boolean decode) {
-        if (mt.isCompatible(MULTIPART_FORM_DATA)) {
+        if (mt.isCompatible(MULTIPART_FORM_DATA_TYPE)) {
             MultipartBody body = 
                 AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold);
             FormUtils.populateMapFromMultipart(params, body, decode);
@@ -122,13 +131,38 @@ public class FormEncodingReaderProvider implements MessageBodyReader<Object> {
         }
     }
 
-    private boolean mediaTypeSupported() {
+    public long getSize(MultivaluedMap<String, String> t) {
+        return -1;
+    }
+
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+        return MultivaluedMap.class.isAssignableFrom(type);
+    }
+
+    public void writeTo(MultivaluedMap<String, String> map, Class<?> c, Type t, Annotation[] anns, 
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+        throws IOException, WebApplicationException {
+        boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
+        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, List<String>> entry = it.next();
+            for (String value : entry.getValue()) {
+                os.write(entry.getKey().getBytes("UTF-8"));
+                os.write('=');
+                os.write(JAXRSUtils.encode(encoded, value).getBytes("UTF-8"));
+                if (it.hasNext()) {
+                    os.write('&');
+                }
+            }
+        }
+    }
+    
+    private boolean multipartSupported() {
 
         if (mc == null) {
             return false;
         }
         MediaType mt = mc.getHttpHeaders().getMediaType();        
 
-        return mt.isCompatible(MULTIPART_FORM_DATA);
+        return mt.isCompatible(MULTIPART_FORM_DATA_TYPE);
     }
 }

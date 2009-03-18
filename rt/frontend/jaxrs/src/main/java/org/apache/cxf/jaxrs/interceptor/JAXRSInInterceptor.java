@@ -91,8 +91,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             rp.preprocess(message, new UriInfoImpl(message, null));
         }
         
-
-        String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {
             requestContentType = "*/*";
@@ -128,6 +126,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
 
+        String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         OperationResourceInfo ori = null;     
         
         List<ProviderInfo<RequestHandler>> shs = 

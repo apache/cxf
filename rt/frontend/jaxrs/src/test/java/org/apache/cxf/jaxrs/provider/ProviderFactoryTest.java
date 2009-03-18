@@ -121,17 +121,17 @@ public class ProviderFactoryTest extends Assert {
     public void testSortEntityProviders() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
-        pf.registerUserProvider(new StringProvider());
+        pf.registerUserProvider(new PrimitiveTextProvider());
         
         List<ProviderInfo<MessageBodyReader>> readers = pf.getUserMessageReaders();
 
         assertTrue(indexOf(readers, TestStringProvider.class) 
-                   < indexOf(readers, StringProvider.class));
+                   < indexOf(readers, PrimitiveTextProvider.class));
         
         List<ProviderInfo<MessageBodyWriter>> writers = pf.getUserMessageWriters();
 
         assertTrue(indexOf(writers, TestStringProvider.class) 
-                   < indexOf(writers, StringProvider.class));
+                   < indexOf(writers, PrimitiveTextProvider.class));
         
         //REVISIT the compare algorithm
         //assertTrue(indexOf(providers, JSONProvider.class) < indexOf(providers, TestStringProvider.class));
@@ -170,7 +170,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetStringProvider() throws Exception {
-        verifyProvider(String.class, StringProvider.class, "text/html");
+        verifyProvider(String.class, PrimitiveTextProvider.class, "text/plain");
     }
     
     @Test
@@ -206,7 +206,7 @@ public class ProviderFactoryTest extends Assert {
        
     @Test
     public void testGetStringProviderWildCard() throws Exception {
-        verifyProvider(String.class, StringProvider.class, "text/*");
+        verifyProvider(String.class, PrimitiveTextProvider.class, "text/*");
     }
     
     @Test

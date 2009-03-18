@@ -46,6 +46,13 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", uri, newUri);
     }
 
+    @Test
+    public void testReplacePath() throws Exception {
+        URI uri = new URI("http://foo/bar/baz;m1=m1value");
+        URI newUri = new UriBuilderImpl(uri).replacePath("/newpath").build();
+        assertEquals("URI is not built correctly", "http://foo/newpath", newUri.toString());
+    }
+    
     @Test(expected = IllegalArgumentException.class)
     public void testUriNull() throws Exception {
         new UriBuilderImpl().uri(null);

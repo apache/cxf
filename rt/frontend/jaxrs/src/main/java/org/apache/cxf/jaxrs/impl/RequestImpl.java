@@ -19,16 +19,20 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 /**
@@ -75,8 +79,29 @@ public class RequestImpl implements Request {
 
 
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
-        // TODO : these dates wreck my head
-        return null;
+        String ifModifiedSince = getHeaderValue(HttpHeaders.IF_MODIFIED_SINCE);
+        
+        if (ifModifiedSince == null) {
+            return null;
+        }
+        
+        SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
+
+        dateFormat.setLenient(false);
+        Date dateSince = null;
+        try {
+            dateSince = dateFormat.parse(ifModifiedSince);
+        } catch (ParseException ex) {
+            // invalid header value, request should continue
+            return null;
+        }
+        
+        if (dateSince.before(lastModified)) {
+            // request should continue
+            return null;
+        }
+        
+        return Response.status(Response.Status.NOT_MODIFIED);
     }
 
 

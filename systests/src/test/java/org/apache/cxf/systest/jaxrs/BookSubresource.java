@@ -19,9 +19,16 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.customer.book.BookNotFoundFault;
 
@@ -31,4 +38,21 @@ public interface BookSubresource {
     @Path("/subresource")
     @ProduceMime("application/xml")
     Book getTheBook() throws BookNotFoundFault;
+    
+    @POST
+    @Path("/subresource2/{n1}")
+    @ConsumeMime("text/plain")
+    @ProduceMime("application/xml")
+    Book getTheBook2(@PathParam("n1") String name1,
+                     @QueryParam("n2") String name2,
+                     @QueryParam("n3") String name3,
+                     @HeaderParam("N4") String name4,
+                     @CookieParam("n5") String name5,
+                     String name6) throws BookNotFoundFault;
+    
+    @POST
+    @Path("/subresource3")
+    Book getTheBook3(MultivaluedMap<String, String> form) throws BookNotFoundFault;
+    
 }
+

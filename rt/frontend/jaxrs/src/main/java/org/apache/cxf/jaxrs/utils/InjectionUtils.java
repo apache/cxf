@@ -132,18 +132,6 @@ public final class InjectionUtils {
         return (Class<?>)paramType.getActualTypeArguments()[0];
     }
     
-    public static Class<?> getActualType(Type genericType, int i) {
-        if (genericType == null 
-            || !ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
-            return null;
-        }
-        ParameterizedType paramType = (ParameterizedType)genericType;
-        if (i < paramType.getActualTypeArguments().length) {
-            return (Class<?>)paramType.getActualTypeArguments()[i];
-        }
-        return null;
-    }
-    
     public static void injectThroughMethod(Object requestObject,
                                            Method method,
                                            Object parameterValue) {
@@ -513,5 +501,12 @@ public final class InjectionUtils {
             Object value = JAXRSUtils.createResourceValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value, true);
         }
+    }
+    
+    public static boolean isPrimitive(Class<?> type) {
+        return type.isPrimitive() 
+            || Number.class.isAssignableFrom(type)
+            || Boolean.class.isAssignableFrom(type)
+            || String.class == type;
     }
 }

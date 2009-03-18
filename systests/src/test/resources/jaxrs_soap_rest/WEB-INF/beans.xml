@@ -35,7 +35,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-
   <jaxws:endpoint xmlns:s="http://books.com"
       serviceName="s:BookService"
       endpointName="s:BookPort"
@@ -49,9 +48,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <ref bean="bookstore"/>
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
-  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl">
-  </bean>
-  
+  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl"/>
+
   <jaxws:endpoint xmlns:s="http://books.com"
       serviceName="s:BookService"
       endpointName="s:BookPort"
@@ -65,8 +63,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <ref bean="bookstore2"/>
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
-  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl2">
-  </bean>
+  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl2"/>
 
 </beans>
 <!-- END SNIPPET: beans -->
