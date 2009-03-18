@@ -13,7 +13,7 @@
 		<resources>
 		  <resource>
 		    <targetPath>schemaorg_apache_xmlbeans</targetPath>
-		    <directory>target/generated/src/main/java/schemaorg_apache_xmlbeans</directory>
+		    <directory>target/generated-sources/cxf/schemaorg_apache_xmlbeans</directory>
 		    <includes>
               <include> **/*.xsb </include>
               <include> **/*.class </include>
