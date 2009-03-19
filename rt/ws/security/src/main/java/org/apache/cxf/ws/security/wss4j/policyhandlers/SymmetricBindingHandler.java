@@ -324,13 +324,17 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
             if (isRequestor()) {
                 addSupportingTokens(sigs);
-                signatures.add(doSignature(sigs, sigTokenWrapper, sigToken, sigTok, tokIncluded));
+                if (!sigs.isEmpty()) {
+                    signatures.add(doSignature(sigs, sigTokenWrapper, sigToken, sigTok, tokIncluded));
+                }
                 doEndorse();
             } else {
                 //confirm sig
                 assertSupportingTokens(sigs);
                 addSignatureConfirmation(sigs);
-                doSignature(sigs, sigTokenWrapper, sigToken, sigTok, tokIncluded);
+                if (!sigs.isEmpty()) {
+                    doSignature(sigs, sigTokenWrapper, sigToken, sigTok, tokIncluded);
+                }
             }
 
             
