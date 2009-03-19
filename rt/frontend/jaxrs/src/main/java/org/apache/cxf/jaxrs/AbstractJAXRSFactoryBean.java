@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.jaxrs;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
@@ -46,7 +49,9 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  */
 public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     
+    protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
+    protected List<?> entityProviders;
     
     protected AbstractJAXRSFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -159,5 +164,30 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         return ep;
     }
     
+    public void setSchemaLocation(String schema) {
+        setSchemaLocations(Collections.singletonList(schema));    
+    }
+    
+    public void setSchemaLocations(List<String> schemas) {
+        this.schemaLocations = schemas;    
+    }
+    
+    /**
+     * @return the entityProviders
+     */
+    public List<?> getProviders() {
+        return entityProviders;
+    }
+
+    /**
+     * @param entityProviders the entityProviders to set
+     */
+    public void setProviders(List<? extends Object> providers) {
+        this.entityProviders = providers;
+    }
+    
+    public void setProvider(Object provider) {
+        setProviders(Collections.singletonList(provider));
+    }
 
 }

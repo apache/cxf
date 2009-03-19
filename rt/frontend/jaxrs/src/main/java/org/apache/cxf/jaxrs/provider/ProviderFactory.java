@@ -53,57 +53,41 @@ public final class ProviderFactory {
     
     private static final Map<String, ProviderFactory> FACTORIES = 
         new HashMap<String, ProviderFactory>();
+    private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     private static final ProviderFactory DEFAULT_FACTORY = new ProviderFactory(); 
     private static final String SLASH = "/"; 
     
-    private List<ProviderInfo<MessageBodyReader>> defaultMessageReaders = 
+    static {
+        SHARED_FACTORY.setProviders(new JAXBElementProvider(),
+                                    new JSONProvider(),
+                                    new BinaryDataProvider(),
+                                    new SourceProvider(),
+                                    new FormEncodingProvider(),
+                                    new PrimitiveTextProvider(),
+                                    new ActivationProvider(),
+                                    new WebApplicationExceptionMapper(),
+                                    new MappingsHandler());
+    }
+    
+    private List<ProviderInfo<MessageBodyReader>> messageReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader>>();
-    private List<ProviderInfo<MessageBodyWriter>> defaultMessageWriters = 
+    private List<ProviderInfo<MessageBodyWriter>> messageWriters = 
         new ArrayList<ProviderInfo<MessageBodyWriter>>();
-    private List<ProviderInfo<MessageBodyReader>> userMessageReaders = 
-        new ArrayList<ProviderInfo<MessageBodyReader>>(1);
-    private List<ProviderInfo<MessageBodyWriter>> userMessageWriters = 
-        new ArrayList<ProviderInfo<MessageBodyWriter>>(1);
-    private List<ProviderInfo<ContextResolver>> userContextResolvers = 
+    private List<ProviderInfo<ContextResolver>> contextResolvers = 
         new ArrayList<ProviderInfo<ContextResolver>>(1);
-    private List<ProviderInfo<ExceptionMapper>> defaultExceptionMappers = 
-        new ArrayList<ProviderInfo<ExceptionMapper>>(1);
-    private List<ProviderInfo<ExceptionMapper>> userExceptionMappers = 
+    private List<ProviderInfo<ExceptionMapper>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper>>(1);
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
         new ArrayList<ProviderInfo<RequestHandler>>(1);
     private List<ProviderInfo<ResponseHandler>> responseHandlers = 
         new ArrayList<ProviderInfo<ResponseHandler>>(1);
-    private List<ProviderInfo<ParameterHandler>> jaxrsParamHandlers = 
+    private List<ProviderInfo<ParameterHandler>> paramHandlers = 
         new ArrayList<ProviderInfo<ParameterHandler>>(1);
-    private List<ProviderInfo<ResponseExceptionMapper>> userResponseExceptionMappers = 
+    private List<ProviderInfo<ResponseExceptionMapper>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper>>(1);
     private RequestPreprocessor requestPreprocessor;
     
     private ProviderFactory() {
-        // TODO : this needs to be done differently,
-        // we need to use cxf-jaxrs-extensions
-        
-        // TODO : make sure the default providers are shared between multiple
-        // factories
-        
-        setProviders(defaultMessageReaders,
-                     defaultMessageWriters,
-                     userContextResolvers,
-                     requestHandlers,
-                     responseHandlers,
-                     defaultExceptionMappers,
-                     jaxrsParamHandlers,
-                     userResponseExceptionMappers,
-                     new JAXBElementProvider(),
-                     new JSONProvider(),
-                     new BinaryDataProvider(),
-                     new SourceProvider(),
-                     new FormEncodingProvider(),
-                     new PrimitiveTextProvider(),
-                     new ActivationProvider(),
-                     new WebApplicationExceptionMapper(),
-                     new MappingsHandler());
     }
     
     public static ProviderFactory getInstance() {
@@ -126,9 +110,22 @@ public final class ProviderFactory {
         return pf;
     }
 
+    public static ProviderFactory getSharedInstance() {
+        return SHARED_FACTORY;
+    }
+    
+    public <T> ContextResolver<T> createContextResolver(Type contextType, 
+                                                        Message m) {
+        Object mt = m.get(Message.CONTENT_TYPE);
+        return createContextResolver(contextType, m,
+               mt == null ? MediaType.valueOf("*/*") : MediaType.valueOf(mt.toString()));
+        
+    }
+    
     @SuppressWarnings("unchecked")
-    public <T> ContextResolver<T> createContextResolver(Type contextType, Message m) {
-        for (ProviderInfo<ContextResolver> cr : userContextResolvers) {
+    public <T> ContextResolver<T> createContextResolver(Type contextType, Message m,
+                                                        MediaType mt) {
+        for (ProviderInfo<ContextResolver> cr : contextResolvers) {
             Type[] types = cr.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
                 if (t instanceof ParameterizedType) {
@@ -148,27 +145,24 @@ public final class ProviderFactory {
         return null;
     }
     
-    public <T> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, Message m) {
+    public <T> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, 
+                                                                          Message m) {
         
-        ExceptionMapper<T> mapper = doCreateExceptionMapper(userExceptionMappers,
-                                                            exceptionType,
-                                                            m);
-        if (mapper != null) {
+        ExceptionMapper<T> mapper = doCreateExceptionMapper(exceptionType, m);
+        if (mapper != null || this == SHARED_FACTORY) {
             return mapper;
         }
         
-        return doCreateExceptionMapper(defaultExceptionMappers,
-                                       exceptionType,
-                                       m);
+        return SHARED_FACTORY.createExceptionMapper(exceptionType, m);
     }
     
     @SuppressWarnings("unchecked")
-    private static <T> ExceptionMapper<T> doCreateExceptionMapper(
-        List<ProviderInfo<ExceptionMapper>> mappers, Class<?> exceptionType, Message m) {
+    private <T> ExceptionMapper<T> doCreateExceptionMapper(
+        Class<?> exceptionType, Message m) {
         
         List<ExceptionMapper<T>> candidates = new LinkedList<ExceptionMapper<T>>();
         
-        for (ProviderInfo<ExceptionMapper> em : mappers) {
+        for (ProviderInfo<ExceptionMapper> em : exceptionMappers) {
             handleMapper((List)candidates, em, exceptionType, m);
         }
         if (candidates.size() == 0) {
@@ -183,7 +177,7 @@ public final class ProviderFactory {
         
         List<ParameterHandler<T>> candidates = new LinkedList<ParameterHandler<T>>();
         
-        for (ProviderInfo<ParameterHandler> em : jaxrsParamHandlers) {
+        for (ProviderInfo<ParameterHandler> em : paramHandlers) {
             handleMapper((List)candidates, em, paramType, null);
         }
         if (candidates.size() == 0) {
@@ -199,7 +193,7 @@ public final class ProviderFactory {
         
         List<ResponseExceptionMapper<T>> candidates = new LinkedList<ResponseExceptionMapper<T>>();
         
-        for (ProviderInfo<ResponseExceptionMapper> em : userResponseExceptionMappers) {
+        for (ProviderInfo<ResponseExceptionMapper> em : responseExceptionMappers) {
             handleMapper((List)candidates, em, paramType, null);
         }
         if (candidates.size() == 0) {
@@ -237,31 +231,31 @@ public final class ProviderFactory {
                                                             MediaType mediaType,
                                                             Message m) {
         // Try user provided providers
-        MessageBodyReader<T> mr = chooseMessageReader(userMessageReaders, 
-                                                      bodyType,
+        MessageBodyReader<T> mr = chooseMessageReader(bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
                                                       mediaType,
                                                       m);
         
         //If none found try the default ones
-        if (mr == null) {
-            mr = chooseMessageReader(defaultMessageReaders,
-                                     bodyType,
-                                     parameterType,
-                                     parameterAnnotations,
-                                     mediaType,
-                                     m);
-        }     
-        
-        return mr;
+        if (mr != null ||  this == SHARED_FACTORY) {
+            return mr;
+        }
+        return SHARED_FACTORY.createMessageBodyReader(bodyType, parameterType, 
+                                                        parameterAnnotations, mediaType, m);
     }
     
     
     
     public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
-        
-        return Collections.unmodifiableList(requestHandlers);
+        if (requestHandlers.size() == 0) {
+            return Collections.unmodifiableList(SHARED_FACTORY.requestHandlers);
+        } else {
+            List<ProviderInfo<RequestHandler>> handlers = 
+                new ArrayList<ProviderInfo<RequestHandler>>(SHARED_FACTORY.requestHandlers);
+            handlers.addAll(requestHandlers);
+            return handlers;
+        }
     }
     
     public List<ProviderInfo<ResponseHandler>> getResponseHandlers() {
@@ -275,64 +269,50 @@ public final class ProviderFactory {
                                                             MediaType mediaType,
                                                             Message m) {
         // Try user provided providers
-        MessageBodyWriter<T> mw = chooseMessageWriter(userMessageWriters,
-                                                      bodyType,
+        MessageBodyWriter<T> mw = chooseMessageWriter(bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
                                                       mediaType,
                                                       m);
         
         //If none found try the default ones
-        if (mw == null) {
-            mw = chooseMessageWriter(defaultMessageWriters,
-                                     bodyType,
-                                     parameterType,
-                                     parameterAnnotations,
-                                     mediaType,
-                                     m);
-        }     
-        
-        return mw;
+        if (mw != null || this == SHARED_FACTORY) {
+            return mw;
+        }
+        return SHARED_FACTORY.createMessageBodyWriter(bodyType, parameterType, 
+                                                        parameterAnnotations, mediaType, m);
     }
     
 //CHECKSTYLE:OFF       
-    private void setProviders(List<ProviderInfo<MessageBodyReader>> readers, 
-                              List<ProviderInfo<MessageBodyWriter>> writers,
-                              List<ProviderInfo<ContextResolver>> resolvers,
-                              List<ProviderInfo<RequestHandler>> requestFilters,
-                              List<ProviderInfo<ResponseHandler>> responseFilters,
-                              List<ProviderInfo<ExceptionMapper>> excMappers,
-                              List<ProviderInfo<ParameterHandler>> paramHandlers,
-                              List<ProviderInfo<ResponseExceptionMapper>> responseExcMappers,
-                              Object... providers) {
+    private void setProviders(Object... providers) {
         
         for (Object o : providers) {
             if (MessageBodyReader.class.isAssignableFrom(o.getClass())) {
-                readers.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)o)); 
+                messageReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)o)); 
             }
             
             if (MessageBodyWriter.class.isAssignableFrom(o.getClass())) {
-                writers.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)o)); 
+                messageWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)o)); 
             }
             
             if (ContextResolver.class.isAssignableFrom(o.getClass())) {
-                resolvers.add(new ProviderInfo<ContextResolver>((ContextResolver)o)); 
+                contextResolvers.add(new ProviderInfo<ContextResolver>((ContextResolver)o)); 
             }
             
             if (RequestHandler.class.isAssignableFrom(o.getClass())) {
-                requestFilters.add(new ProviderInfo<RequestHandler>((RequestHandler)o)); 
+                requestHandlers.add(new ProviderInfo<RequestHandler>((RequestHandler)o)); 
             }
             
             if (ResponseHandler.class.isAssignableFrom(o.getClass())) {
-                responseFilters.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o)); 
+                responseHandlers.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o)); 
             }
             
             if (ExceptionMapper.class.isAssignableFrom(o.getClass())) {
-                excMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
+                exceptionMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
             }
             
             if (ResponseExceptionMapper.class.isAssignableFrom(o.getClass())) {
-                responseExcMappers.add(new ProviderInfo<ResponseExceptionMapper>((ResponseExceptionMapper)o)); 
+                responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper>((ResponseExceptionMapper)o)); 
             }
             
             if (ParameterHandler.class.isAssignableFrom(o.getClass())) {
@@ -340,10 +320,11 @@ public final class ProviderFactory {
             }
         }
         
-        sortReaders(readers);
-        sortWriters(writers);
+        sortReaders();
+        sortWriters();
         
-        injectContexts(readers, writers, resolvers, requestFilters, responseFilters, excMappers);
+        injectContexts(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
+                       exceptionMappers);
     }
 //CHECKSTYLE:ON
     
@@ -363,12 +344,12 @@ public final class ProviderFactory {
      * provider that lists *. Quality parameter values are also used such that
      * x/y;q=1.0 < x/y;q=0.7.
      */    
-    private void sortReaders(List<ProviderInfo<MessageBodyReader>> entityProviders) {
-        Collections.sort(entityProviders, new MessageBodyReaderComparator());
+    private void sortReaders() {
+        Collections.sort(messageReaders, new MessageBodyReaderComparator());
     }
     
-    private void sortWriters(List<ProviderInfo<MessageBodyWriter>> entityProviders) {
-        Collections.sort(entityProviders, new MessageBodyWriterComparator());
+    private void sortWriters() {
+        Collections.sort(messageWriters, new MessageBodyWriterComparator());
     }
     
         
@@ -384,14 +365,12 @@ public final class ProviderFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> MessageBodyReader<T> chooseMessageReader(
-                                 List<ProviderInfo<MessageBodyReader>> readers, 
-                                                         Class<T> type,
+    private <T> MessageBodyReader<T> chooseMessageReader(Class<T> type,
                                                          Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
-        for (ProviderInfo<MessageBodyReader> ep : readers) {
+        for (ProviderInfo<MessageBodyReader> ep : messageReaders) {
             InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
             InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);             
             if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
@@ -432,14 +411,12 @@ public final class ProviderFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> MessageBodyWriter<T> chooseMessageWriter(
-                          List<ProviderInfo<MessageBodyWriter>> writers, 
-                                                         Class<T> type,
+    private <T> MessageBodyWriter<T> chooseMessageWriter(Class<T> type,
                                                          Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
-        for (ProviderInfo<MessageBodyWriter> ep : writers) {
+        for (ProviderInfo<MessageBodyWriter> ep : messageWriters) {
             InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
             InjectionUtils.injectContextMethods(ep.getProvider(), ep, m); 
             if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
@@ -470,24 +447,16 @@ public final class ProviderFactory {
         
     }
     
-    List<ProviderInfo<MessageBodyReader>> getDefaultMessageReaders() {
-        return Collections.unmodifiableList(defaultMessageReaders);
+    List<ProviderInfo<MessageBodyReader>> getMessageReaders() {
+        return Collections.unmodifiableList(messageReaders);
     }
 
-    List<ProviderInfo<MessageBodyWriter>> getDefaultMessageWriters() {
-        return Collections.unmodifiableList(defaultMessageWriters);
+    List<ProviderInfo<MessageBodyWriter>> getMessageWriters() {
+        return Collections.unmodifiableList(messageWriters);
     }
     
-    List<ProviderInfo<MessageBodyReader>> getUserMessageReaders() {
-        return Collections.unmodifiableList(userMessageReaders);
-    }
-    
-    List<ProviderInfo<MessageBodyWriter>> getUserMessageWriters() {
-        return Collections.unmodifiableList(userMessageWriters);
-    }
-    
-    List<ProviderInfo<ContextResolver>> getUserContextResolvers() {
-        return Collections.unmodifiableList(userContextResolvers);
+    List<ProviderInfo<ContextResolver>> getContextResolvers() {
+        return Collections.unmodifiableList(contextResolvers);
     }
     
      
@@ -499,15 +468,7 @@ public final class ProviderFactory {
      * @param entityProviders the entityProviders to set
      */
     public void setUserProviders(List<?> userProviders) {
-        setProviders(userMessageReaders,
-                     userMessageWriters,
-                     userContextResolvers,
-                     requestHandlers,
-                     responseHandlers,
-                     userExceptionMappers,
-                     jaxrsParamHandlers,
-                     userResponseExceptionMappers,
-                     userProviders.toArray());
+        setProviders(userProviders.toArray());
     }
 
     private static class MessageBodyReaderComparator 
@@ -554,14 +515,12 @@ public final class ProviderFactory {
     }
     
     public void clearThreadLocalProxies() {
-        clearProxies(defaultMessageReaders,
-                     defaultMessageWriters,
-                     userMessageReaders,
-                     userMessageWriters,
-                     userContextResolvers,
+        clearProxies(messageReaders,
+                     messageWriters,
+                     contextResolvers,
                      requestHandlers,
                      responseHandlers,
-                     userExceptionMappers);
+                     exceptionMappers);
     }
     
     void clearProxies(List<?> ...lists) {
@@ -574,23 +533,18 @@ public final class ProviderFactory {
     }
     
     void clearProviders() {
-        userMessageReaders.clear();
-        userMessageWriters.clear();
-        userContextResolvers.clear();
-        userExceptionMappers.clear();
+        messageReaders.clear();
+        messageWriters.clear();
+        contextResolvers.clear();
+        exceptionMappers.clear();
         requestHandlers.clear();
         responseHandlers.clear();
-        jaxrsParamHandlers.clear();
+        paramHandlers.clear();
+        responseExceptionMappers.clear();
     }
     
     public void setSchemaLocations(List<String> schemas) {
-        setSchemasOnProviders(userMessageReaders, schemas);
-        setSchemasOnProviders(defaultMessageReaders, schemas);
-    }
-    
-    private void setSchemasOnProviders(List<ProviderInfo<MessageBodyReader>> providers,
-                                       List<String> schemas) {
-        for (ProviderInfo<MessageBodyReader> r : providers) {
+        for (ProviderInfo<MessageBodyReader> r : messageReaders) {
             try {
                 Method m = r.getProvider().getClass().getMethod("setSchemas", 
                                                      new Class[]{List.class});

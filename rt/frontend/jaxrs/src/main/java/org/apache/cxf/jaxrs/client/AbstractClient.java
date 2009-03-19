@@ -266,7 +266,7 @@ public class AbstractClient implements Client {
     }
 
     @SuppressWarnings("unchecked")
-    protected static void writeBody(Object o, Class<?> cls, Type type, Annotation[] anns, 
+    protected void writeBody(Object o, Message m, Class<?> cls, Type type, Annotation[] anns, 
         MultivaluedMap<String, String> headers, OutputStream os) {
         
         if (o == null) {
@@ -275,11 +275,15 @@ public class AbstractClient implements Client {
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type")); 
         
-        MessageBodyWriter mbr = ProviderFactory.getInstance().createMessageBodyWriter(
-            cls, type, anns, contentType, new MessageImpl());
-        if (mbr != null) {
+        MessageBodyWriter mbw = ProviderFactory.getInstance(baseURI.getPath()).createMessageBodyWriter(
+            cls, type, anns, contentType, m);
+        if (mbw == null) {
+            mbw = ProviderFactory.getInstance().createMessageBodyWriter(
+                      cls, type, anns, contentType, m);
+        }
+        if (mbw != null) {
             try {
-                mbr.writeTo(o, cls, type, anns, contentType, headers, os);
+                mbw.writeTo(o, cls, type, anns, contentType, headers, os);
                 os.flush();
             } catch (Exception ex) {
                 throw new WebApplicationException();
@@ -292,8 +296,8 @@ public class AbstractClient implements Client {
     }
     
     @SuppressWarnings("unchecked")
-    protected static Object readBody(Response r, HttpURLConnection conn, Class<?> cls, Type type, 
-                                     Annotation[] anns) {
+    protected Object readBody(Response r, HttpURLConnection conn, Message inMessage, 
+                              Class<?> cls, Type type, Annotation[] anns) {
 
         try {
             int status = conn.getResponseCode();
@@ -306,8 +310,12 @@ public class AbstractClient implements Client {
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader mbr = ProviderFactory.getInstance().createMessageBodyReader(
-            cls, type, anns, contentType, new MessageImpl());
+        MessageBodyReader mbr = ProviderFactory.getInstance(baseURI.getPath()).createMessageBodyReader(
+            cls, type, anns, contentType, inMessage);
+        if (mbr == null) {
+            ProviderFactory.getInstance().createMessageBodyReader(
+                cls, type, anns, contentType, inMessage);
+        }
         if (mbr != null) {
             try {
                 return mbr.readFrom(cls, type, anns, contentType, r.getMetadata(), conn.getInputStream());
@@ -382,6 +390,12 @@ public class AbstractClient implements Client {
         List<Interceptor> i2 = inInterceptors;
         List<Interceptor> i3 = endpoint.getInInterceptors();
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
+    }
+    
+    protected Message createSimpleMessage() {
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, getHeaders());
+        return m;
     }
     
     protected Message createMessage(String httpMethod, 

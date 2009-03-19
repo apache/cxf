@@ -123,12 +123,12 @@ public class ProviderFactoryTest extends Assert {
         pf.registerUserProvider(new TestStringProvider());
         pf.registerUserProvider(new PrimitiveTextProvider());
         
-        List<ProviderInfo<MessageBodyReader>> readers = pf.getUserMessageReaders();
+        List<ProviderInfo<MessageBodyReader>> readers = pf.getMessageReaders();
 
         assertTrue(indexOf(readers, TestStringProvider.class) 
                    < indexOf(readers, PrimitiveTextProvider.class));
         
-        List<ProviderInfo<MessageBodyWriter>> writers = pf.getUserMessageWriters();
+        List<ProviderInfo<MessageBodyWriter>> writers = pf.getMessageWriters();
 
         assertTrue(indexOf(writers, TestStringProvider.class) 
                    < indexOf(writers, PrimitiveTextProvider.class));
@@ -156,12 +156,12 @@ public class ProviderFactoryTest extends Assert {
         json2.setProduceMediaTypes(Collections.singletonList("application/sbc"));
         pf.registerUserProvider(json2);
         
-        List<ProviderInfo<MessageBodyReader>> readers = pf.getUserMessageReaders();
+        List<ProviderInfo<MessageBodyReader>> readers = pf.getMessageReaders();
 
         assertTrue(indexOf(readers, json2) 
                    < indexOf(readers, json1));
         
-        List<ProviderInfo<MessageBodyWriter>> writers = pf.getUserMessageWriters();
+        List<ProviderInfo<MessageBodyWriter>> writers = pf.getMessageWriters();
 
         assertTrue(indexOf(writers, json1) 
                    < indexOf(writers, json2));
@@ -244,7 +244,7 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterCustomResolver() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new JAXBContextProvider());
-        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, null);
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, new MessageImpl());
         assertTrue("JAXBContext ContextProvider can not be found", 
                    cr instanceof JAXBContextProvider);
         

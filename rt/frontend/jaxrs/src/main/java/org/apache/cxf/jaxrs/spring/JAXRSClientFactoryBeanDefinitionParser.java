@@ -66,7 +66,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
 
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element el, String name) {
-        if ("properties".equals(name)) {
+        if ("properties".equals(name) || "headers".equals(name)) {
             Map map = ctx.getDelegate().parseMapElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, map);
         } else if ("executor".equals(name)) {
@@ -79,7 +79,8 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)) {
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
-        } else if ("features".equals(name) || "providers".equals(name)) {
+        } else if ("features".equals(name) || "providers".equals(name)
+                   || "schemaLocations".equals(name)) {
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else {

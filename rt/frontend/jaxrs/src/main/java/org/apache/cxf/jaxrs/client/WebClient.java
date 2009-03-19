@@ -272,15 +272,16 @@ public class WebClient extends AbstractClient {
         HttpURLConnection conn = getConnection(httpMethod);
         
         setAllHeaders(headers, conn);
+        Message message = createSimpleMessage();
         if (body != null) {
             try {
-                writeBody(body, body.getClass(), body.getClass(), 
+                writeBody(body, message, body.getClass(), body.getClass(), 
                       new Annotation[]{}, headers, conn.getOutputStream());
             } catch (IOException ex) {
                 throw new WebApplicationException(ex);
             }
         }
-        return handleResponse(conn, responseClass);
+        return handleResponse(conn, message, responseClass);
     }
     
     protected Response doChainedInvocation(String httpMethod, 
@@ -302,14 +303,14 @@ public class WebClient extends AbstractClient {
         
         // TODO : this needs to be done in an inbound chain instead
         HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        return handleResponse(connect, responseClass);
+        return handleResponse(connect, m, responseClass);
     }
     
-    protected Response handleResponse(HttpURLConnection conn, Class<?> responseClass) {
+    protected Response handleResponse(HttpURLConnection conn, Message m, Class<?> responseClass) {
         try {
             ResponseBuilder rb = setResponseBuilder(conn).clone();
             Response currentResponse = rb.clone().build();
-            Object entity = readBody(currentResponse, conn, responseClass, responseClass,
+            Object entity = readBody(currentResponse, conn, m, responseClass, responseClass,
                                      new Annotation[]{});
             rb.entity(entity);
             
@@ -347,7 +348,7 @@ public class WebClient extends AbstractClient {
             MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
             Object body = objs.get(0);
             try {
-                writeBody(body, body.getClass(), body.getClass(), new Annotation[]{}, headers, os);
+                writeBody(body, m, body.getClass(), body.getClass(), new Annotation[]{}, headers, os);
                 os.flush();
             } catch (Exception ex) {
                 throw new Fault(ex);
