@@ -68,7 +68,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
             "http://localhost:9080/webapp/bookstore/books/12345"; 
         URL url = new URL(endpointAddress);
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();
-        connect.addRequestProperty("Accept", "text/plain");
+        connect.addRequestProperty("Accept", "text/plain,application/xml");
         assertEquals(500, connect.getResponseCode());
         InputStream in = connect.getErrorStream();
         assertNotNull(in);           

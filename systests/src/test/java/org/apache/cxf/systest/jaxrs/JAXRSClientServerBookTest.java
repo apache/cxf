@@ -45,7 +45,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -239,6 +239,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/books/123",
                                "resources/expected_get_book123json.txt",
                                "application/json, application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBookXmlWildcard() throws Exception {
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/123",
+                               "resources/expected_get_book123.txt",
+                               "*/*", 200);
+        
     }
     
     @Test
@@ -505,41 +514,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
     @Test
     public void testGetCDs() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/cds"; 
-        URL url = new URL(endpointAddress);
-        URLConnection connect = url.openConnection();
-        connect.addRequestProperty("Accept", "application/xml");
-        InputStream in = connect.getInputStream();
-        assertNotNull(in);           
-
-        InputStream expected124 = getClass().getResourceAsStream("resources/expected_get_cds124.txt");
-        String result = getStringFromInputStream(in);
-        //System.out.println("---" + result);
-        assertTrue(result.indexOf(getStringFromInputStream(expected124)) >= 0);
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/cds",
+                               "resources/expected_get_cds124.txt",
+                               "application/xml", 200);
     }
     
     @Test
     public void testGetCDJSON() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/cd/123"; 
-
-        GetMethod get = new GetMethod(endpointAddress);
-        get.addRequestHeader("Accept" , "application/json");
-
-        HttpClient httpclient = new HttpClient();
         
-        try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
-
-            InputStream expected = getClass().getResourceAsStream("resources/expected_get_cdjson.txt");
-            
-            assertEquals(getStringFromInputStream(expected), get.getResponseBodyAsString());
-        } finally {
-            // Release current connection to the connection pool once you are done
-            get.releaseConnection();
-        }  
+        getAndCompareAsStrings("http://localhost:9080/bookstore/cd/123",
+                               "resources/expected_get_cdjson.txt",
+                               "application/json", 200);
+        
     }
     
     @SuppressWarnings("deprecation")
@@ -600,6 +587,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetCDsJSON() throws Exception {
+        
         String endpointAddress =
             "http://localhost:9080/bookstore/cds"; 
 
@@ -626,72 +614,29 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetCDXML() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/cd/123"; 
-
-        GetMethod get = new GetMethod(endpointAddress);
-        get.addRequestHeader("Accept" , "application/xml");
-
-        HttpClient httpclient = new HttpClient();
         
-        try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
-
-            InputStream expected = getClass().getResourceAsStream("resources/expected_get_cd.txt");
-            
-            assertEquals(getStringFromInputStream(expected), get.getResponseBodyAsString());
-        } finally {
-            // Release current connection to the connection pool once you are done
-            get.releaseConnection();
-        }  
+        getAndCompareAsStrings("http://localhost:9080/bookstore/cd/123",
+                               "resources/expected_get_cd.txt",
+                               "application/xml", 200);
     }
     
     
     @Test
     public void testGetCDWithMultiContentTypesXML() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/cdwithmultitypes/123"; 
-
-        GetMethod get = new GetMethod(endpointAddress);
-        get.addRequestHeader("Accept" , "application/xml");
-
-        HttpClient httpclient = new HttpClient();
         
-        try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
-
-            InputStream expected = getClass().getResourceAsStream("resources/expected_get_cd.txt");
-            
-            assertEquals(getStringFromInputStream(expected), get.getResponseBodyAsString());
-        } finally {
-            // Release current connection to the connection pool once you are done
-            get.releaseConnection();
-        }  
+        getAndCompareAsStrings("http://localhost:9080/bookstore/cdwithmultitypes/123",
+                               "resources/expected_get_cd.txt",
+                               "application/json;q=0.8,application/xml", 200);
     }
     
     @Test
     public void testGetCDWithMultiContentTypesJSON() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/cdwithmultitypes/123"; 
-
-        GetMethod get = new GetMethod(endpointAddress);
-        get.addRequestHeader("Accept" , "application/json");
-
-        HttpClient httpclient = new HttpClient();
-        
-        try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
-
-            InputStream expected = getClass().getResourceAsStream("resources/expected_get_cdjson.txt");
-            
-            assertEquals(getStringFromInputStream(expected), get.getResponseBodyAsString());
-        } finally {
-            // Release current connection to the connection pool once you are done
-            get.releaseConnection();
-        }  
+        getAndCompareAsStrings("http://localhost:9080/bookstore/cdwithmultitypes/123",
+                               "resources/expected_get_cdjson.txt",
+                               "application/json", 200);
+        getAndCompareAsStrings("http://localhost:9080/bookstore/cdwithmultitypes/123",
+                               "resources/expected_get_cdjson.txt",
+                               "application/xml;q=0.9,application/json", 200);
     }
     
     @Test

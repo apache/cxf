@@ -30,7 +30,31 @@ public class TestResource {
     public TestResource() {
     }
     
+    @Path("/resource")
+    public TestResource subresource() {
+        return this;
+    }
     
+    @Path("/resource")
+    @GET
+    @ProduceMime("application/json")
+    public String resourceMethod() {
+        return "";
+    }
+    
+    @GET
+    @ProduceMime("application/xml")
+    @Path("/resource1")
+    public TestResource xmlResource() {
+        return this;
+    }
+    
+    @Path("/resource1")
+    @GET
+    @ProduceMime("application/json")
+    public String jsonResource() {
+        return "";
+    }
     
     @GET
     @Path("/")

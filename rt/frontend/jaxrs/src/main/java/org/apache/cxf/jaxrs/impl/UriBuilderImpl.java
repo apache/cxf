@@ -169,12 +169,18 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder path(String... segments) throws IllegalArgumentException {
+        
         if (paths == null) {
             paths = new ArrayList<PathSegment>();
         }
         for (String seg : segments) {
             paths.addAll(JAXRSUtils.getPathSegments(seg, false));
         }
+        matrix.clear();
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();        
+        }
+        
         return this;
     }
 
@@ -258,7 +264,6 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    @Override
     public UriBuilder replaceMatrixParams(String m) throws IllegalArgumentException {
         if (m == null) {
             throw new IllegalArgumentException("name is null");
@@ -295,13 +300,11 @@ public class UriBuilderImpl extends UriBuilder {
         // scheme-specific part is whatever after ":" of URI
         // see: http://en.wikipedia.org/wiki/URI_scheme
         try {
-            URI uri = new URI("whatever://" + ssp);
-            port = uri.getPort();
-            host = uri.getHost();
-            paths = JAXRSUtils.getPathSegments(uri.getPath(), false);
-            fragment = uri.getFragment();
-            query = JAXRSUtils.getStructuredParams(uri.getQuery(), "&", true);
-            userInfo = uri.getUserInfo();
+            if (scheme == null) {
+                scheme = "http";
+            }
+            URI uri = new URI(scheme + "://" + ssp);
+            setUriParts(uri);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Wrong syntax of scheme-specific part", e);
         }
@@ -357,7 +360,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private void setPathAndMatrix(String path) {
-        paths = JAXRSUtils.getPathSegments(path, false);
+        paths = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty()) {
             matrix = paths.get(paths.size() - 1).getMatrixParameters();
         } else {
@@ -409,4 +412,6 @@ public class UriBuilderImpl extends UriBuilder {
         }
         return b.length() > 0 ? b.toString() : null;
     }
+    
+    
 }

@@ -36,10 +36,51 @@ import org.junit.Test;
 public class SelectMethodCandidatesTest extends Assert {
     
     @Test
+    public void testFindTargetSubResource() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        String contentTypes = "*/*";
+        String acceptContentTypes = "text/xml,*/*";
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/resource", values);
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                    values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                    "GET", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "resourceMethod",
+                     ori.getMethodToInvoke().getName());
+    }
+    
+    @Test
+    public void testSelectUsingQualityFactors() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        String contentTypes = "*/*";
+        String acceptContentTypes = "application/xml;q=0.5,application/json";
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/resource1", values);
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                    values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                    "GET", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("jsonResource needs to be selected", "jsonResource",
+                     ori.getMethodToInvoke().getName());
+    }
+    
+    @Test
     public void testFindTargetResourceClassWithTemplates() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
-        sf.create();        
+        sf.create();
+        
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
 
         String contentTypes = "*/*";
