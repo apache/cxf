@@ -20,6 +20,9 @@ package org.apache.cxf.pat.internal;
 
 import java.util.*;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+
 
 
 public abstract class TestCaseBase<T> {
@@ -47,7 +50,9 @@ public abstract class TestCaseBase<T> {
 
     protected List<TestResult> results = new ArrayList<TestResult>();
 
-    private int numberOfThreads;
+    protected int numberOfThreads;
+    
+    protected String busCfg;
     
     private String name;
 
@@ -120,6 +125,9 @@ public abstract class TestCaseBase<T> {
             } else if ("-PacketSize".equals(args[count])) {
                 packetSize = Integer.parseInt(args[count + 1]);
                 count += 2;
+            } else if ("-BUScfg".equals(args[count])) {
+                busCfg = args[count + 1];
+                count += 2;
             } else {
                 count++;
             }
@@ -151,7 +159,12 @@ public abstract class TestCaseBase<T> {
     }
 
     // for the cxf init , here do nothing
-    private void initBus() {      
+    public void initBus() {
+        if (busCfg == null || "none".equals(busCfg)) {
+            BusFactory.getDefaultBus();
+        } else {
+            BusFactory.setDefaultBus(new SpringBusFactory().createBus(busCfg));
+        }
     }
 
     public void tearDown() {        
@@ -339,7 +352,7 @@ public abstract class TestCaseBase<T> {
     }
 
     public void setWSDLPath(String wpath) {
-        this.wsdlPath = wsdlPath;
+        this.wsdlPath = wpath;
     }
 
     public void setServiceName(String sname) {

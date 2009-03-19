@@ -20,6 +20,9 @@ package org.apache.cxf.performance.complex_type.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+
 
 
 public class Server implements Runnable {
@@ -34,14 +37,35 @@ public class Server implements Runnable {
     
     public static void main(String args[]) throws Exception {
         String host = "localhost";
-        if ("-host".equals(args[0])) {
-            host = args[1];
+        String protocol = "http";
+        String cfg = null;
+        boolean wait = true;
+        for (int x = 0; x < args.length; x++) {
+            if ("-host".equals(args[x])) {
+                host = args[x + 1];
+                x++;
+            } else if ("-protocol".equals(args[x])) {
+                protocol = args[x + 1];
+                x++;
+            } else if ("-BUScfg".equals(args[x])) {
+                cfg = args[x + 1];
+                x++;
+            } else if ("-nowait".equals(args[x])) {
+                wait = false;
+            }
+        }
+        if (cfg == null || "none".equals(cfg)) {
+            BusFactory.getDefaultBus();
+        } else {
+            BusFactory.setDefaultBus(new SpringBusFactory().createBus(cfg));
         }
     
-        Server server = new Server("http://" + host + ":20003/performance/SoapHttpDocLitPort");
+        Server server = new Server(protocol + "://" + host 
+                                   + ":8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitPort");
         server.run();
-
-        Thread.sleep(10000000);
+        if (wait) {
+            Thread.sleep(10000000);
+        }
     }
     
     public void run() {

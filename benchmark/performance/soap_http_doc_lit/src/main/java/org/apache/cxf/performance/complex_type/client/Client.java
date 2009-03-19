@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Holder;
 
 
 import org.apache.cxf.frontend.ClientProxy;
@@ -64,16 +67,20 @@ public final class Client extends TestCaseBase<DocPortType> {
     private byte[] inputBase64;
     private String inputString = new String();
 
+    private static int statId;
     private final int asciiCount = 1 * 1024;
 
     public Client(String[] args, boolean warmup) {
         super("Base TestCase", args, warmup);
-        serviceName = "PerfService";
-        portName = "PerfService";
+        wsdlPath = PerfService.WSDL_LOCATION.toString();
+        serviceName = SERVICE_NAME.getLocalPart();
+        portName = PORT_NAME.getLocalPart();
         operationName = "echoComplexTypeDoc";
         wsdlNameSpace = "http://cxf.apache.org/cxf/performance";
         amount = 30;
         packetSize = 1;
+        usingTime = true;
+        numberOfThreads = 4;
     }
 
     public void processArgs() {
@@ -90,14 +97,28 @@ public final class Client extends TestCaseBase<DocPortType> {
     }
 
     public static void main(String args[]) throws Exception {
-
+        //workaround issue of xmlsec logging too much
+        Logger.getLogger("org.apache.xml.security.signature.Reference").setLevel(Level.WARNING);
+        
         int threadIdx = -1;
+        int servIdx = -1;
         for (int x = 0; x < args.length; x++) {
             if ("-Threads".equals(args[x])) {
                 threadIdx = x + 1;
+            } else if ("-Server".equals(args[x])) {
+                servIdx = x;
+                break;
             }
         }
-
+        if (servIdx != -1) {
+            String tmp[] = new String[args.length - servIdx];
+            System.arraycopy(args, servIdx, tmp, 0, args.length - servIdx);
+            Server.main(tmp);
+            
+            tmp = new String[servIdx];
+            System.arraycopy(args, 0, tmp, 0, servIdx);
+            args = tmp;
+        }
         List<String> threadList = new ArrayList<String>();
         if (threadIdx != -1) {
             String threads[] = args[threadIdx].split(",");
@@ -176,7 +197,7 @@ public final class Client extends TestCaseBase<DocPortType> {
         complexType.setVarUByte((short)255);
         complexType.setVarUnsignedLong(new BigInteger("13691056728"));
         complexType.setVarFloat(Float.MAX_VALUE);
-        complexType.setVarQName(new QName("return", "return"));
+        complexType.setVarQName(new QName("http://cxf.apache.org", "return"));
         try {
             complexType.setVarStruct(getSimpleStruct());
         } catch (DatatypeConfigurationException e) {
@@ -225,20 +246,27 @@ public final class Client extends TestCaseBase<DocPortType> {
                 port.echoBase64Doc(inputBase64);
                 break;
             case 2:
-                port.echoComplexTypeDoc(complexTypeSeq);
+                int id = ++statId;
+                Holder<Integer> i = new Holder<Integer>();
+                port.echoComplexTypeDoc(complexTypeSeq, id, i);
+                if (id != i.value) {
+                    System.out.println(id + " != " + i.value);
+                }
                 break;
             default:
-                port.echoComplexTypeDoc(complexTypeSeq);
+                port.echoComplexTypeDoc(complexTypeSeq, 0, new Holder<Integer>());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public DocPortType getPort() {
+    public synchronized DocPortType getPort() {
         try {
             URL wsdl = null;
-            if ((wsdlPath.startsWith("file://")) || (wsdlPath.startsWith("http://"))) {
+            if (wsdlPath.startsWith("file:") 
+                || wsdlPath.startsWith("http://")
+                || wsdlPath.startsWith("https://")) {
                 wsdl = new URL(wsdlPath);
             } else {
                 wsdl = new URL("file://" + wsdlPath);
@@ -248,7 +276,7 @@ public final class Client extends TestCaseBase<DocPortType> {
             e.printStackTrace();
         }
         DocPortType port = cs.getSoapHttpDocLitPort();
-        
+        /*
         org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
 
@@ -256,7 +284,7 @@ public final class Client extends TestCaseBase<DocPortType> {
         //httpClientPolicy.setAllowChunking(false);
   
         http.setClient(httpClientPolicy);
-  
+        */
         return port;
     }
 

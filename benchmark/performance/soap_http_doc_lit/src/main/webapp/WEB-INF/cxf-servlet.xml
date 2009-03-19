@@ -17,15 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<endpoints>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jaxws="http://cxf.apache.org/jaxws"
+      xmlns:soap="http://cxf.apache.org/bindings/soap"
+      xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <endpoint
-        name="complex_type"
-        interface="org.apache.cxf.performance.complex_type.ComplexPortType"
-        implementation="org.apache.cxf.performance.complex_type.server.ServerImpl"
-        wsdl="WEB-INF/wsdl/complex_type.wsdl"
-        service="{http://cxf.apache.org/performance/complex_type}ComplexService"
-        port="{http://cxf.apache.org/performance/complex_type}SoapPort"
-        url-pattern="/complex_type" />
+    <jaxws:endpoint
+        id="DocPortType"
+        implementor="org.apache.cxf.performance.complex_type.server.ServerImpl"
+        wsdlLocation="/wsdl/perf.wsdl"
+        address="/SoapHttpDocLitPort" />
+</beans>
 
-</endpoints>
+

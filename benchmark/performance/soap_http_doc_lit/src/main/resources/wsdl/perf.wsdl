@@ -23,7 +23,10 @@
           xmlns:x1="http://cxf.apache.org/cxf/performance/types"
           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+          xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
           targetNamespace="http://cxf.apache.org/cxf/performance">
+
+    <wsdl:import location="perf_policy.wsdl" namespace="http://cxf.apache.org/cxf/performance/policy"/>
 
     <types>
         <schema targetNamespace="http://cxf.apache.org/cxf/performance/types"
@@ -100,13 +103,15 @@
                 <complexType>
                     <sequence>
                         <element name="in" type="x1:NestedComplexTypeSeq"/>
+                        <element name="id" type="xsd:int"/>
                     </sequence>
                 </complexType>
             </element>
             <element name="echoComplexTypeDocResponse">
                 <complexType>
                     <sequence>
-                        <element name="out" type="x1:NestedComplexTypeSeq"/>
+                        <element name="return" type="x1:NestedComplexTypeSeq"/>
+                        <element name="idout" type="xsd:int"/>
                     </sequence>
                 </complexType>
             </element>
@@ -140,10 +145,10 @@
         <part name="out" element="x1:echoBase64DocResponse"/>
     </message>
     <message name="echoComplexTypeDoc">
-        <part name="in" element="x1:echoComplexTypeDoc"/>
+        <part name="parameters" element="x1:echoComplexTypeDoc"/>
     </message>
     <message name="echoComplexTypeDocResponse">
-        <part name="out" element="x1:echoComplexTypeDocResponse"/>
+        <part name="parameters" element="x1:echoComplexTypeDocResponse"/>
     </message>
 
     <message name="echoComplexTypeRPCRequest">
@@ -233,6 +238,7 @@
     </binding>
 
     <binding name="SoapBindingDocLit" type="tns:DocPortType">
+        <wsp:PolicyReference URI="#SymD_policy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 
         <operation name="echoStringDoc">
@@ -297,14 +303,14 @@
     </binding>
 
     <service name="PerfService">
-        <port name="SoapHttpRPCLitPort" binding="tns:SoapBindingRPCLit">
-            <soap:address location="http://localhost:20003/performance/SoapHttpRPCLitPort"/>
-        </port>
         <port name="SoapHttpDocLitPort" binding="tns:SoapBindingDocLit">
-            <soap:address location="http://localhost:20003/performance/SoapHttpDocLitPort"/>
+            <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitPort"/>
+        </port>
+        <port name="SoapHttpRPCLitPort" binding="tns:SoapBindingRPCLit">
+            <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpRPCLitPort"/>
         </port>
         <port name="SoapHttpDocLitPortWrapped" binding="tns:SoapBindingDocLitWrapped">
-            <soap:address location="http://localhost:20003/performance/SoapHttpDocLitWrappedPort"/>
+            <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitWrappedPort"/>
         </port>
     </service>
 
