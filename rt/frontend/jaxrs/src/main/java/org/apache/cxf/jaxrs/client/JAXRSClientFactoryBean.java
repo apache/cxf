@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
@@ -97,15 +96,12 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     public Client create() {
-        List<ClassResourceInfo> list = serviceFactory.getClassResourceInfo();
-        if (list.isEmpty()) {
-            throw new WebApplicationException();
-        }
+        checkResources();
         
         try {
             Endpoint ep = createEndpoint();
             URI baseURI = URI.create(getAddress());
-            ClassResourceInfo cri = list.get(0);
+            ClassResourceInfo cri = serviceFactory.getClassResourceInfo().get(0);
             
             ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, inheritHeaders);
             initClient(proxyImpl, ep);    

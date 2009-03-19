@@ -287,7 +287,7 @@ public class WebClient extends AbstractClient {
     protected Response doChainedInvocation(String httpMethod, 
         MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
 
-        Message m = createMessage(httpMethod, headers, getCurrentURI().toString());
+        Message m = createMessage(httpMethod, headers, getCurrentURI());
         
         if (body != null) {
             MessageContentsList contents = new MessageContentsList(body);

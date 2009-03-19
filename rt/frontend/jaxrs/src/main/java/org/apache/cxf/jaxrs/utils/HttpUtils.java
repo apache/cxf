@@ -90,10 +90,14 @@ public final class HttpUtils {
     public static String getEndpointAddress(Message m) {
         String address = null;
         Destination d = m.getExchange().getDestination();
-        if (d instanceof ServletDestination) {
-            address = ((ServletDestination)d).getEndpointInfo().getAddress();
+        if (d != null) {
+            if (d instanceof ServletDestination) {
+                address = ((ServletDestination)d).getEndpointInfo().getAddress();
+            } else {
+                address = d.getAddress().getAddress().getValue();
+            }
         } else {
-            address = d.getAddress().getAddress().getValue();
+            address = (String)m.get(Message.ENDPOINT_ADDRESS);
         }
         
         return address;

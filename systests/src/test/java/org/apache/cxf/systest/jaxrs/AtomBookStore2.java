@@ -34,7 +34,7 @@ public class AtomBookStore2 extends AtomBookStore {
     
     @GET
     @Path("/")
-    @ProduceMime({"application/json", "application/atom+xml" })
+    @ProduceMime({"application/atom+xml", "application/json" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
         
         return super.getBooksAsFeed(uParam);

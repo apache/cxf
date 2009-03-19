@@ -49,11 +49,19 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
     
     public List<MediaType> getAcceptableMediaTypes() {
-        return JAXRSUtils.sortMediaTypes((String)m.get(Message.ACCEPT_CONTENT_TYPE)); 
+        String lValues = headers.getFirst(HttpHeaders.ACCEPT);
+        if (lValues == null) {
+            return Collections.emptyList();
+        }
+        return JAXRSUtils.sortMediaTypes(lValues); 
     }
 
     public Map<String, Cookie> getCookies() {
-        List<String> cs = headers.get(HttpHeaders.COOKIE);
+        List<String> values = headers.get(HttpHeaders.COOKIE);
+        if (values == null || values.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        String[] cs =  values.get(0).split(",");
         Map<String, Cookie> cl = new HashMap<String, Cookie>(); 
         for (String c : cs) {
             Cookie cookie = Cookie.valueOf(c);
@@ -90,17 +98,18 @@ public class HttpHeadersImpl implements HttpHeaders {
         String[] ls =  values.get(0).split(",");
         Map<String, Float> prefs = new HashMap<String, Float>();
         for (String l : ls) {
-            String[] pair = l.split(";"); 
-            newLs.add(pair[0]);
+            String[] pair = l.split(";");
+            String locale = pair[0].trim();
+            newLs.add(locale);
             if (pair.length > 1) {
                 String[] pair2 = pair[1].split("=");
                 if (pair2.length > 1) {
-                    prefs.put(pair[0], JAXRSUtils.getMediaTypeQualityFactor(pair2[1]));
+                    prefs.put(locale, JAXRSUtils.getMediaTypeQualityFactor(pair2[1].trim()));
                 } else {
-                    prefs.put(pair[0], 1F);
+                    prefs.put(locale, 1F);
                 }
             } else {
-                prefs.put(pair[0], 1F);
+                prefs.put(locale, 1F);
             }
         }
         if (newLs.size() == 1) {
@@ -135,7 +144,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             float p1 = prefs.get(lang1);
             float p2 = prefs.get(lang2);
             int result = Float.compare(p1, p2);
-            return result == 0 ? result : ~result;
+            return result == 0 ? result : result * -1;
         }
     }
 }

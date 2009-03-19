@@ -154,7 +154,7 @@ public class JAXRSUtilsTest extends Assert {
         //method is declared with a most specific ProduceMime type is selected.
         OperationResourceInfo ori = findTargetResourceClass(resources, null, 
              "/bookstore/1/books/123/", "GET", new MetadataMap<String, String>(), contentTypes, 
-             getTypes("*/*"));       
+             getTypes("application/json,application/xml"));       
         assertNotNull(ori);
         assertEquals("getBookJSON", ori.getMethodToInvoke().getName());
         
@@ -403,9 +403,9 @@ public class JAXRSUtilsTest extends Assert {
         List<MediaType> types = 
             JAXRSUtils.sortMediaTypes("text/*,text/plain;q=.2,text/xml,TEXT/BAR");
         assertTrue(types.size() == 4
-                   && "text/bar".equals(types.get(0).toString())
-                   && "text/plain;q=.2".equals(types.get(1).toString())
-                   && "text/xml".equals(types.get(2).toString())
+                   && "text/xml".equals(types.get(0).toString())
+                   && "text/bar".equals(types.get(1).toString())
+                   && "text/plain;q=.2".equals(types.get(2).toString())
                    && "text/*".equals(types.get(3).toString()));
     }
     
@@ -422,10 +422,10 @@ public class JAXRSUtilsTest extends Assert {
         assertTrue("text/* should be equal to itself", 
                    JAXRSUtils.compareMediaTypes(m2, new MediaType("text", "*")) == 0);
         
-        assertTrue("text/plain is alphabetically earlier than text/xml", 
-                   JAXRSUtils.compareMediaTypes(MediaType.valueOf("text/plain"), m1) < 0);
-        assertTrue("text/xml is alphabetically later than text/plain", 
-                   JAXRSUtils.compareMediaTypes(m1, MediaType.valueOf("text/plain")) > 0);
+        assertTrue("text/plain and text/xml are just two specific media types", 
+                   JAXRSUtils.compareMediaTypes(MediaType.valueOf("text/plain"), m1) == 0);
+        assertTrue("text/xml and text/plain are just two specific media types", 
+                   JAXRSUtils.compareMediaTypes(m1, MediaType.valueOf("text/plain")) == 0);
         assertTrue("*/* is less specific than text/xml", 
                    JAXRSUtils.compareMediaTypes(JAXRSUtils.ALL_TYPES, m1) > 0);
         assertTrue("*/* is less specific than text/xml", 
@@ -745,11 +745,13 @@ public class JAXRSUtilsTest extends Assert {
         assertSame(ori, ori1);
         
         ori = JAXRSUtils.findTargetMethod(cri, "/", "GET", new MetadataMap<String, String>(), 
-                                          "*/*", getTypes("*,text/plain,text/xml"));
+                                          "*/*", 
+                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain,text/xml")));
                      
         assertSame(ori, ori2);
         ori = JAXRSUtils.findTargetMethod(cri, "/", "GET", new MetadataMap<String, String>(), 
-                                          "*/*", getTypes("*,x/y,text/xml,text/plain"));
+                                          "*/*", 
+                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain, text/xml,x/y")));
                      
         assertSame(ori, ori2);
     }

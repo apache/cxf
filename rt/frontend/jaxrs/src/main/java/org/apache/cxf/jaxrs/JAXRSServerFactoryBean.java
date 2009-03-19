@@ -23,12 +23,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 import org.apache.cxf.BusException;
-import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
@@ -57,9 +53,6 @@ import org.apache.cxf.service.invoker.Invoker;
  */
 public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServerFactoryBean.class);
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSServerFactoryBean.class);
-    
     protected Map<Class, ResourceProvider> resourceProviders = new HashMap<Class, ResourceProvider>();
     
     private Server server;
@@ -83,13 +76,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
     public Server create() {
         try {
-            if (!serviceFactory.resourcesAvailable()) {
-                org.apache.cxf.common.i18n.Message msg = 
-                    new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
-                                                           BUNDLE);
-                LOG.severe(msg.toString());
-                throw new EndpointException(msg);
-            }
+            checkResources();
             if (serviceFactory.getService() == null) {
                 serviceFactory.create();
                 updateClassResourceProviders();
@@ -126,6 +113,8 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         } catch (BusException e) {
             throw new ServiceConstructionException(e);
         } catch (IOException e) {
+            throw new ServiceConstructionException(e);
+        } catch (Exception e) {
             throw new ServiceConstructionException(e);
         }
 
