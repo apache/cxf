@@ -1,0 +1,93 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.cxf.systest.xmlbeans;
+
+import java.net.URL;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.WebServiceException;
+
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
+import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http.xmlbeans.Greeter;
+import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
+import org.apache.hello_world_soap_http.xmlbeans.SOAPService;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+/**
+ * 
+ */
+public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
+    
+    private static final QName SERVICE_NAME 
+        = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SOAPService");
+    
+    @BeforeClass
+    public static void startServers() throws Exception {
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+    }
+    
+    @Test
+    public void testCallFromClient() throws Exception {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf.xml");
+        BusFactory.setDefaultBus(bus);
+        URL wsdl = this.getClass().getResource("/wsdl_systest/xmlbeans/hello_world.wsdl");
+        assertNotNull("We should found the WSDL her. " , wsdl);      
+        
+        SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
+        Greeter port = ss.getSoapPort();
+        String resp; 
+        
+        resp = port.sayHi();
+        assertEquals("We should get the right response", resp, "Bonjour");        
+        
+        resp = port.greetMe("Willem");
+        assertEquals("We should get the right response", resp, "Hello Willem");
+        
+        try {
+            resp = port.greetMe("Invoking greetMe with invalid length string, expecting exception...");
+            fail("We expect exception here");
+        } catch (WebServiceException ex) {           
+            assertTrue("Get a wrong exception", 
+                       ex.getMessage().
+                       indexOf("string length (67) is greater than maxLength facet (30)") >= 0);
+        }
+        
+        port.greetMeOneWay(System.getProperty("user.name"));
+        
+        try {
+            port.pingMe();
+            fail("We expect exception here");
+        } catch (PingMeFault ex) {            
+            FaultDetailDocument detailDocument = ex.getFaultInfo();
+            FaultDetail detail = detailDocument.getFaultDetail();
+            assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
+            assertEquals("Wrong faultDetail minor:", detail.getMinor(), 1);             
+        }          
+    }
+
+}
