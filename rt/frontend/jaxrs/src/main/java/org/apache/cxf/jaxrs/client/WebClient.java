@@ -38,6 +38,8 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
@@ -124,8 +126,8 @@ public class WebClient extends AbstractClient {
         return invoke("GET", null, responseClass);
     }
     
-    public WebClient path(String path) {
-        getCurrentBuilder().path(path);
+    public WebClient path(Object path) {
+        getCurrentBuilder().path(path.toString());
         return this;
     }
     
@@ -173,12 +175,33 @@ public class WebClient extends AbstractClient {
         return this;
     }
     
+    /**
+     * Converts proxy to Client
+     * @param proxy the proxy
+     * @return proxy as a Client 
+     */
+    public static Client client(Object proxy) {
+        if (proxy instanceof Client) {
+            return (Client)proxy;
+        }
+        return null;
+    }
+    
+    
+    public static WebClient createClient(String baseAddress, String configLocation) {
+        SpringBusFactory bf = new SpringBusFactory();
+        Bus bus = bf.createBus(configLocation);
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setBus(bus);
+        bean.setAddress(baseAddress);
+        return bean.createWebClient();
+    }
+    
     public static WebClient createClient(String baseAddress) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(baseAddress);
         return bean.createWebClient();
     }
-    
     
     @Override
     public WebClient type(MediaType ct) {
@@ -322,10 +345,6 @@ public class WebClient extends AbstractClient {
     
     protected HttpURLConnection getConnection(String methodName) {
         return createHttpConnection(getCurrentBuilder().clone().build(), methodName);
-    }
-    
-    public static Client client(Object proxy) {
-        return (Client)proxy;
     }
     
     private class BodyWriter extends AbstractOutDatabindingInterceptor {

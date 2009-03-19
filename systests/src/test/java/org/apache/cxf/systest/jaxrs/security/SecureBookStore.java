@@ -24,20 +24,29 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
-public class SecureBookStore implements SecureBookInterface {
+public class SecureBookStore implements SecureBookInterface, Injectable {
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private SecureBookInterface subresource;
+    private SecurityContext securityContext; 
     
     public SecureBookStore() {
         Book book = new Book();
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
+    }
+    
+    @Context
+    public void setSecurityContext(SecurityContext sc) {
+        securityContext = sc;
     }
     
     @Resource
@@ -57,7 +66,11 @@ public class SecureBookStore implements SecureBookInterface {
     }
     
     public Book getThatBook() throws BookNotFoundFault {
-        return books.get(123L);
+        if (securityContext.isUserInRole("ROLE_ADMIN")
+            && !securityContext.isUserInRole("ROLE_BAZ")) {
+            return books.get(123L);
+        }
+        throw new WebApplicationException(403);
     }
 
     public SecureBookInterface getBookSubResource() throws BookNotFoundFault {

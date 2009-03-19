@@ -69,6 +69,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <security:user-service>
       <security:user name="bob" password="bobspassword" authorities="ROLE_USER" />
       <security:user name="foo" password="bar" authorities="ROLE_USER, ROLE_ADMIN" />
+      <security:user name="baz" password="baz" authorities="ROLE_BAZ" />
     </security:user-service>
   </security:authentication-provider> 
 </beans>

@@ -55,7 +55,7 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         BookStore bs = JAXRSClientFactory.create("https://localhost:9095", BookStore.class);
         // just to verify the interface call goes through CGLIB proxy too
         assertEquals("https://localhost:9095", WebClient.client(bs).getBaseURI().toString());
-        Book b = bs.getBook("123");
+        Book b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
     }
     
@@ -71,7 +71,7 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         WebClient client = bean.createWebClient();
         assertEquals("https://localhost:9095", client.getBaseURI().toString());
         
-        client.path("/bookstore/books/123").accept(MediaType.APPLICATION_XML_TYPE);
+        client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = client.get(Book.class);
         assertEquals(123, b.getId());
     }
