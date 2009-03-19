@@ -17,34 +17,29 @@
  * under the License.
  */
 
+package org.apache.cxf.jaxrs.fortest.jaxb;
 
-package org.apache.cxf.systest.jaxrs;
 
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
-import org.apache.abdera.model.Feed;
-
-@Path("/")
-public class AtomBookStore2 extends AtomBookStore {
+public class Book {
+    private String name;
+    private long id;
     
-    @GET
-    @Path("/")
-    @ProduceMime({"application/atom+xml", "application/json" })
-    public Feed getBooksAsFeed(@Context UriInfo uParam) {
-        
-        return super.getBooksAsFeed(uParam);
-        
+    public Book() {
     }
     
-    @Context
-    public void setUriInfo(UriInfo ui) {
-        super.uField = ui;
+    public void setName(String n) {
+        name = n;
     }
+
+    public String getName() {
+        return name;
+    }
+    
+    public void setId(long i) {
+        id = i;
+    }
+    public long getId() {
+        return id;
+    }
+   
 }
-
-

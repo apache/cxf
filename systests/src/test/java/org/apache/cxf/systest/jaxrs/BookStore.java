@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.jaxrs;
 
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -47,6 +49,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.StreamingOutput;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -173,6 +176,14 @@ public class BookStore {
     }
     
     @GET
+    @Path("/bookheaders2/")
+    public Book getBookByHeader(@DefaultValue("123") @HeaderParam("BOOK2") String id) 
+        throws Exception {
+        return doGetBook(id);
+    }
+    
+    
+    @GET
     @Path("/bookquery")
     public Book getBookByURLQuery(@QueryParam("urlid") String urlValue) throws Exception {
         String url2 = new URL(urlValue).toString();
@@ -253,8 +264,14 @@ public class BookStore {
         return doGetBook(currentBookId);
     }
     
+    @GET
+    @Path("/books/stream")
+    @ProduceMime("application/xml")
+    public StreamingOutput writeToStreamAndFail() {
+        return new StreamingOutputImpl();
+    }
+    
     private Book doGetBook(String id) throws BookNotFoundFault {
-        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
@@ -305,6 +322,15 @@ public class BookStore {
         books.put(book.getId(), book);
 
         return Response.ok(book).build();
+    }
+    
+    @POST
+    @Path("/booksinfo")
+    @ProduceMime("text/xml")
+    @ConsumeMime("application/xml")
+    public Response addBook(@XmlJavaTypeAdapter(BookInfoAdapter.class) 
+                            BookInfo bookInfo) {
+        return Response.ok(bookInfo.asBook()).build();
     }
 
     @POST
@@ -446,9 +472,16 @@ public class BookStore {
         private String name;
         private long id;
         
+        public BookInfo() {
+            
+        }
+        
         public BookInfo(Book b) {
             this.name = b.getName();
             this.id = b.getId();
+            if (id == 0) {
+                id = 124;
+            }
         }
         
         public String getName() {
@@ -457,6 +490,13 @@ public class BookStore {
         
         public long getId() {
             return id;
+        }
+       
+        public Book asBook() {
+            Book b = new Book();
+            b.setId(id);
+            b.setName(name);
+            return b;
         }
     }
     
@@ -468,9 +508,8 @@ public class BookStore {
         }
 
         @Override
-        public BookInfo unmarshal(Book v) throws Exception {
-            // TODO Auto-generated method stub
-            return null;
+        public BookInfo unmarshal(Book b) throws Exception {
+            return new BookInfo(b);
         }
         
     }
@@ -479,6 +518,17 @@ public class BookStore {
         public BadBook(String s) {
             throw new RuntimeException("The bad book");
         }
+    }
+    
+    private static class StreamingOutputImpl implements StreamingOutput {
+
+        public void write(OutputStream output) throws IOException, WebApplicationException {
+            //output.write("This is not supposed to go on the wire".getBytes());
+            throw new WebApplicationException(
+                 Response.status(410).type("text/plain")
+                 .entity("This is supposed to go on the wire").build());
+        } 
+        
     }
 }
 

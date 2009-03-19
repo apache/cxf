@@ -84,14 +84,17 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
-            Class<?> theType = getActualType(type, genericType);
+            Class<?> theType = getActualType(type, genericType, anns);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
+            Object response = null;
             if (JAXBElement.class.isAssignableFrom(type)) {
-                return unmarshaller.unmarshal(new StreamSource(is), theType);
+                response = unmarshaller.unmarshal(new StreamSource(is), theType);
             } else {
-                return unmarshaller.unmarshal(is);
+                response = unmarshaller.unmarshal(is);
             }
+            response = checkAdapter(response, anns, false);
+            return response;
             
         } catch (JAXBException e) {
             handleJAXBException(e);
@@ -109,7 +112,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         try {
-            Object actualObject = checkAdapter(obj, anns);
+            Object actualObject = checkAdapter(obj, anns, true);
             Class<?> actualClass = actualObject.getClass();
             if (cls == genericType) {
                 genericType = actualClass;
@@ -122,6 +125,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             
         } catch (JAXBException e) {
             throw new WebApplicationException(e);
+        }  catch (WebApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new WebApplicationException(e);        
         }
     }
 

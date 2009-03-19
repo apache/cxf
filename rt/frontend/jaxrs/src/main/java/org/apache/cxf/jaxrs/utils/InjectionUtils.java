@@ -132,6 +132,15 @@ public final class InjectionUtils {
         return (Class<?>)paramType.getActualTypeArguments()[0];
     }
     
+    public static Type[] getActualTypes(Type genericType) {
+        if (genericType == null 
+            || !ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
+            return null;
+        }
+        ParameterizedType paramType = (ParameterizedType)genericType;
+        return paramType.getActualTypeArguments();
+    }
+    
     public static void injectThroughMethod(Object requestObject,
                                            Method method,
                                            Object parameterValue) {

@@ -103,6 +103,19 @@ public final class HttpUtils {
         return address;
     }
     
+    public static void updatePath(Message m, String path) {
+        String baseAddress = getBaseAddress(m);
+        boolean pathSlash = path.startsWith("/");
+        boolean baseSlash = baseAddress.endsWith("/");
+        if (pathSlash && baseSlash) {
+            path = path.substring(1);
+        } else if (!pathSlash && !baseSlash) {
+            path = "/" + path;
+        }
+        m.put(Message.REQUEST_URI, baseAddress + path);
+    }
+
+    
     public static String getPathToMatch(String path, String address, boolean addSlash) {
         
         int ind = path.indexOf(address);

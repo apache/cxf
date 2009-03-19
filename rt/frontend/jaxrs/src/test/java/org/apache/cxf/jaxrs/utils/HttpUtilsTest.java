@@ -21,13 +21,17 @@ package org.apache.cxf.jaxrs.utils;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class HttpUtilsTest extends Assert {
 
     @Test
-    public void testUpdatePath() {
+    public void testPathToMatch() {
         assertEquals("/", HttpUtils.getPathToMatch("/", "/", true));
         assertEquals("/", HttpUtils.getPathToMatch("/", "/bar", true));
         assertEquals("/bar", HttpUtils.getPathToMatch("/bar", "/", true));
@@ -37,6 +41,24 @@ public class HttpUtilsTest extends Assert {
         assertEquals("/baz/bar/foo/", HttpUtils.getPathToMatch("/baz/bar/foo/", "/bar", true));
         
     }
+    
+    @Test
+    public void testUpdatePath() {
+        
+        Message m = new MessageImpl();
+        m.setExchange(new ExchangeImpl());
+        m.put(Message.ENDPOINT_ADDRESS, "http://localhost/");
+        HttpUtils.updatePath(m, "/bar");
+        assertEquals("/bar", m.get(Message.REQUEST_URI));
+        HttpUtils.updatePath(m, "bar");
+        assertEquals("/bar", m.get(Message.REQUEST_URI));
+        HttpUtils.updatePath(m, "bar/");
+        assertEquals("/bar/", m.get(Message.REQUEST_URI));
+        m.put(Message.ENDPOINT_ADDRESS, "http://localhost");
+        HttpUtils.updatePath(m, "bar/");
+        assertEquals("/bar/", m.get(Message.REQUEST_URI));
+    }
+    
     
     @Test
     public void testParameterErrorStatus() {

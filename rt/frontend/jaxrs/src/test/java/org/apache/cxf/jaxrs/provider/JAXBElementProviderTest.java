@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
@@ -43,6 +44,7 @@ import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
 
 import org.w3c.dom.Node;
+
 import org.xml.sax.ContentHandler;
 
 import org.junit.Assert;
@@ -69,6 +71,21 @@ public class JAXBElementProviderTest extends Assert {
         provider.setSchemas(locations);
         Schema s = provider.getSchema();
         assertNotNull("schema can not be read from disk", s);
+    }
+    
+    @Test 
+    public void testPackageContext() {
+        JAXBElementProvider p = new JAXBElementProvider();
+        try {
+            JAXBContext context = p.getPackageContext(org.apache.cxf.jaxrs.fortest.jaxb.Book.class);
+            JAXBContext context2 = p.getPackageContext(org.apache.cxf.jaxrs.fortest.jaxb.Book.class);
+            assertNotNull(context);
+            assertNotNull(context2);
+            assertSame(context, context2);
+        } finally {
+            JAXBElementProvider.clearContexts();
+        }
+        
     }
     
     @Test

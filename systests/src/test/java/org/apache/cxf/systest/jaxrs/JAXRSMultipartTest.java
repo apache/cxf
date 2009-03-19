@@ -179,7 +179,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             + "boundary=\"----=_Part_4_701508.1145579811786\"";
         post.setRequestHeader("Content-Type", ct);
         InputStream is = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/" + resourceName);
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName);
         RequestEntity entity = new InputStreamRequestEntity(is);
         post.setRequestEntity(entity);
         HttpClient httpclient = new HttpClient();

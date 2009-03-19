@@ -73,7 +73,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     }
     
-    @SuppressWarnings("unchecked")
     private void processResponse(Message message, String baseAddress) {
         
         MessageContentsList objs = MessageContentsList.getContentsList(message);
@@ -91,90 +90,120 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
             Exchange exchange = message.getExchange();
-            OperationResourceInfo operation = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
+            OperationResourceInfo ori = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
                 .getName());
 
             List<ProviderInfo<ResponseHandler>> handlers = 
                 ProviderFactory.getInstance(baseAddress).getResponseHandlers();
             for (ProviderInfo<ResponseHandler> rh : handlers) {
-                Response r = rh.getProvider().handleResponse(message, operation, response);
+                Response r = rh.getProvider().handleResponse(message, ori, response);
                 if (r != null) {
                     response = r;
                 }
             }
             
-            message.put(Message.RESPONSE_CODE, response.getStatus());
-            message.put(Message.PROTOCOL_HEADERS, response.getMetadata());
-                            
-            responseObj = response.getEntity();
-            if (responseObj == null) {
-                return;
-            }
-            
-            Class targetType = responseObj.getClass();
-            List<MediaType> availableContentTypes = 
-                computeAvailableContentTypes(message, response);  
-            
-            Method invoked = operation == null ? null : operation.getMethodToInvoke();
-            
-            MessageBodyWriter writer = null;
-            MediaType responseType = null;
-            for (MediaType type : availableContentTypes) { 
-                writer = ProviderFactory.getInstance(baseAddress)
-                    .createMessageBodyWriter(targetType, 
-                          invoked != null ? invoked.getGenericReturnType() : null, 
-                          invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
-                          type,
-                          exchange.getInMessage());
-                
-                if (writer != null) {
-                    responseType = type;
-                    break;
-                }
-            }
-        
-            OutputStream out = message.getContent(OutputStream.class);
-            if (writer == null) {
-                message.put(Message.RESPONSE_CODE, 500);
-                writeResponseErrorMessage(out, 
-                      "NO_MSG_WRITER",
-                      invoked != null ? invoked.getReturnType().getSimpleName() : "");
-                return;
-            }
-            
-            try {
-                
-                responseType = checkFinalContentType(responseType);
-                LOG.fine("Response content type is: " + responseType.toString());
-                message.put(Message.CONTENT_TYPE, responseType.toString());
-                
-                LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
-                writer.writeTo(responseObj, targetType, invoked.getGenericReturnType(), 
-                               invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
-                               responseType, 
-                               response.getMetadata(), 
-                               out);
-                
-            } catch (IOException e) {
-                e.printStackTrace();
-                message.put(Message.RESPONSE_CODE, 500);
-                writeResponseErrorMessage(out, "SERIALIZE_ERROR", 
-                                          responseObj.getClass().getSimpleName());
-            }        
+            serializeMessage(message, response, ori, baseAddress, true);        
             
         } else {
             message.put(Message.RESPONSE_CODE, 204);
         }
     }
     
+    @SuppressWarnings("unchecked")
+    private void serializeMessage(Message message, 
+                                  Response response, 
+                                  OperationResourceInfo ori,
+                                  String baseAddress,
+                                  boolean firstTry) {
+        message.put(Message.RESPONSE_CODE, response.getStatus());
+        message.put(Message.PROTOCOL_HEADERS, response.getMetadata());
+                        
+        Object responseObj = response.getEntity();
+        if (responseObj == null) {
+            return;
+        }
+        
+        Class targetType = responseObj.getClass();
+        List<MediaType> availableContentTypes = 
+            computeAvailableContentTypes(message, response);  
+        
+        Method invoked = ori == null ? null : ori.getMethodToInvoke();
+        
+        MessageBodyWriter writer = null;
+        MediaType responseType = null;
+        for (MediaType type : availableContentTypes) { 
+            writer = ProviderFactory.getInstance(baseAddress)
+                .createMessageBodyWriter(targetType, 
+                      invoked != null ? invoked.getGenericReturnType() : null, 
+                      invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
+                      type,
+                      message.getExchange().getInMessage());
+            
+            if (writer != null) {
+                responseType = type;
+                break;
+            }
+        }
+    
+        OutputStream out = message.getContent(OutputStream.class);
+        if (writer == null) {
+            message.put(Message.RESPONSE_CODE, 500);
+            writeResponseErrorMessage(out, 
+                  "NO_MSG_WRITER",
+                  invoked != null ? invoked.getReturnType().getSimpleName() : "");
+            return;
+        }
+        
+        try {
+            
+            responseType = checkFinalContentType(responseType);
+            LOG.fine("Response content type is: " + responseType.toString());
+            message.put(Message.CONTENT_TYPE, responseType.toString());
+            
+            LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
+            writer.writeTo(responseObj, targetType, invoked.getGenericReturnType(), 
+                           invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
+                           responseType, 
+                           response.getMetadata(), 
+                           out);
+            
+        } catch (IOException ex) {
+            handleWriteException(message, response, ori, baseAddress, ex, responseObj, firstTry);
+        } catch (Exception ex) {
+            handleWriteException(message, response, ori, baseAddress, ex, responseObj, firstTry);
+        }
+    }
+    
+    private void handleWriteException(Message message, 
+                                         Response response, 
+                                         OperationResourceInfo ori,
+                                         String baseAddress,
+                                         Exception ex,
+                                         Object responseObj,
+                                         boolean firstTry) {
+        OutputStream out = message.getContent(OutputStream.class);
+        if (firstTry) {
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress, message);
+            if (excResponse != null) {
+                serializeMessage(message, excResponse, ori, baseAddress, false);
+            }
+        } else {
+            message.put(Message.RESPONSE_CODE, 500);
+            writeResponseErrorMessage(out, "SERIALIZE_ERROR", 
+                                      responseObj.getClass().getSimpleName()); 
+        }    
+    }
+    
     
     private void writeResponseErrorMessage(OutputStream out, String errorString, 
                                            String parameter) {
         try {
-            out.write(new org.apache.cxf.common.i18n.Message(errorString,
-                                                             BUNDLE,
-                                                             parameter
-                                                             ).toString().getBytes("UTF-8"));
+            org.apache.cxf.common.i18n.Message message = 
+                new org.apache.cxf.common.i18n.Message(errorString,
+                                                   BUNDLE,
+                                                   parameter);
+            LOG.warning(message.toString());
+            out.write(message.toString().getBytes("UTF-8"));
         } catch (IOException another) {
             // ignore
         }

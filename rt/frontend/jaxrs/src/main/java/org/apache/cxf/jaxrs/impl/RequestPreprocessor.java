@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public class RequestPreprocessor {
@@ -89,7 +90,8 @@ public class RequestPreprocessor {
     
     private void updatePath(Message m, String path, String suffix) {
         String newPath = path.substring(0, path.length() - (suffix.length() + 1));
-        m.put(Message.REQUEST_URI, newPath);
+        HttpUtils.updatePath(m, newPath);
+        //m.put(Message.REQUEST_URI, newPath);
     }
     
 }

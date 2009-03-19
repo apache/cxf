@@ -103,7 +103,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
         throws IOException {
         
         try {
-            Class<?> theType = getActualType(type, genericType);
+            Class<?> theType = getActualType(type, genericType, anns);
+            
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
             MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
@@ -114,6 +115,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             } else {
                 response = unmarshaller.unmarshal(xsw);
             }
+            response = checkAdapter(response, anns, false);
             return response;
             
         } catch (JAXBException e) {
@@ -134,7 +136,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
         throws IOException {
         try {
             
-            Object actualObject = checkAdapter(obj, anns);
+            Object actualObject = checkAdapter(obj, anns, true);
             Class<?> actualClass = actualObject.getClass();
             if (cls == genericType) {
                 genericType = actualClass;
@@ -163,6 +165,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
         } catch (JAXBException e) {
             throw new WebApplicationException(e);
         } catch (XMLStreamException e) {
+            throw new WebApplicationException(e);
+        } catch (Exception e) {
             throw new WebApplicationException(e);
         }
     }

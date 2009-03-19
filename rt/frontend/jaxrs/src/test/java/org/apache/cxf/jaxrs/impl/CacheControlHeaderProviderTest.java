@@ -61,4 +61,31 @@ public class CacheControlHeaderProviderTest extends Assert {
         String parsed = CacheControl.valueOf(s).toString();
         assertEquals(s, parsed);       
     }
+    
+    @Test
+    public void testNoCacheEnabled() {
+        CacheControl cc = new CacheControl();
+        cc.setNoCache(true);
+        assertEquals("no-cache;no-transform", cc.toString());
+    }
+    
+    @Test
+    public void testNoCacheDisabled() {
+        CacheControl cc = new CacheControl();
+        cc.setNoCache(false);
+        assertEquals("no-transform", cc.toString());
+    }
+    
+    @Test
+    public void testCacheExtensionToString() {
+        CacheControl cc = new CacheControl();
+        cc.getCacheExtension().put("ext1", null);
+        cc.getCacheExtension().put("ext2", "value2");
+        cc.getCacheExtension().put("ext3", "value 3");
+        String value = cc.toString();
+        assertTrue(value.indexOf("ext1") != -1 && value.indexOf("ext1=") == -1);
+        assertTrue(value.indexOf("ext2=value2") != -1);
+        assertTrue(value.indexOf("ext3=\"value 3\"") != -1);
+    }
+    
 }

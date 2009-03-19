@@ -545,6 +545,9 @@ public final class JAXRSUtils {
                                              String defaultValue) {
         
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(header);
+        if (values != null && values.isEmpty()) {
+            values = null;
+        }
         String basePath = HttpUtils.getOriginalAddress(m);
         return InjectionUtils.createParameterObject(values, 
                                                     pClass, 

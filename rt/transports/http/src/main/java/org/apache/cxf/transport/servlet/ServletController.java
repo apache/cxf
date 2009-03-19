@@ -229,7 +229,8 @@ public class ServletController {
                 response.getWriter().write("<table " + (serviceListStyleSheet == null
                         ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
                 for (ServletDestination sd : destinations) {
-                    if (null != sd.getEndpointInfo().getName()) {
+                    if (null != sd.getEndpointInfo().getName() 
+                        && null != sd.getEndpointInfo().getInterface()) {
                         response.getWriter().write("<tr><td>");
                         response.getWriter().write("<span class=\"porttypename\">"
                                 + sd.getEndpointInfo().getInterface().getName().getLocalPart()

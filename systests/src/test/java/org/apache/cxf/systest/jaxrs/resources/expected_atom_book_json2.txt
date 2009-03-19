@@ -9,6 +9,6 @@
   ]
  },
  "attributes":{
-  "xml:base":"http://localhost:9080/bookstore/bookstore/books/entries/123"
+  "xml:base":"http://localhost:9080/bookstore/sub/books/entries/123"
  }
 }

@@ -16,35 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.fortest.jaxb;
 
 
-package org.apache.cxf.systest.jaxrs;
-
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
-import org.apache.abdera.model.Feed;
-
-@Path("/")
-public class AtomBookStore2 extends AtomBookStore {
-    
-    @GET
-    @Path("/")
-    @ProduceMime({"application/atom+xml", "application/json" })
-    public Feed getBooksAsFeed(@Context UriInfo uParam) {
-        
-        return super.getBooksAsFeed(uParam);
-        
-    }
-    
-    @Context
-    public void setUriInfo(UriInfo ui) {
-        super.uField = ui;
+public class ObjectFactory {
+    public Book createBook() {
+        return new Book();
     }
 }
-
-

@@ -38,10 +38,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
-import org.apache.cxf.jaxrs.ext.MappingsHandler;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.ext.SystemQueryHandler;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -66,7 +66,7 @@ public final class ProviderFactory {
                                     new PrimitiveTextProvider(),
                                     new ActivationProvider(),
                                     new WebApplicationExceptionMapper(),
-                                    new MappingsHandler());
+                                    new SystemQueryHandler());
     }
     
     private List<ProviderInfo<MessageBodyReader>> messageReaders = 

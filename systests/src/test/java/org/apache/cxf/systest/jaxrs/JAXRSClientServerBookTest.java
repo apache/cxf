@@ -85,6 +85,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "application/xml", 404);
     }
     
+    @Test
+    public void testWriteAndFailEarly() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/books/stream",
+                      "This is supposed to go on the wire",
+                      "application/xml, text/plain", 410);
+    }
+    
     
     @Test
     public void testAcceptTypeMismatch() throws Exception {
@@ -287,6 +294,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookByHeaderDefault() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/bookheaders2",
+                               "resources/expected_get_book123.txt",
+                               "application/xml;q=0.5,text/xml", 200);
+    }
+    
+    @Test
     public void testGetBookElement() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/books/element",
                                "resources/expected_get_book123.txt",
@@ -351,11 +365,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddBook() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/bookstore/books";
-
+        doAddBook("http://localhost:9080/bookstore/books");               
+    }
+    
+    @Test
+    public void testAddBookXmlAdapter() throws Exception {
+        doAddBook("http://localhost:9080/bookstore/booksinfo");               
+    }
+    
+    private void doAddBook(String address) throws Exception {
         File input = new File(getClass().getResource("resources/add_book.txt").toURI());         
-        PostMethod post = new PostMethod(endpointAddress);
+        PostMethod post = new PostMethod(address);
         post.setRequestHeader("Content-Type", "application/xml");
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         post.setRequestEntity(entity);
@@ -371,8 +391,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
-        }               
-    }  
+        }
+    }
     
     @Test
     public void testUpdateBook() throws Exception {

@@ -18,7 +18,7 @@
   }
  ],
  "attributes":{
-  "xml:base":"http://localhost:9080/bookstore/books/jsonfeed"
+  "xml:base":"http://localhost:9080/bookstore/bookstore/books/jsonfeed"
  }
 }
 

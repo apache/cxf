@@ -17,34 +17,25 @@
  * under the License.
  */
 
+package org.apache.cxf.jaxrs.ext;
 
-package org.apache.cxf.systest.jaxrs;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
+import org.junit.Assert;
+import org.junit.Test;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+public class SystemQueryHandlerTest extends Assert {
 
-import org.apache.abdera.model.Feed;
-
-@Path("/")
-public class AtomBookStore2 extends AtomBookStore {
-    
-    @GET
-    @Path("/")
-    @ProduceMime({"application/atom+xml", "application/json" })
-    public Feed getBooksAsFeed(@Context UriInfo uParam) {
+    @Test
+    public void testMethodQuery() {
+        Message m = new MessageImpl();
+        m.put(Message.HTTP_REQUEST_METHOD, "POST");
+        m.put(Message.QUERY_STRING, "_method=GET");
         
-        return super.getBooksAsFeed(uParam);
-        
+        SystemQueryHandler sqh = new SystemQueryHandler();
+        sqh.handleRequest(m, null);
+        assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
     }
     
-    @Context
-    public void setUriInfo(UriInfo ui) {
-        super.uField = ui;
-    }
 }
-
-
