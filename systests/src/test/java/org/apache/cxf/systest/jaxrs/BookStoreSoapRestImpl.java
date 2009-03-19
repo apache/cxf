@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
@@ -40,16 +42,35 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     @Resource
     private MessageContext jaxrsContext;
     
+    @Resource(name = "restClient")
+    private BookStoreJaxrsJaxws webClient;
+    private boolean invocationInProcess;
+    
     public BookStoreSoapRestImpl() {
         init();
     }
     
-    public Book getBook(Long id) {
+    @PostConstruct
+    public void verifyWebClient() {
+        if (webClient == null) {
+            throw new RuntimeException();
+        }
+        WebClient.client(webClient).accept("application/xml");
+    }
+    
+    public Book getBook(Long id) throws BookNotFoundFault {
         if (books.get(id) == null) {
             Response r = Response.status(404).header("BOOK-HEADER", 
                 "No Book with id " + id + " is available").build();
             throw new WebApplicationException(r);
         }
+        
+        if (!invocationInProcess) {
+            invocationInProcess = true;
+            return webClient.getBook(id);
+        }
+        invocationInProcess = false;
+        
         System.out.println(getContentType());
         return books.get(id);
     }

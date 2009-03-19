@@ -52,11 +52,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     public void setResourceClass(Class cls) {
-        serviceFactory.setResourceClass(cls);
+        setServiceClass(cls);
     }
     
-    public void setResourceBean(Object o) {
-        serviceFactory.setResourceClassFromBean(o);
+    public void setServiceClass(Class cls) {
+        serviceFactory.setResourceClass(cls);
     }
     
     public WebClient createWebClient() {
@@ -69,6 +69,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             WebClient client = new WebClient(getAddress());
             client.setConduitSelector(getConduitSelector(ep));
             client.setBus(getBus());
+            client.setOutInterceptors(getOutInterceptors());
+            client.setInInterceptors(getInInterceptors());
             
             return client;
         } catch (Exception ex) {
@@ -96,6 +98,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, inheritHeaders);
             proxyImpl.setConduitSelector(getConduitSelector(ep));
             proxyImpl.setBus(getBus());
+            proxyImpl.setOutInterceptors(getOutInterceptors());
+            proxyImpl.setInInterceptors(getInInterceptors());
             
             return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
                                         new Class[]{cri.getServiceClass(), Client.class}, 

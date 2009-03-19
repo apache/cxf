@@ -119,13 +119,6 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         createResourceInfo(cls, isRoot);
     }
     
-    public void setResourceClassFromBean(Object o) {
-        classResourceInfos.clear();
-        Class<?> realClass = ClassHelper.getRealClass(o);
-        boolean isRoot = AnnotationUtils.getClassAnnotation(realClass, Path.class) != null;
-        createResourceInfo(realClass, isRoot);
-    }
-    
     public void setResourceClasses(List<Class> classes) {
         for (Class resourceClass : classes) {
             createResourceInfo(resourceClass, true);
