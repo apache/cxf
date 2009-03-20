@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.net.URI;
@@ -25,6 +26,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -41,7 +44,10 @@ import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 
 /**
@@ -49,18 +55,27 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
  *
  */
 public class XMLSource {
+    private static final Logger LOG = LogUtils.getL7dLogger(XMLSource.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(XMLSource.class);
     
     private static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace"; 
     
-    private InputSource source; 
-    private RuntimeException exceptionToThrow;
+    private InputStream stream; 
+    private boolean buffering;
     
     public XMLSource(InputStream is) {
-        source = new InputSource(is);
+        stream = is;
     }
     
-    public void setException(RuntimeException ex) {
-        exceptionToThrow = ex; 
+    public void setBuffering(boolean enable) {
+        buffering = enable;
+        if (!stream.markSupported()) {
+            try {
+                stream = IOUtils.loadIntoBAIS(stream);
+            } catch (IOException ex) {
+                LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
+            }
+        }
     }
     
     public <T> T getNode(String expression, Class<T> cls) {
@@ -71,11 +86,8 @@ public class XMLSource {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
         try {
-            Node node = (Node)xpath.evaluate(expression, source, XPathConstants.NODE);
+            Node node = (Node)xpath.evaluate(expression, getSource(), XPathConstants.NODE);
             if (node == null) {
-                if (exceptionToThrow != null) {
-                    throw exceptionToThrow;
-                }
                 return null;
             }
             DOMSource ds = new DOMSource(node);
@@ -94,11 +106,8 @@ public class XMLSource {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
         try {
-            NodeList nodes = (NodeList)xpath.evaluate(expression, source, XPathConstants.NODESET);
+            NodeList nodes = (NodeList)xpath.evaluate(expression, getSource(), XPathConstants.NODESET);
             if (nodes == null || nodes.getLength() == 0) {
-                if (exceptionToThrow != null) {
-                    throw exceptionToThrow;
-                }
                 return null;
             }
             T[] values = (T[])Array.newInstance(cls, nodes.getLength());
@@ -138,7 +147,7 @@ public class XMLSource {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
         try {
-            return (String)xpath.evaluate(expression, source, XPathConstants.STRING);
+            return (String)xpath.evaluate(expression, getSource(), XPathConstants.STRING);
         } catch (XPathExpressionException ex) {
             throw new IllegalArgumentException("Illegal XPath expression '" + expression + "'", ex);
         }
@@ -186,5 +195,17 @@ public class XMLSource {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+    
+    private InputSource getSource() {
+        try {
+            if (buffering) {
+                stream.reset();
+                stream.mark(stream.available());
+            }
+        } catch (IOException ex) {
+            LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
+        }
+        return new InputSource(stream);
     }
 }

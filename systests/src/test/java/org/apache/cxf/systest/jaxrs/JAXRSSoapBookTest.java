@@ -105,8 +105,13 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:9092/test/services/rest";
         WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
-        Book b = client.get(XMLSource.class).getNode("/Book", Book.class);
+        XMLSource source = client.get(XMLSource.class);
+        source.setBuffering(true);
+        Book b = source.getNode("/Book", Book.class);
         assertEquals(123L, b.getId());
+        assertEquals("CXF in Action", b.getName());
+        b = source.getNode("/Book", Book.class);
+        assertEquals(123, b.getId());
         assertEquals("CXF in Action", b.getName());
     }
     
