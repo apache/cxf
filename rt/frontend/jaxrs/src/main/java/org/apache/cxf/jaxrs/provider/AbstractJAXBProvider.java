@@ -161,7 +161,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         // TODO: still not checked : 
         // - XmlJavaTypeAdapter at package level
         // - anything else ?
-        
         return type.getAnnotation(XmlRootElement.class) != null
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryForClass(type)
@@ -277,6 +276,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
                              BUNDLE, t.getMessage()).toString();
+        LOG.warning(message);
         Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
         throw new WebApplicationException(t, r);

@@ -57,7 +57,8 @@ import org.apache.cxf.service.invoker.AbstractInvoker;
 public class JAXRSInvoker extends AbstractInvoker {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServiceFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInvoker.class);
-
+    private static final String SERVICE_LOADER_AS_CONTEXT = "org.apache.cxf.serviceloader-context";
+    
     private List<Object> resourceObjects;
 
     public JAXRSInvoker() {
@@ -115,7 +116,11 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
 
         Object result = null;
+        ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
         try {
+            if (setServiceLoaderAsContextLoader(exchange.getInMessage())) {
+                Thread.currentThread().setContextClassLoader(resourceObject.getClass().getClassLoader());
+            }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), 
@@ -131,6 +136,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                 throw ex;
             }
             return new MessageContentsList(excResponse);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextLoader);
         }
 
         if (ori.isSubResourceLocator()) {
@@ -194,6 +201,11 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
+    private boolean setServiceLoaderAsContextLoader(Message inMessage) {
+        Object en = inMessage.getContextualProperty(SERVICE_LOADER_AS_CONTEXT);
+        return Boolean.TRUE.equals(en) || "true".equals(en);
+    }
+    
     public Object getServiceObject(Exchange exchange) {
         return getServiceObject(exchange, resourceObjects);
     }

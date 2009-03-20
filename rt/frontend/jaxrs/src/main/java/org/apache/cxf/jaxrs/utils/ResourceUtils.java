@@ -72,8 +72,10 @@ public final class ResourceUtils {
                     if (enableStatic) {
                         ClassResourceInfo subCri = cri.findResource(subClass, subClass);
                         if (subCri == null) {
-                            subCri = createClassResourceInfo(subClass, subClass, false, enableStatic);
+                            subCri = subClass == cri.getServiceClass() ? cri
+                                     : createClassResourceInfo(subClass, subClass, false, enableStatic);
                         }
+                        
                         if (subCri != null) {
                             cri.addSubClassResourceInfo(subCri);
                         }

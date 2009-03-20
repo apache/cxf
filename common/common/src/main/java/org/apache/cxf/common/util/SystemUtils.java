@@ -17,37 +17,30 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.provider;
+package org.apache.cxf.common.util;
 
-import java.util.List;
+/**
+ * Utility class for checking well-known system properties
+ *
+ */
+public final class SystemUtils {
+    
+    public static final String SPRING_VALIDATION_MODE = "org.apache.cxf.spring.validation.mode";
+    
+    private SystemUtils() {
+        
+    }
 
-public abstract class AbstractConfigurableProvider {
-
-    private List<String> consumeMediaTypes;
-    private List<String> produceMediaTypes;
-    private boolean enableBuffering;
-    
-    public void setConsumeMediaTypes(List<String> types) {
-        consumeMediaTypes = types;
+    /**
+     * Gets org.apache.cxf.spring.validation.mode property value if available 
+     * @return Spring validation mode
+     */
+    public static String getSpringValidationMode() {
+        String mode = System.getProperty(SPRING_VALIDATION_MODE);
+        if (mode == null) {
+            mode = System.getProperty("spring.validation.mode");
+        }
+        return mode;
     }
     
-    public List<String> getConsumeMediaTypes() {
-        return consumeMediaTypes;    
-    }
-    
-    public void setProduceMediaTypes(List<String> types) {
-        produceMediaTypes = types;
-    }
-    
-    public List<String> getProduceMediaTypes() {
-        return produceMediaTypes;    
-    }
-    
-    public void setEnableBuffering(boolean enableBuf) {
-        enableBuffering = enableBuf;
-    }
-    
-    public boolean getEnableBuffering() {
-        return enableBuffering;
-    }
 }

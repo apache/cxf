@@ -40,7 +40,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
 
-public class BinaryDataProvider 
+public class BinaryDataProvider extends AbstractConfigurableProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     private static final int BUFFER_SIZE = 4096;

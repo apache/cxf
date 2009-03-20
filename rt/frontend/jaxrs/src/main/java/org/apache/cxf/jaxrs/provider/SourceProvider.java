@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,6 +46,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 
 @Provider
+@ProduceMime({"application/xml", "text/xml" })
+@ConsumeMime({"application/xml", "text/xml" })
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 

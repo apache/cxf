@@ -38,14 +38,20 @@ public class WebApplicationExceptionMapper
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WebApplicationExceptionMapper.class);
     
     public Response toResponse(WebApplicationException ex) {
-        if (LOG.isLoggable(Level.FINE)) {
+        if (LOG.isLoggable(Level.WARNING)) {
+            String message = ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage();
+            if (message == null) {
+                if (ex.getCause() != null) {
+                    message = "cause is " + ex.getCause().getClass().getName();
+                } else {
+                    message = "no cause is available";
+                }
+            }
             org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("WEB_APP_EXCEPTION", 
-                    BUNDLE, ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage());
-            LOG.fine(errorMsg.toString());
+                new org.apache.cxf.common.i18n.Message("WEB_APP_EXCEPTION", BUNDLE, message);
+            LOG.warning(errorMsg.toString());
         }
-         
-        Response r = ex.getResponse();
+        Response r = ex.getResponse(); 
         if (r == null) {
             String message = null;
             if (ex.getCause() == null) {

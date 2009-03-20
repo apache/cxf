@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Calendar;
@@ -264,11 +265,26 @@ public class BookStore {
         return doGetBook(currentBookId);
     }
     
+    
     @GET
-    @Path("/books/stream")
-    @ProduceMime("application/xml")
+    @Path("/books/buffer")
+    @ProduceMime("application/bar")
+    public InputStream getBufferedBook() {
+        return getClass().getResourceAsStream("resources/expected_get_book123.txt");
+    }
+    
+    @GET
+    @Path("/books/fail-early")
+    @ProduceMime("application/bar")
+    public StreamingOutput failEarlyInWrite() {
+        return new StreamingOutputImpl(true);
+    }
+    
+    @GET
+    @Path("/books/fail-late")
+    @ProduceMime("application/bar")
     public StreamingOutput writeToStreamAndFail() {
-        return new StreamingOutputImpl();
+        return new StreamingOutputImpl(false);
     }
     
     private Book doGetBook(String id) throws BookNotFoundFault {
@@ -522,11 +538,21 @@ public class BookStore {
     
     private static class StreamingOutputImpl implements StreamingOutput {
 
+        private boolean failEarly;
+        
+        public StreamingOutputImpl(boolean failEarly) {
+            this.failEarly = failEarly;
+        }
+        
         public void write(OutputStream output) throws IOException, WebApplicationException {
-            //output.write("This is not supposed to go on the wire".getBytes());
-            throw new WebApplicationException(
-                 Response.status(410).type("text/plain")
-                 .entity("This is supposed to go on the wire").build());
+            if (failEarly) {
+                throw new WebApplicationException(
+                     Response.status(410).type("text/plain")
+                     .entity("This is supposed to go on the wire").build());
+            } else {
+                output.write("This is not supposed to go on the wire".getBytes());
+                throw new WebApplicationException(410);
+            }
         } 
         
     }

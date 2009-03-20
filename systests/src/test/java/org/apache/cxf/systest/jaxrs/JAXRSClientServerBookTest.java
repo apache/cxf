@@ -87,9 +87,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testWriteAndFailEarly() throws Exception {
-        getAndCompare("http://localhost:9080/bookstore/books/stream",
+        getAndCompare("http://localhost:9080/bookstore/books/fail-early",
                       "This is supposed to go on the wire",
-                      "application/xml, text/plain", 410);
+                      "application/bar, text/plain", 410);
+    }
+    
+    @Test
+    public void testWriteAndFailLate() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/books/fail-late",
+                      "", "application/bar", 410);
     }
     
     
@@ -256,6 +262,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "*/*", 200);
         
     }
+    
+    @Test
+    public void testGetBookBuffer() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/buffer",
+                               "resources/expected_get_book123.txt",
+                               "application/bar", 200);
+    }    
     
     @Test
     public void testGetBookBySegment() throws Exception {
@@ -729,6 +742,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             String content = getStringFromInputStream(get.getResponseBodyAsStream());
             assertEquals("Expected value is wrong", 
                          expectedValue, content);
+            if (expectedStatus == 200) {
+                assertEquals("123", get.getResponseHeader("BookId").getValue());
+            }
         } finally {
             get.releaseConnection();
         }

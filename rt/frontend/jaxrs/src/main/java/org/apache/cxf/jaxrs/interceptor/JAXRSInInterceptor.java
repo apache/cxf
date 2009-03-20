@@ -119,7 +119,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC", 
                                                    BUNDLE, 
                                                    rawPath);
-            LOG.severe(errorMsg.toString());
+            LOG.warning(errorMsg.toString());
 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

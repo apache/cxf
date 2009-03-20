@@ -104,5 +104,13 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     public BookSubresource getBookSubresource(String id) {
         return new BookSubresourceImpl(Long.valueOf(id));
     }
+
+    @WebMethod(exclude = true)
+    public BookStoreJaxrsJaxws getBookStore(String id) {
+        if (!"number1".equals(id)) {
+            throw new WebApplicationException(404);
+        }
+        return this;
+    }
     
 }

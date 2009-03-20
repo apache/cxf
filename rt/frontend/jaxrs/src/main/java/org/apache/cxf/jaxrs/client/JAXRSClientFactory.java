@@ -20,16 +20,11 @@ package org.apache.cxf.jaxrs.client;
 
 import java.lang.reflect.InvocationHandler;
 import java.net.URI;
+import java.util.List;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.ProxyHelper;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public final class JAXRSClientFactory {
     
@@ -49,58 +44,71 @@ public final class JAXRSClientFactory {
      * Creates a proxy
      * @param baseURI baseURI
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
-     * @param inheritHeaders if true then subresource proxies will inherit the headers
-     *        set on parent proxies 
+     * @param inheritHeaders if true then existing proxy headers will be inherited by 
+     *        subresource proxies if any
      * @return typed proxy
      */
     public static <T> T create(URI baseURI, Class<T> cls, boolean inheritHeaders) {
         
-        return create(baseURI, cls, inheritHeaders, false);
+        JAXRSClientFactoryBean bean = getBean(baseURI.toString(), cls, null);
+        bean.setInheritHeaders(inheritHeaders);
+        return bean.create(cls);
+        
+    }
+    
+    /**
+     * Creates a proxy
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param config classpath location of Spring configuration resource
+     * @return typed proxy
+     */
+    public static <T> T create(String baseAddress, Class<T> cls, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
+        return bean.create(cls);
     }
     
     
     /**
      * Creates a proxy
-     * @param baseURI baseURI
+     * @param baseAddress baseAddress
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
-     * @param config Spring configuration file location
+     * @param providers list of providers
      * @return typed proxy
      */
-    public static <T> T create(URI baseURI, Class<T> cls, String configLocation) {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus(configLocation);
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(baseURI.toString());
-        bean.setServiceClass(cls);
-        bean.setBus(bus);
+    public static <T> T create(String baseAddress, Class<T> cls, List<?> providers) {
+        return create(baseAddress, cls, providers, null);
+    }
+    
+    /**
+     * Creates a proxy
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param providers list of providers
+     * @param config classpath location of Spring configuration resource
+     * @return typed proxy
+     */
+    public static <T> T create(String baseAddress, Class<T> cls, List<?> providers, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
+        bean.setProviders(providers);
         return bean.create(cls);
     }
     
     /**
-     * Creates a proxy
-     * @param baseURI baseURI
+     * Creates a proxy which will do basic authentication
+     * @param baseAddress baseAddress
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
-     * @param inheritHeaders if true then existing proxy headers will be inherited by 
-     *        subresource proxies if any
-     * @param direct if true then no bus and chains will be created
+     * @param username username
+     * @param password password
+     * @param config classpath location of Spring configuration resource
      * @return typed proxy
      */
-    public static <T> T create(URI baseURI, Class<T> cls, boolean inheritHeaders, boolean direct) {
-        
-        if (!direct) {
-            JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-            bean.setAddress(baseURI.toString());
-            bean.setServiceClass(cls);
-            bean.setInheritHeaders(inheritHeaders);
-            return bean.create(cls);
-        } else {
-            boolean isRoot = AnnotationUtils.getClassAnnotation(cls, Path.class) != null;
-            ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(cls, cls, isRoot, true);
-            
-            return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(),
-                            new Class[]{cls, Client.class}, 
-                            new ClientProxyImpl(baseURI, baseURI, cri, inheritHeaders)));
-        }
+    public static <T> T create(String baseAddress, Class<T> cls, String username,
+                               String password, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
+        bean.setUsername(username);
+        bean.setPassword(password);
+        return bean.create(cls);
     }
     
     /**
@@ -126,9 +134,6 @@ public final class JAXRSClientFactory {
      * @return typed proxy
      */
     public static <T> T fromClient(Client client, Class<T> cls) {
-        if (cls.isAssignableFrom(client.getClass())) {
-            return cls.cast(client);
-        }
         return fromClient(client, cls, false);
     }
     
@@ -141,30 +146,25 @@ public final class JAXRSClientFactory {
      * @return typed proxy
      */
     public static <T> T fromClient(Client client, Class<T> cls, boolean inheritHeaders) {
-        return fromClient(client, cls, inheritHeaders, false);
-    }
-    
-    /**
-     * Creates a proxy, baseURI will be set to Client currentURI
-     * @param client Client instance
-     * @param cls proxy class, if not interface then a CGLIB proxy will be created
-     * @param inheritHeaders if true then existing Client headers will be inherited by new proxy 
-     *        and subresource proxies if any 
-     * @param direct if true then no bus and chains will be created       
-     * @return typed proxy
-     */
-    public static <T> T fromClient(Client client, Class<T> cls, boolean inheritHeaders, boolean direct) {
         
-        T proxy = create(client.getCurrentURI(), cls, inheritHeaders, direct);
+        T proxy = create(client.getCurrentURI(), cls, inheritHeaders);
         if (inheritHeaders) {
             WebClient.client(proxy).headers(client.getHeaders());
         }
+        WebClient.copyProperties(WebClient.client(proxy), client);
         return proxy;
     }
     
     static <T> T create(Class<T> cls, InvocationHandler handler) {
         
-        return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(),
-                        new Class[]{cls, Client.class}, handler));
+        return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(), new Class[]{cls, Client.class}, handler));
     }
+    
+    private static JAXRSClientFactoryBean getBean(String baseAddress, Class<?> cls, String configLocation) {
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, configLocation);
+        bean.setServiceClass(cls);
+        return bean;
+    }
+    
+    
 }

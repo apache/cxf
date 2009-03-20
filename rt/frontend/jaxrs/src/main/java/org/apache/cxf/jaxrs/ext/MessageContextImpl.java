@@ -49,7 +49,6 @@ import org.apache.cxf.message.Message;
 public class MessageContextImpl implements MessageContext {
 
     private Message m;
-    
     public MessageContextImpl(Message m) {
         this.m = m;
     }
@@ -112,11 +111,7 @@ public class MessageContextImpl implements MessageContext {
         return JAXRSUtils.createServletResourceValue(m, ServletContext.class);
     }
 
-    public void put(Object key, Object value, boolean outbound) {
-        if (outbound) {
-            throw new UnsupportedOperationException(
-                      "MessageContext.put() is not supported for outbound properties");
-        }
+    public void put(Object key, Object value) {
         m.put(key.toString(), value);
     }
 

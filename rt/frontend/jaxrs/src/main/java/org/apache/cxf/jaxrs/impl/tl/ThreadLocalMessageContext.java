@@ -37,7 +37,7 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
     public Object get(Object key) {
         return get() != null ? get().get(key) : null;
     }
-
+    
     public <T> T getContext(Class<T> contextClass) {
         return get() != null ? get().getContext(contextClass) : null;
     }
@@ -78,12 +78,11 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
         return get() != null ? get().getRequest() : null;
     }
 
-    public void put(Object key, Object value, boolean outbound) {
+    public void put(Object key, Object value) {
         if (get() != null) {
-            get().put(key, value, outbound);
+            get().put(key, value);
         }
         throw new IllegalStateException("MessageContext is not set");
-        
     }
 
     public <T, E> T getResolver(Class<T> resolverClass, Class<E> resolveClazz) {

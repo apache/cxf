@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,6 @@ import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -92,7 +92,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBook123WebClient() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
-        WebClient client = new WebClient(baseAddress);
+        WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = client.get(Book.class);
         assertEquals(123L, b.getId());
@@ -102,7 +102,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBook123WebClientBean() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
-        WebClient client = WebClient.createClient(baseAddress);
+        WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = client.get(Book.class);
         assertEquals(123, b.getId());
@@ -112,7 +112,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testNoBookWebClient() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
-        WebClient client = new WebClient(baseAddress);
+        WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/books/0/subresource").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = client.get(Book.class);
         assertNull(b);
@@ -122,7 +122,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBook123WebClientResponse() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
-        WebClient client = new WebClient(baseAddress);
+        WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = readBook((InputStream)client.get().getEntity());
         assertEquals(123L, b.getId());
@@ -134,9 +134,9 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         
         String baseAddress = "http://localhost:9092/test/services/rest";
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
-                                                              BookStoreJaxrsJaxws.class);
+                                          BookStoreJaxrsJaxws.class,
+                                          Collections.singletonList(new TestResponseExceptionMapper()));
         
-        ProviderFactory.getInstance().registerUserProvider(new TestResponseExceptionMapper());
         try {
             proxy.getBook(356L);
             fail();
@@ -165,29 +165,16 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                                   BookStoreJaxrsJaxws.class);
         doTestSubresource(proxy);
-    }
-    
-    @Test
-    public void testGetBookSubresourceWebClientProxyDirect() throws Exception {
-        
-        WebClient client = new WebClient("http://localhost:9092/test/services/rest");
-        client.type(MediaType.TEXT_PLAIN_TYPE)
-              .accept(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE);
-        BookStoreJaxrsJaxws proxy = 
-            JAXRSClientFactory.fromClient(client, BookStoreJaxrsJaxws.class, true, true);
-        
-        doTestSubresource(proxy);
-        
-        BookStoreJaxrsJaxws proxy2 = JAXRSClientFactory.fromClient(
-            WebClient.client(proxy), BookStoreJaxrsJaxws.class);
+        BookStoreJaxrsJaxws proxy2 = proxy.getBookStore("number1");
         doTestSubresource(proxy2);
-        
+        BookStoreJaxrsJaxws proxy3 = proxy2.getBookStore("number1");
+        doTestSubresource(proxy3);
     }
     
     @Test
     public void testGetBookSubresourceWebClientProxyBean() throws Exception {
         
-        WebClient client = new WebClient("http://localhost:9092/test/services/rest");
+        WebClient client = WebClient.create("http://localhost:9092/test/services/rest");
         client.type(MediaType.TEXT_PLAIN_TYPE)
             .accept(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE);
         BookStoreJaxrsJaxws proxy = 
@@ -205,7 +192,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookSubresourceWebClientProxy2() throws Exception {
         
-        WebClient client = new WebClient("http://localhost:9092/test/services/rest/bookstore")
+        WebClient client = WebClient.create("http://localhost:9092/test/services/rest/bookstore")
             .path("/books/378");
         client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
         BookSubresource proxy = JAXRSClientFactory.fromClient(client, BookSubresource.class);
@@ -227,13 +214,16 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         b = bs.getTheBook2("CXF ", "in ", "Action ", null, "7", "8");
         assertEquals(378L, b.getId());
         assertEquals("CXF in Action - 478", b.getName());
+        
+        
+        
     }
     
     @Test
     public void testGetBookWebClientForm() throws Exception {
         
         String baseAddress = "http://localhost:9092/test/services/rest/bookstore/books/679/subresource3";
-        WebClient wc = new WebClient(baseAddress);
+        WebClient wc = WebClient.create(baseAddress);
         MultivaluedMap<String, Object> map = new MetadataMap<String, Object>();
         map.putSingle("id", "679");
         map.putSingle("name", "CXF in Action - 679");
@@ -247,7 +237,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     public void testGetBookWebClientForm2() throws Exception {
         
         String baseAddress = "http://localhost:9092/test/services/rest/bookstore/books/679/subresource3";
-        WebClient wc = new WebClient(baseAddress);
+        WebClient wc = WebClient.create(baseAddress);
         Form f = new Form();
         f.set("id", "679").set("name", "CXF in Action - 679");
         Book b = readBook((InputStream)wc.accept("application/xml")
@@ -274,7 +264,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddGetBook123WebClient() throws Exception {
         String baseAddress = "http://localhost:9092/test/services/rest";
-        WebClient client = new WebClient(baseAddress);
+        WebClient client = WebClient.create(baseAddress);
         client.path("/bookstore/books").accept(MediaType.APPLICATION_XML_TYPE)
             .type(MediaType.APPLICATION_XML_TYPE);
         Book b = new Book();

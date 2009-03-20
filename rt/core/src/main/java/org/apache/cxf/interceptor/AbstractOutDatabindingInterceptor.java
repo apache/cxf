@@ -48,7 +48,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final String DISABLE_OUTPUTSTREAM_OPTIMIZATION = "disable.outputstream.optimization";
-    
+    public static final String OUT_BUFFERING = "org.apache.cxf.output.buffering";
     
     public AbstractOutDatabindingInterceptor(String phase) {
         super(phase);
@@ -72,8 +72,9 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         XMLStreamWriter xmlWriter = origXmlWriter;
         CachingXmlEventWriter cache = null;
         
-        if (shouldValidate(message) && !isRequestor(message)) {
-            //need to cache the events in case validation fails
+        // need to cache the events in case validation fails or buffering is enabled
+        if (shouldValidate(message) && !isRequestor(message)
+            || isBufferingEnabled(message)) {
             cache = new CachingXmlEventWriter();
             try {
                 cache.setNamespaceContext(origXmlWriter.getNamespaceContext());
@@ -125,6 +126,11 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         }
     }
     
+    
+    protected boolean isBufferingEnabled(Message m) {
+        Object en = m.getContextualProperty(OUT_BUFFERING);
+        return Boolean.TRUE.equals(en) || "true".equals(en);
+    }
     
     protected boolean shouldValidate(Message m) {
         Object en = m.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);

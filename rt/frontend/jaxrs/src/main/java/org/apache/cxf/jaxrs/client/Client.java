@@ -54,5 +54,9 @@ public interface Client {
     URI getBaseURI();
     URI getCurrentURI();
     
+    /**
+     * Gets the response state if any
+     * @return JAXRS Response response
+     */
     Response getResponse();
 }

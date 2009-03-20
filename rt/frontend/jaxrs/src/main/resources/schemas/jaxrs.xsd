@@ -87,6 +87,8 @@
           <xsd:attribute name="serviceClass" type="xsd:string"/>
           <xsd:attribute name="inheritHeaders" type="xsd:boolean"/>
           <xsd:attribute name="bus" type="xsd:string" />
+          <xsd:attribute name="username" type="xsd:string"/>
+          <xsd:attribute name="password" type="xsd:string"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

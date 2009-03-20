@@ -39,10 +39,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @ProduceMime({"application/xml", "text/xml" })
 @ConsumeMime({"application/xml", "text/xml" })
@@ -50,10 +52,23 @@ import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     private Map<String, Object> mProperties = new HashMap<String, Object>();
+    private boolean enableStreaming;
     
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
+    }
+    
+    public void setEnableStreaming(boolean enableStream) {
+        enableStreaming = enableStream; 
+    }
+    
+    public boolean getEnableStreaming() {
+        return enableStreaming;
+    }
+    
+    public void setEnableBuffering(boolean enableBuf) {
+        super.setEnableBuffering(enableBuf);
     }
     
     public void setConsumeMediaTypes(List<String> types) {
@@ -121,10 +136,19 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
                 ms.setProperty(entry.getKey(), entry.getValue());
             }
-            ms.marshal(actualObject, os);
+            if (enableStreaming) {
+                XMLStreamWriter writer = 
+                    (XMLStreamWriter)getContext().get(XMLStreamWriter.class.getName());
+                if (writer == null) {
+                    writer = StaxUtils.createXMLStreamWriter(os);
+                }
+                ms.marshal(actualObject, writer);
+            } else {
+                ms.marshal(actualObject, os);
+            }
             
         } catch (JAXBException e) {
-            throw new WebApplicationException(e);
+            handleJAXBException(e);
         }  catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {

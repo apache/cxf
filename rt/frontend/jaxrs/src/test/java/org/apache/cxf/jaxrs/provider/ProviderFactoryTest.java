@@ -182,7 +182,7 @@ public class ProviderFactoryTest extends Assert {
         verifyProvider(byte[].class, BinaryDataProvider.class, "*/*");
         verifyProvider(InputStream.class, BinaryDataProvider.class, "image/png");
         MessageBodyWriter writer = ProviderFactory.getInstance()
-            .createMessageBodyWriter(File.class, null, null, JAXRSUtils.ALL_TYPES, null);
+            .createMessageBodyWriter(File.class, null, null, JAXRSUtils.ALL_TYPES, new MessageImpl());
         assertTrue(BinaryDataProvider.class == writer.getClass());
     }
     

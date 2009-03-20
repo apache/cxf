@@ -68,7 +68,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.transport.MessageObserver;
 
-public class AbstractClient implements Client {
+public class AbstractClient implements Client, InvocationHandlerAware {
 
     protected static final MediaType WILDCARD = MediaType.valueOf("*/*");
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
@@ -88,14 +88,6 @@ public class AbstractClient implements Client {
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
         this.currentBuilder = new UriBuilderImpl(currentURI);
-    }
-    
-    protected AbstractClient(Client client, boolean inheritHeaders) {
-        this.baseURI = client.getCurrentURI();
-        this.currentBuilder = new UriBuilderImpl(client.getCurrentURI());
-        if (inheritHeaders) {
-            this.requestHeaders = client.getHeaders();
-        }
     }
     
     public Client header(String name, Object... values) {
@@ -197,11 +189,9 @@ public class AbstractClient implements Client {
     
     public Response getResponse() {
         if (responseBuilder == null) {
-            throw new IllegalStateException();
+            return null;
         }
-        Response r = responseBuilder.build();
-        responseBuilder = null;
-        return r;
+        return responseBuilder.build();
     }
     
     public Client reset() {
@@ -459,10 +449,11 @@ public class AbstractClient implements Client {
         public void onMessage(Message m) {
             
             Message message = conduitSelector.getEndpoint().getBinding().createMessage(m);
-            message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+            message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
             message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
             PhaseInterceptorChain chain = setupInInterceptorChain(conduitSelector.getEndpoint());
             message.setInterceptorChain(chain);
+            message.getExchange().setInMessage(message);
             Bus origBus = BusFactory.getThreadDefaultBus(false);
             BusFactory.setThreadDefaultBus(bus);
 
@@ -474,5 +465,9 @@ public class AbstractClient implements Client {
             }
         }
         
+    }
+
+    public Object getInvocationHandler() {
+        return this;
     }
 }

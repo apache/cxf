@@ -49,4 +49,8 @@ public interface BookStoreJaxrsJaxws {
     @Path("/books/{id}")
     @WebMethod(exclude = true)
     BookSubresource getBookSubresource(@PathParam("id") String id);
+    
+    @Path("/thestore/{id}")
+    @WebMethod(exclude = true)
+    BookStoreJaxrsJaxws getBookStore(@PathParam("id") String id);
 }

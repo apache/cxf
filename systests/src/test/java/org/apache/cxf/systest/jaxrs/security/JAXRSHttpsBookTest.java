@@ -21,11 +21,7 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
@@ -46,34 +42,59 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBook123Client() throws Exception {
+    public void testGetBook123Proxy() throws Exception {
         
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus(CLIENT_CONFIG_FILE);
-        BusFactory.setDefaultBus(bus);
-        
-        BookStore bs = JAXRSClientFactory.create("https://localhost:9095", BookStore.class);
+        BookStore bs = JAXRSClientFactory.create("https://localhost:9095", BookStore.class, 
+                                                 CLIENT_CONFIG_FILE);
         // just to verify the interface call goes through CGLIB proxy too
         assertEquals("https://localhost:9095", WebClient.client(bs).getBaseURI().toString());
         Book b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
+        b = bs.getSecureBook("123");
+        assertEquals(b.getId(), 123);
     }
+    
+    @Test
+    public void testGetBook123ProxyToWebClient() throws Exception {
+        
+        BookStore bs = JAXRSClientFactory.create("https://localhost:9095", BookStore.class, 
+                                                 CLIENT_CONFIG_FILE);
+        Book b = bs.getSecureBook("123");
+        assertEquals(b.getId(), 123);
+        WebClient wc = WebClient.fromClient(WebClient.client(bs));
+        wc.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b2 = wc.get(Book.class);
+        assertEquals(123, b2.getId());
+    }
+    
+    
+    @Test
+    public void testGetBook123WebClientToProxy() throws Exception {
+        
+        WebClient wc = WebClient.create("https://localhost:9095", CLIENT_CONFIG_FILE);
+        wc.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b = wc.get(Book.class);
+        assertEquals(123, b.getId());
+        
+        wc.back(true);
+        
+        BookStore bs = JAXRSClientFactory.fromClient(wc, BookStore.class);
+        Book b2 = bs.getSecureBook("123");
+        assertEquals(b2.getId(), 123);
+        
+    }
+    
     
     @Test
     public void testGetBook123WebClient() throws Exception {
         
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus(CLIENT_CONFIG_FILE);
-        BusFactory.setDefaultBus(bus);
-        
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress("https://localhost:9095");
-        WebClient client = bean.createWebClient();
+        WebClient client = WebClient.create("https://localhost:9095", CLIENT_CONFIG_FILE);
         assertEquals("https://localhost:9095", client.getBaseURI().toString());
         
         client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = client.get(Book.class);
         assertEquals(123, b.getId());
+        
     }
     
 }

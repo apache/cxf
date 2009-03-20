@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -54,22 +53,116 @@ import org.apache.cxf.transport.http.HTTPConduit;
 
 public class WebClient extends AbstractClient {
     
-    public WebClient(String baseAddress) {
+    protected WebClient(String baseAddress) {
         this(URI.create(baseAddress));
     }
     
-    public WebClient(URI baseURI) {
-        super(baseURI, baseURI);
+    protected WebClient(URI baseAddress) {
+        super(baseAddress, baseAddress);
     }
     
-    public WebClient(Client client) {
-        this(client, false);
+    /**
+     * Creates WebClient
+     * @param baseAddress baseAddress
+     */
+    public static WebClient create(String baseAddress) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(baseAddress);
+        return bean.createWebClient();
     }
     
-    public WebClient(Client client, boolean inheritHeaders) {
-        super(client, inheritHeaders);
+    public static WebClient create(URI baseURI) {
+        return create(baseURI.toString());
     }
     
+    /**
+     * Creates WebClient
+     * @param baseURI baseURI
+     * @param providers list of providers
+     */
+    public static WebClient create(String baseAddress, List<?> providers) {
+        return create(baseAddress, providers, null);        
+    }
+    
+    /**
+     * Creates a Spring-configuration aware WebClient
+     * @param baseAddress baseAddress
+     * @param providers list of providers
+     * @param configLocation classpath location of Spring configuration resource, can be null  
+     * @return WebClient instance
+     */
+    public static WebClient create(String baseAddress, List<?> providers, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
+        bean.setProviders(providers);
+        return bean.createWebClient();
+    }
+    
+    /**
+     * Creates a Spring-configuration aware WebClient
+     * @param baseAddress baseAddress
+     * @param configLocation classpath location of Spring configuration resource, can be null  
+     * @return WebClient instance
+     */
+    public static WebClient create(String baseAddress, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
+        
+        return bean.createWebClient();
+    }
+    
+    /**
+     * Creates a Spring-configuration aware WebClient which will do basic authentication
+     * @param baseAddress baseAddress
+     * @param username username
+     * @param password password
+     * @param configLocation classpath location of Spring configuration resource, can be null  
+     * @return WebClient instance
+     */
+    public static WebClient create(String baseAddress, String username, String password, 
+                                         String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
+        
+        bean.setUsername(username);
+        bean.setPassword(password);
+        
+        return bean.createWebClient();
+    }
+    
+    /**
+     * Creates WebClient, baseURI will be set to Client currentURI
+     * @param client existing client
+     */
+    public static WebClient fromClient(Client client) {
+        return fromClient(client, false);
+    }
+    
+    public static WebClient fromClient(Client client, boolean inheritHeaders) {
+        WebClient webClient = create(client.getCurrentURI());
+        if (inheritHeaders) {
+            webClient.headers(client.getHeaders());
+        }
+        copyProperties(webClient, client);
+        return webClient;
+    }
+    
+    /**
+     * Converts proxy to Client
+     * @param proxy the proxy
+     * @return proxy as a Client 
+     */
+    public static Client client(Object proxy) {
+        if (proxy instanceof Client) {
+            return (Client)proxy;
+        }
+        return null;
+    }
+    
+    /**
+     * Does HTTP invocation
+     * @param httpMethod HTTP method
+     * @param body request body, can be null
+     * @return JAXRS Response, entity may hold a string representaion of 
+     *         error message if client or server error occured
+     */
     public Response invoke(String httpMethod, Object body) {
         return doInvoke(httpMethod, body, InputStream.class);
     }
@@ -175,34 +268,6 @@ public class WebClient extends AbstractClient {
         return this;
     }
     
-    /**
-     * Converts proxy to Client
-     * @param proxy the proxy
-     * @return proxy as a Client 
-     */
-    public static Client client(Object proxy) {
-        if (proxy instanceof Client) {
-            return (Client)proxy;
-        }
-        return null;
-    }
-    
-    
-    public static WebClient createClient(String baseAddress, String configLocation) {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus(configLocation);
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setBus(bus);
-        bean.setAddress(baseAddress);
-        return bean.createWebClient();
-    }
-    
-    public static WebClient createClient(String baseAddress) {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(baseAddress);
-        return bean.createWebClient();
-    }
-    
     @Override
     public WebClient type(MediaType ct) {
         return (WebClient)super.type(ct);
@@ -273,7 +338,7 @@ public class WebClient extends AbstractClient {
         return (WebClient)super.reset();
     }
     
-    private Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
+    protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
         
         MultivaluedMap<String, String> headers = getHeaders();
         if (body != null && headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
@@ -282,34 +347,14 @@ public class WebClient extends AbstractClient {
         if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
-        if (conduitSelector == null) {
-            return doDirectInvocation(httpMethod, headers, body, responseClass);
-        } else {
-            return doChainedInvocation(httpMethod, headers, body, responseClass);
-        }
+        resetResponse();
+        return doChainedInvocation(httpMethod, headers, body, responseClass);
+        
     }
 
-    protected Response doDirectInvocation(String httpMethod, 
-        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
-        
-        HttpURLConnection conn = getConnection(httpMethod);
-        
-        setAllHeaders(headers, conn);
-        Message message = createSimpleMessage();
-        if (body != null) {
-            try {
-                writeBody(body, message, body.getClass(), body.getClass(), 
-                      new Annotation[]{}, headers, conn.getOutputStream());
-            } catch (IOException ex) {
-                throw new WebApplicationException(ex);
-            }
-        }
-        return handleResponse(conn, message, responseClass);
-    }
-    
     protected Response doChainedInvocation(String httpMethod, 
         MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
-
+        
         Message m = createMessage(httpMethod, headers, getCurrentURI());
         
         if (body != null) {
@@ -372,10 +417,35 @@ public class WebClient extends AbstractClient {
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
-            
         }
-        
     }
 
+    static void copyProperties(Client toClient, Client fromClient) {
+        AbstractClient newClient = toAbstractClient(toClient);
+        AbstractClient oldClient = toAbstractClient(fromClient);
+        newClient.bus = oldClient.bus;
+        newClient.conduitSelector = oldClient.conduitSelector;
+        newClient.inInterceptors = oldClient.inInterceptors;
+        newClient.outInterceptors = oldClient.outInterceptors;
+    }
     
+    private static AbstractClient toAbstractClient(Client client) {
+        if (client instanceof AbstractClient) {
+            return (AbstractClient)client;
+        } else {
+            return (AbstractClient)((InvocationHandlerAware)client).getInvocationHandler();
+        }
+    }
+    
+    static JAXRSClientFactoryBean getBean(String baseAddress, String configLocation) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        
+        if (configLocation != null) {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus bus = bf.createBus(configLocation);
+            bean.setBus(bus);
+        }
+        bean.setAddress(baseAddress);
+        return bean;
+    }
 }

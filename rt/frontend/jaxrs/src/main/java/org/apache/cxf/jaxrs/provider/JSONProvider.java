@@ -70,6 +70,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
         super.setContext(mc);
     }
     
+    public void setEnableBuffering(boolean enableBuf) {
+        super.setEnableBuffering(enableBuf);
+    }
+    
     public void setConsumeMediaTypes(List<String> types) {
         super.setConsumeMediaTypes(types);
     }
@@ -163,7 +167,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             xsw.close();
             
         } catch (JAXBException e) {
-            throw new WebApplicationException(e);
+            handleJAXBException(e);
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
         } catch (Exception e) {

@@ -67,22 +67,24 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     
     private ClassResourceInfo cri;
     private boolean inheritHeaders;
+    private boolean isRoot;
     
-    public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean inheritHeaders) {
+    public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean isRoot, 
+                           boolean inheritHeaders) {
         super(baseURI, currentURI);
         this.cri = cri;
+        this.isRoot = isRoot;
         this.inheritHeaders = inheritHeaders;
     }
     
     public Object invoke(Object o, Method m, Object[] params) throws Throwable {
         
-        resetResponse();
-        
         Class<?> declaringClass = m.getDeclaringClass();
-        if (Client.class == declaringClass || Object.class == declaringClass) {
+        if (Client.class == declaringClass || InvocationHandlerAware.class == declaringClass
+            || Object.class == declaringClass) {
             return m.invoke(this, params);
         }
-        
+        resetResponse();
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(m);
         if (ori == null) {
             reportInvalidResourceMethod(m, "INVALID_RESOURCE_METHOD");
@@ -95,7 +97,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         int bodyIndex = getBodyIndex(types, ori);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
-        if (cri.isRoot()) {
+        if (isRoot) {
             builder.path(ori.getClassResourceInfo().getServiceClass());
         }
         builder.path(m);
@@ -114,7 +116,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             if (subCri == null) {
                 reportInvalidResourceMethod(m, "INVALID_SUBRESOURCE");
             }
-            ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, inheritHeaders);
+            ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, false, inheritHeaders);
             proxyImpl.setBus(bus);
             proxyImpl.setConduitSelector(conduitSelector);
             proxyImpl.setInInterceptors(inInterceptors);
@@ -132,11 +134,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
             bodyIndex == -1 ? null : params[bodyIndex].getClass(), m.getReturnType());
         
-        if (conduitSelector == null) {
-            return doDirectInvocation(uri, headers, ori, params, bodyIndex, types);
-        } else {
-            return doChainedInvocation(uri, headers, ori, params, bodyIndex, types);
-        }
+        return doChainedInvocation(uri, headers, ori, params, bodyIndex, types);
+        
     }
 
     private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(OperationResourceInfo ori, 
@@ -348,33 +347,6 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         
         return p;
-        
-    }
-    
-    protected Object doDirectInvocation(URI uri, MultivaluedMap<String, String> headers, 
-        OperationResourceInfo ori, Object[] params, int bodyIndex, 
-        MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
-
-        // TODO : we need to refactor bits of HTTPConduit such that it can be reused
-        
-        Message message = createSimpleMessage();
-        
-        HttpURLConnection connect = createHttpConnection(uri, ori.getHttpMethod());
-        setAllHeaders(headers, connect);
-        Method m = ori.getMethodToInvoke();
-        if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
-            if (bodyIndex != -1) {
-                writeBody(params[bodyIndex], message, params[bodyIndex].getClass(), 
-                          m.getGenericParameterTypes()[bodyIndex],
-                          m.getParameterAnnotations()[bodyIndex], headers, connect.getOutputStream());
-            } else {
-                MultivaluedMap<String, String> form = handleForm(types, params);
-                writeBody(form, message, form.getClass(), form.getClass(), m.getDeclaredAnnotations(),
-                          headers, connect.getOutputStream());
-            }
-        }
-        
-        return handleResponse(connect, message, ori);
         
     }
     
