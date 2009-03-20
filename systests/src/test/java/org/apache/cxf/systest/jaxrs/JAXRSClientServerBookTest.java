@@ -359,6 +359,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse",
                                "resources/expected_get_chapter1_utf.txt",
                                "application/xml", 200);
+        getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse2",
+                               "resources/expected_get_chapter1.txt",
+                               "application/xml", 200);
     }
     
     @Test

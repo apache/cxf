@@ -24,9 +24,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -67,15 +70,42 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     private ClassResourceInfo cri;
     private boolean inheritHeaders;
     private boolean isRoot;
+    private Map<String, Object> valuesMap;
     
     public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean isRoot, 
-                           boolean inheritHeaders) {
+                           boolean inheritHeaders, Object... varValues) {
         super(baseURI, currentURI);
         this.cri = cri;
         this.isRoot = isRoot;
         this.inheritHeaders = inheritHeaders;
+        initValuesMap(varValues);
     }
     
+    private void initValuesMap(Object... varValues) {
+        if (isRoot && varValues.length != 0) {
+            valuesMap = new LinkedHashMap<String, Object>();
+            List<String> vars = cri.getURITemplate().getVariables();
+            for (int i = 0; i < vars.size(); i++) {
+                if (i < varValues.length) {
+                    valuesMap.put(vars.get(i), varValues[i]);
+                } else {
+                    org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
+                         "ROOT_VARS_MISMATCH", BUNDLE, vars.size(), varValues.length);
+                    LOG.info(msg.toString());
+                    break;
+                }
+            }
+        } else {
+            valuesMap = Collections.emptyMap();
+        }
+    }
+    
+    /**
+     * Updates the current state if Client method is invoked, otherwise 
+     * does the remote invocation or returns a new proxy if subresource 
+     * method is invoked. Can throw an expected exception if ResponseExceptionMapper
+     * is registered     
+     */
     public Object invoke(Object o, Method m, Object[] params) throws Throwable {
         
         Class<?> declaringClass = m.getDeclaringClass();
@@ -91,7 +121,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         MultivaluedMap<ParameterType, Parameter> types = 
             getParametersInfo(ori, m, params);
-        List<Object> pathParams = getParamValues(types, params, ParameterType.PATH);
+        List<Object> pathParams = getPathParamValues(types, params, ori);
         
         int bodyIndex = getBodyIndex(types, ori);
         
@@ -232,12 +262,32 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         return headers;
     }
     
-    private static List<Object> getParamValues(MultivaluedMap<ParameterType, Parameter> map, 
-                                               Object[] params, ParameterType key) {
-        List<Parameter> indexList =  getParameters(map, key);
-        List<Object> list = new ArrayList<Object>(indexList.size());
-        for (Parameter p : indexList) {
-            list.add(params[p.getIndex()].toString());
+    private List<Object> getPathParamValues(MultivaluedMap<ParameterType, Parameter> map,
+                                            Object[] params,
+                                            OperationResourceInfo ori) {
+        List<Parameter> paramsList =  getParameters(map, ParameterType.PATH);
+        List<Object> list = new LinkedList<Object>();
+        if (isRoot) {
+            list.addAll(valuesMap.values());
+        }
+        List<String> vars = ori.getURITemplate().getVariables();
+        // TODO : unfortunately, UriBuilder will lose a method-scoped parameter 
+        // if a same name variable exists in a class scope which is an api bug.
+        // It's a rare case but we might want just to use UriBuilderImpl() directly 
+        // on the client side and tell it to choose the last variable value
+        for (Parameter p : paramsList) {
+            if (valuesMap.containsKey(p.getValue()) && !vars.contains(p.getValue())) {
+                int index = 0; 
+                for (Iterator<String> it = valuesMap.keySet().iterator(); it.hasNext(); index++) {
+                    if (it.next().equals(p.getValue())) {
+                        list.remove(index);
+                        list.add(index, params[p.getIndex()]);
+                        break;
+                    }
+                }
+            } else {
+                list.add(params[p.getIndex()]);
+            }
         }
         return list;
     }

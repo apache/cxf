@@ -122,7 +122,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return context != null ? context : getClassContext(type);
     }
     
-    private JAXBContext getClassContext(Class<?> type) throws JAXBException {
+    // TODO : move this method to a dedicated JAXBContextRegistry class
+    public JAXBContext getClassContext(Class<?> type) throws JAXBException {
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
@@ -133,7 +134,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
-    protected JAXBContext getPackageContext(Class<?> type) {
+    //  TODO : move this method to a dedicated JAXBContextRegistry class
+    public JAXBContext getPackageContext(Class<?> type) {
         if (type == null) {
             return null;
         }

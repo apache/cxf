@@ -61,6 +61,11 @@ public class Chapter {
         return this;
     }
     
+    @Path("/recurse2")
+    public Chapter getItself2() {
+        return this;
+    }
+    
     @GET
     @ProduceMime("application/xml;charset=ISO-8859-1")
     public Chapter get() {

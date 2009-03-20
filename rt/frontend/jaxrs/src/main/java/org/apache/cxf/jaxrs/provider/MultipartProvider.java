@@ -44,7 +44,7 @@ import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Provider
 @ConsumeMime({"multipart/related", "multipart/mixed", "multipart/alternative" })
-public class ActivationProvider implements MessageBodyReader<Object> {
+public class MultipartProvider implements MessageBodyReader<Object> {
 
     @Context
     private MessageContext mc;
@@ -54,7 +54,7 @@ public class ActivationProvider implements MessageBodyReader<Object> {
     public void setAttachmentDirectory(String dir) {
         attachmentDir = dir;
     }
-
+    
     public void setAttachmentThreshold(String threshold) {
         attachmentThreshold = threshold;
     }
@@ -118,12 +118,10 @@ public class ActivationProvider implements MessageBodyReader<Object> {
     }
     
     private boolean mediaTypeSupported() {
-
         if (mc == null) {
             return false;
         }
-        MediaType mt = mc.getHttpHeaders().getMediaType();        
-
+        MediaType mt = mc.getHttpHeaders().getMediaType();
         return mt.getType().equals("multipart") && (mt.getSubtype().equals("related") 
             || mt.getSubtype().equals("mixed") || mt.getSubtype().equals("alternative"));
     }
