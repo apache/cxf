@@ -736,7 +736,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         GetMethod get = new GetMethod(address);
         get.setRequestHeader("Accept", acceptType);
         get.setRequestHeader("Accept-Language", "da;q=0.8,en");
-        get.setRequestHeader("BOOK", "1,2,3");
+        get.setRequestHeader("Book", "1,2,3");
         HttpClient httpClient = new HttpClient();
         try {
             int result = httpClient.executeMethod(get);

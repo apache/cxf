@@ -62,6 +62,33 @@ public class MetadataMapTest extends Assert {
         assertEquals("GetFirst value is wrong", "bar", m.getFirst("baz"));
     }
     
+    @Test
+    public void testCopyAndUpdate() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("baz", "bar");
+        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m);
+        m.remove("baz");
+        m.add("baz", "foo");
+        assertEquals("bar", m2.getFirst("baz"));
+        assertEquals("foo", m.getFirst("baz"));
+        
+    }
     
-
+    @Test(expected = UnsupportedOperationException.class)
+    public void testReadOnly() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("baz", "bar");
+        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
+        m2.remove("baz");
+    }
+    
+    public void testCaseInsensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Baz", "bar");
+        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, true);
+        assertEquals("bar", m2.getFirst("baZ"));
+        assertEquals("bar", m2.getFirst("Baz"));
+        assertTrue(m2.containsKey("BaZ"));
+        assertTrue(m2.containsKey("Baz"));
+    }
 }

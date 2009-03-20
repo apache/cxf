@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
 
+    private boolean caseInsensitive;
     private Map<K, List<V>> m;
     
     public MetadataMap() {
@@ -37,13 +39,29 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
     
     public MetadataMap(Map<K, List<V>> store) {
+        this(store, false, false);
+    }
+    
+    public MetadataMap(Map<K, List<V>> store, boolean readOnly, boolean caseInsensitive) {
+        
+        if (!readOnly && caseInsensitive) {
+            throw new IllegalArgumentException(
+                "Case-insensitive keys are only supported for read-only maps at the moment");
+        }
+        this.caseInsensitive = caseInsensitive;
         
         this.m = new LinkedHashMap<K, List<V>>();
         if (store != null) {
             for (Map.Entry<K, List<V>> entry : store.entrySet()) {
-                m.put(entry.getKey(), new ArrayList<V>(entry.getValue()));
+                List<V> values = new ArrayList<V>(entry.getValue());
+                m.put(entry.getKey(), readOnly 
+                      ? Collections.unmodifiableList(values) : values);
             }
         }
+        if (readOnly) {
+            this.m = Collections.unmodifiableMap(m);
+        }
+        
     }
     
     public void add(K key, V value) {
@@ -56,7 +74,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public V getFirst(K key) {
-        List<V> data = m.get(key);
+        List<V> data = get(key);
         return data == null ? null : data.get(0);
     }
 
@@ -71,7 +89,15 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public boolean containsKey(Object key) {
-        return m.containsKey(key);
+        if (!caseInsensitive) {
+            return m.containsKey(key);
+        }
+        for (K theKey : m.keySet()) {
+            if (theKey.toString().toLowerCase().equals(key.toString().toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean containsValue(Object value) {
@@ -83,7 +109,15 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public List<V> get(Object key) {
-        return m.get(key);
+        if (!caseInsensitive) {
+            return m.get(key);
+        }
+        for (Map.Entry<K, List<V>> entry : m.entrySet()) {
+            if (entry.getKey().toString().toLowerCase().equals(key.toString().toLowerCase())) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     public boolean isEmpty() {
@@ -128,5 +162,4 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         return m.toString();
     }
     
-     
 }

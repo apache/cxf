@@ -622,25 +622,28 @@ public final class JAXRSUtils {
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
  
-        Message inbound = m.getExchange() != null ? m.getExchange().getInMessage() : m;
+        Message contextMessage = m.getExchange() != null ? m.getExchange().getInMessage() : m;
+        if (contextMessage == null && Boolean.FALSE.equals(m.get(Message.INBOUND_MESSAGE))) {
+            contextMessage = m;
+        }
         Object o = null;
         if (UriInfo.class.isAssignableFrom(clazz)) {
-            o = createUriInfo(inbound);
+            o = createUriInfo(contextMessage);
         } else if (HttpHeaders.class.isAssignableFrom(clazz)) {
-            o = new HttpHeadersImpl(inbound);
+            o = new HttpHeadersImpl(contextMessage);
         } else if (Request.class.isAssignableFrom(clazz)) {
-            o = new RequestImpl(inbound);
+            o = new RequestImpl(contextMessage);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
-            o = new SecurityContextImpl(inbound);
+            o = new SecurityContextImpl(contextMessage);
         } else if (Providers.class.isAssignableFrom(clazz)) {
-            o = new ProvidersImpl(inbound);
+            o = new ProvidersImpl(contextMessage);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
-            o = createContextResolver(genericType, inbound);
+            o = createContextResolver(genericType, contextMessage);
         } else if (MessageContext.class.isAssignableFrom(clazz)) {
             o = new MessageContextImpl(m);
         }
         
-        o = o == null ? createServletResourceValue(inbound, clazz) : o;
+        o = o == null ? createServletResourceValue(contextMessage, clazz) : o;
         return clazz.cast(o);
     }
     

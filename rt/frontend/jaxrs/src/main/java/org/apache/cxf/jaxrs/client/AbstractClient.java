@@ -374,7 +374,8 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         }
         if (mbr != null) {
             try {
-                return mbr.readFrom(cls, type, anns, contentType, r.getMetadata(), conn.getInputStream());
+                return mbr.readFrom(cls, type, anns, contentType, 
+                       new MetadataMap<String, Object>(r.getMetadata(), true, true), conn.getInputStream());
             } catch (Exception ex) {
                 throw new WebApplicationException();
             }
@@ -509,10 +510,11 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         public void onMessage(Message m) {
             
             Message message = conduitSelector.getEndpoint().getBinding().createMessage(m);
-            message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+            message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
             message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
             PhaseInterceptorChain chain = setupInInterceptorChain(conduitSelector.getEndpoint());
             message.setInterceptorChain(chain);
+            message.getExchange().setInMessage(message);
             Bus origBus = BusFactory.getThreadDefaultBus(false);
             BusFactory.setThreadDefaultBus(bus);
 
