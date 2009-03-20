@@ -51,6 +51,20 @@ public class XMLSourceTest extends Assert {
     }
     
     @Test
+    public void testGetNodeBuffering() {
+        String data = "<x:foo xmlns:x=\"http://baz\"><x:bar/></x:foo>"; 
+        InputStream is = new ByteArrayInputStream(data.getBytes());
+        XMLSource xp = new XMLSource(is);
+        xp.setBuffering(true);
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("x", "http://baz");
+        Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
+        assertNotNull(bar);
+        bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
+        assertNotNull(bar);
+    }
+    
+    @Test
     public void testGetNodeNamespace2() {
         String data = "<z:foo xmlns:z=\"http://baz\"><z:bar/></z:foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
