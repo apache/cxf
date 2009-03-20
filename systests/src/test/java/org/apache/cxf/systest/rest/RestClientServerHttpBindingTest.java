@@ -55,7 +55,7 @@ public class RestClientServerHttpBindingTest extends AbstractBusClientServerTest
    
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(HttpBindingServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(HttpBindingServer.class));
     }
    
     @Test
