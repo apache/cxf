@@ -122,6 +122,9 @@ public class MultipartProvider implements MessageBodyReader<Object> {
             return false;
         }
         MediaType mt = mc.getHttpHeaders().getMediaType();
+        if (mt == null) {
+            return false;
+        }
         return mt.getType().equals("multipart") && (mt.getSubtype().equals("related") 
             || mt.getSubtype().equals("mixed") || mt.getSubtype().equals("alternative"));
     }

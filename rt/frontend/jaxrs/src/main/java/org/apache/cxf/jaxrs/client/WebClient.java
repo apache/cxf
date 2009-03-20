@@ -343,8 +343,12 @@ public class WebClient extends AbstractClient {
     protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
         
         MultivaluedMap<String, String> headers = getHeaders();
-        if (body != null && headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.toString());
+        if (body != null) {
+            if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
+                headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.toString());
+            }
+        } else {
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, WILDCARD.toString());
         }
         if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());

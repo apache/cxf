@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,31 +38,24 @@ import org.apache.cxf.message.Message;
 
 public class HttpHeadersImpl implements HttpHeaders {
 
-    private Message m;
     private MultivaluedMap<String, String> headers;
     
     @SuppressWarnings("unchecked")
     public HttpHeadersImpl(Message message) {
-        this.m = message;
-        Map<String, List<String>> mHeaders = (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
-        this.headers = mHeaders == null ? new MetadataMap<String, String>()
-                                        : new MetadataMap<String, String>(mHeaders);
+        this.headers = new MetadataMap<String, String>(
+            (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS), true, true);
     }
     
     public List<MediaType> getAcceptableMediaTypes() {
-        String lValues = headers.getFirst(HttpHeaders.ACCEPT);
-        if (lValues == null) {
+        List<String> lValues = headers.get(HttpHeaders.ACCEPT);
+        if (lValues == null || lValues.isEmpty()) {
             return Collections.emptyList();
         }
-        return JAXRSUtils.sortMediaTypes(lValues); 
+        return JAXRSUtils.sortMediaTypes(lValues.get(0)); 
     }
 
     public Map<String, Cookie> getCookies() {
-        List<String> values = headers.get(HttpHeaders.COOKIE);
-        if (values == null || values.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        String[] cs =  values.get(0).split(",");
+        List<String> cs = getListValues(HttpHeaders.COOKIE);
         Map<String, Cookie> cl = new HashMap<String, Cookie>(); 
         for (String c : cs) {
             Cookie cookie = Cookie.valueOf(c);
@@ -71,31 +65,27 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public String getLanguage() {
-        String l = headers.getFirst(HttpHeaders.CONTENT_LANGUAGE);
-        return l == null ? "UTF-8" : l;
+        List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
+        return values.size() == 0 ? null : values.get(0);
     }
 
     public MediaType getMediaType() {
-        String value = (String)m.get(Message.CONTENT_TYPE);
-        return value == null ? MediaType.valueOf("*/*") : MediaType.valueOf(value);
+        List<String> values = getListValues(HttpHeaders.CONTENT_TYPE);
+        return values.size() == 0 ? null : MediaType.valueOf(values.get(0));
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {
-        // should we really worry about immutability given that the Message does not ?
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        for (String key : headers.keySet()) {
-            map.put(key, getRequestHeader(key));
+        Map<String, List<String>> newHeaders = new LinkedHashMap<String, List<String>>();
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            newHeaders.put(entry.getKey(), getListValues(entry.getKey()));
         }
-        return map;
+        return new MetadataMap<String, String>(newHeaders, true, true);
     }
 
     public List<String> getAcceptableLanguages() {
-        List<String> values = headers.get(HttpHeaders.ACCEPT_LANGUAGE);
-        if (values == null || values.isEmpty()) {
-            return Collections.emptyList();
-        }
+        List<String> ls = getListValues(HttpHeaders.ACCEPT_LANGUAGE);
+        
         List<String> newLs = new ArrayList<String>(); 
-        String[] ls =  values.get(0).split(",");
         Map<String, Float> prefs = new HashMap<String, Float>();
         for (String l : ls) {
             String[] pair = l.split(";");
@@ -112,7 +102,7 @@ public class HttpHeadersImpl implements HttpHeaders {
                 prefs.put(locale, 1F);
             }
         }
-        if (newLs.size() == 1) {
+        if (newLs.size() <= 1) {
             return newLs;
         }
         Collections.sort(newLs, new AcceptLanguageComparator(prefs));
@@ -121,18 +111,26 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public List<String> getRequestHeader(String name) {
-        List<String> values = headers.get(name); 
+        return getListValues(name);
+    }
+
+    private List<String> getListValues(String headerName) {
+        List<String> values = headers.get(headerName);
         if (values == null || values.isEmpty()) {
             return Collections.emptyList();
         }
-        List<String> hValues = new ArrayList<String>();
         String[] ls =  values.get(0).split(",");
-        for (String s : ls) {
-            hValues.add(s.trim());
+        if (ls.length == 1) {
+            return Collections.singletonList(ls[0].trim());
+        } else {
+            List<String> newValues = new ArrayList<String>();
+            for (String v : ls) {
+                newValues.add(v.trim());
+            }
+            return newValues;
         }
-        return hValues;
     }
-
+    
     private static class AcceptLanguageComparator implements Comparator<String> {
         private Map<String, Float> prefs;
         

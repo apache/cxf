@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.message.Message;
@@ -61,6 +62,17 @@ public class HttpHeadersImplTest extends Assert {
         assertEquals(hs.getFirst("Content-Type"), "*/*");
     }
 
+    public void testMediaType() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        EasyMock.expectLastCall().andReturn(createHeaders());
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        assertEquals(MediaType.valueOf("*/*"), h.getMediaType());
+    }
+    
+    @Test
     public void testGetHeader() throws Exception {
         
         Message m = control.createMock(Message.class);
@@ -86,7 +98,7 @@ public class HttpHeadersImplTest extends Assert {
         EasyMock.expectLastCall().andReturn(createHeaders());
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
-        assertEquals("UTF-8", h.getLanguage());
+        assertNull(h.getLanguage());
     }
     
         
@@ -152,5 +164,33 @@ public class HttpHeadersImplTest extends Assert {
         list.addAll(Arrays.asList(values));
         hs.put(name, list);
         return hs;
+    }
+    
+    @Test
+    public void testUnmodifiableRequestHeaders() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = 
+            createHeader(HttpHeaders.ACCEPT_LANGUAGE, 
+                         "en;q=0.7, en-gb;q=0.8, da");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> languages = h.getAcceptableLanguages();
+        assertEquals(3, languages.size());
+        languages.clear();
+        languages = h.getAcceptableLanguages();
+        assertEquals(3, languages.size());
+        
+        MultivaluedMap<String, String> rHeaders  = h.getRequestHeaders();
+        List<String> acceptL = rHeaders.get(HttpHeaders.ACCEPT_LANGUAGE);
+        assertEquals(3, acceptL.size());
+        try {
+            rHeaders.clear();
+            fail();
+        } catch (UnsupportedOperationException ex) {
+            // expected
+        }
     }
 }

@@ -164,6 +164,6 @@ public class FormEncodingProvider implements
         }
         MediaType mt = mc.getHttpHeaders().getMediaType();        
 
-        return mt.isCompatible(MULTIPART_FORM_DATA_TYPE);
+        return mt != null && mt.isCompatible(MULTIPART_FORM_DATA_TYPE);
     }
 }

@@ -317,7 +317,8 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         }
         if (mbr != null) {
             try {
-                return mbr.readFrom(cls, type, anns, contentType, r.getMetadata(), conn.getInputStream());
+                return mbr.readFrom(cls, type, anns, contentType, 
+                       new MetadataMap<String, Object>(r.getMetadata(), true, true), conn.getInputStream());
             } catch (Exception ex) {
                 throw new WebApplicationException();
             }
