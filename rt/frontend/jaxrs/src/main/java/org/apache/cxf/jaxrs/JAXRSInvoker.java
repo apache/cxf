@@ -46,7 +46,6 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -106,8 +105,6 @@ public class JAXRSInvoker extends AbstractInvoker {
                                             exchange.getInMessage());
         }
 
-        String baseAddress = HttpUtils.getOriginalAddress(exchange.getInMessage());
-
         List<Object> params = null;
         if (request instanceof List) {
             params = CastUtils.cast((List<?>)request);
@@ -125,10 +122,9 @@ public class JAXRSInvoker extends AbstractInvoker {
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), 
-                                                                     baseAddress,
                                                                      exchange.getInMessage());
             if (excResponse == null) {
-                ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();
+                ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
                 ClassResourceInfo criRoot =
                     (ClassResourceInfo)exchange.get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
                 if (criRoot != null) {
@@ -195,7 +191,6 @@ public class JAXRSInvoker extends AbstractInvoker {
                 return this.invoke(exchange, newParams, newResourceObjects);
             } catch (WebApplicationException ex) {
                 Response excResponse = JAXRSUtils.convertFaultToResponse(ex, 
-                                                                         baseAddress,
                                                                          exchange.getInMessage());
                 return new MessageContentsList(excResponse);
             }

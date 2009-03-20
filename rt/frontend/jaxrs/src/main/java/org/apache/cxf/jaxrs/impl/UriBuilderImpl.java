@@ -31,8 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
@@ -46,7 +44,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder {
     
-    private static final Pattern DECODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     
     private boolean encode;
     private String scheme;
@@ -88,7 +85,7 @@ public class UriBuilderImpl extends UriBuilder {
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
         if (encode) {
             for (int i = 0; i < values.length; i++) {
-                values[i] = decodePartiallyEncoded(values[i].toString());
+                values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
             }
         }
         return doBuild(encode, values);
@@ -96,11 +93,42 @@ public class UriBuilderImpl extends UriBuilder {
 
     private URI doBuild(boolean fromEncoded, Object... values) {
         try {
-            String path = buildPath(fromEncoded);
-            path = substituteVarargs(path, values);
-            return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
+            String thePath = buildPath(fromEncoded);
+            thePath = substituteVarargs(thePath, values);
+            return buildURI(fromEncoded, thePath);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
+        }
+    }
+    
+    private URI buildURI(boolean fromEncoded, String thePath) throws URISyntaxException {
+        String theQuery = buildQuery(fromEncoded);
+        // TODO : do encodePartiallyEncoded only once here, do not do it inside buildPath()
+        // buildFromEncoded and buildFromEncodedMap - we'll need to be careful such that 
+        // path '/' seperators are not encoded so probably we'll need to create PathSegments
+        // again if fromEncoded is set
+        if (fromEncoded) {
+            StringBuilder b = new StringBuilder();
+            b.append(scheme).append("://");
+            if (userInfo != null) {
+                b.append(userInfo).append('@');
+            }
+            b.append(host);
+            if (port != -1) {
+                b.append(':').append(port);    
+            }
+            if (thePath != null && thePath.length() > 0) {
+                b.append(thePath.startsWith("/") ? thePath : '/' + thePath);
+            }
+            if (theQuery != null && theQuery.length() != 0) {
+                b.append('?').append(theQuery);
+            }
+            if (fragment != null) {
+                b.append('#').append(fragment);
+            }
+            return new URI(b.toString());
+        } else {
+            return new URI(scheme, userInfo, host, port, thePath, theQuery, fragment);
         }
     }
     
@@ -127,20 +155,21 @@ public class UriBuilderImpl extends UriBuilder {
         if (encode) {
             Map<String, String> decodedMap = new HashMap<String, String>(map.size());
             for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
-                decodedMap.put(entry.getKey(), decodePartiallyEncoded(entry.getValue().toString()));
+                decodedMap.put(entry.getKey(), 
+                               HttpUtils.encodePartiallyEncoded(entry.getValue().toString(), false));
             }
             return doBuildFromMap(decodedMap, encode);
         } else {
             return doBuildFromMap(map, encode);
         }
     }
-
+    
     private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded) 
         throws IllegalArgumentException, UriBuilderException {
         try {
-            String path = buildPath(fromEncoded);
-            path = substituteMapped(path, map);
-            return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
+            String thePath = buildPath(fromEncoded);
+            thePath = substituteMapped(thePath, map);
+            return buildURI(fromEncoded, thePath);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
@@ -392,9 +421,9 @@ public class UriBuilderImpl extends UriBuilder {
         scheme = uri.getScheme();
         port = uri.getPort();
         host = uri.getHost();
-        setPathAndMatrix(uri.getPath());
+        setPathAndMatrix(uri.getRawPath());
         fragment = uri.getFragment();
-        query = JAXRSUtils.getStructuredParams(uri.getQuery(), "&", true);
+        query = JAXRSUtils.getStructuredParams(uri.getRawQuery(), "&", false);
         userInfo = uri.getUserInfo();
     }
 
@@ -414,6 +443,7 @@ public class UriBuilderImpl extends UriBuilder {
             PathSegment ps = iter.next();
             String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
+                p = fromEncoded ? new URITemplate(p).encodeLiteralCharacters() : p;
                 if (!p.startsWith("/")) {
                     sb.append('/');
                 }
@@ -427,26 +457,8 @@ public class UriBuilderImpl extends UriBuilder {
         return sb.toString();
     }
 
-    private String buildQuery() {
-        return buildParams(query, '&', false);
-    }
-
-    /**
-     * Decode partially encoded string. Decode only values that matches patter "percent char followed by two
-     * hexadecimal digits".
-     * 
-     * @param encoded fully or partially encoded string.
-     * @return decoded string
-     */
-    private String decodePartiallyEncoded(String encoded) {
-        Matcher m = DECODE_PATTERN.matcher(encoded);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String found = m.group();
-            m.appendReplacement(sb, HttpUtils.pathDecode(found));
-        }
-        m.appendTail(sb);
-        return sb.toString();
+    private String buildQuery(boolean fromEncoded) {
+        return buildParams(query, '&', fromEncoded);
     }
 
     /**
@@ -459,13 +471,14 @@ public class UriBuilderImpl extends UriBuilder {
      */
     private String buildParams(MultivaluedMap<String, String> map, char separator,
                                       boolean fromEncoded) {
+        boolean isQuery = separator == '&';
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
                 if (fromEncoded) {
-                    val = decodePartiallyEncoded(val);
+                    val = HttpUtils.encodePartiallyEncoded(val, isQuery);
                 }
                 b.append(entry.getKey()).append('=').append(val);
                 if (sit.hasNext() || it.hasNext()) {

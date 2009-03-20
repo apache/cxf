@@ -42,9 +42,14 @@ import org.apache.cxf.helpers.CastUtils;
 public class XMLSource {
     
     private InputSource source; 
+    private RuntimeException exceptionToThrow;
     
     public XMLSource(InputStream is) {
         source = new InputSource(is);
+    }
+    
+    public void setException(RuntimeException ex) {
+        exceptionToThrow = ex; 
     }
     
     public <T> T getNode(String expression, Class<T> cls) {
@@ -57,6 +62,9 @@ public class XMLSource {
         try {
             Node node = (Node)xpath.evaluate(expression, source, XPathConstants.NODE);
             if (node == null) {
+                if (exceptionToThrow != null) {
+                    throw exceptionToThrow;
+                }
                 return null;
             }
             DOMSource ds = new DOMSource(node);

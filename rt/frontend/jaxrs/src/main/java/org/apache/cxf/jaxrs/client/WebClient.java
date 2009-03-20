@@ -202,6 +202,7 @@ public class WebClient extends AbstractClient {
     }
     
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
+        
         Response r = doInvoke(httpMethod, body, responseClass);
         
         if (r.getStatus() >= 400) {
@@ -228,6 +229,7 @@ public class WebClient extends AbstractClient {
         for (Object o : values) {
             getCurrentBuilder().queryParam(name, o.toString());
         }
+        
         return this;
     }
     
@@ -378,6 +380,7 @@ public class WebClient extends AbstractClient {
         try {
             ResponseBuilder rb = setResponseBuilder(conn).clone();
             Response currentResponse = rb.clone().build();
+            
             Object entity = readBody(currentResponse, conn, m, responseClass, responseClass,
                                      new Annotation[]{});
             rb.entity(entity);

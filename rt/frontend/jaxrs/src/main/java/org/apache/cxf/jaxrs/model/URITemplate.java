@@ -268,6 +268,24 @@ public final class URITemplate {
         return sb.toString();
     }
 
+    /**
+     * Encoded literal characters surrounding template variables, 
+     * ex. "a {id} b" will be encoded to "a%20{id}%20b" 
+     * @return encoded value
+     */
+    public String encodeLiteralCharacters() {
+        StringBuilder sb = new StringBuilder();
+        Matcher matcher = TEMPLATE_NAMES_PATTERN.matcher(template);
+        int i = 0;
+        while (matcher.find()) {
+            sb.append(HttpUtils.encodePartiallyEncoded(template.substring(i, matcher.start()), false));
+            sb.append('{').append(matcher.group(1)).append('}');
+            i = matcher.end();
+        }
+        sb.append(HttpUtils.encodePartiallyEncoded(template.substring(i, template.length()), false));
+        return sb.toString();
+    }
+    
     public static URITemplate createTemplate(ClassResourceInfo cri, Path path) {
 
         if (path == null) {

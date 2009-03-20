@@ -163,7 +163,7 @@ public class UriInfoImpl implements UriInfo {
                         sum += "/" + (decode ? HttpUtils.pathDecode(v) : v);
                     }
                 }
-                UriBuilder ub = UriBuilder.fromPath(sum);
+                UriBuilder ub = UriBuilder.fromPath(sum).encode(decode);
                 objects.addAll(invocation.getTemplateValues());
                 uris.add(ub.build(objects.toArray()).normalize().getPath());
             }

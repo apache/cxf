@@ -45,7 +45,6 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -65,11 +64,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     public void handleMessage(Message message) {
         
-        String baseAddress = HttpUtils.getOriginalAddress(message.getExchange().getInMessage());
         try {
-            processResponse(message, baseAddress);
+            processResponse(message);
         } finally {
-            ProviderFactory.getInstance(baseAddress).clearThreadLocalProxies();
+            ProviderFactory.getInstance(message).clearThreadLocalProxies();
             ClassResourceInfo cri =
                 (ClassResourceInfo)message.getExchange().get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
             if (cri != null) {
@@ -80,7 +78,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     }
     
-    private void processResponse(Message message, String baseAddress) {
+    private void processResponse(Message message) {
         
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {
@@ -101,7 +99,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 .getName());
 
             List<ProviderInfo<ResponseHandler>> handlers = 
-                ProviderFactory.getInstance(baseAddress).getResponseHandlers();
+                ProviderFactory.getInstance(message).getResponseHandlers();
             for (ProviderInfo<ResponseHandler> rh : handlers) {
                 Response r = rh.getProvider().handleResponse(message, ori, response);
                 if (r != null) {
@@ -109,7 +107,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 }
             }
             
-            serializeMessage(message, response, ori, baseAddress, true);        
+            serializeMessage(message, response, ori, true);        
             
         } else {
             message.put(Message.RESPONSE_CODE, 204);
@@ -120,7 +118,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private void serializeMessage(Message message, 
                                   Response response, 
                                   OperationResourceInfo ori,
-                                  String baseAddress,
                                   boolean firstTry) {
         message.put(Message.RESPONSE_CODE, response.getStatus());
         Map<String, List<String>> theHeaders = 
@@ -148,7 +145,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         MessageBodyWriter writer = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
-            writer = ProviderFactory.getInstance(baseAddress)
+            writer = ProviderFactory.getInstance(message)
                 .createMessageBodyWriter(targetType, 
                       invoked != null ? invoked.getGenericReturnType() : null, 
                       invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
@@ -191,9 +188,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
         } catch (IOException ex) {
-            handleWriteException(message, response, ori, baseAddress, ex, responseObj, firstTry);
+            handleWriteException(message, response, ori, ex, responseObj, firstTry);
         } catch (Throwable ex) {
-            handleWriteException(message, response, ori, baseAddress, ex, responseObj, firstTry);
+            handleWriteException(message, response, ori, ex, responseObj, firstTry);
         }
     }
     
@@ -247,15 +244,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private void handleWriteException(Message message, 
                                          Response response, 
                                          OperationResourceInfo ori,
-                                         String baseAddress,
                                          Throwable ex,
                                          Object responseObj,
                                          boolean firstTry) {
         OutputStream out = message.getContent(OutputStream.class);
         if (firstTry) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, baseAddress, message);
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse != null) {
-                serializeMessage(message, excResponse, ori, baseAddress, false);
+                serializeMessage(message, excResponse, ori, false);
             }
         } else {
             message.put(Message.RESPONSE_CODE, 500);

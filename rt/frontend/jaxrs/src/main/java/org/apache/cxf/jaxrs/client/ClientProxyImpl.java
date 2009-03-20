@@ -52,7 +52,6 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Message;
@@ -170,16 +169,13 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         return index;
     }
     
-    private static void checkResponse(String basePath, Method m, Response r) throws Throwable {
+    private static void checkResponse(Method m, Response r, Message message) throws Throwable {
         
         int status = r.getStatus();
         
         if (status >= 400) {
             
-            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, basePath);
-            if (mapper == null) {
-                mapper = findExceptionMapper(m, "/");
-            }
+            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, message);
             if (mapper != null) {
                 Throwable t = mapper.fromResponse(r);
                 if (t != null) {
@@ -191,8 +187,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
     }
     
-    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, String base) {
-        ProviderFactory pf = ProviderFactory.getInstance(base);
+    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
+        ProviderFactory pf = ProviderFactory.getInstance(message);
         for (Class<?> exType : m.getExceptionTypes()) {
             ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
             if (mapper != null) {
@@ -241,7 +237,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> indexList =  getParameters(map, key);
         List<Object> list = new ArrayList<Object>(indexList.size());
         for (Parameter p : indexList) {
-            list.add(encode(p, params[p.getIndex()].toString()));
+            list.add(params[p.getIndex()].toString());
         }
         return list;
     }
@@ -258,7 +254,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> qs = getParameters(map, ParameterType.QUERY);
         for (Parameter p : qs) {
             if (params[p.getIndex()] != null) {
-                ub.queryParam(p.getValue(), encode(p, params[p.getIndex()].toString()));
+                ub.queryParam(p.getValue(), params[p.getIndex()].toString());
             }
         }
     }
@@ -268,7 +264,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> mx = getParameters(map, ParameterType.MATRIX);
         for (Parameter p : mx) {
             if (params[p.getIndex()] != null) {
-                ub.matrixParam(p.getValue(), encode(p, params[p.getIndex()].toString()));
+                ub.matrixParam(p.getValue(), params[p.getIndex()].toString());
             }
         }
     }
@@ -315,48 +311,36 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_CONTEXT_PARAMETERS");
         }
         
-        boolean isEncoded = AnnotationUtils.isEncoded(anns, ori);
         PathParam a = AnnotationUtils.getAnnotation(anns, PathParam.class); 
         if (a != null) {
-            return new Parameter(ParameterType.PATH, index, a.value(), isEncoded);
+            return new Parameter(ParameterType.PATH, index, a.value());
         } 
         
         QueryParam q = AnnotationUtils.getAnnotation(anns, QueryParam.class);
         if (q != null) {
-            return new Parameter(ParameterType.QUERY, index, q.value(), isEncoded);
+            return new Parameter(ParameterType.QUERY, index, q.value());
         }
         
         MatrixParam m = AnnotationUtils.getAnnotation(anns, MatrixParam.class);
         if (m != null) {
-            return new Parameter(ParameterType.MATRIX, index, m.value(), isEncoded);
+            return new Parameter(ParameterType.MATRIX, index, m.value());
         }  
     
         HeaderParam h = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
         if (h != null) {
-            return new Parameter(ParameterType.HEADER, index, h.value(), isEncoded);
+            return new Parameter(ParameterType.HEADER, index, h.value());
         }  
         
         Parameter p = null;
         CookieParam c = AnnotationUtils.getAnnotation(anns, CookieParam.class);
         if (c != null) {
-            p = new Parameter(ParameterType.COOKIE, index, c.value(), isEncoded);
+            p = new Parameter(ParameterType.COOKIE, index, c.value());
         } else {
-            p = new Parameter(ParameterType.REQUEST_BODY, index, null, isEncoded); 
+            p = new Parameter(ParameterType.REQUEST_BODY, index, null); 
         }
         
         return p;
         
-    }
-    
-    private static String encode(Parameter p, String value) {
-        if (p.isEncoded()) {
-            return value;
-        }
-        if (p.getType() == ParameterType.PATH || p.getType() == ParameterType.MATRIX) {
-            return HttpUtils.pathEncode(value);
-        } else {
-            return HttpUtils.urlEncode(value); 
-        }
     }
     
     private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
@@ -390,7 +374,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         throws Throwable {
         Response r = setResponseBuilder(connect).clone().build();
         Method method = ori.getMethodToInvoke();
-        checkResponse(getBaseURI().getPath(), method, r);
+        checkResponse(method, r, inMessage);
         if (method.getReturnType() == Void.class) { 
             return null;
         }
@@ -413,13 +397,11 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         private ParameterType type;
         private int ind;
         private String aValue;
-        private boolean isEncoded;
         
-        public Parameter(ParameterType type, int ind, String aValue, boolean encoded) {
+        public Parameter(ParameterType type, int ind, String aValue) {
             this.type = type;
             this.ind = ind;
             this.aValue = aValue; 
-            this.isEncoded = encoded;
         }
         
         public int getIndex() {
@@ -432,10 +414,6 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         public ParameterType getType() {
             return type;
-        }
-        
-        public boolean isEncoded() {
-            return isEncoded;
         }
     }
 

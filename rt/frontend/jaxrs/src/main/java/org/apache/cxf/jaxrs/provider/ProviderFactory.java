@@ -26,10 +26,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -37,6 +35,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -51,11 +50,7 @@ import org.apache.cxf.message.Message;
 
 public final class ProviderFactory {
     
-    private static final Map<String, ProviderFactory> FACTORIES = 
-        new HashMap<String, ProviderFactory>();
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
-    private static final ProviderFactory DEFAULT_FACTORY = new ProviderFactory(); 
-    private static final String SLASH = "/"; 
     
     static {
         SHARED_FACTORY.setProviders(new JAXBElementProvider(),
@@ -91,25 +86,14 @@ public final class ProviderFactory {
     }
     
     public static ProviderFactory getInstance() {
-        return getInstance("/");
+        return new ProviderFactory();
     }
     
-    public static ProviderFactory getInstance(String baseAddress) {
-        if (SLASH.equals(baseAddress)) {
-            return DEFAULT_FACTORY;
-        }
-        
-        ProviderFactory pf = null;
-        synchronized (ProviderFactory.class) { 
-            pf = FACTORIES.get(baseAddress);
-            if (pf == null) {
-                pf = new ProviderFactory();
-                FACTORIES.put(baseAddress, pf);
-            }
-        }
-        return pf;
+    public static ProviderFactory getInstance(Message m) {
+        Endpoint e = m.getExchange().get(Endpoint.class);
+        return (ProviderFactory)e.get(ProviderFactory.class.getName());
     }
-
+    
     public static ProviderFactory getSharedInstance() {
         return SHARED_FACTORY;
     }

@@ -36,6 +36,7 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -208,5 +209,17 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             LOG.severe(msg.toString());
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
+    }
+    
+    protected ProviderFactory setupFactory(Endpoint ep) { 
+        ProviderFactory factory = ProviderFactory.getInstance(); 
+        if (entityProviders != null) {
+            factory.setUserProviders(entityProviders); 
+        }
+        if (schemaLocations != null) {
+            factory.setSchemaLocations(schemaLocations);
+        }
+        ep.put(ProviderFactory.class.getName(), factory);
+        return factory;
     }
 }

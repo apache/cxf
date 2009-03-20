@@ -228,7 +228,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         // just to verify the interface call goes through CGLIB proxy too
         assertEquals("http://localhost:9080", WebClient.client(bs).getBaseURI().toString());
         Book b = bs.getBook("123");
-        assertEquals(b.getId(), 123);
+        assertEquals(b.getId(), 123L);
     }
     
     @Test

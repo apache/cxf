@@ -78,13 +78,15 @@ public class AbstractClient implements Client, InvocationHandlerAware {
     protected List<Interceptor> outInterceptors = new ModCountCopyOnWriteArrayList<Interceptor>();
     protected ConduitSelector conduitSelector;
     protected Bus bus;
-    
+
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
     private ResponseBuilder responseBuilder;
     
     private URI baseURI;
     private UriBuilder currentBuilder;
 
+    
+    
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
         this.currentBuilder = new UriBuilderImpl(currentURI).encode(true);
@@ -272,7 +274,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type")); 
         
-        MessageBodyWriter mbw = ProviderFactory.getInstance(baseURI.getPath()).createMessageBodyWriter(
+        MessageBodyWriter mbw = ProviderFactory.getInstance(m).createMessageBodyWriter(
             cls, type, anns, contentType, m);
         if (mbw == null) {
             mbw = ProviderFactory.getInstance().createMessageBodyWriter(
@@ -307,7 +309,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader mbr = ProviderFactory.getInstance(baseURI.getPath()).createMessageBodyReader(
+        MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
             cls, type, anns, contentType, inMessage);
         if (mbr == null) {
             ProviderFactory.getInstance().createMessageBodyReader(
@@ -424,6 +426,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         exchange.setOutMessage(m);
         exchange.put(Bus.class, bus);
         exchange.put(MessageObserver.class, new ClientMessageObserver());
+        exchange.put(Endpoint.class, conduitSelector.getEndpoint());
         exchange.setOneWay(false);
         m.setExchange(exchange);
         

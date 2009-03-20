@@ -39,13 +39,13 @@ public class ProvidersImpl implements MessageBodyWorkers {
     
     public <T> MessageBodyReader<T> getMessageBodyReader(
          Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createMessageBodyReader(
+        return ProviderFactory.getInstance(m).createMessageBodyReader(
             type, genericType, annotations, mediaType, m);
     }
 
     public <T> MessageBodyWriter<T> getMessageBodyWriter(
         Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ProviderFactory.getInstance((String)m.get(Message.BASE_PATH)).createMessageBodyWriter(
+        return ProviderFactory.getInstance(m).createMessageBodyWriter(
                    type, genericType, annotations, mediaType, m);
     }
 

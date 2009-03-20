@@ -27,6 +27,14 @@ import org.junit.Test;
 
 public class WebClientTest extends Assert {
 
+    @Test
+    public void testEncoding() {
+        URI u = WebClient.create("http://foo").path("bar+ %2B").matrix("a", "value+ ")
+            .query("b", "bv+ ").getCurrentURI();
+        System.out.println("'" + u.toString() + "'");
+        assertEquals("http://foo/bar+%20%2B;a=value+%20?b=bv%2B+", u.toString());
+    }
+    
     @Test 
     public void testBaseCurrentPath() {
         assertEquals(URI.create("http://foo"), WebClient.create("http://foo").getBaseURI());

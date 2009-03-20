@@ -42,6 +42,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.xml.bind.JAXBContext;
 
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerGender;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
@@ -65,6 +66,8 @@ import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -523,7 +526,7 @@ public class JAXRSUtilsTest extends Assert {
         Class[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
         Method m = Customer.class.getMethod("testFromStringParam", argType);
         UUID u = UUID.randomUUID();
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=" + u.toString() + "&p2=1&p3=2");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
@@ -537,11 +540,12 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testCustomerParameter() throws Exception {
-        ProviderFactory.getInstance().registerUserProvider(
+        Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
         Class[] argType = {Customer.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        
         messageImpl.put(Message.QUERY_STRING, "p1=Fred");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
@@ -555,7 +559,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testWrongType() throws Exception {
         Class[] argType = {HashMap.class};
         Method m = Customer.class.getMethod("testWrongType", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=1");
         try {
             JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
@@ -864,7 +868,7 @@ public class JAXRSUtilsTest extends Assert {
         
         Customer c = new Customer();
         
-        Message m = new MessageImpl();
+        Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
         
         InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
@@ -883,7 +887,7 @@ public class JAXRSUtilsTest extends Assert {
         Customer c = new Customer();
         cri.setResourceProvider(new SingletonResourceProvider(c));
         
-        Message m = new MessageImpl();
+        Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
         ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
@@ -1001,10 +1005,10 @@ public class JAXRSUtilsTest extends Assert {
                                          cri);
         ori.setHttpMethod("GET");
         
+        Message m = createMessage();
         ContextResolver<JAXBContext> cr = new JAXBContextProvider();
-        ProviderFactory.getInstance().registerUserProvider(cr);
+        ProviderFactory.getInstance(m).registerUserProvider(cr);
         
-        Message m = new MessageImpl();
         m.put(Message.BASE_PATH, "/");    
         List<Object> params = 
             JAXRSUtils.processParameters(ori, new MetadataMap<String, String>(), m);
@@ -1019,11 +1023,11 @@ public class JAXRSUtilsTest extends Assert {
         cri.setResourceProvider(new PerRequestResourceProvider(Customer.class));
         OperationResourceInfo ori = new OperationResourceInfo(null, cri);
         
+        Message m = createMessage();
         Customer c = new Customer();
         ContextResolver<JAXBContext> cr = new JAXBContextProvider();
-        ProviderFactory.getInstance().registerUserProvider(cr);
+        ProviderFactory.getInstance(m).registerUserProvider(cr);
         
-        Message m = new MessageImpl();
         m.put(Message.BASE_PATH, "/");    
         InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
         assertSame(cr.getClass(), c.getContextResolver().getClass());
@@ -1046,7 +1050,7 @@ public class JAXRSUtilsTest extends Assert {
         EasyMock.replay(response);
         EasyMock.replay(context);
         
-        Message m = new MessageImpl();
+        Message m = createMessage();
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, context);
@@ -1084,7 +1088,7 @@ public class JAXRSUtilsTest extends Assert {
         values.putSingle("id1", "1");
         values.putSingle("id2", "2");
         
-        Message m = new MessageImpl();
+        Message m = createMessage();
         
         
         List<Object> params = 
@@ -1116,5 +1120,19 @@ public class JAXRSUtilsTest extends Assert {
         }
         
         return null;
+    }
+    
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
     }
 }

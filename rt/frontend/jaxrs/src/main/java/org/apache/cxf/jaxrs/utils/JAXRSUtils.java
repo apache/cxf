@@ -507,13 +507,11 @@ public final class JAXRSUtils {
                 }
             }
             
-            String basePath = HttpUtils.getOriginalAddress(m);
-            
             if ("".equals(key)) {
                 return InjectionUtils.handleBean(pClass, 
                                                  params, 
                                                  ParameterType.MATRIX,
-                                                 basePath);
+                                                 m);
             } else {
                 List<String> values = params.get(key);
                 return InjectionUtils.createParameterObject(values, 
@@ -522,7 +520,7 @@ public final class JAXRSUtils {
                                                             defaultValue,
                                                             false,
                                                             ParameterType.MATRIX,
-                                                            basePath);
+                                                            m);
             }
         }
         
@@ -545,14 +543,13 @@ public final class JAXRSUtils {
         if (values != null && values.isEmpty()) {
             values = null;
         }
-        String basePath = HttpUtils.getOriginalAddress(m);
         return InjectionUtils.createParameterObject(values, 
                                                     pClass, 
                                                     genericType,
                                                     defaultValue,
                                                     false,
                                                     ParameterType.HEADER,
-                                                    basePath);
+                                                    m);
              
         
     }
@@ -573,8 +570,7 @@ public final class JAXRSUtils {
             return c;
         }
         
-        String basePath = HttpUtils.getOriginalAddress(m);
-        return InjectionUtils.handleParameter(c.getValue(), pClass, ParameterType.COOKIE, basePath);
+        return InjectionUtils.handleParameter(c.getValue(), pClass, ParameterType.COOKIE, m);
     }
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
@@ -613,7 +609,7 @@ public final class JAXRSUtils {
     
     public static ContextResolver<?> createContextResolver(Type genericType, Message m) {
         if (genericType instanceof ParameterizedType) {
-            return ProviderFactory.getInstance(HttpUtils.getOriginalAddress(m)).createContextResolver(
+            return ProviderFactory.getInstance(m).createContextResolver(
                       ((ParameterizedType)genericType).getActualTypeArguments()[0], m);
         }
         return null;
@@ -652,10 +648,9 @@ public final class JAXRSUtils {
                                            String defaultValue,
                                            boolean  decoded) {
         
-        String basePath = HttpUtils.getOriginalAddress(m);
         String parameterName = uriParamAnnotation.value();
         if ("".equals(parameterName)) {
-            return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, basePath);
+            return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, m);
         } else {
             List<String> results = values.get(parameterName);
             return InjectionUtils.createParameterObject(results, 
@@ -664,7 +659,7 @@ public final class JAXRSUtils {
                                                     defaultValue,
                                                     decoded,
                                                     ParameterType.PATH,
-                                                    basePath);
+                                                    m);
         }
     }
     
@@ -679,11 +674,10 @@ public final class JAXRSUtils {
                                           boolean decode) {
         String queryName = queryParam.value();
 
-        String basePath = HttpUtils.getOriginalAddress(m);
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, 
                                              new UriInfoImpl(m, null).getQueryParameters(),
-                                             ParameterType.QUERY, basePath);
+                                             ParameterType.QUERY, m);
         } else {
             List<String> results = getStructuredParams((String)m.get(Message.QUERY_STRING),
                                        "&",
@@ -694,7 +688,7 @@ public final class JAXRSUtils {
                                                         genericType,
                                                         defaultValue,
                                                         false,
-                                                        ParameterType.QUERY, basePath);
+                                                        ParameterType.QUERY, m);
              
         }
     }
@@ -744,7 +738,7 @@ public final class JAXRSUtils {
         
         MessageBodyReader provider = null;
         for (MediaType type : types) { 
-            provider = ProviderFactory.getInstance(HttpUtils.getOriginalAddress(m))
+            provider = ProviderFactory.getInstance(m)
                 .createMessageBodyReader(targetTypeClass,
                                          parameterType,
                                          parameterAnnotations,
@@ -908,10 +902,10 @@ public final class JAXRSUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static Response convertFaultToResponse(Throwable ex, String baseAddress, Message inMessage) {
+    public static Response convertFaultToResponse(Throwable ex, Message inMessage) {
         
         ExceptionMapper mapper = 
-            ProviderFactory.getInstance(baseAddress).createExceptionMapper(ex.getClass(), inMessage);
+            ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
             Response excResponse = mapper.toResponse(ex);
             if (excResponse != null) {

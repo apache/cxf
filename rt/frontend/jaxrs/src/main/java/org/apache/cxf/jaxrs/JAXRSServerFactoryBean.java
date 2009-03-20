@@ -94,14 +94,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.getService().setInvoker(invoker);
             }
             
-            if (entityProviders != null) {
-                ProviderFactory.getInstance(getAddress()).setUserProviders(entityProviders); 
-            }
-            if (schemaLocations != null) {
-                ProviderFactory.getInstance(getAddress()).setSchemaLocations(schemaLocations);
-            }
+            ProviderFactory factory = setupFactory(ep);
             
-            ProviderFactory.getInstance(getAddress()).setRequestPreprocessor(
+            factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
             
             
