@@ -121,14 +121,35 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", new URI("http://zzz/foo%2525/bar%25"), newUri);
     }
 
-    
+
+    @Test
+    public void testBuildValuesPctEncoded() throws Exception {
+        URI uri = new URI("http://zzz");
+        URI newUri = new UriBuilderImpl(uri).encode(true).path("/{a}/{b}/{c}")
+            .build("foo%25", "bar%", "baz%20");
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%25/bar%25/baz%20"), newUri);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testBuildFromMapValues() throws Exception {
+        URI uri = new URI("http://zzz");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("b", "foo");
+        map.put("a", "bar");
+        Map<String, String> immutable = Collections.unmodifiableMap(map);
+        URI newUri = new UriBuilderImpl(uri).path("/{b}/{a}/{b}").build((Map)immutable);
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo/bar/foo"), newUri);
+    }
+
+    @SuppressWarnings("unchecked")
     @Test(expected = IllegalArgumentException.class)
     public void testBuildFromMapMissingValues() throws Exception {
         URI uri = new URI("http://zzz");
         Map<String, String> map = new HashMap<String, String>();
         map.put("b", "foo");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
-        new UriBuilderImpl(uri).path("/{b}/{a}/{b}").build(immutable);
+        new UriBuilderImpl(uri).path("/{b}/{a}/{b}").build((Map)immutable);
     }
 
 
@@ -308,7 +329,14 @@ public class UriBuilderImplTest extends Assert {
     }
 
     
+    
     @Test
+    public void testPctEncodedMatrixParam() throws Exception {
+        URI uri = new URI("http://foo/bar");
+        URI newUri = new UriBuilderImpl(uri).matrixParam("p1", "v1%20").encode(true).build();
+        assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=v1%20"), newUri);
+    }
+
     public void testReplaceMatrixParamExisting() throws Exception {
         URI uri = new URI("http://foo/bar;p1=v1");
         URI newUri = new UriBuilderImpl(uri).replaceMatrixParams("p1=nv1").build();
@@ -322,11 +350,6 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", new URI("http://foo/bar;p1=nv1;p1=nv2;p2=v2"), newUri);
     }
 
-    @Test
-    public void testMatrixNonFinalPathSegment() throws Exception {
-        URI uri = new URI("http://blah/foo;p1=v1/bar");
-        URI newUri = new UriBuilderImpl(uri).build();
-        assertEquals("URI is not built correctly", new URI("http://blah/foo/bar"), newUri);
-    }
+    
     
 }

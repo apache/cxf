@@ -62,7 +62,7 @@ public final class FormUtils {
                 if (keyValue.length == 2) {
                     if (decode) {
                         params.add(keyValue[0], 
-                            JAXRSUtils.uriDecode(keyValue[1]));
+                            HttpUtils.urlDecode(keyValue[1]));
                     } else {
                         params.add(keyValue[0], keyValue[1]);
                     }
@@ -86,7 +86,7 @@ public final class FormUtils {
             String name = cd.getParameter("name").replace("\"", "").replace("'", "");
             try {
                 String value = IOUtils.toString(a.getDataHandler().getInputStream());
-                params.add(name, decode ? JAXRSUtils.uriDecode(value) : value);
+                params.add(name, decode ? HttpUtils.urlDecode(value) : value);
             } catch (IOException ex) {
                 throw new WebApplicationException(415);
             }

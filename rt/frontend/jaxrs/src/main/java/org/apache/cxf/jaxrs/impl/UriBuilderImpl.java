@@ -31,6 +31,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
@@ -39,10 +41,14 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder {
-
+    
+    private static final Pattern DECODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
+    
+    private boolean encode;
     private String scheme;
     private String userInfo;
     private int port;
@@ -70,35 +76,34 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public URI build() throws UriBuilderException {
-        try {
-            return new URI(scheme, userInfo, host, port, buildPath(), buildQuery(), fragment);
-        } catch (URISyntaxException ex) {
-            throw new UriBuilderException("URI can not be built", ex);
-        }
+        return build(new Object[]{});
     }
 
     @Override
     public URI build(Map<String, Object> map) throws IllegalArgumentException, UriBuilderException {
-        try {
-            String path = buildPath();
-            path = substituteMapped(path, map);
-            return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
-        } catch (URISyntaxException ex) {
-            throw new UriBuilderException("URI can not be built", ex);
-        }
+        return buildFromMap(map);
     }
 
     @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
+        if (encode) {
+            for (int i = 0; i < values.length; i++) {
+                values[i] = decodePartiallyEncoded(values[i].toString());
+            }
+        }
+        return doBuild(encode, values);
+    }
+
+    private URI doBuild(boolean fromEncoded, Object... values) {
         try {
-            String path = buildPath();
+            String path = buildPath(fromEncoded);
             path = substituteVarargs(path, values);
             return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
     }
-
+    
     private String substituteVarargs(String path, Object... values) {
         Map<String, String> varValueMap = new HashMap<String, String>();
         URITemplate templ = new URITemplate(path);
@@ -117,6 +122,30 @@ public class UriBuilderImpl extends UriBuilder {
         return templ.substitute(varValueMap);
     }
 
+    private URI buildFromMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
+        UriBuilderException {
+        if (encode) {
+            Map<String, String> decodedMap = new HashMap<String, String>(map.size());
+            for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
+                decodedMap.put(entry.getKey(), decodePartiallyEncoded(entry.getValue().toString()));
+            }
+            return doBuildFromMap(decodedMap, encode);
+        } else {
+            return doBuildFromMap(map, encode);
+        }
+    }
+
+    private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded) 
+        throws IllegalArgumentException, UriBuilderException {
+        try {
+            String path = buildPath(fromEncoded);
+            path = substituteMapped(path, map);
+            return new URI(scheme, userInfo, host, port, path, buildQuery(), fragment);
+        } catch (URISyntaxException ex) {
+            throw new UriBuilderException("URI can not be built", ex);
+        }
+    }
+    
     private String substituteMapped(String path, Map<String, ? extends Object> varValueMap) {
         URITemplate templ = new URITemplate(path);
         Set<String> uniqueVars = new HashSet<String>(templ.getVariables());
@@ -131,14 +160,24 @@ public class UriBuilderImpl extends UriBuilder {
     // CHECKSTYLE:OFF
     @Override
     public UriBuilder clone() {
-        return new UriBuilderImpl(build());
+        UriBuilderImpl builder = new UriBuilderImpl();
+        builder.scheme = scheme;
+        builder.userInfo = userInfo;
+        builder.port = port;
+        builder.host = host;
+        builder.paths = new ArrayList<PathSegment>(paths);
+        builder.fragment = fragment;
+        builder.query = new MetadataMap<String, String>(query);
+        builder.matrix = new MetadataMap<String, String>(matrix);
+        builder.encode = encode;
+        return builder;
     }
 
     // CHECKSTYLE:ON
 
     @Override
     public UriBuilder encode(boolean enable) {
-        //this.encode = enable;
+        this.encode = enable;
         return this;
     }
 
@@ -368,27 +407,46 @@ public class UriBuilderImpl extends UriBuilder {
         }
     }
     
-    private String buildPath() {
+    private String buildPath(boolean fromEncoded) {
         StringBuilder sb = new StringBuilder();
         Iterator<PathSegment> iter = paths.iterator();
         while (iter.hasNext()) {
-            String p = iter.next().getPath();
+            PathSegment ps = iter.next();
+            String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
                 if (!p.startsWith("/")) {
                     sb.append('/');
                 }
                 sb.append(p);
+                if (iter.hasNext()) {
+                    buildMatrix(sb, ps.getMatrixParameters(), fromEncoded);
+                }
             }
         }
-        if (!matrix.isEmpty()) {
-            sb.append(';');
-            sb.append(buildParams(matrix, ';'));
-        }
+        buildMatrix(sb, matrix, fromEncoded);
         return sb.toString();
     }
 
     private String buildQuery() {
-        return buildParams(query, '&');
+        return buildParams(query, '&', false);
+    }
+
+    /**
+     * Decode partially encoded string. Decode only values that matches patter "percent char followed by two
+     * hexadecimal digits".
+     * 
+     * @param encoded fully or partially encoded string.
+     * @return decoded string
+     */
+    private String decodePartiallyEncoded(String encoded) {
+        Matcher m = DECODE_PATTERN.matcher(encoded);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String found = m.group();
+            m.appendReplacement(sb, HttpUtils.pathDecode(found));
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     /**
@@ -396,14 +454,19 @@ public class UriBuilderImpl extends UriBuilder {
      * 
      * @param map query or matrix multivalued map
      * @param separator params separator, '&' for query ';' for matrix
+     * @param fromEncoded if true then values will be decoded 
      * @return stringified params.
      */
-    private String buildParams(MultivaluedMap<String, String> map, char separator) {
+    private String buildParams(MultivaluedMap<String, String> map, char separator,
+                                      boolean fromEncoded) {
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
+                if (fromEncoded) {
+                    val = decodePartiallyEncoded(val);
+                }
                 b.append(entry.getKey()).append('=').append(val);
                 if (sit.hasNext() || it.hasNext()) {
                     b.append(separator);
@@ -413,5 +476,17 @@ public class UriBuilderImpl extends UriBuilder {
         return b.length() > 0 ? b.toString() : null;
     }
     
-    
+    /**
+     * Builds param string for matrix part of URI.
+     * 
+     * @param sb buffer to add the matrix part to, will get ';' added if map is not empty 
+     * @param map matrix multivalued map
+     */    
+    private void buildMatrix(StringBuilder sb, MultivaluedMap<String, String> map,
+                                    boolean fromEncoded) {
+        if (!map.isEmpty()) {
+            sb.append(';');
+            sb.append(buildParams(map, ';', fromEncoded));
+        }
+    }
 }

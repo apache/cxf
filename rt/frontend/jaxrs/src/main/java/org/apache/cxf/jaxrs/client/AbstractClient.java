@@ -87,7 +87,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
 
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
-        this.currentBuilder = new UriBuilderImpl(currentURI);
+        this.currentBuilder = new UriBuilderImpl(currentURI).encode(true);
     }
     
     public Client header(String name, Object... values) {

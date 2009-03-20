@@ -23,6 +23,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
@@ -35,7 +36,7 @@ public class PathSegmentImpl implements PathSegment {
     }
     
     public PathSegmentImpl(String path, boolean decode) {
-        this.path = decode ? JAXRSUtils.uriDecode(path) : path;
+        this.path = decode ? HttpUtils.pathDecode(path) : path;
     }
     
     public MultivaluedMap<String, String> getMatrixParameters() {
