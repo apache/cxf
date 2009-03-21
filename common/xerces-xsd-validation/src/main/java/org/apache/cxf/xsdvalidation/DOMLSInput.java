@@ -53,7 +53,7 @@ class DOMLSInput implements LSInput {
         StreamResult result = new StreamResult(writer);
         transformer.transform(source, result);
         data = writer.toString();
-        LOG.warning(systemId + ": " + data);
+        LOG.fine(systemId + ": " + data);
         
     }
 
