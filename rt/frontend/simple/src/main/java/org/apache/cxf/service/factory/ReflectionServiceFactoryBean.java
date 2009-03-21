@@ -52,6 +52,9 @@ import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.DOMError;
+import org.w3c.dom.DOMErrorHandler;
+
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
@@ -62,6 +65,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
+import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.databinding.source.mime.MimeSerializer;
@@ -157,6 +161,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private boolean populateFromClass;
     private boolean anonymousWrappers;
     private boolean qualifiedSchemas = true;
+    private boolean validate;
 
     private List<AbstractFeature> features;
     
@@ -164,8 +169,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
     private String styleCache;
     private Boolean defWrappedCache;
-    
-    
     
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
@@ -400,12 +403,16 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
         }
-        if (LOG.isLoggable(Level.FINE)) {
+        if (LOG.isLoggable(Level.FINE) || isValidate()) {
             ServiceModelSchemaValidator validator = new ServiceModelSchemaValidator(serviceInfo);
             validator.walk();
             String validationComplaints = validator.getComplaints();
             if (!"".equals(validationComplaints)) {
-                LOG.fine(validationComplaints);
+                if (isValidate()) {
+                    LOG.warning(validationComplaints);
+                } else {
+                    LOG.fine(validationComplaints);
+                }
             }
         }
     }
@@ -430,11 +437,21 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         } else {
             buildServiceFromClass();
         }
-        // validateServiceModel();
+        
+        if (isValidate()) {
+            validateServiceModel();
+        }
     }
 
     public void validateServiceModel() {
+        
+        XmlSchemaValidationManager xsdValidator = getBus().getExtension(XmlSchemaValidationManager.class);
+        
         for (ServiceInfo si : getService().getServiceInfos()) {
+            if (xsdValidator != null) {
+                validateSchemas(xsdValidator, si.getXmlSchemaCollection());
+            }
+            
             for (OperationInfo opInfo : si.getInterface().getOperations()) {
                 for (MessagePartInfo mpi : opInfo.getInput().getMessageParts()) {
                     assert mpi.getXmlSchema() != null;
@@ -487,6 +504,23 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
 
             }
+        }
+    }
+
+    private void validateSchemas(XmlSchemaValidationManager xsdValidator, 
+                                 SchemaCollection xmlSchemaCollection) {
+        final boolean[] anyErrors = new boolean[1];
+        anyErrors[0] = false;
+        xsdValidator.validateSchemas(xmlSchemaCollection.getXmlSchemaCollection(), new DOMErrorHandler() {
+
+            public boolean handleError(DOMError error) {
+                anyErrors[0] = true;
+                LOG.warning(error.getMessage());
+                return true;
+            }
+        });
+        if (anyErrors[0]) {
+            throw new ServiceConstructionException(new Message("XSD_VALIDATION_ERROR", LOG));
         }
     }
 
@@ -2292,5 +2326,18 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     public void setFeatures(List<AbstractFeature> f) {
         this.features = f;
+    }
+
+    private boolean isValidate() {
+        return validate || System.getProperty("cxf.validateServiceSchemas", "false").equals("true");
+    }
+
+    /**
+     * If 'validate' is true, this class will validate the service. It will report problems
+     * with the service model and the XML schema for the service.
+     * @param validate
+     */
+    public void setValidate(boolean validate) {
+        this.validate = validate;
     }
 }
