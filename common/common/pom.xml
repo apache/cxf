@@ -153,7 +153,13 @@
             <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
             <scope>test</scope>
         </dependency>
-
+	<dependency>
+<!-- this is probably not quite what we want in terms of the behavior of the other tests 
+     than the schema surgery test. -->
+	  <groupId>xerces</groupId>
+	  <artifactId>xercesImpl</artifactId>
+	  <scope>test</scope>
+	</dependency>
     </dependencies>
 
     <scm>

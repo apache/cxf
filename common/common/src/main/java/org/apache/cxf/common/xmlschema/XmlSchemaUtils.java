@@ -224,6 +224,23 @@ public final class XmlSchemaUtils {
         inc.add(imp);
         schema.getItems().add(imp);
     }
+    
+    /**
+     * For convenience, start from a qname, and add the import if it is non-null
+     * and has a namespace.
+     * @see #addImportIfNeeded(XmlSchema, String)
+     * @param schema
+     * @param qname
+     */
+    public static void addImportIfNeeded(XmlSchema schema, QName qname) {
+        if (qname == null) {
+            return;
+        }
+        if (qname.getNamespaceURI() == null) {
+            return;
+        }
+        addImportIfNeeded(schema, qname.getNamespaceURI());
+    }
 
     /**
      * This copes with an observed phenomenon in the schema built by the
@@ -636,7 +653,7 @@ public final class XmlSchemaUtils {
         throw new UnsupportedConstruct(message);
         
     }
-
+    
     public static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
         Message message = new Message(messageKey, LOG, subject.getQName(), 
                                       cleanedUpSchemaSource(subject));
