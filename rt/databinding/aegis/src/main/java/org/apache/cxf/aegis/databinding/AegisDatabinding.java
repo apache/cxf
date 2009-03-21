@@ -500,6 +500,8 @@ public class AegisDatabinding
                 schemaInfo.setSchema(schema);
                 si.addSchema(schemaInfo);
             }
+            // it's quite likely that the code in Aegis missed at least one ...
+            si.getXmlSchemaCollection().addCrossImports();
         }
     }
     

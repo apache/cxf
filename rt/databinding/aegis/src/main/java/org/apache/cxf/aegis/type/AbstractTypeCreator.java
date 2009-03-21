@@ -163,7 +163,18 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
             QName name = info.getTypeName();
             if (name == null) {
-                name = createQName(info.getTypeClass());
+                // We do not want to use the java.lang.whatever schema type.
+                // If the @ annotation or XML file didn't specify a schema type,
+                // but the natural type has a schema type mapping, we use that rather
+                // than create nonsense.
+                if (info.getTypeClass().getPackage().getName().startsWith("java")) {
+                    name = tm.getTypeQName(info.getTypeClass());
+                }
+                // if it's still null, we'll take our lumps, but probably end up wih
+                // an invalid schema.
+                if (name == null) {
+                    name = createQName(info.getTypeClass());
+                }
             }
 
             type.setSchemaType(name);

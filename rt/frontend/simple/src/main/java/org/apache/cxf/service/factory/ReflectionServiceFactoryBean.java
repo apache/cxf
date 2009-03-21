@@ -510,17 +510,20 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private void validateSchemas(XmlSchemaValidationManager xsdValidator, 
                                  SchemaCollection xmlSchemaCollection) {
         final boolean[] anyErrors = new boolean[1];
+        final StringBuilder errorBuilder = new StringBuilder();
         anyErrors[0] = false;
         xsdValidator.validateSchemas(xmlSchemaCollection.getXmlSchemaCollection(), new DOMErrorHandler() {
 
             public boolean handleError(DOMError error) {
                 anyErrors[0] = true;
+                errorBuilder.append(error.getMessage());
                 LOG.warning(error.getMessage());
                 return true;
             }
         });
         if (anyErrors[0]) {
-            throw new ServiceConstructionException(new Message("XSD_VALIDATION_ERROR", LOG));
+            throw new ServiceConstructionException(new Message("XSD_VALIDATION_ERROR", LOG,
+                                                               errorBuilder.toString()));
         }
     }
 
