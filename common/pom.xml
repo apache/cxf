@@ -37,8 +37,8 @@
         <module>schemas</module>
         <module>xjc</module>
 	<module>wstx-msv-validation</module>
+	<module>xerces-xsd-validation</module>
     </modules>
-
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common</connection>
