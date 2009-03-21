@@ -89,7 +89,12 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             SOAPPart part = soapMessage.getSOAPPart();
             
             Document node = (Document) message.getContent(Node.class);
-            StaxUtils.copy(node, new W3CDOMStreamWriter(part));
+            if (node == null) {
+                // replicate 2.1 behavior.
+                part.setContent(new DOMSource(null));
+            } else {
+                StaxUtils.copy(node, new W3CDOMStreamWriter(part));
+            }
 
             
             // TODO: setup mime headers
