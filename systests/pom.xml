@@ -38,7 +38,6 @@
 	  <plugins>
 		<plugin>
 			<artifactId>maven-resources-plugin</artifactId>
-			<version>2.3</version>
 			<executions>
 				<execution>
 					<id>copy-resources</id>
@@ -60,20 +59,9 @@
 					</configuration>
 				</execution>
 			</executions>
-		</plugin>
+	    </plugin>
 	
-       
-	   <!--  resources>
-		  <resource>
-			<targetPath>${basedir}/target/test-classes/schemaorg_apache_xmlbeans</targetPath>
-			<directory>${basedir}/target/generated/src/test/java/schemaorg_apache_xmlbeans</directory>
-			<includes>
-				<include> **/*.xsb </include>
-				<include> **/*.class </include>
-			</includes>
-		  </resource>
-	    </resources> 
-        <plugins-->
+        
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
