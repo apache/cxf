@@ -46,8 +46,8 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.staxutils.StaxUtils;
 
-@Produces({"application/xml", "text/xml" })
-@Consumes({"application/xml", "text/xml" })
+@Produces({"application/xml", "application/*+xml", "text/xml" })
+@Consumes({"application/xml", "application/*+xml", "text/xml" })
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     

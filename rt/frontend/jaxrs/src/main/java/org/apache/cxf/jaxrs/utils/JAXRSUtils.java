@@ -881,8 +881,19 @@ public final class JAXRSUtils {
 
         for (MediaType requiredType : requiredMediaTypes) {
             for (MediaType userType : userMediaTypes) {
-                if (requiredType.isCompatible(userType) || userType.isCompatible(requiredType)) {
-                    
+                boolean isCompatible = 
+                    requiredType.isCompatible(userType) || userType.isCompatible(requiredType);
+                if (!isCompatible && requiredType.getType().equalsIgnoreCase(userType.getType())) {
+                    // check if we have composite subtypes
+                    String[] subtypes1 = requiredType.getSubtype().split("\\+");
+                    String[] subtypes2 = userType.getSubtype().split("\\+");
+                    if (subtypes1.length == 2 && subtypes2.length == 2
+                        && subtypes1[1].equalsIgnoreCase(subtypes2[1])
+                        && (subtypes1[0].equals("*") || subtypes2[0].equals("*"))) {
+                        isCompatible = true;
+                    }
+                }
+                if (isCompatible) {
                     boolean parametersMatched = true;
                     for (Map.Entry<String, String> entry : userType.getParameters().entrySet()) {
                         String value = requiredType.getParameters().get(entry.getKey());

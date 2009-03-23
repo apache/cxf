@@ -89,6 +89,20 @@ public class TestResource {
     public String readMethod2() {
         return "This is a list method";
     }
+    
+    @GET
+    @Path("{id:custom}")
+    @Produces("application/bar")
+    public String readBar() {
+        return "This is a bar method";
+    }
+    
+    @GET
+    @Path("{id:custom}")
+    @Produces("application/foo")
+    public String readFoo() {
+        return "This is a foo method";
+    }
 }
 
 

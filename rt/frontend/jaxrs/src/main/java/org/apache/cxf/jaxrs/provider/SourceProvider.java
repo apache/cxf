@@ -48,8 +48,8 @@ import org.w3c.dom.Document;
 import org.apache.cxf.jaxrs.utils.XMLSource;
 
 @Provider
-@Produces({"application/xml", "text/xml" })
-@Consumes({"application/xml", "text/xml" })
+@Produces({"application/xml", "application/*+xml", "text/xml" })
+@Consumes({"application/xml", "application/*+xml", "text/xml" })
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 
