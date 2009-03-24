@@ -88,6 +88,19 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         assertEquals(3, handlers.size());
     }
     
+    @Test
+    public void testFindHandlerChainAnnotationPerPortServiceBindingWildcard() {
+        HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
+        AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
+        QName portQName = new QName("http://apache.org/handler_test", "SoapPortWildcard");
+        QName serviceQName = new QName("http://apache.org/handler_test", "SoapServiceWildcard");
+        String bindingID = "BindingUnknow";
+        List<Handler> handlers = chainBuilder
+            .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
+        assertNotNull(handlers);
+        assertEquals(7, handlers.size());
+    }
+    
     public static class TestLogicalHandler implements LogicalHandler {
         Map config;
         boolean initCalled;
