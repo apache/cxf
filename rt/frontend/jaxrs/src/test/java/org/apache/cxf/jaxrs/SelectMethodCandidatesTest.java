@@ -153,4 +153,51 @@ public class SelectMethodCandidatesTest extends Assert {
                      ori.getMethodToInvoke().getName());
         
     }
+    
+    @Test
+    public void testSelectBar() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values);
+        
+        String contentTypes = "*/*";
+        String acceptContentTypes = "application/bar,application/foo";
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                    values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                    "GET", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("readBar", ori.getMethodToInvoke().getName());
+        acceptContentTypes = "application/foo,application/bar";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                    values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                    "GET", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("readFoo", ori.getMethodToInvoke().getName());
+        
+        acceptContentTypes = "application/foo;q=0.5,application/bar";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                    values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                    "GET", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("readBar", ori.getMethodToInvoke().getName());
+        
+        acceptContentTypes = "application/foo,application/bar;q=0.5";
+        resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values);
+        ori = JAXRSUtils.findTargetMethod(resource, 
+                                    values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                    "GET", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("readFoo", ori.getMethodToInvoke().getName());
+        
+    }
 }

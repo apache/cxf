@@ -448,7 +448,7 @@ public class BookStore {
 
     @GET
     @Path("/cdwithmultitypes/{CDId}/")
-    @ProduceMime({"application/xml", "application/json" }) 
+    @ProduceMime({"application/xml", "application/bar+xml", "application/json" }) 
     public CD getCDWithMultiContentTypes(@PathParam("CDId") String id) {
         CD cd = cds.get(Long.parseLong(id));
 

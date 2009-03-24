@@ -48,8 +48,8 @@ import org.w3c.dom.Document;
 import org.apache.cxf.jaxrs.utils.XMLSource;
 
 @Provider
-@ProduceMime({"application/xml", "text/xml" })
-@ConsumeMime({"application/xml", "text/xml" })
+@ProduceMime({"application/xml", "application/*+xml", "text/xml" })
+@ConsumeMime({"application/xml", "application/*+xml", "text/xml" })
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 

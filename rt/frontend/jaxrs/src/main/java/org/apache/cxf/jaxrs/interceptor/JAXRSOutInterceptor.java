@@ -300,10 +300,22 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     private MediaType checkFinalContentType(MediaType mt) {
-        if (mt.isWildcardType() && mt.isWildcardSubtype()) {
+        if (mt.isWildcardType() || mt.isWildcardSubtype()) {
             return MediaType.APPLICATION_OCTET_STREAM_TYPE;
+        } else if (mt.getParameters().containsKey("q")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(mt.getType()).append('/').append(mt.getSubtype());
+            if (mt.getParameters().size() > 1) {
+                for (String key : mt.getParameters().keySet()) {
+                    if (!"q".equals(key)) {
+                        sb.append(';').append(key).append('=').append(mt.getParameters().get(key));
+                    }
+                }
+            }
+            return MediaType.valueOf(sb.toString());
         } else {
             return mt;
         }
+        
     }
 }
