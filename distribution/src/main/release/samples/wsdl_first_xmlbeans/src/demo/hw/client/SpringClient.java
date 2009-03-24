@@ -21,10 +21,10 @@ package demo.hw.client;
 
 import javax.xml.ws.WebServiceException;
 
-import org.apache.hello_world_soap_http.Greeter;
-import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.helloWorldSoapHttp.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttp.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http.Greeter;
+import org.apache.hello_world_soap_http.PingMeFault;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
