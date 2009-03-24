@@ -313,7 +313,7 @@ public class DynamicClientFactory {
         }
         File classes = new File(tmpdir, stem + "-classes");
         if (!classes.mkdir()) {
-            throw new IllegalStateException("Unable to create working directory " + src.getPath());
+            throw new IllegalStateException("Unable to create working directory " + classes.getPath());
         }
         StringBuilder classPath = new StringBuilder();
         try {
