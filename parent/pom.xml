@@ -65,7 +65,7 @@
         <jdom.version>1.0</jdom.version>
         <xmlbeans.version>2.3.0</xmlbeans.version>
         <abdera.version>0.4.0-incubating</abdera.version>
-        <xmlschema.version>1.4.3</xmlschema.version>
+        <xmlschema.version>1.4.4</xmlschema.version>
         <checkstyle.extension />
 
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
