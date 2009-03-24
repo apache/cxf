@@ -35,42 +35,43 @@
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/systests</developerConnection>
     </scm>
     <build>
-	  <plugins>
-		<plugin>
-			<artifactId>maven-resources-plugin</artifactId>
-			<executions>
-				<execution>
-					<id>copy-resources</id>
-					<phase>validate</phase>
-					<goals>
-						<goal>copy-resources</goal>
-					</goals>
-					<configuration>
-						<outputDirectory>${basedir}/target/test-classes/schemaorg_apache_xmlbeans</outputDirectory>
-						<resources>
-							<resource>
-								<directory>${basedir}/target/generated/src/test/java/schemaorg_apache_xmlbeans</directory>
-								<includes>
-									<include>**/*.xsb</include>
-									<include>**/*.class</include>
-								</includes>
-							</resource>
-						</resources>
-					</configuration>
-				</execution>
-			</executions>
-	    </plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-test-resources</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/test-classes/schemaorg_apache_xmlbeans</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target/generated/src/test/java/schemaorg_apache_xmlbeans</directory>
+                                    <includes>
+                                        <include>**/*.xsb</include>
+                                        <include>**/*.class</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 	
         
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
                         <goals>
-                            <goal>add-source</goal>
+                            <goal>add-test-source</goal>
                         </goals>
                         <configuration>
                             <sources>
@@ -109,14 +110,14 @@
                         <configuration>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <wsdlOptions>
-								<wsdlOption>
-									<wsdl>${basedir}/src/test/resources/wsdl_systest/xmlbeans/hello_world.wsdl</wsdl>
-									<extraargs>
-										<extraarg>-db</extraarg>
-										<extraarg>xmlbeans</extraarg>
-									</extraargs>
-								</wsdlOption>
-							</wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest/xmlbeans/hello_world.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>xmlbeans</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -310,9 +311,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-	    <groupId>org.apache.cxf</groupId>
-	    <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-	    <version>${project.version}</version>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -353,12 +354,12 @@
             <artifactId>aspectjweaver</artifactId>
             <version>1.5.4</version>
             <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <scope>test</scope>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
@@ -388,62 +389,63 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-           <groupId>org.springframework.security</groupId>
-           <artifactId>spring-security-core-tiger</artifactId>
-           <version>2.0.4</version>
-           <scope>test</scope> 
-           <exclusions>
-             <exclusion>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-core</artifactId>
-             </exclusion>
-             <exclusion>
-               <groupId>org.springframework</groupId>
-               <artifactId>spring-dao</artifactId>
-             </exclusion>
-             <exclusion>
-               <groupId>org.springframework</groupId>
-               <artifactId>spring-jdbc</artifactId>
-             </exclusion>
-             <exclusion>
-               <groupId>org.springframework</groupId>
-               <artifactId>spring-remoting</artifactId>
-             </exclusion> 
-             <exclusion>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-support</artifactId>
-             </exclusion>
-           </exclusions>
-        </dependency> 
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core-tiger</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-dao</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-remoting</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-support</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         
+
         <dependency>
-           <groupId>org.springframework.security</groupId>
-           <artifactId>spring-security-acl</artifactId>
-           <version>2.0.4</version>
-           <scope>test</scope> 
-           <exclusions>
-             <exclusion>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-core</artifactId>
-             </exclusion>
-             <exclusion>
-               <groupId>org.springframework</groupId>
-               <artifactId>spring-dao</artifactId>
-             </exclusion>
-             <exclusion>
-               <groupId>org.springframework</groupId>
-               <artifactId>spring-jdbc</artifactId>
-             </exclusion>
-             <exclusion>
-               <groupId>org.springframework</groupId>
-               <artifactId>spring-remoting</artifactId>
-             </exclusion> 
-             <exclusion>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-support</artifactId>
-             </exclusion>
-           </exclusions>
-        </dependency>  
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-acl</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-dao</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-remoting</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-support</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -467,16 +469,16 @@
             <groupId>org.apache.servicemix</groupId>
             <artifactId>servicemix-core</artifactId>
             <version>${servicemix.version}</version>
-           <exclusions>
-             <exclusion>
-              <groupId>jaxen</groupId>
-              <artifactId>jaxen</artifactId>
-             </exclusion>
-	     <exclusion>
-	       <groupId>org.codehaus.woodstox</groupId>
-	       <artifactId>wstx-asl</artifactId>
-	     </exclusion>
-	   </exclusions>
+            <exclusions>
+                <exclusion>
+                    <groupId>jaxen</groupId>
+                    <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
