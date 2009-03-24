@@ -139,6 +139,74 @@
   </supplement>
   <supplement>
     <project>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <licenses>
+        <license>
+          <name>MIT License</name>
+          <url>http://www.slf4j.org/license.html</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+  <supplement>
+    <project>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <licenses>
+        <license>
+          <name>MIT License</name>
+          <url>http://www.slf4j.org/license.html</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+
+  <supplement>
+    <project>
+      <groupId>jaxen</groupId>
+      <artifactId>jaxen</artifactId>
+      <licenses>
+        <license>
+          <name>BSD</name>
+          <url>http://jaxen.codehaus.org/license.html</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+  <supplement>
+    <project>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <licenses>
+        <license>
+          <name>BSD</name>
+          <url>http://asm.objectweb.org/license.html</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+
+
+  <supplement>
+    <project>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <name>Apache Commons - collections</name>
+      <organization>
+        <name>The Apache Software Foundation</name>
+        <url>http://www.apache.org</url>
+      </organization>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+  <supplement>
+    <project>
       <groupId>net.java.dev.stax-utils</groupId>
       <artifactId>stax-utils</artifactId>
       <name>StAX Utilities</name>
