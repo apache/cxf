@@ -216,11 +216,37 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         }
         if (localPart.contains("*")) {
             //wildcard pattern matching
-            return Pattern.matches(localPart, comp.getLocalPart());
+            return Pattern.matches(mapPattern(localPart), comp.getLocalPart());
         } else if (!localPart.equals(comp.getLocalPart())) {
             return false;
         }
         return true;
+    }
+    
+    private String mapPattern(String s) {
+        StringBuilder buf = new StringBuilder(s);
+        for (int x = 0; x < buf.length(); x++) {
+            switch (buf.charAt(x)) {
+            case '*':
+                buf.insert(x, '.');
+                x++;
+                break;
+            case '.':
+            case '\\':
+            case '^':
+            case '$':
+            case '{':
+            case '}':
+            case '(':
+            case ')':
+                buf.insert(x, '\\');
+                x++;
+                break;
+            default:
+                //nothing to do
+            }
+        }
+        return buf.toString();
     }
     
     private void processHandlerElement(Element el, List<Handler> chain) {
