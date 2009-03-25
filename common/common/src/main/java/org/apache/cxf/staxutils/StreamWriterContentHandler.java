@@ -30,6 +30,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import org.apache.cxf.common.util.StringUtils;
+
 /**
  * 
  */
@@ -207,8 +209,14 @@ public class StreamWriterContentHandler implements ContentHandler {
             if (atts != null) {
                 int attCount = atts.getLength();
                 for (int i = 0; i < attCount; i++) {
-                    writer.writeAttribute(atts.getURI(i), localName,
+                    if (StringUtils.isEmpty(atts.getURI(i))) {
+                        writer.writeAttribute(atts.getLocalName(i),
+                                              atts.getValue(i));
+                    } else {
+                        writer.writeAttribute(atts.getURI(i),
+                                          atts.getQName(i),
                                           atts.getValue(i));
+                    }
                 }
             }
         } catch (XMLStreamException e) {
