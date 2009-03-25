@@ -60,8 +60,13 @@ public final class ProviderFactory {
         try {
             jsonProvider = new JSONProvider();
         } catch (Throwable ex) {
-            ex.printStackTrace();
-            LOG.fine("Problem with instantiating the default JSON provider");
+            String message = "Problem with instantiating the default JSON provider, ";
+            if (ex.getMessage() != null) {
+                message += ex.getMessage();
+            } else {
+                message += "exception class : " + ex.getClass().getName();  
+            }
+            LOG.info(message);
         }
         
         SHARED_FACTORY.setProviders(new JAXBElementProvider(),
