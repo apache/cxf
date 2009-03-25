@@ -254,7 +254,7 @@
 		<!--<module name="CyclomaticComplexity"/>-->
 		<!--<module name="NPathComplexity"/>-->
 		<module name="JavaNCSS">
-			<property name="methodMaximum" value="75" />
+			<property name="methodMaximum" value="100" />
 		</module>
 
 
