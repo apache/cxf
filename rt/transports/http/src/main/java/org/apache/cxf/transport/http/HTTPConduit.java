@@ -544,7 +544,10 @@ public class HTTPConduit
             needToCacheRequest = true;
             LOG.log(Level.FINE, "AutoRedirect is turned on.");
         }
-        if (!connection.getRequestMethod().equals("GET")
+        // DELETE does not work and empty PUTs cause misleading exceptions
+        // if chunking is enabled
+        // TODO : ensure chunking can be enabled for non-empty PUTs - if requested
+        if (connection.getRequestMethod().equals("POST")
             && getClient().isAllowChunking()) {
             //TODO: The chunking mode be configured or at least some
             // documented client constant.
@@ -1866,8 +1869,11 @@ public class HTTPConduit
             // Trust is okay, set up for writing the request.
             
             // If this is a GET method we must not touch the output
-            // stream as this automagically turns the request into a POST.
-            if ("GET".equals(connection.getRequestMethod())) {
+            // stream as this automatically turns the request into a POST.
+            // Nor it should be done in case of DELETE - strangely, empty PUTs
+            // work ok 
+            if ("GET".equals(connection.getRequestMethod())
+                || "DELETE".equals(connection.getRequestMethod())) {
                 return;
             }
             

@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
@@ -223,10 +225,31 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBook123WebClient() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
-        // just to verify the interface call goes through CGLIB proxy too
-        assertEquals("http://localhost:9080", WebClient.client(bs).getBaseURI().toString());
         Book b = bs.getBook("123");
         assertEquals(b.getId(), 123);
+    }
+    
+    @Test
+    public void testDeleteWithWebClient() throws Exception {
+        BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        Response r = bs.deleteBook("123");
+        assertEquals(200, r.getStatus());
+    }
+    
+    @Test
+    public void testCreatePut() throws Exception {
+        BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        Response r = bs.createBook(777L);
+        assertEquals(200, r.getStatus());
+    }
+    
+    @Test
+    public void testUpdateWithWebClient() throws Exception {
+        BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        Book book = new Book();
+        book.setId(888);
+        bs.updateBook(book);
+        assertEquals(304, WebClient.client(bs).getResponse().getStatus());
     }
     
     @Test
