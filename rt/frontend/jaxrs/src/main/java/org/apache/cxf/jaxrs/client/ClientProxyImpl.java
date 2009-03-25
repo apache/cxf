@@ -428,6 +428,9 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         if (method.getReturnType() == Void.class) { 
             return null;
         }
+        if (method.getReturnType() == Response.class) {
+            return r;
+        }
         
         return readBody(r, connect, inMessage, method.getReturnType(), 
                         method.getGenericReturnType(), method.getDeclaredAnnotations());

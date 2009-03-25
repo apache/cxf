@@ -231,22 +231,25 @@ public class JAXRSInvoker extends AbstractInvoker {
     }
 
     private static Object checkResultObject(Object result, String subResourcePath) {
+        
+
+        //the result becomes the object that will handle the request
+        if (result != null) {
+            if (result instanceof MessageContentsList) {
+                result = ((MessageContentsList)result).get(0);
+            } else if (result instanceof List) {
+                result = ((List)result).get(0);
+            } else if (result.getClass().isArray()) {
+                result = ((Object[])result)[0];
+            }
+        }
         if (result == null) {
             org.apache.cxf.common.i18n.Message errorM =
                 new org.apache.cxf.common.i18n.Message("NULL_SUBRESOURCE",
                                                        BUNDLE,
                                                        subResourcePath);
-            LOG.severe(errorM.toString());
-            throw new WebApplicationException(500);
-        }
-
-        //the result becomes the object that will handle the request
-        if (result instanceof MessageContentsList) {
-            result = ((MessageContentsList)result).get(0);
-        } else if (result instanceof List) {
-            result = ((List)result).get(0);
-        } else if (result.getClass().isArray()) {
-            result = ((Object[])result)[0];
+            LOG.info(errorM.toString());
+            throw new WebApplicationException(404);
         }
 
         return result;

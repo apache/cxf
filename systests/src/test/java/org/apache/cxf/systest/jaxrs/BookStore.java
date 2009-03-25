@@ -374,6 +374,24 @@ public class BookStore {
     }
     
     @PUT
+    @Path("/books/{id}")
+    public Response createBook(@PathParam("id") Long id) {
+        Book b = books.get(id);
+
+        Response r;
+        if (b == null) {
+            Book newBook = new Book();
+            newBook.setId(id);
+            books.put(newBook.getId(), newBook);
+            r = Response.ok().build();
+        } else {
+            r = Response.notModified().build();
+        }
+
+        return r;
+    }
+    
+    @PUT
     @Path("/bookswithdom/")
     public DOMSource updateBook(DOMSource ds) {
         XMLUtils.printDOM(ds.getNode());
