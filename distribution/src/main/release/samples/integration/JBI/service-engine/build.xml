@@ -43,6 +43,7 @@
         <include name="geronimo-jaxws_2.1_spec-1.0.jar"/>
         <include name="geronimo-annotation_1.0_spec-*.jar"/>
         <include name="geronimo-ws-metadata_2.0_spec-*.jar"/>
+        <include name="org.apache.servicemix.specs.jbi-api-*.jar"/>
         <include name="xml-resolver-*.jar"/>
         <include name="saaj*.jar"/>
         <include name="XmlSchema-*.jar"/>
