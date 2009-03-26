@@ -25,6 +25,10 @@ import java.util.Set;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.transport.Destination;
 
+/**
+ * The base interface for all all message implementations. 
+ * All message objects passed to interceptors use this interface.
+ */
 public interface Message extends StringMap {
     
     String TRANSPORT = "org.apache.cxf.transport";    
@@ -70,6 +74,13 @@ public interface Message extends StringMap {
     String getId();
     void setId(String id);
     
+    /**
+     * Returns a live copy of the messages interceptor chain. This is 
+     * useful when an interceptor wants to modify the interceptor chain on the 
+     * fly.
+     * 
+     * @return the interceptor chain used to process the message
+     */
     InterceptorChain getInterceptorChain();
     void setInterceptorChain(InterceptorChain chain);
 
@@ -116,6 +127,12 @@ public interface Message extends StringMap {
      */
     <T> void removeContent(Class<T> format);
     
-    
+    /**
+     * Queries the Message object's metadata for a specific property.
+     * 
+     * @param key the Message interface's property strings that 
+     * correlates to the desired property 
+     * @return the property's value
+     */
     Object getContextualProperty(String key);   
 }
