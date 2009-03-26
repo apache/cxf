@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +34,8 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
+
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public final class ResponseBuilderImpl extends ResponseBuilder {
     private int status = 200;
@@ -117,15 +120,15 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     @Override
-    public ResponseBuilder expires(Date expires) {
-        metadata.putSingle(HttpHeaders.EXPIRES, expires.toString());
-        return null;
+    public ResponseBuilder expires(Date date) {
+        metadata.putSingle(HttpHeaders.EXPIRES, toHttpDate(date));
+        return this;
     }
 
     @Override
     public ResponseBuilder language(Locale language) {
         metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, language.toString());
-        return null;
+        return this;
     }
     
     @Override
@@ -177,4 +180,8 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
         status = 200;
     }
     
+    private String toHttpDate(Date date) {
+        SimpleDateFormat format = HttpUtils.getHttpDateFormat();
+        return format.format(date);
+    }
 }

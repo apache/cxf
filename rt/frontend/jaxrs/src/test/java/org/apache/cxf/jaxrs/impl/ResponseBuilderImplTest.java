@@ -20,8 +20,12 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.ws.rs.core.Response;
+
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +33,23 @@ import org.junit.Test;
 
 public class ResponseBuilderImplTest extends Assert {
 
-        
+    
+    @Test
+    public void testLanguage() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Content-Language", "de");
+        checkBuild(Response.ok().language("de").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testExpires() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Expires", "Tue, 21 Oct 2008 17:00:00 GMT");
+        SimpleDateFormat format = HttpUtils.getHttpDateFormat();
+        Date date = format.parse("Tue, 21 Oct 2008 17:00:00 GMT");
+        checkBuild(Response.ok().expires(date).build(), 200, null, m);
+    }
+    
     @Test
     public void testOkBuild() {
       
