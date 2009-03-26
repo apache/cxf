@@ -61,10 +61,6 @@ public class ColocOutInterceptorTest extends Assert {
     private Message msg;
     private Exchange ex;
 
-    public ColocOutInterceptorTest() {
-        control.makeThreadSafe(true);
-    }
-    
     @Before
     public void setUp() throws Exception {
         colocOut = new ColocOutInterceptor();
