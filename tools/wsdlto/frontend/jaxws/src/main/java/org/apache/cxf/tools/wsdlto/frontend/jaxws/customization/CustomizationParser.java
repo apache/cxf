@@ -96,7 +96,10 @@ public final class CustomizationParser {
             if (wsdlNode == null && env.get(ToolConstants.CFG_CATALOG) != null) {
                 wsdlNode = resolveNodeByCatalog(wsdlURL);
             }
-            // TODO: if wsdlNode is null throw exception
+            
+            if (wsdlNode == null) {
+                throw new ToolException(new Message("MISSING_WSDL", LOG, wsdlURL));
+            }
             customizedElements.put(wsdlURL.toString(), wsdlNode);
             bindingFiles = (String[])env.get(ToolConstants.CFG_BINDING);
             if (bindingFiles == null) {
@@ -490,28 +493,11 @@ public final class CustomizationParser {
 
         } else if (isValidJaxbBindingFile(reader)) {
             String schemaLocation = root.getAttribute("schemaLocation");
-            boolean hasJaxbBindingChild = false;
-            
-            List<Element> elemList = 
-                DOMUtils.findAllElementsByTagNameNS(root, 
-                                                    ToolConstants.JAXB_BINDINGS.getNamespaceURI(), 
-                                                    ToolConstants.JAXB_BINDINGS.getLocalPart()); 
-            if (elemList.size() > 1) {
-                hasJaxbBindingChild = true;
-            }
-            
-            elemList = 
-                DOMUtils.findAllElementsByTagNameNS(root, 
-                                                    ToolConstants.JAXB_BINDINGS.getNamespaceURI(), 
-                                                    "globalBindings");
-            if (elemList.size() > 1) {
-                hasJaxbBindingChild = true;
-            }
-                           
-            if (StringUtils.isEmpty(schemaLocation) && !hasJaxbBindingChild) {
+            String resolvedSchemaLocation = resolveByCatalog(schemaLocation);
+            if (resolvedSchemaLocation != null) {
                 InputSource tmpIns = null;
                 try {
-                    tmpIns = convertToTmpInputSource(root, wsdlURL);
+                    tmpIns = convertToTmpInputSource(root, resolvedSchemaLocation);
                 } catch (Exception e1) {
                     Message msg = new Message("FAILED_TO_ADD_SCHEMALOCATION", LOG, bindingFile);
                     throw new ToolException(msg, e1);
@@ -519,8 +505,7 @@ public final class CustomizationParser {
                 jaxbBindings.add(tmpIns);
             } else {
                 jaxbBindings.add(new InputSource(bindingFile));
-            }
-
+            } 
         } else {
             Message msg = new Message("UNKNOWN_BINDING_FILE", LOG, bindingFile, reader.getName());
             throw new ToolException(msg);
@@ -557,8 +542,14 @@ public final class CustomizationParser {
     }
 
     private String resolveByCatalog(String url) {
+        if (StringUtils.isEmpty(url)) {
+            return null;
+        }
         Bus bus = (Bus)env.get(Bus.class);
         Catalog catalogResolver = OASISCatalogManager.getCatalogManager(bus).getCatalog();
+        if (catalogResolver == null) {
+            return null;
+        }
         String resolvedLocation;
         try {
             resolvedLocation = catalogResolver.resolveSystem(url);

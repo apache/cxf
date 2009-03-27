@@ -65,10 +65,10 @@ import com.sun.tools.xjc.api.SchemaCompiler;
 import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
 
-
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
@@ -81,8 +81,9 @@ import org.apache.cxf.tools.util.JAXBUtils;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.DefaultValueProvider;
 import org.apache.cxf.tools.wsdlto.core.RandomValueProvider;
-
-
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaSerializer;
+import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
 
 public class JAXBDataBinding implements DataBindingProfile {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
@@ -121,14 +122,14 @@ public class JAXBDataBinding implements DataBindingProfile {
         JLDEFAULT_TYPE_MAP.put("java.lang.Float", "float");
         JLDEFAULT_TYPE_MAP.put("java.lang.Double", "double");
         DEFAULT_TYPE_MAP.addAll(JLDEFAULT_TYPE_MAP.keySet());
-    }    
-
-
+    }   
+    
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
         
         SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
         ClassCollector classCollector = context.get(ClassCollector.class);
+        //installResolverIntoSchemaCompiler(schemaCompiler);
         
         ClassNameAllocatorImpl allocator 
             = new ClassNameAllocatorImpl(classCollector,
@@ -140,11 +141,11 @@ public class JAXBDataBinding implements DataBindingProfile {
         schemaCompiler.setErrorListener(listener);
         // Collection<SchemaInfo> schemas = serviceInfo.getSchemas();
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
-        Map<String, Element> schemaLists = CastUtils.cast((Map<?, ?>)context.get(ToolConstants.SCHEMA_MAP));
-
+        SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
         
         Options opts = null;
         opts = getOptions(schemaCompiler);
+        //schemaCompiler.setEntityResolver(entityResolver)
         List<String> args = new ArrayList<String>();
         
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
@@ -196,7 +197,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         
         
-        addSchemas(opts, schemaCompiler, schemaLists);
+        addSchemas(opts, schemaCompiler, schemas);
 
         for (InputSource binding : jaxbBindings) {
             opts.addBindFile(binding);
@@ -220,7 +221,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         rawJaxbModelGenCode = schemaCompiler.bind();
 
-        addedEnumClassToCollector(schemaLists, allocator);
+        addedEnumClassToCollector(schemas, allocator);
 
         if (context.get(ToolConstants.CFG_DEFAULT_VALUES) != null) {
             String cname = (String)context.get(ToolConstants.CFG_DEFAULT_VALUES);
@@ -242,14 +243,29 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private void addSchemas(Options opts, SchemaCompiler schemaCompiler,
-                            Map<String, Element> schemaLists) {
-        for (String key : schemaLists.keySet()) {
-            Element ele = schemaLists.get(key);
+                            SchemaCollection schemaCollection) {
+        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
+                continue;
+            }
+                
+            String key = schema.getSourceURI();
+            XmlSchemaSerializer xser = new XmlSchemaSerializer();
+            xser.setExtReg(schemaCollection.getExtReg());
+            Document[] docs;
+            try {
+                docs = xser.serializeSchema(schema, false);
+            } catch (XmlSchemaSerializerException e) {
+                throw new RuntimeException(e);
+            }
+            Element ele = docs[0].getDocumentElement();
+
             ele = removeImportElement(ele);
             if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
                 validateSchema(ele);
             }           
             InputSource is = new InputSource((InputStream)null);
+           // key = key.replaceFirst("#types[0-9]+$", "");
             is.setSystemId(key);
             is.setPublicId(key);
             opts.addGrammar(is);
@@ -275,10 +291,11 @@ public class JAXBDataBinding implements DataBindingProfile {
     // JAXB bug. JAXB ClassNameCollector may not be invoked when generated
     // class is an enum. We need to use this method to add the missed file
     // to classCollector.
-    private void addedEnumClassToCollector(Map<String, Element> schemaList, 
+    private void addedEnumClassToCollector(SchemaCollection schemaCollection, 
                                            ClassNameAllocatorImpl allocator) {
-        for (Element schemaElement : schemaList.values()) {
-            String targetNamespace = schemaElement.getAttribute("targetNamespace");
+        //for (Element schemaElement : schemaList.values()) {
+        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+            String targetNamespace = schema.getTargetNamespace();
             if (StringUtils.isEmpty(targetNamespace)) {
                 continue;
             }
