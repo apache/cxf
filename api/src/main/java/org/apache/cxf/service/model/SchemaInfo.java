@@ -19,6 +19,8 @@
 
 package org.apache.cxf.service.model;
 
+import java.lang.ref.SoftReference;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
@@ -40,6 +42,9 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     private boolean isAttributeQualified;
     private XmlSchema schema;
     private String systemId;
+    // Avoid re-serializing all the time. Particularly as a cached WSDL will
+    // hold a reference to the element.
+    private SoftReference<Element> cachedElement = new SoftReference<Element>(null);
     
     public SchemaInfo(String namespaceUri) {
         this(namespaceUri, false, false);
@@ -70,8 +75,16 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         this.namespaceUri = nsUri;
     }
 
+    /**
+     * Build and return a DOM tree for this schema.
+     * @return
+     */
     public synchronized Element getElement() {
-        Element element = null;
+        // if someone recently used this DOM tree, take advantage.
+        Element element = cachedElement.get();
+        if (element != null) {
+            return element;
+        }
         if (getSchema() == null) {
             throw new RuntimeException("No XmlSchma in SchemaInfo");
         }
@@ -94,6 +107,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
                 throw new RuntimeException("Error serializing Xml Schema", e);
             }
             element = serializedSchema.getDocumentElement();
+            cachedElement = new SoftReference<Element>(element);
         }
         // XXX A problem can occur with the ibm jdk when the XmlSchema
         // object is serialized. The xmlns declaration gets incorrectly
