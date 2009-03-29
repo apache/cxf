@@ -124,7 +124,6 @@ public final class SchemaUtil {
                         XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
                         catalogResolved.putAll(schemaResolver.getResolvedMap());
                         SchemaInfo schemaInfo = new SchemaInfo(xmlSchema.getTargetNamespace());
-                        schemaInfo.setElement(schemaElem);
                         schemaInfo.setSchema(xmlSchema);
                         schemaInfo.setSystemId(systemId);
                         schemaInfos.add(schemaInfo);
