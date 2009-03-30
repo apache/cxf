@@ -103,4 +103,14 @@ public class ControlImpl implements Control {
         // never called
         return null;
     }
+
+    public Response<?> setFaultLocationAsync(FaultLocation in) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Future<?> setFaultLocationAsync(FaultLocation in, AsyncHandler<?> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

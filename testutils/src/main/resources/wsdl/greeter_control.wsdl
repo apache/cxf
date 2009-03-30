@@ -155,6 +155,8 @@
     <wsdl:message name="setFaultLocationRequest">
         <wsdl:part element="x1:faultLocation" name="in"/>
     </wsdl:message>
+    <wsdl:message name="setFaultLocationResponse">
+    </wsdl:message>
     
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
@@ -191,6 +193,7 @@
 
         <wsdl:operation name="setFaultLocation">
             <wsdl:input message="tns:setFaultLocationRequest" name="setFaultLocationRequest"/>
+            <wsdl:output message="tns:setFaultLocationResponse" name="setFaultLocationResponse"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -264,6 +267,9 @@
             <wsdl:input name="setFaultLocationRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:output name="setFaultLocationResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
 
