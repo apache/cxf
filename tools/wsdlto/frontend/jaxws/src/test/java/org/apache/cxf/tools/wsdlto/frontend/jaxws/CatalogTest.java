@@ -25,7 +25,6 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.resource.ExtendedURIResolver;
-import org.apache.xml.resolver.Catalog;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,11 +38,8 @@ public class CatalogTest extends Assert {
 
         catalogManager.loadCatalog(jaxwscatalog);
 
-        Catalog catalogResolver = catalogManager.getCatalog();
-        assertNotNull(catalogResolver);
-
         String xsd = "http://www.w3.org/2005/08/addressing/ws-addr.xsd";
-        String resolvedSchemaLocation = catalogResolver.resolveSystem(xsd);
+        String resolvedSchemaLocation = catalogManager.resolveSystem(xsd);
         assertEquals("classpath:/schemas/wsdl/ws-addr.xsd", resolvedSchemaLocation);
 
         ExtendedURIResolver resolver = new ExtendedURIResolver();

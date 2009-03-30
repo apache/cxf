@@ -55,6 +55,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>                                                      
+             <groupId>xml-resolver</groupId>                               
+             <artifactId>xml-resolver</artifactId>
+         </dependency> 
+
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxws_2.1_spec</artifactId>

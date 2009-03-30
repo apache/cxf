@@ -58,7 +58,6 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
-import org.apache.xml.resolver.Catalog;
 
 public final class CustomizationParser {
     // For WSDL1.1
@@ -546,7 +545,7 @@ public final class CustomizationParser {
             return null;
         }
         Bus bus = (Bus)env.get(Bus.class);
-        Catalog catalogResolver = OASISCatalogManager.getCatalogManager(bus).getCatalog();
+        OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
         if (catalogResolver == null) {
             return null;
         }

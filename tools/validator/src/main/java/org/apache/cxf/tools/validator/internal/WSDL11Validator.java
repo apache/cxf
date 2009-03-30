@@ -55,7 +55,6 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.validator.AbstractValidator;
 import org.apache.cxf.wsdl.WSDLManager;
-import org.apache.xml.resolver.Catalog;
 
 public class WSDL11Validator extends AbstractDefinitionValidator {
     protected static final Logger LOG = LogUtils.getL7dLogger(SchemaValidator.class);
@@ -76,7 +75,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
     private Document getWSDLDoc(String wsdl) {
         LOG.log(Level.FINE, new Message("VALIDATE_WSDL", LOG, wsdl).toString());
         try {
-            Catalog catalogResolver = OASISCatalogManager.getCatalogManager(this.getBus()).getCatalog();
+            OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(this.getBus());
 
             String nw = catalogResolver.resolveSystem(wsdl);
             if (nw == null) {

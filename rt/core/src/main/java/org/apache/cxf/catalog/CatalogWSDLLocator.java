@@ -28,7 +28,6 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.transport.TransportURIResolver;
-import org.apache.xml.resolver.Catalog;
 
 /**
  * Resolves WSDL URIs using Apache Commons Resolver API.
@@ -37,7 +36,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
 
     private String wsdlUrl;
     private ExtendedURIResolver resolver;
-    private Catalog catalogResolver;
+    private OASISCatalogManager manager;
     private String baseUri;
     
     public CatalogWSDLLocator(String wsdlUrl) {
@@ -46,20 +45,20 @@ public class CatalogWSDLLocator implements WSDLLocator {
     }
     public CatalogWSDLLocator(String wsdlUrl, OASISCatalogManager catalogManager) {
         this.baseUri = wsdlUrl;
-        this.catalogResolver = catalogManager.getCatalog();
+        this.manager = catalogManager;
         this.resolver = new ExtendedURIResolver();
     }
     public CatalogWSDLLocator(String wsdlUrl, Bus b) {
         this.baseUri = wsdlUrl;
-        this.catalogResolver = OASISCatalogManager.getCatalogManager(b).getCatalog();
+        this.manager = OASISCatalogManager.getCatalogManager(b);
         this.resolver = new TransportURIResolver(b);
     }
 
     public InputSource getBaseInputSource() {
         InputSource result = null;
-        if (catalogResolver != null) {
+        if (manager != null) {
             try {
-                String s = catalogResolver.resolveSystem(baseUri);
+                String s = manager.resolveSystem(baseUri);
                 if (s != null) {
                     result = resolver.resolve(s, null);
                 }
@@ -100,14 +99,14 @@ public class CatalogWSDLLocator implements WSDLLocator {
 
     public InputSource getImportInputSource(String parent, String importLocation) {
         String resolvedImportLocation = null;
-        if (catalogResolver != null) {
+        if (manager != null) {
             try {
-                resolvedImportLocation = this.catalogResolver.resolveSystem(importLocation);
+                resolvedImportLocation = this.manager.resolveSystem(importLocation);
                 if (resolvedImportLocation == null) {
-                    resolvedImportLocation = catalogResolver.resolveURI(importLocation);
+                    resolvedImportLocation = manager.resolveURI(importLocation);
                 }
                 if (resolvedImportLocation == null) {
-                    resolvedImportLocation = catalogResolver.resolvePublic(importLocation, parent);
+                    resolvedImportLocation = manager.resolvePublic(importLocation, parent);
                 }
             } catch (IOException e) {
                 throw new RuntimeException("Catalog resolution failed", e);

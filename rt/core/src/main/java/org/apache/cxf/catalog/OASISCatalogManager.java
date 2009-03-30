@@ -21,6 +21,7 @@ package org.apache.cxf.catalog;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -49,19 +50,28 @@ public class OASISCatalogManager {
     
     
 
-    private Catalog resolver;
+    private Object resolver;
     private Set<URL> loadedCatalogs = Collections.synchronizedSet(new HashSet<URL>());
     private Bus bus;
 
     public OASISCatalogManager() {
-        CatalogManager catalogManager = new CatalogManager();
-        if (DEBUG_LEVEL != null) {
-            catalogManager.debug.setDebug(Integer.parseInt(DEBUG_LEVEL));
-        }
-        catalogManager.setUseStaticCatalog(false);
-        catalogManager.setIgnoreMissingProperties(true);
-        CatalogResolver catalogResolver = new CatalogResolver(catalogManager);
-        this.resolver = catalogResolver.getCatalog();
+        resolver = getResolver();
+    }
+    
+    private static Object getResolver() {
+        try {
+            CatalogManager catalogManager = new CatalogManager();
+            if (DEBUG_LEVEL != null) {
+                catalogManager.debug.setDebug(Integer.parseInt(DEBUG_LEVEL));
+            }
+            catalogManager.setUseStaticCatalog(false);
+            catalogManager.setIgnoreMissingProperties(true);
+            CatalogResolver catalogResolver = new CatalogResolver(catalogManager);
+            return catalogResolver.getCatalog();
+        } catch (Throwable t) {
+            //ignore
+        }        
+        return null;
     }
 
     public Bus getBus() {
@@ -81,10 +91,11 @@ public class OASISCatalogManager {
         loadContextCatalogs();
     }
 
+    /*
     public Catalog getCatalog() {
         return this.resolver;
     }
-
+*/
     public void loadContextCatalogs() {
         loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
@@ -97,7 +108,7 @@ public class OASISCatalogManager {
     }
 
     public void loadCatalogs(ClassLoader classLoader, String name) throws IOException {
-        if (classLoader == null) {
+        if (classLoader == null || resolver == null) {
             return;
         }
 
@@ -105,14 +116,14 @@ public class OASISCatalogManager {
         while (catalogs.hasMoreElements()) {
             URL catalogURL = catalogs.nextElement();
             if (!loadedCatalogs.contains(catalogURL)) {
-                this.resolver.parseCatalog(catalogURL);
+                ((Catalog)resolver).parseCatalog(catalogURL);
                 loadedCatalogs.add(catalogURL);
             }
         }
     }
 
     public void loadCatalog(URL catalogURL) throws IOException {
-        if (!loadedCatalogs.contains(catalogURL)) {
+        if (!loadedCatalogs.contains(catalogURL) && resolver != null) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {
                     File file = new File(catalogURL.toURI());
@@ -124,16 +135,20 @@ public class OASISCatalogManager {
                 }
             }
 
-            this.resolver.parseCatalog(catalogURL);
+            ((Catalog)resolver).parseCatalog(catalogURL);
 
             loadedCatalogs.add(catalogURL);
         }
     }
 
     private static OASISCatalogManager getContextCatalog() {
-        OASISCatalogManager oasisCatalog = new OASISCatalogManager();
-        oasisCatalog.loadContextCatalogs();
-        return oasisCatalog;
+        try {
+            OASISCatalogManager oasisCatalog = new OASISCatalogManager();
+            oasisCatalog.loadContextCatalogs();
+            return oasisCatalog;
+        } catch (Throwable ex) {
+            return null;
+        }
     }
 
     public static OASISCatalogManager getCatalogManager(Bus bus) {
@@ -142,10 +157,33 @@ public class OASISCatalogManager {
         }
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         if (catalog == null) {
-            return getContextCatalog();
-        } else {
-            return catalog;
+            catalog = getContextCatalog();
+            if (catalog != null) {
+                bus.setExtension(catalog, OASISCatalogManager.class);
+            }
+        } 
+        return catalog;
+        
+    }
+
+    public String resolveSystem(String sys) throws MalformedURLException, IOException {
+        if (resolver == null) {
+            return null;
         }
+        return ((Catalog)resolver).resolveSystem(sys);
+    }
+
+    public String resolveURI(String uri) throws MalformedURLException, IOException {
+        if (resolver == null) {
+            return null;
+        }
+        return ((Catalog)resolver).resolveURI(uri);
+    }
+    public String resolvePublic(String uri, String parent) throws MalformedURLException, IOException {
+        if (resolver == null) {
+            return null;
+        }
+        return ((Catalog)resolver).resolvePublic(uri, parent);
     }
 
 }

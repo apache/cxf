@@ -59,7 +59,11 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-javamail_1.4_spec</artifactId>
         </dependency>
-
+        <dependency>                                                      
+            <groupId>xml-resolver</groupId>                               
+            <artifactId>xml-resolver</artifactId>
+            <optional>true</optional>
+        </dependency> 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

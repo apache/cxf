@@ -254,14 +254,17 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
     }
 
     static String resolveWithCatalogs(OASISCatalogManager catalogs, String start, String base) {
+        if (catalogs == null) {
+            return null;
+        }
         String resolvedSchemaLocation = null;
         try {
-            resolvedSchemaLocation = catalogs.getCatalog().resolveSystem(start);
+            resolvedSchemaLocation = catalogs.resolveSystem(start);
             if (resolvedSchemaLocation == null) {
-                resolvedSchemaLocation = catalogs.getCatalog().resolveURI(start);
+                resolvedSchemaLocation = catalogs.resolveURI(start);
             }
             if (resolvedSchemaLocation == null) {
-                resolvedSchemaLocation = catalogs.getCatalog().resolvePublic(start, base);
+                resolvedSchemaLocation = catalogs.resolvePublic(start, base);
             }
         } catch (Exception ex) {
             //ignore
