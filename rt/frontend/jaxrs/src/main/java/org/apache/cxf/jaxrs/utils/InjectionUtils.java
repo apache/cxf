@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -134,9 +135,13 @@ public final class InjectionUtils {
     }
     
     public static Class<?> getActualType(Type genericType) {
-        if (genericType == null 
-            || !ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
+        
+        if (genericType == null) {
             return null;
+        }
+        if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
+            Class<?> cls =  (Class<?>)genericType;
+            return cls.isArray() ? cls.getComponentType() : null;
         }
         ParameterizedType paramType = (ParameterizedType)genericType;
         return (Class<?>)paramType.getActualTypeArguments()[0];
@@ -320,6 +325,21 @@ public final class InjectionUtils {
         return theValues;
     }
     
+    @SuppressWarnings("unchecked")
+    public static Object injectIntoArray(Type genericType, List<String> values,
+                                         boolean decoded, ParameterType pathParam, Message message) {
+        Class<?> realType = InjectionUtils.getActualType(genericType);
+        values = checkPathSegment(values, realType, pathParam);
+        Object[] array = (Object[])Array.newInstance(realType, values.size());
+        for (int i = 0; i < values.size(); i++) {
+            String value = decodeValue(values.get(i), decoded, pathParam);
+            Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
+            if (o != null) {
+                array[i] = o;
+            }
+        }
+        return array;
+    }
     
     
     @SuppressWarnings("unchecked")
@@ -382,16 +402,19 @@ public final class InjectionUtils {
                 }
             }
         }
-        
+
+        Object value = null;
         if (List.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam,
+            value = InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam,
                                                  message);
         } else if (Set.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam,
+            value = InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam,
                                                 message);
         } else if (SortedSet.class.isAssignableFrom(paramType)) {
-            return InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam,
+            value = InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam,
                                                 message);
+        } else if (paramType.isArray()) {
+            value = InjectionUtils.injectIntoArray(genericType, paramValues, decoded, pathParam, message);
         } else {
             String result = null;
             if (paramValues.size() > 0) {
@@ -401,11 +424,10 @@ public final class InjectionUtils {
             }
             if (result != null) {
                 result = decodeValue(result, decoded, pathParam);
-                return InjectionUtils.handleParameter(result, paramType, pathParam, message);
-            } else {
-                return null;
+                value = InjectionUtils.handleParameter(result, paramType, pathParam, message);
             }
         }
+        return value;
     }
     
     public static ThreadLocalProxy createThreadLocalProxy(Class<?> type) {

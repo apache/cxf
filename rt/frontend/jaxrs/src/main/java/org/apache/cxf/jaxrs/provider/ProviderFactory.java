@@ -206,6 +206,7 @@ public final class ProviderFactory {
     
     private static void handleMapper(List<Object> candidates, ProviderInfo em, 
                                      Class<?> expectedType, Message m) {
+        
         Type[] types = em.getProvider().getClass().getGenericInterfaces();
         for (Type t : types) {
             if (t instanceof ParameterizedType) {
@@ -218,6 +219,7 @@ public final class ProviderFactory {
                             InjectionUtils.injectContextMethods(em.getProvider(), em, m);
                         }
                         candidates.add(em.getProvider());
+                        break;
                     }
                 }
             }

@@ -557,16 +557,34 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
-        Class[] argType = {Customer.class};
+        Class[] argType = {Customer.class, Customer[].class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
-        messageImpl.put(Message.QUERY_STRING, "p1=Fred");
+        messageImpl.put(Message.QUERY_STRING, "p1=Fred&p2=Barry");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(2, params.size());
+        Customer c = (Customer)params.get(0);
+        assertEquals("Fred", c.getName());
+        Customer c2 = ((Customer[])params.get(1))[0];
+        assertEquals("Barry", c2.getName());
+    }
+    
+    @Test
+    public void testArrayParamNoProvider() throws Exception {
+        Message messageImpl = createMessage();
+        Class[] argType = {String[].class};
+        Method m = Customer.class.getMethod("testCustomerParam2", argType);
+        
+        messageImpl.put(Message.QUERY_STRING, "p1=Fred&p1=Barry");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
-        Customer c = (Customer)params.get(0);
-        assertEquals("Fred", c.getName());
+        String[] values = (String[])params.get(0);
+        assertEquals("Fred", values[0]);
+        assertEquals("Barry", values[1]);
     }
     
     @Test
