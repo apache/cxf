@@ -19,6 +19,7 @@
 
 package org.apache.cxf.management.interceptor;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
@@ -34,7 +35,10 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
+        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
+        mhtr.setFaultMode(null);
+        EasyMock.expectLastCall();
         mhtr.endHandling();
         EasyMock.expectLastCall();              
          
@@ -51,7 +55,59 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.verify(cRepository);
         
     }
+
+    @Test
+    public void testServerCheckedApplicationFaultMessageOut() {
+        testServerFaultMessageOut(FaultMode.CHECKED_APPLICATION_FAULT);
+    }
+
+    @Test
+    public void testServerLogicalRuntimeFaultMessageOut() {
+        testServerFaultMessageOut(FaultMode.LOGICAL_RUNTIME_FAULT);
+    }
     
+    @Test
+    public void testServerRuntimeFaultMessageOut() {
+        testServerFaultMessageOut(FaultMode.RUNTIME_FAULT);
+    }
+    
+    @Test
+    public void testServerUncheckedApplicationFaultMessageOut() {
+        testServerFaultMessageOut(FaultMode.UNCHECKED_APPLICATION_FAULT);
+    }
+    
+    public void testServerFaultMessageOut(FaultMode faultMode) {
+        // need to increase the counter and is not a client
+        setupCounterRepository(true, false);
+        setupExchangeForMessage();
+        EasyMock.expect(message.getExchange()).andReturn(exchange);
+        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
+        EasyMock.expect(message.get(FaultMode.class)).andReturn(faultMode).anyTimes();
+        EasyMock.expect(exchange.getOutMessage()).andReturn(message);
+        exchange.put(FaultMode.class, faultMode);
+        EasyMock.expectLastCall();
+        EasyMock.expect(exchange.isOneWay()).andReturn(false);
+        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(faultMode).anyTimes();
+        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
+        mhtr.setFaultMode(faultMode);
+        EasyMock.expectLastCall();
+        mhtr.endHandling();
+        EasyMock.expectLastCall();              
+        
+        EasyMock.replay(mhtr);
+        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
+        EasyMock.replay(exchange);
+        EasyMock.replay(message);
+        
+        rtmoi.handleFault(message);
+        EasyMock.verify(message);
+        EasyMock.verify(bus);
+        EasyMock.verify(exchange);
+        EasyMock.verify(mhtr);
+        EasyMock.verify(cRepository);
+        
+    }
+
     @Test
     public void testClientOneWayMessageOut() {
         //need to increase the counter and is a client

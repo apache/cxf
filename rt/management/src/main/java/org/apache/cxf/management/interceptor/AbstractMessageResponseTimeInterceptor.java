@@ -33,6 +33,7 @@ import org.apache.cxf.management.counters.Counter;
 import org.apache.cxf.management.counters.CounterRepository;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
@@ -41,7 +42,7 @@ import org.apache.cxf.service.model.OperationInfo;
 public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractMessageResponseTimeInterceptor.class);
     
-    public AbstractMessageResponseTimeInterceptor(String phase) {
+    AbstractMessageResponseTimeInterceptor(String phase) {
         super(phase);
     }
     
@@ -68,7 +69,8 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         }
         MessageHandlingTimeRecorder mhtr = ex.get(MessageHandlingTimeRecorder.class);
         if (null != mhtr) {
-            mhtr.endHandling();            
+            mhtr.endHandling();
+            mhtr.setFaultMode(ex.get(FaultMode.class));
             increaseCounter(ex, mhtr);
                         
         } // else can't get the MessageHandling Infor  

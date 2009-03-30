@@ -20,8 +20,12 @@ package org.apache.cxf.management.counters;
 
 public interface ResponseTimeCounterMBean {   
     Number getNumInvocations();
+    Number getNumCheckedApplicationFaults();
+    Number getNumLogicalRuntimeFaults();
+    Number getNumRuntimeFaults();
+    Number getNumUnCheckedApplicationFaults();
     Number getAvgResponseTime();
     Number getMaxResponseTime();
-    Number getMinResponseTime();
-    Number getTotalHandlingTime();    
+    Number getMinResponseTime();   
+    Number getTotalHandlingTime();
 }

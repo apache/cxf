@@ -20,6 +20,7 @@
 package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.classextension.EasyMock;
@@ -37,9 +38,12 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
+        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         mhtr.endHandling();
-        EasyMock.expectLastCall();              
+        EasyMock.expectLastCall();        
+        mhtr.setFaultMode(null);
+        EasyMock.expectLastCall();
          
         EasyMock.replay(mhtr);
         EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
@@ -54,7 +58,58 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.verify(cRepository);
         
     }
-    
+
+    @Test
+    public void testClientCheckedApplicationFaultMessageIn() {
+        testClientFaultMessageIn(FaultMode.CHECKED_APPLICATION_FAULT);
+    }
+
+    @Test
+    public void testClientLogicalFaultMessageIn() {
+        testClientFaultMessageIn(FaultMode.LOGICAL_RUNTIME_FAULT);
+    }
+
+    @Test
+    public void testClientRuntimeFaultMessageIn() {
+        testClientFaultMessageIn(FaultMode.RUNTIME_FAULT);
+    }
+
+    @Test
+    public void testClientUncheckedApplicationFaultMessageIn() {
+        testClientFaultMessageIn(FaultMode.UNCHECKED_APPLICATION_FAULT);
+    }
+
+    public void testClientFaultMessageIn(FaultMode faultMode) {
+        // need to increase the counter and is a client
+        setupCounterRepository(true, true);
+        setupExchangeForMessage();
+        EasyMock.expect(message.getExchange()).andReturn(exchange);
+        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
+        EasyMock.expect(message.get(FaultMode.class)).andReturn(faultMode).anyTimes();
+        EasyMock.expect(exchange.getOutMessage()).andReturn(message);
+        exchange.put(FaultMode.class, faultMode);
+        EasyMock.expectLastCall();
+        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(faultMode).anyTimes();
+        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
+        mhtr.endHandling();
+        EasyMock.expectLastCall();        
+        mhtr.setFaultMode(faultMode);
+        EasyMock.expectLastCall();
+         
+        EasyMock.replay(mhtr);
+        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
+        EasyMock.replay(exchange);
+        EasyMock.replay(message);
+        
+        rtmii.handleFault(message);
+        EasyMock.verify(message);
+        EasyMock.verify(bus);
+        EasyMock.verify(exchange);
+        EasyMock.verify(mhtr);
+        EasyMock.verify(cRepository);
+        
+    }
+
     
     // it would not fire the counter increase action now
     @Test

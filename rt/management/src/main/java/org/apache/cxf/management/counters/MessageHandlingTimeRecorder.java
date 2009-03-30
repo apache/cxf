@@ -20,12 +20,14 @@
 package org.apache.cxf.management.counters;
 
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 
 /* recoder the message actually handle begin and end time */ 
 public class MessageHandlingTimeRecorder {
     private Exchange exchange;
     private long beginTime;
     private long endTime;
+    private FaultMode faultMode;
     private boolean oneWay;
     
     public MessageHandlingTimeRecorder(Exchange ex) {
@@ -61,4 +63,11 @@ public class MessageHandlingTimeRecorder {
         return endTime - beginTime;
     }
 
+    public FaultMode getFaultMode() {
+        return faultMode;
+    }
+
+    public void setFaultMode(FaultMode faultMode) {
+        this.faultMode = faultMode;
+    }
 }

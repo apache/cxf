@@ -46,12 +46,12 @@ import org.apache.cxf.bus.ManagedBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.JMXConnectorPolicyType;
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
-
 
 /**
  * The manager class for the JMXManagedComponent which hosts the JMXManagedComponents.
@@ -66,6 +66,10 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     private Set<ObjectName> busMBeans = new HashSet<ObjectName>();
     private ModelMBeanAssembler assembler;
     private boolean connectFailed;
+    /**
+     * For backward compatibility, {@link #createMBServerConnectorFactory} is <code>true</code> by default.
+     */
+    private boolean createMBServerConnectorFactory = true;
     private String mbeanServerName = ManagementConstants.DEFAULT_DOMAIN_NAME;
     private boolean usePlatformMBeanServer;
     
@@ -86,6 +90,11 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     public void setServerName(String s) {
         mbeanServerName = s;
     }
+    
+    public void setCreateMBServerConnectorFactory(boolean createMBServerConnectorFactory) {
+        this.createMBServerConnectorFactory = createMBServerConnectorFactory;
+    }
+    
     public void setUsePlatformMBeanServer(Boolean flag) {
         usePlatformMBeanServer = flag;
     }
@@ -105,28 +114,34 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     public void init() {    
         if (isEnabled()) {
             
-            // return platform mbean server if the option is specified.
-            if (usePlatformMBeanServer) {
-                mbs = ManagementFactory.getPlatformMBeanServer();
-            } else {
-                List servers = MBeanServerFactory.findMBeanServer(mbeanServerName);
-                if (servers.size() <= 1) {
-                    mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
+            if (mbs == null) {
+                // return platform mbean server if the option is specified.
+                if (usePlatformMBeanServer) {
+                    mbs = ManagementFactory.getPlatformMBeanServer();
                 } else {
-                    mbs = (MBeanServer)servers.get(0);
+                    List<MBeanServer> servers = CastUtils
+                        .cast(MBeanServerFactory.findMBeanServer(mbeanServerName));
+                    if (servers.size() <= 1) {
+                        mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
+                    } else {
+                        mbs = (MBeanServer)servers.get(0);
+                    }
                 }
             }
-            mcf = MBServerConnectorFactory.getInstance();
-            mcf.setMBeanServer(mbs);
-            mcf.setThreaded(isThreaded());
-            mcf.setDaemon(isDaemon());
-            mcf.setServiceUrl(getJMXServiceURL());
-            try {            
-                mcf.createConnector();                
-            } catch (IOException ex) {
-                connectFailed = true;
-                LOG.log(Level.SEVERE, "START_CONNECTOR_FAILURE_MSG", new Object[]{ex});
-            }              
+            
+            if (createMBServerConnectorFactory) {
+                mcf = MBServerConnectorFactory.getInstance();
+                mcf.setMBeanServer(mbs);
+                mcf.setThreaded(isThreaded());
+                mcf.setDaemon(isDaemon());
+                mcf.setServiceUrl(getJMXServiceURL());
+                try {
+                    mcf.createConnector();
+                } catch (IOException ex) {
+                    connectFailed = true;
+                    LOG.log(Level.SEVERE, "START_CONNECTOR_FAILURE_MSG", new Object[] {ex});
+                }
+            }
 
             if (!connectFailed && null != bus) {            
                 try {
@@ -191,17 +206,23 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     public MBeanServer getMBeanServer() {        
         return mbs;
     }
+
+    public void setServer(MBeanServer server) {
+        this.mbs = server;
+    }
     
     public void shutdown() {
         if (!isEnabled()) {
             return;           
         }
         
-        try {
-            mcf.destroy();
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "STOP_CONNECTOR_FAILURE_MSG", new Object[]{ex});
-        }   
+        if (mcf != null) {
+            try {
+                mcf.destroy();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, "STOP_CONNECTOR_FAILURE_MSG", new Object[] {ex});
+            }
+        }
     }
 
     public void initComplete() {
