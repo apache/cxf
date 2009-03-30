@@ -127,9 +127,11 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             List list = (List) ctx.get(Header.HEADER_LIST);
             if (list != null && !list.isEmpty()) {
                 SoapMessage sm = (SoapMessage) createResponseMessage(exchange);
-                Iterator iter = list.iterator();
-                while (iter.hasNext()) {
-                    sm.getHeaders().add((Header) iter.next());
+                if (sm != null) {
+                    Iterator iter = list.iterator();
+                    while (iter.hasNext()) {
+                        sm.getHeaders().add((Header) iter.next());
+                    }
                 }
             }
         }
