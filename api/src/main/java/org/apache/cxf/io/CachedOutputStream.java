@@ -168,6 +168,7 @@ public class CachedOutputStream extends OutputStream {
     
     public void close() throws IOException {
         currentStream.flush();
+        outputLocked = true;
         if (null != callbacks) {
             for (CachedOutputStreamCallback cb : callbacks) {
                 cb.onClose(this);
