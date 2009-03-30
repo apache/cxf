@@ -43,7 +43,7 @@ public interface Attachment {
      * serialization of the attachment. If true, it will be serialized
      * as binary data, and not Base64Binary.
      * 
-     * @return true iff this attachment is an XOP package
+     * @return true if this attachment is an XOP package
      */
     boolean isXOP();
 }
