@@ -129,11 +129,15 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
             validators.add(new MIMEBindingValidator(this.def));
         }
 
+        boolean notValid = false;
         for (AbstractValidator validator : validators) {
             if (!validator.isValid()) {
+                notValid = true;
                 addErrorMessage(validator.getErrorMessage());                
-                throw new ToolException(this.getErrorMessage());
             }
+        }
+        if (notValid) {
+            throw new ToolException(this.getErrorMessage());            
         }
 
         // By default just use WsdlRefValidator
