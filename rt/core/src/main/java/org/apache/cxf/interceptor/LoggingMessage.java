@@ -18,22 +18,41 @@
  */
 package org.apache.cxf.interceptor;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public final class LoggingMessage {
-
+    public static final String ID_KEY = LoggingMessage.class.getName() + ".ID";
+    private static final AtomicInteger ID = new AtomicInteger();
+    
     private final String heading;
-
+    private final StringBuilder address;
+    private final StringBuilder contentType;
     private final StringBuilder encoding;
     private final StringBuilder header;
     private final StringBuilder message;
     private final StringBuilder payload;
+    private final String id;
+    
 
-    public LoggingMessage(String h) {
+    public LoggingMessage(String h, String i) {
         heading = h;
+        id = i;
 
+        contentType = new StringBuilder();
+        address = new StringBuilder();
         encoding = new StringBuilder();
         header = new StringBuilder();
         message = new StringBuilder();
         payload = new StringBuilder();
+    }
+    
+    public static String nextId() {
+        return Integer.toString(ID.incrementAndGet());
+    }
+        
+    
+    public StringBuilder getAddress() {
+        return address;
     }
 
     public StringBuilder getEncoding() {
@@ -42,6 +61,10 @@ public final class LoggingMessage {
 
     public StringBuilder getHeader() {
         return header;
+    }
+
+    public StringBuilder getContentType() {
+        return contentType;
     }
 
     public StringBuilder getMessage() {
@@ -55,8 +78,15 @@ public final class LoggingMessage {
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append(heading);
+        buffer.append("\nID: ").append(id);
+        if (address.length() > 0) {
+            buffer.append("\nAddress: ");
+            buffer.append(address);
+        }
         buffer.append("\nEncoding: ");
         buffer.append(encoding);
+        buffer.append("\nContent-Type: ");
+        buffer.append(contentType);
         buffer.append("\nHeaders: ");
         buffer.append(header);
         if (message.length() > 0) {
