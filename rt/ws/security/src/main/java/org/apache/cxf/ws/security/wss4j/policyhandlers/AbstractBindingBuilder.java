@@ -995,25 +995,28 @@ public abstract class AbstractBindingBuilder {
         String encrUser = (String)message.getContextualProperty(sign 
                                                                 ? SecurityConstants.SIGNATURE_USERNAME
                                                                 : SecurityConstants.ENCRYPT_USERNAME);
-        if (encrUser == null) {
-            encrUser = crypto.getDefaultX509Alias();
-        }
-        if (encrUser == null) {
-            try {
-                Enumeration<String> en = crypto.getKeyStore().aliases();
-                if (en.hasMoreElements()) {
-                    encrUser = en.nextElement();
-                }
-                if (en.hasMoreElements()) {
-                    //more than one alias in the keystore, user WILL need
-                    //to specify
-                    encrUser = null;
-                }            
-            } catch (KeyStoreException e) {
-                //ignore
+        if (crypto != null) {
+            if (encrUser == null) {
+                encrUser = crypto.getDefaultX509Alias();
             }
+            if (encrUser == null) {
+                try {
+                    Enumeration<String> en = crypto.getKeyStore().aliases();
+                    if (en.hasMoreElements()) {
+                        encrUser = en.nextElement();
+                    }
+                    if (en.hasMoreElements()) {
+                        //more than one alias in the keystore, user WILL need
+                        //to specify
+                        encrUser = null;
+                    }            
+                } catch (KeyStoreException e) {
+                    //ignore
+                }
+            }
+        } else if (encrUser == null || "".equals(encrUser)) {
+            policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " crypto object found.");
         }
-
         if (encrUser == null || "".equals(encrUser)) {
             policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " username found.");
         }
