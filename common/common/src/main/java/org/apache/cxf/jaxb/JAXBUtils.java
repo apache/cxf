@@ -50,7 +50,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.Holder;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -472,7 +471,8 @@ public final class JAXBUtils {
             return cls;
         }
 
-        if (cls == Object.class || cls == String.class || cls == Holder.class) {
+        if (cls == Object.class || cls == String.class
+            || "javax.xml.ws.Holder".equals(cls.getName())) {
             cls = null;
         } else if (cls.isPrimitive() || cls.isAnnotation()) {
             cls = null;
