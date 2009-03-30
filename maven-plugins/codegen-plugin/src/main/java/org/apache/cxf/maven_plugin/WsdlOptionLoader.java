@@ -29,11 +29,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
-/**
-   This class was ported from fAnt wsdl2java task
-   http://code.google.com/p/fant/
- */
-
 public final class WsdlOptionLoader {
     private static final String WSDL_OPTIONS = "-options$";
     private static final String WSDL_BINDINGS = "-binding-?\\d*.xml$";

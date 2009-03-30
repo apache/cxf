@@ -108,7 +108,14 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
         }
         
         public void onClose(CachedOutputStream cos) {
-            final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------");
+            String id = (String)message.getExchange().get(LoggingMessage.ID_KEY);
+            if (id == null) {
+                id = LoggingMessage.nextId();
+                message.getExchange().put(LoggingMessage.ID_KEY, id);
+            }
+            final LoggingMessage buffer 
+                = new LoggingMessage("Outbound Message\n---------------------------",
+                                     id);
             
             String encoding = (String)message.get(Message.ENCODING);
 

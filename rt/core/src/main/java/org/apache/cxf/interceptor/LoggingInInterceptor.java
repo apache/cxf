@@ -84,7 +84,13 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     private void logging(Message message) throws Fault {
-        final LoggingMessage buffer = new LoggingMessage("Inbound Message\n----------------------------");
+        String id = (String)message.getExchange().get(LoggingMessage.ID_KEY);
+        if (id == null) {
+            id = LoggingMessage.nextId();
+            message.getExchange().put(LoggingMessage.ID_KEY, id);
+        }
+        final LoggingMessage buffer 
+            = new LoggingMessage("Inbound Message\n----------------------------", id);
 
         
         String encoding = (String)message.get(Message.ENCODING);
@@ -100,6 +106,10 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         if (headers != null) {
             buffer.getHeader().append(headers);
+        }
+        String uri = (String)message.get(Message.REQUEST_URI);
+        if (uri != null) {
+            buffer.getAddress().append(uri);
         }
             
         InputStream is = message.getContent(InputStream.class);
