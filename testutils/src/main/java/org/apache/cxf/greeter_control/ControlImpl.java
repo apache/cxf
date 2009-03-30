@@ -159,6 +159,16 @@ public class ControlImpl implements Control {
             endpointInterface = "org.apache.cxf.greeter_control.Greeter",
             targetNamespace = "http://cxf.apache.org/greeter_control")
     class GreeterImpl extends AbstractGreeterImpl {
+    }
+
+    public Response<?> setFaultLocationAsync(FaultLocation in) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Future<?> setFaultLocationAsync(FaultLocation in, AsyncHandler<?> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
     } 
     
 }
