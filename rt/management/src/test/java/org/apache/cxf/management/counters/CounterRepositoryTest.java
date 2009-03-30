@@ -54,7 +54,7 @@ public class CounterRepositoryTest extends Assert {
         EasyMock.expect(mhtr.isOneWay()).andReturn(true).anyTimes();
         EasyMock.expect(mhtr.getEndTime()).andReturn((long)100000000).anyTimes();
         EasyMock.expect(mhtr.getHandlingTime()).andReturn((long)1000).anyTimes();
-        
+        EasyMock.expect(mhtr.getFaultMode()).andReturn(null).anyTimes();
         EasyMock.replay(mhtr);
         cr.increaseCounter(serviceCounter, mhtr);
         cr.increaseCounter(operationCounter, mhtr);
@@ -77,6 +77,7 @@ public class CounterRepositoryTest extends Assert {
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         EasyMock.expect(mhtr.isOneWay()).andReturn(true).anyTimes();
         EasyMock.expect(mhtr.getEndTime()).andReturn((long)0).anyTimes();
+        EasyMock.expect(mhtr.getFaultMode()).andReturn(null).anyTimes();
         EasyMock.replay(mhtr);
         cr.increaseCounter(serviceCounter, mhtr);
         cr.increaseCounter(operationCounter, mhtr);
@@ -98,6 +99,7 @@ public class CounterRepositoryTest extends Assert {
         MessageHandlingTimeRecorder mhtr1 = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         EasyMock.expect(mhtr1.isOneWay()).andReturn(false).anyTimes();
         EasyMock.expect(mhtr1.getHandlingTime()).andReturn((long)1000).anyTimes();
+        EasyMock.expect(mhtr1.getFaultMode()).andReturn(null).anyTimes();
         EasyMock.replay(mhtr1);
         cr.createCounter(operationCounter, mhtr1);
         cr.increaseCounter(serviceCounter, mhtr1);
@@ -117,6 +119,7 @@ public class CounterRepositoryTest extends Assert {
         MessageHandlingTimeRecorder mhtr2 = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         EasyMock.expect(mhtr2.isOneWay()).andReturn(false).anyTimes();
         EasyMock.expect(mhtr2.getHandlingTime()).andReturn((long)2000).anyTimes();
+        EasyMock.expect(mhtr2.getFaultMode()).andReturn(null).anyTimes();
         EasyMock.replay(mhtr2);
         cr.increaseCounter(serviceCounter, mhtr2);
         cr.increaseCounter(operationCounter, mhtr2);

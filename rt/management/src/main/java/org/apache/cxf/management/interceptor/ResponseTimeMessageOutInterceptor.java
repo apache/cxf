@@ -20,6 +20,7 @@ package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -35,9 +36,25 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
             if (ex.isOneWay()) {
                 setOneWayMessage(ex);
             } else {
-                beginHandlingMessage(ex); 
+                beginHandlingMessage(ex);
             }
         } else { // the message is handled by server
+            endHandlingMessage(ex);
+        }
+    }
+    
+    @Override
+    public void handleFault(Message message) {
+        Exchange ex = message.getExchange();
+        if (ex.isOneWay()) {
+            // do nothing, done by the ResponseTimeInvokerInterceptor
+        } else {
+            FaultMode faultMode = message.get(FaultMode.class);
+            if (faultMode == null) {
+                // client side exceptions don't have FaultMode set un the message properties (as of 2.1.4)
+                faultMode = FaultMode.RUNTIME_FAULT;
+            }
+            ex.put(FaultMode.class, faultMode);
             endHandlingMessage(ex);
         }
     }

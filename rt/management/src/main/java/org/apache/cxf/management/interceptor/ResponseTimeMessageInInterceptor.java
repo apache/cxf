@@ -21,6 +21,7 @@ package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -38,6 +39,12 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
         } else {            
             beginHandlingMessage(ex);            
         }
-    }
+    }    
     
+    @Override
+    public void handleFault(Message message) {
+        Exchange ex = message.getExchange();
+        ex.put(FaultMode.class, message.get(FaultMode.class));
+        endHandlingMessage(ex);
+    }
 }

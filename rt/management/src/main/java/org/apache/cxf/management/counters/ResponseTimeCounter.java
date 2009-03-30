@@ -23,10 +23,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.ObjectName;
 
+import org.apache.cxf.message.FaultMode;
+
 public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {    
     
     private ObjectName objectName;
     private AtomicInteger invocations = new AtomicInteger();
+    private AtomicInteger checkedApplicationFaults = new AtomicInteger();
+    private AtomicInteger unCheckedApplicationFaults = new AtomicInteger();
+    private AtomicInteger runtimeFaults = new AtomicInteger();
+    private AtomicInteger logicalRuntimeFaults = new AtomicInteger();
     private long totalHandlingTime;    
     private long maxHandlingTime;
     private long minHandlingTime = Integer.MAX_VALUE;
@@ -37,6 +43,29 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     
     public void  increase(MessageHandlingTimeRecorder mhtr) {
         invocations.getAndIncrement();
+        FaultMode faultMode = mhtr.getFaultMode();
+        if (null == faultMode) {
+            // no exception occured
+        } else {
+            switch (faultMode) {
+            case CHECKED_APPLICATION_FAULT:
+                checkedApplicationFaults.incrementAndGet();
+                break;
+            case LOGICAL_RUNTIME_FAULT:
+                logicalRuntimeFaults.incrementAndGet();
+                break;
+            case RUNTIME_FAULT:
+                runtimeFaults.incrementAndGet();
+                break;
+            case UNCHECKED_APPLICATION_FAULT:
+                unCheckedApplicationFaults.incrementAndGet();
+                break;
+            default:
+                runtimeFaults.incrementAndGet();
+                break;
+            }
+        }
+        
         long handlingTime = 0;
         if (mhtr.isOneWay()) {
             // We can count the response time 
@@ -53,10 +82,8 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         }
         if (minHandlingTime > handlingTime) {
             minHandlingTime = handlingTime;
-        }         
+        }
     }
-    
-    
     
     public ObjectName getObjectName() {
         return objectName;
@@ -65,7 +92,6 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     public Number getAvgResponseTime() {        
         return (int)(totalHandlingTime / invocations.get());
     }
-
     
     public Number getMaxResponseTime() {        
         return maxHandlingTime;
@@ -79,7 +105,24 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         return invocations.get();
     }
 
-    public Number getTotalHandlingTime() {
-        return totalHandlingTime;
+    public Number getNumCheckedApplicationFaults() {
+        return checkedApplicationFaults.get();
     }
+
+    public Number getNumLogicalRuntimeFaults() {
+        return logicalRuntimeFaults.get();
+    }
+    
+    public Number getNumRuntimeFaults() {
+        return runtimeFaults.get();
+    }
+    
+    public Number getNumUnCheckedApplicationFaults() {
+        return unCheckedApplicationFaults.get();
+    }
+    
+    public Number getTotalHandlingTime() {        
+        return totalHandlingTime;
+    }  
+
 }

@@ -22,27 +22,35 @@ package org.apache.cxf.management.interceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /* When the message get from the server side
  * The exchange.isOneWay() is workable when the message
  * handler by the binging interceptor  
- * */ 
-public class ResponseTimeMessageInvokerInterceptor 
-    extends AbstractMessageResponseTimeInterceptor {
-      
+ * */
+public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageResponseTimeInterceptor {
+    
     public ResponseTimeMessageInvokerInterceptor() {
         super(Phase.INVOKE);
-        //this interceptor should be add before the serviceInvokerInterceptor
+        // this interceptor should be add before the serviceInvokerInterceptor
         addBefore(ServiceInvokerInterceptor.class.getName());
     }
-
+    
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
         if (ex.isOneWay()) {
-            setOneWayMessage(ex); 
+            setOneWayMessage(ex);
         }
     }
-
+    
+    @Override
+    public void handleFault(Message message) {
+        Exchange ex = message.getExchange();
+        ex.put(FaultMode.class, message.get(FaultMode.class));
+        if (ex.isOneWay()) {
+            endHandlingMessage(ex);
+        }
+    }
 }
