@@ -152,13 +152,6 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             SchemaCollection schemaCollection = service0.getXmlSchemaCollection();
             context.put(ToolConstants.XML_SCHEMA_COLLECTION, schemaCollection);
             
-            // > 2 because the schema-schema is always in there.
-            if (context.isPackageNameChanged() && schemaCollection.getXmlSchemas().length > 2
-                && context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
-                throw new ToolException(new Message("-p option cannot be used "
-                    + "when wsdl contains mutiple schemas", LOG));
-            }
-            
             context.put(ToolConstants.PORTTYPE_MAP, interfaces);
             context.put(ClassCollector.class, new ClassCollector());
             Processor processor = frontend.getProcessor();
