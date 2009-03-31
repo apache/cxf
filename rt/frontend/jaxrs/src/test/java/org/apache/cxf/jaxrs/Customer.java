@@ -235,7 +235,11 @@ public class Customer implements CustomerInfo {
         // complete
     }
     
-    public void testCustomerParam(@QueryParam("p1") Customer c) {
+    public void testCustomerParam(@QueryParam("p1") Customer c, @QueryParam("p2") Customer[] c2) {
+        // complete
+    }
+    
+    public void testCustomerParam2(@QueryParam("p1") String[] p) {
         // complete
     }
     

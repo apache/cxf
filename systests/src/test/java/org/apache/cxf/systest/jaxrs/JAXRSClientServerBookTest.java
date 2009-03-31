@@ -73,7 +73,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/xml", 200);
     }
     
-    
+    @Test
+    public void testGetBookByArrayQuery() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/bookidarray?"
+                               + "id=1&id=2&id=3",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+        
     @Test
     public void testNoRootResourceException() throws Exception {
         getAndCompare("http://localhost:9080/nobookstore/webappexception",

@@ -191,6 +191,15 @@ public class BookStore {
         int index = url2.lastIndexOf('/');
         return doGetBook(url2.substring(index + 1));
     }
+    
+    @GET
+    @Path("/bookidarray")
+    public Book getBookByURLQuery(@QueryParam("id") String[] ids) throws Exception {
+        if (ids == null || ids.length != 3) {
+            throw new WebApplicationException(); 
+        }
+        return doGetBook(ids[0] + ids[1] + ids[2]);
+    }
 
     @GET
     @Path("/securebooks/{bookId}/")
