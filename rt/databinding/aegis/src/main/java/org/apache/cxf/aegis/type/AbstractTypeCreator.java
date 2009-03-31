@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
 
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.basic.ArrayType;
@@ -135,7 +134,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
 
     protected boolean isHolder(Class javaType) {
-        return javaType.equals(Holder.class);
+        return "javax.xml.ws.Holder".equals(javaType.getName());
     }
 
     protected Type createHolderType(TypeClassInfo info) {
