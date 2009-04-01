@@ -126,6 +126,7 @@ public final class SchemaUtil {
                         SchemaInfo schemaInfo = new SchemaInfo(xmlSchema.getTargetNamespace());
                         schemaInfo.setSchema(xmlSchema);
                         schemaInfo.setSystemId(systemId);
+                        schemaInfo.setElement(schemaElem);
                         schemaInfos.add(schemaInfo);
                         schemaCount++;
                     }

@@ -44,7 +44,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     private String systemId;
     // Avoid re-serializing all the time. Particularly as a cached WSDL will
     // hold a reference to the element.
-    private SoftReference<Element> cachedElement = new SoftReference<Element>(null);
+    private SoftReference<Element> cachedElement;
     
     public SchemaInfo(String namespaceUri) {
         this(namespaceUri, false, false);
@@ -75,13 +75,17 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         this.namespaceUri = nsUri;
     }
 
+    public synchronized void setElement(Element el) {
+        cachedElement = new SoftReference<Element>(el);
+    }
+    
     /**
      * Build and return a DOM tree for this schema.
      * @return
      */
     public synchronized Element getElement() {
         // if someone recently used this DOM tree, take advantage.
-        Element element = cachedElement.get();
+        Element element = cachedElement == null ? null : cachedElement.get();
         if (element != null) {
             return element;
         }
