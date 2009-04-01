@@ -54,36 +54,14 @@
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>woodstox-core-asl</artifactId>
-      <version>4.0.2</version>
     </dependency>
     <dependency>
-      <groupId>msv</groupId>
-      <artifactId>relaxngDatatype</artifactId>
-      <version>20050913</version>
-    </dependency>
-    <dependency>
-      <groupId>msv</groupId>
-      <artifactId>isorelax</artifactId>
-      <version>20050913</version>
-    </dependency>
-    <dependency>
-      <groupId>msv</groupId>
-      <artifactId>msv</artifactId>
-      <version>20050913</version>
-    </dependency>
-    <dependency>
-      <groupId>msv</groupId>
-      <artifactId>xsdlib</artifactId>
-      <version>20050913</version>
+      <groupId>net.java.dev.msv</groupId>
+      <artifactId>msv-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.ws.commons.schema</groupId>
       <artifactId>XmlSchema</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${stax.impl.groupId}</groupId>
-      <artifactId>${stax.impl.artifactId}</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <scm>

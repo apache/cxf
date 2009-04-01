@@ -33,7 +33,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.cxf.service.model.ServiceInfo;
 
 /**
  * 
@@ -94,8 +94,6 @@ public class ElementDataReader implements DataReader<Element>, DataBindingValida
         reader.setSchema(s);
     }
 
-    public void setSchema(XmlSchemaCollection schema) {
-        // TODO Auto-generated method stub
-        
+    public void setValidationServiceModel(ServiceInfo serviceInfo) {
     }
 }

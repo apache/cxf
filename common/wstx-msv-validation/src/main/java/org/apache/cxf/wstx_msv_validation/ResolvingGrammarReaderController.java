@@ -24,23 +24,30 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import com.sun.msv.reader.GrammarReaderController;
+import com.sun.msv.reader.GrammarReaderController2;
+import com.sun.msv.reader.xmlschema.DOMLSInputImpl;
 
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * Catch error messages and resolve schema locations. 
+ * Catch error messages and resolve schema locations.
  */
-public class ResolvingGrammarReaderController implements GrammarReaderController {
+public class ResolvingGrammarReaderController implements GrammarReaderController2, LSResourceResolver {
     private static final Logger LOG = LogUtils.getL7dLogger(ResolvingGrammarReaderController.class);
 
-    private Map<String, InputSource> sources;
+    private Map<String, EmbeddedSchema> sources;
 
-    public ResolvingGrammarReaderController(Map<String, InputSource> sources) {
+    private String baseURI;
+
+    public ResolvingGrammarReaderController(String baseURI, Map<String, EmbeddedSchema> sources) {
+        this.baseURI = baseURI;
         this.sources = sources;
     }
 
@@ -61,7 +68,21 @@ public class ResolvingGrammarReaderController implements GrammarReaderController
     }
 
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-        // CXF never trucks with publicId's.
-        return sources.get(systemId);
+        return null;
+    }
+
+    public LSResourceResolver getLSResourceResolver() {
+        return this;
+    }
+
+    public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId,
+                                   String resolveBaseURI) {
+        EmbeddedSchema embeddedSchema = sources.get(namespaceURI);
+        if (embeddedSchema != null) {
+            return new DOMLSInputImpl(this.baseURI, embeddedSchema.getSystemId(), embeddedSchema
+                .getSchemaElement());
+        } else {
+            return null;
+        }
     }
 }

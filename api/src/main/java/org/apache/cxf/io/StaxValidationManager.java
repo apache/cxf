@@ -17,12 +17,13 @@
  * under the License.
  */
 
-package org.apache.cxf.staxutils;
+package org.apache.cxf.io;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.cxf.service.model.ServiceInfo;
 
 /**
  * This interface defines a bus service for Stax validation.
@@ -35,6 +36,7 @@ public interface StaxValidationManager {
      * @param schemas
      * @throws XMLStreamException 
      */
-    void setupValidation(XMLStreamReader reader, XmlSchemaCollection schemas) throws XMLStreamException;
+    void setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException;
+    void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException;
 
 }

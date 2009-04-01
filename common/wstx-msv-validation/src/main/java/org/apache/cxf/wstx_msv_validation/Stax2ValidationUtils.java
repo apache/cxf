@@ -19,31 +19,24 @@
 
 package org.apache.cxf.wstx_msv_validation;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Document;
-
-import org.xml.sax.InputSource;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.service.model.SchemaInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
-import org.apache.ws.commons.schema.XmlSchemaSerializer;
-import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
-import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.codehaus.stax2.XMLStreamWriter2;
 import org.codehaus.stax2.validation.XMLValidationSchema;
 
 /**
@@ -54,34 +47,28 @@ class Stax2ValidationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(Stax2ValidationUtils.class);
     
     public Stax2ValidationUtils() {
-        throw new RuntimeException("Not ready");
+        new W3CMultiSchemaFactory(); // will throw if wrong woodstox. 
     }
     
     /** {@inheritDoc}
      * @throws XMLStreamException */
     public void setupValidation(XMLStreamReader reader, 
-                                XmlSchemaCollection schemas) throws XMLStreamException {
+                                ServiceInfo serviceInfo) throws XMLStreamException {
         // Gosh, this is bad, but I don't know a better solution, unless we're willing 
         // to require the stax2 API no matter what.
-        if (reader instanceof DepthXMLStreamReader) {
-            reader = ((DepthXMLStreamReader)reader).getReader();
+        XMLStreamReader effectiveReader = reader;
+        if (effectiveReader instanceof DepthXMLStreamReader) {
+            effectiveReader = ((DepthXMLStreamReader)reader).getReader();
         }
-        XMLStreamReader2 reader2 = (XMLStreamReader2)reader;
-        XMLValidationSchema vs = getValidator(schemas);
+        final XMLStreamReader2 reader2 = (XMLStreamReader2)effectiveReader;
+        XMLValidationSchema vs = getValidator(serviceInfo);
         reader2.validateAgainst(vs);
-
-
     }
-    
-    private Reader getSchemaAsStream(DOMSource source) {
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        try {
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return new StringReader(writer.toString());
+
+    public void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
+        XMLStreamWriter2 writer2 = (XMLStreamWriter2)writer;
+        XMLValidationSchema vs = getValidator(serviceInfo);
+        writer2.validateAgainst(vs);
     }
 
     /**
@@ -90,38 +77,34 @@ class Stax2ValidationUtils {
      * @return
      * @throws XMLStreamException
      */
-    private XMLValidationSchema getValidator(XmlSchemaCollection schemas) throws XMLStreamException {
-        Map<String, InputSource> sources = new TreeMap<String, InputSource>();
-        XmlSchemaSerializer serializer = new XmlSchemaSerializer();
-        NamespaceMap namespaceContext = new NamespaceMap();
-        for (XmlSchema sch : schemas.getXmlSchemas()) {
+    private XMLValidationSchema getValidator(ServiceInfo serviceInfo) throws XMLStreamException {
+        Map<String, EmbeddedSchema> sources = new TreeMap<String, EmbeddedSchema>();
+
+        for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
+            XmlSchema sch = schemaInfo.getSchema();
             String uri = sch.getTargetNamespace();
+            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri)) {
+                continue;
+            }
             LOG.info(uri);
 
-            if (sch.getNamespaceContext() == null) {
-                sch.setNamespaceContext(namespaceContext);
-            }
-            Document[] serialized;
-            try {
-                serialized = serializer.serializeSchema(sch, false);
-            } catch (XmlSchemaSerializerException e) {
-                throw new RuntimeException(e);
-            }
-            DOMSource domSource = new DOMSource(serialized[0]);
-            Reader schemaReader = getSchemaAsStream(domSource);
-            InputSource inputSource = new InputSource(schemaReader);
+            Element serialized = schemaInfo.getElement();
             String schemaSystemId = sch.getSourceURI();
             if (null == schemaSystemId) {
                 schemaSystemId = sch.getTargetNamespace();
             }
-            inputSource.setSystemId(schemaSystemId);
-            sources.put(schemaSystemId, inputSource);
+            
+            EmbeddedSchema embeddedSchema = 
+                new EmbeddedSchema(schemaSystemId, serialized);
+            sources.put(sch.getTargetNamespace(), embeddedSchema);
         }
         
         W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
         XMLValidationSchema vs;
-        vs = factory.loadSchemas(sources);
+        // I don't think that we need the baseURI.
+        vs = factory.loadSchemas(null, sources);
         return vs;
     }
+
 
 }

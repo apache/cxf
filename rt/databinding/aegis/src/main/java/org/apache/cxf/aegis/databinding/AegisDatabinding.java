@@ -162,7 +162,7 @@ public class AegisDatabinding
     public <T> DataWriter<T> createWriter(Class<T> cls) {
         ensureInitialized();
         if (cls.equals(XMLStreamWriter.class)) {
-            return (DataWriter<T>)new XMLStreamDataWriter(this);
+            return (DataWriter<T>)new XMLStreamDataWriter(this, getBus());
         } else if (cls.equals(Node.class)) {
             return (DataWriter<T>)new ElementDataWriter(this);
         } else {

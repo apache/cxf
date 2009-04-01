@@ -16,16 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.wstx_msv_validation;
 
-package org.apache.cxf.databinding;
-
-import org.apache.cxf.service.model.ServiceInfo;
+import org.w3c.dom.Element;
 
 /**
- * If a DataReader<T> implements this interface, it prefers to be supplied with schema
- * for validation via a service model instead of via a packaged Schema object.
+ * A schema in a DOM Element. This is used in the WSDLSchemaReader to handle inter-schema cross-references. XS
  */
-public interface DataBindingValidation2 {
-    void setValidationServiceModel(ServiceInfo serviceInfo);
+public class EmbeddedSchema {
 
+    private String systemId;
+    private Element schemaElement;
+
+    /**
+     * Create object to represent one of the schemas in a WSDL
+     * 
+     * @param systemId schema system Id.
+     * @param schemaElement Element for the schema.
+     */
+    public EmbeddedSchema(String systemId, Element schemaElement) {
+        this.systemId = systemId;
+        this.schemaElement = schemaElement;
+    }
+
+    public String getSystemId() {
+        return systemId;
+    }
+
+    public Element getSchemaElement() {
+        return schemaElement;
+    }
 }

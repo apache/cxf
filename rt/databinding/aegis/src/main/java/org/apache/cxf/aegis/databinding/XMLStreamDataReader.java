@@ -30,17 +30,18 @@ import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.staxutils.StaxValidationManager;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.cxf.service.model.ServiceInfo;
 
 public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataBindingValidation2 {
 
     private AegisDatabinding databinding;
     private AegisXMLStreamDataReader reader;
     private Bus bus;
-    private XmlSchemaCollection schemas;
+    private ServiceInfo serviceInfo;
+    private boolean validate;
     
     public XMLStreamDataReader(AegisDatabinding databinding, Bus bus) {
         this.bus = bus;
@@ -51,10 +52,10 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataBin
     public Object read(MessagePartInfo part, XMLStreamReader input) {
         Type type = databinding.getType(part);
         try {
-            if (schemas != null) {
+            if (validate) {
                 StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
                 if (mgr != null) {
-                    mgr.setupValidation(input, schemas);
+                    mgr.setupValidation(input, serviceInfo);
                 }
             }
             return reader.read(input, type); 
@@ -87,7 +88,8 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataBin
         reader.setSchema(s);
     }
 
-    public void setSchema(XmlSchemaCollection validationSchemas) {
-        this.schemas = validationSchemas; 
+    public void setValidationServiceModel(ServiceInfo serviceModel) {
+        serviceInfo = serviceModel;
+        validate = true;
     }
 }

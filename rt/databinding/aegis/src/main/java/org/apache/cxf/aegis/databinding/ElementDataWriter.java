@@ -41,8 +41,8 @@ import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 public class ElementDataWriter implements DataWriter<Element>, DataBindingValidation2 {
 
@@ -114,10 +114,6 @@ public class ElementDataWriter implements DataWriter<Element>, DataBindingValida
         return properties.get(key);
     }
 
-    public void setSchema(XmlSchemaCollection schema) {
-        // TODO Auto-generated method stub
-        
+    public void setValidationServiceModel(ServiceInfo serviceInfo) {
     }
-
-
 }

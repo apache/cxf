@@ -35,7 +35,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlObject;
@@ -44,7 +44,7 @@ import org.apache.xmlbeans.XmlOptions;
 
 public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBindingValidation2 {
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
-    private XmlSchemaCollection schemas;
+    private boolean validate;
     
     public DataReaderImpl() {
     }
@@ -74,7 +74,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBinding
                     
                     SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
                     XmlOptions options = new XmlOptions();
-                    if (schemas != null) {
+                    if (validate) {
                         options.setValidateOnSet();
                     }
                     if (st != null && !st.isDocumentType() && !isOutClass) {
@@ -84,7 +84,6 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBinding
                     obj = meth.invoke(null, reader, options);                    
                     break;
                 } catch (Exception e) {
-                    e.printStackTrace();
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG, part.getTypeClass()), e);
                 }
             }
@@ -124,8 +123,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBinding
             try {
                 reader.next();
             } catch (XMLStreamException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return obj;
@@ -145,8 +143,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBinding
     public void setSchema(Schema s) {
     }
 
-    public void setSchema(XmlSchemaCollection validationSchemas) {
-        this.schemas = validationSchemas; 
+    public void setValidationServiceModel(ServiceInfo serviceModel) {
+        validate = true;
     }
-
 }

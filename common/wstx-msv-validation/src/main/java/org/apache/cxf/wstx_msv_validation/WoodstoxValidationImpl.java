@@ -23,11 +23,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.staxutils.StaxValidationManager;
-
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.cxf.io.StaxValidationManager;
+import org.apache.cxf.service.model.ServiceInfo;
 
 /**
  * 
@@ -61,7 +61,11 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
     /** {@inheritDoc}
      * @throws XMLStreamException */
     public void setupValidation(XMLStreamReader reader, 
-                                XmlSchemaCollection schemas) throws XMLStreamException {
-        utils.setupValidation(reader, schemas);
+                                ServiceInfo serviceInfo) throws XMLStreamException {
+        utils.setupValidation(reader, serviceInfo);
+    }
+
+    public void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
+        utils.setupValidation(writer, serviceInfo);
     }
 }

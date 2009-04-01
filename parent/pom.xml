@@ -52,6 +52,7 @@
         <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
         <jdom.version>1.0</jdom.version>
         <jetty.version>6.1.15</jetty.version>
+	<msv.version>2009.1-SNAPSHOT</msv.version>
         <rhino.version>1.7R1</rhino.version>
         <saaj.version>1.3</saaj.version>
         <spring.version>2.5.5</spring.version>
@@ -1063,7 +1064,17 @@
 	      <artifactId>xercesImpl</artifactId>
 	      <version>2.9.1</version>
 	    </dependency>
-
+	    <!-- if we use the new woodstox artifact, we're using the new version -->
+	    <dependency>
+	      <groupId>org.codehaus.woodstox</groupId>
+	      <artifactId>woodstox-core-asl</artifactId>
+	      <version>4.0.3</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>net.java.dev.msv</groupId>
+	      <artifactId>msv-core</artifactId>
+	      <version>${msv.version}</version>
+	    </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1117,7 +1128,7 @@
             <properties>
                 <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
                 <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
-                <stax.impl.version>4.0.2</stax.impl.version>
+                <stax.impl.version>4.0.3</stax.impl.version>
             </properties>
         </profile>
         <profile>

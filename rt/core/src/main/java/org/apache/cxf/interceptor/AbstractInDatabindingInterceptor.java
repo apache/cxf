@@ -108,8 +108,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
              * service info. 
              */
             if (reader instanceof DataBindingValidation2) {
-                ((DataBindingValidation2)reader).setSchema(service.getServiceInfos().get(0)
-                                                          .getXmlSchemaCollection().getXmlSchemaCollection());
+                ((DataBindingValidation2)reader).setValidationServiceModel(service.getServiceInfos().get(0));
             }
         }
     }

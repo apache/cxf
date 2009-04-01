@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
 
 import org.xml.sax.InputSource;
 
@@ -51,14 +52,17 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
         super(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
     }
     
-    public XMLValidationSchema loadSchemas(Map<String, InputSource> sources) throws XMLStreamException {
+    public XMLValidationSchema loadSchemas(String baseURI, 
+                                           Map<String, EmbeddedSchema> sources) throws XMLStreamException {
         parserFactory = getSaxFactory();
         
-        ResolvingGrammarReaderController ctrl = new ResolvingGrammarReaderController(sources);
+        ResolvingGrammarReaderController ctrl = new ResolvingGrammarReaderController(baseURI, sources);
         xmlSchemaReader = new XMLSchemaReader(ctrl, parserFactory);
         multiSchemaReader = new MultiSchemaReader(xmlSchemaReader);
-        for (InputSource source : sources.values()) {
-            multiSchemaReader.parse(source);
+        for (EmbeddedSchema source : sources.values()) {
+            DOMSource domSource = new DOMSource(source.getSchemaElement());
+            domSource.setSystemId(source.getSystemId());
+            multiSchemaReader.parse(domSource);
         }
         
         XMLSchemaGrammar grammar = multiSchemaReader.getResult();
