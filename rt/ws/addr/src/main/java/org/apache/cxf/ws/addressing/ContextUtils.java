@@ -144,7 +144,7 @@ public final class ContextUtils {
     * Determine if current messaging role is that of requestor.
     *
     * @param message the current Message
-    * @return true iff the current messaging role is that of requestor
+    * @return true if the current messaging role is that of requestor
     */
     public static boolean isRequestor(Message message) {
         Boolean requestor = (Boolean)message.get(REQUESTOR_ROLE);
@@ -157,9 +157,9 @@ public final class ContextUtils {
      * @param isProviderContext true if the binding provider request context 
      * available to the client application as opposed to the message context 
      * visible to handlers
-     * @param isRequestor true iff the current messaging role is that of
+     * @param isRequestor true if the current messaging role is that of
      * requestor
-     * @param isOutbound true iff the message is outbound
+     * @param isOutbound true if the message is outbound
      * @return the property name to use when caching the MAPs in the context
      */
     public static String getMAPProperty(boolean isRequestor, 
@@ -180,7 +180,7 @@ public final class ContextUtils {
      * Store MAPs in the message.
      *
      * @param message the current message
-     * @param isOutbound true iff the message is outbound
+     * @param isOutbound true if the message is outbound
      */
     public static void storeMAPs(AddressingProperties maps,
                                  Message message,
@@ -193,8 +193,8 @@ public final class ContextUtils {
      *
      * @param maps the MAPs to store
      * @param message the current message
-     * @param isOutbound true iff the message is outbound
-     * @param isRequestor true iff the current messaging role is that of
+     * @param isOutbound true if the message is outbound
+     * @param isRequestor true if the current messaging role is that of
      * requestor
      * @param handler true if HANDLER scope, APPLICATION scope otherwise
      */
@@ -210,8 +210,8 @@ public final class ContextUtils {
      *
      * @param maps the MAPs to store
      * @param message the current message
-     * @param isOutbound true iff the message is outbound
-     * @param isRequestor true iff the current messaging role is that of
+     * @param isOutbound true if the message is outbound
+     * @param isRequestor true if the current messaging role is that of
      * requestor
      * @param handler true if HANDLER scope, APPLICATION scope otherwise
      * @param isProviderContext true if the binding provider request context 
@@ -235,7 +235,7 @@ public final class ContextUtils {
      * @param isProviderContext true if the binding provider request context
      * available to the client application as opposed to the message context
      * visible to handlers
-     * @param isOutbound true iff the message is outbound
+     * @param isOutbound true if the message is outbound
      * @return the current addressing properties
      */
     public static AddressingPropertiesImpl retrieveMAPs(
@@ -250,7 +250,7 @@ public final class ContextUtils {
      * @param isProviderContext true if the binding provider request context
      * available to the client application as opposed to the message context
      * visible to handlers
-     * @param isOutbound true iff the message is outbound
+     * @param isOutbound true if the message is outbound
      * @param warnIfMissing log a warning  message if properties cannot be retrieved
      * @return the current addressing properties
      */
@@ -309,7 +309,7 @@ public final class ContextUtils {
      * none or anonymous).
      *
      * @param ref the EPR under test
-     * @return true iff the address is generic
+     * @return true if the address is generic
      */
     public static boolean isGenericAddress(EndpointReferenceType ref) {
         return ref == null 
@@ -321,10 +321,10 @@ public final class ContextUtils {
     /**
      * Helper method to determine if an MAPs Action is empty (a null action
      * is considered empty, whereas a zero length action suppresses
-     * the propogation of the Action property).
+     * the propagation of the Action property).
      *
      * @param ref the MAPs Action under test
-     * @return true iff the Action is empty
+     * @return true if the Action is empty
      */
     public static boolean hasEmptyAction(AddressingProperties maps) {
         boolean empty = maps.getAction() == null;
