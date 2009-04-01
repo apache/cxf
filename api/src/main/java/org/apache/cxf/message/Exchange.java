@@ -24,9 +24,23 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.Session;
 
 public interface Exchange extends StringMap {
+    
+    /**
+     * Returns the inbound message for the exchange. On the client-side, this 
+     * is the response. On the server-side, this is the request.
+     * 
+     * @return the inboubnd message
+     */
     Message getInMessage();
     void setInMessage(Message m);
     
+    /**
+     * Returns the outbound message for the exchange. On the client-side, this 
+     * is the request. On the server-side, this is the response. During the 
+     * inbound message processing, the outbound message is null.
+     * 
+     * @return the outbound message
+     */
     Message getOutMessage();
     void setOutMessage(Message m);
     
@@ -60,14 +74,18 @@ public interface Exchange extends StringMap {
     void setConduit(Conduit conduit);
     
     /**
+     * Determines if the exchange is one-way.
+     * 
      * @return true if the exchange is known to be a one-way exchange
      */
     boolean isOneWay();
     
     /**
-     * @return true if the frontend will be wait for the response.   Transports
-     * can then optimize themselves to process the response immediately instead 
-     * of using a background thread or similar.
+     * Determines if the exchange requires the frontend to wait for a 
+     * response. Transports can then optimize themselves to process the 
+     * response immediately instead of using a background thread or similar.
+     * 
+     * @return true if the frontend will wait for the response
      */
     boolean isSynchronous();
     void setSynchronous(boolean b);
@@ -78,5 +96,8 @@ public interface Exchange extends StringMap {
      */
     void setOneWay(boolean b);
     
+    /**
+     * {@inheritDoc}
+     */
     void clear();
 }

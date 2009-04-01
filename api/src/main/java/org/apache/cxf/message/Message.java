@@ -93,6 +93,11 @@ public interface Message extends StringMap {
 
     void setExchange(Exchange exchange);
     
+    /**
+     * Retrieve any binary attachments associated with the message.
+     *  
+     * @return a collection containing the attachments
+     */
     Collection<Attachment> getAttachments();
 
     void setAttachments(Collection<Attachment> attachments);
