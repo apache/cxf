@@ -104,7 +104,7 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="headerTester">
-    <wsdl:operation name="outHeader">
+    <wsdl:operation name="outHeader" parameterOrder="me the_response header_info">
       <wsdl:input name="outHeader" message="tns:outHeader">
     </wsdl:input>
       <wsdl:output name="outHeaderResponse" message="tns:outHeaderResponse">
@@ -116,7 +116,7 @@
       <wsdl:output name="inHeaderResponse" message="tns:inHeaderResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="inoutHeader">
+    <wsdl:operation name="inoutHeader" parameterOrder="me header_info">
       <wsdl:input name="inoutHeader" message="tns:inoutHeader">
     </wsdl:input>
       <wsdl:output name="inoutHeaderResponse" message="tns:inoutHeaderResponse">

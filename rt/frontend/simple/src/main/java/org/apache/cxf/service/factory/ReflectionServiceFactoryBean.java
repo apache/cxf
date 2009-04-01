@@ -1417,7 +1417,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     
     private void setParameterOrder(Method method, Class[] paramClasses, OperationInfo op) {
-        if (isRPC(method)) {
+        if (isRPC(method) || !isWrapped(method)) {
             List<String> paramOrdering = new LinkedList<String>();
             boolean hasOut = false;
             for (int j = 0; j < paramClasses.length; j++) {
