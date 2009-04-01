@@ -102,8 +102,8 @@ public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
         
         Response<GreetMeResponse>  response = proxy.greetMeAsync("cxf");
         int waitCount = 0;
-        while (!response.isDone() && waitCount < 10) {
-            Thread.sleep(100);
+        while (!response.isDone() && waitCount < 15) {
+            Thread.sleep(1000);
             waitCount++;
         }
         assertTrue("Response still not received.", response.isDone());
