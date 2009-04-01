@@ -103,8 +103,10 @@ public interface Message extends StringMap {
     void setAttachments(Collection<Attachment> attachments);
     
     /**
-     * Retrieve the encapsulated content as a particular type (a result type
-     * if message is outbound, a source type if message is inbound)
+     * Retrieve the encapsulated content as a particular type. The content is 
+     * available as a result type if the message is outbound. The content 
+     * is available as a source type if message is inbound. If the content is 
+     * not available as the specified type null is returned.
      * 
      * @param format the expected content format 
      * @return the encapsulated content
