@@ -50,6 +50,9 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
         } catch (Exception e) {
             /* If the dependencies are missing ... */ 
             return;
+        } catch (NoSuchMethodError nsme) {
+            // these don't inherit from 'Exception'
+            return;
         }
         
         if (null != bus) {
