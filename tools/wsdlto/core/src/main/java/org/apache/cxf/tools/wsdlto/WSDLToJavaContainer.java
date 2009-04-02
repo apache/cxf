@@ -146,6 +146,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     // TODO: wsdl2.0 support
                 }
             }
+            context.put(ToolConstants.SERVICE_LIST, serviceList);
+            
             Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
 
             ServiceInfo service0 = serviceList.get(0);
@@ -185,6 +187,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     }
                 }
             }
+            context.remove(ToolConstants.SERVICE_LIST);
 
             // Build projects: compile classes and copy resources etc.
             if (context.optionSet(ToolConstants.CFG_COMPILE)) {

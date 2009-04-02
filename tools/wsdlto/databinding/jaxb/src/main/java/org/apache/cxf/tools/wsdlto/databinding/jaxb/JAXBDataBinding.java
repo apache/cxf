@@ -72,6 +72,8 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.service.model.SchemaInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -196,9 +198,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
         
-        
         addSchemas(opts, schemaCompiler, schemas);
-
         for (InputSource binding : jaxbBindings) {
             opts.addBindFile(binding);
         }
@@ -242,34 +242,70 @@ public class JAXBDataBinding implements DataBindingProfile {
         initialized = true;
     }
 
-    private void addSchemas(Options opts, SchemaCompiler schemaCompiler,
+    @SuppressWarnings("unchecked")
+    private void addSchemas(Options opts, 
+                            SchemaCompiler schemaCompiler,
                             SchemaCollection schemaCollection) {
+        
+        Set<String> ids = new HashSet<String>();
+        List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
+        for (ServiceInfo si : serviceList) {
+            for (SchemaInfo sci : si.getSchemas()) {
+                String key = sci.getSystemId();
+                if (ids.contains(key)) {
+                    continue;
+                }
+                ids.add(key);
+                
+                Element ele = sci.getElement();
+                ele = removeImportElement(ele);
+                if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
+                    validateSchema(ele);
+                }           
+                InputSource is = new InputSource((InputStream)null);
+                //key = key.replaceFirst("#types[0-9]+$", "");
+                is.setSystemId(key);
+                is.setPublicId(key);
+                opts.addGrammar(is);
+                schemaCompiler.parseSchema(key, ele);
+            }
+        }
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
                 continue;
             }
-                
             String key = schema.getSourceURI();
-            XmlSchemaSerializer xser = new XmlSchemaSerializer();
-            xser.setExtReg(schemaCollection.getExtReg());
-            Document[] docs;
-            try {
-                docs = xser.serializeSchema(schema, false);
-            } catch (XmlSchemaSerializerException e) {
-                throw new RuntimeException(e);
+            if (ids.contains(key)) {
+                continue;
             }
-            Element ele = docs[0].getDocumentElement();
-
-            ele = removeImportElement(ele);
-            if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                validateSchema(ele);
-            }           
-            InputSource is = new InputSource((InputStream)null);
-           // key = key.replaceFirst("#types[0-9]+$", "");
-            is.setSystemId(key);
-            is.setPublicId(key);
-            opts.addGrammar(is);
-            schemaCompiler.parseSchema(key, ele);
+            
+            if (key.startsWith("file:")) {
+                InputSource is = new InputSource(key);
+                //key = key.replaceFirst("#types[0-9]+$", "");
+                opts.addGrammar(is);
+                schemaCompiler.parseSchema(is);
+            } else {
+                XmlSchemaSerializer xser = new XmlSchemaSerializer();
+                xser.setExtReg(schemaCollection.getExtReg());
+                Document[] docs;
+                try {
+                    docs = xser.serializeSchema(schema, false);
+                } catch (XmlSchemaSerializerException e) {
+                    throw new RuntimeException(e);
+                }
+                Element ele = docs[0].getDocumentElement();
+    
+                ele = removeImportElement(ele);
+                if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
+                    validateSchema(ele);
+                }           
+                InputSource is = new InputSource((InputStream)null);
+                //key = key.replaceFirst("#types[0-9]+$", "");
+                is.setSystemId(key);
+                is.setPublicId(key);
+                opts.addGrammar(is);
+                schemaCompiler.parseSchema(key, ele);
+            }
         }
     }
     private String getPluginUsageString(Options opts) {
