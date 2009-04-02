@@ -177,16 +177,15 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
        
         // vocabulary of alternative chosen for endpoint
-        if (getChosenAlternative() == null) { 
-            return;
-        }
-        for (PolicyAssertion a : getChosenAlternative()) {
-            if (a.isOptional()) {
-                continue;
-            }
-            vocabulary.add(a);            
-            if (null != faultVocabulary) {
-                faultVocabulary.add(a);
+        if (getChosenAlternative() != null) { 
+            for (PolicyAssertion a : getChosenAlternative()) {
+                if (a.isOptional()) {
+                    continue;
+                }
+                vocabulary.add(a);            
+                if (null != faultVocabulary) {
+                    faultVocabulary.add(a);
+                }
             }
         }
    
@@ -282,16 +281,31 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 initializeInterceptors(reg, out, a, false);
             }
         }
-        interceptors = new ArrayList<Interceptor>(out);
 
-        if (!requestor) {
-            return;
+        if (requestor) {
+            interceptors = new ArrayList<Interceptor>(out);
+            out.clear();
+            for (PolicyAssertion a : getChosenAlternative()) {
+                initializeInterceptors(reg, out, a, true);
+            }
+            faultInterceptors = new ArrayList<Interceptor>(out);
+        } else if (ei != null && ei.getBinding() != null) {
+            for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
+                EffectivePolicy p = engine.getEffectiveServerRequestPolicy(ei, boi);
+                if (p == null || p.getPolicy() == null || p.getPolicy().isEmpty()) {
+                    continue;
+                }
+                Collection<PolicyAssertion> c = engine.getAssertions(p, true);
+                if (c != null) {
+                    for (PolicyAssertion a : c) {
+                        initializeInterceptors(reg, out, a, true);
+                    }
+                }
+            }
+            interceptors = new ArrayList<Interceptor>(out);
+        } else {
+            interceptors = new ArrayList<Interceptor>(out);            
         }
-        out.clear();
-        for (PolicyAssertion a : getChosenAlternative()) {
-            initializeInterceptors(reg, out, a, true);
-        }
-        faultInterceptors = new ArrayList<Interceptor>(out);
     }
     
     // for test
