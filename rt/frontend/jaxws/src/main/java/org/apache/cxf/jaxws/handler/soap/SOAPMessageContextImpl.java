@@ -82,7 +82,6 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
         return message;
     }
 
-    // TODO: handle the boolean parameter
     public Object[] getHeaders(QName name, JAXBContext context, boolean allRoles) {
         SOAPMessage msg = getMessage();
         SOAPHeader header;
@@ -103,7 +102,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
                     
                 }
             }
-            return ret.toArray(new SOAPHeaderElement[ret.size()]);
+            return ret.toArray(new Object[ret.size()]);
         } catch (SOAPException e) {
             throw new WebServiceException(e);
         } catch (JAXBException e) {

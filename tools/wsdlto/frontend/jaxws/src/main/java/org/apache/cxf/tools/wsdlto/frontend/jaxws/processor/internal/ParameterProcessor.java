@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import javax.wsdl.OperationType;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -43,10 +44,13 @@ import org.apache.cxf.tools.common.model.JavaReturn;
 import org.apache.cxf.tools.common.model.JavaType;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.WebParamAnnotator;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlJavaTypeAdapterAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlListAnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper.ParameterMapper;
+import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class ParameterProcessor extends AbstractProcessor {
     public static final String HEADER = "messagepart.isheader";
@@ -131,13 +135,27 @@ public class ParameterProcessor extends AbstractProcessor {
         }
         
         if (part != null && part.getXmlSchema() instanceof XmlSchemaSimpleType) {
-            XmlSchemaSimpleType simpleType = (XmlSchemaSimpleType)part.getXmlSchema();
-            if (simpleType.getContent() instanceof XmlSchemaSimpleTypeList && !part.isElement()) {
-                method.annotate(new XmlListAnotator(method.getInterface()));
+            processXmlSchemaSimpleType((XmlSchemaSimpleType)part.getXmlSchema(), method, part);
+        } else if (part != null && part.getXmlSchema() instanceof XmlSchemaElement) {
+            XmlSchemaElement element = (XmlSchemaElement)part.getXmlSchema();
+            if (element.getSchemaType() instanceof XmlSchemaSimpleType) {
+                processXmlSchemaSimpleType((XmlSchemaSimpleType)element.getSchemaType(), method, part);
             }
         }
         
         method.setReturn(returnType);
+    }
+    
+    private static void processXmlSchemaSimpleType(XmlSchemaSimpleType xmlSchema, JavaMethod method,
+                                                   MessagePartInfo part) {
+        if (xmlSchema.getContent() instanceof XmlSchemaSimpleTypeList
+            && (!part.isElement() || !method.isWrapperStyle())) {
+            method.annotate(new XmlListAnotator(method.getInterface()));
+        }
+        if (Constants.XSD_HEXBIN.equals(xmlSchema.getQName())
+            && (!part.isElement() || !method.isWrapperStyle())) {
+            method.annotate(new XmlJavaTypeAdapterAnnotator(method.getInterface(), HexBinaryAdapter.class));
+        }
     }
 
     private boolean isOutOfBandHeader(final MessagePartInfo part) {
