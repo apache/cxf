@@ -325,7 +325,6 @@ public final class InjectionUtils {
         return theValues;
     }
     
-    @SuppressWarnings("unchecked")
     public static Object injectIntoArray(Type genericType, List<String> values,
                                          boolean decoded, ParameterType pathParam, Message message) {
         Class<?> realType = InjectionUtils.getActualType(genericType);
