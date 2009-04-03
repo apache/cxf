@@ -19,6 +19,8 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper;
 
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.tools.common.ToolContext;
@@ -26,9 +28,12 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaType;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlJavaTypeAdapterAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlListAnotator;
+import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
+import org.apache.ws.commons.schema.constants.Constants;
 
 
 public final class ParameterMapper {
@@ -45,9 +50,11 @@ public final class ParameterMapper {
         JavaParameter parameter = new JavaParameter(name, type, namespace);
         parameter.setPartName(part.getName().getLocalPart());
         if (part.getXmlSchema() instanceof XmlSchemaSimpleType) {
-            XmlSchemaSimpleType simpleType = (XmlSchemaSimpleType)part.getXmlSchema();
-            if (simpleType.getContent() instanceof XmlSchemaSimpleTypeList && !part.isElement()) {
-                parameter.annotate(new XmlListAnotator(jm.getInterface()));
+            processXmlSchemaSimpleType((XmlSchemaSimpleType)part.getXmlSchema(), jm, parameter, part);
+        } else if (part.getXmlSchema() instanceof XmlSchemaElement) {
+            XmlSchemaElement element = (XmlSchemaElement)part.getXmlSchema();
+            if (element.getSchemaType() instanceof XmlSchemaSimpleType) {
+                processXmlSchemaSimpleType((XmlSchemaSimpleType)element.getSchemaType(), jm, parameter, part);
             }
         }
         parameter.setQName(ProcessorUtil.getElementName(part));
@@ -70,5 +77,16 @@ public final class ParameterMapper {
         return parameter;
     }
 
+    private static void processXmlSchemaSimpleType(XmlSchemaSimpleType xmlSchema, JavaMethod jm,
+                                                   JavaParameter parameter, MessagePartInfo part) {
+        if (xmlSchema.getContent() instanceof XmlSchemaSimpleTypeList
+            && (!part.isElement() || !jm.isWrapperStyle())) {
+            parameter.annotate(new XmlListAnotator(jm.getInterface()));
+        }
+        if (Constants.XSD_HEXBIN.equals(xmlSchema.getQName()) 
+            && (!part.isElement() || !jm.isWrapperStyle())) {
+            parameter.annotate(new XmlJavaTypeAdapterAnnotator(jm.getInterface(), HexBinaryAdapter.class));
+        }
+    }
    
 }
