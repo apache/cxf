@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.endpoint.MessageEndpointFactory;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
@@ -45,23 +46,36 @@ public class DispatchMDBInvoker extends MDBInvoker {
     /**
      * @param messageEndpoint
      */
-    public DispatchMDBInvoker(MessageEndpoint messageEndpoint, String targetJndiName) {
-        super(messageEndpoint);
+    public DispatchMDBInvoker(MessageEndpointFactory factory, String targetJndiName) {
+        super(factory);
         this.targetJndiName = targetJndiName;
     }
     
     @Override
     public Object getServiceObject(Exchange context) {
         Object target = null;
+        MessageEndpoint ep = getMessageEndpoint();
+
+        if (ep == null) {
+            LOG.log(Level.SEVERE, "Failed to obtain MessageEndpoint");
+            return null;
+        }
+        
         try {
-            target = ((DispatchMDBMessageListener)getMessageEndpoint())
+            target = ((DispatchMDBMessageListener)ep)
                 .lookupTargetObject(targetJndiName);
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Failed to obtain service object " + targetJndiName, e);
             return null;
+        } finally {
+            releaseEndpoint(ep);
         }
         
         return target;
+    }
+
+    public void releaseServiceObject(final Exchange context, Object obj) {
+
     }
 
 }
