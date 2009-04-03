@@ -83,10 +83,7 @@ public class InboundEndpoint {
      * @throws Exception
      */
     public void shutdown() throws Exception {
-        if (invoker != null) {
-            invoker.getMessageEndpoint().release();
-            invoker = null;
-        }
+        invoker = null;
         
         if (server != null) {
             server.stop();

@@ -18,8 +18,13 @@
  */
 package org.apache.cxf.jca.inbound;
 
-import javax.resource.spi.endpoint.MessageEndpoint;
+import java.util.logging.Logger;
 
+import javax.resource.spi.UnavailableException;
+import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.endpoint.MessageEndpointFactory;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 
@@ -35,26 +40,62 @@ import org.apache.cxf.service.invoker.AbstractInvoker;
  * (SEI) class.
  */
 public class MDBInvoker extends AbstractInvoker {
-
-    private MessageEndpoint messageEndpoint;
+    private static final Logger LOG = LogUtils.getL7dLogger(MDBInvoker.class);
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long RETRY_SLEEP = 2000;
+    
+    private final MessageEndpointFactory endpointFactory;
 
     /**
      * @param messageEndpoint
      */
-    public MDBInvoker(MessageEndpoint messageEndpoint) {
-        this.messageEndpoint = messageEndpoint;
+    public MDBInvoker(MessageEndpointFactory factory) {
+        endpointFactory = factory;
     }
 
     /**
      * @return the messageEndpoint
      */
     public MessageEndpoint getMessageEndpoint() {
-        return messageEndpoint;
+        return createMessageEndpoint();
+    }
+
+    protected void releaseEndpoint(MessageEndpoint mep) {
+        mep.release();
     }
 
     @Override
     public Object getServiceObject(Exchange context) {
-        return messageEndpoint;
+        return getMessageEndpoint();
+    }
+    
+    public void releaseServiceObject(final Exchange context, Object obj) {
+        if (obj instanceof MessageEndpoint) {
+            MessageEndpoint mep = (MessageEndpoint)obj;
+            releaseEndpoint(mep);
+        }
     }
 
+    /**
+     * Invokes endpoint factory to create message endpoint (event driven bean).
+     * It will retry if the event driven bean is not yet available.
+     */
+    private MessageEndpoint createMessageEndpoint() {
+        MessageEndpoint ep = null;
+        for (int i = 0; i < MAX_ATTEMPTS; i++) {
+            try {
+                ep = endpointFactory.createEndpoint(null);
+                break;
+            } catch (UnavailableException e) {
+                LOG.fine("Target endpoint activation in progress.  Will retry.");
+                try {
+                    Thread.sleep(RETRY_SLEEP);
+                } catch (InterruptedException e1) {
+                    // ignore
+                }
+            }
+        }
+        
+        return ep;
+    }
 }
