@@ -298,6 +298,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 Collection<PolicyAssertion> c = engine.getAssertions(p, true);
                 if (c != null) {
                     for (PolicyAssertion a : c) {
+                        initializeInterceptors(reg, out, a, false);
                         initializeInterceptors(reg, out, a, true);
                     }
                 }
