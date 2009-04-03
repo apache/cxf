@@ -853,6 +853,13 @@ public final class StaxUtils {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
     }
+    public static XMLStreamReader createXMLStreamReader(String systemId, InputStream in) {
+        try {
+            return getXMLInputFactory().createXMLStreamReader(systemId, in);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException("Couldn't parse stream.", e);
+        }
+    }
     
     public static XMLStreamReader createXMLStreamReader(Element el) {
         return new W3CDOMStreamReader(el);

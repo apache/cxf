@@ -31,6 +31,13 @@ public class JAXBBindErrorListener implements ErrorListener {
     }
 
     public void error(org.xml.sax.SAXParseException exception) {
+        if (exception.getLineNumber() > 0) {
+            throw new ToolException(prefix + exception.getLocalizedMessage() 
+                                    + " at line " + exception.getLineNumber()
+                                    + " column " + exception.getColumnNumber()
+                                    + " of schema " + exception.getSystemId(), exception);
+           
+        }
         throw new ToolException(prefix + exception.getLocalizedMessage(), exception);
 
     }
