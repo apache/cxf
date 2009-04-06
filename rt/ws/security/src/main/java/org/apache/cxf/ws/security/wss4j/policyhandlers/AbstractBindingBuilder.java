@@ -594,10 +594,10 @@ public abstract class AbstractBindingBuilder {
                 info.setAsserted(true);
                 return utBuilder;
             } else {
-                info.setNotAsserted("No password available");
+                policyNotAsserted(token, "No username available");
             }
         } else {
-            info.setNotAsserted("No username available");
+            policyNotAsserted(token, "No username available");
         }
         return null;
     }

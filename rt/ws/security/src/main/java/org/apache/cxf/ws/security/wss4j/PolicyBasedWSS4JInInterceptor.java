@@ -531,6 +531,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private boolean assertTransportBinding(AssertionInfoMap aim) {
         assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
         assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
+        assertPolicy(aim, SP12Constants.SIGNED_PARTS);
         return !assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
     }
 

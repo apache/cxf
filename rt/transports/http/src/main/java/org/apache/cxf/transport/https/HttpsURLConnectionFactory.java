@@ -35,6 +35,7 @@ import javax.imageio.IIOException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -147,8 +148,6 @@ public final class HttpsURLConnectionFactory
                     throw new IIOException("Error while initializing secure socket", ex);
                 }
             }
-        } else {
-            assert false;
         }
 
         return connection;
@@ -187,9 +186,27 @@ public final class HttpsURLConnectionFactory
                       ? SSLContext.getInstance(protocol)
                       : SSLContext.getInstance(protocol, provider);
             
+                      
+
+            TrustManager[] trustAllCerts = tlsClientParameters.getTrustManagers();
+            /*
+            TrustManager[] trustAllCerts = new TrustManager[] {
+                new javax.net.ssl.X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+            };
+            */         
             ctx.init(
-                tlsClientParameters.getKeyManagers(), 
-                tlsClientParameters.getTrustManagers(), 
+                tlsClientParameters.getKeyManagers(),
+                trustAllCerts, 
                 tlsClientParameters.getSecureRandom());
             
             // The "false" argument means opposite of exclude.
