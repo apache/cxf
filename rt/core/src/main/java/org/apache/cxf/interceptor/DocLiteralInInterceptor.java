@@ -123,9 +123,11 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             } else {
                 //Bare style
                 BindingMessageInfo msgInfo = null;
+
     
+                Endpoint ep = exchange.get(Endpoint.class);
+                ServiceInfo si = ep.getEndpointInfo().getService();
                 if (bop != null) { //for xml binding or client side
-                    getMessageInfo(message, bop);
                     if (client) {
                         msgInfo = bop.getOutput();
                     } else {
@@ -134,12 +136,11 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                             exchange.setOneWay(true);
                         }
                     }
+                    setMessage(message, bop, client, si, msgInfo.getMessageInfo());
                 }
     
                 Collection<OperationInfo> operations = null;
                 operations = new ArrayList<OperationInfo>();
-                Endpoint ep = exchange.get(Endpoint.class);
-                ServiceInfo si = ep.getEndpointInfo().getService();
                 operations.addAll(si.getInterface().getOperations());
     
                 if (!StaxUtils.toNextElement(xmlReader)) {
@@ -246,6 +247,11 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
     private MessageInfo setMessage(Message message, BindingOperationInfo operation,
                                    boolean requestor, ServiceInfo si) {
         MessageInfo msgInfo = getMessageInfo(message, operation, requestor);
+        return setMessage(message, operation, requestor, si, msgInfo);
+    }
+    private MessageInfo setMessage(Message message, BindingOperationInfo operation,
+                                   boolean requestor, ServiceInfo si,
+                                   MessageInfo msgInfo) {
         message.put(MessageInfo.class, msgInfo);
 
         Exchange ex = message.getExchange();
