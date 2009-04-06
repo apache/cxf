@@ -129,7 +129,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             pt.doubleIt(BigInteger.valueOf(25));
         } catch (Exception ex) {
             String msg = ex.getMessage();
-            if (!msg.contains("UsernameToken")) {
+            if (!msg.contains("sername")) {
                 throw ex;
             }
         }
