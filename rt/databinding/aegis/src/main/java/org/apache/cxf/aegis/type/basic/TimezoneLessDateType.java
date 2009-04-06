@@ -55,8 +55,13 @@ public class TimezoneLessDateType extends DateType {
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
-        Calendar c = Calendar.getInstance();
-        c.setTime((Date)object);
+        Calendar c;
+        if (object instanceof Calendar) {
+            c = (Calendar) object;
+        } else {
+            c = Calendar.getInstance();
+            c.setTime((Date) object);
+        }
         writer.writeValue(format.format(c));
     }
 }
