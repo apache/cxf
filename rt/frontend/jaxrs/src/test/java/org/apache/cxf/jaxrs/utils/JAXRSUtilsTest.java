@@ -966,7 +966,7 @@ public class JAXRSUtilsTest extends Assert {
         HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         
-        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         InjectionUtils.injectContextFields(c, cri, m);
         InjectionUtils.injectContextMethods(c, cri, m);
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo2().getClass());
@@ -1008,7 +1008,7 @@ public class JAXRSUtilsTest extends Assert {
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
         HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
-        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         InjectionUtils.injectResourceFields(c, cri, m);
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy)c.getServletContextResource()).get());
@@ -1024,7 +1024,7 @@ public class JAXRSUtilsTest extends Assert {
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         Customer c = new Customer();
         cri.setResourceProvider(new SingletonResourceProvider(c));
-        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri); 

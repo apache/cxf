@@ -58,20 +58,11 @@ public class JAXRSInvoker extends AbstractInvoker {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInvoker.class);
     private static final String SERVICE_LOADER_AS_CONTEXT = "org.apache.cxf.serviceloader-context";
     
-    private List<Object> resourceObjects;
-
     public JAXRSInvoker() {
     }
 
-    public JAXRSInvoker(List<Object> resourceObjects) {
-        this.resourceObjects = resourceObjects;
-    }
-    public Object invoke(Exchange exchange, Object request) {
-        return invoke(exchange, request, resourceObjects);
-    }
     @SuppressWarnings("unchecked")
-    public Object invoke(Exchange exchange, Object request, List<Object> resources) {
-
+    public Object invoke(Exchange exchange, Object request) {
         Response response = exchange.get(Response.class);
         if (response != null) {
             // this means a blocking request filter provided a Response
@@ -83,11 +74,16 @@ public class JAXRSInvoker extends AbstractInvoker {
             //      in the out interceptor instead of dealing with the contents list ?
             return new MessageContentsList(response);
         }
+        
+        return invoke(exchange, request, getServiceObject(exchange));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object invoke(Exchange exchange, Object request, Object resourceObject) {
 
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
         
-        Object resourceObject = getServiceObject(exchange, resources);
         pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
                 
         Method methodToInvoke = InjectionUtils.checkProxy(
@@ -154,9 +150,6 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 result = checkResultObject(result, subResourcePath);
 
-                List<Object> newResourceObjects = new ArrayList<Object>();
-                newResourceObjects.add(result);
-
                 ClassResourceInfo subCri = cri.getSubResource(
                      methodToInvoke.getReturnType(),
                      ClassHelper.getRealClass(result));
@@ -188,7 +181,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
                 msg.setContent(List.class, newParams);
 
-                return this.invoke(exchange, newParams, newResourceObjects);
+                return this.invoke(exchange, newParams, result);
             } catch (WebApplicationException ex) {
                 Response excResponse = JAXRSUtils.convertFaultToResponse(ex, 
                                                                          exchange.getInMessage());
@@ -205,29 +198,10 @@ public class JAXRSInvoker extends AbstractInvoker {
     }
     
     public Object getServiceObject(Exchange exchange) {
-        return getServiceObject(exchange, resourceObjects);
-    }
-    public Object getServiceObject(Exchange exchange, List<Object> resources) {
-        Object serviceObject = null;
-
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
 
-        if (resources != null) {
-            Class c  = cri.getResourceClass();
-            for (Object resourceObject : resources) {
-                if (c.isInstance(resourceObject)) {
-                    serviceObject = resourceObject;
-                    break;
-                }
-            }
-        }
-
-        if (serviceObject == null) {
-            serviceObject = cri.getResourceProvider().getInstance();
-        }
-
-        return serviceObject;
+        return cri.getResourceProvider().getInstance(exchange.getInMessage());
     }
 
     private static Object checkResultObject(Object result, String subResourcePath) {

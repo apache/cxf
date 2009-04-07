@@ -61,6 +61,9 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder status(int s) {
+        if (status < 100 || status > 599) {
+            throw new IllegalArgumentException("Illegal status value : " + s);
+        }
         status = s;
         return this;
     }
@@ -71,77 +74,58 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder type(MediaType type) {
-        return type(type.toString());
+        return type(type == null ? null : type.toString());
     }
 
     public ResponseBuilder type(String type) {
-        metadata.putSingle("Content-Type", type);
-        return this;
+        return setHeader(HttpHeaders.CONTENT_TYPE, type);
     }
 
+    @Override
+    public ResponseBuilder language(Locale locale) {
+        return language(locale == null ? null : locale.toString());
+    }
+    
     public ResponseBuilder language(String language) {
-        metadata.putSingle("Content-Language", language.toString());
-        return this;
+        return setHeader(HttpHeaders.CONTENT_LANGUAGE, language);
     }
 
     public ResponseBuilder location(URI location) {
-        metadata.putSingle("Location", location.toString());
-        return this;
+        return setHeader(HttpHeaders.LOCATION, location);
     }
 
     public ResponseBuilder contentLocation(URI location) {
-        metadata.putSingle("Content-Location", location.toString());
-        return this;
+        return setHeader(HttpHeaders.CONTENT_LOCATION, location);
     }
 
     public ResponseBuilder tag(EntityTag tag) {
-        return tag(tag.toString());
+        return tag(tag == null ? null : tag.toString());
     }
 
     public ResponseBuilder tag(String tag) {
-        metadata.putSingle(HttpHeaders.ETAG, tag.toString());
-        return this;
+        return setHeader(HttpHeaders.ETAG, tag);
     }
 
-    public ResponseBuilder lastModified(Date lastModified) {
-        metadata.putSingle(HttpHeaders.LAST_MODIFIED, lastModified.toString());
-        return this;
+    public ResponseBuilder lastModified(Date date) {
+        return setHeader(HttpHeaders.LAST_MODIFIED, date == null ? null : toHttpDate(date));
     }
 
     public ResponseBuilder cacheControl(CacheControl cacheControl) {
-        metadata.putSingle(HttpHeaders.CACHE_CONTROL, 
-                           cacheControl.toString());
-        return this;
-    }
-
-    public ResponseBuilder cookie(NewCookie cookie) {
-        metadata.putSingle(HttpHeaders.SET_COOKIE, cookie.toString());
-        return this;
+        return setHeader(HttpHeaders.CACHE_CONTROL, cacheControl);
     }
 
     @Override
     public ResponseBuilder expires(Date date) {
-        metadata.putSingle(HttpHeaders.EXPIRES, toHttpDate(date));
-        return this;
+        return setHeader(HttpHeaders.EXPIRES, date == null ? null : toHttpDate(date));
     }
 
     @Override
-    public ResponseBuilder language(Locale language) {
-        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, language.toString());
-        return this;
-    }
-    
-    @Override
     public ResponseBuilder cookie(NewCookie... cookies) {
-        for (NewCookie cookie : cookies) {
-            metadata.add(HttpHeaders.SET_COOKIE, cookie.toString());
-        }
-        return this;
+        return addHeader(HttpHeaders.SET_COOKIE, (Object[])cookies);
     }
     
     public ResponseBuilder header(String name, Object value) {
-        metadata.add(name, value.toString());
-        return this;
+        return addHeader(name, value);
     }
 
     
@@ -183,5 +167,25 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     private String toHttpDate(Date date) {
         SimpleDateFormat format = HttpUtils.getHttpDateFormat();
         return format.format(date);
+    }
+    
+    private ResponseBuilder setHeader(String name, Object value) {
+        if (value == null) {
+            metadata.remove(name);
+        } else {
+            metadata.putSingle(name, value.toString());
+        }
+        return this;
+    }
+    
+    private ResponseBuilder addHeader(String name, Object... values) {
+        if (values != null && values.length >= 1 && values[0] != null) {
+            for (Object value : values) {
+                metadata.add(name, value.toString());
+            }
+        } else {
+            metadata.remove(name);
+        }    
+        return this;
     }
 }

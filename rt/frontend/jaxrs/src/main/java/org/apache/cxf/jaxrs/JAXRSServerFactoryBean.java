@@ -58,7 +58,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private Server server;
     private Invoker invoker;
     private boolean start = true;
-    private List<Object> serviceBeans;
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     
@@ -126,11 +125,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     protected Invoker createInvoker() {
-        if (serviceBeans == null) {
-            return new JAXRSInvoker();
-        } else {
-            return new JAXRSInvoker(serviceBeans);           
-        }
+        return new JAXRSInvoker();
     }
 
     public void setLanguageMappings(Map<Object, Object> lMaps) {
@@ -164,7 +159,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     public void setServiceBeans(List<Object> beans) {
-        this.serviceBeans = beans;
         serviceFactory.setResourceClassesFromBeans(beans);
     }
     
@@ -184,7 +178,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
                 InjectionUtils.injectContextProxies(cri, 
-                                                    cri.getResourceProvider().getInstance());
+                                                    cri.getResourceProvider().getInstance(null));
             }
         }
     }

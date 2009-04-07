@@ -132,21 +132,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (cls == genericType) {
                 genericType = actualClass;
             }
-            Marshaller ms = createMarshaller(actualObject, actualClass, genericType, m);
-            for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
-                ms.setProperty(entry.getKey(), entry.getValue());
-            }
-            if (enableStreaming) {
-                XMLStreamWriter writer = 
-                    (XMLStreamWriter)getContext().get(XMLStreamWriter.class.getName());
-                if (writer == null) {
-                    writer = StaxUtils.createXMLStreamWriter(os);
-                }
-                ms.marshal(actualObject, writer);
-            } else {
-                ms.marshal(actualObject, os);
-            }
-            
+            String encoding = getEncoding(m, headers);
+            marshal(actualObject, actualClass, genericType, encoding, os);
         } catch (JAXBException e) {
             handleJAXBException(e);
         }  catch (WebApplicationException e) {
@@ -156,6 +143,23 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
     }
 
-    
+    protected void marshal(Object obj, Class<?> cls, Type genericType, String enc, OutputStream os)
+        throws Exception {
+        
+        Marshaller ms = createMarshaller(obj, cls, genericType, enc);
+        for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
+            ms.setProperty(entry.getKey(), entry.getValue());
+        }
+        if (enableStreaming) {
+            XMLStreamWriter writer = 
+                (XMLStreamWriter)getContext().get(XMLStreamWriter.class.getName());
+            if (writer == null) {
+                writer = StaxUtils.createXMLStreamWriter(os);
+            }
+            ms.marshal(obj, writer);
+        } else {
+            ms.marshal(obj, os);
+        }
+    }
     
 }

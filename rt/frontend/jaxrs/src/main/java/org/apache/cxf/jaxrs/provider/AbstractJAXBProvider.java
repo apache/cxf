@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -28,7 +29,9 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -49,16 +52,16 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
 public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
-
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
-    private static final String CHARSET_PARAMETER = "charset"; 
-        
+    
+    private static final String CHARSET_PARAMETER = "charset";
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
    
@@ -198,19 +201,39 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return unmarshaller;        
     }
     
-    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, MediaType m)
+    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
         throws JAXBException {
         
         Class<?> objClazz = JAXBElement.class.isAssignableFrom(cls) 
                             ? ((JAXBElement)obj).getDeclaredType() : cls;
         JAXBContext context = getJAXBContext(objClazz, genericType);
         Marshaller marshaller = context.createMarshaller();
-        String enc = m.getParameters().get(CHARSET_PARAMETER);
         if (enc != null) {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, enc);
         }
         return marshaller;
     }
+    
+    protected String getEncoding(MediaType mt, MultivaluedMap<String, Object> headers) {
+        String enc = mt.getParameters().get(CHARSET_PARAMETER);
+        if (enc == null) {
+            return null;
+        }
+        try {
+            "0".getBytes(enc);
+            return enc;
+        } catch (UnsupportedEncodingException ex) {
+            String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING", 
+                                 BUNDLE, enc).toString();
+            LOG.warning(message);
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, 
+                JAXRSUtils.removeMediaTypeParameter(mt, CHARSET_PARAMETER) 
+                + ';' + CHARSET_PARAMETER + "=UTF-8");
+        }
+        return null;
+    }
+        
+
     
     protected Class<?> getActualType(Class<?> type, Type genericType, Annotation[] anns) {
         Class<?> theType = null;

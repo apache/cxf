@@ -47,6 +47,8 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -99,14 +101,15 @@ public class JAXBElementProviderTest extends Assert {
         
         JAXBElementProvider provider = new JAXBElementProvider() {
             @Override
-            protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, MediaType mt)
+            protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
                 throws JAXBException {
                 return m;    
             }
         };
         
         provider.setMarshallerProperties(props);
-        provider.writeTo("123", String.class, (Type)String.class, new Annotation[]{}, null, null,
+        provider.writeTo("123", String.class, (Type)String.class, new Annotation[]{}, 
+                         MediaType.APPLICATION_XML_TYPE, new MetadataMap<String, Object>(), 
                          new ByteArrayOutputStream());
         
         assertEquals("Marshall properties have not been set", props, m.getProperties());

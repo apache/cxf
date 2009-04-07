@@ -19,23 +19,67 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Message;
+
 public class PerRequestResourceProvider implements ResourceProvider {
-    private Class<?> resourceClass;
+    private Constructor<?> c;
    
     public PerRequestResourceProvider(Class<?> clazz) {
-        resourceClass = clazz;
+        c = ResourceUtils.findResourceConstructor(clazz);
+        if (c == null) {
+            throw new RuntimeException("Resource class " + clazz
+                                       + " has no valid constructor");
+        }
     }
     
+    public boolean isSingleton() {
+        return false;
+    }
 
+    public Object getInstance(Message m) {  
+        return createInstance(m);
+    }
+    
     public Object getInstance() {  
-        Object resourceInstance = null;
+        if (c.getParameterTypes().length > 0) {
+            throw new RuntimeException("Resource class constructor has context parameters "
+                          + "but no request message is available");
+        }
+        return createInstance(null);
+    }
+    
+    protected Object createInstance(Message m) {
+        
+        Class<?>[] params = c.getParameterTypes();
+        Type[] genericTypes = c.getGenericParameterTypes();
+        Object[] values = new Object[]{params.length};
+        for (int i = 0; i < params.length; i++) {
+            values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
+        }
         try {
-            resourceInstance = resourceClass.newInstance();
+            return params.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
         } catch (InstantiationException ex) {
-            //TODO
+            String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated";
+            throw new WebApplicationException(Response.serverError().entity(msg).build());
         } catch (IllegalAccessException ex) {
-            //TODO
-        }        
-        return resourceInstance;
+            String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated"
+                + " due to IllegalAccessException";
+            throw new WebApplicationException(Response.serverError().entity(msg).build());
+        } catch (InvocationTargetException ex) {
+            String msg = "Resource class "
+                + c.getDeclaringClass().getName() + " can not be instantiated"
+                + " due to InvocationTargetException";
+            throw new WebApplicationException(Response.serverError().entity(msg).build());
+        }
+        
     }
 }

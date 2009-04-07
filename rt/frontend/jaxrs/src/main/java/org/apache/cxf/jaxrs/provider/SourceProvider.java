@@ -45,7 +45,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.jaxrs.utils.XMLSource;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })

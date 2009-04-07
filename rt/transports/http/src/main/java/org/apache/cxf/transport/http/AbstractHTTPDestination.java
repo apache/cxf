@@ -237,9 +237,14 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
             for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
                 String header = (String)iter.next();
                 List<?> headerList = (List<?>)headers.get(header);
-                for (Object value : headerList) {
-                    response.addHeader(header, (String)value);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < headerList.size(); i++) {
+                    sb.append(headerList.get(i));
+                    if (i + 1 < headerList.size()) {
+                        sb.append(',');
+                    }
                 }
+                response.addHeader(header, sb.toString());
             }
         } else {
             response.setContentType(ct);

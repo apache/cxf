@@ -30,11 +30,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
+
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,6 +82,11 @@ public class ClassResourceInfoTest extends Assert {
         
         @GET
         public void getIt() { 
+            
+        }
+        
+        @HEAD
+        public void head() { 
             
         }
     }
@@ -181,5 +189,14 @@ public class ClassResourceInfoTest extends Assert {
         assertSame(c2, c.getSubResource(TestClass.class, TestClass2.class));
         assertNotSame(c1, c2);
         
+    }
+    
+    @Test
+    public void testAllowedMethods() {
+        ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
+                                  TestClass3.class, TestClass3.class, false, false);
+        Set<String> methods = c.getAllowedMethods();
+        assertEquals(2, methods.size());
+        assertTrue(methods.contains("HEAD") && methods.contains("GET"));
     }
 }

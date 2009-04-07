@@ -16,27 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.utils;
 
-package org.apache.cxf.jaxrs.lifecycle;
+import java.lang.reflect.Constructor;
 
-import org.apache.cxf.message.Message;
+import javax.ws.rs.core.UriInfo;
 
-public class SingletonResourceProvider implements ResourceProvider {
-    private Object resourceInstance;
+import org.apache.cxf.jaxrs.Customer;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class ResourceUtilsTest extends Assert {
     
-    public SingletonResourceProvider(Object o) { 
-        resourceInstance = o;
+    @Test
+    public void testFindResourceConstructor() {
+        Constructor c = ResourceUtils.findResourceConstructor(Customer.class); 
+        assertNotNull(c);
+        assertEquals(1, c.getParameterTypes().length);
+        assertEquals(UriInfo.class, c.getParameterTypes()[0]);
     }
+
     
-    public boolean isSingleton() {
-        return true;
-    }
-    
-    public Object getInstance(Message m) {
-        return resourceInstance;
-    }
-    
-    public Object getInstance() {
-        return resourceInstance;
-    }
 }

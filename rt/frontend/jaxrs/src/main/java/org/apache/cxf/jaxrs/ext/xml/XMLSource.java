@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.utils;
+package org.apache.cxf.jaxrs.ext.xml;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -31,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.stream.XMLStreamWriter;
@@ -45,6 +48,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -119,7 +123,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                   Response response, 
                                   OperationResourceInfo ori,
                                   boolean firstTry) {
-        message.put(Message.RESPONSE_CODE, response.getStatus());
+        int status = response.getStatus();
+        Object responseObj = response.getEntity();
+        if (status == -1) {
+            status = responseObj == null ? 204 : 200;
+        }
+        
+        message.put(Message.RESPONSE_CODE, status);
         Map<String, List<String>> theHeaders = 
             (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
         if (firstTry && theHeaders != null) {
@@ -128,8 +138,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         } else {
             message.put(Message.PROTOCOL_HEADERS, response.getMetadata());
         }
-        
-        Object responseObj = response.getEntity();
+        MultivaluedMap<String, Object> responseHeaders = 
+            (MultivaluedMap)message.get(Message.PROTOCOL_HEADERS);
+        setResponseDate(responseHeaders, firstTry);
         if (responseObj == null) {
             return;
         }
@@ -177,8 +188,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                invoked != null ? invoked.getGenericReturnType() : null, 
                                invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                                responseType, 
-                               response.getMetadata(), 
+                               responseHeaders, 
                                message.getContent(OutputStream.class));
+                Object newContentType = responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
+                if (newContentType != null) {
+                    message.put(Message.CONTENT_TYPE, newContentType.toString());
+                }
                 checkCachedStream(message, outOriginal, enabled);
             } finally {
                 if (enabled) {
@@ -303,19 +318,18 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (mt.isWildcardType() || mt.isWildcardSubtype()) {
             return MediaType.APPLICATION_OCTET_STREAM_TYPE;
         } else if (mt.getParameters().containsKey("q")) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(mt.getType()).append('/').append(mt.getSubtype());
-            if (mt.getParameters().size() > 1) {
-                for (String key : mt.getParameters().keySet()) {
-                    if (!"q".equals(key)) {
-                        sb.append(';').append(key).append('=').append(mt.getParameters().get(key));
-                    }
-                }
-            }
-            return MediaType.valueOf(sb.toString());
+            return MediaType.valueOf(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
         } else {
             return mt;
         }
         
+    }
+    
+    private void setResponseDate(MultivaluedMap<String, Object> headers, boolean firstTry) {
+        if (!firstTry) {
+            return;
+        }
+        SimpleDateFormat format = HttpUtils.getHttpDateFormat();
+        headers.putSingle(HttpHeaders.DATE, format.format(new Date()));
     }
 }

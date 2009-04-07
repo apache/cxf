@@ -24,11 +24,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -98,7 +100,6 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         httpUrlConnection.setRequestProperty("Accept",   "text/xml");   
         httpUrlConnection.setRequestProperty("Content-type",   "application/x-www-form-urlencoded");   
         httpUrlConnection.setRequestProperty("Connection",   "close");   
-        //httpurlconnection.setRequestProperty("Content-Length",   String.valueOf(is.available()));   
 
         OutputStream outputstream = httpUrlConnection.getOutputStream();
         File inputFile = new File(getClass().getResource("resources/singleValPostBody.txt").toURI());         
@@ -121,6 +122,23 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         assertEquals("Wrong status returned", "open", getStringFromInputStream(httpUrlConnection
             .getInputStream()));  
         httpUrlConnection.disconnect();
+    }
+    
+    @Test
+    public void testPostPetStatus2() throws Exception {
+        
+        
+        Socket s = new Socket("localhost", 9080);
+        IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(), 
+                                  s.getOutputStream());
+
+        s.getOutputStream().flush();
+        try {
+            assertTrue("Wrong status returned", getStringFromInputStream(s.getInputStream())
+                       .contains("open"));  
+        } finally {
+            s.close();
+        }
     }
     
     private String getStringFromInputStream(InputStream in) throws Exception {

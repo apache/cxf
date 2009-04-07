@@ -29,7 +29,7 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
     
     public Cookie fromString(String c) {
         
-        int version = -1;
+        int version = Cookie.DEFAULT_VERSION;
         String name = null;
         String value = null;
         String path = null;
@@ -64,7 +64,7 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
     public String toString(Cookie c) {
         StringBuilder sb = new StringBuilder();
         
-        if (c.getVersion() != -1) {
+        if (c.getVersion() != Cookie.DEFAULT_VERSION) {
             sb.append(VERSION).append('=').append(c.getVersion()).append(';');
         }
         sb.append(c.getName()).append('=').append(c.getValue());

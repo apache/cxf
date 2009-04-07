@@ -61,6 +61,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
@@ -301,8 +302,13 @@ public final class JAXRSUtils {
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
         LOG.warning(errorMsg.toString());
-        
-        throw new WebApplicationException(status);
+        ResponseBuilder rb = Response.status(status);
+        if (methodMatched == 0) {
+            for (String m : resource.getAllowedMethods()) {
+                rb.header("Allow", m);
+            }
+        }
+        throw new WebApplicationException(rb.build());
         
     }    
 
@@ -965,19 +971,29 @@ public final class JAXRSUtils {
         ExceptionMapper mapper = 
             ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
-            Response excResponse = mapper.toResponse(ex);
-            if (excResponse != null) {
-                return excResponse;
+            try {
+                return mapper.toResponse(ex);
+            } catch (Exception mapperEx) {
+                mapperEx.printStackTrace();
+                return Response.serverError().build();
             }
-        } else if (ex instanceof WebApplicationException) {
-            WebApplicationException wex = (WebApplicationException)ex;
-            return wex.getResponse();
         }
         
         return null;
         
     }
     
-    
+    public static String removeMediaTypeParameter(MediaType mt, String paramName) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(mt.getType()).append('/').append(mt.getSubtype());
+        if (mt.getParameters().size() > 1) {
+            for (String key : mt.getParameters().keySet()) {
+                if (!paramName.equals(key)) {
+                    sb.append(';').append(key).append('=').append(mt.getParameters().get(key));
+                }
+            }
+        }    
+        return sb.toString();
+    }
         
 }

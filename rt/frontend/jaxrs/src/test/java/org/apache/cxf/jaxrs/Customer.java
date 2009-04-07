@@ -91,6 +91,14 @@ public class Customer implements CustomerInfo {
     @QueryParam("b")
     private String b;
     private String name;
+
+    public Customer() {
+        
+    }
+    
+    public Customer(@Context UriInfo info) {
+        uriInfo = info;
+    }
     
     public String getName() {
         return name;

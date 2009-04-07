@@ -145,13 +145,17 @@ public class JSONProvider extends AbstractJAXBProvider  {
             if (cls == genericType) {
                 genericType = actualClass;
             }
-            Marshaller ms = createMarshaller(actualObject, actualClass, genericType, m);
+            String encoding = getEncoding(m, headers);
+            if (encoding == null) {
+                encoding = "UTF-8";
+            }
+            Marshaller ms = createMarshaller(actualObject, actualClass, genericType, encoding);
 
             Configuration c = new Configuration(namespaceMap);
             MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
             AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
                                                convention, 
-                                               new OutputStreamWriter(os, "UTF-8"));
+                                               new OutputStreamWriter(os, encoding));
             if (serializeAsArray) {
                 if (arrayKeys != null) {
                     for (String key : arrayKeys) {

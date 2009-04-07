@@ -19,11 +19,14 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -84,6 +87,31 @@ public final class ResourceUtils {
             }
         }
         cri.setMethodDispatcher(md);
+    }
+    
+    public static Constructor findResourceConstructor(Class<?> resourceClass) {
+        Constructor defaultConstructor = null;
+        for (Constructor c : resourceClass.getConstructors()) {
+            Class<?>[] params = c.getParameterTypes();
+            if (params.length == 0) {
+                defaultConstructor = c;
+                continue;
+            }
+            
+            Annotation[][] anns = c.getParameterAnnotations();
+            boolean match = true;
+            for (int i = 0; i < params.length; i++) {
+                if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null
+                    || !AnnotationUtils.isContextClass(params[i])) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                return c;
+            }
+        }
+        return defaultConstructor;
     }
     
     private static OperationResourceInfo createOperationInfo(Method m, Method annotatedMethod, 

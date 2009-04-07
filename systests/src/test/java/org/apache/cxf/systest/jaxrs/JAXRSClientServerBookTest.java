@@ -354,6 +354,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookByHeaderPerRequest() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore2/bookheaders",
+                               "resources/expected_get_book123.txt",
+                               "application/xml;q=0.5,text/xml", "text/xml", 200);
+    }
+    
+    @Test
     public void testGetBookByHeaderDefault() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/bookheaders2",
                                "resources/expected_get_book123.txt",
@@ -399,6 +406,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/1",
                                "resources/expected_get_chapter1.txt",
                                "application/xml", "application/xml;charset=iso-8859-1", 200);
+    }
+    
+    @Test
+    public void testGetChapterEncodingDefault() throws Exception {
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/badencoding/1",
+                               "resources/expected_get_chapter1_utf.txt",
+                               "application/xml", "application/xml;charset=UTF-8", 200);
     }
     
     @Test
@@ -829,6 +844,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                          expectedValue, content);
             if (expectedStatus == 200) {
                 assertEquals("123", get.getResponseHeader("BookId").getValue());
+                assertNotNull(get.getResponseHeader("Date"));
+            }
+            if (expectedStatus == 405) {
+                assertNotNull(get.getResponseHeader("Allow"));
             }
             if (expectedContentType != null) {
                 Header ct = get.getResponseHeader("Content-Type");

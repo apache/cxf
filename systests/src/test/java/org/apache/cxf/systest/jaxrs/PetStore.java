@@ -25,6 +25,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -34,7 +35,6 @@ public class PetStore {
     public static final String CLOSED = "The Pet Store is closed";
 
     public PetStore() {
-        System.out.println("Petstore constructed");
     }
 
     @GET
@@ -42,19 +42,16 @@ public class PetStore {
     @Produces("text/xml")
     public Response getStatus(@PathParam("petId")
                               String petId) throws Exception {
-        System.out.println("----invoking getStatus on the petStore for id: " + petId);
 
         return Response.ok(CLOSED).build();
     }
 
     @POST
     @Path("/pets/")
-    @Consumes("application/x-www-form-urlencoded")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/xml")
     public Response updateStatus(MultivaluedMap<String, String> params) throws Exception {
-        System.out.println("----invoking updateStatus on the petStore with stauts post param value of: "
-                           + params.getFirst("status"));
-
+        System.out.println(params);
         return Response.ok(params.getFirst("status")).build();
     }
 }

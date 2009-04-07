@@ -25,7 +25,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.Consumes;
@@ -33,7 +35,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
@@ -102,6 +103,17 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     public Collection<ClassResourceInfo> getSubResources() {
         return Collections.unmodifiableCollection(subResources.values());
+    }
+    
+    public Set<String> getAllowedMethods() {
+        Set<String> methods = new HashSet<String>();
+        for (OperationResourceInfo o : methodDispatcher.getOperationResourceInfos()) {
+            String method = o.getHttpMethod();
+            if (method != null) {
+                methods.add(method);
+            }
+        }
+        return methods;
     }
     
     private void initParamFields() {
@@ -211,6 +223,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     @Override
     public boolean isSingleton() {
-        return resourceProvider instanceof SingletonResourceProvider;
+        return resourceProvider != null && resourceProvider.isSingleton();
     }
 }

@@ -51,7 +51,7 @@ public class NewCookieHeaderProviderTest extends Assert {
     @Test
     public void testToString() {
         NewCookie c = new NewCookie("foo", "bar", "path", "domain", "comment", 2, true);
-        assertEquals("foo=bar;Comment=comment;Domain=domain;Max-Age=2;Path=path;Secure;Version=1", 
+        assertEquals("foo=bar;Comment=comment;Domain=domain;Max-Age=2;Path=path;Secure", 
                      c.toString());
                
     }

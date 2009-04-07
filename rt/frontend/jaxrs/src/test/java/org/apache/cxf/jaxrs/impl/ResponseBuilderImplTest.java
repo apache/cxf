@@ -22,7 +22,10 @@ package org.apache.cxf.jaxrs.impl;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -39,6 +42,34 @@ public class ResponseBuilderImplTest extends Assert {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.putSingle("Content-Language", "de");
         checkBuild(Response.ok().language("de").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testLanguageReplace() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Content-Language", "en");
+        checkBuild(Response.ok().language("de").language((Locale)null)
+                   .language("en").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testAddHeader() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Content-Language", "en");
+        checkBuild(Response.ok().header(HttpHeaders.CONTENT_LANGUAGE, "de")
+                                .header(HttpHeaders.CONTENT_LANGUAGE, null)
+                                .header(HttpHeaders.CONTENT_LANGUAGE, "en").build(), 
+                  200, null, m);
+    }
+    
+    @Test
+    public void testAddCookie() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Set-Cookie", "a=b");
+        m.add("Set-Cookie", "c=d");
+        checkBuild(Response.ok().cookie(new NewCookie("a", "b"))
+                                .cookie(new NewCookie("c", "d")).build(), 
+                  200, null, m);
     }
     
     @Test
