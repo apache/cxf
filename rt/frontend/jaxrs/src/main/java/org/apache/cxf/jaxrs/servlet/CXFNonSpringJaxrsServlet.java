@@ -32,6 +32,7 @@ import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -217,10 +218,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     private Class<?> loadClass(String cName) throws ServletException {
         try {
-            return CXFNonSpringJaxrsServlet.class.getClassLoader().loadClass(cName.trim());
+            return ClassUtils.getClass(CXFNonSpringJaxrsServlet.class.getClassLoader(), cName.trim());
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            throw new ServletException("Resource class " + cName.trim() + " can not be loaded"); 
+            throw new ServletException("Resource class " + cName.trim() + " can not be loaded", ex); 
         }
     }
 }
