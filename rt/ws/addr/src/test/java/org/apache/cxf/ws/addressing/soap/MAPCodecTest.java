@@ -372,6 +372,10 @@ public class MAPCodecTest extends Assert {
             ? EndpointReferenceType.class : exposedAs200408
                 ? VersionTransformer.Names200408.EPR_TYPE : exposedAs200403
                     ? VersionTransformer.Names200403.EPR_TYPE : null, 5, unmarshaller);
+        setUpHeaderDecode(headers, uri, Names.WSA_FROM_NAME, exposedAsNative
+            ? EndpointReferenceType.class : exposedAs200408
+                ? VersionTransformer.Names200408.EPR_TYPE : exposedAs200403
+                    ? VersionTransformer.Names200403.EPR_TYPE : null, 6, unmarshaller);
     }
 
     private <T> void setUpHeaderDecode(List<Header> headers, String uri, String name, Class<T> clz,
@@ -417,6 +421,8 @@ public class MAPCodecTest extends Assert {
             : VersionTransformer.Names200403.WSA_ANONYMOUS_ADDRESS;
         replyTo.setAddress(ContextUtils.getAttributedURI(anonymous));
         maps.setReplyTo(replyTo);
+        EndpointReferenceType from = EndpointReferenceUtils.getEndpointReference("snafu");
+        maps.setFrom(from);
         EndpointReferenceType faultTo = new EndpointReferenceType();
         anonymous = exposeAsNative ? Names.WSA_ANONYMOUS_ADDRESS : exposeAs200408
             ? VersionTransformer.Names200408.WSA_ANONYMOUS_ADDRESS
@@ -443,16 +449,18 @@ public class MAPCodecTest extends Assert {
             new QName(uri, Names.WSA_TO_NAME),
             new QName(uri, Names.WSA_REPLYTO_NAME),
             new QName(uri, Names.WSA_RELATESTO_NAME),
+            new QName(uri, Names.WSA_FROM_NAME),
             new QName(uri, Names.WSA_FAULTTO_NAME),
         };
         if (exposeAsNative) {
             expectedValues = new Object[] {
-                action, id, to, replyTo, relatesTo, faultTo
+                action, id, to, replyTo, relatesTo, from, faultTo
             };
             expectedDeclaredTypes = new Class<?>[] {
                 AttributedURIType.class, 
-                AttributedURIType.class, AttributedURIType.class, EndpointReferenceType.class,
-                RelatesToType.class, EndpointReferenceType.class,  
+                AttributedURIType.class, AttributedURIType.class, 
+                EndpointReferenceType.class, RelatesToType.class,
+                EndpointReferenceType.class, EndpointReferenceType.class 
             };
         } else if (exposeAs200408) {
             expectedValues = new Object[] {
@@ -461,6 +469,7 @@ public class MAPCodecTest extends Assert {
                 VersionTransformer.convert(to),
                 VersionTransformer.convert(replyTo),
                 VersionTransformer.convert(relatesTo),
+                VersionTransformer.convert(from),
                 VersionTransformer.convert(faultTo),
             };
             if (!outbound) {
@@ -474,7 +483,8 @@ public class MAPCodecTest extends Assert {
             expectedDeclaredTypes = new Class<?>[] {
                 AttributedURI.class, AttributedURI.class, AttributedURI.class,
                 VersionTransformer.Names200408.EPR_TYPE, Relationship.class,
-                VersionTransformer.Names200408.EPR_TYPE,
+                VersionTransformer.Names200408.EPR_TYPE, 
+                VersionTransformer.Names200408.EPR_TYPE
             };
         } else if (exposeAs200403) {
             expectedValues = new Object[] {
@@ -483,6 +493,7 @@ public class MAPCodecTest extends Assert {
                 VersionTransformer.convertTo200403(to),
                 VersionTransformer.convertTo200403(replyTo),
                 VersionTransformer.convertTo200403(relatesTo), 
+                VersionTransformer.convertTo200403(from),
                 VersionTransformer.convertTo200403(faultTo),
             };
             if (!outbound) {
@@ -500,6 +511,7 @@ public class MAPCodecTest extends Assert {
                 VersionTransformer.Names200403.EPR_TYPE,
                 org.apache.cxf.ws.addressing.v200403.Relationship.class,
                 VersionTransformer.Names200403.EPR_TYPE,
+                VersionTransformer.Names200403.EPR_TYPE
             };
         } else {
             fail("unexpected namespace URI: " + uri);

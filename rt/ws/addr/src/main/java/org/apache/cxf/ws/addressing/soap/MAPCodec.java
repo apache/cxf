@@ -211,22 +211,6 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 }
                 encodeAsExposed(maps,
                                 message,
-                                maps.getFrom(), 
-                                Names.WSA_FROM_QNAME,
-                                EndpointReferenceType.class,  
-                                hdr, 
-                                marshaller);
-                if (Names.WSA_FROM_QNAME.equals(duplicate)) {
-                    encodeAsExposed(maps,
-                                    message,
-                                    maps.getFrom(), 
-                                    Names.WSA_FROM_QNAME,
-                                    EndpointReferenceType.class,  
-                                    hdr, 
-                                    marshaller);
-                }
-                encodeAsExposed(maps,
-                                message,
                                 maps.getReplyTo(), 
                                 Names.WSA_REPLYTO_QNAME, 
                                 EndpointReferenceType.class,
@@ -256,6 +240,22 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     Names.WSA_RELATESTO_QNAME,
                                     RelatesToType.class,
                                     hdr,
+                                    marshaller);
+                }
+                encodeAsExposed(maps,
+                                message,
+                                maps.getFrom(), 
+                                Names.WSA_FROM_QNAME,
+                                EndpointReferenceType.class,  
+                                hdr, 
+                                marshaller);
+                if (Names.WSA_FROM_QNAME.equals(duplicate)) {
+                    encodeAsExposed(maps,
+                                    message,
+                                    maps.getFrom(), 
+                                    Names.WSA_FROM_QNAME,
+                                    EndpointReferenceType.class,  
+                                    hdr, 
                                     marshaller);
                 }
                 if (maps.getFaultTo() != null
@@ -476,6 +476,12 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                                        headerElement, 
                                                        unmarshaller);
                                 maps.setTo(EndpointReferenceUtils.getEndpointReference(addr));
+                            } else if (Names.WSA_FROM_NAME.equals(localName)) {
+                                maps.setFrom(decodeAsNative(
+                                                       headerURI,
+                                                       EndpointReferenceType.class,
+                                                       headerElement, 
+                                                       unmarshaller));
                             } else if (Names.WSA_REPLYTO_NAME.equals(localName)) {
                                 maps.setReplyTo(decodeAsNative(
                                                        headerURI,
