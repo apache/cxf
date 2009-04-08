@@ -56,8 +56,8 @@ public final class Client {
         if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])) {
             local = true;
         }
-        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])
-            || "ms".equalsIgnoreCase(argv[0])) {        
+        if (argv.length > 0 && ("local".equalsIgnoreCase(argv[0])
+            || "ms".equalsIgnoreCase(argv[0]))) {        
             String tmp[] = new String[argv.length - 1];
             System.arraycopy(argv, 1, tmp, 0, tmp.length);
             argv = tmp;
@@ -66,7 +66,7 @@ public final class Client {
         if (argv.length < 1 || "".equals(argv[0]) 
             || argv[0] == null || "ALL".equals(argv[0])) {
             argv = new String[] {
-                //"SecureConversation_UserNameOverTransport_IPingService", 
+                "SecureConversation_UserNameOverTransport_IPingService", 
                              //service not running on the https port
                 "SecureConversation_MutualCertificate10SignEncrypt_IPingService",
                 "AC_IPingService",
@@ -107,7 +107,7 @@ public final class Client {
                 //"_KD-SEES_IPingService",
             };
         }
-        //argv = new String[] {argv[4]};
+        //argv = new String[] {argv[0]};
         //argv = new String[] {"_X10_IPingService"};
         
         

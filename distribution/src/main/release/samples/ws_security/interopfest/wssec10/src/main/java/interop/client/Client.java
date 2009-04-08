@@ -53,8 +53,8 @@ public final class Client {
         if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])) {
             local = true;
         }
-        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])
-            || "ms".equalsIgnoreCase(argv[0])) {        
+        if (argv.length > 0 && ("local".equalsIgnoreCase(argv[0])
+            || "ms".equalsIgnoreCase(argv[0]))) {        
             String tmp[] = new String[argv.length - 1];
             System.arraycopy(argv, 1, tmp, 0, tmp.length);
             argv = tmp;
@@ -67,7 +67,7 @@ public final class Client {
                 "MutualCertificate10SignEncryptRsa15TripleDes"
             };
         }
-
+        //argv = new String[] {argv[1]};
         new SpringBusFactory().createBus("etc/client.xml");
         
         List<String> results = new ArrayList<String>();

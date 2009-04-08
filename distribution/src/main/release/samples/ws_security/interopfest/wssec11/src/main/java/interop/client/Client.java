@@ -46,13 +46,13 @@ public final class Client {
      */
     public static void main(String argv[])
         throws Exception {
-        boolean local = false;
+        boolean local = true;
 
         if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])) {
             local = true;
         }
-        if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])
-            || "ms".equalsIgnoreCase(argv[0])) {        
+        if (argv.length > 0 && ("local".equalsIgnoreCase(argv[0])
+            || "ms".equalsIgnoreCase(argv[0]))) {        
             String tmp[] = new String[argv.length - 1];
             System.arraycopy(argv, 1, tmp, 0, tmp.length);
             argv = tmp;
@@ -77,13 +77,9 @@ public final class Client {
                                  "XD",
                                  "XD-ES",
                                  "XD-SEES",
-                                 //"K",   //NOT YET WORKING [1]
-                                 //"K-NoTimestamp",     //NOT YET WORKING  [1]
-                                 //"KD",   //NOT YET WORKING  [1]
-                                 //"KD-ES"   //NOT YET WORKING  [1]
             };
         }
-        //argv = new String[] {argv[2]};
+        //argv = new String[] {argv[7]};
         URL wsdlLocation = null;
 
         new SpringBusFactory().createBus("etc/client.xml");
@@ -108,12 +104,6 @@ public final class Client {
                         IPingService.class
                     );
                 
-                /*
-                ((BindingProvider)port)
-                    .getRequestContext()
-                        .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                             "http://localhost:9001/" + portPrefix + "PingService");
-                */
                 
                 final String output = port.echo(INPUT);
                 if (!INPUT.equals(output)) {
