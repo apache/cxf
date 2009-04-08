@@ -276,6 +276,12 @@ public class ServletController {
                 transport.getDestinations());
         Collections.sort(destinations, new Comparator<ServletDestination>() {
             public int compare(ServletDestination o1, ServletDestination o2) {
+                if (o1.getEndpointInfo().getInterface() == null) {
+                    return -1;
+                }
+                if (o2.getEndpointInfo().getInterface() == null) {
+                    return 1;
+                }
                 return o1.getEndpointInfo().getInterface().getName()
                         .getLocalPart().compareTo(
                                 o2.getEndpointInfo().getInterface().getName()
