@@ -55,17 +55,34 @@ public class Customer implements CustomerInfo {
     public static class CustomerBean {
         private String a;
         private Long b;
+        private List<String> c;
+        private CustomerBean d;
+        //CHECKSTYLE:OFF
+        public List<CustomerBean> e;
+        //CHECKSTYLE:ON
         public void setA(String aString) {
             this.a = aString;
         }
         public void setB(Long bLong) {
             this.b = bLong;
         }
+        public void setC(List<String> cStringList) {
+            this.c = cStringList;
+        }
+        public void setD(CustomerBean dCustomerBean) {
+            this.d = dCustomerBean;
+        }
         public String getA() {
             return a;
         }
         public Long getB() {
             return b;
+        }
+        public List<String> getC() {
+            return c;
+        }
+        public CustomerBean getD() {
+            return d;
         }
         
     }

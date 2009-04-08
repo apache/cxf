@@ -31,7 +31,9 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
@@ -133,6 +136,23 @@ public final class InjectionUtils {
         });
         
     }
+
+    @SuppressWarnings("unchecked")
+    public static Object extractFieldValue(final Field f, 
+                                        final Object o) {
+        return AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                f.setAccessible(true);
+                try {
+                    return f.get(o);
+                } catch (IllegalAccessException ex) {
+                    reportServerError("FIELD_ACCESS_FAILURE", 
+                                      f.getType().getName());
+                }
+                return null;
+            }
+        });
+    }
     
     public static Class<?> getActualType(Type genericType) {
         
@@ -167,6 +187,19 @@ public final class InjectionUtils {
         } catch (Exception ex) {
             reportServerError("METHOD_INJECTION_FAILURE", method.getName());
         }
+    }
+
+    public static Object extractFromMethod(Object requestObject,
+                                           Method method) {
+        try {
+            Method methodToInvoke = checkProxy(method, requestObject);
+            return methodToInvoke.invoke(requestObject);
+        } catch (IllegalAccessException ex) {
+            reportServerError("METHOD_ACCESS_FAILURE", method.getName());
+        } catch (Exception ex) {
+            reportServerError("METHOD_INJECTION_FAILURE", method.getName());
+        }
+        return null;
     }
     
     public static Object handleParameter(String value, 
@@ -275,31 +308,103 @@ public final class InjectionUtils {
             reportServerError("CLASS_INSTANTIATION_FAILURE", paramType.getName());
         }    
         
+        Map<String, MultivaluedMap<String, String>> parsedValues =
+            new HashMap<String, MultivaluedMap<String, String>>();
         for (Map.Entry<String, List<String>> entry : values.entrySet()) {
-            boolean injected = false;
-            for (Method m : paramType.getMethods()) {
-                if (m.getName().equalsIgnoreCase("set" + entry.getKey())
-                    && m.getParameterTypes().length == 1) {
-                    Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                        m.getParameterTypes()[0],
-                                                        pType, message);
-                    if (paramValue != null) {
-                        injectThroughMethod(bean, m, paramValue);
-                        injected = true;
+            String memberKey = entry.getKey();
+            String beanKey = null;
+
+            int idx = memberKey.indexOf('.');
+            if (idx == -1) {
+                beanKey = "." + memberKey;
+            } else {
+                beanKey = memberKey.substring(0, idx);
+                memberKey = memberKey.substring(idx + 1);
+            }
+
+            MultivaluedMap<String, String> value = parsedValues.get(beanKey);
+            if (value == null) {
+                value = new MetadataMap<String, String>();
+                parsedValues.put(beanKey, value);
+            }
+            value.put(memberKey, entry.getValue());
+        }
+
+        if (parsedValues.size() > 0) {
+            for (Map.Entry<String, MultivaluedMap<String, String>> entry : parsedValues.entrySet()) {
+                String memberKey = entry.getKey();
+
+                boolean isbean = !memberKey.startsWith(".");
+                if (!isbean) {
+                    memberKey = memberKey.substring(1);
+                }
+
+                Object setter = null;
+                Object getter = null;
+                for (Method m : paramType.getMethods()) {
+                    if (m.getName().equalsIgnoreCase("set" + memberKey)
+                        && m.getParameterTypes().length == 1) {
+                        setter = m;
+                    } else if (m.getName().equalsIgnoreCase("get" + memberKey)
+                        && m.getReturnType() != Void.TYPE) {
+                        getter = m;
+                    }
+                    if (setter != null && getter != null) {
                         break;
                     }
                 }
-            }
-            if (injected) {
-                continue;
-            }
-            for (Field f : paramType.getFields()) {
-                if (f.getName().equalsIgnoreCase(entry.getKey())) {
-                    Object paramValue = handleParameter(entry.getValue().get(0), 
-                                                        f.getType(), pType, message);
-                    if (paramValue != null) {
-                        injectFieldValue(f, bean, paramValue);
-                        break;
+                if (setter == null) {
+                    for (Field f : paramType.getFields()) {
+                        if (f.getName().equalsIgnoreCase(memberKey)) {
+                            setter = f;
+                            getter = f;
+                            break;
+                        }
+                    }
+                }
+
+                if (setter != null && getter != null) {
+                    Class<?> type = null;
+                    Type genericType = null;
+                    Object paramValue = null;
+                    if (setter instanceof Method) {
+                        type = Method.class.cast(setter).getParameterTypes()[0];
+                        genericType = Method.class.cast(setter).getGenericParameterTypes()[0];
+                        paramValue = InjectionUtils.extractFromMethod(bean, (Method) getter);
+                    } else {
+                        type = Field.class.cast(setter).getType();
+                        genericType = Field.class.cast(setter).getGenericType();
+                        paramValue = InjectionUtils.extractFieldValue((Field) getter, bean);
+                    }
+
+                    List<MultivaluedMap<String, String>> processedValuesList =
+                        processValues(type, genericType, entry.getValue(), isbean);
+
+                    for (MultivaluedMap<String, String> processedValues : processedValuesList) {
+                        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+                            Object appendValue = InjectionUtils.injectIntoCollectionOrArray(type,
+                                                            genericType, processedValues,
+                                                            isbean, true,
+                                                            pType, message);
+                            paramValue = InjectionUtils.mergeCollectionsOrArrays(paramValue, appendValue,
+                                                            genericType);
+                        } else if (isbean) {
+                            paramValue = InjectionUtils.handleBean(type, processedValues,
+                                                            pType, message);
+                        } else {
+                            paramValue = InjectionUtils.handleParameter(
+                                                            processedValues.values().iterator().next().get(0),
+                                                            type,
+                                                            pType, message);
+                        }
+
+                        if (paramValue != null) {
+                            if (setter instanceof Method) {
+                                InjectionUtils.injectThroughMethod(bean, (Method) setter, paramValue);
+                            } else {
+                                InjectionUtils.injectFieldValue((Field) setter, bean, paramValue);
+                            }
+                        }
                     }
                 }
             }
@@ -307,58 +412,146 @@ public final class InjectionUtils {
         
         return bean;
     }
-    
+
+    private static List<MultivaluedMap<String, String>> processValues(Class<?> type, Type genericType,
+                                        MultivaluedMap<String, String> values,
+                                        boolean isbean) {
+        List<MultivaluedMap<String, String>> valuesList =
+            new ArrayList<MultivaluedMap<String, String>>();
+
+        if (isbean && InjectionUtils.isSupportedCollectionOrArray(type)) {
+            Class<?> realType = InjectionUtils.getActualType(genericType);
+            for (Map.Entry<String, List<String>> entry : values.entrySet()) {
+                String memberKey = entry.getKey();
+                Class<?> memberType = null;
+
+                for (Method m : realType.getMethods()) {
+                    if (m.getName().equalsIgnoreCase("set" + memberKey)
+                        && m.getParameterTypes().length == 1) {
+                        memberType = m.getParameterTypes()[0];
+                        break;
+                    }
+                }
+                if (memberType == null) {
+                    for (Field f : realType.getFields()) {
+                        if (f.getName().equalsIgnoreCase(memberKey)) {
+                            memberType = f.getType();
+                            break;
+                        }
+                    }
+                }
+
+                // Strip values tied to collection/array fields from beans that are within
+                // collection/array themselves, the only way to support this would be to have
+                // an indexing syntax for nested beans, perhaps like this:
+                //    a(0).b=1&a(0).b=2&a(1).b=3&a(1).b=4
+                // For now though we simply don't support this capability. To illustrate, the 'c'
+                // param is dropped from this multivaluedmap example since it is a list:
+                //    {c=[71, 81, 91, 72, 82, 92], a=[C1, C2], b=[790, 791]}
+                if (memberType != null && InjectionUtils.isSupportedCollectionOrArray(memberType)) {
+                    continue;
+                }
+
+                // Split multivaluedmap value list contents into separate multivaluedmap instances
+                // whose list contents are only 1 level deep, for example: 
+                //    {a=[C1, C2], b=[790, 791]}
+                // becomes these 2 separate multivaluedmap instances:
+                //    {a=[C1], b=[790]} and {a=[C2], b=[791]}
+                int idx = 0;
+                for (String value : entry.getValue()) {
+                    MultivaluedMap<String, String> splitValues =
+                        (idx < valuesList.size()) ? valuesList.get(idx) : null;
+                    if (splitValues == null) {
+                        splitValues = new MetadataMap<String, String>();
+                        valuesList.add(splitValues);
+                    }
+                    splitValues.add(memberKey, value);
+                    idx++;
+                }
+            }
+        } else {
+            valuesList.add(values);
+        }
+
+        return valuesList;
+    }
+
+    public static boolean isSupportedCollectionOrArray(Class<?> type) {
+        return List.class.isAssignableFrom(type)
+            || Set.class.isAssignableFrom(type)
+            || SortedSet.class.isAssignableFrom(type)
+            || type.isArray();
+    }
+
     @SuppressWarnings("unchecked")
-    public static Object injectIntoList(Type genericType, List<String> values,
-                                        boolean decoded, ParameterType pathParam, Message message) {
+    private static Object mergeCollectionsOrArrays(Object first, Object second, Type genericType) {
+        if (first == null) {
+            return second;
+        } else if (first instanceof Collection) {
+            Collection.class.cast(first).addAll((Collection) second);
+            return first;
+        } else {
+            int firstLen = Array.getLength(first);
+            int secondLen = Array.getLength(second);
+            Object mergedArray = Array.newInstance(InjectionUtils.getActualType(genericType),
+                                                    firstLen + secondLen);
+            System.arraycopy(first, 0, mergedArray, 0, firstLen);
+            System.arraycopy(second, 0, mergedArray, firstLen, secondLen);
+            return mergedArray;
+        }
+    }
+
+    private static Object injectIntoCollectionOrArray(Class<?> rawType, Type genericType,
+                                        MultivaluedMap<String, String> values,
+                                        boolean isbean, boolean decoded,
+                                        ParameterType pathParam, Message message) {
+        Class<?> type = null;
+        if (List.class.isAssignableFrom(rawType)) {
+            type = ArrayList.class;
+        } else if (Set.class.isAssignableFrom(rawType)) {
+            type = HashSet.class;
+        } else if (SortedSet.class.isAssignableFrom(rawType)) {
+            type = TreeSet.class;
+        }
+
         Class<?> realType = InjectionUtils.getActualType(genericType);
-        values = checkPathSegment(values, realType, pathParam);
-        List theValues = new ArrayList();
-        for (String r : values) {
-            String value = decodeValue(r, decoded, pathParam);
-            
-            Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
-            if (o != null) {
-                theValues.add(o);
+        
+        Object theValues = null;
+        if (type != null) {
+            try {
+                theValues = type.newInstance();
+            } catch (IllegalAccessException ex) {
+                reportServerError("CLASS_ACCESS_FAILURE", type.getName());
+            } catch (Exception ex) {
+                reportServerError("CLASS_INSTANTIATION_FAILURE", type.getName());
+            }
+        } else {
+            theValues = Array.newInstance(realType, isbean ? 1 : values.values().iterator().next().size());
+        }
+        if (isbean) {
+            Object o = InjectionUtils.handleBean(realType, values, pathParam, message);
+            addToCollectionValues(theValues, o, 0);
+        } else {
+            List<String> valuesList = values.values().iterator().next();
+            valuesList = checkPathSegment(valuesList, realType, pathParam);
+            for (int ind = 0; ind < valuesList.size(); ind++) {
+                String value = decodeValue(valuesList.get(ind), decoded, pathParam);
+                Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
+                addToCollectionValues(theValues, o, ind);
             }
         }
         return theValues;
     }
     
-    public static Object injectIntoArray(Type genericType, List<String> values,
-                                         boolean decoded, ParameterType pathParam, Message message) {
-        Class<?> realType = InjectionUtils.getActualType(genericType);
-        values = checkPathSegment(values, realType, pathParam);
-        Object[] array = (Object[])Array.newInstance(realType, values.size());
-        for (int i = 0; i < values.size(); i++) {
-            String value = decodeValue(values.get(i), decoded, pathParam);
-            Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
-            if (o != null) {
-                array[i] = o;
-            }
-        }
-        return array;
-    }
-    
-    
     @SuppressWarnings("unchecked")
-    public static Object injectIntoSet(Type genericType, List<String> values, 
-                                       boolean sorted, 
-                                       boolean decoded, 
-                                       ParameterType pathParam, Message message) {
-        Class<?> realType = InjectionUtils.getActualType(genericType);
-        
-        values = checkPathSegment(values, realType, pathParam);
-        
-        Set theValues = sorted ? new TreeSet() : new HashSet();
-        for (String r : values) {
-            String value = decodeValue(r, decoded, pathParam);
-            Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
-            if (o != null) {
-                theValues.add(o);
+    private static void addToCollectionValues(Object theValues, Object o, int index) {
+        if (o != null) {
+            if (theValues instanceof Collection) {
+                Collection.class.cast(theValues).add(o);
+            } else {
+                ((Object[]) theValues)[index] = o;
             }
         }
-        return theValues;
     }
     
     private static List<String> checkPathSegment(List<String> values, Class<?> type, 
@@ -403,17 +596,11 @@ public final class InjectionUtils {
         }
 
         Object value = null;
-        if (List.class.isAssignableFrom(paramType)) {
-            value = InjectionUtils.injectIntoList(genericType, paramValues, decoded, pathParam,
-                                                 message);
-        } else if (Set.class.isAssignableFrom(paramType)) {
-            value = InjectionUtils.injectIntoSet(genericType, paramValues, false, decoded, pathParam,
-                                                message);
-        } else if (SortedSet.class.isAssignableFrom(paramType)) {
-            value = InjectionUtils.injectIntoSet(genericType, paramValues, true, decoded, pathParam,
-                                                message);
-        } else if (paramType.isArray()) {
-            value = InjectionUtils.injectIntoArray(genericType, paramValues, decoded, pathParam, message);
+        if (InjectionUtils.isSupportedCollectionOrArray(paramType)) {
+            MultivaluedMap<String, String> paramValuesMap = new MetadataMap<String, String>();
+            paramValuesMap.put("", paramValues);
+            value = InjectionUtils.injectIntoCollectionOrArray(paramType, genericType, paramValuesMap,
+                                                false, decoded, pathParam, message);
         } else {
             String result = null;
             if (paramValues.size() > 0) {

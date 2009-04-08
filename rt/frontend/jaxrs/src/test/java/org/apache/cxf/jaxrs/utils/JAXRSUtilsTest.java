@@ -630,37 +630,73 @@ public class JAXRSUtilsTest extends Assert {
         Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testQueryBean", argType);
         MessageImpl messageImpl = new MessageImpl();
-        
         messageImpl.put(Message.QUERY_STRING, "a=aValue&b=123");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           null, 
-                                                           messageImpl);
-        assertEquals("Bean should be created", 1, params.size());
-        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
-        assertNotNull(cb);
-        
-        assertEquals("aValue", cb.getA());
-        assertEquals(new Long(123), cb.getB());
+
+        MessageImpl complexMessageImpl = new MessageImpl();
+        complexMessageImpl.put(Message.QUERY_STRING, "c=1&a=A&b=123&c=2&c=3&"
+                                + "d.c=4&d.a=B&d.b=456&d.c=5&d.c=6&"
+                                + "e.c=41&e.a=B1&e.b=457&e.c=51&e.c=61&"
+                                + "e.c=42&e.a=B2&e.b=458&e.c=52&e.c=62&"
+                                + "d.d.c=7&d.d.a=C&d.d.b=789&d.d.c=8&d.d.c=9&"
+                                + "d.e.c=71&d.e.a=C1&d.e.b=790&d.e.c=81&d.e.c=91&"
+                                + "d.e.c=72&d.e.a=C2&d.e.b=791&d.e.c=82&d.e.c=92");
+
+        verifyParametersBean(m, null, messageImpl, null, complexMessageImpl);
     }
     
     @Test
     public void testPathParametersBean() throws Exception {
         Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testPathBean", argType);
-        MessageImpl messageImpl = new MessageImpl();
         
-        MultivaluedMap<String, String> pathTamplates = new MetadataMap<String, String>();
-        pathTamplates.add("a", "aValue");
-        pathTamplates.add("b", "123");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           pathTamplates, 
-                                                           messageImpl);
-        assertEquals("Bean should be created", 1, params.size());
-        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
-        assertNotNull(cb);
-        
-        assertEquals("aValue", cb.getA());
-        assertEquals(new Long(123), cb.getB());
+        MultivaluedMap<String, String> pathTemplates = new MetadataMap<String, String>();
+        pathTemplates.add("a", "aValue");
+        pathTemplates.add("b", "123");
+
+        MultivaluedMap<String, String> complexPathTemplates = new MetadataMap<String, String>();
+        complexPathTemplates.add("c", "1");
+        complexPathTemplates.add("a", "A");
+        complexPathTemplates.add("b", "123");
+        complexPathTemplates.add("c", "2");
+        complexPathTemplates.add("c", "3");
+
+        complexPathTemplates.add("d.c", "4");
+        complexPathTemplates.add("d.a", "B");
+        complexPathTemplates.add("d.b", "456");
+        complexPathTemplates.add("d.c", "5");
+        complexPathTemplates.add("d.c", "6");
+
+        complexPathTemplates.add("e.c", "41");
+        complexPathTemplates.add("e.a", "B1");
+        complexPathTemplates.add("e.b", "457");
+        complexPathTemplates.add("e.c", "51");
+        complexPathTemplates.add("e.c", "61");
+
+        complexPathTemplates.add("e.c", "42");
+        complexPathTemplates.add("e.a", "B2");
+        complexPathTemplates.add("e.b", "458");
+        complexPathTemplates.add("e.c", "52");
+        complexPathTemplates.add("e.c", "62");
+
+        complexPathTemplates.add("d.d.c", "7");
+        complexPathTemplates.add("d.d.a", "C");
+        complexPathTemplates.add("d.d.b", "789");
+        complexPathTemplates.add("d.d.c", "8");
+        complexPathTemplates.add("d.d.c", "9");
+
+        complexPathTemplates.add("d.e.c", "71");
+        complexPathTemplates.add("d.e.a", "C1");
+        complexPathTemplates.add("d.e.b", "790");
+        complexPathTemplates.add("d.e.c", "81");
+        complexPathTemplates.add("d.e.c", "91");
+
+        complexPathTemplates.add("d.e.c", "72");
+        complexPathTemplates.add("d.e.a", "C2");
+        complexPathTemplates.add("d.e.b", "791");
+        complexPathTemplates.add("d.e.c", "82");
+        complexPathTemplates.add("d.e.c", "92");
+
+        verifyParametersBean(m, pathTemplates, new MessageImpl(), complexPathTemplates, new MessageImpl());
     }
     
     @Test
@@ -669,15 +705,17 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testMatrixBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar;a=aValue/baz;b=123");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           new MetadataMap<String, String>(), 
-                                                           messageImpl);
-        assertEquals("Bean should be created", 1, params.size());
-        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
-        assertNotNull(cb);
-        
-        assertEquals("aValue", cb.getA());
-        assertEquals(new Long(123), cb.getB());
+
+        MessageImpl complexMessageImpl = new MessageImpl();
+        complexMessageImpl.put(Message.REQUEST_URI, "/bar;c=1/bar;a=A/bar;b=123/bar;c=2/bar;c=3"
+                                + "/bar;d.c=4/bar;d.a=B/bar;d.b=456/bar;d.c=5/bar;d.c=6"
+                                + "/bar;e.c=41/bar;e.a=B1/bar;e.b=457/bar;e.c=51/bar;e.c=61"
+                                + "/bar;e.c=42/bar;e.a=B2/bar;e.b=458/bar;e.c=52/bar;e.c=62"
+                                + "/bar;d.d.c=7/bar;d.d.a=C/bar;d.d.b=789/bar;d.d.c=8/bar;d.d.c=9"
+                                + "/bar;d.e.c=71/bar;d.e.a=C1/bar;d.e.b=790/bar;d.e.c=81/bar;d.e.c=91"
+                                + "/bar;d.e.c=72/bar;d.e.a=C2/bar;d.e.b=791/bar;d.e.c=82/bar;d.e.c=92");
+
+        verifyParametersBean(m, null, messageImpl, null, complexMessageImpl);
     }
     
     @Test
@@ -688,15 +726,106 @@ public class JAXRSUtilsTest extends Assert {
         messageImpl.put(Message.REQUEST_URI, "/bar");
         String body = "a=aValue&b=123";
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+
+        MessageImpl complexMessageImpl = new MessageImpl();
+        complexMessageImpl.put(Message.REQUEST_URI, "/bar");
+        body = "c=1&a=A&b=123&c=2&c=3&"
+                                + "d.c=4&d.a=B&d.b=456&d.c=5&d.c=6&"
+                                + "e.c=41&e.a=B1&e.b=457&e.c=51&e.c=61&"
+                                + "e.c=42&e.a=B2&e.b=458&e.c=52&e.c=62&"
+                                + "d.d.c=7&d.d.a=C&d.d.b=789&d.d.c=8&d.d.c=9&"
+                                + "d.e.c=71&d.e.a=C1&d.e.b=790&d.e.c=81&d.e.c=91&"
+                                + "d.e.c=72&d.e.a=C2&d.e.b=791&d.e.c=82&d.e.c=92";
+        complexMessageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+
+        verifyParametersBean(m, null, messageImpl, null, complexMessageImpl);
+    }
+
+    private void verifyParametersBean(Method m,
+                                      MultivaluedMap<String, String> simpleValues,
+                                      MessageImpl simpleMessageImpl,
+                                      MultivaluedMap<String, String> complexValues,
+                                      MessageImpl complexMessageImpl) throws Exception {
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           new MetadataMap<String, String>(), 
-                                                           messageImpl);
+                                                           simpleValues, 
+                                                           simpleMessageImpl);
         assertEquals("Bean should be created", 1, params.size());
         Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
         assertNotNull(cb);
         
         assertEquals("aValue", cb.getA());
         assertEquals(new Long(123), cb.getB());
+
+        params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                       complexValues, 
+                                                       complexMessageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb1 = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb1);
+
+        assertEquals("A", cb1.getA());
+        assertEquals(new Long(123), cb1.getB());
+        List<String> list1 = (List<String>)cb1.getC();
+        assertEquals(3, list1.size());
+        assertEquals("1", list1.get(0));
+        assertEquals("2", list1.get(1));
+        assertEquals("3", list1.get(2));
+
+        Customer.CustomerBean cb2 = cb1.getD();
+        assertNotNull(cb2);
+
+        assertEquals("B", cb2.getA());
+        assertEquals(new Long(456), cb2.getB());
+        List<String> list2 = (List<String>)cb2.getC();
+        assertEquals(3, list2.size());
+        assertEquals("4", list2.get(0));
+        assertEquals("5", list2.get(1));
+        assertEquals("6", list2.get(2));
+
+        List<Customer.CustomerBean> cb2List = cb1.e;
+        assertEquals(2, cb2List.size());
+
+        int idx = 1;
+        for (Customer.CustomerBean cb2E : cb2List) {
+            assertNotNull(cb2E);
+
+            assertEquals("B" + idx, cb2E.getA());
+            assertEquals(new Long(456 + idx), cb2E.getB());
+            // ensure C was stripped properly since lists within lists are not supported
+            assertNull(cb2E.getC());
+            assertNull(cb2E.getD());
+            assertNull(cb2E.e);
+
+            idx++;
+        }
+
+        Customer.CustomerBean cb3 = cb2.getD();
+        assertNotNull(cb3);
+
+        assertEquals("C", cb3.getA());
+        assertEquals(new Long(789), cb3.getB());
+        List<String> list3 = (List<String>)cb3.getC();
+        assertEquals(3, list3.size());
+        assertEquals("7", list3.get(0));
+        assertEquals("8", list3.get(1));
+        assertEquals("9", list3.get(2));
+
+        List<Customer.CustomerBean> cb3List = cb2.e;
+        assertEquals(2, cb3List.size());
+
+        idx = 1;
+        for (Customer.CustomerBean cb3E : cb3List) {
+            assertNotNull(cb3E);
+
+            assertEquals("C" + idx, cb3E.getA());
+            assertEquals(new Long(789 + idx), cb3E.getB());
+            // ensure C was stripped properly since lists within lists are not supported
+            assertNull(cb3E.getC());
+            assertNull(cb3E.getD());
+            assertNull(cb3E.e);
+
+            idx++;
+        }
     }
     
     @Test
