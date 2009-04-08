@@ -99,16 +99,20 @@ public class JAXBDataBinding implements DataBindingProfile {
 
     public class LocationFilterReader extends StreamReaderDelegate implements XMLStreamReader {
         boolean isImport;
-        int locIdx;
+        int locIdx = -1;
         LocationFilterReader(XMLStreamReader read) {
             super(read);
         }
+
         public int next() throws XMLStreamException {
             int i = super.next();
             if (i == XMLStreamReader.START_ELEMENT) {
-                isImport = super.getName().equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
+                QName qn = super.getName();
+                isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
                 if (isImport) {
                     findLocation();
+                } else {
+                    locIdx = -1;
                 }
             } else {
                 isImport = false;
@@ -123,6 +127,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                 isImport = super.getName().equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
                 if (isImport) {
                     findLocation();
+                } else {
+                    locIdx = -1;
                 }
             } else {
                 isImport = false;
@@ -361,7 +367,6 @@ public class JAXBDataBinding implements DataBindingProfile {
                 ids.add(key);
             }
         }
-                
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
                 continue;
@@ -410,6 +415,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     InputSource is = new InputSource(key);
                     opts.addGrammar(is);
                     schemaCompiler.parseSchema(key, reader);
+                    reader.close();
                 } catch (RuntimeException ex) {
                     throw ex;
                 } catch (Exception ex) {

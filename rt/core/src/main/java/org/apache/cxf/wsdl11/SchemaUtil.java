@@ -105,7 +105,16 @@ public final class SchemaUtil {
                     synchronized (schemaElem.getOwnerDocument()) {
                         for (Object prefix : def.getNamespaces().keySet()) {
                             String ns = (String)def.getNamespaces().get(prefix);
-                            if (!"".equals(prefix) && !schemaElem.hasAttribute("xmlns:" + prefix)) {
+                            if ("".equals(prefix)) {
+                                if (!schemaElem.hasAttribute("xmlns")) {
+                                    Attr attr = 
+                                        schemaElem.getOwnerDocument()
+                                            .createAttributeNS(javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+                                                               "xmlns");
+                                    attr.setValue(ns);
+                                    schemaElem.setAttributeNodeNS(attr);
+                                }
+                            } else if (!schemaElem.hasAttribute("xmlns:" + prefix)) {
                                 String namespace = javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
                                 Attr attr = 
                                     schemaElem.getOwnerDocument().createAttributeNS(namespace, 
