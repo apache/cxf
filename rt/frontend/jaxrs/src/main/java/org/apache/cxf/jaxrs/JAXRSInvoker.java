@@ -61,7 +61,6 @@ public class JAXRSInvoker extends AbstractInvoker {
     public JAXRSInvoker() {
     }
 
-    @SuppressWarnings("unchecked")
     public Object invoke(Exchange exchange, Object request) {
         Response response = exchange.get(Response.class);
         if (response != null) {
