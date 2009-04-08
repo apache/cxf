@@ -64,7 +64,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetAll() throws Exception {
         
-        InputStream in = getRestInputStream("http://localhost:9092/test/services/rest2/myRestService");
+        InputStream in = getHttpInputStream("http://localhost:9092/test/services/rest2/myRestService");
         assertEquals("0", getStringFromInputStream(in));
                 
     }
@@ -72,7 +72,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBook123() throws Exception {
         
-        InputStream in = getRestInputStream("http://localhost:9092/test/services/rest/bookstore/123");
+        InputStream in = getHttpInputStream("http://localhost:9092/test/services/rest/bookstore/123");
         
         InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
@@ -331,6 +331,10 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws store = service.getBookPort();
         Book book = store.getBook(new Long(123));
         assertEquals("id is wrong", book.getId(), 123);
+        
+        String listings = 
+            getStringFromInputStream(getHttpInputStream("http://localhost:9092/test/services"));
+        assertNotNull(listings);
     }
 
     private String getStringFromInputStream(InputStream in) throws Exception {        
@@ -341,7 +345,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         return bos.getOut().toString();        
     }
 
-    private InputStream getRestInputStream(String endpointAddress) throws Exception {
+    private InputStream getHttpInputStream(String endpointAddress) throws Exception {
         URL url = new URL(endpointAddress);
         
         URLConnection connect = url.openConnection();
