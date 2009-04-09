@@ -34,11 +34,17 @@ public class BookServer extends AbstractBusTestServerBase {
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class, BookStorePerRequest.class);
+        
+        List<Object> providers = new ArrayList<Object>();
+        
         //default lifecycle is per-request, change it to singleton
         BinaryDataProvider p = new BinaryDataProvider();
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
-        sf.setProvider(p);
+        
+        providers.add(p);
+        providers.add(new GenericHandlerWriter());
+        sf.setProviders(providers);
         List<Interceptor> ints = new ArrayList<Interceptor>();
         ints.add(new CustomOutInterceptor());
         sf.setOutInterceptors(ints);

@@ -45,6 +45,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -210,6 +211,22 @@ public class BookStore {
             throw new WebApplicationException(Response.status(403).entity("Unsecure link").build());
         }
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/genericbooks/{bookId}/")
+    @Produces("application/xml")
+    public GenericEntity<GenericHandler<Book>> getGenericBook(@PathParam("bookId") String id) 
+        throws BookNotFoundFault {
+        return new GenericEntity<GenericHandler<Book>>(new GenericHandler<Book>(doGetBook(id))) { };
+    }
+    
+    @GET
+    @Path("/genericresponse/{bookId}/")
+    @Produces("application/xml")
+    public Response getGenericResponseBook(@PathParam("bookId") String id) 
+        throws BookNotFoundFault {
+        return Response.ok(getGenericBook(id)).build();
     }
     
     @GET

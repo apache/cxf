@@ -164,7 +164,9 @@ public final class InjectionUtils {
             return cls.isArray() ? cls.getComponentType() : null;
         }
         ParameterizedType paramType = (ParameterizedType)genericType;
-        return (Class<?>)paramType.getActualTypeArguments()[0];
+        Type t = paramType.getActualTypeArguments()[0];
+        // we don't recurse at this stage, otherwise GenericEntity won't be handled properly
+        return t instanceof Class ? (Class<?>)t : null;
     }
     
     public static Type[] getActualTypes(Type genericType) {

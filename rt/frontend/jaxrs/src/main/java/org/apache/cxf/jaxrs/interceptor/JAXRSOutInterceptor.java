@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -125,14 +127,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                   boolean firstTry) {
         int status = response.getStatus();
         Object responseObj = response.getEntity();
-        if (status == 200 && responseObj != null && firstTry 
+        if (status == 200 && !isResponseNull(responseObj) && firstTry 
             && JAXRSUtils.headMethodPossible(ori.getHttpMethod(), 
                 (String)message.getExchange().getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
             LOG.info(new org.apache.cxf.common.i18n.Message("HEAD_WITHOUT_ENTITY", BUNDLE).toString());
             responseObj = null;
         }
         if (status == -1) {
-            status = responseObj == null ? 204 : 200;
+            status = isResponseNull(responseObj) ? 204 : 200;
         }
         
         message.put(Message.RESPONSE_CODE, status);
@@ -147,11 +149,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         MultivaluedMap<String, Object> responseHeaders = 
             (MultivaluedMap)message.get(Message.PROTOCOL_HEADERS);
         setResponseDate(responseHeaders, firstTry);
-        if (responseObj == null) {
+        if (isResponseNull(responseObj)) {
             return;
         }
         
-        Class targetType = responseObj.getClass();
+        Class<?> targetType = getRawResponseClass(responseObj);
         List<MediaType> availableContentTypes = computeAvailableContentTypes(message, response);  
         
         Method invoked = null;
@@ -164,7 +166,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         for (MediaType type : availableContentTypes) { 
             writer = ProviderFactory.getInstance(message)
                 .createMessageBodyWriter(targetType, 
-                      invoked != null ? invoked.getGenericReturnType() : null, 
+                      getGenericResponseType(invoked, responseObj), 
                       invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                       type,
                       message);
@@ -182,15 +184,15 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         boolean enabled = checkBufferingMode(message, writer, firstTry);
+        Object entity = getEntity(responseObj);
         try {
-            
             responseType = checkFinalContentType(responseType);
             LOG.fine("Response content type is: " + responseType.toString());
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
             try {
-                writer.writeTo(responseObj, targetType, 
+                writer.writeTo(entity, targetType, 
                                invoked != null ? invoked.getGenericReturnType() : null, 
                                invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                                responseType, 
@@ -209,10 +211,19 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
         } catch (IOException ex) {
-            handleWriteException(message, response, ori, ex, responseObj, firstTry);
+            handleWriteException(message, response, ori, ex, entity, firstTry);
         } catch (Throwable ex) {
-            handleWriteException(message, response, ori, ex, responseObj, firstTry);
+            handleWriteException(message, response, ori, ex, entity, firstTry);
         }
+    }
+    
+    private boolean isResponseNull(Object o) {
+        return o == null || GenericEntity.class.isAssignableFrom(o.getClass()) 
+                            && ((GenericEntity)o).getEntity() == null; 
+    }
+    
+    private Object getEntity(Object o) {
+        return GenericEntity.class.isAssignableFrom(o.getClass()) ? ((GenericEntity)o).getEntity() : o; 
     }
     
     private boolean checkBufferingMode(Message m, MessageBodyWriter w, boolean firstTry) {
@@ -318,6 +329,22 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }        
         return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes);
         
+    }
+    
+    private Class<?> getRawResponseClass(Object targetObject) {
+        if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
+            return ((GenericEntity)targetObject).getRawType();
+        } else {
+            return targetObject.getClass();
+        }
+    }
+    
+    private Type getGenericResponseType(Method invoked, Object targetObject) {
+        if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
+            return ((GenericEntity)targetObject).getType();
+        } else {
+            return invoked == null ? targetObject.getClass() : invoked.getGenericReturnType();
+        }
     }
     
     private MediaType checkFinalContentType(MediaType mt) {
