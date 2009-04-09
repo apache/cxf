@@ -33,20 +33,22 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class GenericHandlerWriter implements MessageBodyWriter<GenericHandler<Book>> {
 
-    public long getSize(GenericHandler<Book> t, Class type, Type genericType, Annotation[] annotations, 
+    public long getSize(GenericHandler<Book> t, Class<?> type, Type genericType, Annotation[] annotations, 
                         MediaType mediaType) {        
         return -1;
     }
 
-    public boolean isWriteable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isWriteable(Class<?> type, Type genericType, 
+                               Annotation[] annotations, MediaType mediaType) {
         return type == GenericHandler.class && InjectionUtils.getActualType(genericType) == Book.class;
     }
 
-    public void writeTo(GenericHandler<Book> o, Class c, Type t, Annotation[] anns, MediaType m,
+    public void writeTo(GenericHandler<Book> o, Class<?> c, Type t, Annotation[] anns, MediaType m,
                         MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
         JAXBElementProvider jaxb = new JAXBElementProvider();
         jaxb.writeTo(o.getEntity(), c, InjectionUtils.getActualType(t), anns, m, headers, os);
     }
+
 
 }
