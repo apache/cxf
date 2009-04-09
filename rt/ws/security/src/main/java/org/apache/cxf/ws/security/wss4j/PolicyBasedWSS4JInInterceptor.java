@@ -473,13 +473,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             ai.setAsserted(true);
             if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
                 if (abinding.isSignatureProtection()) {
-                    if (prots != Protections.ENCRYPT_SIGN_PROTECT) {
+                    if (prots == Protections.ENCRYPT_SIGN
+                        || prots == Protections.SIGN_ENCRYPT) {
                         ai.setNotAsserted("Not encrypted before signed and then protected");
                     }
-                } else if (prots != Protections.ENCRYPT_SIGN) {
+                } else if (prots != Protections.SIGN_ENCRYPT) {
                     ai.setNotAsserted("Not encrypted before signed");                    
                 }
-            } else if (prots != Protections.SIGN_ENCRYPT && prots != Protections.SIGN) {
+            } else if (prots == Protections.ENCRYPT_SIGN) {
                 ai.setNotAsserted("Not signed before encrypted");                                    
             }
             
@@ -512,13 +513,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             ai.setAsserted(true);
             if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
                 if (abinding.isSignatureProtection()) {
-                    if (prots != Protections.ENCRYPT_SIGN_PROTECT) {
+                    if (prots == Protections.ENCRYPT_SIGN
+                        || prots == Protections.SIGN_ENCRYPT) {
                         ai.setNotAsserted("Not encrypted before signed and then protected");
                     }
-                } else if (prots != Protections.ENCRYPT_SIGN) {
+                } else if (prots == Protections.SIGN_ENCRYPT) {
                     ai.setNotAsserted("Not encrypted before signed");                    
                 }
-            } else if (prots != Protections.SIGN_ENCRYPT) {
+            } else if (prots == Protections.ENCRYPT_SIGN) {
                 ai.setNotAsserted("Not signed before encrypted");                                    
             }
             assertPolicy(aim, abinding.getInitiatorToken());
