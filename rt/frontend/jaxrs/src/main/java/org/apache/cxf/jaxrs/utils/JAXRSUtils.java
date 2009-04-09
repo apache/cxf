@@ -256,7 +256,7 @@ public final class JAXRSUtils {
         for (MediaType acceptType : acceptContentTypes) {
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
                 URITemplate uriTemplate = ori.getURITemplate();
-                MultivaluedMap<String, String> map = cloneMap(values);
+                MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
                     if (ori.isSubResourceLocator()) {
                         candidateList.put(ori, map);
@@ -265,7 +265,7 @@ public final class JAXRSUtils {
                         if (finalGroup == null || StringUtils.isEmpty(finalGroup)
                             || finalGroup.equals("/")) {
                             pathMatched++;
-                            boolean mMatched = ori.getHttpMethod().equalsIgnoreCase(httpMethod);
+                            boolean mMatched = matchHttpMethod(ori.getHttpMethod(), httpMethod);
                             boolean cMatched = matchConsumeTypes(requestType, ori);
                             boolean pMatched = matchProduceTypes(acceptType, ori);
                             if (mMatched && cMatched && pMatched) {
@@ -289,7 +289,13 @@ public final class JAXRSUtils {
                 candidateList.entrySet().iterator().next();
             values.clear();
             values.putAll(firstEntry.getValue());
-            return firstEntry.getKey();
+            OperationResourceInfo ori = firstEntry.getKey();
+            if (headMethodPossible(ori.getHttpMethod(), httpMethod)) {
+                LOG.info(new org.apache.cxf.common.i18n.Message("GET_INSTEAD_OF_HEAD", 
+                         BUNDLE, resource.getServiceClass().getName(), 
+                         ori.getMethodToInvoke().getName()).toString());
+            }
+            return ori;
         }
         
         int status = pathMatched == 0 ? 404 : methodMatched == 0 ? 405 
@@ -301,17 +307,36 @@ public final class JAXRSUtils {
                                                    path,
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
-        LOG.warning(errorMsg.toString());
-        ResponseBuilder rb = Response.status(status);
-        if (methodMatched == 0) {
-            for (String m : resource.getAllowedMethods()) {
-                rb.header("Allow", m);
-            }
+        if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
+            LOG.warning(errorMsg.toString());
         }
+        ResponseBuilder rb = createResponseBuilder(resource, status, methodMatched == 0);
         throw new WebApplicationException(rb.build());
         
     }    
 
+    public static ResponseBuilder createResponseBuilder(ClassResourceInfo cri, int status, boolean addAllow) {
+        ResponseBuilder rb = Response.status(status);
+        if (addAllow) {
+            for (String m : cri.getAllowedMethods()) {
+                rb.header("Allow", m);
+            }
+        }
+        return rb;
+    }
+    
+    private static boolean matchHttpMethod(String expectedMethod, String httpMethod) {
+        if (expectedMethod.equalsIgnoreCase(httpMethod) 
+            || headMethodPossible(expectedMethod, httpMethod)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public static boolean headMethodPossible(String expectedMethod, String httpMethod) {
+        return "HEAD".equalsIgnoreCase(httpMethod) && "GET".equals(expectedMethod);        
+    }
+    
     private static String convertTypesToString(List<MediaType> types) {
         StringBuilder sb = new StringBuilder();
         for (MediaType type : types) {
@@ -421,7 +446,7 @@ public final class JAXRSUtils {
         InputStream is = message.getContent(InputStream.class);
 
         if (parameterAnns == null 
-            || !AnnotationUtils.isMethodParamAnnotations(parameterAnns)) {
+            || !AnnotationUtils.isValidParamAnnotations(parameterAnns)) {
             
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
@@ -454,7 +479,7 @@ public final class JAXRSUtils {
         }
     }
     
-    private static Object createHttpParameterValue(Annotation[] anns, 
+    public static Object createHttpParameterValue(Annotation[] anns, 
                                             Class<?> parameterClass, 
                                             Type genericParam,
                                             Message message,
@@ -952,17 +977,6 @@ public final class JAXRSUtils {
             });
         }
         return types;
-    }
-    
-    
-    private static <K, V> MultivaluedMap<K, V> cloneMap(MultivaluedMap<K, V> map1) {
-        
-        MultivaluedMap<K, V> map2 = new MetadataMap<K, V>();
-        for (Map.Entry<K, List<V>> entry : map1.entrySet()) {
-            map2.put(entry.getKey(), new ArrayList<V>(entry.getValue()));
-        }
-        return map2;
-        
     }
     
     @SuppressWarnings("unchecked")

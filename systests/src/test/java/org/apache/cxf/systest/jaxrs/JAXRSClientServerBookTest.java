@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -48,7 +49,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -63,6 +64,27 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+    }
+    
+    @Test
+    public void testHeadBookByURL() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123");
+        Response response = wc.head();
+        assertTrue(response.getMetadata().size() != 0);
+        assertEquals(0, ((InputStream)response.getEntity()).available());
+    }
+    
+    @Test
+    public void testOptions() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123");
+        Response response = wc.options();
+        List<Object> values = response.getMetadata().get("Allow");
+        assertNotNull(values);
+        assertTrue(values.contains("POST") && values.contains("GET")
+                   && values.contains("DELETE") && values.contains("PUT"));
+        assertEquals(0, ((InputStream)response.getEntity()).available());
     }
     
     @Test

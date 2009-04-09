@@ -90,13 +90,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         List<Class> resourceClasses = new ArrayList<Class>();
         for (String cName : classNames) {
             if (cName.length() != 0) {
-                try {
-                    Class<?> cls = CXFNonSpringJaxrsServlet.class.getClassLoader().loadClass(cName.trim());
-                    resourceClasses.add(cls);
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                    throw new ServletException("Resource class " + cName.trim() + " can not be loaded"); 
-                }
+                Class<?> cls = loadClass(cName);
+                resourceClasses.add(cls);
             }
         }
         if (resourceClasses.isEmpty()) {
@@ -140,7 +135,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     
     private Object createSingletonInstance(Class<?> cls, ServletConfig sc) throws ServletException {
-        Constructor c = ResourceUtils.findResourceConstructor(cls);
+        Constructor c = ResourceUtils.findResourceConstructor(cls, false);
         if (c == null) {
             throw new ServletException("No valid constructor found for " + cls.getName());
         }
@@ -220,7 +215,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         try {
             return ClassUtils.getClass(CXFNonSpringJaxrsServlet.class.getClassLoader(), cName.trim());
         } catch (ClassNotFoundException ex) {
-            throw new ServletException("Resource class " + cName.trim() + " can not be loaded", ex); 
+            throw new ServletException("No resource class " + cName.trim() + " can be found", ex); 
         }
     }
 }

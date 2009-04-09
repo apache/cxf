@@ -42,6 +42,7 @@ public class UriInfoImplTest extends Assert {
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
+        control.makeThreadSafe(true);
     }
     
     @Test

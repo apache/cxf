@@ -22,6 +22,10 @@ package org.apache.cxf.jaxrs.utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -89,29 +93,38 @@ public final class ResourceUtils {
         cri.setMethodDispatcher(md);
     }
     
-    public static Constructor findResourceConstructor(Class<?> resourceClass) {
-        Constructor defaultConstructor = null;
+    public static Constructor findResourceConstructor(Class<?> resourceClass, boolean perRequest) {
+        List<Constructor> cs = new LinkedList<Constructor>();
         for (Constructor c : resourceClass.getConstructors()) {
             Class<?>[] params = c.getParameterTypes();
-            if (params.length == 0) {
-                defaultConstructor = c;
-                continue;
-            }
-            
             Annotation[][] anns = c.getParameterAnnotations();
             boolean match = true;
             for (int i = 0; i < params.length; i++) {
-                if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null
-                    || !AnnotationUtils.isContextClass(params[i])) {
+                if (!perRequest) { 
+                    if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null
+                        || !AnnotationUtils.isContextClass(params[i])) {
+                        match = false;
+                        break;
+                    }
+                } else if (!AnnotationUtils.isValidParamAnnotations(anns[i])) {
                     match = false;
                     break;
                 }
             }
             if (match) {
-                return c;
+                cs.add(c);
             }
         }
-        return defaultConstructor;
+        Collections.sort(cs, new Comparator<Constructor>() {
+
+            public int compare(Constructor c1, Constructor c2) {
+                int p1 = c1.getParameterTypes().length;
+                int p2 = c2.getParameterTypes().length;
+                return p1 > p2 ? -1 : p1 < p2 ? 1 : 0;
+            }
+        
+        });
+        return cs.size() == 0 ? null : cs.get(0);
     }
     
     private static OperationResourceInfo createOperationInfo(Method m, Method annotatedMethod, 

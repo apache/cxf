@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.message.ExchangeImpl;
@@ -33,6 +34,16 @@ public class HttpUtilsTest extends Assert {
     @Test
     public void testUrlDecode() {
         assertEquals("+ ", HttpUtils.urlDecode("%2B+"));
+    }
+    
+    @Test
+    public void testIsDateHeader() {
+        assertFalse(HttpUtils.isDateRelatedHeader(HttpHeaders.ETAG));
+        assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.EXPIRES));
+        assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.IF_MODIFIED_SINCE));
+        assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.IF_UNMODIFIED_SINCE));
+        assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.DATE));
+        assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.LAST_MODIFIED));
     }
     
     @Test

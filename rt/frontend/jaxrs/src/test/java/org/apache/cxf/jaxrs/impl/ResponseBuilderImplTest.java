@@ -79,6 +79,9 @@ public class ResponseBuilderImplTest extends Assert {
         SimpleDateFormat format = HttpUtils.getHttpDateFormat();
         Date date = format.parse("Tue, 21 Oct 2008 17:00:00 GMT");
         checkBuild(Response.ok().expires(date).build(), 200, null, m);
+        checkBuild(Response.ok().expires(date)
+                   .header(HttpHeaders.EXPIRES, date).build(), 200, null, m);
+        checkBuild(Response.ok().header(HttpHeaders.EXPIRES, date).build(), 200, null, m);
     }
     
     @Test

@@ -16,27 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.lifecycle;
+package org.apache.cxf.systest.jaxrs;
 
-import org.apache.cxf.jaxrs.Customer;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
+import javax.ws.rs.core.Application;
 
-public class PerRequestResourceProviderTest extends Assert {
-    
-    @Test
-    public void testGetInstance() {
-        PerRequestResourceProvider rp = new PerRequestResourceProvider(Customer.class);
-        Message message = new MessageImpl();
-        message.put(Message.QUERY_STRING, "a=aValue");
-        Customer c = (Customer)rp.getInstance(message);
-        assertNotNull(c.getUriInfo());
-        assertEquals("aValue", c.getQueryParam());
+public class BookApplication extends Application {
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
+        return classes;
     }
+
+    @Override 
+    public Set<Object> getSingletons() {
+        Set<Object> classes = new HashSet<Object>();
+        classes.add(new org.apache.cxf.systest.jaxrs.BookStore());
+        return classes;
+    }
+    
+    
 }
-
-
-

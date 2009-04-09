@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
@@ -117,6 +118,14 @@ public final class HttpUtils {
         TimeZone tZone = TimeZone.getTimeZone("GMT");
         dateFormat.setTimeZone(tZone);
         return dateFormat;
+    }
+    
+    public static boolean isDateRelatedHeader(String headerName) {
+        return HttpHeaders.DATE.equalsIgnoreCase(headerName)
+               || HttpHeaders.IF_MODIFIED_SINCE.equalsIgnoreCase(headerName)
+               || HttpHeaders.IF_UNMODIFIED_SINCE.equalsIgnoreCase(headerName)
+               || HttpHeaders.EXPIRES.equalsIgnoreCase(headerName)
+               || HttpHeaders.LAST_MODIFIED.equalsIgnoreCase(headerName); 
     }
     
     public static URI toAbsoluteUri(URI u, Message message) { 

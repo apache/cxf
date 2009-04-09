@@ -117,6 +117,12 @@ public class Customer implements CustomerInfo {
         uriInfo = info;
     }
     
+    public Customer(@Context UriInfo info,
+                    @QueryParam("a") String queryParam) {
+        uriInfo = info;
+        this.queryParam = queryParam;
+    }
+    
     public String getName() {
         return name;
     }

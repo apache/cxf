@@ -112,14 +112,14 @@ public final class AnnotationUtils {
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass);
     }
     
-    public static boolean isMethodParamAnnotationClass(Class<?> annotationClass) { 
+    public static boolean isValidParamAnnotationClass(Class<?> annotationClass) { 
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass)
                || Context.class == annotationClass;
     }
     
-    public static boolean isMethodParamAnnotations(Annotation[] paramAnnotations) {
+    public static boolean isValidParamAnnotations(Annotation[] paramAnnotations) {
         for (Annotation a : paramAnnotations) {
-            if (AnnotationUtils.isMethodParamAnnotationClass(a.annotationType())) {
+            if (AnnotationUtils.isValidParamAnnotationClass(a.annotationType())) {
                 return true;
             }
         }
@@ -178,7 +178,7 @@ public final class AnnotationUtils {
             }        
         }
         for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
-            if (isMethodParamAnnotations(paramAnnotations)) {
+            if (isValidParamAnnotations(paramAnnotations)) {
                 return m;
             }
         }

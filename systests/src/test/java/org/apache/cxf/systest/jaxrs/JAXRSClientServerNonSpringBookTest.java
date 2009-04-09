@@ -36,7 +36,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookNonSpringServer.class, true));
+                   launchServer(BookNonSpringServer.class));
     }
     
     
@@ -49,7 +49,6 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     }
     
     @Test
-    @org.junit.Ignore
     public void testGetBook123ApplicationSingleton() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/application/bookstore/books/123",
                                "resources/expected_get_book123.txt",
@@ -58,7 +57,6 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     }
     
     @Test
-    @org.junit.Ignore
     public void testGetBook123ApplicationPerRequest() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/application/bookstore2/bookheaders",
                                "resources/expected_get_book123.txt",

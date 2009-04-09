@@ -90,6 +90,9 @@ public class HttpHeadersImplTest extends Assert {
         assertEquals(1, contentValues.size());
         assertEquals("*/*", contentValues.get(0));
         
+        List<String> dateValues = h.getRequestHeader("Date");
+        assertEquals(1, dateValues.size());
+        assertEquals("Tue, 21 Oct 2008 17:00:00 GMT", dateValues.get(0));
     }
     
     @Test
@@ -168,6 +171,7 @@ public class HttpHeadersImplTest extends Assert {
         MetadataMap<String, String> hs = new MetadataMap<String, String>();
         hs.putSingle("Accept", "text/*;q=1,application/xml");
         hs.putSingle("Content-Type", "*/*");
+        hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
         return hs;
     }
     

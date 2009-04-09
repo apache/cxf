@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -34,9 +35,24 @@ public class BookStorePerRequest {
 
     private HttpHeaders httpHeaders;
     private Map<Long, Book> books = new HashMap<Long, Book>();
+    private List<String> bookIds;
+    
+    public BookStorePerRequest() {
+        throw new RuntimeException();
+    }
     
     public BookStorePerRequest(@Context HttpHeaders headers) {
-        httpHeaders = headers;     
+        throw new RuntimeException();
+    }
+    
+    public BookStorePerRequest(@Context HttpHeaders headers, Long bar) {
+        throw new RuntimeException();
+    }
+    
+    public BookStorePerRequest(@Context HttpHeaders headers,
+                               @HeaderParam("BOOK") List<String> bookIds) {
+        httpHeaders = headers;
+        this.bookIds = bookIds;
         init();
     }
     
@@ -45,6 +61,9 @@ public class BookStorePerRequest {
     public Book getBookByHeader() throws Exception {
         
         List<String> ids = httpHeaders.getRequestHeader("BOOK");
+        if (!ids.equals(bookIds)) {
+            throw new RuntimeException();
+        }
         return doGetBook(ids.get(0) + ids.get(1) + ids.get(2));
     }
     

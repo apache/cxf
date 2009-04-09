@@ -304,8 +304,19 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         int status = conn.getResponseCode();
         responseBuilder = Response.status(status);
         for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
-            for (String s : entry.getValue()) {
-                responseBuilder.header(entry.getKey(), s);
+            if (null == entry.getKey()) {
+                continue;
+            }
+            if (HttpUtils.isDateRelatedHeader(entry.getKey())) {
+                responseBuilder.header(entry.getKey(), entry.getValue());
+            } else if (entry.getValue().size() > 0) {
+                String[] values = entry.getValue().get(0).split(",");
+                for (String s : values) {
+                    String theValue = s.trim();
+                    if (theValue.length() > 0) {
+                        responseBuilder.header(entry.getKey(), theValue);
+                    }
+                }
             }
         }
         if (status >= 400) {

@@ -34,6 +34,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -122,6 +123,9 @@ public class HttpHeadersImpl implements HttpHeaders {
         List<String> values = headers.get(headerName);
         if (values == null || values.isEmpty()) {
             return Collections.emptyList();
+        }
+        if (HttpUtils.isDateRelatedHeader(headerName)) {
+            return values;
         }
         String[] ls =  values.get(0).split(",");
         if (ls.length == 1) {

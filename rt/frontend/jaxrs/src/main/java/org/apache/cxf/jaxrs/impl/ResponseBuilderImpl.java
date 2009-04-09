@@ -125,22 +125,21 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
     
     public ResponseBuilder header(String name, Object value) {
-        return addHeader(name, value);
+        if (HttpUtils.isDateRelatedHeader(name)) {
+            Object theValue = value instanceof Date ? toHttpDate((Date)value) : value;  
+            return setHeader(name, theValue);
+        } else {
+            return addHeader(name, value);
+        }
     }
 
     
     @Override
     public ResponseBuilder variant(Variant variant) {
-        if (variant.getMediaType() != null) {
-            type(variant.getMediaType());
-        }
-        if (variant.getLanguage() != null) {
-            language(variant.getLanguage());
-        }
-        if (variant.getEncoding() != null) {
-            metadata.putSingle(HttpHeaders.CONTENT_ENCODING, 
-                               variant.getEncoding());
-        }
+        type(variant == null ? null : variant.getMediaType());
+        language(variant == null ? null : variant.getLanguage());
+        setHeader(HttpHeaders.CONTENT_ENCODING, variant == null ? null : variant.getEncoding());
+        
         return this;
     }
 

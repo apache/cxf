@@ -1870,10 +1870,10 @@ public class HTTPConduit
             
             // If this is a GET method we must not touch the output
             // stream as this automatically turns the request into a POST.
-            // Nor it should be done in case of DELETE - strangely, empty PUTs
-            // work ok 
-            if ("GET".equals(connection.getRequestMethod())
-                || "DELETE".equals(connection.getRequestMethod())) {
+            // Nor it should be done in case of DELETE/HEAD/OPTIONS 
+            // - strangely, empty PUTs work ok 
+            if (!"POST".equals(connection.getRequestMethod())
+                || !"PUT".equals(connection.getRequestMethod())) {
                 return;
             }
             

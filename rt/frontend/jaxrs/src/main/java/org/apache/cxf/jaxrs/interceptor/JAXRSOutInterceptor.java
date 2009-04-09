@@ -125,6 +125,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                   boolean firstTry) {
         int status = response.getStatus();
         Object responseObj = response.getEntity();
+        if (status == 200 && responseObj != null && firstTry 
+            && JAXRSUtils.headMethodPossible(ori.getHttpMethod(), 
+                (String)message.getExchange().getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
+            LOG.info(new org.apache.cxf.common.i18n.Message("HEAD_WITHOUT_ENTITY", BUNDLE).toString());
+            responseObj = null;
+        }
         if (status == -1) {
             status = responseObj == null ? 204 : 200;
         }
