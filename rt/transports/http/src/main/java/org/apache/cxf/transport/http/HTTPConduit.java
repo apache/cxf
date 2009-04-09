@@ -1873,7 +1873,7 @@ public class HTTPConduit
             // Nor it should be done in case of DELETE/HEAD/OPTIONS 
             // - strangely, empty PUTs work ok 
             if (!"POST".equals(connection.getRequestMethod())
-                || !"PUT".equals(connection.getRequestMethod())) {
+                && !"PUT".equals(connection.getRequestMethod())) {
                 return;
             }
             
