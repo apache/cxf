@@ -77,9 +77,14 @@ public class URIResolver {
         this.calling = (calling != null) ? calling : getClass();
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
-        } else if (baseUriStr != null && (baseUriStr.startsWith("jar:") || baseUriStr.startsWith("zip:"))) {
+        } else if (baseUriStr != null 
+            && (baseUriStr.startsWith("jar:") 
+                || baseUriStr.startsWith("zip:")
+                || baseUriStr.startsWith("wsjar:"))) {
             tryArchive(baseUriStr, uriStr);
-        } else if (uriStr.startsWith("jar:") || uriStr.startsWith("zip:")) {
+        } else if (uriStr.startsWith("jar:") 
+            || uriStr.startsWith("zip:")
+            || uriStr.startsWith("wsjar:")) {
             tryArchive(uriStr);
         } else {
             tryFileSystem(baseUriStr, uriStr);
@@ -101,9 +106,14 @@ public class URIResolver {
 
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
-        } else if (baseUriStr != null && (baseUriStr.startsWith("jar:") || baseUriStr.startsWith("zip:"))) {
+        } else if (baseUriStr != null 
+            && (baseUriStr.startsWith("jar:") 
+                || baseUriStr.startsWith("zip:")
+                || baseUriStr.startsWith("wsjar:"))) {
             tryArchive(baseUriStr, uriStr);
-        } else if (uriStr.startsWith("jar:") || uriStr.startsWith("zip:")) {
+        } else if (uriStr.startsWith("jar:") 
+            || uriStr.startsWith("zip:")
+            || uriStr.startsWith("wsjar:")) {
             tryArchive(uriStr);
         } else {
             tryFileSystem(baseUriStr, uriStr);
@@ -278,7 +288,9 @@ public class URIResolver {
             } catch (URISyntaxException e) {
                 // processing the jar:file:/ type value
                 String urlStr = url.toString();
-                if (urlStr.startsWith("jar:") || urlStr.startsWith("zip:")) {
+                if (urlStr.startsWith("jar:") 
+                    || urlStr.startsWith("zip:")
+                    || urlStr.startsWith("wsjar:")) {
                     int pos = urlStr.indexOf('!');
                     if (pos != -1) {
                         try {
