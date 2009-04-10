@@ -27,10 +27,11 @@ import org.apache.cxf.transport.MessageObserver;
 
 /**
  * Base interface for all interceptor chains.  An interceptor chain is an
- * ordered list of interceptors associated with one portion of the web service
- * processing pipeline.  Interceptor chains are defined for either the SOAP 
- * client's request or response handling, the web service's, or error handling
- * interceptor chains for SOAP faults.
+ * ordered list of interceptors associated with one portion of the message
+ * processing pipeline. Interceptor chains are defined for a client's request 
+ * processing, response processing, and incoming SOAP fault processing. Interceptor 
+ * chains are defined for a service's request processing, response processing, and 
+ * outgoing SOAP fault processing.
  */
 public interface InterceptorChain extends Iterable<Interceptor<? extends Message>> {
     
@@ -44,8 +45,17 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
     String STARTING_AFTER_INTERCEPTOR_ID = "starting_after_interceptor_id";
     String STARTING_AT_INTERCEPTOR_ID = "starting_at_interceptor_id";
     
+    /**
+     * Adds a single interceptor to the interceptor chain.
+     * 
+     * @param i the interceptor to add
+     */
     void add(Interceptor i);
     
+    /**
+     * Adds multiple interceptors to the interceptor chain. 
+     * @param i the interceptors to add to the chain
+     */
     void add(Collection<Interceptor> i);
     
     void remove(Interceptor i);
