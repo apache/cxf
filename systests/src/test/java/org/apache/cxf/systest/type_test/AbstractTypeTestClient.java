@@ -59,6 +59,11 @@ public abstract class AbstractTypeTestClient
     }
 
     public boolean shouldRunTest(String name) {
+        if (System.getProperty("java.vendor").contains("IBM")
+            && "GMonth".equals(name)) {
+            //the validator in ibm doesn't like this type.
+            return false;
+        }
         return true;
     }
     

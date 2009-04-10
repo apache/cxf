@@ -484,6 +484,11 @@ public class CorbaObjectReaderTest extends Assert {
     
     @Test
     public void testReadFixed() {
+        if (System.getProperty("java.vendor").contains("IBM")) {
+            //The ORB in the IBM jdk doesn't support writing fixed
+            //to the stream.
+            return;
+        }
         OutputStream oStream = orb.create_output_stream();
         
         // create the following fixed

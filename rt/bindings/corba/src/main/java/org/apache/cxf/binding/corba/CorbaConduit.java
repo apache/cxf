@@ -96,22 +96,30 @@ public class CorbaConduit implements Conduit {
     public void prepare(Message message) throws IOException {    
         try {
             prepareOrb();
-            AddressType address = endpointInfo.getExtensor(AddressType.class);
-
+            
+            String address = null;
+            if (target != null) {
+                address = target.getAddress().getValue();
+            }
+            if (address == null) {
+                AddressType ad = endpointInfo.getExtensor(AddressType.class);
+                if (ad != null) {
+                    address = ad.getLocation();
+                }
+            }
+            String ref = (String)message.get(Message.ENDPOINT_ADDRESS);
+            if (ref != null) {
+                // A non-null endpoint address from the message means that we want to invoke on a particular
+                // object reference specified by the endpoint reference type.  If the reference is null, then
+                // we want to invoke on the default location as specified in the WSDL.
+                address = ref;
+            }
             if (address == null) {
                 LOG.log(Level.SEVERE, "Unable to locate a valid CORBA address");
                 throw new CorbaBindingException("Unable to locate a valid CORBA address");
             }
-            String ref = (String)message.get(Message.ENDPOINT_ADDRESS);
             org.omg.CORBA.Object targetObject;
-            // A non-null endpoint address from the message means that we want to invoke on a particular
-            // object reference specified by the endpoint reference type.  If the reference is null, then
-            // we want to invoke on the default location as specified in the WSDL.
-            if (ref != null) {
-                targetObject = CorbaUtils.importObjectReference(orb, ref);
-            } else {
-                targetObject = CorbaUtils.importObjectReference(orb, address.getLocation());
-            }
+            targetObject = CorbaUtils.importObjectReference(orb, address);
             message.put(CorbaConstants.ORB, orb);
             message.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, targetObject);
             message.setContent(OutputStream.class,
