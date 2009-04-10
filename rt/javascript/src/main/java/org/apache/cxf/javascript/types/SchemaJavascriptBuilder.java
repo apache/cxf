@@ -47,7 +47,6 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaObjectTable;
-import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
@@ -389,9 +388,8 @@ public class SchemaJavascriptBuilder {
      */
     public void domDeserializerFunction(QName name, XmlSchemaComplexType type) {
         utils = new JavascriptUtils(code);
-        XmlSchemaSequence sequence = null;
-
-        sequence = XmlSchemaUtils.getSequence(type);
+        
+        List<XmlSchemaObject> contentElements = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
         String typeObjectName = nameManager.getJavascriptName(name);
         code.append("function " + typeObjectName + "_deserialize (cxfjsutils, element) {\n");
         // create the object we are deserializing into.
@@ -401,18 +399,19 @@ public class SchemaJavascriptBuilder {
 
         utils.appendLine("var item;");
 
-        for (int i = 0; i < sequence.getItems().getCount(); i++) {
+        int nContentElements = contentElements.size();
+        for (int i = 0; i < contentElements.size(); i++) {
+            XmlSchemaObject contentElement = contentElements.get(i);
             utils.appendLine("cxfjsutils.trace('curElement: ' + cxfjsutils.traceElementName(curElement));");
-            XmlSchemaObject thing = sequence.getItems().getItem(i);
-            ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing,
+            ParticleInfo itemInfo = ParticleInfo.forLocalItem(contentElement,
                                                               schemaInfo.getSchema(),
                                                               xmlSchemaCollection, 
                                                               prefixAccumulator, 
                                                               type.getQName()); 
             if (itemInfo.isAny()) {
                 ParticleInfo nextItem = null;
-                if (i != sequence.getItems().getCount() - 1) {
-                    XmlSchemaObject nextThing = sequence.getItems().getItem(i + 1);
+                if (i != nContentElements - 1) {
+                    XmlSchemaObject nextThing = contentElements.get(i + 1);
                     nextItem = ParticleInfo.forLocalItem(nextThing, 
                                                          schemaInfo.getSchema(), 
                                                          xmlSchemaCollection, 
@@ -426,7 +425,7 @@ public class SchemaJavascriptBuilder {
                 }
                 deserializeAny(type, itemInfo, nextItem);
             } else {
-                deserializeElement(type, thing);
+                deserializeElement(type, contentElement);
             }
         }
         utils.appendLine("return newobject;");
