@@ -44,6 +44,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jbi.ServiceConsumer;
@@ -253,10 +254,7 @@ public class CXFServiceUnit {
         File metaInf = new File(rootPath, "META-INF");
         File jbiXml = new File(metaInf, "jbi.xml");
         try { 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(jbiXml.toURI().toURL().toString());
+            Document doc = XMLUtils.parse(jbiXml);
             
             Element providesEl = (Element)findNode(doc.getDocumentElement(), "provides");
             Element consumersEl = (Element)findNode(doc.getDocumentElement(), "consumes");

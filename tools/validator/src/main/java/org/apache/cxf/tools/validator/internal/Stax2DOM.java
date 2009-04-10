@@ -48,6 +48,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.URIParserUtil;
 
 public class Stax2DOM {
+    static final String XML_NS = "http://www.w3.org/2000/xmlns/";
 
     private  Element currentElement;
     private  Document doc;
@@ -140,28 +141,38 @@ public class Stax2DOM {
 
     public void startElement(StartElement ele) {
         Element element = null;
-        element = doc.createElementNS(ele.getName().getNamespaceURI(), ele.getName().getLocalPart());
+        if (!StringUtils.isEmpty(ele.getName().getPrefix())) {
+            element = doc.createElementNS(ele.getName().getNamespaceURI(),
+                                          ele.getName().getPrefix() + ":"
+                                          + ele.getName().getLocalPart());
+        } else {
+            element = doc.createElementNS(ele.getName().getNamespaceURI(), 
+                                          ele.getName().getLocalPart());
+        }
 
-        Iterator ite = ele.getAttributes();
-
+        Iterator ite = ele.getNamespaces();
+        while (ite.hasNext()) {
+            Namespace ns = (Namespace) ite.next();
+            String pfx = ns.getPrefix();
+            String uri = ns.getNamespaceURI();
+            if (!StringUtils.isEmpty(pfx)) {
+                Attr attr = element.getOwnerDocument().createAttributeNS(XML_NS,
+                                                                        "xmlns:" + pfx);
+                attr.setValue(uri);
+                element.setAttributeNodeNS(attr);
+            } else {
+                Attr attr = element.getOwnerDocument().createAttributeNS(XML_NS,
+                                                                         "xmlns");
+                attr.setValue(uri);
+                element.setAttributeNodeNS(attr);
+            }
+        }
+        ite = ele.getAttributes();
         while (ite.hasNext()) {
             Attribute attr = (Attribute)ite.next();
             element.setAttribute(attr.getName().getLocalPart(), attr.getValue());
         }
 
-        String xmlns = "http://schemas.xmlsoap.org/wsdl/";
-        ite = ele.getNamespaces();
-        while (ite.hasNext()) {
-            Namespace ns = (Namespace) ite.next();
-            String name = ns.getPrefix();
-            if (!StringUtils.isEmpty(name)) {
-                Attr attr = element.getOwnerDocument().createAttributeNS(xmlns, name);
-                attr.setValue(ns.getNamespaceURI());
-                element.setAttributeNodeNS(attr);
-            } else {
-                xmlns = ns.getNamespaceURI();
-            }
-        }
 
         if (currentElement == null) {
             doc.appendChild(element);

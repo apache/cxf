@@ -243,6 +243,9 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         String response = new String("Bonjour");
          
         try {
+            ((BindingProvider)greeter).getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                     "http://localhost:9000/SoapContext/SoapPort");
             greeter.greetMe("test");
             String reply = greeter.sayHi();
             assertNotNull("no response received from service", reply);
@@ -314,6 +317,9 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         
         //getPort only passing in SEI
         Greeter greeter = service.getPort(Greeter.class);
+        ((BindingProvider)greeter).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                 "http://localhost:9000/SoapContext/SoapPort");
         
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");

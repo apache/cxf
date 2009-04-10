@@ -170,7 +170,6 @@
                 <dependency>
                     <groupId>com.sun.xml.parsers</groupId>
                     <artifactId>jaxp-ri</artifactId>
-                    <version>1.4.2</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
