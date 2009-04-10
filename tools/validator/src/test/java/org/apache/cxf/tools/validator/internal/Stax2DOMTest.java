@@ -34,7 +34,8 @@ public class Stax2DOMTest extends Assert {
         File wsdl = new File(getClass().getResource("/validator_wsdl/jms_test.wsdl").toURI());
         Document doc = new Stax2DOM().getDocument(wsdl);
         String content = XMLUtils.toString(doc);
-        assertTrue(content.indexOf("xmlns:ns0=\"http://www.w3.org/2001/XMLSchema\"") != -1);
-        assertTrue(content.indexOf("ns0:x1=\"http://cxf.apache.org/hello_world_jms/types\"") != -1);
+        assertTrue(content, content.indexOf("xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"") != -1);
+        assertTrue(content, content.indexOf("xmlns:x1=\"http://cxf.apache.org/hello_world_jms/types\"")
+                                           != -1);
     }
 }

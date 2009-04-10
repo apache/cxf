@@ -162,6 +162,34 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         };
         NOT_WORKING_TESTS.addAll(Arrays.asList(notWorking));
 
+        String notWorkingIBM[] = new String[] {
+            "AnyURIEnum",
+            "NMTokenEnum",
+            "DecimalEnum",
+            "StringEnum",
+            "NumberEnum",
+            "ColourEnum",
+            "Base64Binary",
+            "HexBinary",
+            "Decimal",
+            "UnsignedShort",
+            "SimpleChoice",
+            "EmptyChoice",
+            "NestedArray",
+            "CompoundArray",
+            "UnboundedArray",
+            "BoundedArray",
+            "FixedArray",
+            "AnonymousStruct",
+            "StructWithNillables",
+            "ChoiceWithBinary",
+            "StructWithBinary",
+            "MultipleOccursSequenceInSequence",
+            "DerivedEmptyBaseEmptyChoice"
+        };
+        if (System.getProperty("java.vendor").contains("IBM")) {
+            NOT_WORKING_TESTS.addAll(Arrays.asList(notWorkingIBM));
+        }
     }
     
 
@@ -175,16 +203,19 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     public static void deleteRefFile() throws Exception {
         File file = new File("./TypeTest.ref");
         file.delete();
-        //for (String s : RUN_TESTS) {
-        //    System.out.println(s);
-        //}
+        for (String s : RUN_TESTS) {
+            System.out.println(s);
+        }
+        System.out.println(RUN_TESTS.size());
     }
 
     public boolean shouldRunTest(String name) {
         if (!NOT_WORKING_TESTS.contains(name)) {
-            RUN_TESTS.add(name);
-            return true;
-            //return true;
+            boolean b = super.shouldRunTest(name);
+            if (b) {
+                RUN_TESTS.add(name);
+            }
+            return b;
         }
         return false;
     }

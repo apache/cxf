@@ -295,12 +295,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testSchemeHostPortQueryFragment() throws Exception {
-        URI uri;
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            uri = new URI("http://foo:1234/bar?n2=v2&n1=v1#fragment");
-        } else {
-            uri = new URI("http://foo:1234/bar?n1=v1&n2=v2#fragment");
-        }
+        URI uri = new URI("http://foo:1234/bar?n1=v1&n2=v2#fragment");
         URI newUri = new UriBuilderImpl().scheme("http").host("foo").port(1234).path("bar").queryParam("n1",
                                                                                                        "v1")
             .queryParam("n2", "v2").fragment("fragment").build();
