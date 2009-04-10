@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -599,9 +601,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetCDs() throws Exception {
         
-        getAndCompareAsStrings("http://localhost:9080/bookstore/cds",
-                               "resources/expected_get_cds124.txt",
-                               "application/xml", 200);
+        WebClient wc = WebClient.create("http://localhost:9080/bookstore/cds");
+        CDs cds = wc.get(CDs.class);
+        Collection<CD> collection = cds.getCD();
+        assertEquals(2, collection.size());
+        assertTrue(collection.contains(new CD("BICYCLE RACE", 124)));
+        assertTrue(collection.contains(new CD("BOHEMIAN RHAPSODY", 123)));
     }
     
     @Test

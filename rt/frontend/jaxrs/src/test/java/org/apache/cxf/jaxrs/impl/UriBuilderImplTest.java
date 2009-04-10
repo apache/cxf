@@ -25,9 +25,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -301,7 +304,7 @@ public class UriBuilderImplTest extends Assert {
         URI newUri = new UriBuilderImpl().scheme("http").host("foo").port(1234).path("bar").queryParam("n1",
                                                                                                        "v1")
             .queryParam("n2", "v2").fragment("fragment").build();
-        assertEquals("URI is not built correctly", uri, newUri);
+        compareURIs(uri, newUri);
     }
 
     
@@ -394,4 +397,18 @@ public class UriBuilderImplTest extends Assert {
 
     
     
+    private void compareURIs(URI uri1, URI uri2) {
+        
+        assertEquals("Unexpected scheme", uri1.getScheme(), uri2.getScheme());
+        assertEquals("Unexpected host", uri1.getHost(), uri2.getHost());
+        assertEquals("Unexpected port", uri1.getPort(), uri2.getPort());
+        assertEquals("Unexpected path", uri1.getPath(), uri2.getPath());
+        assertEquals("Unexpected fragment", uri1.getFragment(), uri2.getFragment());
+        
+        MultivaluedMap<String, String> queries1 = 
+            JAXRSUtils.getStructuredParams(uri1.getRawQuery(), "&", false);
+        MultivaluedMap<String, String> queries2 = 
+            JAXRSUtils.getStructuredParams(uri2.getRawQuery(), "&", false);
+        assertEquals("Unexpected queries", queries1, queries2);
+    }
 }

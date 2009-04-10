@@ -29,6 +29,11 @@ public class CD {
     public CD() {
     }
     
+    public CD(String name, long id) {
+        this.name = name;
+        this.id = id;
+    }
+    
     public void setName(String n) {
         name = n;
     }
@@ -45,4 +50,16 @@ public class CD {
         return id;
     }
 
+    public boolean equals(Object o) {
+        if (!(o instanceof CD)) {
+            return false;
+        }
+        
+        CD other = (CD)o;
+        return name.equals(other.name) && id == other.id;
+    }
+    
+    public int hashCode() {
+        return name.hashCode() + new Long(id).hashCode();
+    }
 }
