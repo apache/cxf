@@ -425,7 +425,7 @@ public class VersionTransformer {
             QName exposedRelationshipType = exposed.getRelationshipType();
             if (exposedRelationshipType != null) {
                 String internalRelationshipType = 
-                    Names.WSA_REPLY_NAME.equals(
+                    Names.WSA_REPLY_NAME.equalsIgnoreCase(
                                       exposedRelationshipType.getLocalPart())
                     ? Names.WSA_RELATIONSHIP_REPLY
                     : exposedRelationshipType.toString();

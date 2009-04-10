@@ -79,6 +79,7 @@ public class MAPCodecTest extends Assert {
     private Map<String, List<String>> mimeHeaders;
     private Exchange correlatedExchange;
     private boolean expectRelatesTo;
+    private String nonReplyRelationship;
     private boolean expectFaultTo;
     
     @Before
@@ -97,6 +98,7 @@ public class MAPCodecTest extends Assert {
         mimeHeaders = null;
         correlatedExchange = null;
         ContextUtils.setJAXBContext(null);
+        nonReplyRelationship = null;
     }
 
     @Test
@@ -237,6 +239,25 @@ public class MAPCodecTest extends Assert {
 
     @Test
     public void testRequestorInboundNonNative() throws Exception {
+        String uri = VersionTransformer.Names200408.WSA_NAMESPACE_NAME;
+        SoapMessage message = setUpMessage(true, false, false, false, uri);
+        codec.handleMessage(message);
+        control.verify();
+        verifyMessage(message, true, false, false);
+    }
+
+    @Test
+    public void testRequestorInboundNonReply() throws Exception {
+        nonReplyRelationship = "wsat:correlatedOneway";
+        SoapMessage message = setUpMessage(true, false);
+        codec.handleMessage(message);
+        control.verify();
+        verifyMessage(message, true, false, true);
+    }
+
+    @Test
+    public void testRequestorInboundNonNativeNonReply() throws Exception {
+        nonReplyRelationship = "wsat:correlatedOneway";
         String uri = VersionTransformer.Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(true, false, false, false, uri);
         codec.handleMessage(message);
@@ -435,8 +456,12 @@ public class MAPCodecTest extends Assert {
             relatesTo = new RelatesToType();
             relatesTo.setValue(correlationID);
             maps.setRelatesTo(relatesTo);
-            correlatedExchange = new ExchangeImpl();
-            codec.uncorrelatedExchanges.put(correlationID, correlatedExchange);
+            if (nonReplyRelationship == null) {
+                correlatedExchange = new ExchangeImpl();
+                codec.uncorrelatedExchanges.put(correlationID, correlatedExchange);
+            } else {
+                relatesTo.setRelationshipType(nonReplyRelationship);
+            }
         }
         AttributedURIType action = ContextUtils.getAttributedURI("http://foo/bar/SEI/opRequest");
         maps.setAction(action);
@@ -646,16 +671,25 @@ public class MAPCodecTest extends Assert {
             if (outbound) {
                 String id = expectedValues[1] instanceof AttributedURIType
                     ? ((AttributedURIType)expectedValues[1]).getValue()
-                    : expectedValues[0] instanceof AttributedURI ? ((AttributedURI)expectedValues[1])
-                        .getValue() : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[1])
-                        .getValue();
-                // assertTrue("expected correlationID : " + id + " in map: " +
-                // codec.uncorrelatedExchanges,
-                // codec.uncorrelatedExchanges.containsKey(id));
-                assertSame("unexpected correlated exchange", codec.uncorrelatedExchanges.get(id), message
-                    .getExchange());
+                    : expectedValues[0] instanceof AttributedURI 
+                      ? ((AttributedURI)expectedValues[1]).getValue() 
+                      : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[1]).getValue();
+                assertSame("unexpected correlated exchange", 
+                           codec.uncorrelatedExchanges.get(id), 
+                           message.getExchange());
             } else {
-                assertSame("unexpected correlated exchange", correlatedExchange, message.getExchange());
+                if (isReply(exposedAsNative)) {
+                    assertSame("unexpected correlated exchange", 
+                               correlatedExchange, 
+                               message.getExchange());
+                } else {
+                    assertNotSame("unexpected correlated exchange",
+                                  correlatedExchange,
+                                  message.getExchange());
+                }
+                assertEquals("expected empty uncorrelated exchange cache",
+                             0, 
+                             codec.uncorrelatedExchanges.size());
             }
         }
         if (outbound) {
@@ -674,6 +708,24 @@ public class MAPCodecTest extends Assert {
             }
         }
         assertTrue("unexpected MAPs", verifyMAPs(message.get(getMAPProperty(requestor, outbound))));
+    }
 
+    private boolean isReply(boolean exposedAsNative) {
+        boolean isReply = false;
+        if (exposedAsNative) {
+            isReply = 
+                Names.WSA_RELATIONSHIP_REPLY.equals(
+                    ((RelatesToType)expectedValues[4]).getRelationshipType());
+        } else {
+            QName relationship = 
+                expectedValues[4] instanceof Relationship
+                ? ((Relationship)expectedValues[4]).getRelationshipType()
+                : ((org.apache.cxf.ws.addressing.v200403.Relationship)expectedValues[4])
+                      .getRelationshipType();
+            isReply = relationship == null 
+                      || Names.WSA_REPLY_NAME.equalsIgnoreCase(relationship.getLocalPart());
+        } 
+
+        return isReply;
     }
 }
