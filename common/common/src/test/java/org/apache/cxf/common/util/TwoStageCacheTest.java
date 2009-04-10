@@ -125,8 +125,13 @@ public class TwoStageCacheTest extends Assert {
         }
         objs = null;
         
-        
-        
+
+        if (System.getProperty("java.vendor").contains("IBM")) {
+            //The IBM VM will dump a core file and a heap dump 
+            //at OOM which kind of pollutes the svn space
+            return;
+        }
+
         List<byte[]> list = new LinkedList<byte[]>();
         int allocCount = 0;
         try {
