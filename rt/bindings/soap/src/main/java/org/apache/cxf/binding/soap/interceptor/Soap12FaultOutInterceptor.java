@@ -118,7 +118,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 }
     
                 if (fault.getRole() != null) {
-                    writer.writeStartElement("faultactor");
+                    writer.writeStartElement(defaultPrefix, "Role", ns);
                     writer.writeCharacters(fault.getRole());
                     writer.writeEndElement();
                 }
