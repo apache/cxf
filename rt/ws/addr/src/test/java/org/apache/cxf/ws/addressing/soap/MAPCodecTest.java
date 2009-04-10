@@ -80,7 +80,6 @@ public class MAPCodecTest extends Assert {
     private Exchange correlatedExchange;
     private boolean expectRelatesTo;
     private String nonReplyRelationship;
-    private boolean expectFaultTo;
     
     @Before
     public void setUp() {
