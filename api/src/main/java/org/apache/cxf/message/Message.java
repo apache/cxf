@@ -31,17 +31,40 @@ import org.apache.cxf.transport.Destination;
  */
 public interface Message extends StringMap {
     
-    String TRANSPORT = "org.apache.cxf.transport";    
+    String TRANSPORT = "org.apache.cxf.transport";
+
+    /**
+     * Boolean property specifying if the message is a request message.
+     */
     String REQUESTOR_ROLE = "org.apache.cxf.client";
 
+    /**
+     * Boolean property specifying if the message is inbound.
+     */
     String INBOUND_MESSAGE = "org.apache.cxf.message.inbound";
+    
+    /**
+     * A Map keyed by a string that stores optional context information 
+     * associated with the invocation that spawned the message.
+     */
     String INVOCATION_CONTEXT = "org.apache.cxf.invocation.context";
     
+    /**
+     * A Map containing the MIME headers for a SOAP message.
+     */
     String MIME_HEADERS = "org.apache.cxf.mime.headers";
     
+    /**
+     * Boolean property specifying if the server should send the response 
+     * asynchronously.
+     */
     String ASYNC_POST_RESPONSE_DISPATCH =
         "org.apache.cxf.async.post.response.dispatch";
 
+    /**
+     * Boolean property specifying if this message arrived via a 
+     * decoupled endpoint.
+     */
     String DECOUPLED_CHANNEL_MESSAGE = "decoupled.channel.message";
     String PARTIAL_RESPONSE_MESSAGE = "org.apache.cxf.partial.response";
     
@@ -52,6 +75,11 @@ public interface Message extends StringMap {
     String PATH_INFO = Message.class.getName() + ".PATH_INFO";
     String REQUEST_URI = Message.class.getName() + ".REQUEST_URI";
     String QUERY_STRING = Message.class.getName() + ".QUERY_STRING";
+
+    /**
+     * Boolean property specifying in the runtime is configured to process 
+     * MTOM attachments.
+     */
     String MTOM_ENABLED = "mtom-enabled";
     String MTOM_THRESHOLD = "mtom-threshold";
     String SCHEMA_VALIDATION_ENABLED = "schema-validation-enabled";
