@@ -90,7 +90,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
                 // set the validate option for XMLBeans Wrapper Helper
                 if (Boolean.TRUE.equals(en) || "true".equals(en)) {
                     try {                        
-                        Class xmlBeanWrapperHelperClass = 
+                        Class<?> xmlBeanWrapperHelperClass = 
                             Class.forName("org.apache.cxf.xmlbeans.XmlBeansWrapperHelper");
                         if (xmlBeanWrapperHelperClass.isInstance(helper)) {
                             Method method = xmlBeanWrapperHelperClass.getMethod("setValidate", boolean.class);

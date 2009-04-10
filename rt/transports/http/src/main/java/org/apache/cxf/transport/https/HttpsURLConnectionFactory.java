@@ -234,8 +234,8 @@ public final class HttpsURLConnectionFactory
         } else {
             // handle the deprecated sun case
             try {
-                Class connectionClass = getDeprecatedSunHttpsURLConnectionClass();
-                Class verifierClass = getDeprecatedSunHostnameVerifierClass();
+                Class<?> connectionClass = getDeprecatedSunHttpsURLConnectionClass();
+                Class<?> verifierClass = getDeprecatedSunHostnameVerifierClass();
                 Method setHostnameVerifier = connectionClass.getMethod("setHostnameVerifier", verifierClass);
                 InvocationHandler handler = new InvocationHandler() {
                     public Object invoke(Object proxy, 

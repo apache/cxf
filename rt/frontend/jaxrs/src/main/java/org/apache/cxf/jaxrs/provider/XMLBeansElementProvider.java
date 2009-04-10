@@ -96,7 +96,7 @@ public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, Me
         XmlObject result = null;
 
         // get XMLBeans inner class Factory
-        Class factory = getFactory(type);
+        Class<?> factory = getFactory(type);
 
         try {
 
@@ -150,7 +150,7 @@ public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, Me
     protected XmlObject parseXmlBean(Class type, Reader reader) {
         XmlObject result = null;
 
-        Class factory = getFactory(type);
+        Class<?> factory = getFactory(type);
 
         try {
 

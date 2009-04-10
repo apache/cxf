@@ -35,6 +35,7 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.management.ManagementConstants;
 
 
@@ -84,12 +85,11 @@ public final class ManagementConsole {
         mbsc = jmxc.getMBeanServerConnection();
     }
     
-    @SuppressWarnings("unchecked")
     void listAllManagedEndpoint() {        
         try {
             ObjectName queryEndpointName = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
                                                           + ":type=Bus.Service.Endpoint,*");
-            Set<ObjectName> endpointNames = mbsc.queryNames(queryEndpointName, null);
+            Set<ObjectName> endpointNames = CastUtils.cast(mbsc.queryNames(queryEndpointName, null));
             System.out.println("The endpoints are : ");
             for (ObjectName oName : endpointNames) {
                 System.out.println(oName);
@@ -109,13 +109,12 @@ public final class ManagementConsole {
         return new ObjectName(buffer.toString());
     }
     
-    @SuppressWarnings("unchecked")
     private void invokeEndpoint(String operation) {
         ObjectName endpointName = null;
         ObjectName queryEndpointName;
         try {
             queryEndpointName = getEndpointObjectName();
-            Set<ObjectName> endpointNames = mbsc.queryNames(queryEndpointName, null);
+            Set<ObjectName> endpointNames = CastUtils.cast(mbsc.queryNames(queryEndpointName, null));
             // now get the ObjectName with the busId 
             Iterator it = endpointNames.iterator();
         

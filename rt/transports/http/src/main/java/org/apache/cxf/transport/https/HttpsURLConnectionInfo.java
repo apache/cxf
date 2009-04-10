@@ -87,7 +87,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
         } else {
             Exception ex = null;
             try {
-                Class deprecatedSunClass = getDeprecatedSunHttpsURLConnectionOldImplClass();
+                Class<?> deprecatedSunClass = getDeprecatedSunHttpsURLConnectionOldImplClass();
                 Method method = null;
                 method = deprecatedSunClass.getMethod("getCipherSuite", (Class[]) null);
                 enabledCipherSuite = (String) method.invoke(connection, (Object[]) null);
