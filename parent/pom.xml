@@ -374,25 +374,18 @@
 
     <dependencyManagement>
         <dependencies>
-<<<<<<< .working
-=======
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib-nodep</artifactId>
                 <version>2.1_3</version>
             </dependency>
->>>>>>> .merge-right.r764033
             <dependency>
-<<<<<<< .working
-=======
                 <groupId>com.sun.xml.fastinfoset</groupId>
                 <artifactId>FastInfoset</artifactId>
                 <version>1.2.3</version>
             </dependency>
 
-
             <dependency>
->>>>>>> .merge-right.r764033
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.4</version>
@@ -1024,12 +1017,6 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
-<<<<<<< .working
-		    <exclusion>
-		      <groupId>org.codehaus.woodstox</groupId>
-		      <artifactId>wstx-asl</artifactId>
-		    </exclusion>
-=======
                     <exclusion>
                         <artifactId>xmlParserAPIs</artifactId>
                         <groupId>xerces</groupId>
@@ -1054,7 +1041,6 @@
                         <groupId>org.codehaus.woodstox</groupId>
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
->>>>>>> .merge-right.r764033
                 </exclusions>
             </dependency>
             <dependency>
@@ -1074,12 +1060,6 @@
                         <groupId>stax</groupId>
                         <artifactId>stax-api</artifactId>
                     </exclusion>
-<<<<<<< .working
-		    <exclusion>
-		      <groupId>org.codehaus.woodstox</groupId>
-		      <artifactId>wstx-asl</artifactId>
-		    </exclusion>
-=======
                     <exclusion>
                         <artifactId>xmlParserAPIs</artifactId>
                         <groupId>xerces</groupId>
@@ -1104,7 +1084,6 @@
                         <groupId>org.codehaus.woodstox</groupId>
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
->>>>>>> .merge-right.r764033
                 </exclusions>
             </dependency>
             <dependency>
@@ -1126,8 +1105,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-<<<<<<< .working
-=======
 
             <dependency>
                 <groupId>jaxen</groupId>
@@ -1171,18 +1148,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- if we use the new woodstox artifact, we're using the new version -->
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>4.0.3</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.dev.msv</groupId>
-                <artifactId>msv-core</artifactId>
-                <version>${msv.version}</version>
-            </dependency>
->>>>>>> .merge-right.r764033
         </dependencies>
     </dependencyManagement>
 
@@ -1409,66 +1374,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
                     </plugin>
-<<<<<<< .working
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <includes>
-                                <include>**/*Test.java</include>
-                                <include>**/*TestCase.java</include>
-                                <include>**/*Tests.java</include>
-                            </includes>
-                            <!-- do not exclude **/Abstract*Test.java **/Abstract*TestCase.java -->
-                            <excludes>
-                                <exclude>**/*$*</exclude>
-                            </excludes>
-                            <reportFormat>${surefire.format}</reportFormat>
-                            <useFile>${surefire.usefile}</useFile>
-                            <forkMode>${surefire.fork.mode}</forkMode>
-                            <childDelegation>false</childDelegation>
-                            <argLine>-ea</argLine>
-                            <systemProperties>
-                                <!--
-                                The default xalan TransformerFactory on the
-                                ibm jdk seems to be 
-                                org.apache.xalan.processor.TransformerFactoryImpl
-                                which seems to have an issue causing it to
-                                add things like duplicate default namespace
-                                declarations.  woodstox doesn't like that.
-                                So set this property to use the xsltc
-                                TransformerFactory which behaves better with
-                                woodstox (and which the sun jdk seems to
-                                default to).
-                                -->
-                                <property>
-                                    <name>javax.xml.transform.TransformerFactory</name>
-                                    <value>org.apache.xalan.xsltc.trax.TransformerFactoryImpl</value>
-                                </property>
-                                <property>
-                                    <name>java.util.logging.config.file</name>
-                                    <value>${basedir}/target/test-classes/logging.properties</value>
-                                </property>
-                                <property>
-                                    <name>spring.validation.mode</name>
-                                    <value>${spring.validation.mode}</value>
-                                </property>
-                                <property>
-                                    <!-- If we close the port after a client in the same JVM has opened a keep-alive
-                                     connection, on some Linux's, the socket remains consumed until
-                                     some timeout occurs.   That may cause some tests to timeout/hang. -->
-                                    <name>org.apache.cxf.transports.http_jetty.DontClosePort</name>
-                                    <value>false</value>
-                                </property>
-                                <property>
-                                    <name>java.security.properties</name>
-                                    <value>${basedir}/target/test-classes/ibm.security</value>
-                                </property>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>
-=======
->>>>>>> .merge-right.r764033
                 </plugins>
             </build>
         </profile>
