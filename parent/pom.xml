@@ -63,7 +63,7 @@
         <activemq.version>4.1.1</activemq.version>
         <rhino.version>1.6R7</rhino.version>
         <jdom.version>1.0</jdom.version>
-        <xmlbeans.version>2.3.0</xmlbeans.version>
+        <xmlbeans.version>2.4.0</xmlbeans.version>
         <abdera.version>0.4.0-incubating</abdera.version>
         <xmlschema.version>1.4.4</xmlschema.version>
         <checkstyle.extension />
