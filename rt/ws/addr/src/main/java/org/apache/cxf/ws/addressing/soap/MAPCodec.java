@@ -462,6 +462,12 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                                        AttributedURIType.class,
                                                        headerElement, 
                                                        unmarshaller));
+                            } else if (Names.WSA_FROM_NAME.equals(localName)) {
+                                maps.setFrom(decodeAsNative(
+                                    headerURI,
+                                    EndpointReferenceType.class,
+                                    headerElement,
+                                    unmarshaller));
                             } else if (Names.WSA_TO_NAME.equals(localName)) {
                                 AttributedURIType addr = decodeAsNative(
                                                        headerURI,
