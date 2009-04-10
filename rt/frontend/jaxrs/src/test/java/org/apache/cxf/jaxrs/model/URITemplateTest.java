@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -305,12 +304,12 @@ public class URITemplateTest extends Assert {
         List<String> list = Arrays.asList("bar", "baz", "blah");
         assertEquals("Wrong substitution", "/foo/bar/baz/blah", ut.substitute(list));
     }
-    
+
     @Test
     public void testSubstituteListIncomplete() throws Exception {
-        URITemplate ut = new URITemplate("/foo/{a}/{c}/{b}");
+        URITemplate ut = new URITemplate("/foo/{a}/{c}/{b}/{d:\\w}");
         List<String> list = Arrays.asList("bar", "baz");
-        assertEquals("Wrong substitution", "/foo/bar/baz/{b}", ut.substitute(list));
+        assertEquals("Wrong substitution", "/foo/bar/baz/{b}/{d:\\w}", ut.substitute(list));
     }
 
     @Test
@@ -374,5 +373,86 @@ public class URITemplateTest extends Assert {
         map.put("b", "baz");
         map.put("a", "blah");
         assertEquals("Wrong substitution", "/foo/blah", ut.substitute(map));
+    }
+
+    @Test
+    public void testVariables() {
+        URITemplate ut = new URITemplate("/foo/{a}/bar{c:\\d}{b:\\w}/{e}/{d}");
+        assertEquals(Arrays.asList("a", "c", "b", "e", "d"), ut.getVariables());
+        assertEquals(Arrays.asList("c", "b"), ut.getCustomVariables());
+    }
+
+    @Test
+    public void testTokenizerNoBraces() {
+        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("nobraces");
+        assertEquals("nobraces", tok.next());
+        assertFalse(tok.hasNext());
+    }
+
+    @Test
+    public void testTokenizerNoNesting() {
+        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo{bar}baz");
+        assertEquals("foo", tok.next());
+        assertEquals("{bar}", tok.next());
+        assertEquals("baz", tok.next());
+        assertFalse(tok.hasNext());
+    }
+
+    @Test
+    public void testTokenizerNesting() {
+        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo{bar{baz}}blah");
+        assertEquals("foo", tok.next());
+        assertEquals("{bar{baz}}", tok.next());
+        assertEquals("blah", tok.next());
+        assertFalse(tok.hasNext());
+    }
+
+    @Test
+    public void testTokenizerNoClosing() {
+        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo{bar}baz{blah");
+        assertEquals("foo", tok.next());
+        assertEquals("{bar}", tok.next());
+        assertEquals("baz", tok.next());
+        assertEquals("{blah", tok.next());
+        assertFalse(tok.hasNext());
+    }
+
+    @Test
+    public void testTokenizerNoOpening() {
+        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo}bar}baz");
+        assertEquals("foo}bar}baz", tok.next());
+        assertFalse(tok.hasNext());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnclosedVariable() {
+        new URITemplate("/foo/{var/bar");
+    }
+
+    @Test
+    public void testUnopenedVariable() {
+        URITemplate ut = new URITemplate("/foo/var}/bar");
+        assertEquals("/foo/var}/bar", ut.getValue());
+    }
+
+    @Test
+    public void testNestedCurlyBraces() {
+        URITemplate ut = new URITemplate("/foo/{hex:[0-9a-fA-F]{2}}");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("hex", "FF");
+        assertEquals("Wrong substitution", "/foo/FF", ut.substitute(map));
+    }
+    
+    @Test
+    public void testEncodeLiteralCharacters() {
+        URITemplate ut = new URITemplate("a {id} b");
+        assertEquals("a%20{id}%20b", ut.encodeLiteralCharacters());
+    }
+
+    @Test
+    public void testEncodeLiteralCharactersNotVariable() {
+        URITemplate ut = new URITemplate("a {digit:[0-9]} b");
+        System.out.println(ut.encodeLiteralCharacters());
+        assertEquals("a%20{digit:[0-9]}%20b", ut.encodeLiteralCharacters());
     }
 }
