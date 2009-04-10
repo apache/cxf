@@ -91,6 +91,12 @@ public class ImportRepairTest extends Assert {
 
     @Test
     public void testImportRepairs() throws Exception {
+        if (System.getProperty("java.vendor").contains("IBM")) {
+            //the version of xerces built into IBM jdk won't work
+            //and we cannot get a good version unless we endorse it
+            return;
+        }
+        
         collection = new SchemaCollection();
         XmlSchema importingSchema = newSchema(IMPORTING_SCHEMA);
         XmlSchema baseTypeSchema1 = newSchema(BASE_TYPE_SCHEMA1);

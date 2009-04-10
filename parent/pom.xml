@@ -1155,6 +1155,8 @@
             <id>fastinstall</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
+                <pmd.skip>true</pmd.skip>
+                <checkstyle.skip>true</checkstyle.skip>
             </properties>
         </profile>
 
@@ -1167,6 +1169,10 @@
 
         <profile>
             <id>nochecks</id>
+            <properties>
+                <pmd.skip>true</pmd.skip>
+                <checkstyle.skip>true</checkstyle.skip>
+            </properties>
         </profile>
 
         <profile>
