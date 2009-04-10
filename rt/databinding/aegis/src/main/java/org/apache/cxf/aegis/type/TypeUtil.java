@@ -74,7 +74,7 @@ public final class TypeUtil {
             }
         
             if (baseType != null) {
-                LOG.info("xsi:type=\"" + overrideName
+                LOG.debug("xsi:type=\"" + overrideName
                          + "\" was specified, but no corresponding Type was registered; defaulting to "
                          + baseType.getSchemaType());
                 return baseType;

@@ -40,17 +40,24 @@ public class XsDateTimeFormat extends Format {
     final boolean parseDate;
 
     final boolean parseTime;
+    
+    final boolean parseTimezone;
 
     XsDateTimeFormat(boolean pParseDate, boolean pParseTime) {
+      this(pParseDate, pParseTime, true);
+    }
+    
+    XsDateTimeFormat(boolean pParseDate, boolean pParseTime, boolean pParseTimezone) {
         parseDate = pParseDate;
         parseTime = pParseTime;
+        parseTimezone = pParseTimezone;
     }
 
     /**
      * Creates a new instance.
      */
     public XsDateTimeFormat() {
-        this(true, true);
+        this(true, true, true);
     }
 
 
@@ -136,27 +143,29 @@ public class XsDateTimeFormat extends Format {
                 append(pBuffer, millis, 3);
             }
         }
-        TimeZone tz = cal.getTimeZone();
-        // JDK 1.4: int offset = tz.getOffset(cal.getTimeInMillis());
-        int offset = cal.get(Calendar.ZONE_OFFSET);
-        if (tz.inDaylightTime(cal.getTime())) {
-            offset += cal.get(Calendar.DST_OFFSET);
-        }
-        if (offset == 0) {
-            pBuffer.append('Z');
-        } else {
-            if (offset < 0) {
-                pBuffer.append('-');
-                offset = -offset;
-            } else {
-                pBuffer.append('+');
+        if (parseTimezone) {
+            TimeZone tz = cal.getTimeZone();
+            // JDK 1.4: int offset = tz.getOffset(cal.getTimeInMillis());
+            int offset = cal.get(Calendar.ZONE_OFFSET);
+            if (tz.inDaylightTime(cal.getTime())) {
+                offset += cal.get(Calendar.DST_OFFSET);
             }
-            int minutes = offset / (60 * 1000);
-            int hours = minutes / 60;
-            minutes -= hours * 60;
-            append(pBuffer, hours, 2);
-            pBuffer.append(':');
-            append(pBuffer, minutes, 2);
+            if (offset == 0) {
+                pBuffer.append('Z');
+            } else {
+                if (offset < 0) {
+                    pBuffer.append('-');
+                    offset = -offset;
+                } else {
+                    pBuffer.append('+');
+                }
+                int minutes = offset / (60 * 1000);
+                int hours = minutes / 60;
+                minutes -= hours * 60;
+                append(pBuffer, hours, 2);
+                pBuffer.append(':');
+                append(pBuffer, minutes, 2);
+            }
         }
         return pBuffer;
     }
