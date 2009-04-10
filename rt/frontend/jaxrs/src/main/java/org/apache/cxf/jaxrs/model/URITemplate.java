@@ -270,8 +270,8 @@ public final class URITemplate {
      * @return encoded value
      */
     public String encodeLiteralCharacters() {
-        final float ENCODED_RATIO = 1.5f;
-        StringBuffer sb = new StringBuffer((int)(ENCODED_RATIO * template.length()));
+        final float encodedRatio = 1.5f;
+        StringBuffer sb = new StringBuffer((int)(encodedRatio * template.length()));
         for (UriChunk chunk : uriChunks) {
             String val = chunk.getValue();
             if (chunk instanceof Literal) {
