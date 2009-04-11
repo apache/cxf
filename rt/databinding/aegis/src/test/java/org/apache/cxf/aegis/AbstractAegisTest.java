@@ -26,7 +26,10 @@ import javax.wsdl.Import;
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLWriter;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -36,6 +39,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
@@ -46,7 +51,10 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -248,4 +256,51 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         globalContext.initialize();
         return new Context(globalContext);
     }
+    
+    
+    protected org.w3c.dom.Element createElement(String namespace, String name) {
+        return createElement(namespace, name, null);
+    }
+
+    protected org.w3c.dom.Element createElement(String namespace, String name, String namespacePrefix) {
+        Document doc = DOMUtils.createDocument();
+
+        org.w3c.dom.Element element = doc.createElementNS(namespace, name);
+        if (namespacePrefix != null) {
+            element.setPrefix(namespacePrefix);
+            DOMUtils.addNamespacePrefix(element, namespace, namespacePrefix);
+        }
+
+        doc.appendChild(element);
+        return element;
+    }
+
+    protected ElementWriter getElementWriter(org.w3c.dom.Element element) {
+        return getElementWriter(element, new MapNamespaceContext());
+    }
+
+    protected ElementWriter getElementWriter(org.w3c.dom.Element element, 
+                                             NamespaceContext namespaceContext) {
+        XMLStreamWriter writer = new W3CDOMStreamWriter(element);
+        try {
+            writer.setNamespaceContext(namespaceContext);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        return new ElementWriter(writer);
+    }
+
+    protected org.w3c.dom.Element writeObjectToElement(Type type, Object bean) {
+        return writeObjectToElement(type, bean, getContext());
+    }
+
+    protected org.w3c.dom.Element writeObjectToElement(Type type, Object bean, Context context) {
+        org.w3c.dom.Element element = createElement("urn:Bean", "root", "b");
+        ElementWriter writer = getElementWriter(element, new MapNamespaceContext());
+        type.writeObject(bean, writer, getContext());
+        writer.close();
+        return element;
+    }
+
+    
 }

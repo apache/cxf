@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
