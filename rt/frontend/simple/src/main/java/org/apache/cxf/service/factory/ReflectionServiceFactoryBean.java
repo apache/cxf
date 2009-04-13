@@ -1495,6 +1495,13 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 break;
             }
         }
+        for (MessagePartInfo mpart : op.getOutput().getMessageParts()) {
+            if (Boolean.TRUE.equals(mpart.getProperty(HEADER))) {
+                partName = "result";
+                break;
+            }
+        }
+        
         if (partName == null) {
             partName = "parameters";
         }

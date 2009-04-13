@@ -50,7 +50,7 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="echo3Response">
-    <wsdl:part name="parameters" element="tns:echo3Response">
+    <wsdl:part name="result" element="tns:echo3Response">
     </wsdl:part>
     <wsdl:part name="header" element="tns:header">
     </wsdl:part>
@@ -123,7 +123,7 @@
       <wsdl:output name="echo3Response">
         <soap:header message="tns:echo3Response" part="header" use="literal">
         </soap:header>
-        <soap:body parts="parameters" use="literal"/>
+        <soap:body parts="result" use="literal"/>
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
