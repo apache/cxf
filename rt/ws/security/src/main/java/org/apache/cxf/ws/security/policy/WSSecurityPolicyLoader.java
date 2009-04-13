@@ -73,7 +73,14 @@ public class WSSecurityPolicyLoader {
     @PostConstruct
     public void register() {
         registerBuilders();
-        registerProviders();
+        try {
+            registerProviders();
+        } catch (Throwable t) {
+            //probably wss4j isn't found or something. We'll ignore this
+            //as the policy framework will then not find the providers
+            //and error out at that point.  If nothing uses ws-securitypolicy
+            //no warnings/errors will display
+        }
     }
     public void registerBuilders() {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
