@@ -23,17 +23,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -46,7 +46,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class ArrayType extends Type {
-    private static final Log LOG = LogFactory.getLog(ArrayType.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(ArrayType.class);
 
     private QName componentName;
     private long minOccurs;
@@ -357,7 +357,7 @@ public class ArrayType extends Type {
             // We couldn't find the type the user specified. One is created
             // below instead.
             if (type == null) {
-                LOG.debug("Couldn't find array component type " + componentName + ". Creating one instead.");
+                LOG.finest("Couldn't find array component type " + componentName + ". Creating one instead.");
             }
         }
 

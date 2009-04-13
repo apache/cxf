@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.aegis.type;
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.util.NamespaceHelper;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -35,7 +36,7 @@ import org.apache.ws.commons.schema.XmlSchema;
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public final class TypeUtil {
-    public static final Log LOG = LogFactory.getLog(TypeUtil.class);
+    public static final Logger LOG = LogUtils.getL7dLogger(TypeUtil.class);
 
     private TypeUtil() {
         //utility class
@@ -45,7 +46,7 @@ public final class TypeUtil {
 
         if (!context.isReadXsiTypes()) {
             if (baseType == null) {
-                LOG.warn("xsi:type reading disabled, and no type available for "  
+                LOG.warning("xsi:type reading disabled, and no type available for "  
                          + xsr.getName());
             }
             return baseType;
@@ -71,18 +72,18 @@ public final class TypeUtil {
             }
         
             if (baseType != null) {
-                LOG.debug("xsi:type=\"" + overrideName
+                LOG.finest("xsi:type=\"" + overrideName
                          + "\" was specified, but no corresponding Type was registered; defaulting to "
                          + baseType.getSchemaType());
                 return baseType;
             } else {
-                LOG.warn("xsi:type=\"" + overrideName
+                LOG.warning("xsi:type=\"" + overrideName
                          + "\" was specified, but no corresponding Type was registered; no default.");
                 return null;
             }
         } else {
             if (baseType == null) {
-                LOG.warn("xsi:type absent, and no type available for "  
+                LOG.warning("xsi:type absent, and no type available for "  
                          + xsr.getName());
             }
             return baseType;
@@ -104,7 +105,7 @@ public final class TypeUtil {
         }
 
         if (!context.isReadXsiTypes()) {
-            LOG.warn("xsi:type reading disabled, and no type available for "  
+            LOG.warning("xsi:type reading disabled, and no type available for "  
                      + xsr.getName());
             return null;
         }
@@ -125,11 +126,11 @@ public final class TypeUtil {
                 return type;
             }
                     
-            LOG.warn("xsi:type=\"" + schemaTypeName
+            LOG.warning("xsi:type=\"" + schemaTypeName
                      + "\" was specified, but no corresponding Type was registered; no default.");
             return null;
         }
-        LOG.warn("xsi:type was not specified for top-level element " + xsr.getName());
+        LOG.warning("xsi:type was not specified for top-level element " + xsr.getName());
         return null;
     }
     
