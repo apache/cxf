@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -43,19 +45,19 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.XMLBeanTypeInfo;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.xpath.XPath;
+
 
 /**
  * Deduce mapping information from an xml file. The xml file should be in the
@@ -94,7 +96,7 @@ import org.jdom.xpath.XPath;
  * specified.
  */
 public class XMLTypeCreator extends AbstractTypeCreator {
-    private static final Log LOG = LogFactory.getLog(XMLTypeCreator.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(XMLTypeCreator.class);
     private static List<Class> stopClasses = new ArrayList<Class>();
     static {
         stopClasses.add(Object.class);
@@ -122,13 +124,13 @@ public class XMLTypeCreator extends AbstractTypeCreator {
                 aegisDocumentBuilderFactory.setSchema(aegisSchema);
             } catch (UnsupportedOperationException e) {
                 //Parsers that don't support schema validation
-                LOG.info("Parser doesn't support setSchema.  Not validating.", e);
+                LOG.log(Level.INFO, "Parser doesn't support setSchema.  Not validating.", e);
             } catch (IOException ie) {
-                LOG.error("Error reading Aegis schema", ie);
+                LOG.log(Level.SEVERE, "Error reading Aegis schema", ie);
             } catch (FactoryConfigurationError e) {
-                LOG.error("Error reading Aegis schema", e);
+                LOG.log(Level.SEVERE, "Error reading Aegis schema", e);
             } catch (SAXException e) {
-                LOG.error("Error reading Aegis schema", e);
+                LOG.log(Level.SEVERE, "Error reading Aegis schema", e);
             }
         }
     }
@@ -138,7 +140,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         try {
             documentBuilder = aegisDocumentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            LOG.error("Unable to create a document builder, e");
+            LOG.log(Level.SEVERE, "Unable to create a document builder, e");
             throw new RuntimeException("Unable to create a document builder, e");
         }
         org.w3c.dom.Document doc;
@@ -161,26 +163,26 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
             public void error(SAXParseException exception) throws SAXException {
                 String message = errorMessage(exception);
-                LOG.error(message, exception);
+                LOG.log(Level.SEVERE, message, exception);
                 throwDatabindingException(message);
 
             }
 
             public void fatalError(SAXParseException exception) throws SAXException {
                 String message = errorMessage(exception);
-                LOG.error(message, exception);
+                LOG.log(Level.SEVERE, message, exception);
                 throwDatabindingException(message);
             }
 
             public void warning(SAXParseException exception) throws SAXException {
-                LOG.info(errorMessage(exception), exception);
+                LOG.log(Level.INFO, errorMessage(exception), exception);
             }
         });
 
         try {
             doc = documentBuilder.parse(is);
         } catch (SAXException e) {
-            LOG.error("Error parsing Aegis file.", e); // can't happen due to
+            LOG.log(Level.SEVERE, "Error parsing Aegis file.", e); // can't happen due to
                                                         // above.
             return null;
         }
@@ -198,16 +200,16 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         String path = '/' + clazz.getName().replace('.', '/') + ".aegis.xml";
         InputStream is = clazz.getResourceAsStream(path);
         if (is == null) {
-            LOG.debug("Mapping file : " + path + " not found.");
+            LOG.finest("Mapping file : " + path + " not found.");
             return null;
         }
-        LOG.debug("Found mapping file : " + path);
+        LOG.finest("Found mapping file : " + path);
         try {
             doc = readAegisFile(is, path);
             documents.put(clazz.getName(), doc);
             return doc;
         } catch (IOException e) {
-            LOG.error("Error loading file " + path, e);
+            LOG.log(Level.SEVERE, "Error loading file " + path, e);
             return null;
         }
     }

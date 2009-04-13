@@ -20,20 +20,13 @@ package org.apache.cxf.aegis.services.base64;
 
 import java.util.zip.CRC32;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class BinaryDataService {
-    private final Log log = LogFactory.getLog(getClass());
 
     public String verifyDataIntegrity(byte[] data, int length, long crc32) {
-        log.debug("verifyDataIntegrity([" + data.length + " bytes of data], " + length + ", " + crc32
-                  + ") called.");
 
-        String status = getStatusForData(data, length, crc32);
+        return getStatusForData(data, length, crc32);
 
-        log.debug("verifyDataIntegrity status: " + status);
-        return status;
     }
 
     /**

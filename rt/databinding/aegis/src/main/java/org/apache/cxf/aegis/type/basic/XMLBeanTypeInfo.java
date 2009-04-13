@@ -23,19 +23,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.jdom.Element;
 
 public class XMLBeanTypeInfo extends BeanTypeInfo {
-    private static final Log LOG = LogFactory.getLog(XMLBeanTypeInfo.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(XMLBeanTypeInfo.class);
     private List mappings;
 
     /**
@@ -71,7 +71,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                 return;
             }
 
-            LOG.debug("Found mapping for property " + pd.getName());
+            LOG.finest("Found mapping for property " + pd.getName());
 
             style = e.getAttributeValue("style");
         }

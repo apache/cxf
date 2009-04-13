@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -37,8 +38,6 @@ import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.type.basic.BigDecimalType;
 import org.apache.cxf.aegis.type.basic.BigIntegerType;
@@ -68,6 +67,7 @@ import org.apache.cxf.aegis.type.xml.JDOMElementType;
 import org.apache.cxf.aegis.type.xml.SourceType;
 import org.apache.cxf.aegis.type.xml.XMLStreamReaderType;
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.jdom.Element;
@@ -77,7 +77,7 @@ import org.jdom.Element;
  */
 public class DefaultTypeMapping implements TypeMapping {
     public  static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
-    private static final Log LOG = LogFactory.getLog(DefaultTypeMapping.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(DefaultTypeMapping.class);
     private Map<Class, Type> class2Type;
     private Map<QName, Type> xml2Type;
     private Map<Class, QName> class2xml;
@@ -146,7 +146,7 @@ public class DefaultTypeMapping implements TypeMapping {
             xml2Type.put(type.getSchemaType(), type);
         }
         if (type.getTypeClass() == null && type.getSchemaType() == null) {
-            LOG.warn("The type " + type.getClass().getName()
+            LOG.warning("The type " + type.getClass().getName()
                      + " supports neither serialization (non-null TypeClass)"
                      + " nor deserialization (non-null SchemaType).");
         }
