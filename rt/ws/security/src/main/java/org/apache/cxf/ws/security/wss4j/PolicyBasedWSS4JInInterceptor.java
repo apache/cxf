@@ -477,7 +477,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         || prots == Protections.SIGN_ENCRYPT) {
                         ai.setNotAsserted("Not encrypted before signed and then protected");
                     }
-                } else if (prots != Protections.SIGN_ENCRYPT) {
+                } else if (prots == Protections.SIGN_ENCRYPT) {
                     ai.setNotAsserted("Not encrypted before signed");                    
                 }
             } else if (prots == Protections.ENCRYPT_SIGN) {
