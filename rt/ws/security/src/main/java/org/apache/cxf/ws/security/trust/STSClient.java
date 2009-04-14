@@ -243,21 +243,22 @@ public class STSClient implements Configurable {
         wsdlLocation = wsdl;
     }
 
-    public void setServiceName(QName qn) {
-        serviceName = qn;
-    }
-
     public void setServiceName(String qn) {
         serviceName = QName.valueOf(qn);
-    }
-
-    public void setEndpointName(QName qn) {
-        endpointName = qn;
     }
 
     public void setEndpointName(String qn) {
         endpointName = QName.valueOf(qn);
     }
+    
+    public void setServiceQName(QName qn) {
+        serviceName = qn;
+    }
+
+    public void setEndpointQName(QName qn) {
+        endpointName = qn;
+    }
+
 
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
