@@ -46,7 +46,7 @@ public final class Client {
      */
     public static void main(String argv[])
         throws Exception {
-        boolean local = true;
+        boolean local = false;
 
         if (argv.length > 0 && "local".equalsIgnoreCase(argv[0])) {
             local = true;
