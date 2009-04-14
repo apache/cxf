@@ -131,6 +131,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     public static final String HEADER = "messagepart.isheader";
     public static final String ELEMENT_NAME = "messagepart.elementName";
     public static final String METHOD = "operation.method";
+    public static final String FORCE_TYPES = "operation.force.types";
     public static final String METHOD_PARAM_ANNOTATIONS = "method.parameters.annotations";
     public static final String METHOD_ANNOTATIONS = "method.return.annotations";
     public static final String PARAM_ANNOTATION = "parameter.annotations";
@@ -786,7 +787,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         op.setProperty(METHOD_ANNOTATIONS, m.getAnnotations());
         op.setProperty(METHOD_PARAM_ANNOTATIONS, m.getParameterAnnotations());
 
-        if (!isRPC(m) && isWrapped(m)) {
+        boolean isrpc = isRPC(m);
+        if (!isrpc && isWrapped(m)) {
             UnwrappedOperationInfo uOp = new UnwrappedOperationInfo(op);
             uOp.setProperty(METHOD_ANNOTATIONS, m.getAnnotations());
             uOp.setProperty(METHOD_PARAM_ANNOTATIONS, m.getParameterAnnotations());
@@ -818,6 +820,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
         } else {
+            if (isrpc) {
+                op.setProperty(FORCE_TYPES, Boolean.TRUE);
+            }
             createMessageParts(intf, op, m);
         }
 
