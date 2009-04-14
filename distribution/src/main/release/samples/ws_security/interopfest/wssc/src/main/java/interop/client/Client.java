@@ -66,8 +66,9 @@ public final class Client {
         if (argv.length < 1 || "".equals(argv[0]) 
             || argv[0] == null || "ALL".equals(argv[0])) {
             argv = new String[] {
-                "SecureConversation_UserNameOverTransport_IPingService", 
-                             //service not running on the https port
+                //don't have the certs available to be able to connect 
+                //"SecureConversation_UserNameOverTransport_IPingService",
+                
                 "SecureConversation_MutualCertificate10SignEncrypt_IPingService",
                 "AC_IPingService",
                 "ADC_IPingService",
