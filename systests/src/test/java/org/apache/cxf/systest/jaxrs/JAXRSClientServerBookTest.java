@@ -479,14 +479,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBookNotFound() throws Exception {
-        
-        getAndCompareAsStrings("http://localhost:9080/bookstore/books/126",
-                               "resources/expected_get_book_notfound.txt",
-                               "application/xml", "text/xml; charset=utf-8", 500);
-    }
-    
-    @Test
     public void testAddBook() throws Exception {
         doAddBook("http://localhost:9080/bookstore/books");               
     }
