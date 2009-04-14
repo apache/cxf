@@ -177,8 +177,9 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
             return;
         }
-        
-        boolean isElement = beanInfo.isElement();
+        boolean isElement = beanInfo.isElement() 
+            && !Boolean.TRUE.equals(part.getMessageInfo().getOperation()
+                                        .getProperty("operation.force.types"));
         boolean hasType = !beanInfo.getTypeNames().isEmpty();
         if (isElement && isFromWrapper && hasType) {
             //if there is both a Global element and a global type, AND we are in a wrapper,
