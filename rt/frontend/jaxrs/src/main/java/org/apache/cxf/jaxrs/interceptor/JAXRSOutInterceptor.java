@@ -59,6 +59,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSOutInterceptor.class);
@@ -85,6 +86,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     private void processResponse(Message message) {
+        
+        if (isResponseAlreadyCommited(message)) {
+            return;
+        }
         
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {
@@ -364,5 +369,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         SimpleDateFormat format = HttpUtils.getHttpDateFormat();
         headers.putSingle(HttpHeaders.DATE, format.format(new Date()));
+    }
+    
+    private boolean isResponseAlreadyCommited(Message m) {
+        return Boolean.TRUE.equals(m.getExchange().get(AbstractHTTPDestination.RESPONSE_COMMITED));
     }
 }

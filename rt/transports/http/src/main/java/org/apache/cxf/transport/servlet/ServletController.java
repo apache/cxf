@@ -40,6 +40,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transports.http.QueryHandler;
@@ -181,9 +182,15 @@ public class ServletController {
                 
                 invokeDestination(request, res, d);
             }
+        } catch (Fault ex) {
+            if (ex.getCause() instanceof RuntimeException) {
+                throw (RuntimeException)ex.getCause(); 
+            } else {
+                throw new ServletException(ex.getCause());
+            }
         } catch (IOException e) {
             throw new ServletException(e);
-        }
+        } 
     }
     
     private ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        

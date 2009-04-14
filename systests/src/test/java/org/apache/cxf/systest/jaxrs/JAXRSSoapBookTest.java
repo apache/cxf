@@ -70,6 +70,15 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBook123ServletResponse() throws Exception {
+        
+        InputStream in = getHttpInputStream("http://localhost:9092/test/services/rest/bookstore/0");
+        InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
+        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
+                
+    }
+    
+    @Test
     public void testGetBook123() throws Exception {
         
         InputStream in = getHttpInputStream("http://localhost:9092/test/services/rest/bookstore/123");

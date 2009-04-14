@@ -242,6 +242,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
                     pause();
                     throw ex;
                 } catch (RuntimeException ex) {
+                    
                     if (!faultOccurred) {
      
                         faultOccurred = true;
@@ -357,8 +358,12 @@ public class PhaseInterceptorChain implements InterceptorChain {
             }
             try {
                 currentInterceptor.handleFault(message);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e);
+                throw e;
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e); 
+                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e);
+                throw new RuntimeException(e);
             }
         }
     }

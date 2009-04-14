@@ -77,6 +77,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -706,7 +707,8 @@ public final class JAXRSUtils {
             value = m.get(AbstractHTTPDestination.HTTP_REQUEST);
         }
         if (HttpServletResponse.class.isAssignableFrom(clazz)) {
-            value = m.get(AbstractHTTPDestination.HTTP_RESPONSE);
+            value = new HttpServletResponseFilter(
+                            (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE), m);
         }
         if (ServletContext.class.isAssignableFrom(clazz)) {
             value = m.get(AbstractHTTPDestination.HTTP_CONTEXT);

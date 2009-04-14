@@ -53,6 +53,7 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -1033,12 +1034,12 @@ public class JAXRSUtilsTest extends Assert {
                 cri);
         ori.setHttpMethod("GET");
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
-        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse response = new HttpServletResponseFilter(
+                                           EasyMock.createMock(HttpServletResponse.class), null);
         ServletContext context = EasyMock.createMock(ServletContext.class);
         ServletConfig config = EasyMock.createMock(ServletConfig.class);        
         
         EasyMock.replay(request);
-        EasyMock.replay(response);
         EasyMock.replay(context);
         EasyMock.replay(config);
         
@@ -1069,6 +1070,8 @@ public class JAXRSUtilsTest extends Assert {
         
         Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
+        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
+        m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         
         InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
         assertSame(UriInfoImpl.class, c.getUriInfo2().getClass());
@@ -1092,7 +1095,7 @@ public class JAXRSUtilsTest extends Assert {
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
         HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
-        HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
+        HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
@@ -1119,8 +1122,9 @@ public class JAXRSUtilsTest extends Assert {
         
         assertSame(httpRequest, 
                    ((ThreadLocalProxy)c.getServletRequest()).get());
-        assertSame(httpResponse, 
-                   ((ThreadLocalProxy)c.getServletResponse()).get());
+        HttpServletResponseFilter filter = (
+            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponse()).get();
+        assertSame(httpResponse, filter.getResponse());
     }
     
     @Test
@@ -1135,7 +1139,7 @@ public class JAXRSUtilsTest extends Assert {
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
         HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
-        HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
+        HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         InjectionUtils.injectResourceFields(c, cri, m);
@@ -1143,8 +1147,9 @@ public class JAXRSUtilsTest extends Assert {
                    ((ThreadLocalProxy)c.getServletContextResource()).get());
         assertSame(httpRequest, 
                    ((ThreadLocalProxy)c.getServletRequestResource()).get());
-        assertSame(httpResponse, 
-                   ((ThreadLocalProxy)c.getServletResponseResource()).get());
+        HttpServletResponseFilter filter = (
+            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponseResource()).get();
+        assertSame(httpResponse, filter.getResponse());
     }
     
     @Test
@@ -1224,6 +1229,8 @@ public class JAXRSUtilsTest extends Assert {
         OperationResourceInfo ori = new OperationResourceInfo(null, cri);
         
         Message m = createMessage();
+        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
+        m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         Customer c = new Customer();
         ContextResolver<JAXBContext> cr = new JAXBContextProvider();
         ProviderFactory.getInstance(m).registerUserProvider(cr);
@@ -1257,7 +1264,8 @@ public class JAXRSUtilsTest extends Assert {
         
         InjectionUtils.injectResourceFields(c, ori.getClassResourceInfo(), m);
         assertSame(request.getClass(), c.getServletRequestResource().getClass());
-        assertSame(response.getClass(), c.getServletResponseResource().getClass());
+        HttpServletResponseFilter filter = (HttpServletResponseFilter)c.getServletResponseResource();
+        assertSame(response.getClass(), filter.getResponse().getClass());
         assertSame(context.getClass(), c.getServletContextResource().getClass());
         assertNull(c.getServletRequest());
         assertNull(c.getServletResponse());
@@ -1269,7 +1277,8 @@ public class JAXRSUtilsTest extends Assert {
         assertNull(c.getServletResponseResource());
         assertNull(c.getServletContextResource());
         assertSame(request.getClass(), c.getServletRequest().getClass());
-        assertSame(response.getClass(), c.getServletResponse().getClass());
+        filter = (HttpServletResponseFilter)c.getServletResponse();
+        assertSame(response.getClass(), filter.getResponse().getClass());
         assertSame(context.getClass(), c.getServletContext().getClass());
     }
     

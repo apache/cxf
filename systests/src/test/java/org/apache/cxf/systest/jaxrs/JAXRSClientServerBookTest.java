@@ -53,6 +53,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServer.class));
     }
     
+    
+    @Test
+    public void testPropogateException() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore/propogateexception",
+                      "", "application/xml", 500);
+    }
+    
     @Test
     public void testWebApplicationException() throws Exception {
         getAndCompare("http://localhost:9080/bookstore/webappexception",

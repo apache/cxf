@@ -90,6 +90,13 @@ public class BookStore {
     }
     
     @GET
+    @Path("propogateexception")
+    public Book propogateException() throws BookNotFoundFault {
+        throw new BookNotFoundFault("Book Exception");
+    }
+    
+    
+    @GET
     @Path("books/check/{id}")
     @Produces("text/plain")
     public boolean checkBook(@PathParam("id") Long id) {

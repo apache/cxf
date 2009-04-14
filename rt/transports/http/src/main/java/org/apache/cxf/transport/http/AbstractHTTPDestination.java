@@ -82,6 +82,8 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         
     public static final String PARTIAL_RESPONSE = AbstractMultiplexDestination.class.getName()
         + ".partial.response";
+    public static final String RESPONSE_COMMITED = "http.response.done";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
