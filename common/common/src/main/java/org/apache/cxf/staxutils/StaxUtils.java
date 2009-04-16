@@ -54,6 +54,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.NamedNodeMap;
@@ -659,6 +660,15 @@ public final class StaxUtils {
         case Node.DOCUMENT_NODE:
             writeDocument((Document)n, writer, repairing);
             break;
+        case Node.DOCUMENT_FRAGMENT_NODE: {
+            DocumentFragment frag = (DocumentFragment)n;
+            Node child = frag.getFirstChild();
+            while (child != null) {
+                writeNode(child, writer, repairing);
+                child = child.getNextSibling();
+            }
+            break;
+        }
         default:
             throw new IllegalStateException("Found type: " + n.getClass().getName());
         }        

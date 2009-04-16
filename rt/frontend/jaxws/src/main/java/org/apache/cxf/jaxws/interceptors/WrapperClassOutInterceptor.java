@@ -113,8 +113,9 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
                 }
 
                 message.setContent(List.class, newObjs);
+            } catch (Fault f) {
+                throw f;
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new Fault(e);
             }
             

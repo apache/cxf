@@ -30,16 +30,18 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.helpers.XMLUtils;
 
 public class W3CDOMStreamWriter implements XMLStreamWriter {
     static final String XML_NS = "http://www.w3.org/2000/xmlns/";
-    private Stack<Element> stack = new Stack<Element>();
+    private Stack<Node> stack = new Stack<Node>();
     private Document document;
-    private Element currentNode;
+    private Node currentNode;
     private NamespaceContext context = new W3CNamespaceContext();
     private boolean nsRepairing;
     private Map properties = Collections.EMPTY_MAP;
@@ -55,6 +57,10 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     public W3CDOMStreamWriter(Document document) {
         this.document = document;
     }
+    public W3CDOMStreamWriter(DocumentFragment frag) {
+        this.document = frag.getOwnerDocument();
+        currentNode = frag;
+    }
 
     public W3CDOMStreamWriter(Element e) {
         this.document = e.getOwnerDocument();
@@ -64,7 +70,16 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
     
     public Element getCurrentNode() {
-        return currentNode;
+        if (currentNode instanceof Element) {
+            return (Element)currentNode;
+        }
+        return null;
+    }
+    public DocumentFragment getCurrentFragment() {
+        if (currentNode instanceof DocumentFragment) {
+            return (DocumentFragment)currentNode;
+        }
+        return null;
     }
     
     public void setNsRepairing(boolean b) {
@@ -85,12 +100,19 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         newChild(document.createElement(local));
     }
 
-    private void newChild(Element element) {
+    protected void newChild(Element element) {
+        setChild(element, true);
+    }
+    protected void setChild(Element element, boolean append) {
         if (currentNode != null) {
             stack.push(currentNode);
-            currentNode.appendChild(element);
+            if (append) {
+                currentNode.appendChild(element);
+            }
         } else {
-            document.appendChild(element);
+            if (append) {
+                document.appendChild(element);
+            }
         }
         if (!(context instanceof W3CNamespaceContext)) {
             context = new W3CNamespaceContext();
@@ -117,24 +139,27 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
 
     public void writeEmptyElement(String namespace, String local) throws XMLStreamException {
         writeStartElement(namespace, local);
+        writeEndElement();
     }
 
     public void writeEmptyElement(String prefix, String namespace, String local) throws XMLStreamException {
         writeStartElement(prefix, namespace, local);
+        writeEndElement();
     }
 
     public void writeEmptyElement(String local) throws XMLStreamException {
         writeStartElement(local);
+        writeEndElement();
     }
 
     public void writeEndElement() throws XMLStreamException {
         if (stack.size() > 0) {
-            currentNode = (Element)stack.pop();
+            currentNode = stack.pop();
         } else {
             currentNode = null;
         }
-        if (context instanceof W3CNamespaceContext) {
-            ((W3CNamespaceContext)context).setElement(currentNode);
+        if (context instanceof W3CNamespaceContext && currentNode instanceof Element) {
+            ((W3CNamespaceContext)context).setElement((Element)currentNode);
         } else if (context instanceof MapNamespaceContext) {
             ((MapNamespaceContext) context).setTargetNode(currentNode);
         }
@@ -146,7 +171,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     public void writeAttribute(String local, String value) throws XMLStreamException {
         Attr a = document.createAttribute(local);
         a.setValue(value);
-        currentNode.setAttributeNode(a);
+        ((Element)currentNode).setAttributeNode(a);
     }
 
     public void writeAttribute(String prefix, String namespace, String local, String value)
@@ -157,7 +182,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         
         Attr a = document.createAttributeNS(namespace, local);
         a.setValue(value);
-        currentNode.setAttributeNodeNS(a);
+        ((Element)currentNode).setAttributeNodeNS(a);
         if (nsRepairing
             && !prefix.equals(getNamespaceContext().getPrefix(namespace))) {
             writeNamespace(prefix, namespace);
@@ -167,7 +192,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     public void writeAttribute(String namespace, String local, String value) throws XMLStreamException {
         Attr a = document.createAttributeNS(namespace, local);
         a.setValue(value);
-        currentNode.setAttributeNodeNS(a);
+        ((Element)currentNode).setAttributeNodeNS(a);
     }
 
     public void writeNamespace(String prefix, String namespace) throws XMLStreamException {
@@ -176,14 +201,14 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         } else {
             Attr attr = document.createAttributeNS(XML_NS, "xmlns:" + prefix);
             attr.setValue(namespace);
-            currentNode.setAttributeNodeNS(attr);
+            ((Element)currentNode).setAttributeNodeNS(attr);
         }
     }
 
     public void writeDefaultNamespace(String namespace) throws XMLStreamException {
         Attr attr = document.createAttributeNS(XML_NS, "xmlns");
         attr.setValue(namespace);
-        currentNode.setAttributeNodeNS(attr);
+        ((Element)currentNode).setAttributeNodeNS(attr);
     }
 
     public void writeComment(String value) throws XMLStreamException {

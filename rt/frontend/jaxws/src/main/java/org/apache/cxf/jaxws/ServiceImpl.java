@@ -586,8 +586,10 @@ public class ServiceImpl extends ServiceDelegate {
         for (AbstractFeature af : clientFac.getFeatures()) {
             af.initialize(client, bus);
         }
-        
-        Dispatch<T> disp = new DispatchImpl<T>(bus, client, mode, type, getExecutor());
+        if (executor != null) {
+            client.getEndpoint().setExecutor(executor);
+        }
+        Dispatch<T> disp = new DispatchImpl<T>(client, mode, type);
         configureObject(disp);
 
         return disp;
@@ -621,7 +623,9 @@ public class ServiceImpl extends ServiceDelegate {
 
         AbstractServiceFactoryBean sf = null;
         try {
-            sf = createDispatchService(new JAXBDataBinding(context));
+            JAXBDataBinding db = new JAXBDataBinding(context);
+            db.setUnwrapJAXBElement(false);
+            sf = createDispatchService(db);
         } catch (ServiceConstructionException e) {
             throw new WebServiceException(e);
         }
@@ -630,8 +634,11 @@ public class ServiceImpl extends ServiceDelegate {
         for (AbstractFeature af : clientFac.getFeatures()) {
             af.initialize(client, bus);
         }
-        Dispatch<Object> disp = new DispatchImpl<Object>(bus, client, mode, 
-                                                         context, Object.class, getExecutor());
+        if (executor != null) {
+            client.getEndpoint().setExecutor(executor);
+        }
+        Dispatch<Object> disp = new DispatchImpl<Object>(client, mode, 
+                                                         context, Object.class);
         configureObject(disp);
 
         return disp;

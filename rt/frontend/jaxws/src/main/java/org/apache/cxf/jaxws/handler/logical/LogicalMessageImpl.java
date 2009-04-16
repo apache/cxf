@@ -190,7 +190,8 @@ public class LogicalMessageImpl implements LogicalMessage {
 
     public void setPayload(Source s) {       
         Message message = msgContext.getWrappedMessage();
-        Service.Mode mode = msgContext.getWrappedMessage().getExchange().get(Service.Mode.class);
+        Service.Mode mode = (Service.Mode)msgContext.getWrappedMessage()
+            .getContextualProperty(Service.Mode.class.getName());
         if (mode != null) {
             if (message instanceof SoapMessage) {
                 if (mode == Service.Mode.MESSAGE) {

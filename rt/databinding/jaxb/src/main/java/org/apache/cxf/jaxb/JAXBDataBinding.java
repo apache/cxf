@@ -156,6 +156,7 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
     
+    private boolean unwrapJAXBElement = true;
 
     private boolean qualifiedSchemas;
     private Service service;
@@ -219,11 +220,11 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
     public <T> DataReader<T> createReader(Class<T> c) {
         DataReader<T> dr = null;
         if (c == XMLStreamReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this);
+            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this, unwrapJAXBElement);
         } else if (c == XMLEventReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this);
+            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this, unwrapJAXBElement);
         } else if (c == Node.class) {
-            dr = (DataReader<T>)new DataReaderImpl<Node>(this);
+            dr = (DataReader<T>)new DataReaderImpl<Node>(this, unwrapJAXBElement);
         }
 
         return dr;
@@ -715,6 +716,14 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
     }
 
     
+    public boolean isUnwrapJAXBElement() {
+        return unwrapJAXBElement;
+    }
+
+    public void setUnwrapJAXBElement(boolean unwrapJAXBElement) {
+        this.unwrapJAXBElement = unwrapJAXBElement;
+    }
+
     public static void clearCaches() {
         synchronized (JAXBCONTEXT_CACHE) {
             JAXBCONTEXT_CACHE.clear();

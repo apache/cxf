@@ -20,7 +20,8 @@
 package org.apache.cxf.binding.soap.saaj;
 
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -61,10 +62,11 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  * SOAPMessage.
  */
 public class SAAJOutInterceptor extends AbstractSoapInterceptor {
-
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJOutInterceptor.class);
-    private static final String ORIGINAL_XML_WRITER 
+    public static final String ORIGINAL_XML_WRITER 
         = SAAJOutInterceptor.class.getName() + ".original.xml.writer";
+    
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJOutInterceptor.class);
+    
 
     public SAAJOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
@@ -96,7 +98,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
             } catch (SOAPException e) {
                 throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, version.getSender());
             }
-        } else {
+        } else if (!message.containsKey(ORIGINAL_XML_WRITER)) {
             //as the SOAPMessage already has everything in place, we do not need XMLStreamWriter to write
             //anything for us, so we just set XMLStreamWriter's output to a dummy output stream.         
             try {
@@ -104,15 +106,20 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 message.put(ORIGINAL_XML_WRITER, origWriter);
                 
                 XMLStreamWriter dummyWriter = StaxUtils.getXMLOutputFactory()
-                    .createXMLStreamWriter(new ByteArrayOutputStream());
+                    .createXMLStreamWriter(new OutputStream() {
+                        public void write(int b) throws IOException {
+                        }
+                        public void write(byte b[], int off, int len) throws IOException {
+                        }                        
+                    });
                 message.setContent(XMLStreamWriter.class, dummyWriter);
             } catch (XMLStreamException e) {
                 // do nothing
-            }
+            }   
         }
         
         // Add a final interceptor to write the message
-        message.getInterceptorChain().add(new SAAJOutEndingInterceptor());
+        message.getInterceptorChain().add(SAAJOutEndingInterceptor.INSTANCE);
     }
     @Override
     public void handleFault(SoapMessage message) {
@@ -120,11 +127,14 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
         XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
         if (writer != null) {
             message.setContent(XMLStreamWriter.class, writer);
+            message.remove(ORIGINAL_XML_WRITER);
         }
     }
 
     
-    public class SAAJOutEndingInterceptor extends AbstractSoapInterceptor {
+    public static class SAAJOutEndingInterceptor extends AbstractSoapInterceptor {
+        public static final SAAJOutEndingInterceptor INSTANCE = new SAAJOutEndingInterceptor();
+        
         public SAAJOutEndingInterceptor() {
             super(SAAJOutEndingInterceptor.class.getName(), Phase.PRE_PROTOCOL_ENDING);
         }
@@ -157,11 +167,14 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 }
                 
                 XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
-                try {
-                    StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
-                    writer.flush();
-                    message.setContent(XMLStreamWriter.class, writer);
+                message.remove(ORIGINAL_XML_WRITER);
 
+                try {
+                    if (writer != null) {
+                        StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
+                        writer.flush();
+                        message.setContent(XMLStreamWriter.class, writer);
+                    }
                 } catch (XMLStreamException e) {
                     throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
                                         .getSender());

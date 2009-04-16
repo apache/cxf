@@ -30,6 +30,9 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataWriter;
@@ -37,6 +40,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataWriter.class);
@@ -53,6 +57,22 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
                 StaxUtils.copy(reader, writer);
                 reader.close();
+            } else if (obj instanceof Node) {
+                Node nd = (Node)obj;
+                if (writer instanceof W3CDOMStreamWriter
+                    && ((W3CDOMStreamWriter)writer).getCurrentNode() != null) {
+                    W3CDOMStreamWriter dw = (W3CDOMStreamWriter)writer;
+                    
+                    if (nd.getOwnerDocument() == dw.getDocument()) {
+                        dw.getCurrentNode().appendChild(nd);
+                        return;
+                    } else if (nd instanceof DocumentFragment) {
+                        nd = dw.getDocument().importNode(nd, true);
+                        dw.getCurrentNode().appendChild(nd);
+                        return;
+                    }
+                }
+                StaxUtils.writeNode(nd, writer, true);
             } else {
                 Source s = (Source) obj;
                 if (s instanceof DOMSource

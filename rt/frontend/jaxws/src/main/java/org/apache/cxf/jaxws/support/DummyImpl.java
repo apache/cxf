@@ -18,13 +18,11 @@
  */
 package org.apache.cxf.jaxws.support;
 
+import javax.jws.soap.SOAPBinding;
+import javax.jws.soap.SOAPBinding.ParameterStyle;
+
 // this class do nothing here, just for a dispatch impl
-public class DummyImpl {
-//    public void invokeOneWay(Object o) {
-//        
-//    }
-//    
-//    public Object invoke(Object o) {
-//        return null;
-//    }
+@SOAPBinding(parameterStyle = ParameterStyle.BARE)
+public interface DummyImpl {
+
 }

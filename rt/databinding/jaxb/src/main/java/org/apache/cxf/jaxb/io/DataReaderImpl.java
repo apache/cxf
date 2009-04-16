@@ -41,16 +41,22 @@ import org.apache.cxf.service.model.MessagePartInfo;
 public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
     JAXBDataBinding databinding;
+    boolean unwrapJAXBElement = true;
     
-    public DataReaderImpl(JAXBDataBinding binding) {
+    public DataReaderImpl(JAXBDataBinding binding, boolean unwrap) {
         super(binding.getContext());
+        unwrapJAXBElement = unwrap;
         databinding = binding;
     }
 
     public Object read(T input) {
         return read(null, input);
     }
-    
+    public void setProperty(String prop, Object value) {
+        if (prop.equals(JAXBDataBinding.UNWRAP_JAXB_ELEMENT)) {
+            unwrapJAXBElement = Boolean.TRUE.equals(value);
+        }
+    }
     private Unmarshaller createUnmarshaller() {
         try {
             Unmarshaller um = null;

@@ -191,7 +191,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
             disp.invoke(soapReq);
             fail("Did not get expected exception");
         } catch (SOAPFaultException e) {
-            assertTrue("Did not get expected exception message",  e.getMessage()
+            assertTrue("Did not get expected exception message: " + e.getMessage(),  e.getMessage()
                        .indexOf("is not valid in PAYLOAD mode with SOAP/HTTP binding") > -1);
         }
     }

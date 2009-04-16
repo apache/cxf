@@ -36,6 +36,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
@@ -45,6 +46,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.GreeterImpl;
@@ -85,6 +88,12 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class));
+    }
+    
+    @org.junit.Before
+    public void setUp() {
+        BusFactory.getDefaultBus().getOutInterceptors().add(new LoggingOutInterceptor());
+        BusFactory.getDefaultBus().getInInterceptors().add(new LoggingInInterceptor());
     }
 
     @Test
@@ -210,6 +219,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testDOMSourcePAYLOAD() throws Exception {
+        
         /*URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
@@ -232,8 +242,15 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         
         assertNotNull(domResMsg);
         String expected = "Hello TestSOAPInputMessage";
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, domResMsg.getNode()
-            .getTextContent().trim());
+        
+        Node node = domResMsg.getNode();
+        assertNotNull(node);
+        if (node instanceof Document) {
+            node = ((Document)node).getDocumentElement();
+        }
+        String content = node.getTextContent();
+        assertNotNull(content);
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, content.trim());
 
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq1.xml");
         SOAPMessage soapReqMsg1 = MessageFactory.newInstance().createMessage(null, is1);
@@ -251,8 +268,16 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         DOMSource domRespMsg2 = (DOMSource)response.get();
         assertNotNull(domRespMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2, domRespMsg2.getNode()
-            .getTextContent().trim());
+        
+        node = domRespMsg2.getNode();
+        assertNotNull(node);
+        if (node instanceof Document) {
+            node = ((Document)node).getDocumentElement();
+        }
+        content = node.getTextContent();
+        assertNotNull(content);
+
+        assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2, content.trim());
 
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
         SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
