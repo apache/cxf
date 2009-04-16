@@ -173,6 +173,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testAddGetBookAegis() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks4/bookstore/books/aegis"; 
+        getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
+    }
+    
+    @Test
     public void testAddValidBookJson() throws Exception {
         doPost("http://localhost:9080/the/bookstore/books/convert",
                200,

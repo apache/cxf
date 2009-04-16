@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,6 +42,8 @@ import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
+@Produces({"application/xml", "application/*+xml", "text/xml" })
+@Consumes({"application/xml", "application/*+xml", "text/xml" })
 public final class AegisElementProvider extends AbstractAegisProvider  {
     
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 

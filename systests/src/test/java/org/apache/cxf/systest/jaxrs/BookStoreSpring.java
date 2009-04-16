@@ -106,6 +106,17 @@ public class BookStoreSpring {
         return b;
     }
     
+    @GET
+    @Path("books/aegis")
+    @Produces({"application/html;q=1.0", "application/xml;q=0.5", "application/json;q=0.5" })
+    public Book getBookAegis() {
+        // how to have Book2 populated ?
+        Book b = new Book();
+        b.setId(124);
+        b.setName("CXF in Action - 2");
+        return b;
+    }
+    
     
     
     final void init() {
