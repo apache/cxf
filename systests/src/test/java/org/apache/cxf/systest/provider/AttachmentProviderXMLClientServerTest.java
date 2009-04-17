@@ -64,8 +64,8 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
         assertTrue("wrong content type", connection.getContentType().contains("multipart/related"));
         String input = IOUtils.toString(connection.getInputStream());
         
-        int idx = input.indexOf("-----");
-        int idx2 = input.indexOf("-----", idx + 5);
+        int idx = input.indexOf("--uuid");
+        int idx2 = input.indexOf("--uuid", idx + 5);
         String root = input.substring(idx, idx2);
         idx = root.indexOf("\r\n\r\n");
         root = root.substring(idx).trim();

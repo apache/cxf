@@ -240,6 +240,8 @@ public class AttachmentDeserializerTest extends Assert {
         assertTrue(attIs.read() == 'a');
         assertTrue(attIs.read() == 'r');
         assertTrue(attIs.read() == -1);
+        
+        assertFalse(itr.hasNext());
     }
     
     @Test

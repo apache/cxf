@@ -52,7 +52,7 @@ public class AttachmentDeserializer {
     // TODO: Is there a better way to detect boundaries in the message content?
     // It seems constricting to assume the boundary will start with ----=_Part_
     private static final Pattern INPUT_STREAM_BOUNDARY_PATTERN =
-            Pattern.compile("^--(----=_Part_\\S*)", Pattern.MULTILINE);
+            Pattern.compile("^--(\\S*)");
 
     private boolean lazyLoading = true;
 

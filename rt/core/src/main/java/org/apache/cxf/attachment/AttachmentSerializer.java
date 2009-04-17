@@ -48,8 +48,8 @@ public class AttachmentSerializer {
      */
     public void writeProlog() throws IOException {
         // Create boundary for body
-        bodyBoundary = AttachmentUtil.getUniqueBoundaryValue(0);
-        
+        bodyBoundary = AttachmentUtil.getUniqueBoundaryValue();
+
         String bodyCt = (String) message.get(Message.CONTENT_TYPE);
         bodyCt = bodyCt.replaceAll("\"", "\\\"");
         
