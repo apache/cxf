@@ -1,0 +1,1 @@
+<ns1:Book xmlns:ns1="http://jaxrs.systest.cxf.apache.org" xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="ns1:Book"><ns1:id>124</ns1:id><ns1:name>CXF in Action - 2</ns1:name></ns1:Book>
