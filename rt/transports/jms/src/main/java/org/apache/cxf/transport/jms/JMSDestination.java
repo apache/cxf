@@ -176,12 +176,15 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             inMessage.setDestination(this);
-
-            inMessage.put(ContinuationProvider.class.getName(), 
-                          new JMSContinuationProvider(bus,
-                                                      inMessage,
-                                                      incomingObserver,
-                                                      continuations));
+            if (jmsConfig.getMaxSuspendedContinuations() != 0) {
+                inMessage.put(ContinuationProvider.class.getName(), 
+                              new JMSContinuationProvider(bus,
+                                                          inMessage,
+                                                          incomingObserver,
+                                                          continuations,
+                                                          jmsListener,
+                                                          jmsConfig));
+            }
             
             BusFactory.setThreadDefaultBus(bus);
 

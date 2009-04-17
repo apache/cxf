@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.util.logging.Logger;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -26,6 +28,7 @@ import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.naming.NamingException;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
@@ -40,6 +43,8 @@ import org.springframework.jms.support.destination.DestinationResolver;
  */
 public final class JMSFactory {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSFactory.class);
+    
     private JMSFactory() {
     }
 
@@ -140,6 +145,12 @@ public final class JMSFactory {
             jmsListener.setCacheLevelName(jmsConfig.getCacheLevelName());
         } else if (jmsConfig.getCacheLevel() != JMSConfiguration.DEFAULT_VALUE) {
             jmsListener.setCacheLevel(jmsConfig.getCacheLevel());
+        }
+        if (jmsListener.getCacheLevel() >= DefaultMessageListenerContainer.CACHE_CONSUMER
+            && jmsConfig.getMaxSuspendedContinuations() > 0) {
+            LOG.info("maxSuspendedContinuations value will be ignored - "
+                     + ", please set cacheLevel to the value less than "
+                     + " org.springframework.jms.listener.DefaultMessageListenerContainer.CACHE_CONSUMER");
         }
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
         if (!userCID && messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {

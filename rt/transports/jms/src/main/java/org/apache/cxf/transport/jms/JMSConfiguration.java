@@ -64,6 +64,7 @@ public class JMSConfiguration implements InitializingBean {
     private int concurrentConsumers = 1;
     private int maxConcurrentConsumers = 1;
     private int maxConcurrentTasks = 10;
+    private int maxSuspendedContinuations = DEFAULT_VALUE;
 
     private volatile String messageSelector;
     private boolean subscriptionDurable;
@@ -317,6 +318,14 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setMaxConcurrentConsumers(int maxConcurrentConsumers) {
         this.maxConcurrentConsumers = maxConcurrentConsumers;
+    }
+    
+    public int getMaxSuspendedContinuations() {
+        return maxSuspendedContinuations;
+    }
+
+    public void setMaxSuspendedContinuations(int maxSuspendedContinuations) {
+        this.maxSuspendedContinuations = maxSuspendedContinuations;
     }
 
     public TaskExecutor getTaskExecutor() {

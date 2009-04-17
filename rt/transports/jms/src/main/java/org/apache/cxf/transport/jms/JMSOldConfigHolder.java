@@ -87,7 +87,9 @@ public class JMSOldConfigHolder {
             }
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);
-            jmsConfig.setMessageSelector(serverBehavior.getMessageSelector());        
+            if (jmsConfig.getMessageSelector() == null) {
+                jmsConfig.setMessageSelector(serverBehavior.getMessageSelector());
+            }
             if (isConduit && runtimePolicy.isSetMessageType()) {
                 jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
             }        
