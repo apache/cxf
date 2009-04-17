@@ -36,7 +36,8 @@ public class JMSContinuationProviderTest extends Assert {
         exchange.setOneWay(true);
         Message m = new MessageImpl();
         m.setExchange(exchange);
-        JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null);
+        JMSContinuationProvider provider = 
+            new JMSContinuationProvider(null, m, null, null, null, null);
         assertNull(provider.getContinuation());
     }
     
@@ -44,7 +45,8 @@ public class JMSContinuationProviderTest extends Assert {
     public void testGetNewContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null);
+        JMSContinuationProvider provider = 
+            new JMSContinuationProvider(null, m, null, null, null, null);
         Continuation cw = provider.getContinuation(); 
         assertTrue(cw.isNew());
         assertSame(cw, m.get(JMSContinuation.class));
@@ -54,9 +56,9 @@ public class JMSContinuationProviderTest extends Assert {
     public void testGetExistingContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        JMSContinuation cw = new JMSContinuation(null, m, null, null);
+        JMSContinuation cw = new JMSContinuation(null, m, null, null, null, null);
         m.put(JMSContinuation.class, cw);
-        JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null);
+        JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null, null, null);
         assertSame(cw, provider.getContinuation());
         assertSame(cw, m.get(JMSContinuation.class));
     }

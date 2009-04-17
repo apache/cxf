@@ -22,20 +22,31 @@ package org.apache.cxf.transport.jms.continuations;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.jms.JMSConfiguration;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class JMSContinuation implements Continuation {
 
+    static final String BOGUS_MESSAGE_SELECTOR = "org.apache.cxf.transports.jms.continuations=too-many";
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSContinuation.class);
+    
     private Bus bus;
     private Message inMessage;
     private MessageObserver incomingObserver;
     private Collection<JMSContinuation> continuations;
+    private DefaultMessageListenerContainer jmsListener;
+    private JMSConfiguration jmsConfig;
+    
+    private String currentMessageSelector = BOGUS_MESSAGE_SELECTOR;
     
     private Object userObject;
     
@@ -44,14 +55,16 @@ public class JMSContinuation implements Continuation {
     private boolean isResumed;
     private Timer timer = new Timer();
     
-    public JMSContinuation(Bus b,
-                                  Message m, 
-                                  MessageObserver observer,
-                                  Collection<JMSContinuation> cList) {
+    public JMSContinuation(Bus b, Message m, MessageObserver observer,
+                           Collection<JMSContinuation> cList, 
+                           DefaultMessageListenerContainer jmsListener,
+                           JMSConfiguration jmsConfig) {
         bus = b;
         inMessage = m;    
         incomingObserver = observer;
         continuations = cList;
+        this.jmsListener = jmsListener;
+        this.jmsConfig = jmsConfig;
     }    
     
     public Object getObject() {
@@ -87,7 +100,8 @@ public class JMSContinuation implements Continuation {
     }
     
     protected void doResume() {
-        continuations.remove(this);
+        
+        updateContinuations(true);
         
         BusFactory.setThreadDefaultBus(bus);
         try {
@@ -108,8 +122,8 @@ public class JMSContinuation implements Continuation {
             return false;
         }
         
-        continuations.add(this);
-        
+        updateContinuations(false);
+                
         isNew = false;
         isResumed = false;
         isPending = true;
@@ -136,4 +150,47 @@ public class JMSContinuation implements Continuation {
     protected void cancelTimerTask() {
         timer.cancel();
     }
+    
+    protected void updateContinuations(boolean remove) {
+
+        modifyList(remove);
+        
+        if (jmsConfig.getMaxSuspendedContinuations() < 0
+            || jmsListener.getCacheLevel() >= DefaultMessageListenerContainer.CACHE_CONSUMER) {
+            return;
+        }
+        
+        // throttle the flow if there're too many continuation instances in memory
+        if (remove && !BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
+            LOG.fine("A number of continuations has dropped below the limit of "
+                     + jmsConfig.getMaxSuspendedContinuations()
+                     + ", resetting JMS MessageSelector to " + currentMessageSelector);
+            jmsListener.setMessageSelector(currentMessageSelector);
+            currentMessageSelector = BOGUS_MESSAGE_SELECTOR;
+        } else if (!remove && continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
+            currentMessageSelector = jmsListener.getMessageSelector();
+            if (!BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
+                LOG.fine("A number of continuations has reached the limit of "
+                         + jmsConfig.getMaxSuspendedContinuations()
+                         + ", setting JMS MessageSelector to " + BOGUS_MESSAGE_SELECTOR);
+                jmsListener.setMessageSelector(BOGUS_MESSAGE_SELECTOR);
+                
+            }
+        }
+
+    }
+    
+    protected void modifyList(boolean remove) {
+        if (remove) {
+            continuations.remove(this);
+        } else {
+            continuations.add(this);
+        }
+    }
+    
+    String getCurrentMessageSelector() {
+        return currentMessageSelector;
+    }
+    
+    
 }

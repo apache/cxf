@@ -28,10 +28,13 @@ import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
+
 
 
 public class JMSContinuationTest extends Assert {
@@ -52,7 +55,7 @@ public class JMSContinuationTest extends Assert {
     @Test
     public void testInitialStatus() {
         JMSContinuation cw = 
-            new JMSContinuation(b, m, observer, continuations);
+            new JMSContinuation(b, m, observer, continuations, null, null);
         assertTrue(cw.isNew());
         assertFalse(cw.isPending());
         assertFalse(cw.isResumed());
@@ -61,7 +64,7 @@ public class JMSContinuationTest extends Assert {
     @Test
     public void testSuspendResume() {
         TestJMSContinuationWrapper cw = 
-            new TestJMSContinuationWrapper(b, m, observer, continuations);
+            new TestJMSContinuationWrapper(b, m, observer, continuations, null, new JMSConfiguration());
         try {
             cw.suspend(5000);
             fail("SuspendInvocation exception expected");
@@ -96,9 +99,58 @@ public class JMSContinuationTest extends Assert {
     }
     
     @Test
+    public void testThrottleWithMessageSelector() {
+        
+        DefaultMessageListenerContainer springContainer = new DefaultMessageListenerContainer();
+        springContainer.setCacheLevel(2);
+        JMSConfiguration config = new JMSConfiguration();
+        config.setMaxSuspendedContinuations(1);
+        
+        TestJMSContinuationWrapper cw = 
+            new TestJMSContinuationWrapper(b, m, observer, continuations,
+                                           springContainer, config);
+        
+        assertNull(springContainer.getMessageSelector());
+        assertEquals(JMSContinuation.BOGUS_MESSAGE_SELECTOR, cw.getCurrentMessageSelector());
+        
+        suspendResumeCheckSelector(cw, springContainer);
+        EasyMock.reset(observer);
+        suspendResumeCheckSelector(cw, springContainer);
+        
+    }
+    
+    private void suspendResumeCheckSelector(JMSContinuation cw, 
+                                            DefaultMessageListenerContainer springContainer) {
+        try {
+            cw.suspend(5000);
+            fail("SuspendInvocation exception expected");
+        } catch (SuspendedInvocationException ex) {
+            // ignore
+        }
+        assertEquals(continuations.size(), 1);
+        assertSame(continuations.get(0), cw);
+        
+        assertFalse(cw.suspend(1000));
+        
+        assertEquals(JMSContinuation.BOGUS_MESSAGE_SELECTOR, springContainer.getMessageSelector());
+        assertNull(cw.getCurrentMessageSelector());        
+        
+        observer.onMessage(m);
+        EasyMock.expectLastCall();
+        EasyMock.replay(observer);
+        
+        cw.resume();
+        
+        assertEquals(continuations.size(), 0);
+        EasyMock.verify(observer);
+        
+        assertNull(springContainer.getMessageSelector());
+        assertEquals(JMSContinuation.BOGUS_MESSAGE_SELECTOR, cw.getCurrentMessageSelector());
+    }
+    
+    @Test
     public void testUserObject() {
-        JMSContinuation cw = 
-            new JMSContinuation(b, m, observer, continuations);
+        JMSContinuation cw = new JMSContinuation(b, m, observer, continuations, null, null);
         assertNull(cw.getObject());
         Object userObject = new Object();
         cw.setObject(userObject);
@@ -113,8 +165,10 @@ public class JMSContinuationTest extends Assert {
         public TestJMSContinuationWrapper(Bus b,
                                           Message m, 
                                           MessageObserver observer,
-                                          List<JMSContinuation> cList) {
-            super(b, m, observer, cList);
+                                          List<JMSContinuation> cList,
+                                          DefaultMessageListenerContainer jmsListener,
+                                          JMSConfiguration jmsConfig) {
+            super(b, m, observer, cList, jmsListener, jmsConfig);
         }
         
         public void createTimerTask(long timeout) {

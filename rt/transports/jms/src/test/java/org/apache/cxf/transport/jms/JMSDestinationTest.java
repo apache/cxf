@@ -127,6 +127,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
         jmsConfig = destination.getJmsConfig();*/
         assertEquals("The concurrentConsumer should be set", jmsConfig.getConcurrentConsumers(), 3);
         assertEquals("The maxConcurrentConsumer should be set", jmsConfig.getMaxConcurrentConsumers(), 5);
+        assertEquals("The maxSuspendedContinuations should be set", 
+                     jmsConfig.getMaxSuspendedContinuations(), 2);
         assertNotNull("The connectionFactory should not be null", jmsConfig.getConnectionFactory());
         assertTrue("Should get the instance of ActiveMQConnectionFactory", 
                    jmsConfig.getConnectionFactory() instanceof ActiveMQConnectionFactory);

@@ -31,6 +31,11 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     
     <jms:conduit name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-conduit">
       <jms:clientConfig clientReceiveTimeout="500000" messageTimeToLive="500000"/>
+      <jms:address jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport.text">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
       <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
     
@@ -44,7 +49,25 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     
   <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration"
     p:connectionFactory-ref="singleConnectionFactory" 
-  	p:concurrentConsumers="10"
-  	p:maxConcurrentConsumers="10"/>
+  	p:concurrentConsumers="1"
+  	p:maxConcurrentConsumers="1"/>
+
+  <jms:destination name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-destination">     
+      <jms:address jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport.text">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+      <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>  
+  </jms:destination>
+
+  <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration"
+  	p:connectionFactory-ref="jmsConnectionFactory"
+  	p:timeToLive="500000"
+  	p:concurrentConsumers="1"
+  	p:maxConcurrentConsumers="1"
+  	p:maxSuspendedContinuations="1"
+  	p:cacheLevel="2"
+  />  
 
 </beans>

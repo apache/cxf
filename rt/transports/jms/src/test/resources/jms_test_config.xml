@@ -107,6 +107,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   	p:usingEndpointInfo="false"
   	p:concurrentConsumers="3"
   	p:maxConcurrentConsumers="5"
+  	p:maxSuspendedContinuations="2"
   />    
  
 <!--

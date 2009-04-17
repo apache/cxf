@@ -36,10 +36,11 @@ import org.apache.cxf.systest.http_jetty.continuations.HelloContinuationService;
 import org.apache.cxf.systest.http_jetty.continuations.HelloWorker;
 import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class HelloWorldContinuationsClientServerTest extends AbstractBusClientServerTestBase {
+public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServerTestBase {
     
     private static boolean serversStarted;
     private static final String CONFIG_FILE =
@@ -61,7 +62,7 @@ public class HelloWorldContinuationsClientServerTest extends AbstractBusClientSe
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
 
         assertTrue("server did not launch correctly", 
-                   launchServer(Server2.class));
+                   launchServer(Server3.class));
         serversStarted = true;
     }
     
@@ -73,7 +74,7 @@ public class HelloWorldContinuationsClientServerTest extends AbstractBusClientSe
         
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
-        URL wsdlURL = getClass().getResource("/org/apache/cxf/systest/jms/continuations/test.wsdl");
+        URL wsdlURL = getClass().getResource("/org/apache/cxf/systest/jms/continuations/test2.wsdl");
         
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);
@@ -85,14 +86,19 @@ public class HelloWorldContinuationsClientServerTest extends AbstractBusClientSe
         CountDownLatch helloDoneSignal = new CountDownLatch(5);
         
         executor.execute(new HelloWorker(helloPort, "Fred", "", startSignal, helloDoneSignal));
+        startSignal.countDown();
+        
+        Thread.sleep(10000);
+                
         executor.execute(new HelloWorker(helloPort, "Barry", "Jameson", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Harry", "", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Rob", "Davidson", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "James", "ServiceMix", startSignal, helloDoneSignal));
         
-        startSignal.countDown();
+                
         helloDoneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
+        System.out.println("Completed : " + (5 - helloDoneSignal.getCount()));
         assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());
     }
         
