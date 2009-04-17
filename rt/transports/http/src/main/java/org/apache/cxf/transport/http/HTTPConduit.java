@@ -817,7 +817,7 @@ public class HTTPConduit
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
             headers = new LinkedHashMap<String, List<String>>();
-        } else {
+        } else if (headers instanceof HashMap) {
             headers = new LinkedHashMap<String, List<String>>(headers);
         }
         message.put(Message.PROTOCOL_HEADERS, headers);
