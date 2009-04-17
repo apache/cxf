@@ -203,10 +203,10 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     public static void deleteRefFile() throws Exception {
         File file = new File("./TypeTest.ref");
         file.delete();
-        for (String s : RUN_TESTS) {
-            System.out.println(s);
-        }
-        System.out.println(RUN_TESTS.size());
+        //for (String s : RUN_TESTS) {
+            //System.out.println(s);
+        //}
+        //System.out.println(RUN_TESTS.size());
     }
 
     public boolean shouldRunTest(String name) {
