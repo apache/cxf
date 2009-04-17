@@ -24,12 +24,15 @@ import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
+
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.Greeter;
@@ -55,8 +58,16 @@ public class GreeterSessionImpl implements Greeter {
         LOG.info("Executing operation greetMe");        
         LOG.info("Message received: " + me);
         MessageContext mc = context.getMessageContext();
-        HttpSession session = ((javax.servlet.http.HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST))
-            .getSession();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        Cookie cookies[] = req.getCookies();
+        String val = "";
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                val += ";" + cookie.getName() + "=" + cookie.getValue();
+            }
+        }
+        
+        HttpSession session = req.getSession();
         // Get a session property "counter" from context
         if (session == null) {
             throw new WebServiceException("No session in WebServiceContext");
@@ -69,7 +80,7 @@ public class GreeterSessionImpl implements Greeter {
         
         session.setAttribute("name", me);
         
-        return "Hello " + name;
+        return "Hello " + name + val;
     }
     
 
