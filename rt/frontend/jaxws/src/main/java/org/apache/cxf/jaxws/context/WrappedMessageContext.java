@@ -343,6 +343,7 @@ public class WrappedMessageContext implements MessageContext {
         if (!MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(mappedKey)) {
             scopes.put(mappedKey, scope);
         }
+        Object ret = null;
         if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
             || MessageContext.HTTP_RESPONSE_CODE.equals(key)
             || MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)
@@ -356,7 +357,6 @@ public class WrappedMessageContext implements MessageContext {
                     return tmp.put(mappedKey, value);
                 }
             }
-            return null;
         } else if (BindingProvider.USERNAME_PROPERTY.equals(key)) {
             AuthorizationPolicy authPolicy =
                 (AuthorizationPolicy)message.get(AuthorizationPolicy.class.getName());
@@ -364,9 +364,8 @@ public class WrappedMessageContext implements MessageContext {
                 authPolicy = new AuthorizationPolicy();
                 message.put(AuthorizationPolicy.class.getName(), authPolicy);
             }
-            String ret = authPolicy.getUserName();
+            ret = authPolicy.getUserName();
             authPolicy.setUserName((String)value);
-            return ret;
         } else if (BindingProvider.PASSWORD_PROPERTY.equals(key)) {
             AuthorizationPolicy authPolicy =
                 (AuthorizationPolicy)message.get(AuthorizationPolicy.class.getName());
@@ -374,12 +373,14 @@ public class WrappedMessageContext implements MessageContext {
                 authPolicy = new AuthorizationPolicy();
                 message.put(AuthorizationPolicy.class.getName(), authPolicy);
             }
-            String ret = authPolicy.getPassword();
+            ret = authPolicy.getPassword();
             authPolicy.setPassword((String)value);
-            return ret;
+        } else if (MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+            ret = message.put(Message.PROTOCOL_HEADERS, value);
         } else {
-            return message.put(mappedKey, value);
+            ret = message.put(mappedKey, value);
         }
+        return ret;
     }
 
     public final void putAll(Map<? extends String, ? extends Object> t) {

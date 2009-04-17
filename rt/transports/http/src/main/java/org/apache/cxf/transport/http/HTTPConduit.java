@@ -564,11 +564,23 @@ public class HTTPConduit
         //Do we need to maintain a session?
         maintainSession = Boolean.TRUE.equals((Boolean)message.get(Message.MAINTAIN_SESSION));
         
-        //If we have any cookies and we are maintaining sessions, then use them
+        //If we have any cookies and we are maintaining sessions, then use them        
         if (maintainSession && sessionCookies.size() > 0) {
+            List<String> cookies = null;
+            for (String s : headers.keySet()) {
+                if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(s)) {
+                    cookies = headers.remove(s);
+                    break;
+                }
+            }
+            if (cookies == null) {
+                cookies = new ArrayList<String>();
+            } else {
+                cookies = new ArrayList<String>(cookies);
+            }
+            headers.put(HttpHeaderHelper.COOKIE, cookies);
             for (Cookie c : sessionCookies.values()) {
-                connection.addRequestProperty(HttpHeaderHelper.COOKIE, 
-                                              c.requestCookieHeader());
+                cookies.add(c.requestCookieHeader());
             }
         }
 
@@ -805,8 +817,10 @@ public class HTTPConduit
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
             headers = new LinkedHashMap<String, List<String>>();
-            message.put(Message.PROTOCOL_HEADERS, headers);
+        } else {
+            headers = new LinkedHashMap<String, List<String>>(headers);
         }
+        message.put(Message.PROTOCOL_HEADERS, headers);
         return headers;
     }
     
@@ -822,14 +836,20 @@ public class HTTPConduit
         Map<String, List<String>> headers = getSetProtocolHeaders(message);
         for (String header : headers.keySet()) {
             List<String> headerList = headers.get(header);
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < headerList.size(); i++) {
-                b.append(headerList.get(i));
-                if (i + 1 < headerList.size()) {
-                    b.append(',');
+            if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
+                for (String s : headerList) {
+                    connection.addRequestProperty(HttpHeaderHelper.COOKIE, s);
                 }
+            } else {
+                StringBuilder b = new StringBuilder();
+                for (int i = 0; i < headerList.size(); i++) {
+                    b.append(headerList.get(i));
+                    if (i + 1 < headerList.size()) {
+                        b.append(',');
+                    }
+                }
+                connection.setRequestProperty(header, b.toString());
             }
-            connection.setRequestProperty(header, b.toString());
         }
         if (!connection.getRequestProperties().containsKey("User-Agent")) {
             connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
