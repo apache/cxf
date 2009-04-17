@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
@@ -45,6 +46,8 @@ import org.apache.cxf.message.Attachment;
 public final class AttachmentUtil {
     private static volatile int counter;
     private static final String ATT_UUID = UUID.randomUUID().toString();
+    
+    private static final Random BOUND_RANDOM = new Random();
     
     private AttachmentUtil() {
 
@@ -73,12 +76,27 @@ public final class AttachmentUtil {
         return URLEncoder.encode(name, "UTF-8") + "@" + URLEncoder.encode(cid, "UTF-8");
     }
 
-    public static String getUniqueBoundaryValue(int part) {
-        StringBuffer s = new StringBuffer();
-        // Unique string is ----=_Part_<part>_<hashcode>.<currentTime>
-        s.append("----=_Part_").append(part++).append("_").append(s.hashCode()).append('.').append(
-                System.currentTimeMillis());
-        return s.toString();
+    public static String getUniqueBoundaryValue() {
+        //generate a random UUID.
+        //we don't need the cryptographically secure random uuid that
+        //UUID.randomUUID() will produce.  Thus, use a faster
+        //pseudo-random thing
+        long leastSigBits = 0;
+        long mostSigBits = 0;
+        synchronized (BOUND_RANDOM) {
+            mostSigBits = BOUND_RANDOM.nextLong();
+            leastSigBits = BOUND_RANDOM.nextLong();
+        }
+        
+        mostSigBits &= 0xFFFFFFFFFFFF0FFFL;  //clear version
+        mostSigBits |= 0x0000000000004000L;  //set version
+
+        leastSigBits &= 0x3FFFFFFFFFFFFFFFL; //clear the variant
+        leastSigBits |= 0x8000000000000000L; //set to IETF variant
+        
+        UUID result = new UUID(mostSigBits, leastSigBits);
+        
+        return "uuid:" + result.toString();
     }
 
     public static String getAttchmentPartHeader(Attachment att) {
@@ -88,7 +106,11 @@ public final class AttachmentUtil {
         if (att.isXOP()) {
             buffer.append("Content-Transfer-Encoding: binary\r\n");
         }
-        buffer.append("Content-ID: <" + att.getId() + ">\r\n\r\n");
+        String id = att.getId();
+        if (id.charAt(0) == '<') {
+            id = id.substring(1, id.length() - 1);
+        }
+        buffer.append("Content-ID: <" + id + ">\r\n\r\n");
         return buffer.toString();
     }
 
