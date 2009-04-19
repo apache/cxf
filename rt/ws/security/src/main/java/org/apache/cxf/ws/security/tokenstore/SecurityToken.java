@@ -81,7 +81,7 @@ public class SecurityToken {
     /**
      * The RequestedUnattachedReference element
      * NOTE : The oasis-200401-wss-soap-message-security-1.0 spec allows 
-     * an extensibility mechanism for wsse:SecurityTokenRefence and 
+     * an extensibility mechanism for wsse:SecurityTokenReference and 
      * wsse:Reference. Hence we cannot limit to the 
      * wsse:SecurityTokenReference\wsse:Reference case and only hold the URI and 
      * the ValueType values.
