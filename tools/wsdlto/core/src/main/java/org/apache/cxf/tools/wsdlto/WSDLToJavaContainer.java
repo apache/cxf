@@ -19,9 +19,11 @@
 
 package org.apache.cxf.tools.wsdlto;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -94,130 +96,168 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         return WSDLConstants.getVersion(version);
     }
 
-    @SuppressWarnings("unchecked")
     public void execute() throws ToolException {
-        if (!hasInfoOption()) {
-            // TODO: After runtime support w3c EPR mapping ,this will be removed
-            //context.put(ToolConstants.CFG_NO_ADDRESS_BINDING, 
-            //            ToolConstants.CFG_NO_ADDRESS_BINDING);
-            buildToolContext();
-            validate(context);
-            FrontEndProfile frontend = context.get(FrontEndProfile.class);
+        if (hasInfoOption()) {
+            return;
+        }
 
-            if (frontend == null) {
-                throw new ToolException(new Message("FOUND_NO_FRONTEND", LOG));
-            }
+        buildToolContext();
+        
+        boolean isWsdlList = context.optionSet(ToolConstants.CFG_WSDLLIST);
 
-            WSDLConstants.WSDLVersion version = getWSDLVersion();
+        if (isWsdlList) {
+            try {
+                ToolContext initialContextState = context.makeCopy();
+                String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
+                wsdlURL = URIParserUtil.getAbsoluteURI(wsdlURL);
 
-            String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
-            List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
-            if (serviceList == null) {
-                serviceList = new ArrayList<ServiceInfo>();
+                URL url = new URL(wsdlURL);
+                InputStream is = (InputStream)url.getContent();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                String tempLine = null;
+                while ((tempLine = reader.readLine()) != null) {                    
+                    ToolContext freshContext = initialContextState.makeCopy();
+                    freshContext.put(ToolConstants.CFG_WSDLURL, tempLine);
+                    setContext(freshContext);
+                    buildToolContext();
+                    
+                    processWsdl();
+                }
+            } catch (IOException e) {
+                throw new ToolException(e);
+            }       
+        } else {
+            processWsdl();
+        }
+    }
 
-                // Build the ServiceModel from the WSDLModel
-                if (version == WSDLConstants.WSDLVersion.WSDL11) {
-                    AbstractWSDLBuilder<Definition> builder = (AbstractWSDLBuilder<Definition>)frontend
-                        .getWSDLBuilder();
-                    builder.setContext(context);
-                    builder.setBus(getBus());
-                    context.put(Bus.class, getBus());
-                    wsdlURL = URIParserUtil.getAbsoluteURI(wsdlURL);
-                    builder.build(wsdlURL);
-                    builder.customize();
-                    Definition definition = builder.getWSDLModel();
+    private void processWsdl() {
+        // TODO: After runtime support w3c EPR mapping ,this will be removed
+        //context.put(ToolConstants.CFG_NO_ADDRESS_BINDING, 
+        //            ToolConstants.CFG_NO_ADDRESS_BINDING);
+        validate(context);
+        FrontEndProfile frontend = context.get(FrontEndProfile.class);
 
-                    context.put(Definition.class, definition);
+        if (frontend == null) {
+            throw new ToolException(new Message("FOUND_NO_FRONTEND", LOG));
+        }
 
-                    builder.validate(definition);
+        WSDLConstants.WSDLVersion version = getWSDLVersion();
 
-                    WSDLServiceBuilder serviceBuilder = new WSDLServiceBuilder(getBus());
-                    serviceBuilder.setIgnoreUnknownBindings(true);
-                    String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
+        String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
 
-                    if (serviceName != null) {
-                        List<ServiceInfo> services = serviceBuilder
-                            .buildServices(definition, getServiceQName(definition));
-                        serviceList.addAll(services);
-                    } else if (definition.getServices().size() > 0) {
-                        serviceList = serviceBuilder.buildServices(definition);
-                    } else {
-                        serviceList = serviceBuilder.buildMockServices(definition);
-                    }
+        @SuppressWarnings("unchecked")
+        List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
+        if (serviceList == null) {
+            serviceList = new ArrayList<ServiceInfo>();
 
+            // Build the ServiceModel from the WSDLModel
+            if (version == WSDLConstants.WSDLVersion.WSDL11) {
+                @SuppressWarnings("unchecked")
+                AbstractWSDLBuilder<Definition> builder = (AbstractWSDLBuilder<Definition>)frontend
+                    .getWSDLBuilder();
+                builder.setContext(context);
+                builder.setBus(getBus());
+                context.put(Bus.class, getBus());
+                wsdlURL = URIParserUtil.getAbsoluteURI(wsdlURL);
+                builder.build(wsdlURL);
+                builder.customize();
+                Definition definition = builder.getWSDLModel();
+
+                context.put(Definition.class, definition);
+
+                builder.validate(definition);
+
+                WSDLServiceBuilder serviceBuilder = new WSDLServiceBuilder(getBus());
+                serviceBuilder.setIgnoreUnknownBindings(true);
+                String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
+
+                if (serviceName != null) {
+                    List<ServiceInfo> services = serviceBuilder
+                        .buildServices(definition, getServiceQName(definition));
+                    serviceList.addAll(services);
+                } else if (definition.getServices().size() > 0) {
+                    serviceList = serviceBuilder.buildServices(definition);
                 } else {
-                    // TODO: wsdl2.0 support
+                    serviceList = serviceBuilder.buildMockServices(definition);
                 }
-            }
-            Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
 
-            Map<String, Element> schemas = (Map<String, Element>)serviceList.get(0)
-                .getProperty(WSDLServiceBuilder.WSDL_SCHEMA_ELEMENT_LIST);
-            if (schemas == null) {
-                schemas = new java.util.HashMap<String, Element>();
-                ServiceInfo serviceInfo = serviceList.get(0);
-                for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
-                    if (schemaInfo.getElement() != null && schemaInfo.getSystemId() == null) {
-                        String sysId = schemaInfo.getElement().getAttribute("targetNamespce");
-                        if (sysId == null) {
-                            sysId = serviceInfo.getTargetNamespace();
-                        }
-                        schemas.put(sysId, schemaInfo.getElement());
+            } else {
+                // TODO: wsdl2.0 support
+            }
+        }
+        context.put(ToolConstants.SERVICE_LIST, serviceList);
+        
+        Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Element> schemas = (Map<String, Element>)serviceList.get(0)
+            .getProperty(WSDLServiceBuilder.WSDL_SCHEMA_ELEMENT_LIST);
+        if (schemas == null) {
+            schemas = new java.util.HashMap<String, Element>();
+            ServiceInfo serviceInfo = serviceList.get(0);
+            for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
+                if (schemaInfo.getElement() != null && schemaInfo.getSystemId() == null) {
+                    String sysId = schemaInfo.getElement().getAttribute("targetNamespce");
+                    if (sysId == null) {
+                        sysId = serviceInfo.getTargetNamespace();
                     }
-                    if (schemaInfo.getElement() != null && schemaInfo.getSystemId() != null) {
-                        schemas.put(schemaInfo.getSystemId(), schemaInfo.getElement());
-                    }
+                    schemas.put(sysId, schemaInfo.getElement());
+                }
+                if (schemaInfo.getElement() != null && schemaInfo.getSystemId() != null) {
+                    schemas.put(schemaInfo.getSystemId(), schemaInfo.getElement());
                 }
             }
-            context.put(ToolConstants.SCHEMA_MAP, schemas);
-            context.put(ToolConstants.PORTTYPE_MAP, interfaces);
-            context.put(ClassCollector.class, new ClassCollector());
-            Processor processor = frontend.getProcessor();
-            if (processor instanceof ClassNameProcessor) {
-                processor.setEnvironment(context);
-                for (ServiceInfo service : serviceList) {
-
-                    context.put(ServiceInfo.class, service);
-
-                    ((ClassNameProcessor)processor).processClassNames();
-
-                    context.put(ServiceInfo.class, null);
-                }
-            }
-            generateTypes();
-
+        }
+        context.put(ToolConstants.SCHEMA_MAP, schemas);
+        
+        context.put(ToolConstants.PORTTYPE_MAP, interfaces);
+        context.put(ClassCollector.class, new ClassCollector());
+        Processor processor = frontend.getProcessor();
+        if (processor instanceof ClassNameProcessor) {
+            processor.setEnvironment(context);
             for (ServiceInfo service : serviceList) {
 
                 context.put(ServiceInfo.class, service);
 
-                validate(service);
+                ((ClassNameProcessor)processor).processClassNames();
 
-                // Build the JavaModel from the ServiceModel
-                processor.setEnvironment(context);
-                processor.process();
-
-                if (!isSuppressCodeGen()) {
-                    // Generate artifacts
-                    for (FrontEndGenerator generator : frontend.getGenerators()) {
-                        generator.generate(context);
-                    }
-                }
+                context.put(ServiceInfo.class, null);
             }
+        }
+        generateTypes();
 
-            // Build projects: compile classes and copy resources etc.
-            if (context.optionSet(ToolConstants.CFG_COMPILE)) {
-                new ClassUtils().compile(context);
-            }
+        for (ServiceInfo service : serviceList) {
 
-            if (context.isExcludeNamespaceEnabled()) {
-                try {
-                    removeExcludeFiles();
-                } catch (IOException e) {
-                    throw new ToolException(e);
+            context.put(ServiceInfo.class, service);
+
+            validate(service);
+
+            // Build the JavaModel from the ServiceModel
+            processor.setEnvironment(context);
+            processor.process();
+
+            if (!isSuppressCodeGen()) {
+                // Generate artifacts
+                for (FrontEndGenerator generator : frontend.getGenerators()) {
+                    generator.generate(context);
                 }
             }
         }
+        context.remove(ToolConstants.SERVICE_LIST);
 
+        // Build projects: compile classes and copy resources etc.
+        if (context.optionSet(ToolConstants.CFG_COMPILE)) {
+            new ClassUtils().compile(context);
+        }
+
+        if (context.isExcludeNamespaceEnabled()) {
+            try {
+                removeExcludeFiles();
+            } catch (IOException e) {
+                throw new ToolException(e);
+            }
+        }
     }
 
     private boolean isSuppressCodeGen() {
@@ -341,6 +381,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 }
             }
         }
+        
     }
 
     public void validate(ToolContext env) throws ToolException {

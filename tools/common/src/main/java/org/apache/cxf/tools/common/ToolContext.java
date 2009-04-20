@@ -96,7 +96,7 @@ public class ToolContext {
     public Object get(String key) {
         return (paramMap == null) ? null : paramMap.get(key);
     }
-
+    
     public Object get(String key, Object defaultValue) {
         if (!optionSet(key)) {
             return defaultValue;
@@ -257,4 +257,27 @@ public class ToolContext {
     public Map<String, String> getNamespacePackageMap() {
         return namespacePackageMap;
     }
+    
+    /**
+     * This method attempts to do a deep copy of items which may change in this ToolContext.
+     * The intent of this is to be able to take a snapshot of the state of the ToolContext
+     * after it's initialised so we can run a tool multiple times with the same setup
+     * while not having the state preserved between multiple runs. I didn't want 
+     * to call this clone() as it neither does a deep nor shallow copy. It does a mix
+     * based on my best guess at what changes and what doesn't.
+     */
+    public ToolContext makeCopy() {
+        ToolContext newCopy = new ToolContext();
+        
+        newCopy.javaModel = javaModel;
+        newCopy.paramMap = new HashMap<String, Object>(paramMap);
+        newCopy.packageName = packageName;
+        newCopy.namespacePackageMap = new HashMap<String, String>(namespacePackageMap);
+        newCopy.excludeNamespacePackageMap = new HashMap<String, String>(excludeNamespacePackageMap);
+        newCopy.jaxbBindingFiles = new ArrayList<InputSource>(jaxbBindingFiles);
+        newCopy.excludePkgList = new ArrayList<String>(excludePkgList);
+        newCopy.excludeFileList = new ArrayList<String>(excludeFileList);
+        
+        return newCopy;
+    }    
 }
