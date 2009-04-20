@@ -872,7 +872,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         }
 
         if (soapBindingInfo != null) {
-            isRPC = soapBindingInfo.getStyle().equals(WSDLConstants.RPC);
+            isRPC = WSDLConstants.RPC.equals(soapBindingInfo.getStyle());
         } else if (xml != null) {
             xmlBindingInfo = xml;
         }
