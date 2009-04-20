@@ -561,10 +561,16 @@ public class DynamicClientFactory {
                 }
                 for (URL url : urls) {
                     if (url.getProtocol().startsWith("file")) {
-                        File file; 
+                        File file;
+                        if (url.toURI().getPath() == null) {
+                            continue;
+                        }
                         try { 
                             file = new File(url.toURI().getPath()); 
                         } catch (URISyntaxException urise) { 
+                            if (url.getPath() == null) {
+                                continue;
+                            }
                             file = new File(url.getPath()); 
                         } 
 

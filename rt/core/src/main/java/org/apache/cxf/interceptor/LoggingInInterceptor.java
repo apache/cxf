@@ -83,6 +83,18 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
+    /**
+     * Transform the string before display. The implementation in this class 
+     * does nothing. Override this method if you want to change the contents of the 
+     * logged message before it is delivered to the output. 
+     * For example, you can use this to mask out sensitive information.
+     * @param originalLogString the raw log message.
+     * @return transformed data
+     */
+    protected String transform(String originalLogString) {
+        return originalLogString;
+    } 
+
     private void logging(Message message) throws Fault {
         String id = (String)message.getExchange().get(LoggingMessage.ID_KEY);
         if (id == null) {
@@ -139,9 +151,9 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         if (writer != null) {
-            writer.println(buffer.toString());
+            writer.println(transform(buffer.toString()));
         } else if (LOG.isLoggable(Level.INFO)) {
-            LOG.info(buffer.toString());
+            LOG.info(transform(buffer.toString()));
         }
     }
 }

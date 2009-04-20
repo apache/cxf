@@ -306,9 +306,16 @@ public class ServletController {
         if (!isHideServiceList) {
             List<ServletDestination> destinations = getServletDestinations();
 
+            boolean renderWsdlList = "true".equals(request.getParameter("wsdlList"));
+            
             for (ServletDestination sd : destinations) {
                 String address = sd.getEndpointInfo().getAddress();
                 response.getWriter().write(address);
+                
+                if (renderWsdlList) {
+                    response.getWriter().write("?wsdl");
+                }
+                
                 response.getWriter().write('\n');
             }
         }

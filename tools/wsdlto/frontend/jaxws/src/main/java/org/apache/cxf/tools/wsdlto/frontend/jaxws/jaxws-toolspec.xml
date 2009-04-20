@@ -315,6 +315,16 @@ Examples:
                 <switch>q</switch>
             </option>
 
+	        <option id="wsdlList" maxOccurs="1">
+	            <annotation>
+	                Indicates the wsdlurl is a plain text list of wsdlurls that are new line delimited.
+	                As an example the wsdlurl might point to 
+	                http://127.0.0.1:8080/context_path/ws?formatted=false&amp;wsdlList=true on a cxf 
+	                server. 
+	            </annotation>
+	            <switch>wsdlList</switch>
+	        </option>
+
         </optionGroup>
         <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
             <annotation>

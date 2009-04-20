@@ -459,6 +459,9 @@ public class WSDL2JavaMojo extends AbstractMojo {
             list.add("-wsdlLocation");
             list.add(wsdlOption.getWsdlLocation() == null ? "" : wsdlOption.getWsdlLocation());
         }
+        if (wsdlOption.isWsdlList()) {
+            list.add("-wsdlList");
+        }
         if (getLog().isDebugEnabled() && !list.contains("-verbose")) {
             list.add("-verbose");            
         }

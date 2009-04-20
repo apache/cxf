@@ -90,6 +90,12 @@ public class Option {
     String wsdlLocation = DEFAULT_WSDL_LOCATION;
 
     /**
+     * Specifies that the wsdlurl contains a plain text, new line delimited,
+     * list of wsdlurls instead of the wsdl itself.
+     */
+    boolean wsdlList;
+
+    /**
      * Specifies the frontend. Default is JAXWS. Currently supports only JAXWS frontend.
      */
     String frontEnd;
@@ -211,6 +217,14 @@ public class Option {
 
     public boolean isSetWsdlLocation() {
         return !DEFAULT_WSDL_LOCATION.equals(wsdlLocation);
+    }
+
+    public boolean isWsdlList() {
+        return wsdlList;
+    }
+
+    public void setWsdlList(boolean wsdlList) {
+        this.wsdlList = wsdlList;
     }
 
     public String getFrontEnd() {
