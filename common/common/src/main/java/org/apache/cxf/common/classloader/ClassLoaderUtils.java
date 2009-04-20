@@ -57,13 +57,16 @@ public final class ClassLoaderUtils {
                 .getResource(resourceName.substring(1));
         }
 
+        ClassLoader cluClassloader = ClassLoaderUtils.class.getClassLoader();
+        if (cluClassloader == null) {
+            cluClassloader = ClassLoader.getSystemClassLoader();
+        }
         if (url == null) {
-            url = ClassLoaderUtils.class.getClassLoader().getResource(resourceName);
+            url = cluClassloader.getResource(resourceName);
         }
         if (url == null && resourceName.startsWith("/")) {
             //certain classloaders need it without the leading /
-            url = ClassLoaderUtils.class.getClassLoader()
-                .getResource(resourceName.substring(1));
+            url = cluClassloader.getResource(resourceName.substring(1));
         }
 
         if (url == null) {
@@ -124,9 +127,13 @@ public final class ClassLoaderUtils {
             }
         }
 
+        ClassLoader cluClassloader = ClassLoaderUtils.class.getClassLoader();
+        if (cluClassloader == null) {
+            cluClassloader = ClassLoader.getSystemClassLoader();
+        }
         if (!urls.hasMoreElements()) {
             try {
-                urls = ClassLoaderUtils.class.getClassLoader().getResources(resourceName);
+                urls = cluClassloader.getResources(resourceName);
             } catch (IOException e) {
                 // ignore
             }
@@ -134,8 +141,7 @@ public final class ClassLoaderUtils {
         if (!urls.hasMoreElements() && resourceName.startsWith("/")) {
             //certain classloaders need it without the leading /
             try {
-                urls = ClassLoaderUtils.class.getClassLoader()
-                    .getResources(resourceName.substring(1));
+                urls = cluClassloader.getResources(resourceName.substring(1));
             } catch (IOException e) {
                 // ignore
             }
