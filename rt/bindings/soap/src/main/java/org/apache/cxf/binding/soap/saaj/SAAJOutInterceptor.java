@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -67,22 +68,30 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJOutInterceptor.class);
     
-
+    private MessageFactory factory11;
+    private MessageFactory factory12;
+    
     public SAAJOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
-    
+    private synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
+        if (message.getVersion() instanceof Soap11) {
+            if (factory11 == null) { 
+                factory11 = MessageFactory.newInstance();
+            } 
+            return factory11;
+        }
+        if (factory12 == null) {
+            factory12 = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+        }
+        return factory12;
+    }
     public void handleMessage(SoapMessage message) throws Fault {
         SOAPMessage saaj = message.getContent(SOAPMessage.class);
         if (saaj == null) {
             SoapVersion version = message.getVersion();
             try {
-                MessageFactory factory = null;
-                if (version.getVersion() == 1.1) {
-                    factory = MessageFactory.newInstance();
-                } else {
-                    factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-                }
+                MessageFactory factory = getFactory(message);
                 SOAPMessage soapMessage = factory.createMessage();
 
                 SOAPPart soapPart = soapMessage.getSOAPPart();
