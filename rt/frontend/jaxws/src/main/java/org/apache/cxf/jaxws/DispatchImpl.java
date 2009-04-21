@@ -22,7 +22,6 @@ package org.apache.cxf.jaxws;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,14 +91,17 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
 
     private Bus bus;
     private InterceptorProvider iProvider;
-    private Class<T> cl;
+    private final Class<T> cl;
     private Executor executor;
     private JAXBContext context;
-    private Service.Mode mode;
+    private final Service.Mode mode;
 
     private ConduitSelector conduitSelector;
+    private final DispatchOutDatabindingInterceptor outInterceptor;
+    private final DispatchInDatabindingInterceptor inInterceptor;
     
-    DispatchImpl(Bus b, Client client, Service.Mode m, JAXBContext ctx, Class<T> clazz, Executor e) {
+    DispatchImpl(Bus b, Client client, Service.Mode m,
+                 JAXBContext ctx, Class<T> clazz, Executor e) {
         super((JaxWsEndpointImpl)client.getEndpoint());
         bus = b;
         this.iProvider = client;
@@ -109,6 +111,8 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
         mode = m;
         getConduitSelector().setEndpoint(client.getEndpoint());
         setupEndpointAddressContext(client.getEndpoint());
+        outInterceptor = new DispatchOutDatabindingInterceptor(mode);
+        inInterceptor = new DispatchInDatabindingInterceptor(cl, mode);
     }
     
     DispatchImpl(Bus b, Client cl, Service.Mode m, Class<T> clazz, Executor e) {
@@ -301,7 +305,7 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
 
         chain.add(new MessageSenderInterceptor());
 
-        chain.add(new DispatchOutDatabindingInterceptor(mode));
+        chain.add(outInterceptor);
         return chain;
     }
 
@@ -336,9 +340,7 @@ public class DispatchImpl<T> extends BindingProviderImpl implements Dispatch<T>,
             chain.add(slhi);
         }
 
-        List<Interceptor> inInterceptors = new ArrayList<Interceptor>();
-        inInterceptors.add(new DispatchInDatabindingInterceptor(cl, mode));
-        chain.add(inInterceptors);
+        chain.add(inInterceptor);
 
         // execute chain
         Bus origBus = BusFactory.getThreadDefaultBus(false);
