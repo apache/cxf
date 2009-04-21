@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxws.context;
 
-import java.lang.ref.WeakReference;
-
 import java.security.Principal;
 import java.util.logging.Logger;
 
@@ -41,20 +39,19 @@ import org.apache.cxf.security.SecurityContext;
 public class WebServiceContextImpl implements WebServiceContext {
     private static final Logger LOG = LogUtils.getL7dLogger(WebServiceContextImpl.class);
 
-    private static ThreadLocal<WeakReference<MessageContext>> context =
-            new ThreadLocal<WeakReference<MessageContext>>();
+    private static ThreadLocal<MessageContext> context = new ThreadLocal<MessageContext>();
 
-    public WebServiceContextImpl() {
+    public WebServiceContextImpl() { 
     }
 
-    public WebServiceContextImpl(MessageContext ctx) {
+    public WebServiceContextImpl(MessageContext ctx) { 
         setMessageContext(ctx);
-    }
+    } 
 
     // Implementation of javax.xml.ws.WebServiceContext
 
     public final MessageContext getMessageContext() {
-        return getThreadMessageContext();
+        return context.get();
     }
 
     public final Principal getUserPrincipal() {
@@ -72,7 +69,7 @@ public class WebServiceContextImpl implements WebServiceContext {
         }
         return ctx.isUserInRole(role);
     }
-
+    
     //  TODO JAX-WS 2.1
     public EndpointReference getEndpointReference(Element... referenceParameters) {
         WrappedMessageContext ctx = (WrappedMessageContext)getMessageContext();
@@ -84,13 +81,13 @@ public class WebServiceContextImpl implements WebServiceContext {
         builder.serviceName(ep.getService().getName());
         builder.endpointName(ep.getEndpointInfo().getName());
 
-//        builder.wsdlDocumentLocation(wsdlLocation);
+//        builder.wsdlDocumentLocation(wsdlLocation);        
         if (referenceParameters != null) {
             for (Element referenceParameter : referenceParameters) {
                 builder.referenceParameter(referenceParameter);
             }
         }
-
+        
         return builder.build();
     }
 
@@ -106,21 +103,11 @@ public class WebServiceContextImpl implements WebServiceContext {
 
     public static void setMessageContext(MessageContext ctx) {
         //ContextPropertiesMapping.mapCxf2Jaxws(ctx);
-        setThreadMessageContext(ctx);
+        context.set(ctx);
     }
 
     public static void clear() {
         context.set(null);
-    }
-
-    private static MessageContext getThreadMessageContext() {
-        WeakReference<MessageContext> r = context.get();
-        return (r != null) ? r.get() : null;
-    }
-
-    private static void setThreadMessageContext(MessageContext ctx) {
-        WeakReference<MessageContext> r = new WeakReference<MessageContext>(ctx);
-        context.set(r);
     }
 
 }

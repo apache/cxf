@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxws;
 
-import java.lang.ref.WeakReference;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,13 +33,13 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 
 public class BindingProviderImpl implements BindingProvider {
-    protected ThreadLocal <WeakReference<Map<String, Object>>> requestContext =
-        new ThreadLocal<WeakReference<Map<String, Object>>>();
-    protected ThreadLocal <WeakReference<Map<String, Object>>> responseContext =
-        new ThreadLocal<WeakReference<Map<String, Object>>>();
+    protected ThreadLocal <Map<String, Object>> requestContext = 
+        new ThreadLocal<Map<String, Object>>();
+    protected ThreadLocal <Map<String, Object>> responseContext =
+        new ThreadLocal<Map<String, Object>>();
     private final Binding binding;
     private final EndpointReferenceBuilder builder;
-
+       
     public BindingProviderImpl() {
         this.binding = null;
         this.builder = null;
@@ -51,20 +49,28 @@ public class BindingProviderImpl implements BindingProvider {
         this.binding = b;
         this.builder = null;
     }
-
+    
     public BindingProviderImpl(JaxWsEndpointImpl endpoint) {
         this.binding = endpoint.getJaxwsBinding();
         this.builder = new EndpointReferenceBuilder(endpoint);
     }
-
+    
     public Map<String, Object> getRequestContext() {
-        return getThreadRequestContext();
+        if (null == requestContext.get()) {
+            requestContext.set(new HashMap<String, Object>());
+        }
+        return requestContext.get();
     }
 
     public Map<String, Object> getResponseContext() {
-        return getThreadResponseContext();
+        if (null == responseContext.get()) {
+            responseContext.set(new WrappedMessageContext(new HashMap<String, Object>(),
+                                                          null,
+                                                          Scope.APPLICATION));
+        }
+        return responseContext.get();
     }
-
+    
     protected void clearContext(ThreadLocal<Map<String, Object>> context) {
         context.set(null);
     }
@@ -72,9 +78,9 @@ public class BindingProviderImpl implements BindingProvider {
     public Binding getBinding() {
         return binding;
     }
-
+    
     protected void populateResponseContext(MessageContext ctx) {
-
+        
         Iterator<String> iter  = ctx.keySet().iterator();
         Map<String, Object> respCtx = getResponseContext();
         while (iter.hasNext()) {
@@ -85,32 +91,11 @@ public class BindingProviderImpl implements BindingProvider {
         }
     }
 
-    public EndpointReference getEndpointReference() {
+    public EndpointReference getEndpointReference() {            
         return builder.getEndpointReference();
     }
 
     public <T extends EndpointReference> T getEndpointReference(Class<T> clazz) {
         return builder.getEndpointReference(clazz);
     }
-
-    protected Map<String, Object> getThreadRequestContext() {
-        WeakReference<Map<String, Object>> r = requestContext.get();
-        if ((null == r) || (null == r.get())) {
-            r = new WeakReference<Map<String, Object>>(new HashMap<String, Object>());
-            requestContext.set(r);
-        }
-        return (r != null) ? r.get() : null;
-    }
-
-    protected Map<String, Object> getThreadResponseContext() {
-        WeakReference<Map<String, Object>> r = responseContext.get();
-        if ((null == r) || (null == r.get())) {
-            r = new WeakReference<Map<String, Object>>(
-                    new WrappedMessageContext(
-                    new HashMap<String, Object>(), null, Scope.APPLICATION));
-            responseContext.set(r);
-        }
-        return (r != null) ? r.get() : null;
-    }
-
 }
