@@ -52,7 +52,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.WSDLConstants;
@@ -78,7 +77,9 @@ public class DispatchOutDatabindingInterceptor extends AbstractOutDatabindingInt
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchOutDatabindingInterceptor.class);
     private DispatchOutDatabindingEndingInterceptor ending;
     
-    private Service.Mode mode;
+    private final Service.Mode mode;
+    private MessageFactory soap11Factory;
+    private MessageFactory soap12Factory;
     
     public DispatchOutDatabindingInterceptor(Mode mode) {
         super(Phase.WRITE);
@@ -86,7 +87,21 @@ public class DispatchOutDatabindingInterceptor extends AbstractOutDatabindingInt
         
         this.mode = mode;
     }
-
+    private MessageFactory getFactory(SoapMessage message) throws SOAPException {
+        return getFactory(message.getVersion());
+    }
+    private synchronized MessageFactory getFactory(SoapVersion version) throws SOAPException {
+        if (version instanceof Soap11) {
+            if (soap11Factory == null) { 
+                soap11Factory = MessageFactory.newInstance();
+            } 
+            return soap11Factory;
+        }
+        if (soap12Factory == null) {
+            soap12Factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+        }
+        return soap12Factory;
+    }
     public void handleMessage(Message message) throws Fault {
         Object obj = null;
         Object result = message.getContent(List.class);
@@ -337,13 +352,7 @@ public class DispatchOutDatabindingInterceptor extends AbstractOutDatabindingInt
                     }
                 } else {
                     try {
-                        SoapVersion version = ((SoapMessage)message).getVersion();
-                        MessageFactory msgFactory = null;
-                        if (version == null || version instanceof Soap11) {
-                            msgFactory = MessageFactory.newInstance();
-                        } else if (version instanceof Soap12) {
-                            msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-                        }
+                        MessageFactory msgFactory = getFactory((SoapMessage)message);
                         SOAPMessage msg = msgFactory.createMessage();
                         msg.getSOAPPart().setContent(source);
                         if (message.getAttachments() != null) {
@@ -375,12 +384,7 @@ public class DispatchOutDatabindingInterceptor extends AbstractOutDatabindingInt
         SOAPMessage msg = null;
         
         MimeHeaders headers = new MimeHeaders();
-        MessageFactory msgFactory = null;
-        if (version == null || version instanceof Soap11) {
-            msgFactory = MessageFactory.newInstance();
-        } else if (version instanceof Soap12) {
-            msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-        }
+        MessageFactory msgFactory = getFactory(version);
         
         if (is != null) {
             msg = msgFactory.createMessage(headers, is);
