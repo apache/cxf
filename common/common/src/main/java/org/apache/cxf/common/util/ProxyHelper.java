@@ -31,7 +31,7 @@ public class ProxyHelper {
         ProxyHelper theHelper = null;
         try {
             theHelper = new CglibProxyHelper();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             theHelper = new ProxyHelper();
         }
         HELPER = theHelper;
