@@ -113,7 +113,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </util:map> 
   
   <util:list id="jsonKeys">
-    <value>Books</value>
+    <value>books</value>
   </util:list>
   
   <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.JSONProvider">

@@ -134,13 +134,12 @@ public class ImportRepairTest extends Assert {
         /*
          * Notice that no imports have been added. In an ideal world, XmlSchema would do this for us.
          */
-        boolean threw = false;
         try {
             tryToParseSchemas();
+            fail("Expected an exception");
         } catch (DOMErrorException e) {
-            threw = true;
+            //ignore, expected
         }
-        assertTrue(threw);
         LOG.info("adding imports");
         collection.addCrossImports();
         tryToParseSchemas();
@@ -198,7 +197,9 @@ public class ImportRepairTest extends Assert {
 
     private XmlSchema newSchema(String uri) {
         XmlSchema schema = collection.newXmlSchemaInCollection(uri);
-        schema.setNamespaceContext(new NamespaceMap());
+        NamespaceMap map = new NamespaceMap();
+        map.add("", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schema.setNamespaceContext(map);
         return schema;
     }
 
