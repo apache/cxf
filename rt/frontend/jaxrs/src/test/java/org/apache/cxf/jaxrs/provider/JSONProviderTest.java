@@ -46,7 +46,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        System.out.println(s);
         assertEquals(
             "{\"Tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"},{\"group\":\"d\",\"name\":\"c\"}]}}",
             s);
@@ -56,6 +55,7 @@ public class JSONProviderTest extends Assert {
     public void testWriteToListWithSingleValue() throws Exception {
         JSONProvider p = new JSONProvider();
         p.setSerializeAsArray(true);
+        p.setArrayKeys(Collections.singletonList("list"));
         Tags tags = new Tags();
         tags.addTag(createTag("a", "b"));
         
@@ -65,7 +65,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        System.out.println(s);
         assertEquals(
             "{\"Tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}",
             s);
@@ -75,7 +74,7 @@ public class JSONProviderTest extends Assert {
     public void testManyTags() throws Exception {
         JSONProvider p = new JSONProvider();
         p.setSerializeAsArray(true);
-        p.setArrayKeys(Collections.singletonList("tags"));
+        p.setArrayKeys(Collections.singletonList("list"));
         
         Tags tags = new Tags();
         tags.addTag(createTag("a", "b"));
@@ -88,7 +87,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        System.out.println(s);
         assertEquals(
             "{\"ManyTags\":{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}}",
             s);
