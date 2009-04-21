@@ -74,7 +74,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     public SAAJOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
-    private synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
+    public synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
         if (message.getVersion() instanceof Soap11) {
             if (factory11 == null) { 
                 factory11 = MessageFactory.newInstance();

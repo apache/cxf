@@ -29,7 +29,6 @@ import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
@@ -57,7 +56,6 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -117,8 +115,9 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                                     m,
                                     "SOAP/HTTP");
             } else if (m == Service.Mode.MESSAGE) {
-                client.getOutInterceptors().add(new SAAJOutInterceptor());
-                client.getOutInterceptors().add(new MessageModeOutInterceptor());
+                SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
+                client.getOutInterceptors().add(saajOut);
+                client.getOutInterceptors().add(new MessageModeOutInterceptor(saajOut));
                 client.getInInterceptors().add(new SAAJInInterceptor());
                 client.getInInterceptors().add(new MessageModeInInterceptor(clazz));
             }
@@ -310,9 +309,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     
     
     static class MessageModeOutInterceptor extends AbstractSoapInterceptor {
-        public MessageModeOutInterceptor() {
+        SAAJOutInterceptor saajOut;
+        public MessageModeOutInterceptor(SAAJOutInterceptor saajOut) {
             super(Phase.PRE_PROTOCOL);
             addBefore(SAAJOutInterceptor.class.getName());
+            this.saajOut = saajOut;
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
@@ -324,13 +325,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                 soapMessage = (SOAPMessage)o;
             } else {
                 try {
-                    MessageFactory factory = null;
-                    if (message.getVersion() instanceof Soap11) {
-                        factory = MessageFactory.newInstance();
-                    } else {
-                        factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-                    }
-                    
+                    MessageFactory factory = saajOut.getFactory(message);
                     soapMessage = factory.createMessage();
                     SOAPPart part = soapMessage.getSOAPPart();
                     if (o instanceof Source) {
