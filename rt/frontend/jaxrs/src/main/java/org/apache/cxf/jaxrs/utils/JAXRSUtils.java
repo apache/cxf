@@ -637,8 +637,8 @@ public final class JAXRSUtils {
     private static Object processCookieParam(Message m, String cookieName, 
                               Class<?> pClass, Type genericType, String defaultValue) {
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(HttpHeaders.COOKIE);
-        String value = values != null && values.get(0).contains(cookieName + '=') ? values.get(0) 
-                       : defaultValue != null ? cookieName + '=' + defaultValue : null;
+        String value = values.size() == 1 && values.get(0).contains(cookieName + '=') 
+                       ? values.get(0) : defaultValue != null ? cookieName + '=' + defaultValue : null;
         
         if (value == null) {
             return null;

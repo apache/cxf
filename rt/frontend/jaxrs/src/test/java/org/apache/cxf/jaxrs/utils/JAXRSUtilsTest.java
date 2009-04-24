@@ -537,6 +537,24 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testCookieParameters() throws Exception {
+        Class[] argType = {String.class, String.class};
+        Method m = Customer.class.getMethod("testCookieParam", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.add("Cookie", "c1=c1Value");
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(params.size(), 2);
+        assertEquals("c1Value", params.get(0));
+        assertEquals("c2Value", params.get(1));
+        
+        
+    }
+    
+    @Test
     public void testFromStringParameters() throws Exception {
         Class[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
         Method m = Customer.class.getMethod("testFromStringParam", argType);

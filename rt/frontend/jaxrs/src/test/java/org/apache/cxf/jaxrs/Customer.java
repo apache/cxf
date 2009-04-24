@@ -29,6 +29,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
@@ -294,6 +296,11 @@ public class Customer implements CustomerInfo {
     
     public void testFormParam(@FormParam("p1") String fp1, 
                               @FormParam("p2") List<String> fp2) {
+        // complete
+    }
+    
+    public void testCookieParam(@CookieParam("c1") String c1,
+                                @CookieParam("c2") @DefaultValue("c2Value") String c2) {
         // complete
     }
     
