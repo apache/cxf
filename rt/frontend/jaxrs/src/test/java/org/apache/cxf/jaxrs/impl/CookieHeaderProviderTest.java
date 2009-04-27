@@ -31,7 +31,8 @@ public class CookieHeaderProviderTest extends Assert {
     public void testFromSimpleString() {
         Cookie c = Cookie.valueOf("foo=bar");
         assertTrue("bar".equals(c.getValue())
-                   && "foo".equals(c.getName()));
+                   && "foo".equals(c.getName())
+                   && 0 == c.getVersion());
     }
     
     @Test
@@ -58,4 +59,20 @@ public class CookieHeaderProviderTest extends Assert {
                      c.toString());
                
     }
+    
+    @Test
+    public void testCookieWithQuotes() {
+        Cookie c = Cookie.valueOf("$Version=\"1\"; foo=\"bar\"; $Path=\"/path\"");
+        assertTrue("bar".equals(c.getValue())
+                   && "foo".equals(c.getName())
+                   && 1 == c.getVersion()
+                   && "/path".equals(c.getPath())
+                   && null == c.getDomain());
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullValue() throws Exception {
+        Cookie.valueOf(null);
+    }
+    
 }

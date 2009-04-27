@@ -27,9 +27,15 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
     private static final String PATH = "$Path";
     private static final String DOMAIN = "$Domain";
     
+    private static final String DOUBLE_QUOTE = "\""; 
+    
     public Cookie fromString(String c) {
         
-        int version = Cookie.DEFAULT_VERSION;
+        if (c == null) {
+            throw new IllegalArgumentException("Cookie value can not be null");
+        }
+        
+        int version = 0;
         String name = null;
         String value = null;
         String path = null;
@@ -38,17 +44,18 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
         // ignore the fact the possible version may be seperated by ','
         String[] tokens = c.split(";");
         for (String token : tokens) {
-            if (token.startsWith(VERSION)) {
-                version = Integer.parseInt(token.substring(VERSION.length() + 1));
-            } else if (token.startsWith(PATH)) {
-                path = token.substring(PATH.length() + 1);
-            } else if (token.startsWith(DOMAIN)) {
-                domain = token.substring(DOMAIN.length() + 1);
+            String theToken = token.trim();
+            if (theToken.startsWith(VERSION)) {
+                version = Integer.parseInt(stripQuotes(theToken.substring(VERSION.length() + 1)));
+            } else if (theToken.startsWith(PATH)) {
+                path = stripQuotes(theToken.substring(PATH.length() + 1));
+            } else if (theToken.startsWith(DOMAIN)) {
+                domain = stripQuotes(theToken.substring(DOMAIN.length() + 1));
             } else {
-                int i = token.indexOf('=');
+                int i = theToken.indexOf('=');
                 if (i != -1) {
-                    name = token.substring(0, i);
-                    value = i == token.length()  + 1 ? "" : token.substring(i + 1);
+                    name = theToken.substring(0, i);
+                    value = i == theToken.length()  + 1 ? "" : stripQuotes(theToken.substring(i + 1));
                 }
             }
         }
@@ -60,11 +67,14 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
         return new Cookie(name, value, path, domain, version);
     }
 
+    private String stripQuotes(String value) {
+        return value.replaceAll(DOUBLE_QUOTE, "");
+    }
     
     public String toString(Cookie c) {
         StringBuilder sb = new StringBuilder();
         
-        if (c.getVersion() != Cookie.DEFAULT_VERSION) {
+        if (c.getVersion() != 0) {
             sb.append(VERSION).append('=').append(c.getVersion()).append(';');
         }
         sb.append(c.getName()).append('=').append(c.getValue());

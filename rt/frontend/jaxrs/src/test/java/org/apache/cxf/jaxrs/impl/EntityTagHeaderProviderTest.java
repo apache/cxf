@@ -49,4 +49,9 @@ public class EntityTagHeaderProviderTest extends Assert {
         assertEquals("\"bar\"", tag.toString());
         
     }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullValue() throws Exception {
+        EntityTag.valueOf(null);
+    }
 }
