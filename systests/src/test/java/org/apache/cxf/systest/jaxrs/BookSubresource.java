@@ -47,6 +47,7 @@ public interface BookSubresource {
     Book getTheBook2(@PathParam("n1") String name1,
                      @QueryParam("n2") String name2,
                      @MatrixParam("n3") String name3,
+                     @MatrixParam("n33") String name33,
                      @HeaderParam("N4") String name4,
                      @CookieParam("n5") String name5,
                      String name6) throws BookNotFoundFault;

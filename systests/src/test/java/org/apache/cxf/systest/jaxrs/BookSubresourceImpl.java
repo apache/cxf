@@ -45,12 +45,13 @@ public class BookSubresourceImpl implements BookSubresource {
         return b;
     }
 
-    public Book getTheBook2(String n1, String n2, String n3, String n4, String n5, String n6) 
+    public Book getTheBook2(String n1, String n2, String n3, String n33, 
+                            String n4, String n5, String n6) 
         throws BookNotFoundFault {
         
         Book b = new Book();
         b.setId(id); 
-        b.setName(n1 + n2 + n3 + n4 + n5 + n6);
+        b.setName(n1 + n2 + n3 + n33 + n4 + n5 + n6);
         return b;
     }
     

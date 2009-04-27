@@ -332,13 +332,24 @@ public class ServletController {
             reqPrefix = UrlUtils.pathDecode(reqPrefix);
             // pathInfo drops matrix parameters attached to a last path segment
             int offset = 0;
-            int index = reqPrefix.lastIndexOf(';');
+            int index = getMatrixParameterIndex(reqPrefix, pathInfo.length());
             if (index >= pathInfo.length()) {
                 offset = reqPrefix.length() - index;
             }
             reqPrefix = reqPrefix.substring(0, reqPrefix.length() - pathInfo.length() - offset);
         }
         return reqPrefix;
+    }
+    
+    private int getMatrixParameterIndex(String reqPrefix, int pathInfoLength) {
+        int index = reqPrefix.lastIndexOf(';');
+        int lastIndex = -1;
+        while (index >= pathInfoLength) {
+            lastIndex = index;
+            reqPrefix = reqPrefix.substring(0, index);
+            index = reqPrefix.lastIndexOf(';');
+        }
+        return lastIndex;
     }
 
     protected void generateNotFound(HttpServletRequest request, HttpServletResponse res) throws IOException {

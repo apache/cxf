@@ -212,7 +212,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
         BookSubresource proxy = JAXRSClientFactory.fromClient(client, BookSubresource.class);
         
-        Book b = proxy.getTheBook2("CXF ", "in ", "Action ", "- 3", "7", "8");
+        Book b = proxy.getTheBook2("CXF ", "in ", "Acti", "on ", "- 3", "7", "8");
         assertEquals(378, b.getId());
         assertEquals("CXF in Action - 378", b.getName());
         
@@ -221,12 +221,12 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     private void doTestSubresource(BookStoreJaxrsJaxws proxy) throws Exception {
         BookSubresource bs = proxy.getBookSubresource("378");
         
-        Book b = bs.getTheBook2("CXF ", "in ", "Action ", "- 3", "7", "8");
+        Book b = bs.getTheBook2("CXF ", "in ", "Acti", "on ", "- 3", "7", "8");
         assertEquals(378, b.getId());
         assertEquals("CXF in Action - 378", b.getName());
         
         WebClient.client(bs).reset().header("N4", "- 4");
-        b = bs.getTheBook2("CXF ", "in ", "Action ", null, "7", "8");
+        b = bs.getTheBook2("CXF ", "in ", "Acti", "on ", null, "7", "8");
         assertEquals(378, b.getId());
         assertEquals("CXF in Action - 478", b.getName());
         
