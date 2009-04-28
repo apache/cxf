@@ -385,17 +385,15 @@ public final class JAXRSUtils {
             return -1;
         }       
         
-        
+        return compareMediaTypesQualityFactors(mt1, mt2);
+    }
+    
+    public static int compareMediaTypesQualityFactors(MediaType mt1, MediaType mt2) {
         float q1 = getMediaTypeQualityFactor(mt1.getParameters().get("q"));
         float q2 = getMediaTypeQualityFactor(mt2.getParameters().get("q"));
-        int result = Float.compare(q1, q2);
-        if (result != 0) {
-            return result * -1;
-        }
-        
-        return 0;
-        
+        return Float.compare(q1, q2) * -1;
     }
+    
 
     public static float getMediaTypeQualityFactor(String q) {
         if (q == null) {

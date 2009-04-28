@@ -34,6 +34,10 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     
     public NewCookie fromString(String c) {
         
+        if (c == null) {
+            throw new IllegalArgumentException("SetCookie value can not be null");
+        }
+        
         String name = null;
         String value = null;
         String path = null;
@@ -44,23 +48,24 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         
         String[] tokens = c.split(";");
         for (String token : tokens) {
-            if (token.startsWith(VERSION)) {
+            String theToken = token.trim();
+            if (theToken.startsWith(VERSION)) {
                 // should we throw an exception if it's not == 1 ?
-            } else if (token.startsWith(MAX_AGE)) {
-                maxAge = Integer.parseInt(token.substring(MAX_AGE.length() + 1));
-            } else if (token.startsWith(PATH)) {
-                path = token.substring(PATH.length() + 1);
-            } else if (token.startsWith(DOMAIN)) {
-                domain = token.substring(DOMAIN.length() + 1);
-            } else if (token.startsWith(COMMENT)) {
-                comment = token.substring(COMMENT.length() + 1);
-            } else if (token.startsWith(SECURE)) {
+            } else if (theToken.startsWith(MAX_AGE)) {
+                maxAge = Integer.parseInt(theToken.substring(MAX_AGE.length() + 1));
+            } else if (theToken.startsWith(PATH)) {
+                path = theToken.substring(PATH.length() + 1);
+            } else if (theToken.startsWith(DOMAIN)) {
+                domain = theToken.substring(DOMAIN.length() + 1);
+            } else if (theToken.startsWith(COMMENT)) {
+                comment = theToken.substring(COMMENT.length() + 1);
+            } else if (theToken.startsWith(SECURE)) {
                 isSecure = true;
             } else {
-                int i = token.indexOf('=');
+                int i = theToken.indexOf('=');
                 if (i != -1) {
-                    name = token.substring(0, i);
-                    value = i == token.length()  + 1 ? "" : token.substring(i + 1);
+                    name = theToken.substring(0, i);
+                    value = i == theToken.length()  + 1 ? "" : theToken.substring(i + 1);
                 }
             }
         }

@@ -26,6 +26,10 @@ import org.junit.Test;
 
 public class NewCookieHeaderProviderTest extends Assert {
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullValue() throws Exception {
+        NewCookie.valueOf(null);
+    }
         
     @Test
     public void testFromSimpleString() {
@@ -48,6 +52,20 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && 10 == c.getMaxAge());
     }
     
+    
+    @Test
+    public void testFromStringWithSpaces() {
+        NewCookie c = NewCookie.valueOf(
+                      "foo=bar; Comment=comment; Path=path; Max-Age=10; Domain=domain; Secure; Version=1");
+        assertTrue("bar".equals(c.getValue())
+                   && "foo".equals(c.getName())
+                   && 1 == c.getVersion()
+                   && "path".equals(c.getPath())
+                   && "domain".equals(c.getDomain())
+                   && "comment".equals(c.getComment())
+                   && 10 == c.getMaxAge());
+    }
+    
     @Test
     public void testToString() {
         NewCookie c = new NewCookie("foo", "bar", "path", "domain", "comment", 2, true);
@@ -55,4 +73,5 @@ public class NewCookieHeaderProviderTest extends Assert {
                      c.toString());
                
     }
+    
 }

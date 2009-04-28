@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -194,6 +195,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
      */
     protected void copyRequestHeaders(Message message, Map<String, List<String>> headers) {
         HttpServletRequest req = (HttpServletRequest)message.get(HTTP_REQUEST);
+        
         //TODO how to deal with the fields        
         for (Enumeration e = req.getHeaderNames(); e.hasMoreElements();) {
             String fname = (String)e.nextElement();
@@ -210,6 +212,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                 values.add(val);
             }
         }
+        headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
     }
 
     /**

@@ -53,7 +53,9 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (lValues == null || lValues.isEmpty()) {
             return Collections.emptyList();
         }
-        return JAXRSUtils.sortMediaTypes(lValues.get(0)); 
+        List<MediaType> mediaTypes = JAXRSUtils.parseMediaTypes(lValues.get(0));
+        sortMediaTypesUsingQualityFactor(mediaTypes); 
+        return mediaTypes;
     }
 
     public Map<String, Cookie> getCookies() {
@@ -68,7 +70,7 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
-        return values.size() == 0 ? null : new Locale(values.get(0));
+        return values.size() == 0 ? null : new Locale(values.get(0).trim());
     }
 
     public MediaType getMediaType() {
@@ -92,7 +94,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         for (String l : ls) {
             String[] pair = l.split(";");
             
-            Locale locale = new Locale(pair[0].trim());
+            Locale locale = createLocale(pair[0].trim());
             
             newLs.add(locale);
             if (pair.length > 1) {
@@ -149,8 +151,33 @@ public class HttpHeadersImpl implements HttpHeaders {
         public int compare(Locale lang1, Locale lang2) {
             float p1 = prefs.get(lang1);
             float p2 = prefs.get(lang2);
-            int result = Float.compare(p1, p2);
-            return result == 0 ? result : result * -1;
+            return Float.compare(p1, p2) * -1;
         }
     }
+    
+    private Locale createLocale(String value) {
+        String[] values = value.split("-");
+        if (values.length == 0 || values.length > 2) {
+            throw new IllegalArgumentException("Illegal locale value : " + value);
+        }
+        if (values.length == 1) {
+            return new Locale(values[0]);
+        } else {
+            return new Locale(values[0], values[1]);
+        }
+        
+    }
+    
+    private void sortMediaTypesUsingQualityFactor(List<MediaType> types) {
+        if (types.size() > 1) {
+            Collections.sort(types, new Comparator<MediaType>() {
+
+                public int compare(MediaType mt1, MediaType mt2) {
+                    return JAXRSUtils.compareMediaTypesQualityFactors(mt1, mt2);
+                }
+                
+            });
+        }
+    }
+    
 }

@@ -368,6 +368,13 @@ public class BookStore {
     @Produces("text/xml")
     @Consumes("application/xml")
     public Response addBook(Book book) {
+        String ct1 = httpHeaders.getMediaType().toString();
+        String ct2 = httpHeaders.getRequestHeader("Content-Type").get(0);
+        String ct3 = httpHeaders.getRequestHeaders().getFirst("Content-Type");
+        if (!("application/xml".equals(ct1) && ct1.equals(ct2) && ct1.equals(ct3))) {
+            throw new RuntimeException("Unexpected content type");
+        }
+        
         book.setId(++bookId);
         books.put(book.getId(), book);
 
