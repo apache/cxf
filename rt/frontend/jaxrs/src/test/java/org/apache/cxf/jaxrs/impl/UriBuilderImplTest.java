@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
@@ -119,8 +120,17 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testSchemeSpecificPart() throws Exception {
         URI uri = new URI("http://bar");
-        URI newUri = new UriBuilderImpl(uri).scheme("https").schemeSpecificPart("foo/bar").build();
-        assertEquals("URI is not built correctly", "https://foo/bar", newUri.toString());
+        URI newUri = new UriBuilderImpl(uri).scheme("https").schemeSpecificPart("//localhost:8080/foo/bar")
+            .build();
+        assertEquals("URI is not built correctly", "https://localhost:8080/foo/bar", newUri.toString());
+    }
+    
+    @Test
+    public void testOpaqueSchemeSpecificPart() throws Exception {
+        URI expectedUri = new URI("mailto:javanet@java.net.com");
+        URI newUri = new UriBuilderImpl().scheme("mailto")
+            .schemeSpecificPart("javanet@java.net.com").build();
+        assertEquals("URI is not built correctly", expectedUri, newUri);
     }
     
     @Test
@@ -568,6 +578,27 @@ public class UriBuilderImplTest extends Assert {
         URI uri = new URI("http://blah/foo/bar;p1=v1");
         URI newUri = new UriBuilderImpl(uri).path("baz;p2=v2").build();
         assertEquals("URI is not built correctly", new URI("http://blah/foo/bar;p1=v1/baz;p2=v2"), newUri);
+    }
+    
+    @Test
+    public void testNonHttpSchemes() {
+        String[] uris = {"ftp://ftp.is.co.za/rfc/rfc1808.txt",
+                         "mailto:java-net@java.sun.com",
+                         "news:comp.lang.java",
+                         "urn:isbn:096139212y",
+                         "ldap://[2001:db8::7]/c=GB?objectClass?one",
+                         "telnet://194.1.2.17:81/",
+                         "tel:+1-816-555-1212",
+                         "foo://bar.com:8042/there/here?name=baz#brr"};
+
+        int expectedCount = 0; 
+         
+        for (int i = 0; i < uris.length; i++) {
+            URI uri = UriBuilder.fromUri(uris[i]).build();
+            assertEquals("Strange", uri.toString(), uris[i]);
+            expectedCount++;
+        }
+        assertEquals(8, expectedCount);
     }
     
     private void compareURIs(URI uri1, URI uri2) {

@@ -49,9 +49,10 @@ public class UriBuilderImpl extends UriBuilder {
     private String host;
     private List<PathSegment> paths = new ArrayList<PathSegment>();
     private String fragment;
+    private String schemeSpecificPart; 
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
     private MultivaluedMap<String, String> matrix = new MetadataMap<String, String>();
-
+    
     /**
      * Creates builder with empty URI.
      */
@@ -91,27 +92,38 @@ public class UriBuilderImpl extends UriBuilder {
         // again if fromEncoded is set
         if (fromEncoded) {
             StringBuilder b = new StringBuilder();
-            b.append(scheme).append("://");
-            if (userInfo != null) {
-                b.append(userInfo).append('@');
-            }
-            b.append(host);
-            if (port != -1) {
-                b.append(':').append(port);    
-            }
-            if (thePath != null && thePath.length() > 0) {
-                b.append(thePath.startsWith("/") ? thePath : '/' + thePath);
-            }
-            if (theQuery != null && theQuery.length() != 0) {
-                b.append('?').append(theQuery);
+            b.append(scheme).append(":");
+            if (!isSchemeOpaque()) {
+                b.append("//");
+                if (userInfo != null) {
+                    b.append(userInfo).append('@');
+                }
+                b.append(host);
+                if (port != -1) {
+                    b.append(':').append(port);    
+                }
+                if (thePath != null && thePath.length() > 0) {
+                    b.append(thePath.startsWith("/") ? thePath : '/' + thePath);
+                }
+                if (theQuery != null && theQuery.length() != 0) {
+                    b.append('?').append(theQuery);
+                }
+            } else {
+                b.append(schemeSpecificPart);
             }
             if (fragment != null) {
                 b.append('#').append(fragment);
             }
             return new URI(b.toString());
-        } else {
+        } else if (!isSchemeOpaque()) {
             return new URI(scheme, userInfo, host, port, thePath, theQuery, fragment);
+        } else {
+            return new URI(scheme, schemeSpecificPart, fragment);
         }
+    }
+    
+    private boolean isSchemeOpaque() {
+        return schemeSpecificPart != null;
     }
     
     private String substituteVarargs(String path, Object... values) {
@@ -311,7 +323,7 @@ public class UriBuilderImpl extends UriBuilder {
             if (scheme == null) {
                 scheme = "http";
             }
-            URI uri = new URI(scheme + "://" + ssp);
+            URI uri = new URI(scheme, ssp, fragment);
             setUriParts(uri);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Wrong syntax of scheme-specific part", e);
@@ -336,12 +348,22 @@ public class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException("uri is null");
         }
         scheme = uri.getScheme();
-        port = uri.getPort();
-        host = uri.getHost();
-        setPathAndMatrix(uri.getRawPath());
+        if (!uri.isOpaque()) {
+            port = uri.getPort();
+            host = uri.getHost();
+            String rawPath = uri.getRawPath();
+            if (rawPath != null) {
+                setPathAndMatrix(uri.getRawPath());
+            }
+            String rawQuery = uri.getRawQuery();
+            if (rawQuery != null) {
+                query = JAXRSUtils.getStructuredParams(rawQuery, "&", false);
+            }
+            userInfo = uri.getUserInfo();
+        } else {
+            schemeSpecificPart = uri.getSchemeSpecificPart();
+        }
         fragment = uri.getFragment();
-        query = JAXRSUtils.getStructuredParams(uri.getRawQuery(), "&", false);
-        userInfo = uri.getUserInfo();
     }
 
     private void setPathAndMatrix(String path) {
@@ -502,7 +524,10 @@ public class UriBuilderImpl extends UriBuilder {
                 if (fromEncoded) {
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
                 }
-                b.append(entry.getKey()).append('=').append(val);
+                b.append(entry.getKey());
+                if (val.length() != 0) {
+                    b.append('=').append(val);
+                }
                 if (sit.hasNext() || it.hasNext()) {
                     b.append(separator);
                 }
