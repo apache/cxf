@@ -42,12 +42,12 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         this(store, false, false);
     }
     
+    public MetadataMap(boolean readOnly, boolean caseInsensitive) {
+        this(null, readOnly, caseInsensitive);
+    }
+    
     public MetadataMap(Map<K, List<V>> store, boolean readOnly, boolean caseInsensitive) {
         
-        if (!readOnly && caseInsensitive) {
-            throw new IllegalArgumentException(
-                "Case-insensitive keys are only supported for read-only maps at the moment");
-        }
         this.caseInsensitive = caseInsensitive;
         
         this.m = new LinkedHashMap<K, List<V>>();
@@ -65,7 +65,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
     
     public void add(K key, V value) {
-        List<V> data = m.get(key);
+        List<V> data = this.get(key);
         if (data == null) {
             data = new ArrayList<V>();    
             m.put(key, data);
@@ -74,14 +74,14 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public V getFirst(K key) {
-        List<V> data = get(key);
+        List<V> data = this.get(key);
         return data == null ? null : data.get(0);
     }
 
     public void putSingle(K key, V value) {
         List<V> data = new ArrayList<V>();
         data.add(value);
-        m.put(key, data);
+        this.put(key, data);
     }
 
     public void clear() {
@@ -161,5 +161,6 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     public String toString() {
         return m.toString();
     }
+    
     
 }

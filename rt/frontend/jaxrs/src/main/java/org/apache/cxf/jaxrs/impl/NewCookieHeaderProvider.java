@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
@@ -95,9 +94,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         if (value.isSecure()) {
             sb.append(';').append(SECURE);
         }
-        if (value.getVersion() != Cookie.DEFAULT_VERSION) {
-            sb.append(';').append(VERSION).append('=').append(1);
-        }
+        sb.append(';').append(VERSION).append('=').append(value.getVersion());
         return sb.toString();
     }
 

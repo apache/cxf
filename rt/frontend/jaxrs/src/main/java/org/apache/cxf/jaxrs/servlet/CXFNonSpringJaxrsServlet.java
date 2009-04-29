@@ -20,11 +20,15 @@ package org.apache.cxf.jaxrs.servlet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -33,6 +37,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang.ClassUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -42,6 +47,8 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
+    
     private static final String SERVICE_ADDRESS_PARAM = "jaxrs.address";
     private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
     private static final String PROVIDERS_PARAM = "jaxrs.providers";
@@ -166,7 +173,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     }
     
     protected void createServerFromApplication(String cName) throws ServletException {
-        Class<?> appClass = loadClass(cName);
+        Class<?> appClass = loadClass(cName, "Application");
         Application app = null;
         try {
             app = (Application)appClass.newInstance();
@@ -180,14 +187,19 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                                        + " can not be instantiated due to IllegalAccessException"); 
         }
         
+        verifySingletons(app.getSingletons());
+        
         List<Class> resourceClasses = new ArrayList<Class>();
         List<Object> providers = new ArrayList<Object>();
         Map<Class, ResourceProvider> map = new HashMap<Class, ResourceProvider>();
         
         // at the moment we don't support per-request providers, only resource classes
+        // Note, app.getClasse() returns a list of per-resource classes
         for (Class<?> c : app.getClasses()) {
-            resourceClasses.add(c);
-            map.put(c, new PerRequestResourceProvider(c));
+            if (isValidPerRequestResourceClass(c, app.getSingletons())) {
+                resourceClasses.add(c);
+                map.put(c, new PerRequestResourceProvider(c));
+            }
         }
         
         // we can get either a provider or resource class here        
@@ -212,10 +224,52 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     }
     
     private Class<?> loadClass(String cName) throws ServletException {
+        return loadClass(cName, "Resource");
+    }
+    
+    private Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
             return ClassUtils.getClass(CXFNonSpringJaxrsServlet.class.getClassLoader(), cName.trim());
         } catch (ClassNotFoundException ex) {
-            throw new ServletException("No resource class " + cName.trim() + " can be found", ex); 
+            throw new ServletException("No " + classType + " class " + cName.trim() + " can be found", ex); 
+        }
+    }
+    
+    private boolean isValidResourceClass(Class<?> c) {
+        if (c.isInterface() || Modifier.isAbstract(c.getModifiers())) {
+            LOG.info("Ignoring invalid resource class " + c.getName());
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean isValidPerRequestResourceClass(Class<?> c, Set<Object> singletons) {
+        if (!isValidResourceClass(c)) {
+            return false;
+        }
+        for (Object s : singletons) {
+            if (c == s.getClass()) {
+                LOG.info("Ignoring per-request resource class " + c.getName() 
+                         + " as it is also registered as singleton");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    private void verifySingletons(Set<Object> singletons) throws ServletException {
+        if (singletons.isEmpty()) {
+            return;
+        }
+        Set<String> map = new HashSet<String>(); 
+        for (Object s : singletons) {
+            if (map.contains(s.getClass().getName())) {
+                throw new ServletException("More than one instance of the same singleton class "
+                                           + s.getClass().getName() + " is available"); 
+            } else {
+                map.add(s.getClass().getName());
+            }
         }
     }
 }

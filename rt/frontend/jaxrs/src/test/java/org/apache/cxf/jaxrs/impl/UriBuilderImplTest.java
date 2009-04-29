@@ -41,6 +41,11 @@ public class UriBuilderImplTest extends Assert {
     public void testCtorNull() throws Exception {
         new UriBuilderImpl(null);
     }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testPathStringNull() throws Exception {
+        new UriBuilderImpl().path((String)null);
+    }
 
     @Test
     public void testCtorAndBuild() throws Exception {

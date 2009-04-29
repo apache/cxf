@@ -53,8 +53,8 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
        
     public Response build() {
         ResponseImpl r = new ResponseImpl(status, entity);
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
-        m.putAll(metadata);
+        MetadataMap<String, Object> m = 
+            new MetadataMap<String, Object>(metadata, false, true);
         r.addMetadata(m);
         reset();
         return r;
@@ -146,7 +146,46 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
 
     @Override
     public ResponseBuilder variants(List<Variant> variants) {
-        throw new UnsupportedOperationException("Only a single variant option is supported");
+        if (variants == null) {
+            metadata.remove(HttpHeaders.VARY);
+            return this;
+        }
+        String acceptVary = null;
+        String acceptLangVary = null;
+        String acceptEncVary = null;
+        for (Variant v : variants) {
+            MediaType mt = v.getMediaType();
+            if (mt != null) {
+                acceptVary = HttpHeaders.ACCEPT;
+                addHeader(HttpHeaders.ACCEPT, mt);
+            }
+            Locale l = v.getLanguage();
+            if (l != null) {
+                acceptLangVary = HttpHeaders.ACCEPT_LANGUAGE;
+                addHeader(HttpHeaders.ACCEPT_LANGUAGE, l);
+            }
+            String enc = v.getEncoding();
+            if (enc != null) {
+                acceptEncVary = HttpHeaders.ACCEPT_ENCODING;
+                addHeader(HttpHeaders.ACCEPT_ENCODING, enc);
+            }
+        }
+        handleVaryValue(acceptVary, acceptLangVary, acceptEncVary);
+        return this;
+    }
+    
+    private void handleVaryValue(String ...values) {
+        List<Object> varyValues = metadata.get(HttpHeaders.VARY);
+        for (String v : values) {
+            if (v == null) {
+                metadata.remove(v);
+                if (varyValues != null) {
+                    varyValues.remove(v);
+                }
+            } else {
+                addHeader(HttpHeaders.VARY, v);
+            }
+        }
     }
     
 //  CHECKSTYLE:OFF
@@ -180,11 +219,18 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     private ResponseBuilder addHeader(String name, Object... values) {
         if (values != null && values.length >= 1 && values[0] != null) {
             for (Object value : values) {
-                metadata.add(name, value.toString());
+                if (!valueExists(name, value)) {
+                    metadata.add(name, value.toString());
+                }
             }
         } else {
             metadata.remove(name);
         }    
         return this;
+    }
+    
+    private boolean valueExists(String key, Object value) {
+        List<Object> values = metadata.get(key);
+        return values == null ? false : values.contains(value.toString());
     }
 }

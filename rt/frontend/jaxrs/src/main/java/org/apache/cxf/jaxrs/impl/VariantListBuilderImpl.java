@@ -22,10 +22,8 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
@@ -33,9 +31,9 @@ import javax.ws.rs.core.Variant.VariantListBuilder;
 
 public class VariantListBuilderImpl extends VariantListBuilder {
     
-    private Set<String> encodings = new HashSet<String>();
-    private Set<Locale> languages = new HashSet<Locale>();
-    private Set<MediaType> mediaTypes = new HashSet<MediaType>();
+    private List<String> encodings = new ArrayList<String>();
+    private List<Locale> languages = new ArrayList<Locale>();
+    private List<MediaType> mediaTypes = new ArrayList<MediaType>();
     private List<Variant> variants = new ArrayList<Variant>();
     
     public VariantListBuilderImpl() {

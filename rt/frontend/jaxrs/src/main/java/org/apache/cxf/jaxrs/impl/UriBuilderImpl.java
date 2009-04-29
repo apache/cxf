@@ -273,6 +273,11 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder path(String path) throws IllegalArgumentException {
+        
+        if (path == null) {
+            throw new IllegalArgumentException("path is null");
+        }
+        
         List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty() && !matrix.isEmpty()) {
             PathSegment ps = paths.remove(paths.size() - 1);

@@ -22,11 +22,14 @@ package org.apache.cxf.jaxrs.impl;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
@@ -36,7 +39,7 @@ import org.junit.Test;
 
 public class ResponseBuilderImplTest extends Assert {
 
-    
+        
     @Test
     public void testLanguage() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
@@ -65,8 +68,8 @@ public class ResponseBuilderImplTest extends Assert {
     @Test
     public void testAddCookie() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
-        m.add("Set-Cookie", "a=b");
-        m.add("Set-Cookie", "c=d");
+        m.add("Set-Cookie", "a=b;Version=1");
+        m.add("Set-Cookie", "c=d;Version=1");
         checkBuild(Response.ok().cookie(new NewCookie("a", "b"))
                                 .cookie(new NewCookie("c", "d")).build(), 
                   200, null, m);
@@ -93,6 +96,20 @@ public class ResponseBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testVariant() throws Exception {
+        
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Content-Type", "text/xml");
+        m.putSingle("Content-Language", "en");
+        m.putSingle("Content-Encoding", "gzip");
+        Variant v = new Variant(MediaType.TEXT_XML_TYPE, new Locale("en"), "gzip");
+        
+        checkBuild(Response.ok().variant(v).build(),
+                   200, null, m);
+    }
+    
+
+    @Test
     public void testCreatedNoEntity() throws Exception {
         
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
@@ -104,6 +121,7 @@ public class ResponseBuilderImplTest extends Assert {
         
     }
     
+    
     private void checkBuild(Response r, int status, Object entity, 
                             MetadataMap<String, Object> meta) {
         ResponseImpl ri = (ResponseImpl)r;
@@ -111,5 +129,28 @@ public class ResponseBuilderImplTest extends Assert {
         assertSame("Wrong entity", ri.getEntity(), entity);
         assertEquals("Wrong meta", ri.getMetadata(), meta);
     }
+    
+    @Test
+    public void testVariants() throws Exception {
+        
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Accept", "text/xml");
+        m.add("Accept", "application/xml");
+        m.add("Accept-Language", "en_UK");
+        m.add("Accept-Language", "en_GB");
+        m.add("Accept-Encoding", "compress");
+        m.add("Accept-Encoding", "gzip");
+        m.add("Vary", "Accept");
+        m.add("Vary", "Accept-Language");
+        m.add("Vary", "Accept-Encoding");
+        List<Variant> vts = Variant.VariantListBuilder.newInstance()
+            .mediaTypes(MediaType.TEXT_XML_TYPE, MediaType.APPLICATION_XML_TYPE).
+            languages(new Locale("en", "UK"), new Locale("en", "GB")).encodings("compress", "gzip").
+                      add().build();
+
+        checkBuild(Response.ok().variants(vts).build(),
+                   200, null, m);
+    }
+    
     
 }
