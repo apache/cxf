@@ -56,7 +56,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     protected Map<Class, ResourceProvider> resourceProviders = new HashMap<Class, ResourceProvider>();
     
     private Server server;
-    private Invoker invoker;
     private boolean start = true;
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
@@ -87,6 +86,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                                     getDestinationFactory(), 
                                     getBindingFactory());
 
+            Invoker invoker = serviceFactory.getInvoker(); 
             if (invoker == null) {
                 ep.getService().setInvoker(createInvoker());
             } else {
@@ -167,7 +167,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     public void setInvoker(Invoker invoker) {
-        this.invoker = invoker;
+        serviceFactory.setInvoker(invoker);
     }
 
     public void setStart(boolean start) {

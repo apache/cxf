@@ -58,6 +58,7 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
             "http://localhost:9080/bookstorestorage/thosebooks/123/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
+        getBook(endpointAddress, "baddy", "baddyspassword", 403);
     }
     
     @Test
