@@ -56,6 +56,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Message;
@@ -290,7 +291,17 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                     }
                 }
             } else {
-                list.add(params[p.getIndex()]);
+                String paramName = p.getValue();
+                if (!"".equals(paramName)) {
+                    list.add(params[p.getIndex()]);
+                } else {
+                    MultivaluedMap<String, Object> values = 
+                        InjectionUtils.extractValuesFromBean(params[p.getIndex()], "");
+                    for (String var : vars) {
+                        list.addAll(values.get(var));
+                    }
+                }
+                
             }
         }
         return list;
@@ -308,7 +319,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> qs = getParameters(map, ParameterType.QUERY);
         for (Parameter p : qs) {
             if (params[p.getIndex()] != null) {
-                ub.queryParam(p.getValue(), params[p.getIndex()].toString());
+                addParametersToBuilder(ub, p.getValue(), params[p.getIndex()], ParameterType.QUERY);
             }
         }
     }
@@ -318,20 +329,20 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> mx = getParameters(map, ParameterType.MATRIX);
         for (Parameter p : mx) {
             if (params[p.getIndex()] != null) {
-                ub.matrixParam(p.getValue(), params[p.getIndex()].toString());
+                addParametersToBuilder(ub, p.getValue(), params[p.getIndex()], ParameterType.MATRIX);
             }
         }
     }
 
-    private MultivaluedMap<String, String> handleForm(MultivaluedMap<ParameterType, Parameter> map, 
+    private MultivaluedMap<String, Object> handleForm(MultivaluedMap<ParameterType, Parameter> map, 
                                                       Object[] params) {
         
-        MultivaluedMap<String, String> form = new MetadataMap<String, String>();
+        MultivaluedMap<String, Object> form = new MetadataMap<String, Object>();
         
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
             if (params[p.getIndex()] != null) {
-                form.add(p.getValue(), params[p.getIndex()].toString());
+                FormUtils.addPropertyToForm(form, p.getValue(), params[p.getIndex()]);
             }
         }
         

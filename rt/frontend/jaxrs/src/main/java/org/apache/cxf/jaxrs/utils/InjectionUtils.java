@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,6 +63,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -300,7 +302,7 @@ public final class InjectionUtils {
     }
     
     public static Object handleBean(Class<?> paramType, MultivaluedMap<String, String> values,
-                                    ParameterType pType, Message message) {
+                                    ParameterType pType, Message message, boolean decoded) {
         Object bean = null;
         try {
             bean = paramType.newInstance();
@@ -392,12 +394,11 @@ public final class InjectionUtils {
                                                             genericType);
                         } else if (isbean) {
                             paramValue = InjectionUtils.handleBean(type, processedValues,
-                                                            pType, message);
+                                                            pType, message, decoded);
                         } else {
-                            paramValue = InjectionUtils.handleParameter(
-                                                            processedValues.values().iterator().next().get(0),
-                                                            type,
-                                                            pType, message);
+                            String value = decodeValue(processedValues.values().iterator().next().get(0),
+                                                       decoded, pType);
+                            paramValue = InjectionUtils.handleParameter(value, type, pType, message);
                         }
 
                         if (paramValue != null) {
@@ -531,7 +532,7 @@ public final class InjectionUtils {
             theValues = Array.newInstance(realType, isbean ? 1 : values.values().iterator().next().size());
         }
         if (isbean) {
-            Object o = InjectionUtils.handleBean(realType, values, pathParam, message);
+            Object o = InjectionUtils.handleBean(realType, values, pathParam, message, decoded);
             addToCollectionValues(theValues, o, 0);
         } else {
             List<String> valuesList = values.values().iterator().next();
@@ -724,6 +725,44 @@ public final class InjectionUtils {
         for (Field f : cri.getResourceFields()) {
             Object value = JAXRSUtils.createResourceValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value, true);
+        }
+    }
+    
+    public static MultivaluedMap<String, Object> extractValuesFromBean(Object bean, String baseName) {
+        MultivaluedMap<String, Object> values = new MetadataMap<String, Object>();
+        fillInValuesFromBean(bean, baseName, values);
+        return values;
+    }
+    
+    public static void fillInValuesFromBean(Object bean, String baseName, 
+                                            MultivaluedMap<String, Object> values) {
+        for (Method m : bean.getClass().getMethods()) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+                && m.getName().length() > 3) {
+                String propertyName = m.getName().substring(3).toLowerCase();
+                if (baseName.contains(propertyName) || "class".equals(propertyName)) {
+                    continue;
+                }
+                if (!"".equals(baseName)) {
+                    propertyName = baseName + "." + propertyName;
+                }
+                
+                Object value = extractFromMethod(bean, m);
+                if (isPrimitive(value.getClass())) {
+                    values.putSingle(propertyName, value);
+                } else if (isSupportedCollectionOrArray(value.getClass())) {
+                    // ignoring arrrays for a moment
+                    List<Object> theValues = null;
+                    if (value.getClass().isArray()) {
+                        theValues = Arrays.asList(value);
+                    } else {
+                        theValues = CastUtils.cast((List<?>)value);
+                    }
+                    values.put(propertyName, theValues);
+                } else {
+                    fillInValuesFromBean(value, propertyName, values);
+                }
+            }
         }
     }
     

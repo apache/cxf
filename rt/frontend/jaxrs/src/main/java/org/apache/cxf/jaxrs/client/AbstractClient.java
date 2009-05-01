@@ -59,6 +59,8 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -395,6 +397,35 @@ public class AbstractClient implements Client, InvocationHandlerAware {
             reportNoMessageHandler("NO_MSG_READER", cls);
         }
         return null;                                                
+    }
+    
+    // TODO : shall we just do the reflective invocation here ?
+    protected static void addParametersToBuilder(UriBuilder ub, String paramName, Object pValue,
+                                                 ParameterType pt) {
+        if (pt != ParameterType.MATRIX && pt != ParameterType.QUERY) {
+            throw new IllegalArgumentException("This method currently deal "
+                                               + "with matrix and query parameters only");
+        }
+        if (!"".equals(paramName)) {
+            addToBuilder(ub, paramName, pValue, pt);    
+        } else {
+            MultivaluedMap<String, Object> values = 
+                InjectionUtils.extractValuesFromBean(pValue, "");
+            for (Map.Entry<String, List<Object>> entry : values.entrySet()) {
+                for (Object v : entry.getValue()) {
+                    addToBuilder(ub, entry.getKey(), v, pt);
+                }
+            }
+        }
+    }
+
+    private static void addToBuilder(UriBuilder ub, String paramName, Object pValue,
+                                     ParameterType pt) {
+        if (pt == ParameterType.MATRIX) {
+            ub.matrixParam(paramName, pValue.toString());
+        } else {
+            ub.queryParam(paramName, pValue.toString());
+        }
     }
     
     protected static void reportNoMessageHandler(String name, Class<?> cls) {

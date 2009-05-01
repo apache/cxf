@@ -62,5 +62,24 @@ public class BookSubresourceImpl implements BookSubresource {
         b.setName(name);
         return b;
     }
+    
+    public Book getTheBook4(Book bookPath, Book bookQuery, Book bookMatrix) throws BookNotFoundFault {
+        if (bookPath == null || bookQuery == null || bookMatrix == null) {
+            throw new RuntimeException();
+        }
+        long id1 = bookPath.getId();
+        long id2 = bookQuery.getId();
+        long id3 = bookMatrix.getId();
+        if (id1 != 139L || id1 != id2 || id1 != id3 || id1 != id.longValue()) {
+            throw new RuntimeException();
+        }
+        String name1 = bookPath.getName();
+        String name2 = bookQuery.getName();
+        String name3 = bookMatrix.getName();
+        if (!"CXF Rocks".equals(name1) || !name1.equals(name2) || !name1.equals(name3)) {
+            throw new RuntimeException();
+        }
+        return bookPath;
+    }
 
 }

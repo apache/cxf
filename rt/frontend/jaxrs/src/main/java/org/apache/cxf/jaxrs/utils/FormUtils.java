@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,6 +41,20 @@ public final class FormUtils {
         
     private FormUtils() {
         
+    }
+    
+    public static void addPropertyToForm(MultivaluedMap<String, Object> map, String name, Object value) {
+        if (!"".equals(name)) {
+            map.add(name, value);
+        } else {
+            MultivaluedMap<String, Object> values = 
+                InjectionUtils.extractValuesFromBean(value, "");
+            for (Map.Entry<String, List<Object>> entry : values.entrySet()) {
+                for (Object v : entry.getValue()) {
+                    map.add(entry.getKey(), v.toString());
+                }
+            }
+        }
     }
     
     public static String readBody(InputStream is) {

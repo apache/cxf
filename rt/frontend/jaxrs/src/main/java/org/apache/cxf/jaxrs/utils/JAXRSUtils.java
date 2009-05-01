@@ -547,10 +547,7 @@ public final class JAXRSUtils {
             }
             
             if ("".equals(key)) {
-                return InjectionUtils.handleBean(pClass, 
-                                                 params, 
-                                                 ParameterType.MATRIX,
-                                                 m);
+                return InjectionUtils.handleBean(pClass, params, ParameterType.MATRIX, m, false);
             } else {
                 List<String> values = params.get(key);
                 return InjectionUtils.createParameterObject(values, 
@@ -589,7 +586,7 @@ public final class JAXRSUtils {
         }
         
         if ("".equals(key)) {
-            return InjectionUtils.handleBean(pClass, params, ParameterType.FORM, m);
+            return InjectionUtils.handleBean(pClass, params, ParameterType.FORM, m, false);
         } else {
             List<String> results = params.get(key);
     
@@ -724,11 +721,11 @@ public final class JAXRSUtils {
                                            Type genericType,
                                            MultivaluedMap<String, String> values,
                                            String defaultValue,
-                                           boolean  decoded) {
+                                           boolean decoded) {
         
         String parameterName = uriParamAnnotation.value();
         if ("".equals(parameterName)) {
-            return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, m);
+            return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, m, decoded);
         } else {
             List<String> results = values.get(parameterName);
             return InjectionUtils.createParameterObject(results, 
@@ -753,9 +750,8 @@ public final class JAXRSUtils {
         String queryName = queryParam.value();
 
         if ("".equals(queryName)) {
-            return InjectionUtils.handleBean(paramType, 
-                                             new UriInfoImpl(m, null).getQueryParameters(),
-                                             ParameterType.QUERY, m);
+            return InjectionUtils.handleBean(paramType, new UriInfoImpl(m, null).getQueryParameters(),
+                                             ParameterType.QUERY, m, decode);
         } else {
             List<String> results = getStructuredParams((String)m.get(Message.QUERY_STRING),
                                        "&",

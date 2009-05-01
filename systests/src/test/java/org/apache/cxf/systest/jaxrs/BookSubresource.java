@@ -57,5 +57,13 @@ public interface BookSubresource {
     Book getTheBook3(@FormParam("id") String id,
                      @FormParam("name") String name) throws BookNotFoundFault;
     
+    @GET
+    @Path("/subresource4/{id}/{name}")
+    @Produces("application/xml")
+    Book getTheBook4(@PathParam("") Book bookPath,
+                     @QueryParam("") Book bookQuery,
+                     @MatrixParam("") Book matrixBook) throws BookNotFoundFault;
+    
+    
 }
 

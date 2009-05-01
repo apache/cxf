@@ -58,7 +58,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class));
+                   launchServer(BookServerRestSoap.class, true));
     }
     
     @Test
@@ -171,6 +171,31 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         Book b = bs.getTheBook();
         assertEquals(125, b.getId());
         assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
+    public void testGetBookSubresourceParamExtensions() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                              BookStoreJaxrsJaxws.class);
+        BookSubresource bs = proxy.getBookSubresource("139");
+        Book bean = new Book("CXF Rocks", 139L);
+        Book b = bs.getTheBook4(bean, bean, bean);
+        assertEquals(139, b.getId());
+        assertEquals("CXF Rocks", b.getName());
+    }
+    
+    @Test
+    public void testGetBookSubresourceWebClientParamExtensions() throws Exception {
+        
+        WebClient client = WebClient.create("http://localhost:9092/test/services/rest");
+        client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
+        client.path("/bookstore/books/139/subresource4/139/CXF Rocks");
+        Book bean = new Book("CXF Rocks", 139L);
+        Book b = client.matrix("", bean).query("", bean).get(Book.class);
+        assertEquals(139, b.getId());
+        assertEquals("CXF Rocks", b.getName());
     }
     
     @Test

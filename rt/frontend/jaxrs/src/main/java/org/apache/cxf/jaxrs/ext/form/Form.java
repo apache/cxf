@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.ext.form;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.FormUtils;
 
 /**
  * Simple MultivaluedMap wrapper 
@@ -32,7 +33,8 @@ public class Form {
         new MetadataMap<String, Object>();
     
     public Form set(String name, Object value) {
-        map.add(name, value);
+        
+        FormUtils.addPropertyToForm(map, name, value);
         return this;
     }
     

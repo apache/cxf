@@ -44,6 +44,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
@@ -298,6 +299,7 @@ public class WebClient extends AbstractClient {
      */
     public WebClient path(Object path) {
         getCurrentBuilder().path(path.toString());
+        
         return this;
     }
     
@@ -308,7 +310,11 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient query(String name, Object ...values) {
-        getCurrentBuilder().queryParam(name, values);
+        if (!"".equals(name)) {
+            getCurrentBuilder().queryParam(name, values);
+        } else {
+            addParametersToBuilder(getCurrentBuilder(), name, values[0], ParameterType.QUERY);
+        }
         
         return this;
     }
@@ -320,7 +326,12 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient matrix(String name, Object ...values) {
-        getCurrentBuilder().matrixParam(name, values);
+        if (!"".equals(name)) {
+            getCurrentBuilder().matrixParam(name, values);
+        } else {
+            addParametersToBuilder(getCurrentBuilder(), name, values[0], ParameterType.MATRIX);
+        }
+        
         return this;
     }
     
