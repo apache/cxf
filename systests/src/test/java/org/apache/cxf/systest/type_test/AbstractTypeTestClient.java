@@ -544,8 +544,11 @@ public abstract class AbstractTypeTestClient
             buffer2.append((char)('A' + (x % 26)));
         }
 
-        String valueSets[][] = {{"hello", "world"}, {"is pi > 3 ?", " is pi < 4\\\""},
-                                {"<illegal_tag/>", ""}, {buffer.toString(), buffer2.toString()}};
+        String valueSets[][] = {{"hello", "world"},
+                                {"is pi > 3 ?", " is pi < 4\\\""},
+                                {"<illegal_tag/>", ""},
+                                {buffer.toString(), buffer2.toString()},
+                                {"jon&marry", "marry&john"}};
 
         for (int i = 0; i < valueSets.length; i++) {
             String x = valueSets[i][0];
