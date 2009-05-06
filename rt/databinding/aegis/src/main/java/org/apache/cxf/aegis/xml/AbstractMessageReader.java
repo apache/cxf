@@ -50,7 +50,7 @@ public abstract class AbstractMessageReader implements MessageReader {
         boolean nil = false;
         if (nilReader != null) {
             String value = nilReader.getValue();
-            if (value != null && (value.equals("true") || value.equals("1"))) {
+            if (value != null && (value.trim().equals("true") || value.trim().equals("1"))) {
                 return true;
             }
         }
@@ -77,7 +77,7 @@ public abstract class AbstractMessageReader implements MessageReader {
             return 0;
         }
 
-        return Integer.parseInt(getValue());
+        return Integer.parseInt(getValue().trim());
     }
 
     /**
@@ -88,7 +88,7 @@ public abstract class AbstractMessageReader implements MessageReader {
             return 0L;
         }
 
-        return Long.parseLong(getValue());
+        return Long.parseLong(getValue().trim());
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class AbstractMessageReader implements MessageReader {
             return 0d;
         }
 
-        return Double.parseDouble(getValue());
+        return Double.parseDouble(getValue().trim());
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class AbstractMessageReader implements MessageReader {
             return 0f;
         }
 
-        return Float.parseFloat(getValue());
+        return Float.parseFloat(getValue().trim());
     }
 
     /**
@@ -121,7 +121,7 @@ public abstract class AbstractMessageReader implements MessageReader {
         if (value == null) {
             return false;
         }
-
+        value = value.trim();
         if ("true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
             return true;
         }

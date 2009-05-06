@@ -141,7 +141,7 @@ public final class XPathAssert {
                                            + writeNodeToString(node));
         }
 
-        String value2 = DOMUtils.getContent(result).trim();
+        String value2 = DOMUtils.getContent(result);
 
         Assert.assertEquals(value, value2);
     }

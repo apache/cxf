@@ -39,7 +39,7 @@ public class BigDecimalType extends Type {
     public Object readObject(final MessageReader reader, final Context context) {
         final String value = reader.getValue();
 
-        return null == value ? null : new BigDecimal(value);
+        return null == value ? null : new BigDecimal(value.trim());
     }
 
     @Override

@@ -47,7 +47,7 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     public Item getItemByKey(String key1, String key2) {
         Item fake = new Item();
         fake.setKey(new Integer(33));
-        fake.setData("and a third");
+        fake.setData(key1 + ":" + key2);
         return fake;
     }
     

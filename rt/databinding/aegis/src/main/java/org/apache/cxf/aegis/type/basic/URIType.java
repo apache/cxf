@@ -35,7 +35,7 @@ public class URIType extends Type {
     public Object readObject(final MessageReader reader, final Context context) {
         final String value = reader.getValue();
 
-        return null == value ? null : URI.create(value);
+        return null == value ? null : URI.create(value.trim());
     }
 
     @Override

@@ -39,7 +39,7 @@ public class BigIntegerType extends Type {
     public Object readObject(final MessageReader reader, final Context context) {
         final String value = reader.getValue();
 
-        return null == value ? null : new BigInteger(value);
+        return null == value ? null : new BigInteger(value.trim());
     }
 
     @Override

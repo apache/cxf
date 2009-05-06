@@ -16,28 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.aegis.type.basic;
 
-import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.Type;
-import org.apache.cxf.aegis.xml.MessageReader;
-import org.apache.cxf.aegis.xml.MessageWriter;
+package org.apache.cxf.systest.aegis;
+
+import java.io.IOException;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.apache.ws.security.WSPasswordCallback;
 
 /**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
+ * 
  */
-public class ShortType extends Type {
-    @Override
-    public Object readObject(MessageReader reader, Context context) {
-        return new Short(reader.getValue().trim());
+public class ServerPasswordCallback implements CallbackHandler {
+
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+            pc.setPassword("pass");
+        }
+
     }
 
-    @Override
-    public void writeObject(Object object, MessageWriter writer, Context context) {
-        if (object instanceof Short) {
-            writer.writeValueAsShort((Short)object);
-        } else {
-            writer.writeValueAsShort(new Short(((Number)object).shortValue()));
-        }
-    }
 }

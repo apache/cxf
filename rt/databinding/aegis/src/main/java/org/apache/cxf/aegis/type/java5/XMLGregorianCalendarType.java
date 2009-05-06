@@ -46,7 +46,7 @@ public class XMLGregorianCalendarType extends Type {
 
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return dtFactory.newXMLGregorianCalendar(reader.getValue());
+        return dtFactory.newXMLGregorianCalendar(reader.getValue().trim());
     }
 
     @Override

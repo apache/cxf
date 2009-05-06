@@ -92,7 +92,7 @@ public class URIParameterOutInterceptor extends AbstractPhaseInterceptor<Message
                     Node node = root.getFirstChild();
                     while (node != null) {
                         if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getLocalName())) {
-                            builder.append(DOMUtils.getContent(node));
+                            builder.append(DOMUtils.getRawContent(node));
                             break;
                         }   
                         node = node.getNextSibling();

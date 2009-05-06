@@ -25,7 +25,5 @@
 
   <thing xsi:type="xsd:int">42</thing>
   <thing xsi:type="xsd:float">42.42</thing>
-  <thing xsi:type="xsd:string">
-    Forty Two
-  </thing>
+  <thing xsi:type="xsd:string">Forty Two</thing>
 </b:numbers>

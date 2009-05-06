@@ -90,7 +90,7 @@ public abstract class AbstractXOPType extends Type {
             MessageReader child = reader.getNextElementReader();
             if (child.getName().equals(XOP_INCLUDE)) {
                 MessageReader mimeReader = child.getAttributeReader(XOP_HREF);
-                String type = mimeReader.getValue();
+                String type = mimeReader.getValue().trim();
                 o = readInclude(type, child, context);
             }
             child.readToEnd();
@@ -123,7 +123,7 @@ public abstract class AbstractXOPType extends Type {
     
     private Object readInclude(String type, MessageReader reader,
                               Context context) throws DatabindingException {
-        String href = reader.getAttributeReader(XOP_HREF).getValue();
+        String href = reader.getAttributeReader(XOP_HREF).getValue().trim();
 
         Attachment att = AttachmentUtil.getAttachment(href, context.getAttachments());
 

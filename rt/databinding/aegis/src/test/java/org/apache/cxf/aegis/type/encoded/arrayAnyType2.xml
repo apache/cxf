@@ -25,7 +25,5 @@
 
   <soapenc:int>42</soapenc:int>
   <soapenc:decimal>42.42</soapenc:decimal>
-  <xsd:string>
-    Forty Two
-  </xsd:string>
+  <xsd:string>Forty Two</xsd:string>
 </b:numbers>

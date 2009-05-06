@@ -101,6 +101,7 @@ public class ObjectType extends Type {
             throw new DatabindingException("Missing 'xsi:type' attribute value");
         }
 
+        typeName = typeName.trim();
         Type type = null;
         QName typeQName = null;
         if (typeName != null) {
@@ -154,7 +155,8 @@ public class ObjectType extends Type {
     private Object reconstituteJavaObject(MessageReader reader) throws DatabindingException {
 
         try {
-            ByteArrayInputStream in = new ByteArrayInputStream(Base64Utility.decode(reader.getValue()));
+            ByteArrayInputStream in = new ByteArrayInputStream(Base64Utility
+                                                                   .decode(reader.getValue().trim()));
             return new ObjectInputStream(in).readObject();
         } catch (Exception e) {
             throw new DatabindingException("Unable to reconstitute serialized object", e);
@@ -162,7 +164,7 @@ public class ObjectType extends Type {
     }
 
     private boolean isNil(MessageReader reader) {
-        return null != reader && "true".equals(reader.getValue());
+        return null != reader && "true".equals(reader.getValue() == null ? "" : reader.getValue());
     }
 
     @Override

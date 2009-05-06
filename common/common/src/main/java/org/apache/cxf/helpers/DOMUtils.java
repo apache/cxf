@@ -46,6 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -93,17 +94,11 @@ public final class DOMUtils {
      * Get the trimmed text content of a node or null if there is no text
      */
     public static String getContent(Node n) {
-        if (n == null) {
-            return null;
+        String s = getRawContent(n);
+        if (s != null) {
+            s = s.trim();
         }
-
-        Node n1 = DOMUtils.getChild(n, Node.TEXT_NODE);
-
-        if (n1 == null) {
-            return null;
-        }
-
-        return n1.getNodeValue().trim();
+        return s;
     }
 
     /**
@@ -113,14 +108,26 @@ public final class DOMUtils {
         if (n == null) {
             return null;
         }
-
-        Node n1 = DOMUtils.getChild(n, Node.TEXT_NODE);
-
-        if (n1 == null) {
-            return null;
+        StringBuilder b = null;
+        String s = null;
+        Node n1 = n.getFirstChild();
+        while (n1 != null) {
+            if (n1.getNodeType() == Node.TEXT_NODE) {
+                if (b != null) {
+                    b.append(((Text)n1).getNodeValue());
+                } else if (s == null) {
+                    s = ((Text)n1).getNodeValue();
+                } else {
+                    b = new StringBuilder(s);
+                    s = null;
+                }
+            }
+            n1 = n1.getNextSibling();
         }
-
-        return n1.getNodeValue();
+        if (b != null) {
+            return b.toString();
+        }
+        return s;
     }
 
     /**
@@ -234,7 +241,7 @@ public final class DOMUtils {
             // System.out.println("getNode: " + name + " " +
             // node.getNodeName());
             if (name.equals(node.getNodeName())) {
-                return getContent(node);
+                return getRawContent(node);
             }
         }
         return null;

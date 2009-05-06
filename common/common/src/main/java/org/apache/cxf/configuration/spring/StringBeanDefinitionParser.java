@@ -29,7 +29,7 @@ public class StringBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
     @SuppressWarnings("deprecation")
     @Override
     protected void doParse(Element element, BeanDefinitionBuilder builder) {
-        builder.addConstructorArg(DOMUtils.getContent(element));
+        builder.addConstructorArg(DOMUtils.getRawContent(element));
     }
 
     @Override
