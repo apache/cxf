@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -117,7 +118,18 @@ public class BookStoreSpring {
         return b;
     }
     
-    
+    @GET
+    @Path("books/xslt/{id}")
+    @Produces({"text/html", "application/xhtml+xml", "application/xml" })
+    public Book getBookXSLT(@PathParam("id") long id, 
+                            @QueryParam("name") String name,
+                            @MatrixParam("name2") String name2) {
+        // how to have Book2 populated ?
+        Book b = new Book();
+        b.setId(999);
+        b.setName("CXF in ");
+        return b;
+    }
     
     final void init() {
         Book book = new Book();

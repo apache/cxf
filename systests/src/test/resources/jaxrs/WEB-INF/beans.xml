@@ -90,6 +90,32 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     
   </jaxrs:server> 
 
+  <jaxrs:server id="bookservice5"
+		        address="/thebooks5/bookstore">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		  
+
+    <jaxrs:providers>
+       <ref bean="xsltProvider"/>
+    </jaxrs:providers> 
+  </jaxrs:server> 
+  
+  <util:map id="outTemplates">
+      <entry key="application/xhtml+xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template.xsl"/>
+      <entry key="application/xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template2.xsl"/>
+  </util:map> 
+  
+  <bean id="xsltProvider" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">    
+      <property name="resolver" ref="uriResolver"/>
+      <!-- 
+      <property name="outTemplate" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template.xsl"/>
+      -->
+      <property name="outMediaTemplates" ref="outTemplates"/>
+  </bean>
+
+  <bean id="uriResolver" class="org.apache.cxf.systest.jaxrs.URIResolverImpl"/>     
+
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>
   </bean>

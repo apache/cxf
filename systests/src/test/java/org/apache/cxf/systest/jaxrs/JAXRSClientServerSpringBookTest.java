@@ -23,6 +23,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
@@ -30,8 +35,12 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTestBase {
@@ -39,7 +48,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
     }
     
     @Test
@@ -173,11 +182,39 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
-    public void testAddGetBookAegis() throws Exception {
+    public void testGetBookAegis() throws Exception {
         
         String endpointAddress =
             "http://localhost:9080/the/thebooks4/bookstore/books/aegis"; 
         getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
+    }
+    
+    
+    @Test
+    public void testGetBookXSLTXml() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks5/bookstore/books/xslt";
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").path(666).matrix("name2", 2).query("name", "Action - ");
+        Book b = wc.get(Book.class);
+        assertEquals(666, b.getId());
+        assertEquals("CXF in Action - 2", b.getName());
+    }
+    
+    
+    @Test
+    public void testGetBookXSLTHtml() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks5/bookstore/books/xslt";
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xhtml+xml").path(666).matrix("name2", 2).query("name", "Action - ");
+        XMLSource source = wc.get(XMLSource.class);
+        Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
+        Book2 b = source.getNode("xhtml:html/xhtml:body/xhtml:ul/xhtml:Book", namespaces, Book2.class);
+        assertEquals(666, b.getId());
+        assertEquals("CXF in Action - 2", b.getName());
     }
     
     @Test
@@ -236,4 +273,31 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         return bos.getOut().toString();        
     }
 
+    @Ignore
+    @XmlRootElement(name = "Book", namespace = "http://www.w3.org/1999/xhtml")
+    public static class Book2 {
+        @XmlElement(name = "id", namespace = "http://www.w3.org/1999/xhtml")
+        private long id1;
+        @XmlElement(name = "name", namespace = "http://www.w3.org/1999/xhtml")
+        private String name1;
+        public Book2() {
+            
+        }
+        public long getId() {
+            return id1;
+        }
+        
+        public void setId(Long theId) {
+            id1 = theId;
+        }
+        
+        public String getName() {
+            return name1;
+        }
+        
+        public void setName(String n) {
+            name1 = n;
+        }
+        
+    }
 }

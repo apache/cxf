@@ -106,7 +106,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (JAXBElement.class.isAssignableFrom(type)) {
                 response = unmarshaller.unmarshal(new StreamSource(is), theType);
             } else {
-                response = unmarshaller.unmarshal(is);
+                response = doUnmarshal(unmarshaller, is, mt);
             }
             response = checkAdapter(response, anns, false);
             return response;
@@ -122,6 +122,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         return null;
     }
 
+    protected Object doUnmarshal(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
+        throws JAXBException {
+        return unmarshaller.unmarshal(is);
+    }
     
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
@@ -133,7 +137,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 genericType = actualClass;
             }
             String encoding = getEncoding(m, headers);
-            marshal(actualObject, actualClass, genericType, encoding, os);
+            marshal(actualObject, actualClass, genericType, encoding, os, m);
         } catch (JAXBException e) {
             handleJAXBException(e);
         }  catch (WebApplicationException e) {
@@ -143,7 +147,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
     }
 
-    protected void marshal(Object obj, Class<?> cls, Type genericType, String enc, OutputStream os)
+    protected void marshal(Object obj, Class<?> cls, Type genericType, 
+                           String enc, OutputStream os, MediaType mt)
         throws Exception {
         
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
@@ -158,8 +163,12 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             ms.marshal(obj, writer);
         } else {
-            ms.marshal(obj, os);
+            doMarshal(ms, obj, os, mt);
         }
     }
     
+    protected void doMarshal(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
+        throws Exception {
+        ms.marshal(obj, os);
+    }
 }
