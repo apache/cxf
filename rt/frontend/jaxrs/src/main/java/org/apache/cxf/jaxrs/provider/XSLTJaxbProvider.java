@@ -221,7 +221,6 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
         return outClassesToHandle == null || outClassesToHandle.contains(className); 
     }
     
-    @SuppressWarnings("unchecked")
     private Templates createTemplates(Templates templates, 
                                       Map<String, Object> configuredParams,
                                       Map<String, String> outProps) {
