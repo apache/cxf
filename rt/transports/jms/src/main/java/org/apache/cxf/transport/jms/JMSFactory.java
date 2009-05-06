@@ -29,7 +29,6 @@ import javax.jms.Session;
 import javax.naming.NamingException;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.JmsTemplate102;
@@ -166,11 +165,8 @@ public final class JMSFactory {
         }
         if (jmsConfig.getTaskExecutor() != null) {
             jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
-        } else {
-            SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-            taskExecutor.setConcurrencyLimit(jmsConfig.getMaxConcurrentTasks());
-            jmsListener.setTaskExecutor(taskExecutor);
-        }
+        } 
+        
         if (jmsConfig.isAutoResolveDestination()) {
             jmsListener.setDestinationName(destinationName);
         } else {

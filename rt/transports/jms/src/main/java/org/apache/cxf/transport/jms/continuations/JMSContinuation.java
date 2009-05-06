@@ -22,11 +22,9 @@ package org.apache.cxf.transport.jms.continuations;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
@@ -36,8 +34,7 @@ import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class JMSContinuation implements Continuation {
 
-    static final String BOGUS_MESSAGE_SELECTOR = "org.apache.cxf.transports.jms.continuations=too-many";
-    private static final Logger LOG = LogUtils.getL7dLogger(JMSContinuation.class);
+    static final String BOGUS_MESSAGE_SELECTOR = "orgApacheCxfTransportsJmsContinuations='too-many'";
     
     private Bus bus;
     private Message inMessage;
@@ -153,28 +150,24 @@ public class JMSContinuation implements Continuation {
     
     protected void updateContinuations(boolean remove) {
 
-        modifyList(remove);
-        
         if (jmsConfig.getMaxSuspendedContinuations() < 0
             || jmsListener.getCacheLevel() >= DefaultMessageListenerContainer.CACHE_CONSUMER) {
+            modifyList(remove);
             return;
         }
         
         // throttle the flow if there're too many continuation instances in memory
-        if (remove && !BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
-            LOG.fine("A number of continuations has dropped below the limit of "
-                     + jmsConfig.getMaxSuspendedContinuations()
-                     + ", resetting JMS MessageSelector to " + currentMessageSelector);
-            jmsListener.setMessageSelector(currentMessageSelector);
-            currentMessageSelector = BOGUS_MESSAGE_SELECTOR;
-        } else if (!remove && continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
-            currentMessageSelector = jmsListener.getMessageSelector();
-            if (!BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
-                LOG.fine("A number of continuations has reached the limit of "
-                         + jmsConfig.getMaxSuspendedContinuations()
-                         + ", setting JMS MessageSelector to " + BOGUS_MESSAGE_SELECTOR);
-                jmsListener.setMessageSelector(BOGUS_MESSAGE_SELECTOR);
-                
+        synchronized (continuations) {
+            modifyList(remove);
+            if (remove && !BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
+                jmsListener.setMessageSelector(currentMessageSelector);
+                currentMessageSelector = BOGUS_MESSAGE_SELECTOR;
+            } else if (!remove && continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
+                currentMessageSelector = jmsListener.getMessageSelector();
+                if (!BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
+                    jmsListener.setMessageSelector(BOGUS_MESSAGE_SELECTOR);
+                    
+                }
             }
         }
 
