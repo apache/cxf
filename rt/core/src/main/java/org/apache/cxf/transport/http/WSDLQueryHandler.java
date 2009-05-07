@@ -109,7 +109,15 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         try {
             int idx = baseUri.toLowerCase().indexOf("?");
             Map<String, String> params = UrlUtilities.parseQueryString(baseUri.substring(idx + 1));
-            String base = baseUri.substring(0, baseUri.toLowerCase().indexOf("?"));
+
+            String base;
+            
+            if (endpointInfo.getProperty("publishedEndpointUrl") != null) {
+                base = String.valueOf(endpointInfo.getProperty("publishedEndpointUrl"));
+            } else {
+                base = baseUri.substring(0, baseUri.toLowerCase().indexOf("?"));
+            }
+
             String wsdl = params.get("wsdl");
             String xsd =  params.get("xsd");
             
