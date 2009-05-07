@@ -82,8 +82,11 @@ public class XMLFormatValidator extends ServiceValidator {
                 if (inExtensors != null) {
                     itIn = inExtensors.iterator();
                 }
-                if (findXMLFormatRootNode(itIn, bo, path + "-input")) {
-                    // Input check correct, continue to check output binding
+                if (!findXMLFormatRootNode(itIn, bo, path + "-input")) {
+                    return false;
+                }
+                // Input check correct, continue to check output binding
+                if (op.getOutput() != null) {
                     needRootNode = false;
                     if (op.getOutput().getMessageParts().size() == 0
                         || op.getOutput().getMessageParts().size() > 1) {
@@ -102,8 +105,6 @@ public class XMLFormatValidator extends ServiceValidator {
                             return false;
                         }
                     }
-                } else {
-                    return false;
                 }
             }
         }
