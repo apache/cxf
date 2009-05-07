@@ -19,12 +19,15 @@
 
 package org.apache.cxf.systest.aegis;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.aegis.bean.Item;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+
 import org.junit.Test;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
@@ -43,26 +46,46 @@ public class AegisJaxWsTest extends AbstractDependencyInjectionSpringContextTest
         return new String[] {"classpath:aegisJaxWsBeans.xml"};
     }
     
-    private void setupForTest() throws Exception {
+    private void setupForTest(boolean sec) throws Exception {
         
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(AegisJaxWs.class);
-        factory.setAddress("http://localhost:9167/aegisJaxWs");
+        if (sec) {
+            factory.setAddress("http://localhost:9167/aegisJaxWsUN");
+            WSS4JOutInterceptor wss4jOut = new WSS4JOutInterceptor();
+            wss4jOut.setProperty("action", "UsernameToken");
+            wss4jOut.setProperty("user", "alice");
+            wss4jOut.setProperty("password", "pass");
+            
+            factory.setProperties(new HashMap<String, Object>());
+            factory.getProperties().put("password", "pass");
+            factory.getOutInterceptors().add(wss4jOut);
+        } else {
+            factory.setAddress("http://localhost:9167/aegisJaxWs");            
+        }
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
 
         client = (AegisJaxWs)factory.create();
     }
     
     @Test
-    public void testGetItem() throws Exception {
-        setupForTest();
-        Item item = client.getItemByKey("a", "b");
+    public void testGetItemSecure() throws Exception {
+        setupForTest(true);
+        Item item = client.getItemByKey("   jack&jill   ", "b");
         assertEquals(33, item.getKey().intValue());
+        assertEquals("   jack&jill   :b", item.getData());
     }
     
+    @Test
+    public void testGetItem() throws Exception {
+        setupForTest(false);
+        Item item = client.getItemByKey(" a ", "b");
+        assertEquals(33, item.getKey().intValue());
+        assertEquals(" a :b", item.getData());
+    }
     @Test 
     public void testMapSpecified() throws Exception {
-        setupForTest();
+        setupForTest(false);
         Item item = new Item();
         item.setKey(new Integer(42));
         item.setData("Godzilla");
@@ -78,4 +101,5 @@ public class AegisJaxWsTest extends AbstractDependencyInjectionSpringContextTest
         assertEquals(42, key2.intValue());
         assertEquals("Godzilla", item2.getData());
     }
+    
 }

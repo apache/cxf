@@ -46,7 +46,7 @@ public class TimestampType extends Type {
         }
 
         try {
-            Calendar c = (Calendar)format.parseObject(value);
+            Calendar c = (Calendar)format.parseObject(value.trim());
             return new Timestamp(c.getTimeInMillis());
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:dateTime: " + e.getMessage(), e);

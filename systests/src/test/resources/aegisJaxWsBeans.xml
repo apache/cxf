@@ -60,4 +60,33 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 				class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor" />
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
+	
+	
+	<bean id="myPasswordCallback"
+		class="org.apache.cxf.systest.aegis.ServerPasswordCallback"/>
+	
+	<jaxws:endpoint id="aegisRPCImplUN" implementor="#impl"
+		address="http://localhost:9167/aegisJaxWsUN">
+		<jaxws:serviceFactory>
+			<ref bean='jaxws-and-aegis-service-factory' />
+		</jaxws:serviceFactory>
+		
+		<jaxws:inInterceptors>
+  			<bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+	     		<constructor-arg>
+	        		<map>
+	           			<entry key="action" value="UsernameToken"/>
+	           			<entry key="passwordType" value="PasswordText"/>
+	           			<entry key="passwordCallbackRef">
+	             			 <ref bean="myPasswordCallback"/>
+	           			</entry>
+	       			</map>
+	     		</constructor-arg>
+ 			</bean>
+		</jaxws:inInterceptors>
+
+		<jaxws:properties>
+		  <entry key="mtom-enabled" value="true" />
+		</jaxws:properties>
+	</jaxws:endpoint>
 </beans>

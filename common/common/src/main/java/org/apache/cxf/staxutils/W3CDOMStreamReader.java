@@ -175,7 +175,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     @Override
     public String getElementText() throws XMLStreamException {
-        String result = DOMUtils.getContent(content);
+        String result = DOMUtils.getRawContent(content);
 
         ElementFrame<Node, Node> frame = getCurrentFrame();
         frame.ended = true;
@@ -216,8 +216,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         if (at == null) {
             return null;
         }
-
-        return DOMUtils.getContent(at);
+        return at.getNodeValue();
     }
 
     public int getAttributeCount() {

@@ -34,7 +34,7 @@ public class EnumType extends Type {
     public Object readObject(MessageReader reader, Context context) {
         String value = reader.getValue();
 
-        return Enum.valueOf(getTypeClass(), value);
+        return Enum.valueOf(getTypeClass(), value.trim());
     }
 
     @Override

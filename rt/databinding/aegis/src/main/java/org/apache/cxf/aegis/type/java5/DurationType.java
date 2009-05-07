@@ -46,7 +46,7 @@ public class DurationType extends Type {
 
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return dtFactory.newDuration(reader.getValue());
+        return dtFactory.newDuration(reader.getValue().trim());
     }
 
     @Override

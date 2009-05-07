@@ -46,7 +46,7 @@ public class TimeType extends Type {
         }
 
         try {
-            Calendar c = (Calendar)format.parseObject(value);
+            Calendar c = (Calendar)format.parseObject(value.trim());
             return new Time(c.getTimeInMillis());
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:dateTime: " + e.getMessage(), e);

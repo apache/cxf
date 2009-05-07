@@ -141,8 +141,6 @@ public class ElementReader extends AbstractMessageReader implements MessageReade
             
             if (value == null) {
                 value = "";
-            } else {
-                value = value.trim();
             }
         }
         return value;

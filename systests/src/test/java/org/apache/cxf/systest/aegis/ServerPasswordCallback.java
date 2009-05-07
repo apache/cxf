@@ -16,24 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.configuration.spring;
 
-import org.w3c.dom.Element;
+package org.apache.cxf.systest.aegis;
 
-import org.apache.cxf.helpers.DOMUtils;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import java.io.IOException;
 
-public class StringBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
-    @Override
-    protected void doParse(Element element, BeanDefinitionBuilder builder) {
-        builder.addConstructorArg(DOMUtils.getRawContent(element));
-    }
+import org.apache.ws.security.WSPasswordCallback;
 
-    @Override
-    protected Class getBeanClass(Element arg0) {
-        return String.class;
+/**
+ * 
+ */
+public class ServerPasswordCallback implements CallbackHandler {
+
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+            pc.setPassword("pass");
+        }
+
     }
 
 }

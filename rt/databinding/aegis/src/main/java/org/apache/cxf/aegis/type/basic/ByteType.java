@@ -31,7 +31,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class ByteType extends Type {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return new Byte(reader.getValue());
+        return new Byte(reader.getValue().trim());
     }
 
     @Override

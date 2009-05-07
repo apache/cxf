@@ -47,7 +47,7 @@ public class TimezoneLessDateType extends DateType {
         }
 
         try {
-            return ((Calendar)format.parseObject(value)).getTime();
+            return ((Calendar)format.parseObject(value.trim())).getTime();
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:date: " + e.getMessage(), e);
         }

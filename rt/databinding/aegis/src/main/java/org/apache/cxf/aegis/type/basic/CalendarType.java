@@ -44,7 +44,7 @@ public class CalendarType extends Type {
         }
 
         try {
-            return format.parseObject(value);
+            return format.parseObject(value.trim());
         } catch (ParseException e) {
             throw new DatabindingException("Could not parse xs:dateTime: " + e.getMessage(), e);
         }
