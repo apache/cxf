@@ -337,6 +337,13 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                     hasWrapped = true;
                 }
             }
+            
+            if (Boolean.TRUE.equals(binding.getService().getProperty("soap.force.doclit.bare"))) {
+                hasDoc = true;
+                hasRPC = false;
+                parameterStyle = SoapBindingConstants.PARAMETER_STYLE_BARE;
+                bindingStyle = SoapBindingConstants.BINDING_STYLE_DOC;
+            }
             if (hasRPC && hasDoc) {
                 throw new RuntimeException("WSI-BP prohibits RPC and Document style "
                                            + "operations in same service.");

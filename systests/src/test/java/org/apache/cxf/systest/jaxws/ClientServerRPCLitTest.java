@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
@@ -36,15 +37,21 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_rpclit.GreeterRPCLit;
@@ -112,7 +119,28 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
     }
-    
+     
+    @Test
+    public void testDispatchClient() throws Exception {
+        SOAPServiceRPCLit service = new SOAPServiceRPCLit();
+        Dispatch<Source> disp = service.createDispatch(portName, Source.class, 
+                                                       javax.xml.ws.Service.Mode.PAYLOAD);
+        
+        String req = "<ns1:sendReceiveData xmlns:ns1=\"http://apache.org/hello_world_rpclit\">"
+            + "<in xmlns:ns2=\"http://apache.org/hello_world_rpclit/types\">"
+            + "<ns2:elem1>elem1</ns2:elem1><ns2:elem2>elem2</ns2:elem2><ns2:elem3>45</ns2:elem3>"
+            + "</in></ns1:sendReceiveData>";
+        Source source = new StreamSource(new StringReader(req));
+        Source resp = disp.invoke(source);
+        assertNotNull(resp);
+        
+        Node nd = XMLUtils.fromSource(resp);
+        if (nd instanceof Document) {
+            nd = ((Document)nd).getDocumentElement();
+        }
+        XPathUtils xpu = new XPathUtils(new W3CNamespaceContext((Element)nd));
+        assertTrue(xpu.isExist("/ns1:sendReceiveDataResponse/out", nd, XPathConstants.NODE));
+    }
     @Test
     public void testComplexType() throws Exception {
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();

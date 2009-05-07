@@ -272,6 +272,9 @@ public class ServiceImpl extends ServiceDelegate {
             serviceFactory = sf;
         }    
         configureObject(dispatchService);
+        for (ServiceInfo si : dispatchService.getServiceInfos()) {
+            si.setProperty("soap.force.doclit.bare", Boolean.TRUE);
+        }
         return serviceFactory;
     }    
 
