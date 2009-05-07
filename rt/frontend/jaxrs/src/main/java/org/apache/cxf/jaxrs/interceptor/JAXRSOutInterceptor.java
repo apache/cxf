@@ -241,11 +241,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             enabled = InjectionUtils.invokeBooleanGetter(w, "getEnableBuffering");
         }
         if (enabled) {
-            boolean streamingOn = 
-                "org.apache.cxf.jaxrs.provider.JAXBElementProvider".equals(w.getClass().getName())
-                && InjectionUtils.invokeBooleanGetter(w, "getEnableStreaming");
+            boolean streamingOn = InjectionUtils.invokeBooleanGetter(w, "getEnableStreaming");
             if (streamingOn) {
-                m.put(XMLStreamWriter.class.getName(), new CachingXmlEventWriter());
+                m.setContent(XMLStreamWriter.class, new CachingXmlEventWriter());
             } else {
                 m.setContent(OutputStream.class, new CachedOutputStream());
             }
@@ -257,7 +255,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (!enabled) {
             return;
         }
-        XMLStreamWriter writer = (XMLStreamWriter)m.get(XMLStreamWriter.class.getName());
+        XMLStreamWriter writer = m.getContent(XMLStreamWriter.class);
         if (writer instanceof CachingXmlEventWriter) {
             CachingXmlEventWriter cache = (CachingXmlEventWriter)writer;
             if (cache.getEvents().size() != 0) {
@@ -266,7 +264,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                     StaxUtils.writeEvent(event, origWriter);
                 }
             }
-            m.put(XMLStreamWriter.class.getName(), null);
+            m.setContent(XMLStreamWriter.class, null);
             return;
         }
         OutputStream os = m.getContent(OutputStream.class);

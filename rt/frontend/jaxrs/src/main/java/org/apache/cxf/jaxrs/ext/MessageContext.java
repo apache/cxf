@@ -36,6 +36,9 @@ import javax.ws.rs.ext.Providers;
 public interface MessageContext {
     
     Object get(Object key);
+    Object getContextualProperty(Object key);
+    <T> T getContent(Class<T> format);
+    
     void put(Object key, Object value);
     
     UriInfo getUriInfo();

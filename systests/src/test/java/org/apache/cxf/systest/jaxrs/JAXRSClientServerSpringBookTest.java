@@ -48,7 +48,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
     }
     
     @Test
@@ -201,6 +201,20 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals("CXF in Action - 2", b.getName());
     }
     
+    @Test
+    public void testGetBookReaderWriter() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks5/bookstore/books/convert";
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.type("application/xml").accept("application/xml");
+        Book2 b = new Book2();
+        b.setId(777L);
+        b.setName("CXF - 777");
+        Book2 b2 = wc.post(b, Book2.class);
+        assertNotSame(b, b2);
+        assertEquals(777, b2.getId());
+        assertEquals("CXF - 777", b2.getName());
+    }
     
     @Test
     public void testGetBookXSLTHtml() throws Exception {

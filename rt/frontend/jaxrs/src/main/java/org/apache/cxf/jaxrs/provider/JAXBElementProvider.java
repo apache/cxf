@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEventHandler;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
@@ -51,12 +54,24 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     
+    private static final List<String> MARSHALLER_PROPERTIES =
+        Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
+                                    Marshaller.JAXB_FORMATTED_OUTPUT,
+                                    Marshaller.JAXB_FRAGMENT,
+                                    Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
+                                    Marshaller.JAXB_SCHEMA_LOCATION});
+    
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     private boolean enableStreaming;
+    private ValidationEventHandler eventHandler;
     
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
+    }
+    
+    public void setValidationHandler(ValidationEventHandler handler) {
+        eventHandler = handler;
     }
     
     public void setEnableStreaming(boolean enableStream) {
@@ -101,7 +116,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         try {
             Class<?> theType = getActualType(type, genericType, anns);
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
-            
+            if (eventHandler != null) {
+                unmarshaller.setEventHandler(eventHandler);
+            }
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type)) {
                 response = unmarshaller.unmarshal(new StreamSource(is), theType);
@@ -124,7 +141,24 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
 
     protected Object doUnmarshal(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
+        MessageContext mc = getContext();
+        if (mc != null) {
+            XMLStreamReader reader = getContext().getContent(XMLStreamReader.class);
+            if (reader != null) {
+                return unmarshalFromReader(unmarshaller, reader, mt);
+            }
+        }
+        return unmarshalFromInputStream(unmarshaller, is, mt);
+    }
+    
+    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
+        throws JAXBException {
         return unmarshaller.unmarshal(is);
+    }
+
+    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 
+        throws JAXBException {
+        return unmarshaller.unmarshal(reader);
     }
     
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
@@ -155,20 +189,38 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
             ms.setProperty(entry.getKey(), entry.getValue());
         }
-        if (enableStreaming) {
-            XMLStreamWriter writer = 
-                (XMLStreamWriter)getContext().get(XMLStreamWriter.class.getName());
-            if (writer == null) {
+        
+        XMLStreamWriter writer = null;
+        MessageContext mc = getContext();
+        if (mc != null) {
+            writer = mc.getContent(XMLStreamWriter.class);
+            if (writer == null && enableStreaming) {
                 writer = StaxUtils.createXMLStreamWriter(os);
             }
-            ms.marshal(obj, writer);
+            // check Marshaller properties here as well which might've been set earlier on,
+            // they'll overwrite statically configured ones
+            for (String key : MARSHALLER_PROPERTIES) {
+                Object value = mc.get(key);
+                if (value != null) {
+                    ms.setProperty(key, value);
+                }
+            }
+            
+        }
+        if (writer != null) {
+            marshalToWriter(ms, obj, writer, mt);
         } else {
-            doMarshal(ms, obj, os, mt);
+            marshalToOutputStream(ms, obj, os, mt);
         }
     }
     
-    protected void doMarshal(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
+    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
         throws Exception {
         ms.marshal(obj, os);
+    }
+    
+    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, MediaType mt) 
+        throws Exception {
+        ms.marshal(obj, writer);
     }
 }

@@ -59,6 +59,14 @@ public class MessageContextImpl implements MessageContext {
         }
         return m.get(key);
     }
+    
+    public <T> T getContent(Class<T> format) {
+        return m.getContent(format);
+    }
+    
+    public Object getContextualProperty(Object key) {
+        return m.getContextualProperty(key.toString());
+    }
 
     public <T> T getContext(Class<T> contextClass) {
         return getContext(contextClass, contextClass);

@@ -98,13 +98,19 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
     <jaxrs:providers>
        <ref bean="xsltProvider"/>
+       <bean class="org.apache.cxf.systest.jaxrs.XmlStreamReaderProvider"/>
+       <bean class="org.apache.cxf.systest.jaxrs.XmlStreamWriterProvider"/>
     </jaxrs:providers> 
   </jaxrs:server> 
   
   <util:map id="outTemplates">
       <entry key="application/xhtml+xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template.xsl"/>
       <entry key="application/xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template2.xsl"/>
-  </util:map> 
+  </util:map>
+  
+  <util:list id="outClassNames">
+      <value>org.apache.cxf.systest.jaxrs.Book</value>
+  </util:list> 
   
   <bean id="xsltProvider" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">    
       <property name="resolver" ref="uriResolver"/>
@@ -112,6 +118,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <property name="outTemplate" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template.xsl"/>
       -->
       <property name="outMediaTemplates" ref="outTemplates"/>
+      <property name="outClassNames" ref="outClassNames"/>
   </bean>
 
   <bean id="uriResolver" class="org.apache.cxf.systest.jaxrs.URIResolverImpl"/>     

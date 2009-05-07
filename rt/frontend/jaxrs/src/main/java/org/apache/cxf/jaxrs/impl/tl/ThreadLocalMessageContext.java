@@ -89,4 +89,12 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
         return get() != null ? get().getResolver(resolverClass, resolveClazz) : null;
     }
 
+    public <T> T getContent(Class<T> format) {
+        return get() != null ? get().getContent(format) : null;
+    }
+
+    public Object getContextualProperty(Object key) {
+        return get() != null ? get().getContextualProperty(key) : null;
+    }
+
 }

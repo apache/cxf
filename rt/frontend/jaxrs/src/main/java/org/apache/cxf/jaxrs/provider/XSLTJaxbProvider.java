@@ -27,7 +27,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,11 +102,15 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     }
     
     protected boolean inTemplatesAvailable(MediaType mt) {
-        return inTemplates != null || inMediaTemplates.containsKey(mt.getType() + "/" + mt.getSubtype());
+        return inTemplates != null 
+            || inMediaTemplates != null && inMediaTemplates.containsKey(mt.getType() + "/" 
+                                                                        + mt.getSubtype());
     }
     
     protected boolean outTemplatesAvailable(MediaType mt) {
-        return outTemplates != null || outMediaTemplates.containsKey(mt.getType() + "/" + mt.getSubtype());
+        return outTemplates != null 
+            || outMediaTemplates != null && outMediaTemplates.containsKey(mt.getType() 
+                                                                          + "/" + mt.getSubtype());
     }
     
     protected Templates getInTemplates(MediaType mt) {
@@ -121,7 +124,7 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     }
     
     @Override
-    protected Object doUnmarshal(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
+    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
         try {
             XMLFilter filter = factory.newXMLFilter(
@@ -138,7 +141,7 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     }
     
     @Override
-    protected void doMarshal(Marshaller ms, Object obj, OutputStream os, MediaType mt)
+    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt)
         throws Exception {
         TransformerHandler th = factory.newTransformerHandler(
             createTemplates(getOutTemplates(mt), outParamsMap, outProperties));
@@ -199,22 +202,16 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
         this.outProperties = outProps;
     }
     
-    public void setInClassname(String className) {
-        if (inClassesToHandle == null) {
-            inClassesToHandle = new ArrayList<String>();
-        }
-        inClassesToHandle.add(className);
+    public void setInClassNames(List<String> classNames) {
+        inClassesToHandle = classNames;
     }
     
     public boolean inClassCanBeHandled(String className) {
         return inClassesToHandle == null || inClassesToHandle.contains(className); 
     }
     
-    public void setOutClassname(String className) {
-        if (outClassesToHandle == null) {
-            outClassesToHandle = new ArrayList<String>();
-        }
-        outClassesToHandle.add(className);
+    public void setOutClassNames(List<String> classNames) {
+        outClassesToHandle = classNames;
     }
     
     public boolean outClassCanBeHandled(String className) {
