@@ -50,7 +50,7 @@ public class JMSContinuation implements Continuation {
     private boolean isNew = true;
     private boolean isPending;
     private boolean isResumed;
-    private Timer timer = new Timer();
+    private Timer timer;
     
     public JMSContinuation(Bus b, Message m, MessageObserver observer,
                            Collection<JMSContinuation> cList, 
@@ -133,6 +133,7 @@ public class JMSContinuation implements Continuation {
     }
 
     protected void createTimerTask(long timeout) {
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
                 synchronized (JMSContinuation.this) { 
@@ -145,7 +146,10 @@ public class JMSContinuation implements Continuation {
     }
     
     protected void cancelTimerTask() {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+            timer.cancel();
+        }
     }
     
     protected void updateContinuations(boolean remove) {

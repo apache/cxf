@@ -191,7 +191,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
         } catch (SuspendedInvocationException ex) {
-            System.out.println("Request message has been suspended");
+            getLogger().log(Level.FINE, "Request message has been suspended");
         } catch (UnsupportedEncodingException ex) {
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } finally {
