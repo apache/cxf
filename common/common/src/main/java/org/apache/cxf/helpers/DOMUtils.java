@@ -118,7 +118,7 @@ public final class DOMUtils {
                 } else if (s == null) {
                     s = ((Text)n1).getNodeValue();
                 } else {
-                    b = new StringBuilder(s);
+                    b = new StringBuilder(s).append(((Text)n1).getNodeValue());
                     s = null;
                 }
             }
