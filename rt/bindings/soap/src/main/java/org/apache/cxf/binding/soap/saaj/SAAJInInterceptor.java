@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.AttachmentPart;
+import javax.xml.soap.Detail;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
@@ -146,9 +147,19 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 }
                 if (fault.getDetail() != null
                     && fault.getDetail().getFirstChild() != null) {
-                    soapFault.addDetail().appendChild(
-                        soapMessage.getSOAPPart().importNode(
-                            fault.getDetail().getFirstChild(), true));
+                    
+                    Detail detail = null;
+                    Node child = fault.getDetail().getFirstChild();
+                    while (child != null) {
+                        if (Node.ELEMENT_NODE == child.getNodeType()) {
+                            if (detail == null) {
+                                detail = soapFault.addDetail();
+                            }
+                            Node importedChild = soapMessage.getSOAPPart().importNode(child, true);
+                            detail.appendChild(importedChild);
+                        }
+                        child = child.getNextSibling();
+                    }
                 }
 
                 DOMSource bodySource = new DOMSource(soapFault);

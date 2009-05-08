@@ -26,9 +26,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.soap.Detail;
+import javax.xml.soap.DetailEntry;
+import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.Soap12;
@@ -59,7 +64,6 @@ public class SAAJInInterceptorTest extends TestBase {
         chain.add(saajIntc);
         
         chain.add(new CheckFaultInterceptor("phase3"));
-
     }
 
     @Test
@@ -93,6 +97,42 @@ public class SAAJInInterceptorTest extends TestBase {
         
         assertEquals(2, headerChilds.size());
     }
+    
+    @Test
+    public void testFaultDetail() throws Exception {
+        try {
+            prepareSoapMessage("../test-soap-fault-detail.xml");
+        } catch (IOException ioe) {
+            fail("Failed in creating soap message");
+        }
+
+        staxIntc.handleMessage(soapMessage);
+        rhi.handleMessage(soapMessage);
+
+        // check the xmlReader should be placed on the first entry of the body
+        // element
+        XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
+        xmlReader.nextTag();
+        saajIntc.handleMessage(soapMessage);
+        
+        SOAPMessage parsedMessage = soapMessage.getContent(SOAPMessage.class);
+        SOAPFault fault = parsedMessage.getSOAPBody().getFault();
+        assertEquals("soap:Server", fault.getFaultCode());
+        assertEquals("This is a fault string", fault.getFaultString());
+        Detail faultDetail = fault.getDetail();
+        NodeList faultDetailChildNodes = faultDetail.getChildNodes();
+        assertEquals(2, faultDetailChildNodes.getLength());
+        
+        Iterator<?> detailEntries = faultDetail.getDetailEntries();
+        DetailEntry detailEntry = (DetailEntry)detailEntries.next();
+        assertEquals("errorcode", detailEntry.getLocalName());
+        assertEquals(3, Integer.valueOf(detailEntry.getTextContent()).intValue());
+        detailEntry = (DetailEntry)detailEntries.next();
+        assertEquals("errorstring", detailEntry.getLocalName());
+        assertEquals("This is a fault detail error string", detailEntry.getTextContent());
+        
+    }
+    
 
     private void prepareSoapMessage(String message) throws IOException {
 
