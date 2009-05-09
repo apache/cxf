@@ -72,7 +72,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
 
     @Test
     public void testHandleMessageSucc() throws Exception {
-        prepareSoapMessage();
+        prepareSoapMessage("test-soap-header.xml");
         dsi.getUnderstoodHeaders().add(RESERVATION);
         dsi.getUnderstoodHeaders().add(PASSENGER);
 
@@ -84,7 +84,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
 
     @Test
     public void testHandleMessageFail() throws Exception {
-        prepareSoapMessage();
+        prepareSoapMessage("test-soap-header.xml");
 
         dsi.getUnderstoodHeaders().add(RESERVATION);
 
@@ -104,9 +104,10 @@ public class MustUnderstandInterceptorTest extends TestBase {
     }
 
     @Test
-    public void testHandleMessageWithHeaderParam() throws Exception {
-        prepareSoapMessage();
+    public void testHandleMessageWithSoapHeader11Param() throws Exception {
+        prepareSoapMessage("test-soap-header.xml");
         dsi.getUnderstoodHeaders().add(RESERVATION);
+        
         ServiceInfo serviceInfo = getMockedServiceModel(getClass().getResource("test-soap-header.wsdl")
             .toString());
 
@@ -122,11 +123,30 @@ public class MustUnderstandInterceptorTest extends TestBase {
             .isCalledGetUnderstood());
     }
 
-    private void prepareSoapMessage() throws Exception {
+    @Test
+    public void testHandleMessageWithSoapHeader12Param() throws Exception {
+        prepareSoapMessage("test-soap-12-header.xml");
+        dsi.getUnderstoodHeaders().add(RESERVATION);
+        ServiceInfo serviceInfo = getMockedServiceModel(getClass().getResource("test-soap-12-header.wsdl")
+            .toString());
+
+        BindingInfo binding = serviceInfo.getBinding(new QName("http://org.apache.cxf/headers",
+                                                               "headerTesterSOAPBinding"));
+        BindingOperationInfo bop = binding.getOperation(new QName("http://org.apache.cxf/headers",
+                                                                  "inHeader"));
+        soapMessage.getExchange().put(BindingOperationInfo.class, bop);
+
+        soapMessage.getInterceptorChain().doIntercept(soapMessage);
+        assertEquals("DummaySoapInterceptor getRoles has been called!", true, dsi.isCalledGetRoles());
+        assertEquals("DummaySoapInterceptor getUnderstood has been called!", true, dsi
+            .isCalledGetUnderstood());
+    }
+    
+    private void prepareSoapMessage(String payloadFileName) throws Exception {
 
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
         ByteArrayDataSource bads = new ByteArrayDataSource(this.getClass()
-            .getResourceAsStream("test-soap-header.xml"), "Application/xop+xml");
+            .getResourceAsStream(payloadFileName), "Application/xop+xml");
         String cid = AttachmentUtil.createContentID("http://cxf.apache.org");
         soapMessage.setContent(Attachment.class, new AttachmentImpl(cid, new DataHandler(bads)));
         soapMessage.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()

@@ -55,7 +55,7 @@ public class SoapOutInterceptorTest extends TestBase {
 
     @Test
     public void testHandleMessage() throws Exception {
-        prepareSoapMessage();
+        prepareSoapMessage("test-soap-header.xml");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         soapMessage.setContent(OutputStream.class, out);
@@ -72,18 +72,43 @@ public class SoapOutInterceptorTest extends TestBase {
 
         InputStream bis = new ByteArrayInputStream(out.toByteArray());
         XMLStreamReader xmlReader = StaxUtils.createXMLStreamReader(bis);
-        assertInputStream(xmlReader);
+        assertInputStream(xmlReader, Soap11.getInstance());
     }
 
-    private void assertInputStream(XMLStreamReader xmlReader) throws Exception {
+    @Test
+    public void testHandleMessage12() throws Exception {
+        prepareSoapMessage("test-soap-12-header.xml");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        soapMessage.setContent(OutputStream.class, out);
+        soapMessage.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(out));
+        
+        soapMessage.getInterceptorChain().doIntercept(soapMessage);
+        
+        assertNotNull(soapMessage.getHeaders());
+
+        Exception oe = (Exception)soapMessage.getContent(Exception.class);
+        if (oe != null) {
+            throw oe;
+        }
+
+        InputStream bis = new ByteArrayInputStream(out.toByteArray());
+        XMLStreamReader xmlReader = StaxUtils.createXMLStreamReader(bis);
+        assertInputStream(xmlReader, Soap12.getInstance());
+    }
+
+    private void assertInputStream(XMLStreamReader xmlReader, SoapVersion version) throws Exception {
         assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
-        assertEquals(Soap12.getInstance().getEnvelope(), xmlReader.getName());
+        assertEquals(version.getEnvelope(), xmlReader.getName());
 
         assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
-        assertEquals(Soap12.getInstance().getHeader(), xmlReader.getName());
+        assertEquals(version.getHeader(), xmlReader.getName());
 
         assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
         assertEquals("reservation", xmlReader.getLocalName());
+        assertEquals(version.getAttrValueMustUnderstand(true), 
+                     xmlReader.getAttributeValue(version.getNamespace(), 
+                                                 version.getAttrNameMustUnderstand()));
 
         assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
         assertEquals("reference", xmlReader.getLocalName());
@@ -93,10 +118,11 @@ public class SoapOutInterceptorTest extends TestBase {
         // assertEquals(Soap12.getInstance().getBody(), xmlReader.getName());
     }
 
-    private void prepareSoapMessage() throws IOException {
+    
+    private void prepareSoapMessage(String payloadFileName) throws IOException {
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
 
-        soapMessage.setContent(InputStream.class, getClass().getResourceAsStream("test-soap-header.xml"));
+        soapMessage.setContent(InputStream.class, getClass().getResourceAsStream(payloadFileName));
     }
 
 }

@@ -51,6 +51,8 @@ public interface SoapVersion {
 
     String getAttrNameMustUnderstand();
     
+    String getAttrValueMustUnderstand(boolean value);
+    
     // Role related properties
     //-------------------------------------------------------------------------
     String getAttrNameRole();
