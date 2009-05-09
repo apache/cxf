@@ -16,17 +16,17 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
     <!-- before header test for processing comment here -->
     <env:Header>
         <!-- header test for processing comment here -->
         <m:reservation xmlns:m="http://travelcompany.example.org/reservation"
-            env:actor="http://schemas.xmlsoap.org/soap/actor/next" env:mustUnderstand="1">
+            env:role="http://www.w3.org/2003/05/soap-envelope/role/next" env:mustUnderstand="true">
             <m:reference>uuid:093a2da1-q345-739r-ba5d-pqff98fe8j7d</m:reference>
             <m:dateAndTime>2001-11-29T13:20:00.000-05:00</m:dateAndTime>
         </m:reservation>
         <n:passenger xmlns:n="http://mycompany.example.com/employees"
-            env:actor="http://schemas.xmlsoap.org/soap/actor/next" env:mustUnderstand="1">
+            env:role="http://www.w3.org/2003/05/soap-envelope/role/next" env:mustUnderstand="true">
             <n:name>Bob</n:name>
         </n:passenger>
     </env:Header>

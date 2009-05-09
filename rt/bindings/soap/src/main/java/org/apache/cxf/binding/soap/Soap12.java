@@ -117,6 +117,10 @@ public final class Soap12 implements SoapVersion {
         return "mustUnderstand";
     }
 
+    public String getAttrValueMustUnderstand(boolean value) {
+        return value ? "true" : "false";
+    }
+
     public QName getReceiver() {
         return new QName(SOAP_NAMESPACE, "Receiver");
     }

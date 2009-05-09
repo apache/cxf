@@ -321,11 +321,13 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                                    soapVersion.getAttrNameRole(),
                                    soapHeader.getActor());
                 }
-                if (soapHeader.isMustUnderstand()) {
+                boolean mu = soapHeader.isMustUnderstand();
+                if (mu) {
+                    String mul = soapVersion.getAttrValueMustUnderstand(mu); 
                     super.writeAttribute(soapPrefix,
                                    soapVersion.getNamespace(),
                                    soapVersion.getAttrNameMustUnderstand(),
-                                   "true");                                        
+                                   mul);                                        
                 }
             }
         }
