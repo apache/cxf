@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -172,6 +173,14 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             return true;
         }
         String name = el.getTextContent().trim();
+        StringTokenizer st = new StringTokenizer(name, " ", false);
+        boolean result = false;
+        while (st.hasMoreTokens() && !result) {
+            result = result || singleProtocolMatches(st.nextToken(), id);
+        }
+        return result;
+    }
+    private boolean singleProtocolMatches(String name, String id) {
         if ("##SOAP11_HTTP".equals(name)) {
             return "http://schemas.xmlsoap.org/wsdl/soap/http".contains(id)
                 || "http://schemas.xmlsoap.org/soap/".contains(id);
