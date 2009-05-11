@@ -47,7 +47,8 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         // by declaring the Object.
         Object prop = message.getContextualProperty(org.apache.cxf.message.Message.MTOM_ENABLED); 
         boolean mtomEnabled = MessageUtils.isTrue(prop);
-        boolean writeAtts = MessageUtils.isTrue(message.getContextualProperty(WRITE_ATTACHMENTS));
+        boolean writeAtts = MessageUtils.isTrue(message.getContextualProperty(WRITE_ATTACHMENTS))
+            || (message.getAttachments() != null && !message.getAttachments().isEmpty());
         
         if (!mtomEnabled && !writeAtts) {
             return;
