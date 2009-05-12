@@ -112,7 +112,17 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
         SOAPServiceRPCLit service = new SOAPServiceRPCLit(wsdl, serviceName);
         assertNotNull(service);
 
-        doGreeterRPCLit(service, portName, 2, false);
+        
+        String response1 = new String("TestGreetMeResponseServerLogicalHandlerServerSOAPHandler");
+        String response2 = new String("TestSayHiResponse");
+        GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+        String greeting = greeter.greetMe("Milestone-0");
+        assertNotNull("no response received from service", greeting);
+        assertEquals(response1, greeting);
+
+        String reply = greeter.sayHi();
+        assertNotNull("no response received from service", reply);
+        assertEquals(response2, reply);
     }
 
     @Test

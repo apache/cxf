@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxws;
 
 import java.net.HttpURLConnection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -28,17 +27,9 @@ import java.util.logging.Logger;
 import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
@@ -53,27 +44,19 @@ import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Node;
 
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
-import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
+import org.apache.cxf.jaxws.interceptors.MessageModeInInterceptor;
+import org.apache.cxf.jaxws.interceptors.MessageModeOutInterceptor;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
-import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -81,11 +64,6 @@ import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
-import org.apache.cxf.staxutils.StaxSource;
-import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
-import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchImpl.class);
@@ -120,9 +98,15 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             } else if (m == Service.Mode.MESSAGE) {
                 SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
                 client.getOutInterceptors().add(saajOut);
-                client.getOutInterceptors().add(new MessageModeOutInterceptor(saajOut));
+                client.getOutInterceptors().
+                    add(new MessageModeOutInterceptor(saajOut,
+                                                      client.getEndpoint()
+                                                          .getBinding().getBindingInfo().getName()));
                 client.getInInterceptors().add(new SAAJInInterceptor());
-                client.getInInterceptors().add(new MessageModeInInterceptor(clazz));
+                client.getInInterceptors()
+                    .add(new MessageModeInInterceptor(clazz, 
+                                                      client.getEndpoint()
+                                                          .getBinding().getBindingInfo().getName()));
             }
         } else if (m == Service.Mode.PAYLOAD 
             && binding instanceof SOAPBinding
@@ -308,128 +292,4 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     public Client getClient() {
         return client;
     }
-    
-    
-    static class MessageModeOutInterceptor extends AbstractSoapInterceptor {
-        SAAJOutInterceptor saajOut;
-        public MessageModeOutInterceptor(SAAJOutInterceptor saajOut) {
-            super(Phase.PRE_PROTOCOL);
-            addBefore(SAAJOutInterceptor.class.getName());
-            this.saajOut = saajOut;
-        }
-
-        public void handleMessage(SoapMessage message) throws Fault {
-            if (!isDispatch(message.getMessage())) {
-                LOG.info("Dispatch interceptor bailing on unrelated message");
-                return;
-            }
-
-            MessageContentsList list = (MessageContentsList)message.getContent(List.class);
-            Object o = list.get(0);
-            
-            SOAPMessage soapMessage = null;
-            
-            if (o instanceof SOAPMessage) {
-                soapMessage = (SOAPMessage)o;
-            } else {
-                try {
-                    MessageFactory factory = saajOut.getFactory(message);
-                    soapMessage = factory.createMessage();
-                    SOAPPart part = soapMessage.getSOAPPart();
-                    if (o instanceof Source) {
-                        StaxUtils.copy((Source)o, new W3CDOMStreamWriter(part));
-                    }
-                } catch (SOAPException e) {
-                    throw new SoapFault("Error creating SOAPMessage", e, 
-                                        message.getVersion().getSender());
-                } catch (XMLStreamException e) {
-                    throw new SoapFault("Error creating SOAPMessage", e, 
-                                        message.getVersion().getSender());
-                }
-            }
-            message.setContent(SOAPMessage.class, soapMessage);
-            
-            if (!message.containsKey(SAAJOutInterceptor.ORIGINAL_XML_WRITER)) {
-                XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
-                message.put(SAAJOutInterceptor.ORIGINAL_XML_WRITER, origWriter);
-            }
-            W3CDOMStreamWriter writer = new OverlayW3CDOMStreamWriter(soapMessage.getSOAPPart());
-            // Replace stax writer with DomStreamWriter
-            message.setContent(XMLStreamWriter.class, writer);
-            message.setContent(SOAPMessage.class, soapMessage);
-            
-            DocumentFragment frag = soapMessage.getSOAPPart().createDocumentFragment();
-            try {
-                Node body = soapMessage.getSOAPBody();
-                Node nd = body.getFirstChild();
-                while (nd != null) {
-                    body.removeChild(nd);
-                    frag.appendChild(nd);
-                    nd = soapMessage.getSOAPBody().getFirstChild();
-                    list.set(0, frag);
-                }
-            } catch (Exception ex) {
-                throw new Fault(ex);
-            }
-            
-            
-            // Add a final interceptor to write the message
-            message.getInterceptorChain().add(SAAJOutEndingInterceptor.INSTANCE);
-        }
-        
-    }
-
-    static class MessageModeInInterceptor extends AbstractSoapInterceptor {
-        Class<?> type;
-        public MessageModeInInterceptor(Class<?> c) {
-            super(Phase.POST_LOGICAL);
-            type = c;
-        }
-
-        public void handleMessage(SoapMessage message) throws Fault {
-            if (!isDispatch(message.getMessage())) {
-                LOG.info("Dispatch interceptor bailing on unrelated message");
-                return;
-            }
-
-            SOAPMessage m = message.getContent(SOAPMessage.class);
-            MessageContentsList list = (MessageContentsList)message.getContent(List.class); 
-            if (list == null) {
-                list = new MessageContentsList();
-                message.setContent(List.class, list);
-            }
-            Object o = m;
-            
-            if (StreamSource.class.isAssignableFrom(type)) {
-                try {
-                    CachedOutputStream out = new CachedOutputStream();
-                    try {
-                        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
-                        StaxUtils.copy(new DOMSource(m.getSOAPPart()), xsw);
-                        xsw.close();
-                        o = new StreamSource(out.getInputStream());
-                    } finally {
-                        out.close();
-                    }
-                } catch (Exception e) {
-                    throw new Fault(e);
-                }
-            } else if (SAXSource.class.isAssignableFrom(type)) {
-                o = new StaxSource(new W3CDOMStreamReader(m.getSOAPPart()));
-            } else if (Source.class.isAssignableFrom(type)) {
-                o = new DOMSource(m.getSOAPPart());
-            }
-            
-            list.set(0, o);
-        }
-    }
-
-    protected static boolean isDispatch(org.apache.cxf.message.Message message) {   
-        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
-        return boi != null 
-               && DISPATCH_NS.equals(boi.getName().getNamespaceURI())
-               && (INVOKE_NAME.equals(boi.getName().getLocalPart()) 
-                   || INVOKE_ONEWAY_NAME.equals(boi.getName().getLocalPart()));
-    }
-
 }

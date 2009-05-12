@@ -495,8 +495,15 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         TestSAXSourceHandler tssh = new TestSAXSourceHandler();
         Future fd = disp.invokeAsync(saxSourceReq3, tssh);
         assertNotNull(fd);
+        
+        int count = 0;
         while (!fd.isDone()) {
+            if (count > 100) {
+                fail("Did not finish in 10 seconds");
+            }
             //wait
+            Thread.sleep(100);
+            count++;
         }
         String expected3 = "Hello TestSOAPInputMessage3";
         SAXSource saxSourceResp3 = tssh.getSAXSource();

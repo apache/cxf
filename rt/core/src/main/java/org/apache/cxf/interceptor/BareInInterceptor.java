@@ -126,7 +126,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
                 assert msgInfo.getMessageParts().size() > paramNum;
                 p = msgInfo.getMessageParts().get(paramNum);
             } else {
-                p = findMessagePart(exchange, ops, elName, client, paramNum);
+                p = findMessagePart(exchange, ops, elName, client, paramNum, message);
             }
 
             if (p == null) {

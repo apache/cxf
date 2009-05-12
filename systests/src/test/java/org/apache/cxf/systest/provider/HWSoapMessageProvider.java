@@ -19,9 +19,11 @@
 
 package org.apache.cxf.systest.provider;
 import java.io.InputStream;
+import java.util.Iterator;
 
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
+import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
@@ -31,6 +33,8 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 
 import org.w3c.dom.Node;
+
+import org.apache.cxf.helpers.CastUtils;
 
 //The following wsdl file is used.
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
@@ -73,6 +77,17 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
             }
             if (n.getLocalName().equals(sayHi.getLocalPart())) {
                 response = sayHiResponse;
+                if (request.countAttachments() > 0) {
+                    MessageFactory factory = MessageFactory.newInstance();            
+                    InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
+                    response =  factory.createMessage(null, is);
+                    is.close();
+                    Iterator<AttachmentPart> it = CastUtils.cast(request.getAttachments(), 
+                                                                 AttachmentPart.class);
+                    while (it.hasNext()) {
+                        response.addAttachmentPart(it.next());
+                    }
+                }
             } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
                 response = greetMeResponse;
             } else {

@@ -88,9 +88,8 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
         OutputStream out = conn.getOutputStream();
         IOUtils.copy(in, out);
         out.close();
-
-        MimeMultipart mm = readAttachmentParts(conn.getRequestProperty("Content-Type"),
-                                                        conn.getInputStream());
+        MimeMultipart mm = readAttachmentParts(conn.getContentType(),
+                                               conn.getInputStream());
 
         assertEquals("incorrect number of parts received by server", 3, mm.getCount());
 

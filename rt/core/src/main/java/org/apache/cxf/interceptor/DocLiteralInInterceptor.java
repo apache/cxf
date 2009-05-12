@@ -19,8 +19,6 @@
 
 package org.apache.cxf.interceptor;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,7 +38,6 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -174,12 +171,13 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                         //no input messagePartInfo
                         return;
                     }
+                    
                     if (msgInfo != null && msgInfo.getMessageParts() != null 
                         && msgInfo.getMessageParts().size() > 0) {
                         assert msgInfo.getMessageParts().size() > paramNum;
                         p = msgInfo.getMessageParts().get(paramNum);
                     } else {
-                        p = findMessagePart(exchange, operations, elName, client, paramNum);
+                        p = findMessagePart(exchange, operations, elName, client, paramNum, message);
                     }
     
                     if (p == null) {
@@ -252,44 +250,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         MessageInfo msgInfo = getMessageInfo(message, operation, requestor);
         return setMessage(message, operation, requestor, si, msgInfo);
     }
-    private MessageInfo setMessage(Message message, BindingOperationInfo operation,
-                                   boolean requestor, ServiceInfo si,
-                                   MessageInfo msgInfo) {
-        message.put(MessageInfo.class, msgInfo);
 
-        Exchange ex = message.getExchange();
-        ex.put(BindingOperationInfo.class, operation);
-        ex.put(OperationInfo.class, operation.getOperationInfo());
-        ex.setOneWay(operation.getOperationInfo().isOneWay());
-
-        //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
-        message.put(Message.WSDL_OPERATION, operation.getName());
-
-        QName serviceQName = si.getName();
-        message.put(Message.WSDL_SERVICE, serviceQName);
-
-        QName interfaceQName = si.getInterface().getName();
-        message.put(Message.WSDL_INTERFACE, interfaceQName);
-
-        EndpointInfo endpointInfo = ex.get(Endpoint.class).getEndpointInfo();
-        QName portQName = endpointInfo.getName();
-        message.put(Message.WSDL_PORT, portQName);
-
-        
-        URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
-        if (wsdlDescription == null) {
-            String address = endpointInfo.getAddress();
-            try {
-                wsdlDescription = new URI(address + "?wsdl");
-            } catch (URISyntaxException e) {
-                //do nothing
-            }
-            endpointInfo.setProperty("URI", wsdlDescription);
-        }
-        message.put(Message.WSDL_DESCRIPTION, wsdlDescription);
-
-        return msgInfo;
-    }
     
     protected BindingOperationInfo getBindingOperationInfo(Exchange exchange, QName name,
                                                            boolean client) {
