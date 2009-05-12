@@ -88,6 +88,25 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     }
     public void handleMessage(SoapMessage message) throws Fault {
         SOAPMessage saaj = message.getContent(SOAPMessage.class);
+
+        try { 
+            if (message.hasHeaders()
+                && saaj != null 
+                && saaj.getSOAPPart().getEnvelope().getHeader() == null) {
+
+                // creating an empty SOAPHeader at this point in the
+                // pre-existing SOAPMessage avoids the <soap:body> and 
+                // <soap:header> appearing in reverse order when the envolope
+                // is written to the wire
+                //
+                saaj.getSOAPPart().getEnvelope().addHeader();
+            }
+        } catch (SOAPException e) {
+            throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), 
+                                e,
+                                message.getVersion().getSender());
+        }    
+
         if (saaj == null) {
             SoapVersion version = message.getVersion();
             try {

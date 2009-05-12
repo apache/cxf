@@ -89,6 +89,9 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchImpl.class);
+    private static final String DISPATCH_NS = "http://cxf.apache.org/jaxws/dispatch";
+    private static final String INVOKE_NAME = "Invoke";
+    private static final String INVOKE_ONEWAY_NAME = "InvokeOneWay";
     
     private final Binding binding;
     private final EndpointReferenceBuilder builder;
@@ -142,13 +145,12 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     }
     
     private void addInvokeOperation(boolean oneWay) {
-        String name = oneWay ? "InvokeOneWay" : "Invoke";
+        String name = oneWay ? INVOKE_ONEWAY_NAME : INVOKE_NAME;
             
-        String ns = "http://cxf.apache.org/jaxws/dispatch";
         ServiceInfo info = client.getEndpoint().getEndpointInfo().getService();
         OperationInfo opInfo = info.getInterface()
-            .addOperation(new QName(ns, name));
-        MessageInfo mInfo = opInfo.createMessage(new QName(ns, name + "Request"), Type.INPUT);
+            .addOperation(new QName(DISPATCH_NS, name));
+        MessageInfo mInfo = opInfo.createMessage(new QName(DISPATCH_NS, name + "Request"), Type.INPUT);
         opInfo.setInput(name + "Request", mInfo);
         MessagePartInfo mpi = mInfo.addMessagePart("parameters");
         if (context == null) {
@@ -157,7 +159,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         mpi.setElement(true);
 
         if (!oneWay) {
-            mInfo = opInfo.createMessage(new QName(ns, name + "Response"), Type.OUTPUT);
+            mInfo = opInfo.createMessage(new QName(DISPATCH_NS, name + "Response"), Type.OUTPUT);
             opInfo.setOutput(name + "Response", mInfo);
             mpi = mInfo.addMessagePart("parameters");
             mpi.setElement(true);
@@ -317,8 +319,14 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
+            if (!isDispatch(message.getMessage())) {
+                LOG.info("Dispatch interceptor bailing on unrelated message");
+                return;
+            }
+
             MessageContentsList list = (MessageContentsList)message.getContent(List.class);
             Object o = list.get(0);
+            
             SOAPMessage soapMessage = null;
             
             if (o instanceof SOAPMessage) {
@@ -379,6 +387,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
+            if (!isDispatch(message.getMessage())) {
+                LOG.info("Dispatch interceptor bailing on unrelated message");
+                return;
+            }
+
             SOAPMessage m = message.getContent(SOAPMessage.class);
             MessageContentsList list = (MessageContentsList)message.getContent(List.class); 
             if (list == null) {
@@ -410,4 +423,13 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             list.set(0, o);
         }
     }
+
+    protected static boolean isDispatch(org.apache.cxf.message.Message message) {   
+        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+        return boi != null 
+               && DISPATCH_NS.equals(boi.getName().getNamespaceURI())
+               && (INVOKE_NAME.equals(boi.getName().getLocalPart()) 
+                   || INVOKE_ONEWAY_NAME.equals(boi.getName().getLocalPart()));
+    }
+
 }

@@ -41,6 +41,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalIn"/>
                 <ref bean="rmCodec"/>
+                <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
             </list>
         </property>
         <property name="inFaultInterceptors">
@@ -49,6 +50,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalIn"/>
                 <ref bean="rmCodec"/>
+                <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
             </list>
         </property>
         <property name="outInterceptors">
@@ -57,6 +59,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalOut"/>
                 <ref bean="rmCodec"/>
+                <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
             </list>
         </property>
         <property name="outFaultInterceptors">
@@ -65,6 +68,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalOut"/>
                 <ref bean="rmCodec"/>
+                <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
             </list>
         </property>
     </bean>
