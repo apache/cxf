@@ -49,7 +49,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
     @Test
@@ -73,19 +73,28 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
     }
     @Test
     public void testProviderEndpoint() throws Exception {
+        String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
+        String expectedOut = base + "addNumbersRequest</Action>";
+        String expectedIn = base + "addNumbersResponse</Action>";
+
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
         AddNumbersPortType port = getPort();
-
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
                                                         "http://localhost:9094/jaxws/add-provider");
-
         assertEquals(3, port.addNumbers(1, 2));
 
-        String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
-        String expectedOut = base + "addNumbersRequest</Action>";
-        String expectedIn = base + "addNumbersResponse</Action>";
+
+        assertTrue(output.toString().indexOf(expectedOut) != -1);
+        assertTrue(input.toString().indexOf(expectedIn) != -1);
+
+        output.reset();
+        input.reset();
+        
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+            "http://localhost:9094/jaxws/add-providernows");
+        assertEquals(3, port.addNumbers(1, 2));
 
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);
