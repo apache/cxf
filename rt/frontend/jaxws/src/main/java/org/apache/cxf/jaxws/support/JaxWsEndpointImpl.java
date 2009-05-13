@@ -187,7 +187,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 || addressingRequired(portExtensors)) {
                 feature.setAddressingRequired(true);
             }
-            addAddressingFeature(new WSAddressingFeature());
+            addAddressingFeature(feature);
         }
     }
     
@@ -279,6 +279,10 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         } else {
             removeAddressingFeature();
         }
+    }
+    
+    public List<AbstractFeature> getFeatures() {
+        return features;
     }
 
     private WSAddressingFeature getWSAddressingFeature() {

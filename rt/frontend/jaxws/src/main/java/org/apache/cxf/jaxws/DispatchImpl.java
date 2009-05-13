@@ -38,6 +38,7 @@ import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.http.HTTPBinding;
 import javax.xml.ws.http.HTTPException;
@@ -248,8 +249,12 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                     client.getRequestContext().put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, Boolean.TRUE);
                 }
             }
-            Object ret[] = client.invokeWrapped(new QName("http://cxf.apache.org/jaxws/dispatch",
-                                                          "Invoke" + (isOneWay ? "OneWay" : "")),
+            QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
+            if (opName == null) {
+                opName = new QName(DISPATCH_NS,
+                                   isOneWay ? INVOKE_ONEWAY_NAME : INVOKE_NAME);
+            }
+            Object ret[] = client.invokeWrapped(opName,
                                                 obj);
             if (isOneWay) {
                 return null;
@@ -269,10 +274,14 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
              
         Response<T> ret = new JaxwsResponseCallback<T>(callback);
         try {
+            QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
+            if (opName == null) {
+                opName = new QName(DISPATCH_NS, INVOKE_NAME);
+            }
+
             client.invokeWrapped(callback, 
-                                 new QName("http://cxf.apache.org/jaxws/dispatch",
-                                       "Invoke"),
-                                       obj);
+                                 opName,
+                                 obj);
             
             return ret;
         } catch (Exception ex) {

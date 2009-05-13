@@ -219,7 +219,7 @@ public class ServiceImpl extends ServiceDelegate {
         portInfos.put(portName, portInfo);
     }
 
-    private Endpoint getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf, 
+    private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf, 
                                       WebServiceFeature...features) {
         Service service = sf.getService();
         EndpointInfo ei = null;
@@ -584,11 +584,15 @@ public class ServiceImpl extends ServiceDelegate {
         } catch (ServiceConstructionException e) {
             throw new WebServiceException(e);
         }
-        Endpoint endpoint = getJaxwsEndpoint(portName, sf, features);
+        JaxWsEndpointImpl endpoint = getJaxwsEndpoint(portName, sf, features);
         Client client = new ClientImpl(getBus(), endpoint, clientFac.getConduitSelector());
         for (AbstractFeature af : clientFac.getFeatures()) {
             af.initialize(client, bus);
         }
+        for (AbstractFeature af : endpoint.getFeatures()) {
+            af.initialize(client, bus);
+        }
+        
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }

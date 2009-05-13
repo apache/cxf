@@ -20,9 +20,15 @@
 package org.apache.cxf.systest.ws.addr_wsdl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.net.URL;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
+import javax.xml.ws.Service.Mode;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
@@ -64,6 +70,59 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
 
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);
+    }
+    @Test
+    public void testBasicDispatchInvocation() throws Exception {
+        String req = "<addNumbers xmlns=\"http://apache.org/cxf/systest/ws/addr_feature/\">"
+            + "<number1>1</number1><number2>2</number2></addNumbers>";
+        String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
+        String expectedOut = base + "addNumbersRequest";
+        String expectedIn = base + "addNumbersResponse</Action>";
+
+        
+        ByteArrayOutputStream input = setupInLogging();
+        ByteArrayOutputStream output = setupOutLogging();
+        
+        URL wsdl = getClass().getResource("/wsdl_systest/add_numbers.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+        AddNumbersService service = new AddNumbersService(wsdl, serviceName);
+
+
+        Dispatch<Source> disp = service.createDispatch(AddNumbersService.AddNumbersPort,
+                                                       Source.class, Mode.PAYLOAD);
+
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                     "http://localhost:9094/jaxws/add");
+
+        //manually set the action
+        disp.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY,
+                                     expectedOut);
+        disp.invoke(new StreamSource(new StringReader(req)));
+        
+        assertTrue(output.toString().indexOf(expectedOut) != -1);
+        assertTrue(input.toString().indexOf(expectedIn) != -1);
+        
+
+        output.reset();
+        input.reset();
+        
+        disp = service.createDispatch(AddNumbersService.AddNumbersPort,
+                                      Source.class, Mode.PAYLOAD);
+
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                     "http://localhost:9094/jaxws/add");
+        
+        //set the operation name so action can be pulled from the wsdl
+        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, 
+                                     new QName("http://apache.org/cxf/systest/ws/addr_feature/",
+                                               "addNumbers"));
+        
+        disp.invoke(new StreamSource(new StringReader(req)));
+        
+        assertTrue(output.toString().indexOf(expectedOut) != -1);
+        assertTrue(input.toString().indexOf(expectedIn) != -1);
+
+        
     }
 
     private AddNumbersPortType getPort() {
