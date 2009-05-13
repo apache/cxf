@@ -20,15 +20,31 @@
 package org.apache.cxf.systest.ws.security;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jws.WebService;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.Provider;
+import javax.xml.ws.Service.Mode;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceProvider;
+import javax.xml.xpath.XPathConstants;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
@@ -47,6 +63,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String POLICY_HTTPS_ADDRESS = "https://localhost:9009/SecPolTest";
     public static final String POLICY_ENCSIGN_ADDRESS = "http://localhost:9010/SecPolTestEncryptThenSign";
     public static final String POLICY_SIGNENC_ADDRESS = "http://localhost:9010/SecPolTestSignThenEncrypt";
+    public static final String POLICY_SIGNENC_PROVIDER_ADDRESS 
+        = "http://localhost:9010/SecPolTestSignThenEncryptProvider";
     public static final String POLICY_SIGN_ADDRESS = "http://localhost:9010/SecPolTestSign";
 
     
@@ -106,6 +124,18 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        SecurityPolicyTest.class.getResource("bob.properties").toString());
         ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
                        SecurityPolicyTest.class.getResource("alice.properties").toString());
+        
+        
+        ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNENC_PROVIDER_ADDRESS,
+                                            new DoubleItProvider());
+        
+        ei = ep.getServer().getEndpoint().getEndpointInfo(); 
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("bob.properties").toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+
     }
     
     @Test
@@ -141,6 +171,11 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(BigInteger.valueOf(5));
         
+        ((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                      POLICY_SIGNENC_PROVIDER_ADDRESS);
+        int x = pt.doubleIt(BigInteger.valueOf(5)).intValue();
+        assertEquals(10, x);
+        
         pt = service.getDoubleItPortHttps();
         try {
             pt.doubleIt(BigInteger.valueOf(25));
@@ -166,6 +201,35 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             }
         }
 
+        
+    }
+    
+    @Test
+    public void testDispatchClient() throws Exception {
+        DoubleItService service = new DoubleItService();
+        Dispatch<Source> disp = service.createDispatch(DoubleItService.DoubleItPortEncryptThenSign, 
+                                                       Source.class,
+                                                       Mode.PAYLOAD);
+        
+        disp.getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                     new KeystorePasswordCallback());
+        disp.getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                     getClass().getResource("alice.properties"));
+        disp.getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                     getClass().getResource("bob.properties"));
+
+        String req = "<ns2:DoubleIt xmlns:ns2=\"http://cxf.apache.org/policytest/DoubleIt\">"
+            + "<numberToDouble>25</numberToDouble></ns2:DoubleIt>";
+        Source source = new StreamSource(new StringReader(req));
+        source = disp.invoke(source);
+        
+        DOMSource ds = (DOMSource)source;
+        Element el = ((Document)ds.getNode()).getDocumentElement();
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("ns2", "http://cxf.apache.org/policytest/DoubleIt");
+        XPathUtils xp = new XPathUtils(ns);
+        Object o = xp.getValue("/ns2:DoubleItResponse/doubledNumber", el, XPathConstants.STRING);
+        assertEquals("50", o);
         
     }
     
@@ -226,5 +290,29 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         public BigInteger doubleIt(BigInteger numberToDouble) {
             return numberToDouble.multiply(new BigInteger("2"));
         }
+    }
+    
+    @WebServiceProvider(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                        portName = "DoubleItPortSignThenEncrypt",
+                        serviceName = "DoubleItService", 
+                        wsdlLocation = "classpath:/wsdl_systest/DoubleIt.wsdl") 
+    @ServiceMode(value = Mode.PAYLOAD)
+    public static class DoubleItProvider implements Provider<Source> {
+
+        public Source invoke(Source obj) {
+            //CHECK the incoming
+            DOMSource ds = (DOMSource)obj;
+            Element el = ((Document)ds.getNode()).getDocumentElement();
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("ns2", "http://cxf.apache.org/policytest/DoubleIt");
+            XPathUtils xp = new XPathUtils(ns);
+            String o = (String)xp.getValue("/ns2:DoubleIt/numberToDouble", el, XPathConstants.STRING);
+            int i = Integer.parseInt(o);
+            
+            String req = "<ns2:DoubleItResponse xmlns:ns2=\"http://cxf.apache.org/policytest/DoubleIt\">"
+                + "<doubledNumber>" + Integer.toString(i * 2) + "</doubledNumber></ns2:DoubleItResponse>";
+            return new StreamSource(new StringReader(req));
+        }
+        
     }
 }
