@@ -19,7 +19,25 @@
 
 package org.apache.cxf.systest.ws.addr_wsdl;
 
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Provider;
+import javax.xml.ws.Service.Mode;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceProvider;
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -34,8 +52,9 @@ public class Server extends AbstractBusTestServerBase {
                                            null, 
                                            getWsdl());
 
-        //EndpointImpl ep = (EndpointImpl) Endpoint.create(implementor);
         ep.publish(address);
+        
+        Endpoint.publish(address + "-provider", new AddNumberProvider());
     }
     
     private String getWsdl() {
@@ -58,5 +77,32 @@ public class Server extends AbstractBusTestServerBase {
         } finally {
             System.out.println("done!");
         }
+    }
+    
+    
+    @WebServiceProvider(serviceName = "AddNumbersService",
+                        targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/",
+                        wsdlLocation = "/wsdl_systest/add_numbers.wsdl")
+    @ServiceMode(Mode.PAYLOAD)
+    public static class AddNumberProvider implements Provider<Source> {
+
+        public Source invoke(Source obj) {
+            //CHECK the incoming
+            DOMSource ds = (DOMSource)obj;
+            
+            Element el = ((Document)ds.getNode()).getDocumentElement();
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
+            XPathUtils xp = new XPathUtils(ns);
+            String o = (String)xp.getValue("/ns:addNumbers/ns:number1", el, XPathConstants.STRING);
+            String o2 = (String)xp.getValue("/ns:addNumbers/ns:number2", el, XPathConstants.STRING);
+            int i = Integer.parseInt(o);
+            int i2 = Integer.parseInt(o2);
+            
+            String resp = "<addNumbersResponse xmlns=\"http://apache.org/cxf/systest/ws/addr_feature/\">"
+                + "<return>" + (i + i2) + "</return></addNumbersResponse>";
+            return new StreamSource(new StringReader(resp));
+        }
+        
     }
 }

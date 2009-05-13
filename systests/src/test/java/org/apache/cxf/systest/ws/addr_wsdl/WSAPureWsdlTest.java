@@ -72,6 +72,26 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
     @Test
+    public void testProviderEndpoint() throws Exception {
+        ByteArrayOutputStream input = setupInLogging();
+        ByteArrayOutputStream output = setupOutLogging();
+
+        AddNumbersPortType port = getPort();
+
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                                        "http://localhost:9094/jaxws/add-provider");
+
+        assertEquals(3, port.addNumbers(1, 2));
+
+        String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
+        String expectedOut = base + "addNumbersRequest</Action>";
+        String expectedIn = base + "addNumbersResponse</Action>";
+
+        assertTrue(output.toString().indexOf(expectedOut) != -1);
+        assertTrue(input.toString().indexOf(expectedIn) != -1);
+    }
+
+    @Test
     public void testBasicDispatchInvocation() throws Exception {
         String req = "<addNumbers xmlns=\"http://apache.org/cxf/systest/ws/addr_feature/\">"
             + "<number1>1</number1><number2>2</number2></addNumbers>";
