@@ -378,7 +378,7 @@ public class WrappedMessageContext implements MessageContext {
         } else if (MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
             ret = message.put(Message.PROTOCOL_HEADERS, value);
         } else if (SoapBindingConstants.SOAP_ACTION.equals(mappedKey)
-            && !isRequestor()) {
+            && !isRequestor() && exchange != null) {
             Message tmp = createResponseMessage();
             if (tmp != null) {
                 tmp.put(mappedKey, value);
