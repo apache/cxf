@@ -42,8 +42,9 @@ import javax.xml.ws.WebServiceProvider;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -224,13 +225,15 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         source = disp.invoke(source);
         
         DOMSource ds = (DOMSource)source;
-        Element el = ((Document)ds.getNode()).getDocumentElement();
+        Node nd = ds.getNode();
+        if (nd instanceof Document) {
+            nd = ((Document)nd).getDocumentElement();
+        }
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("ns2", "http://cxf.apache.org/policytest/DoubleIt");
         XPathUtils xp = new XPathUtils(ns);
-        Object o = xp.getValue("/ns2:DoubleItResponse/doubledNumber", el, XPathConstants.STRING);
-        assertEquals("50", o);
-        
+        Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
+        assertEquals(XMLUtils.toString(nd), "50", o);
     }
     
     
@@ -302,11 +305,15 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         public Source invoke(Source obj) {
             //CHECK the incoming
             DOMSource ds = (DOMSource)obj;
-            Element el = ((Document)ds.getNode()).getDocumentElement();
+            
+            Node el = ds.getNode();
+            if (el instanceof Document) {
+                el = ((Document)el).getDocumentElement();
+            }
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("ns2", "http://cxf.apache.org/policytest/DoubleIt");
             XPathUtils xp = new XPathUtils(ns);
-            String o = (String)xp.getValue("/ns2:DoubleIt/numberToDouble", el, XPathConstants.STRING);
+            String o = (String)xp.getValue("//ns2:DoubleIt/numberToDouble", el, XPathConstants.STRING);
             int i = Integer.parseInt(o);
             
             String req = "<ns2:DoubleItResponse xmlns:ns2=\"http://cxf.apache.org/policytest/DoubleIt\">"

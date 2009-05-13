@@ -203,6 +203,17 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
      */
     public abstract String getElementText() throws XMLStreamException;
 
+    public void consumeFrame() {
+        frame.started = true;
+        frame.ended = true;
+        if (frame.isDocument()) {
+            currentEvent = END_DOCUMENT;                
+        } else {
+            currentEvent = END_ELEMENT;
+            endElement();
+        }
+    }
+    
     /*
      * (non-Javadoc)
      * 

@@ -63,7 +63,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     && ((W3CDOMStreamWriter)writer).getCurrentNode() != null) {
                     W3CDOMStreamWriter dw = (W3CDOMStreamWriter)writer;
                     
-                    if (nd.getOwnerDocument() == dw.getDocument()) {
+                    if (nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {
                         dw.getCurrentNode().appendChild(nd);
                         return;
                     } else if (nd instanceof DocumentFragment) {
