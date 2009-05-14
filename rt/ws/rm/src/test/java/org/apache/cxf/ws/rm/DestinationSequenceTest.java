@@ -340,18 +340,18 @@ public class DestinationSequenceTest extends Assert {
         for (int i = 0; i < 10; i++) {
             seq.acknowledge(messages[i]);
             try {
-                Thread.sleep(50);
+                Thread.sleep(55);
             } catch (InterruptedException ex) {
                 // ignore
             }
         }
         int mpm1 = monitor.getMPM();
-        assertTrue(mpm1 > 0);
+        assertTrue("unexpected MPM: " + mpm1, mpm1 > 0);
         
         for (int i = 10; i < messages.length; i++) {
             seq.acknowledge(messages[i]);
             try {
-                Thread.sleep(100);
+                Thread.sleep(110);
             } catch (InterruptedException ex) {
                 // ignore
             }
