@@ -44,7 +44,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 
 
@@ -116,8 +118,19 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         // Use a DOMSource for now, we should really use a StaxSource/SAXSource though for 
         // performance reasons
         try {
-            Document document = StaxUtils.read(reader);
-            return new DOMSource(document);
+            XMLStreamReader reader2 = reader;
+            if (reader2 instanceof DepthXMLStreamReader) {
+                reader2 = ((DepthXMLStreamReader)reader2).getReader();
+            }
+            if (reader2 instanceof W3CDOMStreamReader) {
+                W3CDOMStreamReader domreader = (W3CDOMStreamReader)reader2;
+                Object o = new DOMSource(domreader.getCurrentElement());
+                domreader.consumeFrame();
+                return o;
+            } else {
+                Document document = StaxUtils.read(reader);
+                return new DOMSource(document);
+            }
         } catch (XMLStreamException e) {
             throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
         }
