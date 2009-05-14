@@ -124,13 +124,16 @@ public class AttachmentSerializer {
 
         writer.write("Content-Transfer-Encoding: binary\r\n");
 
-        writer.write("Content-ID: <");
-        if (attachmentId.charAt(0) == '<'
-            && attachmentId.charAt(attachmentId.length() - 1) == '>') {
-            attachmentId = attachmentId.substring(1, attachmentId.length() - 1);
+        if (attachmentId != null) {
+            writer.write("Content-ID: <");
+            if (attachmentId.charAt(0) == '<'
+                && attachmentId.charAt(attachmentId.length() - 1) == '>') {
+                attachmentId = attachmentId.substring(1, attachmentId.length() - 1);
+            }
+            writer.write(URLDecoder.decode(attachmentId, "UTF-8"));
+            writer.write(">\r\n");
         }
-        writer.write(URLDecoder.decode(attachmentId, "UTF-8"));
-        writer.write(">\r\n\r\n");
+        writer.write("\r\n");
     }
 
     /**
