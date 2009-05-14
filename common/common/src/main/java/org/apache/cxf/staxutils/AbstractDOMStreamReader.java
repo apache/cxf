@@ -76,16 +76,18 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
             this.parent = parent;
             this.currentChild = ch;
         }
-        public ElementFrame(T doc) {
+        public ElementFrame(T doc, boolean s) {
             this.element = doc;
             parent = null;
-            started = true;
+            started = s;
             attributes = Collections.emptyList();
             prefixes = Collections.emptyList();
             uris = Collections.emptyList();
             allAttributes = Collections.emptyList();
         }
-        
+        public ElementFrame(T doc) {
+            this(doc, true);
+        }        
         public T getElement() {
             return element;
         }
@@ -96,7 +98,12 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         public void setCurrentChild(I o) {
             currentChild = o;
         }
-
+        public boolean isDocument() {
+            return false;
+        }
+        public boolean isDocumentFragment() {
+            return false;
+        }
     }
 
     /**
@@ -138,7 +145,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
         if (!frame.started) {
             frame.started = true;
-            currentEvent = START_ELEMENT;
+            currentEvent = frame.isDocument() ? START_DOCUMENT : START_ELEMENT;
         } else if (frame.currentAttribute < getAttributeCount() - 1) {
             frame.currentAttribute++;
             currentEvent = ATTRIBUTE;
@@ -159,8 +166,12 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
             }
         } else {
             frame.ended = true;
-            currentEvent = END_ELEMENT;
-            endElement();
+            if (frame.isDocument()) {
+                currentEvent = END_DOCUMENT;                
+            } else {
+                currentEvent = END_ELEMENT;
+                endElement();
+            }
         }
         return currentEvent;
     }
@@ -224,7 +235,8 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
      * @see javax.xml.stream.XMLStreamReader#hasNext()
      */
     public boolean hasNext() throws XMLStreamException {
-        return !(frames.size() == 0 && frame.ended);
+        
+        return !(frame.ended && (frames.size() == 0 || frame.isDocumentFragment()));
 
     }
 
