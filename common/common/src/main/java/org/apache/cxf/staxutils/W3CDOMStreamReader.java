@@ -196,7 +196,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
                 return frame.uris.get(index);
             }
 
-            if (frame.parent == null) {
+            if (frame.parent == null && frame.getElement() instanceof Element) {
                 return ((Element)frame.getElement()).lookupNamespaceURI(prefix);
             }
             frame = frame.parent;
