@@ -122,6 +122,9 @@ public class LazyAttachmentCollection
     }
 
     public boolean isEmpty() {
+        if (attachments.isEmpty()) {
+            return !iterator().hasNext();
+        }
         return attachments.isEmpty();
     }
 

@@ -19,9 +19,12 @@
 package org.apache.cxf.databinding.source;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -52,19 +55,11 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         return read(null, input, part.getTypeClass());
     }
 
-    public Object read(QName name, XMLStreamReader input, Class type) {
+    public Object read(final QName name, XMLStreamReader input, Class type) {
         if (type != null) {
             if (SAXSource.class.isAssignableFrom(type)) {
                 try {
-                    CachedOutputStream out = new CachedOutputStream();
-                    try {
-                        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
-                        StaxUtils.copy(input, xsw);
-                        xsw.close();
-                        return new SAXSource(new InputSource(out.getInputStream()));
-                    } finally {
-                        out.close();
-                    }
+                    return new SAXSource(new InputSource(getInputStream(input)));
                 } catch (IOException e) {
                     throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
                 } catch (XMLStreamException e) {
@@ -72,25 +67,51 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 }
             } else if (StreamSource.class.isAssignableFrom(type)) {
                 try {
-                    CachedOutputStream out = new CachedOutputStream();
-                    try {
-                        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
-                        StaxUtils.copy(input, xsw);
-                        xsw.close();
-                        return new StreamSource(out.getInputStream());
-                    } finally {
-                        out.close();
-                    }
+                    return new StreamSource(getInputStream(input));
                 } catch (IOException e) {
                     throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
                 } catch (XMLStreamException e) {
                     throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
                 }
-            } 
+            } else if (DataSource.class.isAssignableFrom(type)) {
+                try {
+                    final InputStream ins = getInputStream(input);
+                    return new DataSource() {
+                        public String getContentType() {
+                            return "text/xml";
+                        }
+                        public InputStream getInputStream() throws IOException {
+                            return ins;
+                        }
+                        public String getName() {
+                            return name.toString();
+                        }
+                        public OutputStream getOutputStream() throws IOException {
+                            return null;
+                        }
+                    };
+                } catch (IOException e) {
+                    throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+                } catch (XMLStreamException e) {
+                    throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+                }                
+            }
         }
         return read(input);
     }
-
+    private InputStream getInputStream(XMLStreamReader input) 
+        throws XMLStreamException, IOException {
+        
+        CachedOutputStream out = new CachedOutputStream();
+        try {
+            XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
+            StaxUtils.copy(input, xsw);
+            xsw.close();
+            return out.getInputStream();
+        } finally {
+            out.close();
+        }
+    }
     public Object read(XMLStreamReader reader) {
         // Use a DOMSource for now, we should really use a StaxSource/SAXSource though for 
         // performance reasons
