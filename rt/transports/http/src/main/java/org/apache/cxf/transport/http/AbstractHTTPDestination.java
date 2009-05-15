@@ -283,9 +283,13 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         }
         inMessage.put(Message.PATH_INFO, contextPath + req.getPathInfo());
         
+        String contentType = req.getContentType();
+        String enc = HttpHeaderHelper.findCharset(contentType);
+        if (enc == null) {
+            enc = req.getCharacterEncoding();
+        }
         // work around a bug with Jetty which results in the character
         // encoding not being trimmed correctly.
-        String enc = req.getCharacterEncoding();
         if (enc != null && enc.endsWith("\"")) {
             enc = enc.substring(0, enc.length() - 1);
         }
@@ -300,7 +304,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         inMessage.put(Message.ENCODING, normalizedEncoding);
         
         inMessage.put(Message.QUERY_STRING, req.getQueryString());
-        inMessage.put(Message.CONTENT_TYPE, req.getContentType());
+        inMessage.put(Message.CONTENT_TYPE, contentType);
         inMessage.put(Message.ACCEPT_CONTENT_TYPE, req.getHeader("Accept"));
         String basePath = getBasePath(contextPath);
         if (!StringUtils.isEmpty(basePath)) {
