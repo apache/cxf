@@ -354,48 +354,45 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
         sb.getOutFaultInterceptors().add(new StaxOutInterceptor());
         sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
-        
-        if (!Boolean.TRUE.equals(binding.getProperty(SMX_DATABINDING_DISABLED))) {
 
-            sb.getInInterceptors().add(new AttachmentInInterceptor());
-            sb.getInInterceptors().add(new StaxInInterceptor());
-            sb.getInInterceptors().add(new SoapActionInInterceptor());
+        sb.getInInterceptors().add(new AttachmentInInterceptor());
+        sb.getInInterceptors().add(new StaxInInterceptor());
+        sb.getInInterceptors().add(new SoapActionInInterceptor());
         
-            sb.getOutInterceptors().add(new AttachmentOutInterceptor());
-            sb.getOutInterceptors().add(new StaxOutInterceptor());
-            sb.getOutInterceptors().add(new SoapHeaderOutFilterInterceptor());
+        sb.getOutInterceptors().add(new AttachmentOutInterceptor());
+        sb.getOutInterceptors().add(new StaxOutInterceptor());
+        sb.getOutInterceptors().add(new SoapHeaderOutFilterInterceptor());
 
-            if (SoapBindingConstants.BINDING_STYLE_RPC.equalsIgnoreCase(bindingStyle)) {
-                sb.getInInterceptors().add(new RPCInInterceptor());
-                sb.getOutInterceptors().add(new RPCOutInterceptor());
-            } else if (SoapBindingConstants.BINDING_STYLE_DOC.equalsIgnoreCase(bindingStyle)
+        if (SoapBindingConstants.BINDING_STYLE_RPC.equalsIgnoreCase(bindingStyle)) {
+            sb.getInInterceptors().add(new RPCInInterceptor());
+            sb.getOutInterceptors().add(new RPCOutInterceptor());
+        } else if (SoapBindingConstants.BINDING_STYLE_DOC.equalsIgnoreCase(bindingStyle)
                         && SoapBindingConstants.PARAMETER_STYLE_BARE.equalsIgnoreCase(parameterStyle)) {
-                //sb.getInInterceptors().add(new BareInInterceptor());
-                sb.getInInterceptors().add(new DocLiteralInInterceptor());
-                if (hasWrapped) {
-                    sb.getOutInterceptors().add(new WrappedOutInterceptor());                    
-                }
-                sb.getOutInterceptors().add(new BareOutInterceptor());
-            } else {
-                //sb.getInInterceptors().add(new WrappedInInterceptor());
-                sb.getInInterceptors().add(new DocLiteralInInterceptor());
-                sb.getOutInterceptors().add(new WrappedOutInterceptor());
-                sb.getOutInterceptors().add(new BareOutInterceptor());
+            //sb.getInInterceptors().add(new BareInInterceptor());
+            sb.getInInterceptors().add(new DocLiteralInInterceptor());
+            if (hasWrapped) {
+                sb.getOutInterceptors().add(new WrappedOutInterceptor());                    
             }
-            sb.getInInterceptors().add(new SoapHeaderInterceptor());
-            
-            sb.getInInterceptors().add(new ReadHeadersInterceptor(getBus()));
-            sb.getInInterceptors().add(new CheckFaultInterceptor());
-            sb.getInInterceptors().add(new MustUnderstandInterceptor());
-            sb.getOutInterceptors().add(new SoapPreProtocolOutInterceptor());
-            sb.getOutInterceptors().add(new SoapOutInterceptor(getBus()));
-            sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
-
-            // REVISIT: The phase interceptor chain seems to freak out if this added
-            //first. Not sure what the deal is at the moment, I suspect the
-            //ordering algorithm needs to be improved
-            sb.getInInterceptors().add(new URIMappingInterceptor());
+            sb.getOutInterceptors().add(new BareOutInterceptor());
+        } else {
+            //sb.getInInterceptors().add(new WrappedInInterceptor());
+            sb.getInInterceptors().add(new DocLiteralInInterceptor());
+            sb.getOutInterceptors().add(new WrappedOutInterceptor());
+            sb.getOutInterceptors().add(new BareOutInterceptor());
         }
+        sb.getInInterceptors().add(new SoapHeaderInterceptor());
+
+        sb.getInInterceptors().add(new ReadHeadersInterceptor(getBus()));
+        sb.getInInterceptors().add(new CheckFaultInterceptor());
+        sb.getInInterceptors().add(new MustUnderstandInterceptor());
+        sb.getOutInterceptors().add(new SoapPreProtocolOutInterceptor());
+        sb.getOutInterceptors().add(new SoapOutInterceptor(getBus()));
+        sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
+
+        // REVISIT: The phase interceptor chain seems to freak out if this added
+        // first. Not sure what the deal is at the moment, I suspect the
+        // ordering algorithm needs to be improved
+        sb.getInInterceptors().add(new URIMappingInterceptor());
 
         if (version.getVersion() == 1.1) {
             sb.getInFaultInterceptors().add(new Soap11FaultInInterceptor());
