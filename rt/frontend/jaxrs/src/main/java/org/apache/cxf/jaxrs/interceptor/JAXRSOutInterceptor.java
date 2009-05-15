@@ -202,8 +202,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
             try {
-                writer.writeTo(entity, targetType, 
-                               invoked != null ? invoked.getGenericReturnType() : null, 
+                writer.writeTo(entity, targetType, genericType, 
                                invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                                responseType, 
                                responseHeaders, 
