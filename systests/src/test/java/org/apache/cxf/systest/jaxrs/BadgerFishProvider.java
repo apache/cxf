@@ -96,7 +96,7 @@ public final class BadgerFishProvider
     public void writeTo(Object obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
         try {
-            if (!new Locale("badger-fish-language").equals(requestHeaders.getLanguage())) {
+            if (!new Locale("badgerFishLanguage").equals(requestHeaders.getLanguage())) {
                 throw new RuntimeException();
             }
             

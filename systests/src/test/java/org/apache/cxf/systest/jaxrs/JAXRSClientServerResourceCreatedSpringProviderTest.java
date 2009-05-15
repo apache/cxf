@@ -50,7 +50,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
-        connect.addRequestProperty("Content-Language", "badger-fish-language");
+        connect.addRequestProperty("Content-Language", "badgerFishLanguage");
         InputStream in = connect.getInputStream();
         assertNotNull(in);           
 
