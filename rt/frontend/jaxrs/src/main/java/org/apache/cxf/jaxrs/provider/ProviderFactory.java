@@ -394,16 +394,16 @@ public final class ProviderFactory {
                                                Type genericType,
                                                Annotation[] annotations,
                                                MediaType mediaType) {
-        if (!ep.isReadable(type, genericType, annotations, mediaType)) {
-            return false;
-        }
-        
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderConsumeTypes(ep);
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType), supportedMediaTypes);
 
-        return availableMimeTypes.size() != 0 ? true : false;
+        if (availableMimeTypes.size() == 0) {
+            return false;
+        }
+        
+        return ep.isReadable(type, genericType, annotations, mediaType);
         
     }
         
@@ -440,18 +440,16 @@ public final class ProviderFactory {
                                                Type genericType,
                                                Annotation[] annotations,
                                                MediaType mediaType) {
-        if (!ep.isWriteable(type, genericType, annotations, mediaType)) {
-            return false;
-        }
-        
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderProduceTypes(ep);
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
                                           supportedMediaTypes);
 
-        return availableMimeTypes.size() != 0 ? true : false;
-        
+        if (availableMimeTypes.size() == 0) {
+            return false;
+        }
+        return ep.isWriteable(type, genericType, annotations, mediaType); 
     }
     
     List<ProviderInfo<MessageBodyReader>> getMessageReaders() {

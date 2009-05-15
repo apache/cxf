@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -424,13 +425,21 @@ public final class JAXRSUtils {
         List<Object> params = new ArrayList<Object>(parameterTypes.length);
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            Object param = processParameter(parameterTypes[i], 
-                                            genericParameterTypes[i],
-                                            parameterAnnotations[i], 
-                                            values, 
-                                            message,
-                                            ori);
-            params.add(param);
+            Class<?> param = parameterTypes[i]; 
+            Type genericParam = genericParameterTypes[i];
+            if (param == Object.class && genericParam instanceof TypeVariable) {
+                genericParam = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
+                                                           (TypeVariable)genericParam);
+                param = (Class)genericParam; 
+            }
+            
+            Object paramValue = processParameter(param, 
+                                                 genericParam,
+                                                 parameterAnnotations[i], 
+                                                 values, 
+                                                 message,
+                                                 ori);
+            params.add(paramValue);
         }
 
         return params;
@@ -442,6 +451,7 @@ public final class JAXRSUtils {
                                            MultivaluedMap<String, String> values,
                                            Message message,
                                            OperationResourceInfo ori) {
+        
         InputStream is = message.getContent(InputStream.class);
 
         if (parameterAnns == null 

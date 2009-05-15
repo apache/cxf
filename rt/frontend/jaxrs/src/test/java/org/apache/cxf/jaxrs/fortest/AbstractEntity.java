@@ -17,16 +17,33 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.impl.tl;
+package org.apache.cxf.jaxrs.fortest;
 
-import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 
-public class ThreadLocalContextResolver extends AbstractThreadLocalProxy<ContextResolver> 
-    implements ContextResolver {
 
-    @SuppressWarnings("unchecked")
-    public Object getContext(Class type) {
-        return get() != null ? get().getContext(type) : null;
+public class AbstractEntity<T, E> {
+    
+    private T entity1;
+    private E entity2;
+    
+    @POST
+    public void postEntity(T object) {
+        entity1 = object;   
     }
-
+    
+    @PUT
+    public void putEntity(E object) {
+        entity2 = object;   
+    }
+    
+    public T getEntity1() {
+        return entity1;
+    }
+    
+    public E getEntity2() {
+        return entity2;
+    }
+    
 }

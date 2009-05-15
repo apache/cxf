@@ -16,17 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.fortest;
 
-package org.apache.cxf.jaxrs.impl.tl;
+import javax.ws.rs.Path;
 
-import javax.ws.rs.ext.ContextResolver;
+import org.apache.cxf.jaxrs.resources.Book;
 
-public class ThreadLocalContextResolver extends AbstractThreadLocalProxy<ContextResolver> 
-    implements ContextResolver {
+@Path("/books")
+public class GenericEntityImpl implements GenericEntity<Book> {
 
-    @SuppressWarnings("unchecked")
-    public Object getContext(Class type) {
-        return get() != null ? get().getContext(type) : null;
+    private Book book;
+    
+    public void postEntity(Book object) {
+        book = object;
     }
-
+    
+    public Book getEntity() {
+        return book;
+    }
 }

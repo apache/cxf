@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
-public class Customer implements CustomerInfo {
+public class Customer extends AbstractCustomer implements CustomerInfo {
     
     @XmlRootElement(name = "CustomerBean")
     public static class CustomerBean {

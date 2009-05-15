@@ -28,6 +28,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -93,6 +94,28 @@ public final class InjectionUtils {
         
     }
 
+    public static Type getSuperType(Class<?> serviceClass, TypeVariable var) {
+        
+        int pos = 0;
+        TypeVariable[] vars = var.getGenericDeclaration().getTypeParameters();
+        for (; pos < vars.length; pos++) {
+            if (vars[pos].getName().equals(var.getName())) {
+                break;
+            }
+        }
+        
+        Type genericSubtype = serviceClass.getGenericSuperclass();
+        if (genericSubtype == Object.class) {
+            Type[] genInterfaces = serviceClass.getGenericInterfaces();
+            for (Type t : genInterfaces) {
+                genericSubtype = t;
+                break;
+            }
+        }
+        return genericSubtype != Object.class ? InjectionUtils.getActualType(genericSubtype, pos)
+                                              : genericSubtype;
+    }
+    
     public static boolean invokeBooleanGetter(Object o, String name) {
         try {
             Method method = o.getClass().getMethod(name, new Class[]{});
@@ -158,6 +181,11 @@ public final class InjectionUtils {
     
     public static Class<?> getActualType(Type genericType) {
         
+        return getActualType(genericType, 0);
+    }
+    
+    public static Class<?> getActualType(Type genericType, int pos) {
+        
         if (genericType == null) {
             return null;
         }
@@ -166,7 +194,11 @@ public final class InjectionUtils {
             return cls.isArray() ? cls.getComponentType() : null;
         }
         ParameterizedType paramType = (ParameterizedType)genericType;
-        Type t = paramType.getActualTypeArguments()[0];
+        Type[] types = paramType.getActualTypeArguments();
+        if (pos >= types.length) {
+            throw new RuntimeException("No type can be found at position " + pos);
+        }
+        Type t = types[pos];
         // we don't recurse at this stage, otherwise GenericEntity won't be handled properly
         return t instanceof Class ? (Class<?>)t : null;
     }

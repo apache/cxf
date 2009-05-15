@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -158,20 +159,24 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         
-        Class<?> targetType = getRawResponseClass(responseObj);
         List<MediaType> availableContentTypes = computeAvailableContentTypes(message, response);  
         
         Method invoked = null;
         if (firstTry) {
             invoked = ori == null ? null : ori.getMethodToInvoke();
         }
+        Class<?> targetType = getRawResponseClass(responseObj);
+        Type genericType = getGenericResponseType(invoked, responseObj);
+        if (genericType instanceof TypeVariable) {
+            genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
+                                                       (TypeVariable)genericType);
+        }
         
         MessageBodyWriter writer = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
             writer = ProviderFactory.getInstance(message)
-                .createMessageBodyWriter(targetType, 
-                      getGenericResponseType(invoked, responseObj), 
+                .createMessageBodyWriter(targetType, genericType, 
                       invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                       type,
                       message);

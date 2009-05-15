@@ -1137,7 +1137,8 @@ public class JAXRSUtilsTest extends Assert {
                    ((ThreadLocalProxy)c.getThreadLocalServletContext()).get());
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy)c.getServletContext()).get());
-        
+        assertSame(servletContextMock, 
+                   ((ThreadLocalProxy)c.getSuperServletContext()).get());
         assertSame(httpRequest, 
                    ((ThreadLocalProxy)c.getServletRequest()).get());
         HttpServletResponseFilter filter = (

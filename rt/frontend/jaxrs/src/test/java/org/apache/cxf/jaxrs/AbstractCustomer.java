@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.impl.tl;
+package org.apache.cxf.jaxrs;
 
-import javax.ws.rs.ext.ContextResolver;
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 
-public class ThreadLocalContextResolver extends AbstractThreadLocalProxy<ContextResolver> 
-    implements ContextResolver {
-
-    @SuppressWarnings("unchecked")
-    public Object getContext(Class type) {
-        return get() != null ? get().getContext(type) : null;
+public class AbstractCustomer {
+    @Context 
+    private ServletContext sContext;
+    
+    public ServletContext getSuperServletContext() {
+        return sContext;
     }
-
-}
+};
