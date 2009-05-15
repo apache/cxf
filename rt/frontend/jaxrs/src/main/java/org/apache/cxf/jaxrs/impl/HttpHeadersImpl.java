@@ -70,7 +70,7 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
-        return values.size() == 0 ? null : new Locale(values.get(0).trim());
+        return values.size() == 0 ? null : createLocale(values.get(0).trim());
     }
 
     public MediaType getMediaType() {

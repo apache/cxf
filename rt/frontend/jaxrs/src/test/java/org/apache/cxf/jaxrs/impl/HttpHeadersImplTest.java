@@ -130,11 +130,11 @@ public class HttpHeadersImplTest extends Assert {
         Message m = control.createMock(Message.class);
         m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        headers.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en-US");
         EasyMock.expectLastCall().andReturn(headers);
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
-        assertEquals(new Locale("en"), h.getLanguage());
+        assertEquals("en_US", h.getLanguage().toString());
     }
     
     @Test
