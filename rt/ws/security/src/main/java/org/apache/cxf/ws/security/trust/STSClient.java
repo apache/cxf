@@ -403,11 +403,19 @@ public class STSClient implements Configurable {
 
         Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
-        SecurityToken token = createSecurityToken((Document)((DOMSource)obj[0]).getNode(), requestorEntropy);
+        SecurityToken token = createSecurityToken(getDocumentElement((DOMSource)obj[0]), requestorEntropy);
         if (cert != null) {
             token.setX509Certificate(cert, crypto);
         }
         return token;
+    }
+    
+    private Element getDocumentElement(DOMSource ds) {
+        Node nd = ds.getNode();
+        if (nd instanceof Document) {
+            nd = ((Document)nd).getDocumentElement();
+        }
+        return (Element)nd;
     }
 
     public void renewSecurityToken(SecurityToken tok) throws Exception {
@@ -625,10 +633,9 @@ public class STSClient implements Configurable {
         }
     }
 
-    private SecurityToken createSecurityToken(Document document, byte[] requestorEntropy)
+    private SecurityToken createSecurityToken(Element el, byte[] requestorEntropy)
         throws WSSecurityException {
 
-        Element el = document.getDocumentElement();
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
         }
