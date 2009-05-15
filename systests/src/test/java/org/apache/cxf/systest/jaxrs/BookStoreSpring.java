@@ -27,6 +27,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -105,6 +106,14 @@ public class BookStoreSpring {
         b.setId(book.getId());
         b.setName(book.getName());
         return b;
+    }
+    
+    @PUT
+    @Path("books/convert2")
+    @Consumes({"application/xml", "application/json", "application/jettison" })
+    @Produces("application/xml")
+    public Book convertBook2(Book2 book) {
+        return convertBook(book);
     }
     
     @GET

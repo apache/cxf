@@ -32,7 +32,7 @@ public class XmlStreamWriterProvider implements ResponseHandler {
 
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
         String method = ori.getHttpMethod();
-        if ("POST".equals(method)) {
+        if ("PUT".equals(method)) {
             XMLStreamWriter writer = 
                 StaxUtils.createXMLStreamWriter(m.getContent(OutputStream.class));
             m.setContent(XMLStreamWriter.class, new CustomXmlStreamWriter(writer));

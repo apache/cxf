@@ -33,9 +33,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class ResponseBuilderImpl extends ResponseBuilder {
     private int status = 200;
@@ -91,6 +94,13 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder location(URI location) {
+        if (!location.isAbsolute()) {
+            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
+            if (currentMessage != null) {
+                UriInfo ui = new UriInfoImpl(currentMessage.getExchange().getInMessage(), null);
+                location = ui.getBaseUriBuilder().path(location.toString()).build();
+            }
+        }
         return setHeader(HttpHeaders.LOCATION, location);
     }
 

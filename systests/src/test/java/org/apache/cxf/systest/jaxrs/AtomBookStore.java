@@ -121,8 +121,6 @@ public class AtomBookStore {
             Book b = (Book)jc.createUnmarshaller().unmarshal(reader);
             books.put(b.getId(), b);
             
-            // this code is broken as Response does not
-            
             URI uri = 
                 uField.getBaseUriBuilder().path("books").path("entries") 
                                                 .path(Long.toString(b.getId())).build();
@@ -131,6 +129,25 @@ public class AtomBookStore {
             return Response.serverError().build();
         }
     }
+    
+    @POST
+    @Path("/books/feed/relative")
+    @Consumes("application/atom+xml")
+    public Response addBookAsEntryRelativeURI(Entry e) throws Exception {
+        try {
+            String text = e.getContentElement().getValue();
+            StringReader reader = new StringReader(text);
+            JAXBContext jc = JAXBContext.newInstance(Book.class);
+            Book b = (Book)jc.createUnmarshaller().unmarshal(reader);
+            books.put(b.getId(), b);
+            
+            URI uri = URI.create("books/entries/" + Long.toString(b.getId()));
+            return Response.created(uri).entity(e).build();
+        } catch (Exception ex) {
+            return Response.serverError().build();
+        }
+    }
+    
     
     @GET
     @Path("/books/entries/{bookId}/")

@@ -18,26 +18,29 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.InputStream;
+import java.io.OutputStream;
 
-import javax.ws.rs.core.Response;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class XmlStreamReaderProvider implements RequestHandler {
+public class XMLStreamWriterOutInterceptor extends AbstractOutDatabindingInterceptor {
 
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
-        String method = m.get(Message.HTTP_REQUEST_METHOD).toString();
-        if ("PUT".equals(method)) {
-            XMLStreamReader reader = 
-                StaxUtils.createXMLStreamReader(m.getContent(InputStream.class));
-            m.setContent(XMLStreamReader.class, new CustomXmlStreamReader(reader));
+    public XMLStreamWriterOutInterceptor() {
+        super(Phase.PRE_MARSHAL);
+    }
+    
+    public void handleMessage(Message m) throws Fault {
+        String method = m.getExchange().getInMessage().get(Message.HTTP_REQUEST_METHOD).toString();
+        if ("POST".equals(method)) {
+            XMLStreamWriter writer = 
+                StaxUtils.createXMLStreamWriter(m.getContent(OutputStream.class));
+            m.setContent(XMLStreamWriter.class, new CustomXmlStreamWriter(writer));
         }
-        return null;
     }
 
 }

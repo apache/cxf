@@ -20,24 +20,27 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
 
-import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class XmlStreamReaderProvider implements RequestHandler {
+public class XMLStreamReaderInInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public XMLStreamReaderInInterceptor() {
+        super(Phase.POST_STREAM);
+    }
+    
+    public void handleMessage(Message m) throws Fault {
         String method = m.get(Message.HTTP_REQUEST_METHOD).toString();
-        if ("PUT".equals(method)) {
+        if ("POST".equals(method)) {
             XMLStreamReader reader = 
                 StaxUtils.createXMLStreamReader(m.getContent(InputStream.class));
             m.setContent(XMLStreamReader.class, new CustomXmlStreamReader(reader));
         }
-        return null;
     }
 
 }

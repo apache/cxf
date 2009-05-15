@@ -202,7 +202,22 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
-    public void testGetBookReaderWriter() throws Exception {
+    public void testReaderWriterFromJaxrsFilters() throws Exception {
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks5/bookstore/books/convert2";
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.type("application/xml").accept("application/xml");
+        Book2 b = new Book2();
+        b.setId(777L);
+        b.setName("CXF - 777");
+        Book2 b2 = wc.invoke("PUT", b, Book2.class);
+        assertNotSame(b, b2);
+        assertEquals(777, b2.getId());
+        assertEquals("CXF - 777", b2.getName());
+    }
+    
+    @Test
+    public void testReaderWriterFromInterceptors() throws Exception {
         String endpointAddress =
             "http://localhost:9080/the/thebooks5/bookstore/books/convert";
         WebClient wc = WebClient.create(endpointAddress);
@@ -210,7 +225,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         Book2 b = new Book2();
         b.setId(777L);
         b.setName("CXF - 777");
-        Book2 b2 = wc.post(b, Book2.class);
+        Book2 b2 = wc.invoke("POST", b, Book2.class);
         assertNotSame(b, b2);
         assertEquals(777, b2.getId());
         assertEquals("CXF - 777", b2.getName());

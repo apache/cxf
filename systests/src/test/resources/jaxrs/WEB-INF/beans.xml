@@ -101,6 +101,15 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
        <bean class="org.apache.cxf.systest.jaxrs.XmlStreamReaderProvider"/>
        <bean class="org.apache.cxf.systest.jaxrs.XmlStreamWriterProvider"/>
     </jaxrs:providers> 
+    
+    <jaxrs:inInterceptors>
+       <bean class="org.apache.cxf.systest.jaxrs.XMLStreamReaderInInterceptor"/>
+    </jaxrs:inInterceptors>
+    
+    <jaxrs:outInterceptors>
+       <bean class="org.apache.cxf.systest.jaxrs.XMLStreamWriterOutInterceptor"/>
+    </jaxrs:outInterceptors>
+    
   </jaxrs:server> 
   
   <util:map id="outTemplates">

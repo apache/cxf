@@ -56,7 +56,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
 
     public JAXRSInInterceptor() {
-        super(Phase.PRE_STREAM);
+        super(Phase.UNMARSHAL);
     }
 
     public void handleMessage(Message message) {

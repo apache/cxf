@@ -39,7 +39,14 @@ import org.junit.Test;
 
 public class ResponseBuilderImplTest extends Assert {
 
-        
+     
+    @Test
+    public void testAbsoluteLocation() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Location", "http://localhost/rest");
+        checkBuild(Response.ok().location(URI.create("http://localhost/rest")).build(), 200, null, m);
+    }
+    
     @Test
     public void testLanguage() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
