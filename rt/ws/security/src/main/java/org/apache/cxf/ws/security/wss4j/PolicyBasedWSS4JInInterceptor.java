@@ -216,13 +216,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                 Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
-                if (e != null) {
-                    message.put("SignaturePropRefId", "RefId-" + e.toString());
-                    message.put("RefId-" + e.toString(), getProps(e, message));
-                }
                 if (s != null) {
                     message.put("decryptionPropRefId", "RefId-" + s.toString());
                     message.put("RefId-" + s.toString(), getProps(s, message));
+                    if (e == null) {
+                        e = s;
+                    }
+                }
+                if (e != null) {
+                    message.put("SignaturePropRefId", "RefId-" + e.toString());
+                    message.put("RefId-" + e.toString(), getProps(e, message));
                 }
             }
         }
@@ -246,7 +249,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                 Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
                 if (abinding.getProtectionToken() != null) {
-                    s = e;
+                    if (e != null) {
+                        s = e;
+                    } else if (s != null) {
+                        e = s;
+                    }
                 }
                 if (isRequestor(message)) {
                     if (e != null) {
