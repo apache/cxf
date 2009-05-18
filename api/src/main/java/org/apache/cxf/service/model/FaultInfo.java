@@ -35,4 +35,25 @@ public class FaultInfo extends AbstractMessageContainer {
     public void setFaultName(QName fname) {
         faultName = fname;
     }
+    
+    
+    
+    public int hashCode() {
+        return faultName == null ? -1 : faultName.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof FaultInfo)) {
+            return false;
+        }
+        FaultInfo oi = (FaultInfo)o;
+        return equals(faultName, oi.faultName) 
+            && super.equals(o);
+    }
+    
+
 }

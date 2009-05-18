@@ -113,5 +113,6 @@ public class InterfaceInfo extends AbstractDescriptionElement implements NamedIt
     public Collection<OperationInfo> getOperations() {
         return Collections.unmodifiableCollection(operations.values());
     }   
-
+    
+    
 }

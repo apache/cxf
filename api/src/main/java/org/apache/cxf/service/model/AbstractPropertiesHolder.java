@@ -157,4 +157,15 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return extensor;
     }
+    
+    
+
+    protected static final boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 != null
+            || o1 != null && o2 == null) {
+            return false;
+        }
+        return o1 == null ? true : o1.equals(o2);
+    }
+    
 }

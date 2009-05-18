@@ -137,6 +137,25 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
             .append(getConcreteName()).toString();
     }
     
+    public int hashCode() {
+        return pname == null ? -1 : pname.hashCode();
+    }
     
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof MessagePartInfo)) {
+            return false;
+        }
+        MessagePartInfo oi = (MessagePartInfo)o;
+        return equals(pname, oi.pname) 
+            && isElement == oi.isElement
+            && equals(typeName, oi.typeName)
+            && equals(elementName, oi.elementName)
+            && equals(concreteName, oi.concreteName)
+            && equals(typeClass, oi.typeClass);
+    }
+
     
 }

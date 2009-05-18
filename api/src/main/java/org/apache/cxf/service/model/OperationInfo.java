@@ -212,4 +212,25 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
             .append(opName)
             .append("]").toString();
     }
+    
+    public int hashCode() {
+        return opName == null ? -1 : opName.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof OperationInfo)) {
+            return false;
+        }
+        OperationInfo oi = (OperationInfo)o;
+        return equals(opName, oi.opName) 
+            && equals(inputMessage, oi.inputMessage)
+            && equals(outputMessage, oi.outputMessage)
+            && equals(faults, oi.faults)
+            && equals(intf.getName(), oi.intf.getName()); 
+    }
+    
 }

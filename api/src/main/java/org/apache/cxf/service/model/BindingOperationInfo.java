@@ -140,4 +140,19 @@ public class BindingOperationInfo extends AbstractPropertiesHolder {
             .append("]").toString();
     }
     
+    
+    public int hashCode() {
+        return opInfo.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof BindingOperationInfo)) {
+            return false;
+        }
+        return equals(opInfo, ((BindingOperationInfo)o).opInfo);
+    }
+
 }
