@@ -2094,14 +2094,7 @@ public class HTTPConduit
             inMessage.put(Message.RESPONSE_CODE, responseCode);
             String ct = connection.getContentType();
             inMessage.put(Message.CONTENT_TYPE, ct);
-            String charset = null;
-            if (ct != null 
-                && ct.indexOf("charset") != -1) {
-                charset = ct.substring(ct.indexOf("charset") + 8);
-                if (charset.indexOf(";") != -1) {
-                    charset = charset.substring(0, charset.indexOf(";"));
-                }
-            }
+            String charset = HttpHeaderHelper.findCharset(ct);
             String normalizedEncoding = HttpHeaderHelper.mapCharset(charset);
             if (normalizedEncoding == null) {
                 String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",

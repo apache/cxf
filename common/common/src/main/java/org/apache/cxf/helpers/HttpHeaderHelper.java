@@ -74,6 +74,24 @@ public final class HttpHeaderHelper {
         }
     }
     
+    public static String findCharset(String contentType) {
+        if (contentType == null) {
+            return null;
+        }
+        int idx = contentType.indexOf("charset=");
+        if (idx != -1) {
+            String charset = contentType.substring(idx + 8);
+            if (charset.indexOf(";") != -1) {
+                charset = charset.substring(0, charset.indexOf(";")).trim();
+            }
+            if (charset.charAt(0) == '\"') {
+                charset = charset.substring(1, charset.length() - 1);
+            }
+            return charset;
+        }
+        return null;
+    }
+    
     //helper to map the charsets that various things send in the http Content-Type header 
     //into something that is actually supported by Java and the Stax parsers and such.
     public static String mapCharset(String enc) {
