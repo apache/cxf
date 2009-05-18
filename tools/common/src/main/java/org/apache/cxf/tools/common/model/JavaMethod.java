@@ -32,6 +32,7 @@ import javax.wsdl.OperationType;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolException;
+import org.apache.cxf.tools.common.model.JavaType.Style;
 
 public class JavaMethod implements JavaAnnotatable {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaMethod.class);
@@ -150,6 +151,9 @@ public class JavaMethod implements JavaAnnotatable {
         int index = ((ArrayList)parameters).indexOf(p1);
         parameters.remove(index);
         parameters.add(index, p2);
+        if ((p1.isIN() && p2.isOUT()) || p1.isINOUT()) {
+            p2.setStyle(Style.INOUT);
+        }
     }
 
     private boolean isEquiv(String c1, String c2) {
