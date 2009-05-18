@@ -28,6 +28,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -39,8 +40,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
-
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 
@@ -92,8 +93,12 @@ import org.junit.Test;
 public class SequenceTest extends AbstractBusClientServerTestBase {
 
     private static final Logger LOG = LogUtils.getLogger(SequenceTest.class);
+    private static final QName GREETMEONEWAY_NAME 
+        = new QName("http://cxf.apache.org/greeter_control", "greetMeOneWay");
     private static final String GREETMEONEWAY_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
+    private static final QName GREETME_NAME 
+        = new QName("http://cxf.apache.org/greeter_control", "greetMe");
     private static final String GREETME_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
     private static final String GREETME_RESPONSE_ACTION
@@ -188,23 +193,24 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("twice");
         greeter.greetMeOneWay("thrice");
 
-        verifyOnewayAnonymousAcks(GREETMEONEWAY_ACTION);
+        verifyOnewayAnonymousAcks();
     }
 
     @Test
     public void testOnewayAnonymousAcksDispatch() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false, true);
 
+        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
+                                         GREETMEONEWAY_NAME);
+
         dispatch.invokeOneWay(getDOMRequest("One", true));
         dispatch.invokeOneWay(getDOMRequest("Two", true));
         dispatch.invokeOneWay(getDOMRequest("Three", true));
 
-        String dispatchStyleAction = 
-            "http://cxf.apache.org/jaxws/dispatch/Greeter/InvokeOneWayRequest";
-        verifyOnewayAnonymousAcks(dispatchStyleAction);
+        verifyOnewayAnonymousAcks();
     }
 
-    private void verifyOnewayAnonymousAcks(String greeterAction) throws Exception {
+    private void verifyOnewayAnonymousAcks() throws Exception {
         // three application messages plus createSequence
 
         awaitMessages(4, 4);
@@ -213,9 +219,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         mf.verifyMessages(4, true);
         String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
-                                                 greeterAction,
-                                                 greeterAction,
-                                                 greeterAction};
+                                                 GREETMEONEWAY_ACTION,
+                                                 GREETMEONEWAY_ACTION,
+                                                 GREETMEONEWAY_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
 
@@ -422,23 +428,24 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         assertEquals("TWO", greeter.greetMe("two"));
         assertEquals("THREE", greeter.greetMe("three"));
 
-        verifyTwowayNonAnonymous(GREETME_ACTION);
+        verifyTwowayNonAnonymous();
     }
 
     @Test
     public void testTwowayNonAnonymousDispatch() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true, true);
 
+        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
+                                         GREETME_NAME);
+
         verifyDOMResponse(dispatch.invoke(getDOMRequest("One")), "ONE");
         verifyDOMResponse(dispatch.invoke(getDOMRequest("Two")), "TWO");
         verifyDOMResponse(dispatch.invoke(getDOMRequest("Three")), "THREE");
 
-        String dispatchStyleAction = 
-            "http://cxf.apache.org/jaxws/dispatch/Greeter/InvokeRequest";
-        verifyTwowayNonAnonymous(dispatchStyleAction);
+        verifyTwowayNonAnonymous();
     }
 
-    private void verifyTwowayNonAnonymous(String greeterAction) throws Exception {
+    private void verifyTwowayNonAnonymous() throws Exception {
     
         // CreateSequence and three greetMe messages
         // TODO there should be partial responses to the decoupled responses!
@@ -450,9 +457,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         mf.verifyMessages(4, true);
         String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(), 
-                                                 greeterAction,
-                                                 greeterAction, 
-                                                 greeterAction};
+                                                 GREETME_ACTION,
+                                                 GREETME_ACTION, 
+                                                 GREETME_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, true);
