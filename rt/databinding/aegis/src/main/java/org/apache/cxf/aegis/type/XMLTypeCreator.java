@@ -260,7 +260,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
         TypeClassInfo info = new TypeClassInfo();
         info.setTypeClass(pd.getReadMethod().getReturnType());
-        info.setDescription("property " + pd);
+        info.setDescription("property " + pd.getDisplayName());
         readMetadata(info, mapping, propertyEl);
 
         return info;

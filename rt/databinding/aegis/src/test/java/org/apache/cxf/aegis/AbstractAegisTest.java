@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -58,6 +59,7 @@ import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -331,6 +333,14 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
 
     protected void setEnableJDOM(boolean enableJDOM) {
         this.enableJDOM = enableJDOM;
+    }
+    
+    protected String renderWsdl(Document wsdlDoc) throws XMLStreamException {
+        StringWriter out = new StringWriter();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+        StaxUtils.writeNode(wsdlDoc, writer, true);
+        writer.flush();
+        return out.toString();
     }
     
 }

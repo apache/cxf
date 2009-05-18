@@ -509,7 +509,7 @@ public class BeanType extends Type {
         }
 
         /*
-         * Automagically add chain of superclassesif this is an an extension.
+         * Automagically add chain of superclasses if this is an an extension.
          */
         if (inf.isExtension()) {
             Type sooperType = getSuperType();

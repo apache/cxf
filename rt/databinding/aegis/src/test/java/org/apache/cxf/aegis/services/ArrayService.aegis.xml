@@ -22,5 +22,8 @@
         <method name="submitStringArray">
             <parameter index="0" minOccurs='2' maxOccurs='50' nillable='false' />
         </method>
+        <method name="takeNumber" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        	<parameter index="0" typeName="xsd:long"/>
+        </method>
     </mapping>
 </mappings>

@@ -34,6 +34,15 @@ public class SimpleBean {
     private char primitiveCharacter;
     private byte littleByte;
     private Byte bigByte;
+    private Number numberValue;
+    
+    public Number getNumber() {
+        return numberValue;
+    }
+    
+    public void setNumber(Number value) {
+        numberValue = value;
+    }
 
     public int[] getNumbers() {
         return numbers;

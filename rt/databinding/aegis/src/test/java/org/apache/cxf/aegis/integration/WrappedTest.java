@@ -27,6 +27,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.ArrayService;
 import org.apache.cxf.aegis.services.BeanService;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +38,7 @@ import org.junit.Test;
 public class WrappedTest extends AbstractAegisTest {
     
     private ArrayService arrayService;
+    private Document arrayWsdlDoc;
     
     @Before 
     public void setUp() throws Exception {
@@ -45,6 +47,7 @@ public class WrappedTest extends AbstractAegisTest {
         arrayService = new ArrayService();
         createService(BeanService.class, "BeanService");
         createService(ArrayService.class, arrayService, "Array", new QName("urn:Array", "Array"));
+        arrayWsdlDoc = getWSDLDocument("Array");
     }
     
     @Test
@@ -61,9 +64,24 @@ public class WrappedTest extends AbstractAegisTest {
     
     @Test
     public void testArrayWsdl() throws Exception {
-        Document doc = getWSDLDocument("Array");
-        NodeList stuff = assertValid("//xsd:complexType[@name='ArrayOfString-2-50']", doc);
+        NodeList stuff = assertValid("//xsd:complexType[@name='ArrayOfString-2-50']", arrayWsdlDoc);
         assertEquals(1, stuff.getLength());
+    }
+    
+    @Test
+    public void testXmlConfigurationOfParameterTypeSchema() throws Exception {
+        assertValid(
+                    "/wsdl:definitions/wsdl:types"
+                        + "/xsd:schema[@targetNamespace='urn:Array']"
+                        + "/xsd:complexType[@name=\"takeNumber\"]/xsd:sequence/xsd:element"
+                        + "[@type=\"xsd:long\"]",
+                    arrayWsdlDoc);
+    }
+    
+    @Test
+    public void testXmlConfigurationOfParameterType() throws Exception {
+        invoke("Array", "takeNumber.xml");
+        assertEquals(Long.valueOf(123456789), arrayService.getNumberValue());
     }
 
     @Test
