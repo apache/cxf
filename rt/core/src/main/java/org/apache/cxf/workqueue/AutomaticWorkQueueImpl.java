@@ -19,10 +19,14 @@
 
 package org.apache.cxf.workqueue;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,30 +47,44 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
     
     WorkQueueManagerImpl manager;
     String name = "default";
-    
 
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
     }    
+    public AutomaticWorkQueueImpl(String name) {
+        this(DEFAULT_MAX_QUEUE_SIZE, name);
+    }    
     public AutomaticWorkQueueImpl(int max) {
+        this(max, "default");
+    }
+    public AutomaticWorkQueueImpl(int max, String name) {
         this(max,
              0,
              25,
              5,
-             2 * 60 * 1000L);
+             2 * 60 * 1000L,
+             name);
     }
-    
     public AutomaticWorkQueueImpl(int mqs, 
                                   int initialThreads, 
                                   int highWaterMark, 
                                   int lowWaterMark,
                                   long dequeueTimeout) {
+        this(mqs, initialThreads, highWaterMark, lowWaterMark, dequeueTimeout, "default");
+    }    
+    public AutomaticWorkQueueImpl(int mqs, 
+                                  int initialThreads, 
+                                  int highWaterMark, 
+                                  int lowWaterMark,
+                                  long dequeueTimeout,
+                                  String name) {
         
         super(-1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark, 
             -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark,
                 TimeUnit.MILLISECONDS.toMillis(dequeueTimeout), TimeUnit.MILLISECONDS, 
                 mqs == -1 ? new LinkedBlockingQueue<Runnable>(DEFAULT_MAX_QUEUE_SIZE)
-                    : new LinkedBlockingQueue<Runnable>(mqs));
+                    : new LinkedBlockingQueue<Runnable>(mqs),
+            createThreadFactory(name));
         
         maxQueueSize = mqs == -1 ? DEFAULT_MAX_QUEUE_SIZE : mqs;
         
@@ -99,6 +117,66 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
             setCorePoolSize(lowWaterMark);
         }
     }
+    private static ThreadFactory createThreadFactory(final String name) {
+        ThreadGroup group;
+        try { 
+            //Try and find the highest level ThreadGroup that we're allowed to use.
+            //That SHOULD allow the default classloader and thread locals and such 
+            //to be the least likely to cause issues down the road.
+            group = AccessController.doPrivileged(
+                new PrivilegedAction<ThreadGroup>() { 
+                    public ThreadGroup run() { 
+                        ThreadGroup group = Thread.currentThread().getThreadGroup(); 
+                        ThreadGroup parent = group;
+                        try { 
+                            while (parent != null) { 
+                                group = parent;  
+                                parent = parent.getParent(); 
+                            } 
+                        } catch (SecurityException se) {
+                            //ignore - if we get here, the "group" is as high as 
+                            //the security manager will allow us to go.   Use that one.
+                        }
+                        return new ThreadGroup(group, name + "-workqueue"); 
+                    } 
+                }
+            );
+        } catch (SecurityException e) { 
+            group = new ThreadGroup(name + "-workqueue"); 
+        }
+        
+        return new AWQThreadFactory(group, name);
+    }
+    static class AWQThreadFactory implements ThreadFactory {
+        final AtomicInteger threadNumber = new AtomicInteger(1);
+        ThreadGroup group;
+        String name;
+        ClassLoader loader;
+        AWQThreadFactory(ThreadGroup gp, String nm) {
+            group = gp;
+            name = nm;
+            //force the loader to be the loader of CXF, not the application loader
+            loader = AutomaticWorkQueueImpl.class.getClassLoader();
+        }
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, 
+                                  r, 
+                                  name + "-workqueue-" + threadNumber.getAndIncrement(),
+                                  0);
+            t.setContextClassLoader(loader);
+            if (t.isDaemon()) {
+                t.setDaemon(false);
+            }
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
+        }
+        public void setName(String s) {
+            name = s;
+        }
+    }
+    
     @Resource(name = "org.apache.cxf.workqueue.WorkQueueManager")
     public void setManager(WorkQueueManagerImpl mgr) {
         manager = mgr;
@@ -109,6 +187,10 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
 
     public void setName(String s) {
         name = s;
+        ThreadFactory factory = this.getThreadFactory();
+        if (factory instanceof AWQThreadFactory) {
+            ((AWQThreadFactory)factory).setName(s);
+        }
     }
     public String getName() {
         return name;
@@ -148,8 +230,26 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         return buf.toString();
     }
     
+    public void execute(final Runnable command) {
+        //Grab the context classloader of this thread.   We'll make sure we use that 
+        //on the thread the runnable actually runs on.
+        
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Runnable r = new Runnable() {
+            public void run() {
+                ClassLoader orig = Thread.currentThread().getContextClassLoader();
+                try {
+                    Thread.currentThread().setContextClassLoader(loader);
+                    command.run();
+                } finally {
+                    Thread.currentThread().setContextClassLoader(orig);
+                }
+            }
+        };
+        super.execute(r);
+    }
+    
     // WorkQueue interface
-     
     public void execute(Runnable work, long timeout) {
         try {
             execute(work);

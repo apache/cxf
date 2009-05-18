@@ -118,7 +118,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     }
     
     private AutomaticWorkQueue createAutomaticWorkQueue() {        
-        AutomaticWorkQueueImpl impl = new AutomaticWorkQueueImpl();
+        AutomaticWorkQueueImpl impl = new AutomaticWorkQueueImpl("default");
         impl.setManager(this);
         impl.register();
         return impl;       
