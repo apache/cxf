@@ -74,7 +74,7 @@ public class MessageInfo extends AbstractMessageContainer {
 
     @Override
     public String toString() {
-        return "[MessageInfo " + type + mName.toString() + "]";
+        return "[MessageInfo " + type + ": " + mName.toString() + "]";
     }
 
     public Type getType() {

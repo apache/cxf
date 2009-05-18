@@ -219,5 +219,23 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         return messageParts.size() + getOutOfBandParts().size();
     }
     
+    
+    public int hashCode() {
+        return mName == null ? -1 : mName.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof AbstractMessageContainer)) {
+            return false;
+        }
+        AbstractMessageContainer oi = (AbstractMessageContainer)o;
+        return equals(mName, oi.mName) 
+            && equals(messageParts, oi.messageParts)
+            && equals(outOfBandParts, oi.outOfBandParts);
+    }
 
 }
