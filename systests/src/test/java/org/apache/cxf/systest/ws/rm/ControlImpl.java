@@ -20,17 +20,33 @@
 
 package org.apache.cxf.systest.ws.rm;
 
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jws.WebService;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.Provider;
+import javax.xml.ws.Service.Mode;
+import javax.xml.ws.ServiceMode;
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+//import org.apache.cxf.jaxws.EndpointImpl;
+
 
 @WebService(serviceName = "ControlService", 
             portName = "ControlPort", 
@@ -57,8 +73,13 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
             greeterBus.getOutInterceptors().add(logOut);
             greeterBus.getOutFaultInterceptors().add(logOut);
 
-            Endpoint.publish(address, implementor);
-            LOG.info("Published greeter endpoint.");
+            if (cfgResource.indexOf("provider") == -1) {
+                Endpoint.publish(address, implementor);
+                LOG.info("Published greeter endpoint.");
+            } else {
+                Endpoint.publish(address, new GreeterProvider());
+                LOG.info("Published greeter provider.");
+            }
         } finally {
             if (derbyHome != null) {
                 System.setProperty("derby.system.home", derbyHome);
@@ -69,5 +90,40 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
         
         return true;        
     }
-    
+
+    @WebService(serviceName = "GreeterService",
+                portName = "GreeterPort",
+                targetNamespace = "http://cxf.apache.org/greeter_control",
+                wsdlLocation = "/wsdl/greeter_control.wsdl")
+    @ServiceMode(Mode.PAYLOAD)
+    public static class GreeterProvider implements Provider<Source> {
+
+        public Source invoke(Source obj) {
+            DOMSource ds = (DOMSource)obj;
+            
+            Element el = ((Document)ds.getNode()).getDocumentElement();
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("ns", "http://cxf.apache.org/greeter_control/types");
+            XPathUtils xp = new XPathUtils(ns);
+            String s = (String)xp.getValue("/ns:greetMe/ns:requestType",
+                                           el,
+                                           XPathConstants.STRING);
+
+            if (s == null || "".equals(s)) {
+                s = (String)xp.getValue("/ns:greetMeOneWay/ns:requestType",
+                                        el,
+                                        XPathConstants.STRING);
+                System.out.println("greetMeOneWay arg: " + s);
+                return null;
+            } else {
+                System.out.println("greetMe arg: " + s);
+                String resp =
+                    "<greetMeResponse "
+                        + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
+                        + "<responseType>" + s.toUpperCase() + "</responseType>"
+                    + "</greetMeResponse>";
+                return new StreamSource(new StringReader(resp));
+            }
+        }
+    }    
 }

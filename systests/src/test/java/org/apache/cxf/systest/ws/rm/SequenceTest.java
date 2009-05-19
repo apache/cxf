@@ -22,8 +22,10 @@ package org.apache.cxf.systest.ws.rm;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -36,14 +38,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -57,6 +60,7 @@ import org.apache.cxf.greeter_control.Control;
 import org.apache.cxf.greeter_control.ControlService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
@@ -197,8 +201,35 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testOnewayAnonymousAcksProvider() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml");
+
+        greeter.greetMeOneWay("once");
+        greeter.greetMeOneWay("twice");
+        greeter.greetMeOneWay("thrice");
+
+        verifyOnewayAnonymousAcks();
+    }
+
+    @Test
     public void testOnewayAnonymousAcksDispatch() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false, true);
+
+        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
+                                         GREETMEONEWAY_NAME);
+
+        dispatch.invokeOneWay(getDOMRequest("One", true));
+        dispatch.invokeOneWay(getDOMRequest("Two", true));
+        dispatch.invokeOneWay(getDOMRequest("Three", true));
+
+        verifyOnewayAnonymousAcks();
+    }
+
+    @Test
+    public void testOnewayAnonymousAcksDispatchProvider() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml",
+             false, 
+             true);
 
         dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
                                          GREETMEONEWAY_NAME);
@@ -432,8 +463,35 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testTwowayNonAnonymousProvider() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml", true);
+
+        assertEquals("ONE", greeter.greetMe("one"));
+        assertEquals("TWO", greeter.greetMe("two"));
+        assertEquals("THREE", greeter.greetMe("three"));
+
+        verifyTwowayNonAnonymous();
+    }
+
+    @Test
     public void testTwowayNonAnonymousDispatch() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true, true);
+
+        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
+                                         GREETME_NAME);
+
+        verifyDOMResponse(dispatch.invoke(getDOMRequest("One")), "ONE");
+        verifyDOMResponse(dispatch.invoke(getDOMRequest("Two")), "TWO");
+        verifyDOMResponse(dispatch.invoke(getDOMRequest("Three")), "THREE");
+
+        verifyTwowayNonAnonymous();
+    }
+
+    @Test
+    public void testTwowayNonAnonymousDispatchProvider() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml",
+             true,
+             true);
 
         dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
                                          GREETME_NAME);
@@ -1431,9 +1489,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         return getDOMRequest(n, false);
     }
 
-    private DOMSource getDOMRequest(String n, boolean oneway) throws Exception {
-        InputStream is = getClass().getResourceAsStream((oneway ? "oneway" : "twoway") + "Req" + n + ".xml");
-         
+    private DOMSource getDOMRequest(String n, boolean oneway)
+        throws Exception {
+        InputStream is = 
+            getClass().getResourceAsStream((oneway ? "oneway" : "twoway")
+                                           + "Req" + n + ".xml");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -1441,14 +1501,34 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         return new DOMSource(newDoc);
     }
 
-    private static String convertToString(DOMSource domSource) throws TransformerException {
-        Transformer xformer = TransformerFactory.newInstance().newTransformer();
+    private static String convertToString(DOMSource domSource)
+        throws TransformerException {
+        Transformer xformer =
+            TransformerFactory.newInstance().newTransformer();
         StringWriter output = new StringWriter();
         xformer.transform(domSource, new StreamResult(output));
         return output.toString();
     }
 
-    private void verifyDOMResponse(DOMSource domResponse, String expected) throws Exception {
-        assertTrue(convertToString(domResponse).indexOf(expected) != -1);
+    private static String parseResponse(DOMSource domResponse) {
+        Element el = ((Document)domResponse.getNode()).getDocumentElement();
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
+        ns.put("ns", "http://cxf.apache.org/greeter_control/types");
+        XPathUtils xp = new XPathUtils(ns);
+        return (String)xp.getValue("/soap:Envelope/soap:Body"
+                                   + "/ns:greetMeResponse/ns:responseType",
+                                   el,
+                                   XPathConstants.STRING);
+    }
+
+    private void verifyDOMResponse(DOMSource domResponse, String expected) 
+        throws TransformerException {
+        String s = convertToString(domResponse);
+        assertTrue("expected: " + s + " to contain: " + expected,
+                   s.indexOf(expected) != -1);
+        assertEquals("unexpected response: " + s,
+                     expected,
+                     parseResponse(domResponse));
     }
 }
