@@ -40,9 +40,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -111,6 +113,15 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             throw new RuntimeException("Exchange to be sent has no outMessage");
         }
 
+        boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
+        if (isTextPayload && MessageUtils.isTrue(outMessage.getContextualProperty(
+            org.apache.cxf.message.Message.MTOM_ENABLED)) 
+            && outMessage.getAttachments() != null && outMessage.getAttachments().size() > 0) {
+            org.apache.cxf.common.i18n.Message msg = 
+                new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);
+            throw new ConfigurationException(msg);
+        }
+        
         JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
 

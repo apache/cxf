@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.systest.jms;
 
+import javax.xml.ws.Binding;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
@@ -39,7 +42,7 @@ public class Server extends AbstractBusTestServerBase {
         Object i4 = new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix();
         Object i5 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng();
         Object i6 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales();
-        
+        Object mtom = new JMSMTOMImpl();
         
         Endpoint.publish(null, impleDoc);
         String address = "http://localhost:9000/SoapContext/SoapPort";
@@ -55,6 +58,9 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint.publish("", i4);
         Endpoint.publish("", i5);
         Endpoint.publish("", i6);
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://cxf.apache.org/transports/jms", mtom);
+        Binding binding = ep.getBinding();        
+        ((SOAPBinding)binding).setMTOMEnabled(true);  
     }
 
 

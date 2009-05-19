@@ -28,8 +28,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPBinding;
 
 
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
@@ -45,6 +49,8 @@ import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDStaticPre
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDDynamicPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDStaticPrefix;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
+import org.apache.cxf.jms_mtom.JMSMTOMPortType;
+import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
@@ -689,8 +695,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             BindingProvider  bp = null;
             
             if (handler instanceof BindingProvider) {
-                bp = (BindingProvider)handler;
-                //System.out.println(bp.toString());
+                bp = (BindingProvider)handler;                
                 Map<String, Object> requestContext = bp.getRequestContext();
                 JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
                 requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
@@ -737,4 +742,28 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    @Test
+    public void testMTOM() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
+        QName portName = new QName("http://cxf.apache.org/jms_mtom", "MTOMPort");
+
+        URL wsdl = getClass().getResource("/wsdl/jms_test_mtom.wsdl");
+        assertNotNull(wsdl);
+
+        JMSMTOMService service = new JMSMTOMService(wsdl, serviceName);
+        assertNotNull(service);
+
+        JMSMTOMPortType mtom = service.getPort(portName, JMSMTOMPortType.class);
+        Binding binding = ((BindingProvider)mtom).getBinding();
+        ((SOAPBinding)binding).setMTOMEnabled(true);
+
+        Holder<String> name = new Holder<String>("Sam");
+        URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
+        Holder<DataHandler> handler1 = new Holder<DataHandler>();
+        handler1.value = new DataHandler(fileURL);
+        int size = handler1.value.getInputStream().available();
+        mtom.testDataHandler(name, handler1);
+        int size2 = handler1.value.getInputStream().available();
+        assertTrue("The response file is not same with the sent file.", size == size2);
+    }
 }
