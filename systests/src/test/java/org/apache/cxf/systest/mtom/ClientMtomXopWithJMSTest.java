@@ -21,7 +21,6 @@ package org.apache.cxf.systest.mtom;
 import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -100,12 +100,14 @@ public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
             param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
             Holder<String> name = new Holder<String>("call detail");
             mtomPort.testXop(name, param);
+            fail("Expect the exception here !");
             assertEquals("name unchanged", "return detail + call detail", name.value);
             assertNotNull(param.value);
             param.value.getInputStream().close();
             
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception) ex.getCause();
+        } catch (SOAPFaultException ex) {
+            assertTrue("Expect the configuration exception here",
+                       ex.getCause() instanceof org.apache.cxf.configuration.ConfigurationException);
         }
     }
 
