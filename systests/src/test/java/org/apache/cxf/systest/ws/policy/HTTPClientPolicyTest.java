@@ -147,8 +147,9 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
 
         try {
             greeter.greetMe("cxf");
+            fail("Didn't get the exception");
         } catch (Exception ex) {
-            assertTrue(ex.getCause() instanceof SocketTimeoutException);
+            assertTrue(ex.getCause().getClass().getName(), ex.getCause() instanceof SocketTimeoutException);
         }
      
         // pingMe - policy attached to binding operation fault should have no effect

@@ -637,6 +637,8 @@ public class ClientImpl
                 chain.doInterceptStartingAfter(message, startingAfterInterceptorID);
             } else if (startingInterceptorID != null) {
                 chain.doInterceptStartingAt(message, startingInterceptorID);
+            } else if (message.getContent(Exception.class) != null) {
+                chain.getFaultObserver().onMessage(message);
             } else {
                 chain.doIntercept(message);
             }

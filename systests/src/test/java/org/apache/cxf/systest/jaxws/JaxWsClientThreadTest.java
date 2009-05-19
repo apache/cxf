@@ -75,7 +75,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                         } catch (SOAPFaultException expected) {
                             //expected.getCause().printStackTrace();
                             MalformedURLException mue = (MalformedURLException)expected
-                                .getCause().getCause();
+                                .getCause();
                             if (mue == null || mue.getMessage() == null) {
                                 throw expected;
                             }

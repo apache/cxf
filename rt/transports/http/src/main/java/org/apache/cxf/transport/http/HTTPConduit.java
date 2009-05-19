@@ -492,18 +492,19 @@ public class HTTPConduit
         // The need to cache the request is off by default
         boolean needToCacheRequest = false;
         
+        HTTPClientPolicy csPolicy = getClient(message);
         HttpURLConnection connection = getConnectionFactory(currentURL)
-            .createConnection(getProxy(clientSidePolicy), currentURL);
+            .createConnection(getProxy(csPolicy), currentURL);
         connection.setDoOutput(true);  
         
         //TODO using Message context to decided HTTP send properties 
              
-        long timeout = clientSidePolicy.getConnectionTimeout();
+        long timeout = csPolicy.getConnectionTimeout();
         if (timeout > Integer.MAX_VALUE) {
             timeout = Integer.MAX_VALUE;
         }
         connection.setConnectTimeout((int)timeout);
-        timeout = clientSidePolicy.getReceiveTimeout();
+        timeout = csPolicy.getReceiveTimeout();
         if (timeout > Integer.MAX_VALUE) {
             timeout = Integer.MAX_VALUE;
         }
@@ -540,7 +541,7 @@ public class HTTPConduit
             }
             message.put("AUTH_VALUE", auth);
         }
-        if (getClient().isAutoRedirect()) {
+        if (csPolicy.isAutoRedirect()) {
             needToCacheRequest = true;
             LOG.log(Level.FINE, "AutoRedirect is turned on.");
         }
@@ -548,12 +549,12 @@ public class HTTPConduit
         // if chunking is enabled
         // TODO : ensure chunking can be enabled for non-empty PUTs - if requested
         if (connection.getRequestMethod().equals("POST")
-            && getClient().isAllowChunking()) {
+            && csPolicy.isAllowChunking()) {
             //TODO: The chunking mode be configured or at least some
             // documented client constant.
             //use -1 and allow the URL connection to pick a default value
             isChunking = true;
-            chunkThreshold = getClient().getChunkingThreshold();
+            chunkThreshold = csPolicy.getChunkingThreshold();
             if (chunkThreshold <= 0) {
                 chunkThreshold = 0;
                 connection.setChunkedStreamingMode(-1);                    
@@ -1452,7 +1453,7 @@ public class HTTPConduit
     ) throws IOException {
         
         // If we are not redirecting by policy, then we don't.
-        if (!getClient().isAutoRedirect()) {
+        if (!getClient(message).isAutoRedirect()) {
             return connection;
         }
 
@@ -1638,11 +1639,12 @@ public class HTTPConduit
         // Disconnect the old, and in with the new.
         connection.disconnect();
         
-        connection = getConnectionFactory(newURL).createConnection(getProxy(clientSidePolicy), newURL);
+        HTTPClientPolicy cp = getClient(message);
+        connection = getConnectionFactory(newURL).createConnection(getProxy(cp), newURL);
         connection.setDoOutput(true);        
-        // TODO: using Message context to deceided HTTP send properties        
-        connection.setConnectTimeout((int)getClient().getConnectionTimeout());
-        connection.setReadTimeout((int)getClient().getReceiveTimeout());
+        // TODO: using Message context to deceided HTTP send properties
+        connection.setConnectTimeout((int)cp.getConnectionTimeout());
+        connection.setReadTimeout((int)cp.getReceiveTimeout());
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(false);
 
@@ -1964,7 +1966,7 @@ public class HTTPConduit
 
                 HttpURLConnection oldcon = connection;
                 
-                HTTPClientPolicy policy = getClient();
+                HTTPClientPolicy policy = getClient(outMessage);
                 
                 // Default MaxRetransmits is -1 which means unlimited.
                 int maxRetransmits = (policy == null)
@@ -2016,8 +2018,11 @@ public class HTTPConduit
                     public void run() {
                         try {
                             handleResponseInternal();
-                        } catch (IOException e) {
-                            LOG.log(Level.WARNING, e.getMessage(), e);
+                        } catch (Exception e) {
+                            Message inMessage = new MessageImpl();
+                            inMessage.setExchange(outMessage.getExchange());
+                            inMessage.setContent(Exception.class, e);
+                            incomingObserver.onMessage(inMessage);
                         }
                     }
                 };

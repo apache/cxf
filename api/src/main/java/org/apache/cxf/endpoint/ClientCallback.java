@@ -141,6 +141,9 @@ public class ClientCallback implements Future<Object[]> {
         if (cancelled) {
             throw new InterruptedException("Operation Cancelled");
         }
+        if (!done) {
+            throw new TimeoutException("Timeout Exceeded");
+        }
         if (exception != null) {
             throw new ExecutionException(exception);
         }
