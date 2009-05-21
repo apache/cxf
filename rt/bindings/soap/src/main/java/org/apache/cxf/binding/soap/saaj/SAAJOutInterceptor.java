@@ -19,7 +19,8 @@
 
 package org.apache.cxf.binding.soap.saaj;
 
-
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
