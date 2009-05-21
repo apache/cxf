@@ -20,7 +20,6 @@
 package org.apache.cxf.binding.soap.saaj;
 
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
