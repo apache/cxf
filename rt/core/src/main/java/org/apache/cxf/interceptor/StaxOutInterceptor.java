@@ -64,7 +64,10 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         String encoding = getEncoding(message);
         
         try {
-            writer = getXMLOutputFactory(message).createXMLStreamWriter(os, encoding);
+            XMLOutputFactory factory = getXMLOutputFactory(message);
+            synchronized (factory) {
+                writer = factory.createXMLStreamWriter(os, encoding);
+            }
             if (Boolean.TRUE.equals(message.getContextualProperty(FORCE_START_DOCUMENT))) {
                 writer.writeStartDocument(encoding, "1.0");
                 message.removeContent(OutputStream.class);

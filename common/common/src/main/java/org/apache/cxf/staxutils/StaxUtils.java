@@ -147,7 +147,10 @@ public final class StaxUtils {
 
     public static XMLStreamWriter createXMLStreamWriter(Writer out) {
         try {
-            return getXMLOutputFactory().createXMLStreamWriter(out);
+            XMLOutputFactory factory = getXMLOutputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamWriter(out);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
         }
@@ -163,7 +166,10 @@ public final class StaxUtils {
         }
 
         try {
-            return getXMLOutputFactory().createXMLStreamWriter(out, encoding);
+            XMLOutputFactory factory = getXMLOutputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamWriter(out, encoding);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
         }
@@ -171,7 +177,10 @@ public final class StaxUtils {
     
     public static XMLStreamWriter createXMLStreamWriter(Result r) {
         try {
-            return getXMLOutputFactory().createXMLStreamWriter(r);
+            XMLOutputFactory factory = getXMLOutputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamWriter(r);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
         }
@@ -179,7 +188,10 @@ public final class StaxUtils {
 
     public static XMLStreamReader createFilteredReader(XMLStreamReader reader, StreamFilter filter) {
         try {
-            return getXMLInputFactory().createFilteredReader(reader, filter);
+            XMLInputFactory factory = getXMLInputFactory();
+            synchronized (factory) {
+                return factory.createFilteredReader(reader, filter);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamReader", e);
         }
@@ -846,7 +858,10 @@ public final class StaxUtils {
         }
 
         try {
-            return getXMLInputFactory().createXMLStreamReader(in, encoding);
+            XMLInputFactory factory = getXMLInputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamReader(in, encoding);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
@@ -858,14 +873,20 @@ public final class StaxUtils {
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in) {
         try {
-            return getXMLInputFactory().createXMLStreamReader(in);
+            XMLInputFactory factory = getXMLInputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamReader(in);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
     }
     public static XMLStreamReader createXMLStreamReader(String systemId, InputStream in) {
         try {
-            return getXMLInputFactory().createXMLStreamReader(systemId, in);
+            XMLInputFactory factory = getXMLInputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamReader(systemId, in);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
@@ -893,8 +914,10 @@ public final class StaxUtils {
                     return new W3CDOMStreamReader(el);
                 }
             }
-            
-            return getXMLInputFactory().createXMLStreamReader(source);
+            XMLInputFactory factory = getXMLInputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamReader(source);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
@@ -907,7 +930,10 @@ public final class StaxUtils {
     public static XMLStreamReader createXMLStreamReader(Reader reader) {
 
         try {
-            return getXMLInputFactory().createXMLStreamReader(reader);
+            XMLInputFactory factory = getXMLInputFactory();
+            synchronized (factory) {
+                return factory.createXMLStreamReader(reader);
+            }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         }
