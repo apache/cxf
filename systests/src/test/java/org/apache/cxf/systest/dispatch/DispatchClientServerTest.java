@@ -51,7 +51,6 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMe;
