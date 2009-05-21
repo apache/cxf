@@ -108,7 +108,6 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
                                                          BindingInfo bi, 
                                                          XMLStreamReader xsr) {
 
-        BindingOperationInfo match = null;
         for (BindingOperationInfo boi : bi.getOperations()) {
             BindingMessageInfo bmi;
             if (!isRequestor) {
@@ -118,41 +117,39 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
             }
             
             if (hasRootNode(bmi, startQName)) {
-                match = boi;
                 //Consume The rootNode tag
                 try {
                     xsr.nextTag();
                 } catch (XMLStreamException xse) {
                     throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_READ_EXC", LOG));
                 }
+                return boi;
             } else {
                 Collection<MessagePartInfo> bodyParts = bmi.getMessageParts();
                 if (bodyParts.size() == 1) {
                     MessagePartInfo p = bodyParts.iterator().next();
                     if (p.getConcreteName().equals(startQName)) {
-                        match = boi;
+                        return boi;
                     }
                 }
             }
         }
-        if (match == null) {
-            for (BindingOperationInfo boi : bi.getOperations()) {
-                if (startQName.equals(boi.getName())) {
-                    match = boi;
-                    //Consume The rootNode tag
-                    try {
-                        xsr.nextTag();
-                    } catch (XMLStreamException xse) {
-                        throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_READ_EXC", LOG));
-                    }
+        for (BindingOperationInfo boi : bi.getOperations()) {
+            if (startQName.equals(boi.getName())) {
+                //Consume The rootNode tag
+                try {
+                    xsr.nextTag();
+                } catch (XMLStreamException xse) {
+                    throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_READ_EXC", LOG));
                 }
-            } 
-        }
-        return match;
+                return boi;
+            }
+        } 
+        return null;
     }
 
     private boolean hasRootNode(BindingMessageInfo bmi, QName elName) {
         XMLBindingMessageFormat xmf = bmi.getExtensor(XMLBindingMessageFormat.class);
-        return xmf != null && xmf.getRootNode().equals(elName);
+        return bmi.getMessageParts().size() != 1 && xmf != null && xmf.getRootNode().equals(elName);
     }
 }
