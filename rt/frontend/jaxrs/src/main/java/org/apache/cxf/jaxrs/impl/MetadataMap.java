@@ -38,6 +38,10 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         this.m = new LinkedHashMap<K, List<V>>();
     }
     
+    public MetadataMap(int size) {
+        this.m = new LinkedHashMap<K, List<V>>(size);
+    }
+    
     public MetadataMap(Map<K, List<V>> store) {
         this(store, false, false);
     }

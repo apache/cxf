@@ -283,13 +283,17 @@ public final class URITemplate {
         return sb.toString();
     }
     
-    public static URITemplate createTemplate(ClassResourceInfo cri, Path path) {
+    public static URITemplate createTemplate(Path path) {
 
-        if (path == null) {
+        return createTemplate(path == null ? null : path.value());
+    }
+    
+    public static URITemplate createTemplate(String pathValue) {
+
+        if (pathValue == null) {
             return new URITemplate("/");
         }
 
-        String pathValue = path.value();
         if (!pathValue.startsWith("/")) {
             pathValue = "/" + pathValue;
         }

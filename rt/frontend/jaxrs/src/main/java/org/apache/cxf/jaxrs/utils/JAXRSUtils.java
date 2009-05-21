@@ -46,15 +46,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -89,6 +82,8 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoComparator;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -182,7 +177,8 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> values = 
             (MultivaluedMap<String, String>)message.get(URITemplate.TEMPLATE_PARAMETERS);
         for (Method m : cri.getParameterMethods()) {
-            Object o = createHttpParameterValue(m.getAnnotations(), 
+            Parameter p = ResourceUtils.getParameter(0, m.getAnnotations());
+            Object o = createHttpParameterValue(p, 
                                                 m.getParameterTypes()[0],
                                                 m.getGenericParameterTypes()[0],
                                                 message,
@@ -194,7 +190,8 @@ public final class JAXRSUtils {
         }
         // Param fields
         for (Field f : cri.getParameterFields()) {
-            Object o = createHttpParameterValue(f.getAnnotations(), 
+            Parameter p = ResourceUtils.getParameter(0, f.getAnnotations());
+            Object o = createHttpParameterValue(p, 
                                                 f.getType(),
                                                 f.getGenericType(),
                                                 message,
@@ -417,11 +414,13 @@ public final class JAXRSUtils {
                                                  Message message) {
         
         
-        Method method = ori.getAnnotatedMethod();
+        Method method = ori.getMethodToInvoke();
         Class[] parameterTypes = method.getParameterTypes();
-        Type[] genericParameterTypes = method.getGenericParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-
+        Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[]{});  
+        Method annotatedMethod = ori.getAnnotatedMethod();
+        Type[] genericParameterTypes = annotatedMethod == null ? method.getGenericParameterTypes() 
+                                      : annotatedMethod.getGenericParameterTypes();
+        Annotation[][] anns = annotatedMethod == null ? null : annotatedMethod.getParameterAnnotations();
         List<Object> params = new ArrayList<Object>(parameterTypes.length);
 
         for (int i = 0; i < parameterTypes.length; i++) {
@@ -435,7 +434,8 @@ public final class JAXRSUtils {
             
             Object paramValue = processParameter(param, 
                                                  genericParam,
-                                                 parameterAnnotations[i], 
+                                                 anns == null ? new Annotation[0] : anns[i],
+                                                 paramsInfo[i], 
                                                  values, 
                                                  message,
                                                  ori);
@@ -447,15 +447,14 @@ public final class JAXRSUtils {
 
     private static Object processParameter(Class<?> parameterClass, 
                                            Type parameterType,
-                                           Annotation[] parameterAnns, 
+                                           Annotation[] parameterAnns,
+                                           Parameter parameter, 
                                            MultivaluedMap<String, String> values,
                                            Message message,
                                            OperationResourceInfo ori) {
-        
         InputStream is = message.getContent(InputStream.class);
 
-        if (parameterAnns == null 
-            || !AnnotationUtils.isValidParamAnnotations(parameterAnns)) {
+        if (parameter.getType() == ParameterType.REQUEST_BODY) {
             
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
@@ -475,11 +474,11 @@ public final class JAXRSUtils {
                                        MediaType.valueOf(contentType),
                                        ori.getConsumeTypes(),
                                        message);
-        } else if (parameterAnns[0].annotationType() == Context.class) {
+        } else if (parameter.getType() == ParameterType.CONTEXT) {
             return createContextValue(message, parameterType, parameterClass);
         } else {
             
-            return createHttpParameterValue(parameterAnns,
+            return createHttpParameterValue(parameter,
                                             parameterClass,
                                             parameterType,
                                             message,
@@ -488,51 +487,48 @@ public final class JAXRSUtils {
         }
     }
     
-    public static Object createHttpParameterValue(Annotation[] anns, 
+    public static Object createHttpParameterValue(Parameter parameter, 
                                             Class<?> parameterClass, 
                                             Type genericParam,
                                             Message message,
                                             MultivaluedMap<String, String> values,
                                             OperationResourceInfo ori) {
        
-        boolean isEncoded = AnnotationUtils.isEncoded(anns, ori);
-        String defaultValue = AnnotationUtils.getDefaultParameterValue(anns, ori);
+        boolean isEncoded = parameter.isEncoded() || ori != null && ori.isEncodedEnabled();
+        String defaultValue = parameter.getDefaultValue();
+        if (defaultValue == null && ori != null) {
+            defaultValue = ori.getDefaultParameterValue();
+        }
         
         Object result = null;
         
-        PathParam pathParam = AnnotationUtils.getAnnotation(anns, PathParam.class);
-        if (pathParam != null) {
-            result = readFromUriParam(message, pathParam, parameterClass, genericParam, 
+        if (parameter.getType() == ParameterType.PATH) {
+            result = readFromUriParam(message, parameter.getName(), parameterClass, genericParam, 
                                       values, defaultValue, !isEncoded);
         } 
         
-        QueryParam qp = AnnotationUtils.getAnnotation(anns, QueryParam.class);
-        if (qp != null) {
-            result = readQueryString(qp, parameterClass, genericParam, message, 
+        if (parameter.getType() == ParameterType.QUERY) {
+            result = readQueryString(parameter.getName(), parameterClass, genericParam, message, 
                                    defaultValue, !isEncoded);
         }
         
-        MatrixParam mp = AnnotationUtils.getAnnotation(anns, MatrixParam.class);
-        if (mp != null) {
-            result = processMatrixParam(message, mp.value(), parameterClass, genericParam, 
+        if (parameter.getType() == ParameterType.MATRIX) {
+            result = processMatrixParam(message, parameter.getName(), parameterClass, genericParam, 
                                       defaultValue, !isEncoded);
         }
         
-        FormParam fp = AnnotationUtils.getAnnotation(anns, FormParam.class);
-        if (fp != null) {
-            result = processFormParam(message, fp.value(), parameterClass, genericParam, 
+        if (parameter.getType() == ParameterType.FORM) {
+            result = processFormParam(message, parameter.getName(), parameterClass, genericParam, 
                                       defaultValue, !isEncoded);
         }
         
-        CookieParam cookie = AnnotationUtils.getAnnotation(anns, CookieParam.class);
-        if (cookie != null) {
-            result = processCookieParam(message, cookie.value(), parameterClass, genericParam,
+        if (parameter.getType() == ParameterType.COOKIE) {
+            result = processCookieParam(message, parameter.getName(), parameterClass, genericParam,
                                         defaultValue);
         } 
         
-        HeaderParam hp = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
-        if (hp != null) {
-            result = processHeaderParam(message, hp.value(), parameterClass, genericParam, 
+        if (parameter.getType() == ParameterType.HEADER) {
+            result = processHeaderParam(message, parameter.getName(), parameterClass, genericParam, 
                                         defaultValue);
         } 
 
@@ -726,14 +722,13 @@ public final class JAXRSUtils {
     }
 
     private static Object readFromUriParam(Message m,
-                                           PathParam uriParamAnnotation,
+                                           String parameterName,
                                            Class<?> paramType,
                                            Type genericType,
                                            MultivaluedMap<String, String> values,
                                            String defaultValue,
                                            boolean decoded) {
         
-        String parameterName = uriParamAnnotation.value();
         if ("".equals(parameterName)) {
             return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, m, decoded);
         } else {
@@ -751,14 +746,12 @@ public final class JAXRSUtils {
     
     
     //TODO : multiple query string parsing, do it once
-    private static Object readQueryString(QueryParam queryParam,
+    private static Object readQueryString(String queryName,
                                           Class<?> paramType,
                                           Type genericType,
                                           Message m, 
                                           String defaultValue,
                                           boolean decode) {
-        String queryName = queryParam.value();
-
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, new UriInfoImpl(m, null).getQueryParameters(),
                                              ParameterType.QUERY, m, decode);

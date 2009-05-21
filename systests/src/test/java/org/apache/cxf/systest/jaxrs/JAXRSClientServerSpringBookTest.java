@@ -35,6 +35,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -48,7 +49,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
     }
     
     @Test
@@ -189,6 +190,42 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
     }
     
+    @Test
+    public void testGetBookUserResource() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks6/bookstore/books/123"; 
+        getBook(endpointAddress, "resources/expected_get_book123.txt", "application/xml"); 
+    }
+    
+    @Test
+    public void testGetBookUserResource2() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks7/bookstore/books/123"; 
+        getBook(endpointAddress, "resources/expected_get_book123.txt", "application/xml"); 
+    }
+    
+    @Test
+    public void testGetBookUserResourceFromProxy() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks6"; 
+        BookStoreNoAnnotations bStore = JAXRSClientFactory.createFromModel(
+                                         endpointAddress, 
+                                         BookStoreNoAnnotations.class,
+                                         "classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml",
+                                         null);
+        Book b = bStore.getBook(123L);
+        assertNotNull(b);
+        assertEquals(123L, b.getId());
+        assertEquals("CXF in Action", b.getName());
+        ChapterNoAnnotations proxy = bStore.getBookChapter(123L);
+        ChapterNoAnnotations c = proxy.getItself();
+        assertNotNull(c);
+        assertEquals(1, c.getId());
+        assertEquals("chapter 1", c.getTitle());
+    }
     
     @Test
     public void testGetBookXSLTXml() throws Exception {

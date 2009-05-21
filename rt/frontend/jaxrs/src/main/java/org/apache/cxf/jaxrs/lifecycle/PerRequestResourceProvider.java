@@ -28,6 +28,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -74,8 +75,9 @@ public class PerRequestResourceProvider implements ResourceProvider {
             if (AnnotationUtils.isContextClass(params[i])) {
                 values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
             } else {
+                Parameter p = ResourceUtils.getParameter(i, anns[i]);
                 values[i] = JAXRSUtils.createHttpParameterValue(
-                                anns[i], params[i], genericTypes[i], m, templateValues, null);
+                                p, params[i], genericTypes[i], m, templateValues, null);
             }
         }
         try {

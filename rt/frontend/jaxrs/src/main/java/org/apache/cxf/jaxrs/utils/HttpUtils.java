@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;

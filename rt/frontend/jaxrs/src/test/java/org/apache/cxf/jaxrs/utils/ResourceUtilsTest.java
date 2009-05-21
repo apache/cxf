@@ -19,10 +19,21 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.UserOperation;
+import org.apache.cxf.jaxrs.model.UserResource;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,5 +49,32 @@ public class ResourceUtilsTest extends Assert {
         assertEquals(String.class, c.getParameterTypes()[1]);
     }
 
+    @Test
+    public void testClassResourceInfoUserResource() throws Exception {
+        UserResource ur = new UserResource();
+        ur.setName(HashMap.class.getName());
+        ur.setPath("/hashmap");
+        UserOperation op = new UserOperation();
+        op.setPath("/key/{id}");
+        op.setName("get");
+        op.setVerb("POST");
+        op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
+        ur.setOperations(Collections.singletonList(op));
+        
+        Map<String, UserResource> resources = new HashMap<String, UserResource>();
+        resources.put(ur.getName(), ur);
+        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(resources, ur, true);
+        assertNotNull(cri);
+        assertEquals("/hashmap", cri.getURITemplate().getValue());
+        Method method = 
+            HashMap.class.getMethod("get", new Class[]{Object.class});
+        OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(method);
+        assertNotNull(ori);
+        assertEquals("/key/{id}", ori.getURITemplate().getValue());
+        List<Parameter> params = ori.getParameters();
+        assertNotNull(params);
+        Parameter p = params.get(0);
+        assertEquals("id", p.getName());
+    }
     
 }

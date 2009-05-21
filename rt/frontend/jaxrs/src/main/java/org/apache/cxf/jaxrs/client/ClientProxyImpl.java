@@ -33,14 +33,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -54,11 +47,11 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
@@ -125,17 +118,16 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             reportInvalidResourceMethod(m, "INVALID_RESOURCE_METHOD");
         }
         
-        MultivaluedMap<ParameterType, Parameter> types = 
-            getParametersInfo(ori, m, params);
+        MultivaluedMap<ParameterType, Parameter> types = getParametersInfo(ori);
         List<Object> pathParams = getPathParamValues(types, params, ori);
         
         int bodyIndex = getBodyIndex(types, ori);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
         if (isRoot) {
-            builder.path(ori.getClassResourceInfo().getServiceClass());
+            builder.path(ori.getClassResourceInfo().getURITemplate().getValue());
         }
-        builder.path(m);
+        builder.path(ori.getURITemplate().getValue());
         handleMatrixes(types, params, builder);
         handleQueries(types, params, builder);
         
@@ -173,23 +165,26 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
     }
 
-    private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(OperationResourceInfo ori, 
-                                                                              Method m, Object[] params) {
-        MultivaluedMap<ParameterType, Parameter> map = new MetadataMap<ParameterType, Parameter>();
-        Annotation[][] paramAnns = m.getParameterAnnotations();
-        if (paramAnns.length == 0) {
+    private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(OperationResourceInfo ori) {
+        MultivaluedMap<ParameterType, Parameter> map = 
+            new MetadataMap<ParameterType, Parameter>();
+        
+        List<Parameter> parameters = ori.getParameters();
+        if (parameters.size() == 0) {
             return map;
         }
-        for (int i = 0; i < paramAnns.length; i++) {
-            Parameter p = getParameter(i, paramAnns[i], ori);
+        for (Parameter p : parameters) {
+            if (p.getType() == ParameterType.CONTEXT) {
+                reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_CONTEXT_PARAMETERS");
+            }
             map.add(p.getType(), p);
         }
         if (map.containsKey(ParameterType.REQUEST_BODY)) {
             if (map.get(ParameterType.REQUEST_BODY).size() > 1) {
-                reportInvalidResourceMethod(m, "SINGLE_BODY_ONLY");
+                reportInvalidResourceMethod(ori.getMethodToInvoke(), "SINGLE_BODY_ONLY");
             }
             if (map.containsKey(ParameterType.FORM)) {
-                reportInvalidResourceMethod(m, "ONLY_FORM_ALLOWED");
+                reportInvalidResourceMethod(ori.getMethodToInvoke(), "ONLY_FORM_ALLOWED");
             }
         }
         return map;
@@ -281,17 +276,17 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         // It's a rare case but we might want just to use UriBuilderImpl() directly 
         // on the client side and tell it to choose the last variable value
         for (Parameter p : paramsList) {
-            if (valuesMap.containsKey(p.getValue()) && !vars.contains(p.getValue())) {
+            if (valuesMap.containsKey(p.getName()) && !vars.contains(p.getName())) {
                 int index = 0; 
                 for (Iterator<String> it = valuesMap.keySet().iterator(); it.hasNext(); index++) {
-                    if (it.next().equals(p.getValue())) {
+                    if (it.next().equals(p.getName())) {
                         list.remove(index);
                         list.add(index, params[p.getIndex()]);
                         break;
                     }
                 }
             } else {
-                String paramName = p.getValue();
+                String paramName = p.getName();
                 if (!"".equals(paramName)) {
                     list.add(params[p.getIndex()]);
                 } else {
@@ -319,7 +314,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> qs = getParameters(map, ParameterType.QUERY);
         for (Parameter p : qs) {
             if (params[p.getIndex()] != null) {
-                addParametersToBuilder(ub, p.getValue(), params[p.getIndex()], ParameterType.QUERY);
+                addParametersToBuilder(ub, p.getName(), params[p.getIndex()], ParameterType.QUERY);
             }
         }
     }
@@ -329,7 +324,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> mx = getParameters(map, ParameterType.MATRIX);
         for (Parameter p : mx) {
             if (params[p.getIndex()] != null) {
-                addParametersToBuilder(ub, p.getValue(), params[p.getIndex()], ParameterType.MATRIX);
+                addParametersToBuilder(ub, p.getName(), params[p.getIndex()], ParameterType.MATRIX);
             }
         }
     }
@@ -342,7 +337,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
             if (params[p.getIndex()] != null) {
-                FormUtils.addPropertyToForm(form, p.getValue(), params[p.getIndex()]);
+                FormUtils.addPropertyToForm(form, p.getName(), params[p.getIndex()]);
             }
         }
         
@@ -354,7 +349,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> hs = getParameters(map, ParameterType.HEADER);
         for (Parameter p : hs) {
             if (params[p.getIndex()] != null) {
-                headers.add(p.getValue(), params[p.getIndex()].toString());
+                headers.add(p.getName(), params[p.getIndex()].toString());
             }
         }
     }
@@ -364,53 +359,9 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> cs = getParameters(map, ParameterType.COOKIE);
         for (Parameter p : cs) {
             if (params[p.getIndex()] != null) {
-                headers.add(HttpHeaders.COOKIE, p.getValue() + '=' + params[p.getIndex()].toString());
+                headers.add(HttpHeaders.COOKIE, p.getName() + '=' + params[p.getIndex()].toString());
             }
         }
-    }
-    
-    private static Parameter getParameter(int index, Annotation[] anns, OperationResourceInfo ori) {
-        
-        Context ctx = AnnotationUtils.getAnnotation(anns, Context.class);
-        if (ctx != null) {
-            reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_CONTEXT_PARAMETERS");
-        }
-        
-        PathParam a = AnnotationUtils.getAnnotation(anns, PathParam.class); 
-        if (a != null) {
-            return new Parameter(ParameterType.PATH, index, a.value());
-        } 
-        
-        QueryParam q = AnnotationUtils.getAnnotation(anns, QueryParam.class);
-        if (q != null) {
-            return new Parameter(ParameterType.QUERY, index, q.value());
-        }
-        
-        MatrixParam m = AnnotationUtils.getAnnotation(anns, MatrixParam.class);
-        if (m != null) {
-            return new Parameter(ParameterType.MATRIX, index, m.value());
-        }  
-    
-        FormParam f = AnnotationUtils.getAnnotation(anns, FormParam.class);
-        if (f != null) {
-            return new Parameter(ParameterType.FORM, index, f.value());
-        }  
-        
-        HeaderParam h = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
-        if (h != null) {
-            return new Parameter(ParameterType.HEADER, index, h.value());
-        }  
-        
-        Parameter p = null;
-        CookieParam c = AnnotationUtils.getAnnotation(anns, CookieParam.class);
-        if (c != null) {
-            p = new Parameter(ParameterType.COOKIE, index, c.value());
-        } else {
-            p = new Parameter(ParameterType.REQUEST_BODY, index, null); 
-        }
-        
-        return p;
-        
     }
     
     private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
@@ -466,30 +417,6 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         throw new WebApplicationException(405);
     }
     
-    private static class Parameter {
-        private ParameterType type;
-        private int ind;
-        private String aValue;
-        
-        public Parameter(ParameterType type, int ind, String aValue) {
-            this.type = type;
-            this.ind = ind;
-            this.aValue = aValue; 
-        }
-        
-        public int getIndex() {
-            return ind;
-        }
-        
-        public String getValue() {
-            return aValue;
-        }
-        
-        public ParameterType getType() {
-            return type;
-        }
-    }
-
     // TODO : what we really need to do is to refactor JAXRSOutInterceptor so that
     // it can handle both client requests and server responses - it may need to be split into
     // several interceptors - in fact we need to do the same for JAXRSInInterceptor so that we can do
@@ -516,15 +443,18 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
             Method method = ori.getMethodToInvoke();
             int bodyIndex = (Integer)m.get("BODY_INDEX");
+            Method aMethod = ori.getAnnotatedMethod();
+            Annotation[] anns = aMethod == null || bodyIndex == -1 ? new Annotation[0] 
+                                                  : aMethod.getParameterAnnotations()[bodyIndex];
             Object body = objs.get(0);
             try {
                 if (bodyIndex != -1) {
                     writeBody(body, m, body.getClass(), 
-                          method.getGenericParameterTypes()[bodyIndex],
-                          method.getParameterAnnotations()[bodyIndex], headers, os);
+                              method.getGenericParameterTypes()[bodyIndex],
+                              anns, headers, os);
                 } else {
                     writeBody(body, m, body.getClass(), body.getClass(), 
-                              method.getDeclaredAnnotations(), headers, os);
+                              anns, headers, os);
                 }
                 os.flush();
             } catch (Exception ex) {

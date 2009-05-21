@@ -39,8 +39,15 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     
     @Test
     public void testGetThatBook123() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/test/bookstorestorage/thosebooks/123"; 
+        getBook("http://localhost:9080/test/bookstorestorage/thosebooks/123");
+    }
+    
+    @Test
+    public void testGetThatBook123UserResource() throws Exception {
+        getBook("http://localhost:9080/test/bookstore/books/123");
+    }
+    
+    private void getBook(String endpointAddress) throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -48,41 +55,17 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
 
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123.txt");
-
-        //System.out.println("---" + getStringFromInputStream(in));
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
     }
     
     @Test
     public void testGetThatBookOverloaded() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/test/bookstorestorage/thosebooks/123/123"; 
-        URL url = new URL(endpointAddress);
-        URLConnection connect = url.openConnection();
-        connect.addRequestProperty("Accept", "application/xml");
-        InputStream in = connect.getInputStream();           
-
-        InputStream expected = getClass()
-            .getResourceAsStream("resources/expected_get_book123.txt");
-
-        //System.out.println("---" + getStringFromInputStream(in));
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+        getBook("http://localhost:9080/test/bookstorestorage/thosebooks/123/123");
     }
     
     @Test
     public void testGetThatBookOverloaded2() throws Exception {
-        String endpointAddress =
-            "http://localhost:9080/test/bookstorestorage/thosebooks"; 
-        URL url = new URL(endpointAddress);
-        URLConnection connect = url.openConnection();
-        connect.addRequestProperty("Accept", "application/xml");
-        InputStream in = connect.getInputStream();           
-
-        InputStream expected = getClass()
-            .getResourceAsStream("resources/expected_get_book123.txt");
-
-        //System.out.println("---" + getStringFromInputStream(in));
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+        getBook("http://localhost:9080/test/bookstorestorage/thosebooks");
     }
     
     @Test

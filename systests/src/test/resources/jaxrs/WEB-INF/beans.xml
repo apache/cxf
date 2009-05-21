@@ -39,7 +39,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-  
+
   <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
   
   <jaxrs:server id="bookservice"
@@ -123,14 +123,30 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   
   <bean id="xsltProvider" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">    
       <property name="resolver" ref="uriResolver"/>
-      <!-- 
-      <property name="outTemplate" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template.xsl"/>
-      -->
       <property name="outMediaTemplates" ref="outTemplates"/>
       <property name="outClassNames" ref="outClassNames"/>
   </bean>
 
   <bean id="uriResolver" class="org.apache.cxf.systest.jaxrs.URIResolverImpl"/>     
+  
+  <jaxrs:server id="bookservice6" address="/thebooks6" 
+     modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml"/>
+
+  <jaxrs:server id="bookservice7" address="/thebooks7">
+    <jaxrs:model>
+      <jaxrs:resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations" path="bookstore">
+        <jaxrs:operation name="getBook" verb="GET" path="/books/{id}">
+           <jaxrs:param name="id" type="PATH"/>
+        </jaxrs:operation>
+        <jaxrs:operation name="getBookChapter" path="/books/{id}/chapter">
+           <jaxrs:param name="id" type="PATH"/>
+        </jaxrs:operation> 
+      </jaxrs:resource>
+      <jaxrs:resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
+        <jaxrs:operation name="getItself" verb="GET"/>
+      </jaxrs:resource>
+    </jaxrs:model>
+  </jaxrs:server>  
 
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>

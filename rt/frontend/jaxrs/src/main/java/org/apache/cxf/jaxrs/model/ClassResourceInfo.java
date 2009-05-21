@@ -49,6 +49,7 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     private List<Field> paramFields;
     private List<Method> paramMethods;
     private boolean enableStatic;
+    private boolean createdFromModel; 
     
     public ClassResourceInfo(Class<?> theResourceClass) {
         this(theResourceClass, false);
@@ -63,11 +64,7 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, boolean theRoot) {
-        super(theResourceClass, theServiceClass, theRoot);
-        if (theRoot) {
-            initParamFields();
-            initParamMethods();
-        }
+        this(theResourceClass, theServiceClass, theRoot, false);
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
@@ -78,6 +75,17 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             initParamFields();
             initParamMethods();
         }
+    }
+    
+    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
+                             boolean theRoot, boolean enableStatic, boolean createdFromModel) {
+        super(theResourceClass, theServiceClass, theRoot);
+        this.enableStatic = enableStatic;
+        if (theRoot) {
+            initParamFields();
+            initParamMethods();
+        }
+        this.createdFromModel = createdFromModel;
     }
     
     public ClassResourceInfo findResource(Class<?> typedClass, Class<?> instanceClass) {
@@ -174,6 +182,10 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         subResources.putIfAbsent(new SubresourceKey(cri.getResourceClass(), 
                                             cri.getServiceClass()),
                                  cri);
+    }
+    
+    public boolean isCreatedFromModel() {
+        return createdFromModel;
     }
     
     public ResourceProvider getResourceProvider() {

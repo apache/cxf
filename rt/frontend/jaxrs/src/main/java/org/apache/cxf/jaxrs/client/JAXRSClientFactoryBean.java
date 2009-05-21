@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.client;
 import java.net.URI;
 import java.util.Map;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -35,7 +34,6 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.service.Service;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
@@ -126,7 +124,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             Endpoint ep = createEndpoint();
             URI baseURI = URI.create(getAddress());
             ClassResourceInfo cri = serviceFactory.getClassResourceInfo().get(0);
-            boolean isRoot = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Path.class) != null;
+            boolean isRoot = cri.getURITemplate() != null;
             ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders,
                                                             varValues);
             initClient(proxyImpl, ep);    

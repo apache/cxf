@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class OperationResourceInfo {
     private URITemplate uriTemplate;
@@ -41,16 +42,45 @@ public class OperationResourceInfo {
     private List<MediaType> consumeMimes;
     private boolean encoded;
     private String defaultParamValue;
+    private List<Parameter> parameters;
 
-    public OperationResourceInfo(Method m, ClassResourceInfo cri) {
-        methodToInvoke = m;
-        annotatedMethod = m;
+    public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
+        this(mInvoke, mInvoke, cri);
+    }
+    
+    public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
+        methodToInvoke = mInvoke;
+        annotatedMethod = mAnnotated;
+        if (mAnnotated != null) {
+            parameters = ResourceUtils.getParameters(mAnnotated);
+        }
         classResourceInfo = cri;
         checkMediaTypes();
         checkEncoded();
         checkDefaultParameterValue();
     }
+    
+    public OperationResourceInfo(Method m, 
+                                 ClassResourceInfo cri,
+                                 URITemplate template,
+                                 String httpVerb,
+                                 String consumeMediaTypes,
+                                 String produceMediaTypes,
+                                 List<Parameter> params) {
+        methodToInvoke = m;
+        annotatedMethod = null;
+        classResourceInfo = cri;
+        uriTemplate = template;
+        httpMethod = httpVerb;
+        consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes);
+        produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes);
+        parameters = params;
+    }
 
+    public List<Parameter> getParameters() {
+        return parameters;
+    }
+        
     public URITemplate getURITemplate() {
         return uriTemplate;
     }
@@ -63,12 +93,12 @@ public class OperationResourceInfo {
         return classResourceInfo;
     }
 
-    public void setClassResourceInfo(ClassResourceInfo c) {
-        classResourceInfo = c;
-    }
-
     public Method getMethodToInvoke() {
         return methodToInvoke;
+    }
+    
+    public Method getAnnotatedMethod() {
+        return annotatedMethod;
     }
 
     public void setMethodToInvoke(Method m) {
@@ -81,17 +111,6 @@ public class OperationResourceInfo {
 
     public void setHttpMethod(String m) {
         httpMethod = m;
-    }
-    
-    public void setAnnotatedMethod(Method m) {
-        if (m != null) {
-            annotatedMethod = m;
-            checkMediaTypes();
-        }
-    }
-    
-    public Method getAnnotatedMethod() {
-        return annotatedMethod;
     }
     
     public boolean isSubResourceLocator() {

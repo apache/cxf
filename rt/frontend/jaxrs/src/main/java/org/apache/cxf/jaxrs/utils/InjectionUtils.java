@@ -82,6 +82,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 

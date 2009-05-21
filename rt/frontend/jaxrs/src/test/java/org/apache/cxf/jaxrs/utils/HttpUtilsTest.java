@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.utils;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;

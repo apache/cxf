@@ -47,8 +47,16 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <ref bean="bookstoreInterface"/>
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
-  <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
-  <bean id="bookstoreInterface" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
+  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
+  <bean id="bookstoreInterface" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
+  
+  <jaxrs:server id="bookservice2" address="/2"
+    modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml">
+    <jaxrs:serviceBeans>
+      <ref bean="bookstore2"/>
+    </jaxrs:serviceBeans>		   
+  </jaxrs:server>
+  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations"/>
   
   <aop:config>
 		<aop:aspect id="loggingAspect" ref="simpleLogger">

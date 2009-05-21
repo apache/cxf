@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -31,6 +32,7 @@ import javax.ws.rs.Path;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
@@ -125,6 +127,21 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
     
+    public void setUserResources(List<UserResource> resources) {
+        Map<String, UserResource> map = new HashMap<String, UserResource>();
+        for (UserResource ur : resources) {
+            map.put(ur.getName(), ur);
+        }
+        for (UserResource ur : resources) {
+            if (ur.getPath() != null) {
+                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true);
+                if (cri != null) {
+                    classResourceInfos.add(cri);
+                }
+            }
+        }
+    }
+    
     protected ClassResourceInfo createResourceInfo(Class cls, boolean isRoot) {
         ClassResourceInfo classResourceInfo = 
             ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic);
@@ -143,15 +160,28 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             
             Class<?> realClass = ClassHelper.getRealClass(bean);
             
-            ClassResourceInfo classResourceInfo = 
-                ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic);
-            if (classResourceInfo != null) {
-                classResourceInfos.add(classResourceInfo);
-                
-                classResourceInfo.setResourceProvider(
+            ClassResourceInfo cri = getCreatedFromModel(realClass);
+            if (cri != null) {
+                cri.setResourceClass(bean.getClass());
+                continue;
+            }
+            
+            cri = ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic);
+            if (cri != null) {
+                classResourceInfos.add(cri);
+                cri.setResourceProvider(
                                    new SingletonResourceProvider(bean));
             }
         }
+    }
+    
+    private ClassResourceInfo getCreatedFromModel(Class<?> realClass) {
+        for (ClassResourceInfo cri : classResourceInfos) {
+            if (cri.isCreatedFromModel() && cri.getServiceClass() == realClass) {
+                return cri;
+            }
+        }
+        return null;
     }
     
     protected void initializeServiceModel() {

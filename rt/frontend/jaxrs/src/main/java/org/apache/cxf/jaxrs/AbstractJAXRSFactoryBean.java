@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -36,7 +37,9 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -222,4 +225,20 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         ep.put(ProviderFactory.class.getName(), factory);
         return factory;
     }
+
+    public void setModelBeans(UserResource... resources) {
+        setModelBeans(Arrays.asList(resources));
+    }
+    
+    public void setModelBeans(List<UserResource> resources) {
+        serviceFactory.setUserResources(resources);
+    }
+    
+    public void setModelRef(String modelRef) {
+        List<UserResource> resources = ResourceUtils.getUserResources(modelRef);
+        if (resources != null) {
+            serviceFactory.setUserResources(resources);
+        }
+    }
+    
 }

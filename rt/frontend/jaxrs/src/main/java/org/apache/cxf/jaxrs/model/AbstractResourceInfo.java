@@ -59,6 +59,10 @@ public abstract class AbstractResourceInfo {
         }
     }
     
+    public void setResourceClass(Class<?> rClass) {
+        resourceClass = rClass;
+    }
+    
     public Class<?> getServiceClass() {
         return serviceClass;
     }

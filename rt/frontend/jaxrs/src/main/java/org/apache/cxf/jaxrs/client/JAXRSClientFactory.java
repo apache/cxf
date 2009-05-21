@@ -20,9 +20,11 @@ package org.apache.cxf.jaxrs.client;
 
 import java.lang.reflect.InvocationHandler;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.common.util.ProxyHelper;
+import org.apache.cxf.jaxrs.model.UserResource;
 
 /**
  * Factory for creating proxy clients.
@@ -138,6 +140,62 @@ public final class JAXRSClientFactory {
         JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
         bean.setUsername(username);
         bean.setPassword(password);
+        return bean.create(cls);
+    }
+    
+    /**
+     * Creates a proxy using user resource model
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param modelRef model location
+     * @return typed proxy
+     */
+    public static <T> T createFromModel(String baseAddress, Class<T> cls, String modelRef, 
+                                        String configLocation) {
+        return createFromModel(baseAddress, cls, modelRef, Collections.emptyList(), configLocation);
+    }
+    
+    /**
+     * Creates a proxy using user resource model
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param modelRef model location
+     * @param providers list of providers
+     * @return typed proxy
+     */
+    public static <T> T createFromModel(String baseAddress, Class<T> cls, String modelRef, 
+                               List<?> providers, String configLocation) {
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, configLocation);
+        bean.setProviders(providers);
+        bean.setModelRef(modelRef);
+        return bean.create(cls);
+    }
+    
+    /**
+     * Creates a proxy using user resource model
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param modelBeans model beans
+     * @return typed proxy
+     */
+    public static <T> T createFromModel(String baseAddress, Class<T> cls, List<UserResource> modelBeans, 
+                               String configLocation) {
+        return createFromModel(baseAddress, cls, modelBeans, Collections.emptyList(), configLocation);
+    }
+    
+    /**
+     * Creates a proxy using user resource model
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param modelBeans model beans
+     * @param providers list of providers
+     * @return typed proxy
+     */
+    public static <T> T createFromModel(String baseAddress, Class<T> cls, List<UserResource> modelBeans,
+                               List<?> providers, String configLocation) {
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, configLocation);
+        bean.setProviders(providers);
+        bean.setModelBeans(modelBeans);
         return bean.create(cls);
     }
     

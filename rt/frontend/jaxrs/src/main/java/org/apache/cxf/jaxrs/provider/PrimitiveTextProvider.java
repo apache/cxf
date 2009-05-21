@@ -30,8 +30,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.ParameterType;
 
 public class PrimitiveTextProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {

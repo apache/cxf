@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
@@ -37,7 +36,6 @@ import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -151,14 +149,13 @@ public class UriInfoImpl implements UriInfo {
             String sum = "";
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
-                Path[] paths = {
-                    AnnotationUtils.getClassAnnotation(ori.getClassResourceInfo().getResourceClass(),
-                                                             Path.class),
-                    AnnotationUtils.getMethodAnnotation(ori.getAnnotatedMethod(), Path.class)
+                URITemplate[] paths = {
+                    ori.getClassResourceInfo().getURITemplate(),
+                    ori.getURITemplate()
                 };
-                for (Path p : paths) {
-                    if (p != null) {
-                        String v = p.value();
+                for (URITemplate t : paths) {
+                    if (t != null) {
+                        String v = t.getValue();
                         sum += "/" + (decode ? HttpUtils.pathDecode(v) : v);
                     }
                 }

@@ -17,17 +17,34 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.utils;
+package org.apache.cxf.systest.jaxrs;
 
-public enum ParameterType {
-    PATH,
-    QUERY,
-    MATRIX,
-    HEADER,
-    COOKIE,
-    FORM,
+import java.util.HashMap;
+import java.util.Map;
+
+public class BookStoreNoAnnotations {
+
+    private Map<Long, Book> books = new HashMap<Long, Book>();
     
-    REQUEST_BODY,
-    CONTEXT,
-    UNKNOWN
+    public BookStoreNoAnnotations() {
+        Book b = new Book();
+        b.setId(123L);
+        b.setName("CXF in Action");
+        books.put(b.getId(), b);
+    }
+    
+    public Book getBook(Long id) throws BookNotFoundFault {
+        return books.get(id);
+    }
+    
+    public ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault {
+        Book b = books.get(id);
+        Chapter ch = b.getChapter(1);
+        
+        ChapterNoAnnotations ch2 = new ChapterNoAnnotations();
+        ch2.setId(ch.getId());
+        ch2.setTitle(ch.getTitle());
+        return ch2;
+    }
+    
 }
