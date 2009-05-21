@@ -55,6 +55,7 @@ import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -141,9 +142,12 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 if (soapFault == null) {
                     throw new WebServiceException(ex);
                 }
-                
                 SOAPFaultException  exception = new SOAPFaultException(soapFault);
-                exception.initCause(ex);
+                if (ex instanceof Fault && ex.getCause() != null) {
+                    exception.initCause(ex.getCause());
+                } else {
+                    exception.initCause(ex);
+                }
                 throw exception;                
             } else {
                 throw new WebServiceException(ex);

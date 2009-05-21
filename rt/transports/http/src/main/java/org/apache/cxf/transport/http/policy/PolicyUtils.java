@@ -73,6 +73,10 @@ public final class PolicyUtils {
      * @throws PolicyException if no compatible HTTPClientPolicy can be determined
      */
     public static HTTPClientPolicy getClient(Message message, HTTPClientPolicy confPolicy) {
+        HTTPClientPolicy pol = message.get(HTTPClientPolicy.class);
+        if (pol != null) {
+            return intersect(pol, confPolicy);
+        }
         AssertionInfoMap amap =  message.get(AssertionInfoMap.class);
         if (null == amap) {
             return confPolicy;
@@ -200,7 +204,11 @@ public final class PolicyUtils {
      * @param client the client policy
      */
     public static void assertClientPolicy(Message message, HTTPClientPolicy client) {
-       
+        HTTPClientPolicy pol = message.get(HTTPClientPolicy.class);
+        if (pol != null) {
+            client = intersect(pol, client);
+        }
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
             return;

@@ -26,7 +26,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.SchemaValidationService;
@@ -77,9 +76,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             validation.setComplexStruct(complexStruct);
             fail("Set ComplexStruct hould have thrown ProtocolException");
         } catch (WebServiceException e) {
-            assertTrue(e.getCause() instanceof Fault);
             String expected = "'{\"http://apache.org/schema_validation/types\":elem2}' is expected.";
-            assertTrue(e.getCause().getMessage().indexOf(expected) != -1);
+            assertTrue(e.getMessage(), e.getMessage().indexOf(expected) != -1);
         }
 
         OccuringStruct occuringStruct = new OccuringStruct();
@@ -94,9 +92,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             validation.setOccuringStruct(occuringStruct);
             fail("Set OccuringStruct hould have thrown ProtocolException");
         } catch (WebServiceException e) {
-            assertTrue(e.getCause() instanceof Fault);
             String expected = "'{\"http://apache.org/schema_validation/types\":varFloat}' is expected.";
-            assertTrue(e.getCause().getMessage().indexOf(expected) != -1);
+            assertTrue(e.getMessage().indexOf(expected) != -1);
         }
 
         try {
@@ -107,10 +104,9 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             validation.getComplexStruct("Hello");
             fail("Get ComplexStruct should have thrown ProtocolException");
         } catch (WebServiceException e) {
-            assertTrue(e.getCause() instanceof Fault);
             String expected = "'{\"http://apache.org/schema_validation/types\":elem2}' is expected.";
-            assertTrue("Found message " + e.getCause().getMessage(), 
-                       e.getCause().getMessage().indexOf(expected) != -1);
+            assertTrue("Found message " + e.getMessage(), 
+                       e.getMessage().indexOf(expected) != -1);
         }
 
         try {
@@ -121,9 +117,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             validation.getOccuringStruct("World");
             fail("Get OccuringStruct should have thrown ProtocolException");
         } catch (WebServiceException e) {
-            assertTrue(e.getCause() instanceof Fault);
             String expected = "'{\"http://apache.org/schema_validation/types\":varFloat}' is expected.";
-            assertTrue(e.getCause().getMessage().indexOf(expected) != -1);
+            assertTrue(e.getMessage().indexOf(expected) != -1);
         }
     }
 

@@ -20,8 +20,11 @@
 package org.apache.cxf.systest.dispatch;
 
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
@@ -47,9 +50,12 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMe;
+import org.apache.hello_world_soap_http.types.GreetMeLater;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -309,6 +315,32 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         }
         String responseValue3 = ((GreetMeResponse)tjbh.getResponse()).getResponseType();
         assertTrue("Expected string, " + expected, expected.equals(responseValue3));
+        
+        GreetMeLater later = new GreetMeLater();
+        later.setRequestType(1000);
+        
+        HTTPClientPolicy pol = new HTTPClientPolicy();
+        pol.setReceiveTimeout(100);
+        disp.getRequestContext().put(HTTPClientPolicy.class.getName(), pol);
+        Response<Object> o = disp.invokeAsync(later);
+        try {
+            o.get(10, TimeUnit.SECONDS);
+            fail("Should have gotten a SocketTimeoutException");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof SocketTimeoutException);
+        }
+
+        later.setRequestType(20000);
+        pol.setReceiveTimeout(20000);
+        disp.getRequestContext().put(HTTPClientPolicy.class.getName(), pol);
+        o = disp.invokeAsync(later);
+        try {
+            o.get(100, TimeUnit.MILLISECONDS);
+            fail("Should have gotten a SocketTimeoutException");
+        } catch (TimeoutException ex) {
+            //ignore - expected
+        }
+
     }
 
     @Test

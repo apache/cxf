@@ -44,7 +44,6 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.types.FaultLocation;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseComparator;
 import org.apache.cxf.phase.PhaseManager;
@@ -67,7 +66,6 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
     private static final QName SOAP_FAULT_CODE = new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                            "Server");
-    private static final String FAULT_CODE = "COULD_NOT_SEND";
     private static final String FAULT_MESSAGE = "Could not send Message.";
     
     private static final String CONTROL_PORT_ADDRESS = 
@@ -261,10 +259,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             if (!expectOnewayFault) {
                 fail("Oneway operation unexpectedly failed.");
             }
-            Throwable cause = ex.getCause();
-            Fault f = (Fault)cause;
-            assertEquals(FAULT_CODE, f.getCode());
-            assertEquals(FAULT_MESSAGE, f.getMessage());
+            assertEquals(FAULT_MESSAGE, ex.getMessage());
         }
         
         try {

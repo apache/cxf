@@ -143,7 +143,7 @@
         <wsdl:operation name="greetMe">
             <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
                 <http-conf:client xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
-                    ReceiveTimeout="2000"/>
+                    ReceiveTimeout="1000"/>
             </wsp:Policy>
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeRequest">
