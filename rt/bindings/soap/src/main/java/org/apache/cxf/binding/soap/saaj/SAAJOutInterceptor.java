@@ -108,16 +108,17 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
         } else {
             //as the SOAPMessage already has everything in place, we do not need XMLStreamWriter to write
             //anything for us, so we just set XMLStreamWriter's output to a dummy output stream.         
-            try {
-                XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
-                message.put(ORIGINAL_XML_WRITER, origWriter);
-                
-                XMLStreamWriter dummyWriter = StaxUtils.getXMLOutputFactory()
-                    .createXMLStreamWriter(new ByteArrayOutputStream());
-                message.setContent(XMLStreamWriter.class, dummyWriter);
-            } catch (XMLStreamException e) {
-                // do nothing
-            }
+
+            XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
+            message.put(ORIGINAL_XML_WRITER, origWriter);
+            
+            XMLStreamWriter dummyWriter = StaxUtils.createXMLStreamWriter(new OutputStream() {
+                    public void write(int b) throws IOException {
+                    }
+                    public void write(byte b[], int off, int len) throws IOException {
+                    }                        
+                });
+            message.setContent(XMLStreamWriter.class, dummyWriter);
         }
         
         // Add a final interceptor to write the message

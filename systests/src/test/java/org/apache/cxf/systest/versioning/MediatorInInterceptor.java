@@ -25,6 +25,7 @@ import java.util.Set;
 
 
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.endpoint.Endpoint;
@@ -62,8 +63,10 @@ public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor 
             String encoding = (String)message.get(Message.ENCODING);
 
             XMLStreamReader xsr;
-            xsr = StaxInInterceptor.getXMLInputFactory(message).
-                createXMLStreamReader(bos.getInputStream(), encoding);
+            XMLInputFactory factory = StaxInInterceptor.getXMLInputFactory(message);
+            synchronized (factory) {
+                xsr = factory.createXMLStreamReader(bos.getInputStream(), encoding);
+            }
             
             // move to the soap body            
             while (true) {                
