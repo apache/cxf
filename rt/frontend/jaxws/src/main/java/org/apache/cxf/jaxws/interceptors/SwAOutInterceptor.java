@@ -86,10 +86,10 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         if (m == null && !SWA_REF_METHOD.containsKey(ctx.getClass().getName())) {
             try {
                 m = ctx.getClass().getMethod("hasSwaRef", new Class[0]);
+                SWA_REF_METHOD.put(ctx.getClass().getName(), m);
             } catch (Exception e) {
                 //ignore
             }
-            SWA_REF_METHOD.put(ctx.getClass().getName(), m);
         }
         try {
             return (Boolean)m.invoke(ctx);
