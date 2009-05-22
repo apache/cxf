@@ -22,6 +22,7 @@ package org.apache.cxf.endpoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,9 +87,11 @@ public class ClientImpl
     protected PhaseChainCache inboundChainCache = new PhaseChainCache();
 
     protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>();
-    protected Map<Thread, EchoContext> requestContext = new WeakHashMap<Thread, EchoContext>();
+    protected Map<Thread, EchoContext> requestContext 
+        = Collections.synchronizedMap(new WeakHashMap<Thread, EchoContext>());
 
-    protected Map<Thread, Map<String, Object>> responseContext = new WeakHashMap<Thread, Map<String, Object>>();
+    protected Map<Thread, Map<String, Object>> responseContext 
+        = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
 
     protected Executor executor;
 
