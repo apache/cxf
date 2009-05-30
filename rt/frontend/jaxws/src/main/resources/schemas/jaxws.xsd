@@ -149,8 +149,13 @@
           <xsd:attribute name="serviceName" type="xsd:QName">
             <xsd:annotation>
               <xsd:documentation>Specifies the value of the service's WSDL service element's name attribute.</xsd:documentation>
-            </xsd:annotation>
+            </xsd:annotation>            
           </xsd:attribute>
+          <xsd:attribute name="transportId" type="xsd:string">
+        	<xsd:annotation>
+              <xsd:documentation>Specifies the transportId that endpoint will use, it will override the transport which is defined in the wsdl.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>  
           <xsd:attribute name="wsdlLocation" type="xsd:string">
             <xsd:annotation>
               <xsd:documentation>Specifies the location of the endpoint's WSDL contract. The WSDL contract's location is relative to the folder 

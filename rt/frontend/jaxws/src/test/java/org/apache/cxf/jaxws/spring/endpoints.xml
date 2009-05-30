@@ -36,7 +36,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
               <value>http://cxf.apache.org/transports/local</value>
               <value>http://schemas.xmlsoap.org/soap/http</value>
               <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/http/</value>
+              <value>http://schemas.xmlsoap.org/wsdl/http/</value>              
           </list>
       </property>
   </bean>
@@ -50,7 +50,8 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
   
     <jaxws:endpoint id="simpleWithBindingUri" 
     implementor="#greeter" address="http://localhost:8080/simpeWithHttpBinding"
-    bindingUri="http://cxf.apache.org/bindings/xformat"/>
+    bindingUri="http://cxf.apache.org/bindings/xformat"
+    transportId="http://cxf.apache.org/transports/local"/>
     
   <jaxws:endpoint id="inlineImplementor" address="http://localhost:8080/simpleWithAddress2">
     <jaxws:implementor>
