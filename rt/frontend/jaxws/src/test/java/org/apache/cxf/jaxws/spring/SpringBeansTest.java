@@ -87,7 +87,7 @@ public class SpringBeansTest extends Assert {
             fail("can't get the right implementor object");
         }
         assertEquals("http://localhost:8080/simpleWithAddress",
-                     ep.getServer().getEndpoint().getEndpointInfo().getAddress());
+                     ep.getServer().getEndpoint().getEndpointInfo().getAddress());        
 
         ep = getEndpointImplBean("inlineImplementor", ctx);
         if (!(ep.getImplementor() instanceof org.apache.hello_world_soap_http.GreeterImpl)) {
@@ -107,6 +107,8 @@ public class SpringBeansTest extends Assert {
         assertEquals("get the wrong bindingId",
                      ep.getBindingUri(),
                      "http://cxf.apache.org/bindings/xformat");
+        assertEquals("get a wrong transportId",
+                     "http://cxf.apache.org/transports/local", ep.getTransportId());
 
         ep = getEndpointImplBean("simpleWithBinding", ctx);
         BindingConfiguration bc = ep.getBindingConfig();

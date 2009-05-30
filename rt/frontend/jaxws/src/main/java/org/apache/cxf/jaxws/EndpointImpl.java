@@ -528,6 +528,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         this.implementorClass = implementorClass;
     }
     
+    public void setTransportId(String transportId) {        
+        serverFactory.setTransportId(transportId);
+    }
+    
+    public String getTransportId() {
+        return serverFactory.getTransportId();
+    }
+    
     public void setBindingConfig(BindingConfiguration config) {
         serverFactory.setBindingConfig(config);
     }
