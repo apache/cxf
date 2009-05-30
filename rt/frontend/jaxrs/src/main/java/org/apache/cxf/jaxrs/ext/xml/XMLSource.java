@@ -51,7 +51,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 
 /**
- * Utiliity class for manipulating XML response using XPath and XSLT
+ * Utility class for manipulating XML response using XPath and XSLT
  *
  */
 public class XMLSource {

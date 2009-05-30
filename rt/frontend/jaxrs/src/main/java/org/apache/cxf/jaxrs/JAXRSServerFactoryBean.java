@@ -139,6 +139,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     public List<Class> getResourceClasses() {
         return serviceFactory.getResourceClasses();
     }
+    
+    public void setServiceClass(Class clazz) {
+        serviceFactory.setResourceClasses(clazz);
+    }
 
     public void setResourceClasses(List<Class> classes) {
         serviceFactory.setResourceClasses(classes);

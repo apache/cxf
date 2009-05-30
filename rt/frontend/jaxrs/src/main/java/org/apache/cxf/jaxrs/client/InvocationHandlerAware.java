@@ -19,8 +19,8 @@
 package org.apache.cxf.jaxrs.client;
 
 /**
- * Utiliy interface which helps to retrieve 
- * the invoiation handler from a CGLIB proxy  
+ * Utility interface which helps to retrieve 
+ * the invocation handler from a CGLIB proxy  
  *
  */
 public interface InvocationHandlerAware {
