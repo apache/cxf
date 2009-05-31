@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jaxrs="http://cxf.apache.org/jaxrs"     
+      xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+
+  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+      <property name="transportIds">
+          <list>
+              <value>http://cxf.apache.org/transports/local</value>
+              <value>http://schemas.xmlsoap.org/soap/http</value>
+              <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+          </list>
+      </property>
+  </bean>
+  
+  <jaxrs:server id="simple" serviceClass="org.apache.cxf.jaxrs.resources.BookStore"         
+        address="http://localhost:8080/rs"/>
+  
+  <jaxrs:server id="inlineServiceBeans" address="http://localhost:8080/simpleWithAddress10">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.jaxrs.resources.BookStore"/>
+      <bean class="org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly"/>      
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+  
+  <jaxrs:server id="inlineProvider"
+    serviceClass="org.apache.cxf.jaxrs.resources.BookStore"
+    address="http://localhost:8080/simpleWithAddress"
+    bus="cxf" staticSubresourceResolution="false">
+    <jaxrs:providers>
+        <ref bean="feed"/>
+        <ref bean="entry"/>
+    </jaxrs:providers>	
+    <jaxrs:extensionMappings>
+      <entry key="json" value="application/json"/>
+    </jaxrs:extensionMappings>    
+  </jaxrs:server>
+  
+  <bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider"/>
+  <bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider"/>
+  
+  <jaxrs:server id="moduleServer"
+    modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
+    address="http://localhost:8080/simpleWithAddress"
+    bus="cxf" >
+    <jaxrs:serviceBeans>
+       <bean class="org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations"/>
+    </jaxrs:serviceBeans>        
+  </jaxrs:server>
+  
+</beans>

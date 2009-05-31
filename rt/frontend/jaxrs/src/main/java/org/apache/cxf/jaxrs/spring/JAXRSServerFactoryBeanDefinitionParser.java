@@ -21,8 +21,6 @@ package org.apache.cxf.jaxrs.spring;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -44,7 +42,6 @@ import org.springframework.context.ApplicationContextAware;
 
 
 
-
 public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
     
 
@@ -55,12 +52,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
     
     @Override
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
-        if ("endpointName".equals(name) || "serviceName".equals(name)) {
-            QName q = parseQName(e, val);
-            bean.addPropertyValue(name, q);
-        } else {
-            mapToProperty(bean, name, val);
-        }
+        mapToProperty(bean, name, val);        
     }
 
     @Override

@@ -72,9 +72,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             Map map = ctx.getDelegate().parseMapElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, map);
         } else if ("executor".equals(name)) {
-            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");
-        } else if ("invoker".equals(name)) {
-            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.invoker");
+            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");         
         } else if ("binding".equals(name)) {
             setFirstChildAsProperty(el, ctx, bean, "bindingConfig");
         } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
