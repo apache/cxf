@@ -204,13 +204,22 @@ public class WrappedMessageContext implements MessageContext {
                 }
             }
             if (MessageContext.INBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
-                if (isOutbound()) {
-                    ret = reqMessage.get(key);
+                if (isRequestor() && isOutbound()) {
+                    ret = null;
+                } else if (isOutbound()) {
+                    ret = createAttachments(reqMessage, 
+                                            MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
+                } else {
+                    ret = createAttachments(message, 
+                                            MessageContext.INBOUND_MESSAGE_ATTACHMENTS);                    
                 }
-                ret = createAttachments(getWrappedMessage(), MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
             } else if (MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
-                ret = createAttachments(isRequestor() ? getWrappedMessage() : createResponseMessage(),
-                    MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
+                if (isRequestor() && !isOutbound()) {
+                    ret = createAttachments(reqMessage, MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
+                } else {
+                    ret = createAttachments(isRequestor() ? getWrappedMessage() : createResponseMessage(),
+                        MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
+                }
             } else if (MessageContext.MESSAGE_OUTBOUND_PROPERTY.equals(key)) {
                 ret = isOutbound();
             } else if (MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
@@ -283,11 +292,11 @@ public class WrappedMessageContext implements MessageContext {
         }
         return m;
     }
-    private Object createAttachments(Message mc, String propertyName) {
+    private Object createAttachments(Map<String, Object> mc, String propertyName) {
         if (mc == null) {
             return null;
         }
-        Collection<Attachment> attachments = mc.getAttachments();
+        Collection<Attachment> attachments = CastUtils.cast((Collection<?>)mc.get(Message.ATTACHMENTS));
         Map<String, DataHandler> dataHandlers = 
             AttachmentUtil.getDHMap(attachments);
         mc.put(propertyName, 

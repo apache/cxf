@@ -21,6 +21,7 @@ package org.apache.cxf.systest.swa;
 import java.awt.Image;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
@@ -32,10 +33,13 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
+import javax.xml.ws.handler.MessageContext;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.swa.SwAService;
 import org.apache.cxf.swa.SwAServiceInterface;
@@ -218,7 +222,12 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         VoidRequest request = new VoidRequest();
         OutputResponseAll response = port.echoAllAttachmentTypes(request, attach1, attach2, attach3, attach4,
                                                                  attach5);
+        
         assertNotNull(response);
+        Map<?, ?> map = CastUtils.cast((Map<?, ?>)((BindingProvider)port).getResponseContext()
+                                           .get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
+        assertNotNull(map);
+        assertEquals(5, map.size()); 
     }
     
     @Test
