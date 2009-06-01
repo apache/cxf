@@ -59,7 +59,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(String username) {        
         this.username = username;
     }
     
@@ -93,6 +93,10 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                 }
             }
         }
+    }
+    
+    public Map getHeaders() {
+        return headers;
     }
     
     public WebClient createWebClient() {

@@ -1,0 +1,10 @@
+<model xmlns="http://cxf.apache.org/jaxrs">
+ <resource name="org.apache.cxf.jaxrs.resources.BookStore" path="bookstore">
+    <operation name="getBook" verb="GET" path="/books/{id}">
+       <param name="id" type="PATH"/>
+    </operation>
+    <operation name="getBookChapter" path="/books/{id}/chapter">
+        <param name="id" type="PATH"/>
+    </operation> 
+ </resource>
+</model>
