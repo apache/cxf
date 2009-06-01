@@ -76,6 +76,10 @@ public class ArrayService {
     }
     
     @WebMethod
+    public void verifyCustomParamName(String param) {
+    }
+    
+    @WebMethod
     public void submitJDOMArray(String before, org.jdom.Element[] anything, String after) {
         beforeValue = before;
         jdomArray = anything;

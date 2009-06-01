@@ -62,6 +62,19 @@ public class ParameterMappingTest extends AbstractAegisTest {
                         + "/xsd:complexType[@name='unmappedAdd']" + "/xsd:sequence"
                         + "/xsd:element[@name='one']", doc);
     }
+    
+    @Test
+    public void testNamedParameter() throws Exception {
+        Node doc = getWSDLDocument("ArrayService");
+        Definition def = getWSDLDefinition("ArrayService");
+        StringWriter sink = new StringWriter();
+        WSDLFactory.newInstance().newWSDLWriter().writeWSDL(def, sink);
+        assertValid("/wsdl:definitions/wsdl:types/"
+                    + "xsd:schema[@targetNamespace= 'http://services.aegis.cxf.apache.org']"
+                    + "/xsd:complexType[@name='verifyCustomParamName']" 
+                    + "/xsd:sequence" 
+                    + "/xsd:element[@name='custom']", doc);
+    }
 
     @Test
     public void testOccursWSDL() throws Exception {

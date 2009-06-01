@@ -25,5 +25,8 @@
         <method name="takeNumber" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         	<parameter index="0" typeName="xsd:long"/>
         </method>
+        <method name="verifyCustomParamName">
+        	<parameter index="0" mappedName="custom"/>
+        </method>
     </mapping>
 </mappings>
