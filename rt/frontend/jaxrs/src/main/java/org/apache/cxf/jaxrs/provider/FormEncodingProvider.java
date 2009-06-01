@@ -147,15 +147,17 @@ public class FormEncodingProvider implements
         boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
-            for (String value : entry.getValue()) {
+            for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
+                String value = entryIterator.next();
                 os.write(entry.getKey().getBytes("UTF-8"));
                 os.write('=');
-                String data = encoded ? value : HttpUtils.urlEncode(value); 
+                String data = encoded ? value : HttpUtils.urlEncode(value);
                 os.write(data.getBytes("UTF-8"));
-                if (it.hasNext()) {
+                if (entryIterator.hasNext() || it.hasNext()) {
                     os.write('&');
                 }
             }
+
         }
     }
 
