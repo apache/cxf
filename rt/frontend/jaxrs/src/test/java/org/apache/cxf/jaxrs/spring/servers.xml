@@ -24,6 +24,7 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/>
 
