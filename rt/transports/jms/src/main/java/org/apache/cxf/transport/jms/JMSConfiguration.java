@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory102;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,7 +37,7 @@ public class JMSConfiguration implements InitializingBean {
      * if the setCacheLevel has been called.
      */
     public static final int DEFAULT_VALUE = -1;
-
+    
     static final boolean DEFAULT_USEJMS11 = true;
     
     private boolean usingEndpointInfo = true;
@@ -54,7 +53,7 @@ public class JMSConfiguration implements InitializingBean {
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
-    private long receiveTimeout = JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT;
+    private Long receiveTimeout;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
     private int priority = Message.DEFAULT_PRIORITY;
@@ -157,11 +156,11 @@ public class JMSConfiguration implements InitializingBean {
         this.pubSubNoLocal = pubSubNoLocal;
     }
 
-    public long getReceiveTimeout() {
+    public Long getReceiveTimeout() {
         return receiveTimeout;
     }
 
-    public void setReceiveTimeout(long receiveTimeout) {
+    public void setReceiveTimeout(Long receiveTimeout) {
         this.receiveTimeout = receiveTimeout;
     }
 

@@ -125,6 +125,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         destination = setupJMSDestination(false);
         jmsConfig = destination.getJmsConfig();*/
+        assertEquals("The receiveTimeout should be set", jmsConfig.getReceiveTimeout().longValue(), 1500L);
         assertEquals("The concurrentConsumer should be set", jmsConfig.getConcurrentConsumers(), 3);
         assertEquals("The maxConcurrentConsumer should be set", jmsConfig.getMaxConcurrentConsumers(), 5);
         assertEquals("The maxSuspendedContinuations should be set", 

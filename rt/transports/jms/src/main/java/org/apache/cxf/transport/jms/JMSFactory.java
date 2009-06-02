@@ -92,7 +92,9 @@ public final class JMSFactory {
         JmsTemplate jmsTemplate = jmsConfig.isUseJms11() ? new JmsTemplate() : new JmsTemplate102();
         jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
-        jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
+        if (jmsConfig.getReceiveTimeout() != null) {
+            jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
+        }
         jmsTemplate.setTimeToLive(jmsConfig.getTimeToLive());
         int priority = (headers != null && headers.isSetJMSPriority())
             ? headers.getJMSPriority() : jmsConfig.getPriority();
@@ -137,6 +139,9 @@ public final class JMSFactory {
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
         jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
         jmsListener.setMessageListener(listenerHandler);
+        if (jmsConfig.getReceiveTimeout() != null) {
+            jmsListener.setReceiveTimeout(jmsConfig.getReceiveTimeout());
+        }
         if (jmsConfig.getRecoveryInterval() != JMSConfiguration.DEFAULT_VALUE) {
             jmsListener.setRecoveryInterval(jmsConfig.getRecoveryInterval());
         }
