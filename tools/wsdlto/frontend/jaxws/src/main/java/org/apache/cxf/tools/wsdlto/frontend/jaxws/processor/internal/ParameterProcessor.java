@@ -111,9 +111,17 @@ public class ParameterProcessor extends AbstractProcessor {
         if (parameter == null) {
             return null;
         }
+        String name = parameter.getName();
+        int count = 0;
+        while (method.getParameter(parameter.getName()) != null
+            && context.optionSet(ToolConstants.CFG_AUTORESOLVE)) {
+            parameter.setName(name + (++count));
+        }
+        
         parameter.setMethod(method);
         parameter.annotate(new WebParamAnnotator());
         method.addParameter(parameter);
+
         return parameter;
     }
 
@@ -638,6 +646,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 style = JavaType.Style.OUT;
             } else if (outputPartsMap.get(inputMessage.getMessagePartQName(partName)) != null
                 && isSamePart(part, outputPartsMap.get(inputMessage.getMessagePartQName(partName)))) {
+                
                 style = JavaType.Style.INOUT;
             }
             if (part != null) {
