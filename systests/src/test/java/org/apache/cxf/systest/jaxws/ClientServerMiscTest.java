@@ -283,6 +283,8 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         
         Set<Foo> fooSet = port.getFooSet();
         assertEquals(2, fooSet.size());
+        assertEquals("size: 2", port.doFooList(new ArrayList<Foo>(fooSet)));
+        
         
         assertEquals(24, port.echoIntDifferentWrapperName(24));
         

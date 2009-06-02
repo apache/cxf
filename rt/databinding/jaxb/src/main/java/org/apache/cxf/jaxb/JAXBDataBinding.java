@@ -816,6 +816,15 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
                     } 
                 }                
             }
+            if (getMethod == null && elField != null) {
+                getAccessor = JAXBUtils.nameToIdentifier(elField.getName(), JAXBUtils.IdentifierType.GETTER);
+                setAccessor = JAXBUtils.nameToIdentifier(elField.getName(), JAXBUtils.IdentifierType.SETTER);
+                try {               
+                    getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES); 
+                } catch (NoSuchMethodException ex) {
+                    //ignore for now
+                }
+            }
             String setAccessor2 = setAccessor;
             if ("return".equals(partName)) {
                 //some versions of jaxb map "return" to "set_return" instead of "setReturn"
@@ -911,7 +920,6 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
                                                               jaxbMethods, fields, objectFactory);
         } catch (ClassNotFoundException e) {
             // ASM not found, just use reflection based stuff
-            e.printStackTrace();
         }
         return null;
     }   

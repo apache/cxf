@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxws;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -29,6 +30,10 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.ws.Holder;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
@@ -136,5 +141,20 @@ public interface DocLitWrappedCodeFirstService {
     }
     
     Set<Foo> getFooSet();
+    
+    @RequestWrapper(className = "org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService$DoFooListRequest")
+    @WebMethod(operationName = "doFooList")
+    String doFooList(@WebParam(name = "dbRef") List<Foo> fooList);
+    
+    
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "doFooList", propOrder = { "dbReves" })
+    public static class DoFooListRequest {
+        @XmlElement(name = "dbRef", required = true)
+        protected List<Foo> dbReves = new ArrayList<Foo>();
 
+        public List<Foo> getDbReves() {
+            return dbReves;
+        }
+    }
 }

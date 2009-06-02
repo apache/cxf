@@ -72,10 +72,11 @@ final class WrapperHelperCompiler extends ASMHelper {
                                         jaxbMethods,
                                         fields,
                                         objectFactory).compile();
+            
         } catch (Throwable t) {
             // Some error - probably a bad version of ASM or similar
-            return null;
         }
+        return null;
     }
     
 
@@ -115,14 +116,14 @@ final class WrapperHelperCompiler extends ASMHelper {
                  Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER,
                  newClassName,
                  null,
-                 periodToSlashes(WrapperHelper.class.getName()),
-                 null);
+                 "java/lang/Object",
+                 new String[] {periodToSlashes(WrapperHelper.class.getName())});
         
         addConstructor(newClassName, cw, objectFactory == null ? null : objectFactory.getClass());
         boolean b = addSignature();
         if (b) {
-            addCreateWrapperObject(newClassName,
-                                   objectFactory == null ? null : objectFactory.getClass());
+            b = addCreateWrapperObject(newClassName,
+                                       objectFactory == null ? null : objectFactory.getClass());
         }
         if (b) {
             b = addGetWrapperParts(newClassName, wrapperType,
@@ -139,6 +140,7 @@ final class WrapperHelperCompiler extends ASMHelper {
             }
         } catch (Throwable e) {
             // ignore, we'll just fall down to reflection based
+            e.printStackTrace();
         }
         return null;
     }
@@ -165,14 +167,11 @@ final class WrapperHelperCompiler extends ASMHelper {
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getSignature", "()Ljava/lang/String;", null, null);
         mv.visitCode();
+        mv.visitLdcInsn(sig);
         Label l0 = new Label();
         mv.visitLabel(l0);
         mv.visitLineNumber(100, l0);
-        mv.visitLdcInsn(sig);
         mv.visitInsn(Opcodes.ARETURN);
-        Label l1 = new Label();
-        mv.visitLabel(l1);
-        mv.visitLineNumber(101, l1);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
         return true;
@@ -196,7 +195,7 @@ final class WrapperHelperCompiler extends ASMHelper {
         
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
-                           periodToSlashes(WrapperHelper.class.getName()),
+                           "java/lang/Object",
                            "<init>",
                            "()V");
         if (objectFactory != null) {
@@ -294,7 +293,6 @@ final class WrapperHelperCompiler extends ASMHelper {
     
         Label lEnd = new Label();
         mv.visitLabel(lEnd);
-        mv.visitLineNumber(105, lEnd);
         mv.visitLocalVariable("this", "L" + newClassName + ";", null, lBegin, lEnd, 0);
         mv.visitLocalVariable("lst", "Ljava/util/List;", "Ljava/util/List<*>;", lBegin, lEnd, 1);
         mv.visitLocalVariable("ok", "L" + periodToSlashes(wrapperType.getName()) + ";",
@@ -447,7 +445,6 @@ final class WrapperHelperCompiler extends ASMHelper {
         
         Label lEnd = new Label();
         mv.visitLabel(lEnd);
-        mv.visitLineNumber(109, lEnd);
         mv.visitLocalVariable("this", "L" + newClassName + ";", null, lBegin, lEnd, 0);
         mv.visitLocalVariable("o", "Ljava/lang/Object;", null, lBegin, lEnd, 1);
         mv.visitLocalVariable("ret", "Ljava/util/List;", "Ljava/util/List<Ljava/lang/Object;>;",
