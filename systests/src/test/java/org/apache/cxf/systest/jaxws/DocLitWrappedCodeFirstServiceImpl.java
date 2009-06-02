@@ -209,5 +209,9 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
     public String echoStringNotReallyAsync(String s) {
         return s;
     }
+
+    public String doFooList(List<Foo> fooList) {
+        return "size: " + fooList.size();
+    }
     
 }
