@@ -37,7 +37,7 @@ public class JMSConfiguration implements InitializingBean {
      * if the setCacheLevel has been called.
      */
     public static final int DEFAULT_VALUE = -1;
-
+    
     static final boolean DEFAULT_USEJMS11 = false;
     
     private boolean usingEndpointInfo = true;
@@ -53,8 +53,7 @@ public class JMSConfiguration implements InitializingBean {
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
-    private long receiveTimeout;
-    // Repalce the JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT with 0 to support the Spring 2.0.x 
+    private Long receiveTimeout;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
     private int priority = Message.DEFAULT_PRIORITY;
@@ -157,11 +156,11 @@ public class JMSConfiguration implements InitializingBean {
         this.pubSubNoLocal = pubSubNoLocal;
     }
 
-    public long getReceiveTimeout() {
+    public Long getReceiveTimeout() {
         return receiveTimeout;
     }
 
-    public void setReceiveTimeout(long receiveTimeout) {
+    public void setReceiveTimeout(Long receiveTimeout) {
         this.receiveTimeout = receiveTimeout;
     }
 

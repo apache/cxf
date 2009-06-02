@@ -105,6 +105,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   	p:replyDestination="queue:test.reply"
   	p:pubSubDomain="false"
   	p:usingEndpointInfo="false"
+    p:receiveTimeout="1500"
   	p:concurrentConsumers="3"
   	p:maxConcurrentConsumers="5"
   	p:maxSuspendedContinuations="2"

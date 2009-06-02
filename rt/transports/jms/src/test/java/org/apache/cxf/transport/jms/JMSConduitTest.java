@@ -62,7 +62,7 @@ public class JMSConduitTest extends AbstractJMSTester {
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         JMSConduit conduit = setupJMSConduit(false, false);
         assertEquals("Can't get the right ClientReceiveTimeout", 500L, conduit.getJmsConfig()
-            .getReceiveTimeout());
+            .getReceiveTimeout().longValue());
         bus.shutdown(false);
         BusFactory.setDefaultBus(null);
         conduit.close();
@@ -93,7 +93,7 @@ public class JMSConduitTest extends AbstractJMSTester {
         setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HelloWorldServiceLoop", "HelloWorldPortLoop");
         JMSConduit conduit = setupJMSConduit(true, false);
-        conduit.getJmsConfig().setReceiveTimeout(10000);
+        conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(10000));
 
         try {
             for (int c = 0; c < 10; c++) {
@@ -121,7 +121,7 @@ public class JMSConduitTest extends AbstractJMSTester {
 
         JMSConduit conduit = setupJMSConduit(true, false);
         // TODO IF the system is extremely fast. The message could still get through
-        conduit.getJmsConfig().setReceiveTimeout(1);
+        conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(1));
         Message message = new MessageImpl();
         try {
             sendoutMessage(conduit, message, false);
