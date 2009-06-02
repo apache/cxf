@@ -94,7 +94,10 @@ public final class JMSFactory {
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
         if (jmsConfig.getReceiveTimeout() != null) {
             jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
-        }
+        } else {
+            // set the default value for support the spring 2.0.x
+            jmsTemplate.setReceiveTimeout(0);
+        }  
         jmsTemplate.setTimeToLive(jmsConfig.getTimeToLive());
         int priority = (headers != null && headers.isSetJMSPriority())
             ? headers.getJMSPriority() : jmsConfig.getPriority();
@@ -141,7 +144,7 @@ public final class JMSFactory {
         jmsListener.setMessageListener(listenerHandler);
         if (jmsConfig.getReceiveTimeout() != null) {
             jmsListener.setReceiveTimeout(jmsConfig.getReceiveTimeout());
-        }
+        } 
         if (jmsConfig.getRecoveryInterval() != JMSConfiguration.DEFAULT_VALUE) {
             jmsListener.setRecoveryInterval(jmsConfig.getRecoveryInterval());
         }
