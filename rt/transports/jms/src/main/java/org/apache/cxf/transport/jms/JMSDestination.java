@@ -48,6 +48,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -82,6 +83,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         super(b, getTargetReference(info, b), info);
         this.bus = b;
         this.jmsConfig = jmsConfig;
+        info.setProperty(OneWayProcessorInterceptor.USE_ORIGINAL_THREAD, Boolean.TRUE);
     }
 
     /**
