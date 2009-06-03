@@ -59,21 +59,21 @@
 
 		<!-- Checks for Naming Conventions.                  -->
 		<!-- See http://checkstyle.sf.net/config_naming.html -->
-        <module name="ConstantName"/>
-        <module name="LocalFinalVariableName"/>
-        <module name="LocalVariableName"/>
-        <module name="MemberName">
+		<module name="ConstantName" />
+		<module name="LocalFinalVariableName" />
+		<module name="LocalVariableName" />
+		<module name="MemberName">
             <property name="format"
                       value="^[a-z_][a-zA-Z0-9_]*$"/>
         </module>
-        <module name="MethodName">
+		<module name="MethodName">
             <property name="format"
                       value="^[a-z_][a-zA-Z0-9_]*$"/>
         </module>
-        <module name="PackageName"/>
-        <module name="ParameterName"/>
-        <module name="StaticVariableName"/>
-        <module name="TypeName"/>
+		<module name="PackageName" />
+		<module name="ParameterName" />
+		<module name="StaticVariableName" />
+		<module name="TypeName" />
 
 		<!-- Header checks -->
 		<module name="Header">
@@ -94,7 +94,7 @@
 		<module name="UnusedImports" />
 		<module name="ImportOrder">
 			<property name="groups"
-				value="java,javax,org.w3c,org.xml,junit" />
+				value="java,javax,org.w3c,org.xml,junit,antlr,com,net,org,org.junit" />
 			<property name="ordered" value="true" />
 		</module>
 		<!--
