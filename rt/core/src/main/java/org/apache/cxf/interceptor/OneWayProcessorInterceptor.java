@@ -37,6 +37,9 @@ import org.apache.cxf.workqueue.WorkQueueManager;
  * 
  */
 public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static final String USE_ORIGINAL_THREAD 
+        = OneWayProcessorInterceptor.class.getName() + ".USE_ORIGINAL_THREAD"; 
+    
     public OneWayProcessorInterceptor() {
         super(Phase.PRE_LOGICAL);
     }
@@ -67,14 +70,21 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 //IGNORE
             }
             
-            
-            chain.pause();
-            message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
-                .getAutomaticWorkQueue().execute(new Runnable() {
-                    public void run() {
-                        chain.resume();
-                    }
-                });
+            Object o = message.getContextualProperty(USE_ORIGINAL_THREAD);
+            if (o == null) {
+                o = Boolean.FALSE;
+            } else if (o instanceof String) {
+                o = Boolean.valueOf((String)o);
+            }
+            if (Boolean.FALSE.equals(o)) {
+                chain.pause();
+                message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
+                    .getAutomaticWorkQueue().execute(new Runnable() {
+                        public void run() {
+                            chain.resume();
+                        }
+                    });
+            }
         }
     }
     
