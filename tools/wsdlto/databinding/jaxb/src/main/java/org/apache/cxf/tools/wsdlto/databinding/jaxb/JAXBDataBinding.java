@@ -663,7 +663,14 @@ public class JAXBDataBinding implements DataBindingProfile {
                 typeAnno = mapping.getType();
             }
         }
-        if (typeAnno != null) { 
+        if (typeAnno != null && typeAnno.getTypeClass() instanceof JDefinedClass) {
+            JDefinedClass dc = (JDefinedClass)typeAnno.getTypeClass();
+            if (dc.isAbstract()) {
+                //no default values for abstract classes
+                typeAnno = null;
+            }
+        }
+        if (typeAnno != null) {
             final JType type = typeAnno.getTypeClass();
             return new JAXBDefaultValueWriter(type);
         } 
@@ -678,6 +685,13 @@ public class JAXBDataBinding implements DataBindingProfile {
                 for (Property pro : propList) {
                     if (pro.elementName().getNamespaceURI().equals(item.getNamespaceURI())
                         && pro.elementName().getLocalPart().equals(item.getLocalPart())) {
+                        
+                        JType type = pro.type();
+                        if (type instanceof JDefinedClass
+                            && ((JDefinedClass)type).isAbstract()) {
+                            //no default values for abstract classes
+                            return null;
+                        }
                         return new JAXBDefaultValueWriter(pro.type());
                     }
                 }
@@ -732,6 +746,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                         ex.initCause(e);
                         throw ex;
                     }
+                } else if (jdc.isAbstract()) {
+                    writer.write("null;");
                 } else {
                     writer.write("new ");
                     writer.write(tp.fullName());
