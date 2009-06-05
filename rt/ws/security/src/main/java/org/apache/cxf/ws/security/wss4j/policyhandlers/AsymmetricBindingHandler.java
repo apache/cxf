@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.Collection;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
@@ -29,6 +31,8 @@ import javax.xml.soap.SOAPMessage;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -57,6 +61,9 @@ import org.apache.ws.security.message.WSSecTimestamp;
  * 
  */
 public class AsymmetricBindingHandler extends AbstractBindingBuilder {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AsymmetricBindingHandler.class);
+
     AsymmetricBinding abinding;
     
     private WSSecEncryptedKey encrKey;
@@ -133,8 +140,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             
             doEncryption(recToken, enc, false);
         } catch (Exception e) {
-            e.printStackTrace();
-            //REVISIT!!
+            String reason = e.getMessage();
+            LOG.log(Level.WARNING, "Sign before encryption failed due to : " + reason);
+            throw new Fault(e);
         }
     }
 
