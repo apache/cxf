@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+	xmlns:tns="http://WSSec/wssc" 
+	xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+	xmlns:wssctest="http://apache.cxf.org/"
+	xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" 
+	xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+	xmlns:wsa10="http://www.w3.org/2005/08/addressing" 
+	xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"
+	name="PingService" 
+	targetNamespace="http://WSSec/wssc">
+	<wsdl:import location="WSSecureConversation_policy.wsdl"
+		namespace="http://apache.cxf.org/" />
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://WSSec/wssc">
+			
+			<xsd:import schemaLocation="XMLSoapPing.xsd"
+				namespace="http://xmlsoap.org/Ping" />
+			<xsd:element name="PingRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element xmlns:q1="http://xmlsoap.org/Ping" minOccurs="0"
+							maxOccurs="1" ref="q1:Ping" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="PingResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element xmlns:q2="http://xmlsoap.org/Ping" minOccurs="0"
+							maxOccurs="1" ref="q2:PingResponse" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="PingRequest">
+		<wsdl:part name="parameters" element="tns:PingRequest" />
+	</wsdl:message>
+	<wsdl:message name="PingResponse">
+		<wsdl:part name="parameters" element="tns:PingResponse" />
+	</wsdl:message>
+	
+	<wsdl:portType name="IPingService">
+		<wsdl:operation name="Ping">
+			<wsdl:input wsaw:Action="http://xmlsoap.org/Ping" name="PingRequest"
+				message="tns:PingRequest" />
+			<wsdl:output wsaw:Action="http://xmlsoap.org/Ping" name="PingResponse"
+				message="tns:PingResponse" />
+		</wsdl:operation>
+		
+	</wsdl:portType>
+	<wsdl:service name="PingService">
+		<wsdl:port binding="wssctest:SecureConversation_UserNameOverTransport_IPingService"
+			name="SecureConversation_UserNameOverTransport_IPingService">
+			<soap12:address
+				location="https://localhost:8443/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/SecureConversation_UserNameOverTransport" />
+		</wsdl:port>
+		<wsdl:port
+			binding="wssctest:SecureConversation_MutualCertificate10SignEncrypt_IPingService"
+			name="SecureConversation_MutualCertificate10SignEncrypt_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/SecureConversation_MutualCertificate10SignEncrypt" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:XC_IPingService" name="XC_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/XC" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:XDC_IPingService" name="XDC_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/SecureConversation_MutualCertificate11" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:XDC_IPingService" name="XDC_IPingService1">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/XDC" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:XDC-ES_IPingService" name="XDC-ES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/XDC-ES" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:XDC-SEES_IPingService" name="XDC-SEES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/XDC-SEES" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_X_IPingService" name="_X_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_X" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_X10_IPingService" name="_X10_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_X10" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_XD_IPingService" name="_XD_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_XD" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_XD-SEES_IPingService" name="_XD-SEES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_XD-SEES" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_XD-ES_IPingService" name="_XD-ES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_XD-ES" />
+		</wsdl:port>
+		
+		<wsdl:port binding="wssctest:AC_IPingService" name="AC_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/AC" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:ADC_IPingService" name="ADC_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/ADC" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:ADC-ES_IPingService" name="ADC-ES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/ADC-ES" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_A_IPingService" name="_A_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_A" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_AD_IPingService" name="_AD_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_AD" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_AD-ES_IPingService" name="_AD-ES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_AD-ES" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:UXC_IPingService" name="UXC_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/UXC" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:UXDC_IPingService" name="UXDC_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/UXDC" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:UXDC-SEES_IPingService" name="UXDC-SEES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/UXDC-SEES" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_UX_IPingService" name="_UX_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_UX" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_UXD_IPingService" name="_UXD_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_UXD" />
+		</wsdl:port>
+		<wsdl:port binding="wssctest:_UXD-SEES_IPingService" name="_UXD-SEES_IPingService">
+			<soap12:address
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc/_UXD-SEES" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
