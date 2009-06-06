@@ -140,7 +140,6 @@ final class WrapperHelperCompiler extends ASMHelper {
             }
         } catch (Throwable e) {
             // ignore, we'll just fall down to reflection based
-            e.printStackTrace();
         }
         return null;
     }
