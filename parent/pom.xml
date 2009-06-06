@@ -379,7 +379,7 @@
             <dependency>
                 <groupId>com.sun.xml.fastinfoset</groupId>
                 <artifactId>FastInfoset</artifactId>
-                <version>1.2.6</version>
+                <version>1.2.3</version>
             </dependency>
 
 
