@@ -190,7 +190,11 @@ public class ASMHelper {
             return defined.get(name.replace('/', '.'));
         }
         
-        public Class<?> defineClass(String name, byte bytes[]) {
+        public synchronized Class<?> defineClass(String name, byte bytes[]) {
+            Class<?> ret = defined.get(name.replace('/', '.'));
+            if (ret != null) {
+                return ret;
+            }
             if (name.endsWith("package-info")) {
                 Package p = super.getPackage(name.substring(0, name.length() - 13));
                 if (p == null) {
@@ -205,7 +209,7 @@ public class ASMHelper {
                 }
             }
             
-            Class<?> ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
+            ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
             defined.put(name.replace('/', '.'), ret);
             return ret;
         }
