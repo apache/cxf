@@ -60,6 +60,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLFilter;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
@@ -271,8 +272,8 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
         try {
             InputStream is = null;
             if (loc.startsWith("classpath:")) {
-                String path = loc.substring("classpath:".length() + 1);
-                is = this.getClass().getClassLoader().getResourceAsStream(path);
+                String path = loc.substring("classpath:".length());
+                is = ClassLoaderUtils.getResourceAsStream(path, this.getClass());
             } else {
                 File f = new File(loc);
                 if (f.exists()) {

@@ -67,10 +67,6 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
   <jaxrs:server id="moduleServer"
     modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
     address="http://localhost:8080/simpleWithAddress"
-    bus="cxf" >
-    <jaxrs:serviceBeans>
-       <bean class="org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations"/>
-    </jaxrs:serviceBeans>        
-  </jaxrs:server>
+    bus="cxf"/>
   
 </beans>

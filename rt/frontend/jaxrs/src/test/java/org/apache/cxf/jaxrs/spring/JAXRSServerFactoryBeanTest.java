@@ -17,14 +17,17 @@
  * under the License.
  */
 package org.apache.cxf.jaxrs.spring;
-import junit.framework.Assert;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.resources.BookStore;
+import org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
@@ -60,7 +63,8 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         sfb = (JAXRSServerFactoryBean)ctx.getBean("moduleServer");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
         assertEquals("Get a wrong ResourceClasses size", 1, sfb.getResourceClasses().size());
-        
+        assertEquals("Get a wrong resource class", BookStoreNoAnnotations.class, 
+                     sfb.getResourceClasses().get(0));
         
     }
 }

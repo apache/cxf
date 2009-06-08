@@ -35,6 +35,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class SchemaHandler {
@@ -65,8 +66,8 @@ public class SchemaHandler {
             for (String loc : locations) {
                 InputStream is = null;
                 if (loc.startsWith(CLASSPATH_PREFIX)) {
-                    String path = loc.substring(CLASSPATH_PREFIX.length() + 1);
-                    is = SchemaHandler.class.getClassLoader().getResourceAsStream(path);
+                    String path = loc.substring(CLASSPATH_PREFIX.length());
+                    is = ClassLoaderUtils.getResourceAsStream(path, SchemaHandler.class);
                     if (is == null) {
                         LOG.warning("No schema resource " + loc + " is available on classpath");
                         return null;

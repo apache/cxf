@@ -295,7 +295,7 @@ public final class ResourceUtils {
             InputStream is = null;
             if (loc.startsWith("classpath:")) {
                 String path = loc.substring("classpath:".length());
-                is = ResourceUtils.class.getResourceAsStream(path);
+                is = ClassLoaderUtils.getResourceAsStream(path, ResourceUtils.class);
             } else {
                 File f = new File(loc);
                 if (f.exists()) {

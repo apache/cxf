@@ -49,6 +49,14 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         assertEquals("Get a wrong map size", cfb.getHeaders().size(), 1);
         assertEquals("Get a wrong username", cfb.getUsername(), "username");
         assertEquals("Get a wrong password", cfb.getPassword(), "password");
+        
+        bean = ctx.getBean("ModelClient.proxyFactory");
+        assertNotNull(bean);
+        cfb = (JAXRSClientFactoryBean) bean;
+        assertNotNull(cfb.getHeaders());
+        assertEquals("Get a wrong map size", cfb.getHeaders().size(), 1);
+        assertEquals("Get a wrong username", cfb.getUsername(), "username");
+        assertEquals("Get a wrong password", cfb.getPassword(), "password");
     }
 
 }
