@@ -34,7 +34,6 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
@@ -47,7 +46,7 @@ import org.apache.cxf.jaxb.JAXBToStringStyle;
  * Modifies the JAXB code model to override the Object.toString() method with an 
  * implementation that provides a String representation of the xml content.
  */
-public class ToStringPlugin extends Plugin {
+public class ToStringPlugin {
     
     private static final Logger LOG = LogUtils.getL7dLogger(ToStringPlugin.class);
 
