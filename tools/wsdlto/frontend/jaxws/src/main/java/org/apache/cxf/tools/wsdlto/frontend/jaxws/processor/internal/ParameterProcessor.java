@@ -114,7 +114,8 @@ public class ParameterProcessor extends AbstractProcessor {
         String name = parameter.getName();
         int count = 0;
         while (method.getParameter(parameter.getName()) != null
-            && context.optionSet(ToolConstants.CFG_AUTORESOLVE)) {
+            && context.optionSet(ToolConstants.CFG_AUTORESOLVE)
+            && parameter.getStyle() != JavaType.Style.INOUT) {
             parameter.setName(name + (++count));
         }
         
@@ -363,13 +364,23 @@ public class ParameterProcessor extends AbstractProcessor {
             if (outputWrapElement.size() > 1) {
                 for (QName inElement : inputWrapElement) {
                     if (isSameWrapperChild(inElement, outElement)) {
-                        JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
-                                                                  JavaType.Style.INOUT, outputPart);
+                        JavaParameter jpIn = null;
+                        for (JavaParameter j : method.getParameters()) {
+                            if (inElement.equals(j.getQName())) {
+                                jpIn = j;
+                            }
+                        }
+                        JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
+                                                                 JavaType.Style.INOUT, outputPart);
                         if (!qualified) {
                             jp.setTargetNamespace("");
                         }
+                        if (!jpIn.getClassName().equals(jp.getClassName())) {
+                            jp.setStyle(JavaType.Style.OUT);
+                        } 
                         addParameter(method, jp);
                         sameWrapperChild = true;
+
                         if (method.getReturn() == null) {
                             addVoidReturn(method);
                         }
@@ -406,10 +417,20 @@ public class ParameterProcessor extends AbstractProcessor {
             if (inputWrapElement != null) {
                 for (QName inElement : inputWrapElement) {
                     if (isSameWrapperChild(inElement, outElement)) {
-                        JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
-                                                                  JavaType.Style.INOUT, outputPart);
+                        
+                        JavaParameter jpIn = null;
+                        for (JavaParameter j : method.getParameters()) {
+                            if (inElement.equals(j.getQName())) {
+                                jpIn = j;
+                            }
+                        }
+                        JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
+                                                                 JavaType.Style.INOUT, outputPart);
                         if (!qualified) {
                             jp.setTargetNamespace("");
+                        }
+                        if (!jpIn.getClassName().equals(jp.getClassName())) {
+                            jp.setStyle(JavaType.Style.OUT);
                         }
                         addParameter(method, jp);
                         sameWrapperChild = true;
