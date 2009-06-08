@@ -31,6 +31,7 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.validator.ServiceValidator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
@@ -66,6 +67,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
 
     private boolean isValidOperation(OperationInfo operation) {
         ToolContext context = service.getProperty(ToolContext.class.getName(), ToolContext.class);
+        
+        boolean c = context.optionSet(ToolConstants.CFG_AUTORESOLVE);
 
         boolean valid = false;
         if (operation.getUnwrappedOperation() == null) {
@@ -101,32 +104,34 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
             && operation.getOutput().getMessageParts().size() == 1) {
             output = operation.getOutput().getMessageParts().iterator().next();
         }
-
-        Map<QName, QName> names = new HashMap<QName, QName>();
-        if (input != null) {
-            for (WrapperElement element : ProcessorUtil.getWrappedElement(context, input.getElementQName())) {
-                if (names.containsKey(element.getElementName())
-                    &&  (names.get(element.getElementName()) == element.getSchemaTypeName()
-                        || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
-                    handleErrors(names.get(element.getElementName()), element);
-                    return false;
-                } else {
-                    names.put(element.getElementName(), element.getSchemaTypeName());
-                }
-            }
-        }
-
-        if (output != null) {
-            List<WrapperElement> els = ProcessorUtil.getWrappedElement(context, output.getElementQName());
-            if (els.size() > 1) {
-                for (WrapperElement element : els) {
+        if (!c) {
+            Map<QName, QName> names = new HashMap<QName, QName>();
+            if (input != null) {
+                for (WrapperElement element : ProcessorUtil.getWrappedElement(context, 
+                                                                              input.getElementQName())) {
                     if (names.containsKey(element.getElementName())
-                        &&  !(names.get(element.getElementName()) == element.getSchemaTypeName()
+                        &&  (names.get(element.getElementName()) == element.getSchemaTypeName()
                             || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
                         handleErrors(names.get(element.getElementName()), element);
                         return false;
                     } else {
                         names.put(element.getElementName(), element.getSchemaTypeName());
+                    }
+                }
+            }
+    
+            if (output != null) {
+                List<WrapperElement> els = ProcessorUtil.getWrappedElement(context, output.getElementQName());
+                if (els.size() > 1) {
+                    for (WrapperElement element : els) {
+                        if (names.containsKey(element.getElementName())
+                            &&  !(names.get(element.getElementName()) == element.getSchemaTypeName()
+                                || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
+                            handleErrors(names.get(element.getElementName()), element);
+                            return false;
+                        } else {
+                            names.put(element.getElementName(), element.getSchemaTypeName());
+                        }
                     }
                 }
             }
