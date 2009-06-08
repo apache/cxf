@@ -45,6 +45,8 @@ public final class CorbaBindingHelper {
     public static synchronized ORB getDefaultORB(OrbConfig config) {        
         if (defaultORB == null) {
             Properties props = System.getProperties();
+            Properties configSpecifiedOrbProperties = config.getOrbProperties();
+            props.putAll(configSpecifiedOrbProperties);
             if (config.getOrbClass() != null) {
                 props.put("org.omg.CORBA.ORBClass", config.getOrbClass());
             }
@@ -205,5 +207,5 @@ public final class CorbaBindingHelper {
             orbUseCount.put(getORBNameFromAddress(address), count);
         }
     }
-
+    
 }

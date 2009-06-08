@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.interceptors.SystemExceptionHelper;
@@ -47,6 +48,7 @@ public class OrbConfig {
     protected String orbClass;
     protected String orbSingletonClass;
     protected List<String> orbArgs = new ArrayList<String>();
+    protected Properties orbProperties = new Properties();
     
     public OrbConfig() {
         //nothing
@@ -76,6 +78,13 @@ public class OrbConfig {
         return orbArgs;
     }
     
+    public void setOrbProperties(Properties props) {
+        orbProperties = props;
+    }
+    
+    public Properties getOrbProperties() {
+        return orbProperties;
+    }
     
     public void addPOAPolicies(ORB orb, 
                                String poaName,
