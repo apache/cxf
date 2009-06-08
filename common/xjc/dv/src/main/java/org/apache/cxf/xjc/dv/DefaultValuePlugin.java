@@ -41,7 +41,6 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -60,7 +59,7 @@ import org.apache.cxf.common.logging.LogUtils;
  * Modifies the JAXB code model to initialise fields mapped from schema elements 
  * with their default value.
  */
-public class DefaultValuePlugin extends Plugin {
+public class DefaultValuePlugin {
     
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultValuePlugin.class);
     
