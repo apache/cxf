@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.corba.runtime.CorbaDSIServant;
@@ -192,6 +193,8 @@ public class CorbaDestination implements MultiplexDestination {
 
     public void activate() {
         java.util.Properties props = new java.util.Properties();
+        Properties configSpecifiedOrbProperties = orbConfig.getOrbProperties();
+        props.putAll(configSpecifiedOrbProperties);
         if (orbConfig.getOrbClass() != null) {
             props.put("org.omg.CORBA.ORBClass", orbConfig.getOrbClass());
         }
