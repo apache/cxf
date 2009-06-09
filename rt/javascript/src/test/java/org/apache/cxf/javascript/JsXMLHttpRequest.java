@@ -60,6 +60,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
@@ -367,18 +368,19 @@ public class JsXMLHttpRequest extends ScriptableObject {
                 baos.write(buffer, 0, read);
             }
             is.close();
-            // convert bytes to text.
-            String contentEncoding = connection.getContentEncoding();
-            if (contentEncoding == null || contentEncoding.length() == 0) {
-                contentEncoding = "utf-8";
-            }
             
             // For a one-way message or whatever, there may not be a content type.
             // throw away any encoding modifier.
             String contentType = "";
             String connectionContentType = connection.getContentType();
+            String contentEncoding = null;
             if (connectionContentType != null) {
+                contentEncoding = HttpHeaderHelper
+                    .mapCharset(HttpHeaderHelper.findCharset(connectionContentType));
                 contentType = connectionContentType.split(";")[0];
+            }
+            if (contentEncoding == null || contentEncoding.length() == 0) {
+                contentEncoding = "iso-8859-1";
             }
             
             byte[] responseBytes = baos.toByteArray();
