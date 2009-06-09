@@ -49,6 +49,7 @@ function testSendNotOpenError() {
 function testSyncHttpFetch() {
 	
 	var r = new XMLHttpRequest();
+	
 	r.open("GET", "http://localhost:8808/test.html", false);
 	if (r.readyState != r.OPENED) {
 		assertionFailed("state not OPENED after OPEN");
@@ -159,6 +160,7 @@ function testSyncXml(address, request) {
 		assertionFailed("state not OPENED after OPEN");
 	}
 	// just send it as text (or, really, whatever the Java code set up for us).
+	r.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
 	r.send(request);
 	if (r.readyState != r.DONE) {
 		assertionFailed("state not DONE after sync send.")

@@ -58,7 +58,8 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         properties.setProperty("staticResourceURL", getStaticResourceURL());
         cfg.setProperties(properties);
         // now actually do the replacement
-        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());        
+        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());  
+        
     }
 
     @Override
@@ -85,7 +86,7 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         testUtilities.rhinoCallInContext("testStateNotificationSync");
         Notifier notifier = testUtilities.rhinoCallConvert("testAsyncHttpFetch1", Notifier.class);
         testUtilities.rhinoCallInContext("testAsyncHttpFetch2");
-        boolean notified = notifier.waitForJavascript(100);
+        boolean notified = notifier.waitForJavascript(10000);
         assertTrue(notified);
         assertEquals("HEADERS_RECEIVED", Boolean.TRUE, 
                      testUtilities.rhinoEvaluateConvert("asyncGotHeadersReceived", Boolean.class));
@@ -126,7 +127,7 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         XPath echoStringPath = new DOMXPath("//t:responseType/text()");
         echoStringPath.addNamespace("t", "http://apache.org/hello_world_xml_http/wrapped/types");
         String nodeText = echoStringPath.stringValueOf(echoStringPath.selectSingleNode(doc));
-        assertEquals(nodeText, "Hello \u05e9\u05dc\u05d5\u05dd");
+        assertEquals("Hello \u05e9\u05dc\u05d5\u05dd", nodeText);
     }
     
     public String getStaticResourceURL() throws Exception {

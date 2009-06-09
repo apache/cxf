@@ -54,6 +54,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.mozilla.javascript.Context;
@@ -362,12 +363,25 @@ public class JsXMLHttpRequest extends ScriptableObject {
                 baos.write(buffer, 0, read);
             }
             is.close();
-            // convert bytes to text.
-            String contentEncoding = connection.getContentEncoding();
+            
+            // For a one-way message or whatever, there may not be a content type.
+            // throw away any encoding modifier.
+            String contentType = "";
+            String connectionContentType = connection.getContentType();
+            String contentEncoding = null;
+            if (connectionContentType != null) {
+                contentEncoding = HttpHeaderHelper
+                    .mapCharset(HttpHeaderHelper.findCharset(connectionContentType));
+                contentType = connectionContentType.split(";")[0];
+            }
             if (contentEncoding == null || contentEncoding.length() == 0) {
-                contentEncoding = "utf-8";
+                contentEncoding = "iso-8859-1";
             }
             
+            /* We need all the text in a string, independent of the
+             * XML parse. 
+             */
+
             Charset contentCharset = Charset.forName(contentEncoding);
             byte[] contentBytes = baos.toByteArray();
             CharBuffer contentChars = 
@@ -375,12 +389,6 @@ public class JsXMLHttpRequest extends ScriptableObject {
             responseText = contentChars.toString();
             LOG.fine(responseText);
             
-            // For a one-way message or whatever, there may not be a content type.
-            // throw away any encoding modifier.
-            String contentType = "";
-            if (connection.getContentType() != null) {
-                contentType = connection.getContentType().split(";")[0];
-            }
             
             if ("text/xml".equals(contentType)
                 || "application/xml".equals(contentType) 

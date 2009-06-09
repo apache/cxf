@@ -70,7 +70,7 @@ public class DataHandlerType extends AbstractXOPType {
                 charset = charset.substring(0, charset.indexOf(";"));
             }
         }
-        String normalizedEncoding = HttpHeaderHelper.mapCharset(charset);
+        String normalizedEncoding = HttpHeaderHelper.mapCharset(charset, "UTF-8");
         try {
             String stringData = new String(bareBytes, normalizedEncoding);
             return new DataHandler(stringData, contentType);

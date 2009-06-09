@@ -227,7 +227,7 @@ public final class JMSUtils {
             }
         }
 
-        String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
+        String normalizedEncoding = HttpHeaderHelper.mapCharset(enc, "UTF-8");
         if (normalizedEncoding == null) {
             String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG", LOG, new Object[] {
                 enc
