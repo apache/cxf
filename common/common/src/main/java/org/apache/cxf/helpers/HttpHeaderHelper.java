@@ -39,8 +39,7 @@ public final class HttpHeaderHelper {
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
     public static final String AUTHORIZATION = "Authorization";
-    private static final Charset UTF8 = Charset.forName("utf-8"); 
-
+    private static final String ISO88591 = Charset.forName("ISO-8859-1").name();
     
     private static Map<String, String> internalHeaders = new HashMap<String, String>();
     private static Map<String, String> encodings = new ConcurrentHashMap<String, String>();
@@ -91,12 +90,15 @@ public final class HttpHeaderHelper {
         }
         return null;
     }
+    public static String mapCharset(String enc) {
+        return mapCharset(enc, ISO88591);
+    }    
     
     //helper to map the charsets that various things send in the http Content-Type header 
     //into something that is actually supported by Java and the Stax parsers and such.
-    public static String mapCharset(String enc) {
+    public static String mapCharset(String enc, String deflt) {
         if (enc == null) {
-            return UTF8.name();
+            return deflt;
         }
         //older versions of tomcat don't properly parse ContentType headers with stuff
         //after charset="UTF-8"
@@ -109,7 +111,7 @@ public final class HttpHeaderHelper {
         enc = enc.replace("\"", "").trim();
         enc = enc.replace("'", "");
         if ("".equals(enc)) {
-            return UTF8.name();
+            return deflt;
         }
         String newenc = encodings.get(enc);
         if (newenc == null) {

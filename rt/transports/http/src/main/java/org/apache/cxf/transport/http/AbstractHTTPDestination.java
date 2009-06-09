@@ -293,15 +293,17 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         if (enc != null && enc.endsWith("\"")) {
             enc = enc.substring(0, enc.length() - 1);
         }
-        String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
-        if (normalizedEncoding == null) {
-            String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
-                                                              LOG, enc).toString();
-            LOG.log(Level.WARNING, m);
-            throw new IOException(m);   
+        if (enc != null || "POST".equals(req.getMethod()) || "PUT".equals(req.getMethod())) {
+            //allow gets/deletes/options to not specify an encoding
+            String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
+            if (normalizedEncoding == null) {
+                String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
+                                                                  LOG, enc).toString();
+                LOG.log(Level.WARNING, m);
+                throw new IOException(m);   
+            }
+            inMessage.put(Message.ENCODING, normalizedEncoding);
         }
-        
-        inMessage.put(Message.ENCODING, normalizedEncoding);
         
         inMessage.put(Message.QUERY_STRING, req.getQueryString());
         inMessage.put(Message.CONTENT_TYPE, contentType);
