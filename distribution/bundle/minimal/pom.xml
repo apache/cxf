@@ -125,6 +125,11 @@
             <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${pom.version}</version>
+        </dependency> 
     </dependencies>
 
     <build>
