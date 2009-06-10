@@ -30,31 +30,37 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.codehaus.stax2.XMLStreamWriter2;
+import org.codehaus.stax2.validation.ValidationProblemHandler;
+import org.codehaus.stax2.validation.XMLValidationException;
+import org.codehaus.stax2.validation.XMLValidationProblem;
 import org.codehaus.stax2.validation.XMLValidationSchema;
 
 /**
- * This class touches stax2 API, so it is kept separate to allow graceful
- * fallback.
+ * This class touches stax2 API, so it is kept separate to allow graceful fallback.
  */
 class Stax2ValidationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(Stax2ValidationUtils.class);
-    
+
     public Stax2ValidationUtils() {
-        new W3CMultiSchemaFactory(); // will throw if wrong woodstox. 
+        new W3CMultiSchemaFactory(); // will throw if wrong woodstox.
     }
-    
-    /** {@inheritDoc}
-     * @throws XMLStreamException */
-    public void setupValidation(XMLStreamReader reader, 
-                                ServiceInfo serviceInfo) throws XMLStreamException {
-        // Gosh, this is bad, but I don't know a better solution, unless we're willing 
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @throws XMLStreamException
+     */
+    public void setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException {
+        // Gosh, this is bad, but I don't know a better solution, unless we're willing
         // to require the stax2 API no matter what.
         XMLStreamReader effectiveReader = reader;
         if (effectiveReader instanceof DepthXMLStreamReader) {
@@ -62,17 +68,31 @@ class Stax2ValidationUtils {
         }
         final XMLStreamReader2 reader2 = (XMLStreamReader2)effectiveReader;
         XMLValidationSchema vs = getValidator(serviceInfo);
+        reader2.setValidationProblemHandler(new ValidationProblemHandler() {
+
+            public void reportProblem(XMLValidationProblem problem) throws XMLValidationException {
+                throw new Fault(new Message("READ_VALIDATION_ERROR", LOG, problem.getMessage()),
+                                Fault.FAULT_CODE_CLIENT);
+            }
+        });
         reader2.validateAgainst(vs);
     }
 
     public void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
         XMLStreamWriter2 writer2 = (XMLStreamWriter2)writer;
         XMLValidationSchema vs = getValidator(serviceInfo);
+        writer2.setValidationProblemHandler(new ValidationProblemHandler() {
+
+            public void reportProblem(XMLValidationProblem problem) throws XMLValidationException {
+                throw new Fault(problem.getMessage(), LOG);
+            }
+        });
         writer2.validateAgainst(vs);
     }
 
     /**
      * Create woodstox validator for a schema set.
+     * 
      * @param schemas
      * @return
      * @throws XMLStreamException
@@ -93,18 +113,16 @@ class Stax2ValidationUtils {
             if (null == schemaSystemId) {
                 schemaSystemId = sch.getTargetNamespace();
             }
-            
-            EmbeddedSchema embeddedSchema = 
-                new EmbeddedSchema(schemaSystemId, serialized);
+
+            EmbeddedSchema embeddedSchema = new EmbeddedSchema(schemaSystemId, serialized);
             sources.put(sch.getTargetNamespace(), embeddedSchema);
         }
-        
+
         W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
         XMLValidationSchema vs;
         // I don't think that we need the baseURI.
         vs = factory.loadSchemas(null, sources);
         return vs;
     }
-
 
 }

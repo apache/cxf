@@ -19,12 +19,18 @@
 
 package org.apache.cxf.aegis.integration;
 
+import java.io.StringWriter;
+
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Node;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.ArrayService;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +54,13 @@ public class SchemaValidationTest extends AbstractAegisTest {
     
     @Test
     public void testInvalidArray() throws Exception {
-        invoke("Array", "/org/apache/cxf/aegis/integration/invalidArrayMessage.xml");
+        Node r = invoke("Array", "/org/apache/cxf/aegis/integration/invalidArrayMessage.xml");
+        assertNotNull(r);
+        StringWriter out = new StringWriter();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+        StaxUtils.writeNode(r, writer, true);
+        writer.flush();
+        String m = out.toString();
+        assertTrue(m.contains("Fault"));
     }
 }

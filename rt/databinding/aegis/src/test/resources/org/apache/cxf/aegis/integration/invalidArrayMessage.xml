@@ -27,7 +27,7 @@
        <jns0:anyType><penguin xmlns='uri:linux'>emperor</penguin></jns0:anyType>
        <jns0:anyType><moon xmlns='uri:planets'>blue</moon></jns0:anyType>
     </jns0:anything>
-    <jns0:after>after items</jns0:after>
+    <jns0:laughter>after items</jns0:laughter>
     </jns0:submitW3CArray>
   </soap-env:Body>
 </soap-env:Envelope>
