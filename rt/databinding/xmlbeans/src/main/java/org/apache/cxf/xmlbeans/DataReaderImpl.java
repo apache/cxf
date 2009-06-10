@@ -30,19 +30,17 @@ import javax.xml.validation.Schema;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 
 
-public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBindingValidation2 {
+public class DataReaderImpl implements DataReader<XMLStreamReader> {
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
     private boolean validate;
     
@@ -141,9 +139,5 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> , DataBinding
     }
 
     public void setSchema(Schema s) {
-    }
-
-    public void setValidationServiceModel(ServiceInfo serviceModel) {
-        validate = true;
     }
 }

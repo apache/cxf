@@ -27,12 +27,10 @@ import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.validation.Schema;
 
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -48,7 +46,6 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String NO_VALIDATE_PARTS = AbstractInDatabindingInterceptor.class.getName() 
@@ -89,9 +86,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         }
         dataReader.setAttachments(message.getAttachments());
         dataReader.setProperty(DataReader.ENDPOINT, message.getExchange().get(Endpoint.class));
-        setSchemaInMessage(service, message, dataReader);
 
-        
         return dataReader;
     }
 
@@ -103,21 +98,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         return getDataReader(message, Node.class);
     }
 
-    private void setSchemaInMessage(Service service, Message message, DataReader<?> reader) {
-        Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        if (Boolean.TRUE.equals(en) || "true".equals(en)) {
-            //all serviceInfos have the same schemas
-            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0));
-            reader.setSchema(schema);
-            /* This might be a reader that wants to grab the schema from the
-             * service info. 
-             */
-            if (reader instanceof DataBindingValidation2) {
-                ((DataBindingValidation2)reader).setValidationServiceModel(service.getServiceInfos().get(0));
-            }
-        }
-    }
-    
     protected DepthXMLStreamReader getXMLStreamReader(Message message) {
         XMLStreamReader xr = message.getContent(XMLStreamReader.class);
         if (xr instanceof DepthXMLStreamReader) {

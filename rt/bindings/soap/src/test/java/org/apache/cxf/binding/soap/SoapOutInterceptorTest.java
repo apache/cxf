@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
+import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Before;
@@ -39,6 +40,7 @@ import org.junit.Test;
 public class SoapOutInterceptorTest extends TestBase {
     private ReadHeadersInterceptor rhi;
     private SoapOutInterceptor soi;
+    private StartBodyInterceptor sbi; 
 
     @Before
     public void setUp() throws Exception {
@@ -48,6 +50,8 @@ public class SoapOutInterceptorTest extends TestBase {
 
         rhi = new ReadHeadersInterceptor(BusFactory.getDefaultBus(), "phase2");
         chain.add(rhi);
+        sbi = new StartBodyInterceptor("phase1.5");
+        chain.add(sbi);
 
         soi = new SoapOutInterceptor(BusFactory.getDefaultBus(), "phase3");
         chain.add(soi);

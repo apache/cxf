@@ -48,7 +48,7 @@ public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor
 
     public void handleMessage(Message message) {
         if (isGET(message) && message.getContent(List.class) != null) {
-            LOG.fine("DocLiteralInInterceptor skipped in HTTP GET method");
+            LOG.fine("StaxDataBindingInterceptor skipped in HTTP GET method");
             return;
         }
         

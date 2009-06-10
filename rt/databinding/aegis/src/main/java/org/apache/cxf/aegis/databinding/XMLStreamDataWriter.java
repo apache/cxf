@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
 
@@ -36,28 +35,22 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
-public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter>, DataBindingValidation2 {
+public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
 
     private AegisDatabinding databinding;
     private Collection<Attachment> attachments;
     private Map<String, Object> properties;
-    private ServiceInfo validationServiceInfo;
-    private Bus bus;
     
     public XMLStreamDataWriter(AegisDatabinding databinding, Bus bus) {
         this.databinding = databinding;
-        this.bus = bus;
     }
 
     public void setAttachments(Collection<Attachment> attachments) {
@@ -72,17 +65,6 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter>, DataBin
 
         if (type == null) {
             throw new Fault(new Message("NO_MESSAGE_FOR_PART", LOG, part));
-        }
-        
-        if (validationServiceInfo != null) {
-            StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
-            if (mgr != null) {
-                try {
-                    mgr.setupValidation(output, validationServiceInfo);
-                } catch (XMLStreamException e) {
-                    throw new Fault(e);
-                }
-            }
         }
         
         Context context = new Context(databinding.getAegisContext());
@@ -131,9 +113,5 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter>, DataBin
             return null;
         }
         return properties.get(key);
-    }
-
-    public void setValidationServiceModel(ServiceInfo serviceInfo) {
-        validationServiceInfo = serviceInfo;
     }
 }

@@ -257,6 +257,8 @@ public class AegisDatabinding
         aegisContext.setMappingNamespaceURI(s.getServiceInfos().get(0).getName().getNamespaceURI());
         aegisContext.initialize();
         this.service = s;
+        s.getInInterceptors().add(new AegisSchemaValidationInInterceptor(getBus(), 
+                                                                         s.getServiceInfos().get(0)));
 
         Set<Type> deps = new HashSet<Type>();
 

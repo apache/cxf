@@ -171,14 +171,6 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                         hel = DOMUtils.getNextElement(hel);
                     }
                 }
-                //advance to just outside the <soap:body> opening tag, but not 
-                //to the nextTag as that may skip over white space that is 
-                //important to keep for ws-security signature digests and stuff
-                int i = xmlReader.next();
-                while (i == XMLStreamReader.NAMESPACE
-                    || i == XMLStreamReader.ATTRIBUTE) {
-                    i = xmlReader.next();
-                }
             }
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("XML_STREAM_EXC", LOG), e, message.getVersion().getSender());

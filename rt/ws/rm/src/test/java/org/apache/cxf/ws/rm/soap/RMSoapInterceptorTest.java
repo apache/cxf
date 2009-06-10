@@ -39,6 +39,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
+import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -411,6 +412,8 @@ public class RMSoapInterceptorTest extends Assert {
         soapMessage.setContent(XMLStreamReader.class, reader);
         ReadHeadersInterceptor rji = new ReadHeadersInterceptor(BusFactory.getDefaultBus());
         rji.handleMessage(soapMessage); 
+        StartBodyInterceptor sbi = new StartBodyInterceptor();
+        sbi.handleMessage(soapMessage);
         return soapMessage;
     }
 }

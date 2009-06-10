@@ -19,6 +19,9 @@
 
 package org.apache.cxf.wstx_msv_validation;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.stream.XMLStreamException;
@@ -26,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.service.model.ServiceInfo;
 
@@ -33,6 +37,7 @@ import org.apache.cxf.service.model.ServiceInfo;
  * 
  */
 public class WoodstoxValidationImpl implements StaxValidationManager {
+    private static final Logger LOG = LogUtils.getL7dLogger(WoodstoxValidationImpl.class);
     
     private Bus bus;
     private Stax2ValidationUtils utils;
@@ -48,9 +53,10 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
         try {
             utils = new Stax2ValidationUtils();
         } catch (Exception e) {
-            /* If the dependencies are missing ... */ 
+            LOG.log(Level.INFO, "Problem initializing MSV validation", e);
             return;
         } catch (NoSuchMethodError nsme) {
+            LOG.log(Level.INFO, "Problem initializing MSV validation", nsme);
             // these don't inherit from 'Exception'
             return;
         }
@@ -65,10 +71,14 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
      * @throws XMLStreamException */
     public void setupValidation(XMLStreamReader reader, 
                                 ServiceInfo serviceInfo) throws XMLStreamException {
-        utils.setupValidation(reader, serviceInfo);
+        if (utils != null) {
+            utils.setupValidation(reader, serviceInfo);
+        }
     }
 
     public void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
-        utils.setupValidation(writer, serviceInfo);
+        if (utils != null) {
+            utils.setupValidation(writer, serviceInfo);
+        }
     }
 }
