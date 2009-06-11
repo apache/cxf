@@ -54,14 +54,14 @@
         <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
         <jdom.version>1.0</jdom.version>
         <jetty.version>6.1.18</jetty.version>
-        <msv.version>2009.1-SNAPSHOT</msv.version>
+        <msv.version>2009.1</msv.version>
         <rhino.version>1.7R1</rhino.version>
         <saaj.version>1.3</saaj.version>
         <spring.version>2.5.5</spring.version>
         <spring.mock>spring-test</spring.mock>
         <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
-        <stax.impl.artifactId>wstx-asl</stax.impl.artifactId>
-        <stax.impl.version>3.2.8</stax.impl.version>
+        <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
+        <stax.impl.version>4.0.5</stax.impl.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
         <xmlbeans.version>2.4.0</xmlbeans.version>
         <xmlschema.version>1.4.5</xmlschema.version>
@@ -1183,14 +1183,6 @@
                 <stax.impl.groupId>com.sun.xml.parsers</stax.impl.groupId>
                 <stax.impl.artifactId>jaxp-ri</stax.impl.artifactId>
                 <stax.impl.version>1.4.2</stax.impl.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>woodstox4</id>
-            <properties>
-                <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
-                <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
-                <stax.impl.version>4.1.0-SNAPSHOT</stax.impl.version>
             </properties>
         </profile>
         <profile>

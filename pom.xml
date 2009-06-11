@@ -44,8 +44,9 @@
         <compiler.fork>false</compiler.fork>
     </properties>
 
-    <!-- java.net for msv snapshots -->
     <repositories>
+<!-- java.net for msv, codehaus for woodstox, but we don't need either at the moment. -->
+<!--
       <repository>
 	<id>maven2-repository.dev.java.net</id>
 	<releases>
@@ -68,6 +69,7 @@
 	<name>Java.net Repository for Maven</name>
 	<url>http://snapshots.repository.codehaus.org</url>
       </repository>
+-->
     </repositories>
 
     <distributionManagement>
