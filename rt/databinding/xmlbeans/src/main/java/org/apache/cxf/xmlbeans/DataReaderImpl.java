@@ -139,5 +139,6 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
     }
 
     public void setSchema(Schema s) {
+        validate = s != null;
     }
 }
