@@ -217,11 +217,17 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         addApplicationContext(ac);
         setBeanFactory(ac.getAutowireCapableBeanFactory());
     }
+    
     public final void addApplicationContext(ApplicationContext ac) {
         if (!appContexts.contains(ac)) {
             appContexts.add(ac);
             initWildcardDefinitionMap();
         }
+    }
+    
+    public void destroy() {
+        super.destroy();       
+        appContexts.clear();
     }
 
     public Class<?> getRegistrationType() {
