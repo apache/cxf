@@ -47,6 +47,15 @@ public class UriInfoImpl implements UriInfo {
     private Message message;
     private OperationResourceInfoStack stack;
 
+    @SuppressWarnings("unchecked")
+    public UriInfoImpl(Message m) {
+        this.message = m;
+        this.templateParams = (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
+        if (m != null) {
+            this.stack = m.get(OperationResourceInfoStack.class);
+        }
+    }
+    
     public UriInfoImpl(Message m, MultivaluedMap<String, String> templateParams) {
         this.message = m;
         this.templateParams = templateParams;
