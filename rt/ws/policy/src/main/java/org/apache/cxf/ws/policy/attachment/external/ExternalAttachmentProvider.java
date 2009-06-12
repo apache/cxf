@@ -247,7 +247,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
         attachments = a;    
     }
     
-    Collection<PolicyAttachment> getAttachments() {
+    public Collection<PolicyAttachment> getAttachments() {
         return attachments;
     }
     
