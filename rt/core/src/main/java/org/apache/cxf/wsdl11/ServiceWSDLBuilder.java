@@ -489,6 +489,7 @@ public class ServiceWSDLBuilder {
                 if (operationInfo.isOneWay()) {
                     operation.setStyle(OperationType.ONE_WAY);
                 }
+                this.addExtensibilityElements(operation, getWSDL11Extensors(operationInfo));
                 Input input = def.createInput();
                 input.setName(operationInfo.getInputName());
                 Message message = def.createMessage();
