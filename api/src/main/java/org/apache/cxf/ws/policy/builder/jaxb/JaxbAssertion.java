@@ -19,8 +19,14 @@
 
 package org.apache.cxf.ws.policy.builder.jaxb;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.PolicyComponent;
@@ -72,6 +78,19 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
     @SuppressWarnings("unchecked")
     public static <T> JaxbAssertion<T> cast(PolicyAssertion a, Class<T> type) {
         return (JaxbAssertion<T>)a;
+    }
+
+    @Override
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        try {
+            JAXBContext context = JAXBContext.newInstance(PackageUtils.getPackageName(data.getClass()),
+                                                          data.getClass().getClassLoader());
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty("jaxb.fragment", Boolean.TRUE);
+            marshaller.marshal(data, writer);
+        } catch (JAXBException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }
