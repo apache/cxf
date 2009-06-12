@@ -33,6 +33,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.neethi.Policy;
@@ -123,6 +124,14 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         EndpointInfo ei = endpoint.getEndpointInfo();
         EndpointPolicy ep = pe.getServerEndpointPolicy(ei, null);
         pe.setServerEndpointPolicy(ei, ep.updatePolicy(p));
+
+        // Add policy to the service model (and consequently to the WSDL)
+        ServiceModelPolicyUpdater pu = new ServiceModelPolicyUpdater(ei);
+        for (PolicyProvider pp : ((PolicyEngineImpl) pe).getPolicyProviders()) {
+            if (pp instanceof ExternalAttachmentProvider) {
+                pu.addPolicyAttachments(((ExternalAttachmentProvider) pp).getAttachments());
+            }
+        }
     }
 
     private Policy initializeEndpointPolicy(Endpoint endpoint, Bus bus) {
