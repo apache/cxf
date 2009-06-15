@@ -19,11 +19,12 @@
 
 package demo.hw.client;
 
-import demo.hw.server.HelloWorld;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+
+import demo.hw.server.HelloWorld;
 
 public final class Client {
 

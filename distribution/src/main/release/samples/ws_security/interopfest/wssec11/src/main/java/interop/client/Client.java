@@ -24,10 +24,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import interopbaseaddress.interop.IPingService;
-import interopbaseaddress.interop.PingService11;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
+
+import interopbaseaddress.interop.IPingService;
+import interopbaseaddress.interop.PingService11;
 
 public final class Client {
     

@@ -28,10 +28,11 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 
-import demo.handlers.common.SmallNumberHandler;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersFault;
 import org.apache.handlers.AddNumbersService;
+
+import demo.handlers.common.SmallNumberHandler;
 
 public final class Client {
 

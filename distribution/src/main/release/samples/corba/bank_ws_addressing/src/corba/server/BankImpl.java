@@ -22,11 +22,12 @@ package corba.server;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.omg.PortableServer.POA;
+
 import corba.common.Account;
 import corba.common.AccountHelper;
 import corba.common.BankPOA;
 
-import org.omg.PortableServer.POA;
 
 public class BankImpl extends BankPOA {
     

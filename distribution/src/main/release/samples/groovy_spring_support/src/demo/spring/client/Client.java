@@ -18,10 +18,10 @@
  */
 package demo.spring.client;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 
 import demo.spring.HelloWorld;
-
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public final class Client {

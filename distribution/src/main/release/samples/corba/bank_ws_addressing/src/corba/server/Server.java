@@ -21,8 +21,6 @@ package corba.server;
 
 import java.util.Properties;
 
-import corba.common.BankHelper;
-
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.UserException;
 import org.omg.CosNaming.NameComponent;
@@ -31,6 +29,8 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManager;
+
+import corba.common.BankHelper;
 
 public final class Server {
     private Server() {

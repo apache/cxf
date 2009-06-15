@@ -19,11 +19,12 @@
 
 package org.apache.cxf.demo.complex;
 
-import agentwsresponse.agent.legacysystemservices.schemas.hitum.esb.company.AgentWSResponse;
 
 import com.company.application.CompanyESBApplicationBiztalkAgentDetails4405AgentDetailsPrtSoap;
 import com.company.application.GetAgentDetails;
 import com.company.application.GetAgentDetailsResponse;
+
+import agentwsresponse.agent.legacysystemservices.schemas.hitum.esb.company.AgentWSResponse;
 
 /**
  * This is a trivial implementation of a service contributed in a bug report.  It's useful

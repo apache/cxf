@@ -29,13 +29,14 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-import javanet.staxutils.IndentingXMLStreamWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.demo.aegis.types.Animal;
 import org.apache.cxf.demo.aegis.types.Zoo;
+
+import javanet.staxutils.IndentingXMLStreamWriter;
 
 /**
  * 
