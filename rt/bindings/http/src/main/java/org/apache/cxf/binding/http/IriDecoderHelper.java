@@ -333,8 +333,9 @@ public final class IriDecoderHelper {
             } else {
                 Node node = ec.getFirstChild();
                 while (node != null) {
+                    Node next = node.getNextSibling();
                     ec.removeChild(node);
-                    node = node.getNextSibling();
+                    node = next;
                 }
             }
 
