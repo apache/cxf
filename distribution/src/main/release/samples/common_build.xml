@@ -40,10 +40,10 @@
         value="../../../../../target/srcbuild_env.ant"
         file="target/srcbuild_env.ant"
         filepath="../../../../.."/>
-     <available property="srcbuild_paths.file"
-        value="../../../../../../target/srcbuild_env.ant"
-        file="target/srcbuild_env.ant"
-        filepath="../../../../../.."/>
+    <available property="srcbuild_paths.file"
+       value="../../../../../../target/srcbuild_env.ant"
+       file="target/srcbuild_env.ant"
+       filepath="../../../../../.."/>
     <property name="srcbuild_paths.file" value="${build.dir}/notsrcbuildpath"/>
     <mkdir dir="${build.dir}"/>
     <touch file="${build.dir}/notsrcbuildpath" verbose="false"/>
@@ -64,8 +64,8 @@
 
     <condition property="is.java.version.15">
         <or>
-          <equals arg1="${ant.java.version}" arg2="1.5"/>
-          <equals arg1="${ant.java.version}" arg2="1.6"/>
+            <equals arg1="${ant.java.version}" arg2="1.5"/>
+            <equals arg1="${ant.java.version}" arg2="1.6"/>
         </or>
     </condition>
 
@@ -226,7 +226,7 @@
                 <arg line="@{servicename.arg}"/>
                 <arg line="${package.arg.@{file}}"/>
                 <arg line="${databinding.arg}"/>
-                <arg line="${binding.arg}"/>                
+                <arg line="${binding.arg}"/>
                 <arg value="-verbose"/>
                 <arg value="-d"/>
                 <arg value="@{srcdestdir}"/>
@@ -235,8 +235,11 @@
         </sequential>
     </macrodef>
 		
-		<property name="war-lib" value="${basedir}/libs" />
-		<property name="config.dir" value="${basedir}/config" />
+
+    <property name="war-lib" value="${basedir}/libs" />
+    <property name="config.dir" value="${basedir}/config" />
+		
+
     <macrodef name="cxfwar">
         <attribute name="filename"/>
         <attribute name="wsdl" default=""/>
@@ -247,11 +250,14 @@
             <mkdir dir="@{dir}"/>
             <mkdir dir="${war-lib}"/>
             <mkdir dir="${config.dir}"/>
+
             <antcall target="copy-war-libs"/>
             
-            <available property="has.config" file="${basedir}/webapp/WEB-INF" type="dir" />
-            <antcall target="copy-config-files" />
-            
+            <available property="has.config.webinf" file="${basedir}/webapp/WEB-INF" type="dir" />
+            <available property="has.config.metainf" file="${basedir}/webapp/META-INF" type="dir" />
+            <antcall target="copy-config-files-webinf" />
+            <antcall target="copy-config-files-metainf" />
+
             <delete file="@{dir}/@{filename}" />
             <war destfile="@{dir}/@{filename}" webxml="@{webxml}">
                 <classes dir="@{classesdir}"/>
@@ -262,36 +268,51 @@
                     <include name="wsdl/@{wsdl}"/>
                 </webinf>
                 <webinf dir="${config.dir}">
-                		<include name="*.*" />
-                </webinf> 
+                    <include name="*.*" />
+                    <exclude name="context.xml"/>
+                </webinf>
+
+                <metainf dir="${config.dir}">
+                    <include name="context.xml" />
+                </metainf>
+
                 <lib dir="${war-lib}">
-    							<include name="*.jar"/>
-  							</lib>
+                    <include name="*.jar"/>
+                </lib>
             </war>
             
+
             <delete dir="${war-lib}" />
             <delete dir="${config.dir}" />
         </sequential>
     </macrodef>
     
+
     <target name="copy-war-libs" unless="without.libs">
-    	<copy todir="${war-lib}">
-    		<fileset dir="${cxf.home}/lib">
-    		   <exclude name="servlet-api-*.jar" />
-                   <exclude name="geronimo-servlet_*.jar" />
-                   <exclude name="jetty-*.jar"/>
-                   <exclude name="WHICH_JARS" />
-    		</fileset>
-    	</copy>	
+        <copy todir="${war-lib}">
+            <fileset dir="${cxf.home}/lib">
+                <exclude name="servlet-api-*.jar" />
+                <exclude name="geronimo-servlet_*.jar" />
+                <exclude name="jetty-*.jar"/>
+                <exclude name="WHICH_JARS" />
+            </fileset>
+        </copy>
     </target>
     
-    <target name="copy-config-files" if="has.config">
-    		<copy todir="${config.dir}" >
-    			<fileset dir="${basedir}/webapp/WEB-INF">
-    				<include name="*.xml" />
-    				<exclude name="web.xml" />
-    			</fileset>
-    		</copy>
+    <target name="copy-config-files-webinf" if="has.config.webinf">
+        <copy todir="${config.dir}" >
+            <fileset dir="${basedir}/webapp/WEB-INF">
+                <include name="*.xml" />
+                <exclude name="web.xml" />
+            </fileset>
+        </copy>
+    </target>
+    <target name="copy-config-files-metainf" if="has.config.metainf">
+        <copy todir="${config.dir}" >
+            <fileset dir="${basedir}/webapp/META-INF">
+                <include name="context.xml" />
+            </fileset>
+        </copy>
     </target>
 
     <target name="deploy" description="deploy the application into the container">
