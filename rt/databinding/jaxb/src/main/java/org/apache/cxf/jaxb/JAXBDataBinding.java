@@ -50,6 +50,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
@@ -60,6 +61,8 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -73,8 +76,10 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -141,6 +146,80 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
     
     private static final Map<Package, CachedClassOrNull> OBJECT_FACTORY_CACHE
         = new CacheMap<Package, CachedClassOrNull>();
+    
+    private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
+    static {
+        URIResolver resolver = new URIResolver();
+        try {
+            resolver.resolve("", "classpath:/schemas/wsdl/ws-addr-wsdl.xsd", JAXBDataBinding.class);
+            if (resolver.isResolved()) {
+                InputStream ins = resolver.getInputStream();
+                Document doc = XMLUtils.parse(ins);
+                ins.close();
+                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/ws-addr-wsdl.xsd");
+                BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/02/addressing/wsdl", dr);
+                resolver.unresolve();
+            }
+        } catch (IOException e) {
+            //IGNORE
+        } catch (ParserConfigurationException e) {
+            //IGNORE
+        } catch (SAXException e) {
+            //IGNORE
+        }
+        try {
+            resolver.resolve("", "classpath:/schemas/wsdl/ws-addr.xsd", JAXBDataBinding.class);
+            if (resolver.isResolved()) {
+                InputStream ins = resolver.getInputStream();
+                Document doc = XMLUtils.parse(ins);
+                ins.close();
+                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/ws-addr.xsd");
+                BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/08/addressing", dr);
+                resolver.unresolve();
+            }
+        } catch (IOException e) {
+            //IGNORE
+        } catch (ParserConfigurationException e) {
+            //IGNORE
+        } catch (SAXException e) {
+            //IGNORE
+        }
+        try {
+            resolver.resolve("", "classpath:/schemas/wsdl/wsrm.xsd", JAXBDataBinding.class);
+            if (resolver.isResolved()) {
+                InputStream ins = resolver.getInputStream();
+                Document doc = XMLUtils.parse(ins);
+                ins.close();
+                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/wsrm.xsd");
+                BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
+                resolver.unresolve();
+            }
+        } catch (IOException e) {
+            //IGNORE
+        } catch (ParserConfigurationException e) {
+            //IGNORE
+        } catch (SAXException e) {
+            //IGNORE
+        }
+        try {
+            resolver.resolve("", "classpath:/schemas/wsdl/wsrm.xsd", JAXBDataBinding.class);
+            if (resolver.isResolved()) {
+                InputStream ins = resolver.getInputStream();
+                Document doc = XMLUtils.parse(ins);
+                ins.close();
+                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/wsrm.xsd");
+                BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
+                resolver.unresolve();
+            }
+        } catch (IOException e) {
+            //IGNORE
+        } catch (ParserConfigurationException e) {
+            //IGNORE
+        } catch (SAXException e) {
+            //IGNORE
+        }
+    }
+    
 
     Class[] extraClass;
 
@@ -308,17 +387,32 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
             } else {
                 schemasFromCache = true;
             }
+            Set<DOMSource> bi = new LinkedHashSet<DOMSource>();
             if (schemas == null) {
-                schemas = new HashSet<DOMSource>();
+                schemas = new LinkedHashSet<DOMSource>();
                 try {
                     for (DOMResult r : generateJaxbSchemas()) {
-                        schemas.add(new DOMSource(r.getNode(), r.getSystemId()));
+                        DOMSource src = new DOMSource(r.getNode(), r.getSystemId());
+                        if (BUILT_IN_SCHEMAS.containsValue(r)) {
+                            bi.add(src);
+                        } else {
+                            schemas.add(src);                            
+                        }
                     }
+                    //put any builtins at the end.   Anything that DOES import them 
+                    //will cause it to load automatically and we'll skip them later
+                    schemas.addAll(bi);
                 } catch (IOException e) {
                     throw new ServiceConstructionException(new Message("SCHEMA_GEN_EXC", LOG), e);
                 }
             }
             for (DOMSource r : schemas) {
+                if (bi.contains(r)) {
+                    String ns = ((Document)r.getNode()).getDocumentElement().getAttribute("targetNamespace");
+                    if (serviceInfo.getSchema(ns) != null) {
+                        continue;
+                    }
+                }
                 addSchemaDocument(serviceInfo, 
                                   col, 
                                  (Document)r.getNode(),
@@ -360,21 +454,15 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
         final List<DOMResult> results = new ArrayList<DOMResult>();
 
         context.generateSchema(new SchemaOutputResolver() {
-            private Map<String, String> builtIns = new HashMap<String, String>();
-            {
-                builtIns.put("http://www.w3.org/2005/02/addressing/wsdl",
-                             "classpath:/schemas/wsdl/ws-addr-wsdl.xsd");
-                builtIns.put("http://www.w3.org/2005/08/addressing", "classpath:/schemas/wsdl/ws-addr.xsd");
-                builtIns.put("http://schemas.xmlsoap.org/ws/2005/02/rm", "classpath:/schemas/wsdl/wsrm.xsd");
-                builtIns.put("http://www.w3.org/2005/05/xmlmime", "classpath:/schemas/wsdl/ws-addr.xsd");
-            }
 
             @Override
             public Result createOutput(String ns, String file) throws IOException {
                 DOMResult result = new DOMResult();
 
-                if (builtIns.containsKey(ns)) {
-                    result.setSystemId(builtIns.get(ns));
+                if (BUILT_IN_SCHEMAS.containsKey(ns)) {
+                    DOMResult dr = BUILT_IN_SCHEMAS.get(ns);
+                    result.setSystemId(dr.getSystemId());
+                    results.add(dr);
                     return result;
                 }
                 result.setSystemId(file);
