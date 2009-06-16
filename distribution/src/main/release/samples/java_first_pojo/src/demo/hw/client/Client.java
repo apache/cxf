@@ -19,9 +19,8 @@
 
 package demo.hw.client;
 
-import demo.hw.server.HelloWorld;
-//import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import demo.hw.server.HelloWorld;
 
 public final class Client {
 

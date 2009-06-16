@@ -131,13 +131,13 @@ Now compile the provided client and server applications with the commands:
 
 For UNIX:  
   
-  export CLASSPATH=$CLASSPATH:$CXF_HOME/lib/celtix.jar:./build/classes
+  export CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar:./build/classes
   javac -d build/classes src/demo/ws_rm/common/*.java
   javac -d build/classes src/demo/ws_rm/client/*.java
   javac -d build/classes src/demo/ws_rm/server/*.java
 
 For Windows:
-  set classpath=%classpath%;%CXF_HOME%\lib\celtix.jar;.\build\classes
+  set classpath=%classpath%;%CXF_HOME%\lib\cxf-manifest.jar;.\build\classes
   javac -d build\classes src\demo\ws_rm\common\*.java
   javac -d build\classes src\demo\ws_rm\client\*.java
   javac -d build\classes src\demo\ws_rm\server\*.java

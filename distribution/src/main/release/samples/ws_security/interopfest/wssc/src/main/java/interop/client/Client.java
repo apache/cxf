@@ -25,14 +25,15 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.xmlsoap.ping.Ping;
+
 import interopbaseaddress.interop.IPingService;
 import interopbaseaddress.interop.PingRequest;
 import interopbaseaddress.interop.PingResponse;
 import interopbaseaddress.interop.PingService;
 
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.xmlsoap.ping.Ping;
 
 public final class Client {
     

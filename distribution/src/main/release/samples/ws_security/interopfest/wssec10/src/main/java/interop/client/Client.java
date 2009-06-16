@@ -26,10 +26,10 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.bus.spring.SpringBusFactory;
+
 import interopbaseaddress.interop.IPingService;
 import interopbaseaddress.interop.PingService10;
-
-import org.apache.cxf.bus.spring.SpringBusFactory;
 
 
 public final class Client {
