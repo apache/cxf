@@ -22,11 +22,13 @@ package demo.colocated.client;
 import java.io.File;
 import java.net.URL;
 import javax.xml.namespace.QName;
-import demo.colocated.server.Server;
+
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.FaultDetail;
+
+import demo.colocated.server.Server;
 
 public final class Client {
 

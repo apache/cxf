@@ -21,13 +21,14 @@ package corba.client;
 
 import java.util.Properties;
 
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.UserException;
+
+
 import corba.common.Account;
 import corba.common.AccountHelper;
 import corba.common.Bank;
 import corba.common.BankHelper;
-
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.UserException;
 
 
 public final class Client {
