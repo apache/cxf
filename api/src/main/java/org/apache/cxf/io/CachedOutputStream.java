@@ -73,8 +73,8 @@ public class CachedOutputStream extends OutputStream {
 
     private boolean inmem;
 
+    private boolean tempFileFailed;
     private File tempFile;
-
     private File outputDir = DEFAULT_TEMP_DIR;
 
     private List<CachedOutputStreamCallback> callbacks;
@@ -241,7 +241,7 @@ public class CachedOutputStream extends OutputStream {
     public int size() {
         return totalLength;
     }
-    
+
     public byte[] getBytes() throws IOException {
         flush();
         if (inmem) {
@@ -256,7 +256,7 @@ public class CachedOutputStream extends OutputStream {
             return IOUtils.readBytesFromStream(fin);
         }
     }
-    
+
     public void writeCacheTo(OutputStream out) throws IOException {
         flush();
         if (inmem) {
@@ -278,7 +278,7 @@ public class CachedOutputStream extends OutputStream {
             writeCacheTo(out);
             return;
         }
-        
+
         int count = 0;
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
@@ -298,7 +298,7 @@ public class CachedOutputStream extends OutputStream {
                 }
                 out.append(IOUtils.newStringFromBytes(bytes, 0, x));
                 count += x;
-                
+
                 if (count >= limit) {
                     x = -1;
                 } else {
@@ -328,8 +328,8 @@ public class CachedOutputStream extends OutputStream {
             }
             fin.close();
         }
-    }    
-    
+    }
+
 
     /**
      * @return the underlying output stream
@@ -355,7 +355,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     protected void onWrite() throws IOException {
-        
+
     }
 
     public void write(byte[] b, int off, int len) throws IOException {
@@ -392,17 +392,29 @@ public class CachedOutputStream extends OutputStream {
     }
 
     private void createFileOutputStream() throws IOException {
-        ByteArrayOutputStream bout = (ByteArrayOutputStream)currentStream;
-        if (outputDir == null) {
-            tempFile = FileUtils.createTempFile("cos", "tmp");
-        } else {
-            tempFile = FileUtils.createTempFile("cos", "tmp", outputDir, false);
+        if (tempFileFailed) {
+            return;
         }
-        
-        currentStream = new BufferedOutputStream(new FileOutputStream(tempFile));
-        bout.writeTo(currentStream);
-        inmem = false;
-        streamList.add(currentStream);
+        ByteArrayOutputStream bout = (ByteArrayOutputStream)currentStream;
+        try {
+            if (outputDir == null) {
+                tempFile = FileUtils.createTempFile("cos", "tmp");
+            } else {
+                tempFile = FileUtils.createTempFile("cos", "tmp", outputDir, false);
+            }
+            
+            currentStream = new BufferedOutputStream(new FileOutputStream(tempFile));
+            bout.writeTo(currentStream);
+            inmem = false;
+            streamList.add(currentStream);
+        } catch (Exception ex) {
+            //Could be IOException or SecurityException or other issues.
+            //Don't care what, just keep it in memory.
+            tempFileFailed = true;
+            tempFile = null;
+            inmem = true;
+            currentStream = bout;
+        }
     }
 
     public File getTempFile() {
