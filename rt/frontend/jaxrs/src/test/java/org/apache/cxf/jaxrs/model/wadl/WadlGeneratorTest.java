@@ -87,6 +87,7 @@ public class WadlGeneratorTest extends Assert {
         EasyMock.expectLastCall().andReturn(epr).anyTimes();
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
+        m.put(Message.HTTP_REQUEST_METHOD, "GET");
         control.replay();
         return m;
     }
