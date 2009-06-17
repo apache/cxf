@@ -22,13 +22,11 @@
     <import file="../../common_build.xml"/>
 
     <target name="client" description="run demo client" depends="build">
-		<antcall  target="copy-client-keystoreconfig-files"/>
         <cxfrun classname="demo.wssec.client.Client"
                 logging-properties-file="logging.properties"/>
     </target>
 
     <target name="server" description="run demo server" depends="build">
-		<antcall  target="copy-server-keystoreconfig-files"/>
         <cxfrun classname="demo.wssec.server.Server"
                 logging-properties-file="${basedir}/logging.properties"/>
 
@@ -48,30 +46,6 @@
     		</copy>
     </target>
 
-    <target name="copy-client-keystoreconfig-files">
-        <mkdir dir="${build.classes.dir}/demo/wssec/client/etc"/>
-		<mkdir dir="${build.classes.dir}/demo/wssec/client/keystore"/>
 
-        <copy todir="${build.classes.dir}/demo/wssec/client/etc">
-            <fileset dir="${basedir}/etc" includes="Client*.properties" />
-        </copy>
-
-        <copy todir="${build.classes.dir}/demo/wssec/client/keystore">
-            <fileset dir="${basedir}/keystore" includes="client*.jks" />
-        </copy>
-    </target>
-
-    <target name="copy-server-keystoreconfig-files">
-        <mkdir dir="${build.classes.dir}/demo/wssec/server/etc"/>
-		<mkdir dir="${build.classes.dir}/demo/wssec/server/keystore"/>
-
-        <copy todir="${build.classes.dir}/demo/wssec/server/etc">
-            <fileset dir="${basedir}/etc" includes="Server*.properties" />
-        </copy>
-
-        <copy todir="${build.classes.dir}/demo/wssec/server/keystore">
-            <fileset dir="${basedir}/keystore" includes="server*.jks" />
-        </copy>
-    </target>
 
 </project>

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package demos.wssec.common;
+package demo.wssec.common;
 
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
