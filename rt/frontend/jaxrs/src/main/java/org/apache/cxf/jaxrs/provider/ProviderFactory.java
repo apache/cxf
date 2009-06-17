@@ -46,6 +46,7 @@ import org.apache.cxf.jaxrs.ext.SystemQueryHandler;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -77,7 +78,8 @@ public final class ProviderFactory {
                                     new PrimitiveTextProvider(),
                                     new MultipartProvider(),
                                     new WebApplicationExceptionMapper(),
-                                    new SystemQueryHandler());
+                                    new SystemQueryHandler(),
+                                    new WadlGenerator());
     }
     
     private List<ProviderInfo<MessageBodyReader>> messageReaders = 
