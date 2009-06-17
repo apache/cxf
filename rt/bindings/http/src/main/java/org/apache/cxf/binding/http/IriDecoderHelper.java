@@ -29,12 +29,14 @@ import java.util.ResourceBundle;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -237,8 +239,10 @@ public final class IriDecoderHelper {
 
 
         XmlSchemaSequence seq = (XmlSchemaSequence)cplxType.getParticle();
-        Element e = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        e.setAttribute(XMLConstants.XMLNS_ATTRIBUTE, qname.getNamespaceURI());
+        Element e = doc.createElementNS(qname.getNamespaceURI(), "ns1:" + qname.getLocalPart());
+        Attr ns = doc.createAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:ns1");
+        e.setAttributeNodeNS(ns);
+        ns.setNodeValue(qname.getNamespaceURI());
         doc.appendChild(e);
 
         if (seq == null || seq.getItems() == null) {
@@ -255,13 +259,18 @@ public final class IriDecoderHelper {
                 }
             }
             Element ec = null;
-            if (unQualified) {
+            QName qn = elChild.getQName();
+            if (StringUtils.isEmpty(qn.getNamespaceURI()) && unQualified) {
                 ec = doc.createElement(elChild.getQName().getLocalPart());
             } else {
-                ec = doc.createElementNS(elChild.getQName().getNamespaceURI(), elChild.getQName()
-                    .getLocalPart());
+                
                 if (!elChild.getQName().getNamespaceURI().equals(qname.getNamespaceURI())) {
+                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(), 
+                                             elChild.getQName().getLocalPart());
                     ec.setAttribute(XMLConstants.XMLNS_ATTRIBUTE, elChild.getQName().getNamespaceURI());
+                } else {
+                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(), 
+                                             "ns1:" + elChild.getQName().getLocalPart());                    
                 }
             }
             
