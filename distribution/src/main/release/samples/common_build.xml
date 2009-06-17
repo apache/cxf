@@ -22,6 +22,8 @@
     <property environment="env"/>
     <property name="build.dir" location ="${basedir}/build"/>
     <property name="build.classes.dir" location ="${build.dir}/classes"/>
+    <available property="src.dir" value="${basedir}/src/main/java"   file="${basedir}/src/main/java" type="dir"/>
+    <property name="src.dir" location ="${basedir}/src"/>
     <property name="build.src.dir" location ="${build.dir}/src"/>
     <property name="build.var.dir" location ="${build.dir}/var"/>
     <property name="codegen.timestamp.file" value="${build.src.dir}/.CODEGEN_DONE"/>
@@ -111,8 +113,8 @@
         <mkdir dir="${build.src.dir}"/>
 
         <javac destdir="${build.classes.dir}" debug="true">
+            <src path="${src.dir}"/>
             <src path="${build.src.dir}"/>
-            <src path="${basedir}/src"/>
             <classpath>
                 <path refid="cxf.classpath"/>
                 <pathelement path="${thirdparty.classpath}"/>
@@ -120,8 +122,9 @@
         </javac>
 
         <copy todir="${build.classes.dir}">
-            <fileset dir="${basedir}/src" includes="**/*.xml, **/*.txt" />
-            <fileset dir="${build.src.dir}" includes="**/*.xml, **/*.txt" />
+            <fileset dir="${src.dir}" excludes="**/*.java" />
+            <fileset dir="${build.src.dir}" includes="**/*.java" />
+            <fileset dir="${basedir}/src/main/resources" includes="**/*" />
         </copy>
     </target>
 
