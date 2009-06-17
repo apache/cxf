@@ -133,10 +133,17 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                                                             varValues);
             initClient(proxyImpl, ep);    
             
-            return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
+            try {
+                return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
                                         new Class[]{cri.getServiceClass(), Client.class, 
                                                     InvocationHandlerAware.class}, 
                                         proxyImpl);
+            } catch (Exception ex) {
+                return (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
+                                                    new Class[]{cri.getServiceClass(), Client.class, 
+                                                                InvocationHandlerAware.class}, 
+                                     proxyImpl);
+            }
         } catch (Exception ex) {
             throw new WebApplicationException();
         }
