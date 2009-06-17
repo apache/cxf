@@ -21,12 +21,16 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.fortest.AegisTestBean;
+
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisProviderTest extends Assert {
@@ -74,4 +78,35 @@ public class AegisProviderTest extends Assert {
         String xml = new String(bytes, "utf-8");
         assertEquals(SIMPLE_BEAN_XML, xml);
     }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    @Ignore
+    public void testReadWriteComplexMap() throws Exception {
+        Map<AegisTestBean, String> map = new HashMap<AegisTestBean, String>();
+        AegisTestBean bean = new AegisTestBean();
+        bean.setBoolValue(Boolean.TRUE);
+        bean.setStrValue("hovercraft");
+        map.put(bean, "hovercraft");
+        
+        MessageBodyWriter<Object> writer = new AegisElementProvider();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        writer.writeTo(bean, null, null, null, null, null, os);
+        byte[] bytes = os.toByteArray();
+        String xml = new String(bytes, "utf-8");
+                
+        MessageBodyReader<Object> reader = new AegisElementProvider();         
+        byte[] simpleBytes = xml.getBytes("utf-8");
+        Object beanObject = reader.readFrom((Class)Map.class, null, null, 
+                                          null, null, new ByteArrayInputStream(simpleBytes));
+        Map<AegisTestBean, String> map2 = (Map)beanObject;
+        AegisTestBean bean2 = map2.keySet().iterator().next();
+        assertEquals("hovercraft", bean2.getStrValue());
+        assertEquals(Boolean.TRUE, bean2.getBoolValue());
+        
+        
+    }
+    
+    
 }
