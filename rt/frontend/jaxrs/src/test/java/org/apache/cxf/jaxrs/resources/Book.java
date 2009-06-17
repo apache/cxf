@@ -59,7 +59,7 @@ public class Book {
     
     @Path("chapters/{chapterid}/")
     @GET
-    public Chapter getChapter(@PathParam("id")int chapterid) {
+    public Chapter getChapter(@PathParam("chapterid") int chapterid) {
         return chapters.get(new Long(chapterid));
     }   
 
