@@ -49,6 +49,10 @@ public class WadlGenerator implements RequestHandler {
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
+        if (!"GET".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
+            return null;
+        }
+
         UriInfo ui = new UriInfoImpl(m);
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
             return null;
