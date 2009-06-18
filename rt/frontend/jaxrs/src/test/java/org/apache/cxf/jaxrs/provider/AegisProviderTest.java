@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.jaxrs.fortest.AegisTestBean;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisProviderTest extends Assert {
@@ -79,9 +80,13 @@ public class AegisProviderTest extends Assert {
         assertEquals(SIMPLE_BEAN_XML, xml);
     }
     
+    private static interface InterfaceWithMap {
+        Map<AegisTestBean, String> mapFunction();
+    }
+    
     @SuppressWarnings("unchecked")
     @Test
-    @Ignore
+    @org.junit.Ignore
     public void testReadWriteComplexMap() throws Exception {
         Map<AegisTestBean, String> map = new HashMap<AegisTestBean, String>();
         AegisTestBean bean = new AegisTestBean();
@@ -98,7 +103,12 @@ public class AegisProviderTest extends Assert {
                 
         MessageBodyReader<Object> reader = new AegisElementProvider();         
         byte[] simpleBytes = xml.getBytes("utf-8");
-        Object beanObject = reader.readFrom((Class)Map.class, null, null, 
+        
+        Class<InterfaceWithMap> iwithMapClass = InterfaceWithMap.class;
+        Method method = iwithMapClass.getMethod("mapFunction");
+        Type mapType = method.getGenericReturnType();
+        
+        Object beanObject = reader.readFrom((Class)Map.class, mapType, null, 
                                           null, null, new ByteArrayInputStream(simpleBytes));
         Map<AegisTestBean, String> map2 = (Map)beanObject;
         AegisTestBean bean2 = map2.keySet().iterator().next();

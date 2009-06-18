@@ -20,6 +20,9 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
@@ -63,10 +66,30 @@ public abstract class AbstractAegisProvider
             }
         }
         
-        return getClassContext(type);
+        return getClassContext(type, genericType);
     }
     
-    private AegisContext getClassContext(Class<?> type) {
+    
+    private void addType(Set<Class<?>> rootClasses, Type cls, boolean allowArray) {
+        if (cls instanceof Class) {
+            if (((Class)cls).isArray() && !allowArray) {
+                rootClasses.add(((Class)cls).getComponentType());
+            } else {
+                rootClasses.add((Class)cls);
+            }
+        } else if (cls instanceof ParameterizedType) {
+            for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
+                addType(rootClasses, t2, false);
+            }
+        } else if (cls instanceof GenericArrayType) {
+            GenericArrayType gt = (GenericArrayType)cls;
+            Class ct = (Class) gt.getGenericComponentType();
+            ct = Array.newInstance(ct, 0).getClass();
+
+            rootClasses.add(ct);
+        }
+    }
+    private AegisContext getClassContext(Class<?> type, Type genericType) {
         synchronized (classContexts) {
             AegisContext context = classContexts.get(type);
             if (context == null) {
@@ -75,6 +98,9 @@ public abstract class AbstractAegisProvider
                 context.setReadXsiTypes(true);
                 Set<Class<?>> rootClasses = new HashSet<Class<?>>();
                 rootClasses.add(type);
+                if (!(genericType instanceof Class)) {
+                    addType(rootClasses, genericType, true);
+                }
                 context.setRootClasses(rootClasses);
                 context.initialize();
                 classContexts.put(type, context);
