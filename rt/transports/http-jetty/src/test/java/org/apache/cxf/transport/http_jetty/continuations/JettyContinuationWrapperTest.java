@@ -67,7 +67,7 @@ public class JettyContinuationWrapperTest extends Assert {
         cw.isNew();
         cw.isPending();
         cw.isResumed();
-        assertSame(ci, cw.getObject());
+        assertNull(cw.getObject());
         cw.setObject(userObject);
         cw.reset();
         cw.resume();
