@@ -20,8 +20,6 @@
 package org.apache.cxf.systest.ws.wssc;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -41,7 +39,6 @@ import wssec.wssc.IPingService;
 import wssec.wssc.PingRequest;
 import wssec.wssc.PingResponse;
 import wssec.wssc.PingService;
-
 
 /**
  *
@@ -66,7 +63,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testClientServer() {
+    public void testClientServer() throws Exception {
         if (!WSSecurity11Common.checkUnrestrictedPoliciesInstalled()) {
             //do nothing
             return;
@@ -104,67 +101,36 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/client/client.xml");
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
-        List<String> results = new ArrayList<String>(argv.length);
         URL wsdlLocation = null;
         
         for (String portPrefix : argv) {
-            try {
-                PingService svc;
-                wsdlLocation = new URL("http://localhost:9001/" + portPrefix + "?wsdl");
-                
-                svc = new PingService(wsdlLocation);
-                final IPingService port = 
-                    svc.getPort(
-                        new QName(
-                            "http://WSSec/wssc",
-                            portPrefix
-                        ),
-                        IPingService.class
-                    );
-               
-                
-                if (portPrefix.charAt(0) == '_') {
-                    //MS would like the _ versions to send a cancel
-                    ((BindingProvider)port).getRequestContext()
-                        .put(SecurityConstants.STS_TOKEN_DO_CANCEL, Boolean.TRUE);
-                }
-                PingRequest params = new PingRequest();
-                Ping ping = new Ping();
-                ping.setOrigin("CXF");
-                ping.setScenario("Scenario5");
-                ping.setText("ping");
-                params.setPing(ping);
-                PingResponse output = port.ping(params);
-                assertTrue("Expected OUT, " + OUT + ", not equal to received :" 
-                        + output.getPingResponse().getText(),
-                        OUT.equals(output.getPingResponse().getText()));
-                if (!OUT.equals(output.getPingResponse().getText())) {
-                    System.err.println(
-                        "Expected " + OUT + " but got " + output.getPingResponse().getText()
-                    );
-                    results.add("Unexpected output " + output.getPingResponse().getText());
-                    
-                } else {
-                    System.out.println(portPrefix + ": OK!");
-                    results.add("OK!");
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-                results.add("Exception: " + t);
-                assertTrue("Unexpected exception thrown, t : " + t,
-                        t == null);
+            PingService svc;
+            wsdlLocation = new URL("http://localhost:9001/" + portPrefix + "?wsdl");
+            
+            svc = new PingService(wsdlLocation);
+            final IPingService port = 
+                svc.getPort(
+                    new QName(
+                        "http://WSSec/wssc",
+                        portPrefix
+                    ),
+                    IPingService.class
+                );
+           
+            
+            if (portPrefix.charAt(0) == '_') {
+                //MS would like the _ versions to send a cancel
+                ((BindingProvider)port).getRequestContext()
+                    .put(SecurityConstants.STS_TOKEN_DO_CANCEL, Boolean.TRUE);
             }
-            //blasting the MS endpoints tends to cause a hang
-            //pause a sec to allow it to recover
-            try {
-                Thread.sleep(1000);
-                System.gc();
-            } catch (Exception e) {
-                //not really a problem
-            }
-        }
-        for (int x = 0; x < argv.length; x++) {
-            System.out.println(argv[x] + ": " + results.get(x));
+            PingRequest params = new PingRequest();
+            Ping ping = new Ping();
+            ping.setOrigin("CXF");
+            ping.setScenario("Scenario5");
+            ping.setText("ping");
+            params.setPing(ping);
+            PingResponse output = port.ping(params);
+            assertEquals(OUT, output.getPingResponse().getText());
         }
     }
 
