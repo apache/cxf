@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
@@ -77,12 +78,17 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             }
             if (Boolean.FALSE.equals(o)) {
                 chain.pause();
-                message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
+                try {
+                    message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
                     .getAutomaticWorkQueue().execute(new Runnable() {
                         public void run() {
                             chain.resume();
                         }
                     });
+                } catch (RejectedExecutionException e) {
+                    //the executor queue is full, so run the task in the caller thread
+                    chain.resume();
+                }
             }
         }
     }
