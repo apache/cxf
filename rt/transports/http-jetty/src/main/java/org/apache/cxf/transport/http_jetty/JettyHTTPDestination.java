@@ -44,6 +44,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
+import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationWrapper;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
@@ -280,7 +281,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
         MessageImpl inMessage = retrieveFromContinuation(req);
         
-        
         if (inMessage == null) {
             
             inMessage = new MessageImpl();
@@ -302,6 +302,15 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             incomingObserver.onMessage(inMessage);
             resp.flushBuffer();
             baseRequest.setHandled(true);
+            JettyContinuationProvider p = (JettyContinuationProvider)inMessage
+                .get(ContinuationProvider.class.getName());
+            if (p != null) {
+                //make sure the continuation is stripped down 
+                JettyContinuationWrapper c = p.getContinuation(false);
+                if (c != null) {
+                    c.done();
+                }
+            }
         } catch (SuspendedInvocationException ex) {
             throw ex.getRuntimeException();
         } catch (RuntimeException ex) {
@@ -333,7 +342,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                 // if any, need to be restored
                 cont.setObject(ci.getUserObject());
             }
-            if (m == null && !cont.isNew()) {
+            if (m == null && (cont.isPending() || cont.isResumed())) {
                 String message = "No message for existing continuation, status : "
                     + (cont.isPending() ? "Pending" : "Resumed");
                 if (!(o instanceof ContinuationInfo)) {
@@ -342,7 +351,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                 LOG.warning(message);
             }
         }
-        
         return m;
     }
     

@@ -74,7 +74,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
     }
 
     @Test
-    public void testHttpWrappedContinuatuions() throws Exception {
+    public void testHttpWrappedContinuations() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus(CLIENT_CONFIG_FILE);
         BusFactory.setDefaultBus(bus);
@@ -115,6 +115,10 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         executor.shutdownNow();
         assertEquals("Not all invocations have been resumed", 0, controlDoneSignal.getCount());
         assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());
+        
+        helloPort.sayHi("Dan1", "to:100");
+        helloPort.sayHi("Dan2", "to:100");
+        helloPort.sayHi("Dan3", "to:100");
     }
     
     

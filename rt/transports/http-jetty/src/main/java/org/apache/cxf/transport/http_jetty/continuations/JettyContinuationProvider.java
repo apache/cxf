@@ -29,17 +29,23 @@ public class JettyContinuationProvider implements ContinuationProvider {
 
     private HttpServletRequest request;
     private Message inMessage; 
+    private JettyContinuationWrapper wrapper;
     
     public JettyContinuationProvider(HttpServletRequest req, Message m) {
         request = req;
         this.inMessage = m;
     }
-    
     public Continuation getContinuation() {
+        return getContinuation(true);
+    }    
+    public JettyContinuationWrapper getContinuation(boolean create) {
         if (inMessage.getExchange().isOneWay()) {
             return null;
         }
-        return new JettyContinuationWrapper(request, inMessage);
+        if (wrapper == null && create) {
+            wrapper = new JettyContinuationWrapper(request, inMessage);
+        }
+        return wrapper;
     }
 
 }

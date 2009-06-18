@@ -54,7 +54,11 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
                 Object userObject = secondName != null && secondName.length() > 0 
                                     ? secondName : null;
                 continuation.setObject(userObject);
-                suspendInvocation(firstName, continuation);
+                long timeout = 20000;
+                if (secondName.startsWith("to:")) {
+                    timeout = Long.parseLong(secondName.substring(3));
+                }
+                suspendInvocation(firstName, continuation, timeout);
             } else {
                 StringBuilder sb = new StringBuilder();
                 sb.append(firstName);
@@ -99,9 +103,9 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
         }
     }
     
-    private void suspendInvocation(String name, Continuation cont) {
+    private void suspendInvocation(String name, Continuation cont, long timeout) {
         try {
-            cont.suspend(20000);    
+            cont.suspend(timeout);    
         } finally {
             synchronized (suspended) {
                 suspended.put(name, cont);
