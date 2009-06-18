@@ -40,11 +40,15 @@ public class JettyContinuationWrapper implements Continuation {
     }
 
     public Object getObject() {
-        return continuation.getObject();
+        Object o = continuation.getObject();
+        if (o instanceof ContinuationInfo) {
+            return ((ContinuationInfo)o).getUserObject();
+        }
+        return o;
     }
 
     public boolean isNew() {
-        return continuation.isNew();
+        return continuation.isNew() || (!continuation.isPending() && !continuation.isResumed());
     }
 
     public boolean isPending() {
@@ -92,12 +96,22 @@ public class JettyContinuationWrapper implements Continuation {
             throw new SuspendedInvocationException(ex);
         }
     }
+    
+    public void done() {
+        ContinuationInfo ci = null;
+        Object obj = continuation.getObject();
+        if (obj instanceof ContinuationInfo) {
+            ci = (ContinuationInfo)obj;
+            continuation.setObject(ci.getUserObject());
+        }
+        continuation.reset();
+    }
 
     protected Message getMessage() {
         return message;
     }
     
-    protected org.mortbay.util.ajax.Continuation getContinuation() {
+    public org.mortbay.util.ajax.Continuation getContinuation() {
         return continuation;
     }
     
