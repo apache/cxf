@@ -135,4 +135,26 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         assertNotNull(field.getAnnotation(XmlList.class));
     }
     
+    @Test
+    public void testGenGeneric() throws Exception {
+        String testingClass = "org.apache.cxf.tools.fortest.withannotation.doc.EchoGenericNoWrapperBean";
+        env.put(ToolConstants.CFG_CLASSNAME, testingClass);
+        
+        WrapperBeanGenerator generator = new WrapperBeanGenerator();
+        generator.setServiceModel(getServiceInfo());
+        
+        generator.generate(output);
+
+        String pkgBase = "org/apache/cxf";
+        File requestWrapperClass = new File(output, pkgBase + "/EchoGeneric.java");
+        assertTrue(requestWrapperClass.exists());
+        String contents = IOUtils.toString(new FileInputStream(requestWrapperClass));
+        assertTrue(contents.indexOf("public java.util.List<java.lang.String> get") != -1);
+        
+        File responseWrapperClass = new File(output, pkgBase + "/EchoGenericResponse.java");
+        assertTrue(responseWrapperClass.exists());
+        contents = IOUtils.toString(new FileInputStream(responseWrapperClass));
+        assertTrue(contents.indexOf("public java.util.List<java.lang.String> getReturn()") != -1);
+    }
+    
 }

@@ -19,12 +19,17 @@
 
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
+import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -190,4 +195,36 @@ public class Wrapper {
     public OperationInfo getOperationInfo() {
         return this.operationInfo;
     }
+    
+    protected String getTypeString(Type t) {
+        String type = "Object";
+        if (t instanceof Class) {
+            Class clz = (Class) t;
+            if (clz.isArray()) {
+                if (isBuiltInTypes(clz.getComponentType())) {
+                    type = clz.getComponentType().getSimpleName() + "[]";
+                } else {
+                    type = clz.getComponentType().getName() + "[]";
+                }
+            } else {
+                type = clz.getName();
+            }
+        } else if (t instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) t;
+            Class c = (Class)pt.getRawType();
+            if (Holder.class.isAssignableFrom(c)
+                && pt.getActualTypeArguments().length == 1
+                && pt.getActualTypeArguments()[0] instanceof Class) {
+                type = getTypeString(pt.getActualTypeArguments()[0]);
+            } else {
+                type = t.toString();
+            }
+        } else if (t instanceof GenericArrayType) {
+            GenericArrayType gat = (GenericArrayType)t;
+            type = gat.toString();
+        }
+        type = type.replace('$', '.');
+        return type;
+    }
+
 }
