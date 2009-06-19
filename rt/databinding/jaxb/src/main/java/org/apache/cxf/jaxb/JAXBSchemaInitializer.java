@@ -331,6 +331,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         el.setNillable(true);
         el.setSchemaTypeName(typeName);
         part.setXmlSchema(el);
+        schemaInfo.setElement(null);
         return el;
     }
     
@@ -348,13 +349,14 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             SchemaInfo schemaInfo = serviceInfo.getSchema(part.getElementQName().getNamespaceURI());
             if (schemaInfo != null
                 && !isExistSchemaElement(schemaInfo.getSchema(), part.getElementQName())) {
-                    
+                
                 XmlSchemaElement el = new XmlSchemaElement();
                 XmlSchemaUtils.setElementQName(el, part.getElementQName());
                 el.setNillable(true);
                 
                 schemaInfo.getSchema().getItems().add(el);
                 schemaInfo.getSchema().getElements().add(el.getQName(), el);
+                schemaInfo.setElement(null);
 
                 Iterator<QName> itr = beanInfo.getTypeNames().iterator();
                 if (!itr.hasNext()) {
@@ -387,6 +389,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             
             schemaInfo.getSchema().getItems().add(el);
             schemaInfo.getSchema().getElements().add(el.getQName(), el);
+            schemaInfo.setElement(null);
 
             part.setXmlSchema(el);
 
@@ -478,6 +481,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         
         schema.getItems().add(ct);
         schema.addType(ct);
+        schemaInfo.setElement(null);
         el.setSchemaTypeName(part.getElementQName());
         
         XmlSchemaSequence seq = new XmlSchemaSequence();

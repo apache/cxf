@@ -909,6 +909,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         SchemaInfo si = getOrCreateSchema(serviceInfo, mpi.getElementQName().getNamespaceURI(),
                                           getQualifyWrapperSchema());
         XmlSchema schema = si.getSchema();
+        si.setElement(null); //cached element is now invalid
 
         XmlSchemaElement el = new XmlSchemaElement();
         XmlSchemaUtils.setElementQName(el, mpi.getElementQName());
@@ -957,7 +958,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         SchemaInfo schemaInfo = getOrCreateSchema(serviceInfo, wrapperBeanName.getNamespaceURI(),
                                                   getQualifyWrapperSchema());
 
-        createWrappedMessageSchema(serviceInfo, wrappedMessage, unwrappedMessage, schemaInfo.getSchema(),
+        createWrappedMessageSchema(serviceInfo, wrappedMessage, unwrappedMessage, schemaInfo,
                                    wrapperBeanName);
     }
 
@@ -1017,6 +1018,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
 
+            schemaInfo.setElement(null); //cached element is now invalid
             XmlSchemaElement el = new XmlSchemaElement();
             XmlSchemaUtils.setElementQName(el, qname);
             el.setNillable(true);
@@ -1108,9 +1110,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     private void createWrappedMessageSchema(ServiceInfo serviceInfo, AbstractMessageContainer wrappedMessage,
-                                            AbstractMessageContainer unwrappedMessage, XmlSchema schema,
+                                            AbstractMessageContainer unwrappedMessage, SchemaInfo info,
                                             QName wrapperName) {
 
+        XmlSchema schema = info.getSchema();
+        info.setElement(null); // the cached schema will be no good
         XmlSchemaElement el = new XmlSchemaElement();
         XmlSchemaUtils.setElementQName(el, wrapperName);
         SchemaCollection.addGlobalElementToSchema(schema, el);
