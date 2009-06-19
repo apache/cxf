@@ -19,6 +19,9 @@
 
 package org.apache.cxf.common.i18n;
 
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
 
 
 public class UncheckedException extends java.lang.RuntimeException {
@@ -41,7 +44,29 @@ public class UncheckedException extends java.lang.RuntimeException {
         message = null;
     } 
     
-
+    public UncheckedException(Logger log, String msg, Object ... params) {
+        message = new org.apache.cxf.common.i18n.Message(msg,
+                                                         log,
+                                                         params);
+    } 
+    public UncheckedException(ResourceBundle bundle, String msg, Object ... params) {
+        message = new org.apache.cxf.common.i18n.Message(msg,
+                                                         bundle,
+                                                         params);
+    } 
+    public UncheckedException(Logger log, String msg, Throwable t, Object ... params) {
+        super(t);
+        message = new org.apache.cxf.common.i18n.Message(msg,
+                                                         log,
+                                                         params);
+    } 
+    public UncheckedException(ResourceBundle bundle, String msg, Throwable t, Object ... params) {
+        super(t);
+        message = new org.apache.cxf.common.i18n.Message(msg,
+                                                         bundle,
+                                                         params);
+    } 
+    
     public String getCode() {
         if (null != message) {
             return message.getCode();

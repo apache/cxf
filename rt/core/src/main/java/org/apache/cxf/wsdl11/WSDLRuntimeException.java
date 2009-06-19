@@ -19,6 +19,8 @@
 
 package org.apache.cxf.wsdl11;
 
+import java.util.logging.Logger;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -39,4 +41,9 @@ public class WSDLRuntimeException extends UncheckedException {
     public WSDLRuntimeException(Throwable cause) {
         super(cause);
     }
+    
+    public WSDLRuntimeException(Logger log, String msg, Object ... params) {
+        super(log, msg, params);
+    }
+
 }
