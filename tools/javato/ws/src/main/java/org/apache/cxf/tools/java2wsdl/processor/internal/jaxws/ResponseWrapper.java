@@ -21,7 +21,6 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,16 +78,7 @@ public final class ResponseWrapper extends Wrapper {
 
         if (!returnType.isAssignableFrom(void.class)) {
             hasReturnType = true;
-            String type;
-            if (returnType.isArray()) {
-                if (isBuiltInTypes(returnType.getComponentType())) {
-                    type = returnType.getComponentType().getSimpleName() + "[]";
-                } else {
-                    type = returnType.getComponentType().getName() + "[]";
-                }
-            } else {
-                type = returnType.getName();
-            }
+            String type = getTypeString(method.getGenericReturnType());
             List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method);
             field.setType(type);
             field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
@@ -102,27 +92,9 @@ public final class ResponseWrapper extends Wrapper {
             int idx = hasReturnType ? mpi.getIndex() - 1 : mpi.getIndex();
             if (idx >= 0) {
                 String name = mpi.getName().getLocalPart();
-                String type = "Object";
 
                 Type t = paramClasses[idx];
-                if (t instanceof Class) {
-                    Class clz = (Class) t;
-                    if (clz.isArray()) {
-                        if (isBuiltInTypes(clz.getComponentType())) {
-                            type = clz.getComponentType().getSimpleName() + "[]";
-                        } else {
-                            type = clz.getComponentType().getName() + "[]";
-                        }
-                    } else {
-                        type = clz.getName();
-                    }
-                } else if (t instanceof ParameterizedType) {
-                    ParameterizedType pt = (ParameterizedType) t;
-                    if (pt.getActualTypeArguments().length > 0
-                        && pt.getActualTypeArguments()[0] instanceof Class) {
-                        type = ((Class)pt.getActualTypeArguments()[0]).getName();
-                    }
-                }
+                String type = getTypeString(t);
 
                 JavaField jf = new JavaField(name, type, "");
                 List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method, idx - 1);
@@ -134,7 +106,7 @@ public final class ResponseWrapper extends Wrapper {
 
         return fields;
     }
-
+    
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.ResponseWrapper resWrapper = method.getAnnotation(javax.xml.ws.ResponseWrapper.class);
@@ -156,8 +128,5 @@ public final class ResponseWrapper extends Wrapper {
         jClass.setNamespace(resNs);
         return jClass;
     }
-
-
-
 
 }
