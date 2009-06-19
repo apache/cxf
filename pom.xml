@@ -129,8 +129,8 @@
         </mailingList>
     </mailingLists>
     <ciManagement>
-        <system>CruiseControl</system>
-        <url>http://pdceltix.boston.amer.iona.com:8080/cruisecontrol</url>
+        <system>Hudson</system>
+        <url>http://hudson.zones.apache.org/hudson/view/CXF/</url>
         <notifiers>
             <notifier>
                 <type>mail</type>
