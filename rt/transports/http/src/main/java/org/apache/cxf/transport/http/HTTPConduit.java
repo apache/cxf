@@ -545,6 +545,10 @@ public class HTTPConduit
             needToCacheRequest = true;
             LOG.log(Level.FINE, "AutoRedirect is turned on.");
         }
+        if (csPolicy.getMaxRetransmits() > 0) {
+            needToCacheRequest = true;
+            LOG.log(Level.FINE, "MaxRetransmits is set > 0.");
+        }
         // DELETE does not work and empty PUTs cause misleading exceptions
         // if chunking is enabled
         // TODO : ensure chunking can be enabled for non-empty PUTs - if requested
