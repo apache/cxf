@@ -124,6 +124,13 @@
         <copy todir="${build.classes.dir}">
             <fileset dir="${src.dir}" excludes="**/*.java" />
             <fileset dir="${build.src.dir}" includes="**/*.java" />
+        </copy>
+        <available property="maven.resources.dir.exists" file="${basedir}/src/main/resources" type="dir" />
+        <antcall target="copy.maven.resources"/>
+    </target>
+
+    <target name="copy.maven.resources" if="maven.resources.dir.exists">
+        <copy todir="${build.classes.dir}">
             <fileset dir="${basedir}/src/main/resources" includes="**/*" />
         </copy>
     </target>
