@@ -117,6 +117,9 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
 
     public void setElement(Element element) {
         this.element = element;        
+        if (element == null) { 
+            return;
+        }
         String form = element.getAttribute("elementFormDefault");
         if ((form != null) && form.equals("qualified")) {
             isElementQualified = true;
