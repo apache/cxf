@@ -52,7 +52,8 @@ public class ProcessorTestBase extends Assert {
 
     public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList(new String[]{"attributeFormDefault",
                                                                                       "elementFormDefault", 
-                                                                                      "form"});
+                                                                                      "form",
+                                                                                      "version"});
     public static final List<String> DEFAULT_IGNORE_TAG = Arrays.asList(new String[]{"sequence"});
 
     protected ToolContext env = new ToolContext();
