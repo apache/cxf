@@ -105,7 +105,7 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
     }
 
     public void setDeliveryChannel(DeliveryChannel newDeliverychannel) {
-        LOG.info(new org.apache.cxf.common.i18n.Message(
+        LOG.fine(new org.apache.cxf.common.i18n.Message(
             "CONFIG.DELIVERY.CHANNEL", LOG).toString() + newDeliverychannel);
         deliveryChannel = newDeliverychannel;
     }
