@@ -22,8 +22,6 @@ package org.apache.cxf.systest.ws.wssec10;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -81,43 +79,22 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         }
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
-        List<String> results = new ArrayList<String>();
         URL wsdlLocation = null;
         for (String portPrefix : argv) {
-            try {
-                PingService svc = null; 
-                wsdlLocation = getWsdlLocation(portPrefix); 
-                svc = new PingService(wsdlLocation);
-                final IPingService port = 
-                    svc.getPort(
-                        new QName(
-                            "http://WSSec/wssec10",
-                            portPrefix + "_IPingService"
-                        ),
-                        IPingService.class
-                    );
-                
-                final String output = port.echo(INPUT);
-                assertTrue("Input, " + INPUT + " not equal to Output " + output, 
-                        INPUT.equals(output));
-                if (!INPUT.equals(output)) {
-                    System.err.println(
-                        "Expected " + INPUT + " but got " + output
-                    );
-                    results.add("Expected " + INPUT + " but got " + output);
-                } else {
-                    System.out.println("OK!");
-                    results.add("OK");
-                }
-            } catch (Throwable t) {
-                results.add("Exception: " + t);
-                t.printStackTrace();
-                assertTrue("Caught excetion: " + t, 
-                        false);
-            }
-        }
-        for (int x = 0; x < argv.length; x++) {
-            System.out.println(argv[x] + ": " + results.get(x));
+            PingService svc = null; 
+            wsdlLocation = getWsdlLocation(portPrefix); 
+            svc = new PingService(wsdlLocation);
+            final IPingService port = 
+                svc.getPort(
+                    new QName(
+                        "http://WSSec/wssec10",
+                        portPrefix + "_IPingService"
+                    ),
+                    IPingService.class
+                );
+            
+            final String output = port.echo(INPUT);
+            assertEquals(INPUT, output);
         }
     }
     
