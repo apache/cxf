@@ -23,6 +23,8 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.helpers.XMLUtils;
+
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -48,6 +50,8 @@ public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 
         Document d = getWSDLDocument(serverFB.getServer());
 
+        XMLUtils.printDOM(d);
+        
         // XmlSchema still isn't preserving all the extra info...
         assertValid("//xsd:complexType[@name='foo']/xsd:sequence", d);
         
