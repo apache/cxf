@@ -44,12 +44,18 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     
     @Test
     public void testGetThatBook123UserResource() throws Exception {
-        getBook("http://localhost:9080/test/bookstore/books/123");
+        getBook("http://localhost:9080/test/2/bookstore/books/123");
+    }
+    
+    @Test
+    public void testGetThatBook123UserResourceInterface() throws Exception {
+        getBook("http://localhost:9080/test/3/bookstore2/books/123");
     }
     
     private void getBook(String endpointAddress) throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
+        connect.addRequestProperty("Content-Type", "*/*");
         connect.addRequestProperty("Accept", "application/xml");
         InputStream in = connect.getInputStream();           
 

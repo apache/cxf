@@ -44,10 +44,13 @@ public abstract class AbstractResourceInfo {
     private static Map<Class<?>, Map<Field, ThreadLocalProxy>> resourceProxyMap;
     private static Map<Class<?>, Map<Method, ThreadLocalProxy>> setterProxyMap;
     
-    private boolean root;
-    private Class<?> resourceClass;
-    private Class<?> serviceClass;
+    protected boolean root;
+    protected Class<?> resourceClass;
+    protected Class<?> serviceClass;
     
+    protected AbstractResourceInfo() {
+        
+    }
     
     protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot) {
         this.serviceClass = serviceClass;

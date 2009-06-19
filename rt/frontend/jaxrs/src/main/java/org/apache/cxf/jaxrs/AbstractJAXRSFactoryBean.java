@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -37,8 +38,10 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -204,8 +207,18 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         setProviders(Collections.singletonList(provider));
     }
 
-    protected void checkResources() {
-        if (!serviceFactory.resourcesAvailable()) {
+    protected void checkResources(boolean server) {
+        List<ClassResourceInfo> list = serviceFactory.getRealClassResourceInfo();
+        if (server) {
+            for (Iterator<ClassResourceInfo> it = list.iterator(); it.hasNext();) {
+                ClassResourceInfo cri = it.next();
+                if (cri.isCreatedFromModel() && cri.getServiceClass() == cri.getResourceClass() 
+                    && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
+                    it.remove();
+                }
+            }
+        }
+        if (list.size() == 0) {
             org.apache.cxf.common.i18n.Message msg = 
                 new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
                                                        BUNDLE);

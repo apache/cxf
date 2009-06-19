@@ -80,10 +80,12 @@ public final class ResourceUtils {
         }
         Class<?> sClass = loadClass(model.getName());
         ClassResourceInfo cri  = new ClassResourceInfo(sClass, sClass, isRoot, true, true);
-        try {
-            cri.setResourceProvider(new SingletonResourceProvider(sClass.newInstance()));
-        } catch (Exception ex) {
-            throw new RuntimeException("Resource class " + model.getName() + " can not be created");
+        if (InjectionUtils.isConcreteClass(cri.getServiceClass())) {
+            try {
+                cri.setResourceProvider(new SingletonResourceProvider(sClass.newInstance()));
+            } catch (Exception ex) {
+                throw new RuntimeException("Resource class " + model.getName() + " can not be created");
+            }
         }
         URITemplate t = URITemplate.createTemplate(model.getPath());
         cri.setURITemplate(t);
