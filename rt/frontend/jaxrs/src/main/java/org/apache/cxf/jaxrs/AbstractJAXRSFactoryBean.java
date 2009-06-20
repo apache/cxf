@@ -247,11 +247,23 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         serviceFactory.setUserResources(resources);
     }
     
+    public void setModelBeansWithServiceClass(List<UserResource> resources, Class<?> sClass) {
+        serviceFactory.setUserResourcesWithServiceClass(resources, sClass);
+    }
+    
     public void setModelRef(String modelRef) {
         List<UserResource> resources = ResourceUtils.getUserResources(modelRef);
         if (resources != null) {
             serviceFactory.setUserResources(resources);
         }
     }
+    
+    public void setModelRefWithServiceClass(String modelRef, Class<?> sClass) {
+        List<UserResource> resources = ResourceUtils.getUserResources(modelRef);
+        if (resources != null) {
+            serviceFactory.setUserResourcesWithServiceClass(resources, sClass);
+        }
+    }
+    
     
 }

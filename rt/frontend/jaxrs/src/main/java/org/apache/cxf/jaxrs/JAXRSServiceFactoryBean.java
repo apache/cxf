@@ -131,10 +131,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     
     public void setUserResources(List<UserResource> resources) {
-        Map<String, UserResource> map = new HashMap<String, UserResource>();
-        for (UserResource ur : resources) {
-            map.put(ur.getName(), ur);
-        }
+        Map<String, UserResource> map = userResourcesAsMap(resources);
         for (UserResource ur : resources) {
             if (ur.getPath() != null) {
                 ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true);
@@ -143,6 +140,22 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
         }
+    }
+    
+    public void setUserResourcesWithServiceClass(List<UserResource> resources, Class<?> sClass) {
+        Map<String, UserResource> map = userResourcesAsMap(resources);
+        ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(map, sClass, true);
+        if (cri != null) {
+            classResourceInfos.add(cri);
+        }
+    }
+    
+    private Map<String, UserResource> userResourcesAsMap(List<UserResource> resources) {
+        Map<String, UserResource> map = new HashMap<String, UserResource>();
+        for (UserResource ur : resources) {
+            map.put(ur.getName(), ur);
+        }
+        return map;
     }
     
     protected ClassResourceInfo createResourceInfo(Class cls, boolean isRoot) {
