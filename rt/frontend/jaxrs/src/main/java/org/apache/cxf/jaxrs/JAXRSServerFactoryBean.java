@@ -74,7 +74,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
     public Server create() {
         try {
-            checkResources();
+            checkResources(true);
             if (serviceFactory.getService() == null) {
                 serviceFactory.create();
                 updateClassResourceProviders();

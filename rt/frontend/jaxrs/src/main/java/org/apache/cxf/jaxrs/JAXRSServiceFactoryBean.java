@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
@@ -59,10 +60,6 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     public void setEnableStaticResolution(boolean staticResolution) {
         this.enableStatic = staticResolution;
-    }
-    
-    public boolean resourcesAvailable() {
-        return !classResourceInfos.isEmpty();
     }
     
     @Override
@@ -115,6 +112,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return Collections.unmodifiableList(classResourceInfos);
     }
     
+    List<ClassResourceInfo> getRealClassResourceInfo() {
+        return classResourceInfos;
+    }
+    
     public void setResourceClass(Class cls) {
         if (getCreatedFromModel(cls) == null) {
             classResourceInfos.clear();
@@ -164,7 +165,12 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             
             ClassResourceInfo cri = getCreatedFromModel(realClass);
             if (cri != null) {
+                if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
+                    cri = new ClassResourceInfo(cri);
+                    classResourceInfos.add(cri);
+                }
                 cri.setResourceClass(bean.getClass());
+                cri.setResourceProvider(new SingletonResourceProvider(bean));
                 continue;
             }
             
@@ -179,7 +185,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     private ClassResourceInfo getCreatedFromModel(Class<?> realClass) {
         for (ClassResourceInfo cri : classResourceInfos) {
-            if (cri.isCreatedFromModel() && cri.getServiceClass() == realClass) {
+            if (cri.isCreatedFromModel() 
+                && cri.isRoot() && cri.getServiceClass().isAssignableFrom(realClass)) {
                 return cri;
             }
         }

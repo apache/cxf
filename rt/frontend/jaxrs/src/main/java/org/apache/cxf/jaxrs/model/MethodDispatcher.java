@@ -30,6 +30,18 @@ public class MethodDispatcher {
     private Map<Method, OperationResourceInfo> methodToOri = 
         new LinkedHashMap<Method, OperationResourceInfo>();
 
+    public MethodDispatcher() {
+        
+    }
+    
+    MethodDispatcher(MethodDispatcher md, ClassResourceInfo cri) {
+        for (OperationResourceInfo ori : md.getOperationResourceInfos()) {    
+            OperationResourceInfo clone = new OperationResourceInfo(ori, cri);
+            oriToMethod.put(clone, clone.getMethodToInvoke());
+            methodToOri.put(clone.getMethodToInvoke(), clone);
+        }
+    }
+    
     public void bind(OperationResourceInfo o, Method... methods) {
         Method primary = methods[0];
 

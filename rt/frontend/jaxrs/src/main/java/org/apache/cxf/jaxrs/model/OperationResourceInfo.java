@@ -48,6 +48,19 @@ public class OperationResourceInfo {
         this(mInvoke, mInvoke, cri);
     }
     
+    OperationResourceInfo(OperationResourceInfo ori, ClassResourceInfo cri) {
+        this.uriTemplate = ori.uriTemplate;
+        this.methodToInvoke = ori.methodToInvoke;
+        this.annotatedMethod = ori.annotatedMethod;
+        this.httpMethod = ori.httpMethod;
+        this.produceMimes = ori.produceMimes;
+        this.consumeMimes = ori.consumeMimes;
+        this.encoded = ori.encoded;
+        this.defaultParamValue = ori.defaultParamValue;
+        this.parameters = ori.parameters;
+        this.classResourceInfo = cri;
+    }
+    
     public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
         methodToInvoke = mInvoke;
         annotatedMethod = mAnnotated;

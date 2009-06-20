@@ -36,6 +36,7 @@ import javax.ws.rs.Produces;
 
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class ClassResourceInfo extends AbstractResourceInfo {
@@ -53,6 +54,23 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     public ClassResourceInfo(Class<?> theResourceClass) {
         this(theResourceClass, false);
+    }
+    
+    public ClassResourceInfo(ClassResourceInfo cri) {
+        
+        if (cri.isCreatedFromModel() && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
+            this.root = cri.root;
+            this.serviceClass = cri.serviceClass;
+            this.uriTemplate = cri.uriTemplate;    
+            this.methodDispatcher = new MethodDispatcher(cri.methodDispatcher, this);
+            this.subResources = cri.subResources;
+            this.paramFields = cri.paramFields;
+            this.paramMethods = cri.paramMethods;
+            this.enableStatic = true;
+        } else {
+            throw new IllegalArgumentException();
+        }
+        
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, boolean theRoot) {

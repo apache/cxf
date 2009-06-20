@@ -49,7 +49,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
     }
     
     @Test
@@ -124,6 +124,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     private void getBook(String endpointAddress, String resource, String type) throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
+        connect.addRequestProperty("Content-Type", "*/*");
         connect.addRequestProperty("Accept", type);
         InputStream in = connect.getInputStream();           
 

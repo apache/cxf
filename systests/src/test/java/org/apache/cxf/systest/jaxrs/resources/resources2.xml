@@ -1,0 +1,13 @@
+<model xmlns="http://cxf.apache.org/jaxrs">
+ <resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotationsInterface" path="bookstore2">
+    <operation name="getBook" verb="GET" path="/books/{id}">
+       <param name="id" type="PATH"/>
+    </operation>
+    <operation name="getBookChapter" path="/books/{id}/chapter">
+        <param name="id" type="PATH"/>
+    </operation> 
+ </resource>
+ <resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
+    <operation name="getItself" verb="GET"/>
+ </resource>
+</model>

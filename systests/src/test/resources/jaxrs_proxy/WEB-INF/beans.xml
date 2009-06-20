@@ -58,6 +58,15 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:server>
   <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations"/>
   
+  
+  <jaxrs:server id="bookservice3" address="/3"
+    modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml">
+    <jaxrs:serviceBeans>
+      <ref bean="bookstore3"/>
+    </jaxrs:serviceBeans>		   
+  </jaxrs:server>
+  <bean id="bookstore3" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotationsImpl"/>
+  
   <aop:config>
 		<aop:aspect id="loggingAspect" ref="simpleLogger">
 			<aop:before

@@ -122,7 +122,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     public Client createWithValues(Object... varValues) {
-        checkResources();
+        checkResources(false);
         
         try {
             Endpoint ep = createEndpoint();
