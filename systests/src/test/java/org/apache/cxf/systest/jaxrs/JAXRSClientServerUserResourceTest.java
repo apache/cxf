@@ -80,6 +80,9 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             
             sf.setModelBeans(ur, ur2);
             
+            String modelRef = "classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml";
+            sf.setModelRefWithServiceClass(modelRef, BookStoreNoAnnotationsInterface.class);
+            sf.setServiceBeans(new BookStoreNoAnnotationsImpl());
             sf.create();
 
         }
@@ -106,6 +109,12 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
     @Test
     public void testGetBook123() throws Exception {
         getAndCompare("http://localhost:9080/bookstoreNoAnnotations/books/123",
+                      "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBookInterface123() throws Exception {
+        getAndCompare("http://localhost:9080/bookstore2/books/123",
                       "application/xml", 200);
     }
     

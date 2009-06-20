@@ -119,6 +119,46 @@ public final class ResourceUtils {
 
     }
     
+    public static ClassResourceInfo createServiceClassResourceInfo(
+        Map<String, UserResource> resources, Class<?> sClass, boolean isRoot) {
+        UserResource model = resources.get(sClass.getName());
+        if (model == null) {
+            throw new RuntimeException("Resource class " + sClass.getName() + " has no model info");
+        }
+        ClassResourceInfo cri  = new ClassResourceInfo(sClass, sClass, isRoot, true, true);
+        URITemplate t = URITemplate.createTemplate(model.getPath());
+        cri.setURITemplate(t);
+        MethodDispatcher md = new MethodDispatcher();
+        Map<String, UserOperation> ops = model.getOperationsAsMap();
+        for (Method m : cri.getServiceClass().getMethods()) {
+            UserOperation op = ops.get(m.getName());
+            if (op == null || op.getName() == null) {
+                continue;
+            }
+            OperationResourceInfo ori = 
+                new OperationResourceInfo(m, cri, URITemplate.createTemplate(op.getPath()),
+                                          op.getVerb(), op.getConsumes(), op.getProduces(),
+                                          op.getParameters());
+            String rClassName = m.getReturnType().getName();
+            if (op.getVerb() == null) {
+                if (resources.containsKey(rClassName)) {
+                    ClassResourceInfo subCri = rClassName.equals(model.getName()) ? cri 
+                        : createServiceClassResourceInfo(resources, m.getReturnType(), false);
+                    if (subCri != null) {
+                        cri.addSubClassResourceInfo(subCri);
+                        md.bind(ori, m);
+                    }
+                }
+            } else {
+                md.bind(ori, m);
+            }
+        }
+        cri.setMethodDispatcher(md);
+        return checkMethodDispatcher(cri) ? cri : null;
+
+    }
+    
+    
     public static ClassResourceInfo createClassResourceInfo(
         final Class<?> rClass, final Class<?> sClass, boolean root, boolean enableStatic) {
         ClassResourceInfo cri  = new ClassResourceInfo(rClass, sClass, root, enableStatic);
