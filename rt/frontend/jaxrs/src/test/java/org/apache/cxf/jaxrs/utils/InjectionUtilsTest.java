@@ -19,7 +19,12 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -27,6 +32,27 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class InjectionUtilsTest extends Assert {
+    
+    public void testCollectionTypeFromArray() {
+        assertNull(InjectionUtils.getCollectionType(String[].class));
+    }
+    
+    @Test
+    public void testCollectionType() {
+        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(List.class));
+        assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class));
+        assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class));
+    }
+    
+    @Test
+    public void testSupportedCollectionType() {
+        assertFalse(InjectionUtils.isSupportedCollectionOrArray(Map.class));
+        assertTrue(InjectionUtils.isSupportedCollectionOrArray(String[].class));
+        assertTrue(InjectionUtils.isSupportedCollectionOrArray(List.class));
+        assertTrue(InjectionUtils.isSupportedCollectionOrArray(Set.class));
+        assertTrue(InjectionUtils.isSupportedCollectionOrArray(SortedSet.class));
+    }
+    
     
     @Test
     public void testExtractValuesFromBean() {
