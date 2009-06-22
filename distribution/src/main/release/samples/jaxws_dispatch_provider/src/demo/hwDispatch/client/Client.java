@@ -120,7 +120,7 @@ public final class Client {
         DOMSource domRespPayload = dispDOMSrcPayload.invoke(domReqPayload);
 
         System.out.println("Response from server: "
-                           + fetchElementByName(domRespPayload.getNode(), "responseType").getTextContent());
+                           + fetchElementByName(domRespPayload.getNode(), "greetMeResponse").getTextContent());
 
         System.exit(0);
     }
