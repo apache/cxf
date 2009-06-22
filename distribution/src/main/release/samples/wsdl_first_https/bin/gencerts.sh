@@ -57,7 +57,7 @@ EOF
 
     openssl req -verbose -x509 -new -nodes -set_serial 1234 \
     -subj "/CN=TheCA/OU=NOT FOR PRODUCTION/O=Apache/ST=NY/C=US" \
-    -days 365 -out cacert.pem -keyout caprivkey.pem 
+    -days 7300 -out cacert.pem -keyout caprivkey.pem 
 
 # Create the RA's keypair and Certificate Request
 #    without -x509, we generate an x509 cert request.
@@ -66,13 +66,13 @@ EOF
 
     openssl req -verbose -new -nodes \
     -subj "/CN=TheRA/OU=NOT FOR PRODUCTION/O=Apache/ST=NY/C=US" \
-    -days 365 -out csrra.pem -keyout raprivkey.pem 
+    -days 7300 -out csrra.pem -keyout raprivkey.pem 
 
 # Have the CN=TheCA issue a certificate for the CN=TheRA
 # We need -extfile exts -extenstions x509_extensions to make sure 
 # CN=TheRA can be a Certificate Authority.
 
-    openssl ca -batch -days 364 -cert cacert.pem -keyfile caprivkey.pem \
+    openssl ca -batch -days 7300 -cert cacert.pem -keyfile caprivkey.pem \
     -in csrra.pem -out ra-ca-cert.pem -extfile exts -extensions x509_extensions
 
 # Create keypairs and Cert Request for a certificate for CN=Wibble and CN=Cherry
@@ -103,10 +103,10 @@ EOF
 # Have the CN=TheRA issue a certificate for CN=Wibble and CN=Cherry via
 # their Certificate Requests.
 
-   openssl ca -batch -days 364 -cert ra-ca-cert.pem -keyfile raprivkey.pem \
+   openssl ca -batch -days 7300 -cert ra-ca-cert.pem -keyfile raprivkey.pem \
    -in csrwibble.pem -out wibble-ra-cert.pem 
    
-   openssl ca -batch -days 364 -cert ra-ca-cert.pem -keyfile raprivkey.pem \
+   openssl ca -batch -days 7300 -cert ra-ca-cert.pem -keyfile raprivkey.pem \
    -in csrcherry.pem -out cherry-ra-cert.pem
 
 
