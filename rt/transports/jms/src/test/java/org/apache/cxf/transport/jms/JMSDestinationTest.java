@@ -41,7 +41,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSDestinationTest extends AbstractJMSTester {
-    private static final int MAX_RECEIVE_TIME = 3;
+    private static final int MAX_RECEIVE_TIME = 5;
     private Message destMessage;
 
     @BeforeClass
