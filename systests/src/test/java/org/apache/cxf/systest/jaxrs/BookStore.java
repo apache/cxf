@@ -375,7 +375,7 @@ public class BookStore {
             throw new RuntimeException("Unexpected content type");
         }
         
-        book.setId(++bookId);
+        book.setId(bookId + 1);
         books.put(book.getId(), book);
 
         return Response.ok(book).build();

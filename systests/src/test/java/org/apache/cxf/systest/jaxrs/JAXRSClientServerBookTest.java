@@ -40,6 +40,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -65,6 +66,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompare("http://localhost:9080/bookstore/webappexception",
                       "This is a WebApplicationException",
                       "application/xml", 500);
+    }
+    
+    @Test 
+    public void testAddBookProxyResponse() {
+        BookStore store = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        Book b = new Book("CXF rocks", 123L);
+        Response r = store.addBook(b);
+        assertNotNull(r);
+        InputStream is = (InputStream)r.getEntity();
+        assertNotNull(is);
+        XMLSource source = new XMLSource(is);
+        source.setBuffering(true);
+        assertEquals(124L, Long.parseLong(source.getValue("Book/id")));
+        assertEquals("CXF rocks", source.getValue("Book/name"));
     }
     
     @Test
@@ -242,7 +257,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBookExists() throws Exception {
         checkBook("http://localhost:9080/bookstore/books/check/123", true);
-        checkBook("http://localhost:9080/bookstore/books/check/124", false);  
+        checkBook("http://localhost:9080/bookstore/books/check/125", false);  
         
     }
     

@@ -330,6 +330,12 @@ public class AbstractClient implements Client, InvocationHandlerAware {
             } catch (Exception ex) {
                 // nothing we can do really
             }
+        } else {
+            try {
+                responseBuilder.entity(conn.getInputStream());
+            } catch (Exception ex) {
+                // it may that the successful response has no response body
+            }
         }
         return responseBuilder;
     }
@@ -388,11 +394,14 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         if (mbr != null) {
             try {
                 return mbr.readFrom(cls, type, anns, contentType, 
-                       new MetadataMap<String, Object>(r.getMetadata(), true, true), conn.getInputStream());
+                       new MetadataMap<String, Object>(r.getMetadata(), true, true), 
+                       (InputStream)r.getEntity());
             } catch (Exception ex) {
                 throw new WebApplicationException();
             }
              
+        } else if (cls == Response.class) {
+            return r;
         } else {
             reportNoMessageHandler("NO_MSG_READER", cls);
         }

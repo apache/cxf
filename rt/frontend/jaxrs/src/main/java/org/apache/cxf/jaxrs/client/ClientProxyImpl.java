@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -399,7 +400,9 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         if (method.getReturnType() == Void.class) { 
             return null;
         }
-        if (method.getReturnType() == Response.class) {
+        if (method.getReturnType() == Response.class
+            && (r.getEntity() == null || InputStream.class.isAssignableFrom(r.getEntity().getClass())
+                && ((InputStream)r.getEntity()).available() == 0)) {
             return r;
         }
         
