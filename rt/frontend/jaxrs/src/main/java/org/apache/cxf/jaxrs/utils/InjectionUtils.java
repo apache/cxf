@@ -519,7 +519,6 @@ public final class InjectionUtils {
     public static boolean isSupportedCollectionOrArray(Class<?> type) {
         return List.class.isAssignableFrom(type)
             || Set.class.isAssignableFrom(type)
-            || SortedSet.class.isAssignableFrom(type)
             || type.isArray();
     }
 
@@ -541,18 +540,25 @@ public final class InjectionUtils {
         }
     }
 
+    
+    static Class<?> getCollectionType(Class<?> rawType) {
+        Class<?> type = null;
+        if (List.class.isAssignableFrom(rawType)) {
+            type = ArrayList.class;
+        } else if (SortedSet.class.isAssignableFrom(rawType)) {
+            type = TreeSet.class;
+        } else if (Set.class.isAssignableFrom(rawType)) {
+            type = HashSet.class;
+        }
+        return type;
+        
+    }
+    
     private static Object injectIntoCollectionOrArray(Class<?> rawType, Type genericType,
                                         MultivaluedMap<String, String> values,
                                         boolean isbean, boolean decoded,
                                         ParameterType pathParam, Message message) {
-        Class<?> type = null;
-        if (List.class.isAssignableFrom(rawType)) {
-            type = ArrayList.class;
-        } else if (Set.class.isAssignableFrom(rawType)) {
-            type = HashSet.class;
-        } else if (SortedSet.class.isAssignableFrom(rawType)) {
-            type = TreeSet.class;
-        }
+        Class<?> type = getCollectionType(rawType);
 
         Class<?> realType = InjectionUtils.getActualType(genericType);
         
