@@ -21,6 +21,7 @@ package org.apache.cxf.xmlbeans.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,14 +29,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.xml.sax.EntityResolver;
+import org.w3c.dom.Document;
 
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -47,6 +54,7 @@ import org.apache.xmlbeans.SchemaTypeLoader;
 import org.apache.xmlbeans.SchemaTypeSystem;
 import org.apache.xmlbeans.SimpleValue;
 import org.apache.xmlbeans.XmlBeans;
+import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlErrorCodes;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -78,11 +86,12 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     
     SchemaTypeSystem typeSystem;
     Map<String, String> sourcesToCopyMap = new HashMap<String, String>();
-    XmlErrorWatcher errorListener = new XmlErrorWatcher(null);
+    List<XmlError> errors = new LinkedList<XmlError>();
+    XmlErrorWatcher errorListener = new XmlErrorWatcher(errors);
     PathResourceLoader cpResourceLoader = new PathResourceLoader(CodeGenUtil.systemClasspath());
-
+    StscState state;
+    
     public void initialize(ToolContext context) throws ToolException {
-        // TODO Auto-generated method stub
         String wsdl = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
         String catalog = (String)context.get(ToolConstants.CFG_CATALOG);
         Object o = context.get(ToolConstants.CFG_BINDING);
@@ -94,6 +103,10 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         }
 
         // build the in-memory type system
+        state = StscState.start();
+        // construct the state (have to initialize early in case of errors)
+        state.setErrorListener(errorListener);
+
         EntityResolver cmdLineEntRes = ResolverUtil.resolverForCatalog(catalog);
         typeSystem = loadTypeSystem(wsdl, 
                                      bindingFiles, 
@@ -101,7 +114,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
                                      null, 
                                      null, 
                                      cmdLineEntRes);
-        
+        StscState.end();
     }
 
     public DefaultValueWriter createDefaultValueWriter(QName qn, boolean element) {
@@ -202,8 +215,24 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             */
         }
 
-        if (!result && verbose) {
-            System.out.println("BUILD FAILED");
+        if (!result) {
+            if (verbose) {
+                System.out.println("BUILD FAILED");
+            }
+            StringBuilder sb = new StringBuilder("Error generating XMLBeans types\n");
+            for (XmlError err : errors) {
+                if (err.getSeverity() != XmlError.SEVERITY_INFO) {
+                    sb.append(err.toString());
+                    if (err.getLine() != -1) {
+                        sb.append(": ").append(err.getSourceName());
+                        sb.append('[').append(Integer.toString(err.getLine()))
+                            .append(',').append(Integer.toString(err.getColumn()))
+                            .append(']');
+                    }
+                    sb.append('\n');
+                }
+            }
+            throw new ToolException(sb.toString());
         }
 
         if (cpResourceLoader != null) {
@@ -220,9 +249,6 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
                                            File schemasDir,
                                            EntityResolver entResolver) {
 
-        // construct the state (have to initialize early in case of errors)
-        StscState state = StscState.start();
-        state.setErrorListener(errorListener);
 
         SchemaTypeLoader loader = XmlBeans.typeLoaderForClassLoader(SchemaDocument.class.getClassLoader());
 
@@ -236,6 +262,9 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
                 .singletonMap("http://schemas.xmlsoap.org/wsdl/",
                               "http://www.apache.org/internal/xmlbeans/wsdlsubst"));
             options.setEntityResolver(entResolver);
+            options.setGenerateJavaVersion(XmlOptions.GENERATE_JAVA_15);
+
+            
 
             XmlObject urldoc = loader.parse(url, null, options);
 
@@ -282,7 +311,16 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
                     options.setEntityResolver(entResolver);
                     options.setLoadSubstituteNamespaces(MAP_COMPATIBILITY_CONFIG_URIS);
 
-                    XmlObject configdoc = loader.parse(configFiles[i], null, options);
+                    URI uri = new URI(configFiles[i]);
+                    XmlObject configdoc = null;
+                    if ("file".equals(uri.getRawSchemeSpecificPart())) {
+                        configdoc = loader.parse(new File(uri), null, options);                        
+                    } else {
+                        InputSource source = new InputSource(configFiles[i]);
+                        Document doc = XMLUtils.parse(source);
+                        configdoc = loader.parse(doc, null, options);                        
+                    }
+                    
                     if (!(configdoc instanceof ConfigDocument)) {
                         StscState.addError(errorListener, XmlErrorCodes.INVALID_DOCUMENT_TYPE, new Object[] {
                             configFiles[i], "xsd config"

@@ -521,9 +521,6 @@ public final class CustomizationParser {
                 jaxbBindings.add(new InputSource(bindingFile));
             }
 
-        } else {
-            Message msg = new Message("UNKNOWN_BINDING_FILE", LOG, bindingFile, reader.getName());
-            throw new ToolException(msg);
         }
     }
 
