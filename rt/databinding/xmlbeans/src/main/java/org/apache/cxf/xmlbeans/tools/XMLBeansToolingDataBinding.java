@@ -21,7 +21,6 @@ package org.apache.cxf.xmlbeans.tools;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,7 +41,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.XMLUtils;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
