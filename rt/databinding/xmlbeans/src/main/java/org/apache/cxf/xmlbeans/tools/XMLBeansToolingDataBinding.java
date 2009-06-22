@@ -90,7 +90,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     StscState state;
     
     public void initialize(ToolContext context) throws ToolException {
-        String wsdl = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
+        String wsdl = (String)context.get(ToolConstants.CFG_WSDLURL);
         String catalog = (String)context.get(ToolConstants.CFG_CATALOG);
         Object o = context.get(ToolConstants.CFG_BINDING);
         String bindingFiles[]; 
@@ -289,7 +289,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
 
         SchemaDocument.Schema[] sdocs = (SchemaDocument.Schema[])scontentlist
             .toArray(new SchemaDocument.Schema[scontentlist.size()]);
-
+        
         // now the config files.
         List<ConfigDocument.Config> cdoclist = new ArrayList<ConfigDocument.Config>();
         List<File> javaFiles = new ArrayList<File>();
