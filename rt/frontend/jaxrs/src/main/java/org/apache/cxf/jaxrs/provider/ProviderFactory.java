@@ -42,7 +42,6 @@ import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
-import org.apache.cxf.jaxrs.ext.SystemQueryHandler;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -78,7 +77,6 @@ public final class ProviderFactory {
                                     new PrimitiveTextProvider(),
                                     new MultipartProvider(),
                                     new WebApplicationExceptionMapper(),
-                                    new SystemQueryHandler(),
                                     new WadlGenerator());
     }
     

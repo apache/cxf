@@ -16,26 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.jaxrs;
 
-package org.apache.cxf.jaxrs.ext;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
+import javax.ws.rs.HttpMethod;
 
-import org.junit.Assert;
-import org.junit.Test;
+@Target({ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@HttpMethod("RETRIEVE")
+public @interface RETRIEVE {
 
-public class SystemQueryHandlerTest extends Assert {
-
-    @Test
-    public void testMethodQuery() {
-        Message m = new MessageImpl();
-        m.put(Message.HTTP_REQUEST_METHOD, "POST");
-        m.put(Message.QUERY_STRING, "_method=GET");
-        
-        SystemQueryHandler sqh = new SystemQueryHandler();
-        sqh.handleRequest(m, null);
-        assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
-    }
-    
 }
