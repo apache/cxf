@@ -54,7 +54,7 @@
         <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
         <jdom.version>1.0</jdom.version>
         <jetty.version>6.1.18</jetty.version>
-        <msv.version>2009.1-SNAPSHOT</msv.version>
+        <msv.version>2009.1</msv.version>
         <rhino.version>1.7R1</rhino.version>
         <saaj.version>1.3</saaj.version>
         <spring.version>2.5.5</spring.version>
