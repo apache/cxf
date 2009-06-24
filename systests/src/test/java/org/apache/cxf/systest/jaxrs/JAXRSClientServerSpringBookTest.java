@@ -19,8 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -31,7 +34,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
@@ -232,20 +234,29 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
-    @Ignore
     public void testRetrieveBookAegis3() throws Exception {
-        GetMethod get = new GetMethod("http://localhost:9080/the/thebooks4/bookstore/books/aegis/retrieve");
-        get.setRequestHeader("Content-Type", "*/*");
-        get.setRequestHeader("Accept", "application/xml");
-        HttpClient httpClient = new HttpClient();
-        try {
-            httpClient.executeMethod(get);           
-            String aegisData = getStringFromInputStream(get.getResponseBodyAsStream());
-            InputStream expected = getClass().getResourceAsStream("resources/expected_add_book_aegis.txt");
-            assertEquals(getStringFromInputStream(expected), aegisData);
-        } finally {
-            get.releaseConnection();
+        
+        Socket s = new Socket("localhost", 9080);
+        
+        InputStream is = this.getClass().getResourceAsStream("resources/retrieveRequest.txt");
+        byte[] bytes = IOUtils.readBytesFromStream(is);
+        s.getOutputStream().write(bytes);
+        s.getOutputStream().flush();
+        
+        BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String str = null;
+        while ((str = r.readLine()) != null) {
+            sb.append(str);
         }
+        
+        String aegisData = sb.toString();
+        s.getInputStream().close();
+        s.close();
+        String expected = getStringFromInputStream(
+                              getClass().getResourceAsStream("resources/expected_add_book_aegis.txt"));
+        assertTrue(aegisData.contains(expected));
+        
     }
     
     @Test
