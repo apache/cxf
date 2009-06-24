@@ -92,7 +92,7 @@ public class InjectionUtilsTest extends Assert {
         
     }
 
-    private static class CustomerBean1 {
+    static class CustomerBean1 {
         private String a;
         private Long b;
         private List<String> c;
@@ -124,7 +124,7 @@ public class InjectionUtilsTest extends Assert {
         
     }
     
-    private static class CustomerBean2 {
+    static class CustomerBean2 {
         private String a;
         private Long b;
         private List<String> c;

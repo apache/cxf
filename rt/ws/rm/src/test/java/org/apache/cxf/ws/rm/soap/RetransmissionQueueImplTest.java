@@ -441,7 +441,7 @@ public class RetransmissionQueueImplTest extends Assert {
         return ret;
     }
     
-    private static class TestResender implements RetransmissionQueueImpl.Resender {
+    static class TestResender implements RetransmissionQueueImpl.Resender {
         Message message;
         boolean includeAckRequested;
         

@@ -607,7 +607,7 @@ public class DynamicClientFactory {
         }
     }
 
-    private class InnerErrorListener {
+    class InnerErrorListener {
 
         private String url;
 
