@@ -31,8 +31,8 @@ public class Parameter {
         
     }
     
-    public Parameter(String type, String aValue) {
-        this(ParameterType.valueOf(type), 0, aValue); 
+    public Parameter(String type, int pos, String aValue) {
+        this(ParameterType.valueOf(type), pos, aValue); 
     }
     
     public Parameter(ParameterType type, String aValue) {
