@@ -240,6 +240,17 @@ public final class JAXRSUtils {
                                                          MultivaluedMap<String, String> values, 
                                                          String requestContentType, 
                                                          List<MediaType> acceptContentTypes) {
+        return JAXRSUtils.findTargetMethod(resource, path, httpMethod, values, requestContentType, 
+                                           acceptContentTypes, true);
+    }
+    
+    public static OperationResourceInfo findTargetMethod(ClassResourceInfo resource, 
+                                                         String path,
+                                                         String httpMethod, 
+                                                         MultivaluedMap<String, String> values, 
+                                                         String requestContentType, 
+                                                         List<MediaType> acceptContentTypes,
+                                                         boolean logNow) {
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
                 new OperationResourceInfoComparator());
@@ -306,7 +317,7 @@ public final class JAXRSUtils {
                                                    path,
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
-        if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
+        if (!"OPTIONS".equalsIgnoreCase(httpMethod) && logNow) {
             LOG.warning(errorMsg.toString());
         }
         ResponseBuilder rb = createResponseBuilder(resource, status, methodMatched == 0);

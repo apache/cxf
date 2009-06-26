@@ -37,6 +37,7 @@ import javax.xml.transform.Result;
 import javax.xml.transform.sax.SAXResult;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -48,6 +49,7 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.StreamWriterContentHandler;
 
@@ -79,11 +81,19 @@ public class WadlGenerator implements RequestHandler {
         sbMain.append("<application xmlns=\"").append(WADL_NS).append("\">");
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
+        
         StringBuilder sbResources = new StringBuilder();
         sbResources.append("<resources base=\"").append(ui.getBaseUri().toString()).append("\">");
-        handleResource(sbResources, resource, resource.getURITemplate().getValue(),
-                       resource.getURITemplate().getVariables());
+        
+        List<ClassResourceInfo> cris = getResourcesList(m, resource);
+        for (ClassResourceInfo cri : cris) {
+            handleResource(sbResources, cri, cri.getURITemplate().getValue(),
+                           cri.getURITemplate().getVariables());
+        }
         sbResources.append("</resources>");
+        
+        
+        
         sbGrammars.append("</grammars>");
         sbMain.append(sbGrammars.toString());
         sbMain.append(sbResources.toString());
@@ -276,5 +286,9 @@ public class WadlGenerator implements RequestHandler {
         return opsWithSamePath;
     }
     
+    public List<ClassResourceInfo> getResourcesList(Message m, ClassResourceInfo cri) {
+        return cri != null ? Collections.singletonList(cri)
+               : ((JAXRSServiceImpl)m.getExchange().get(Service.class)).getClassResourceInfos();
+    }
     
 }

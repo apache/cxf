@@ -26,8 +26,10 @@ import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
@@ -69,6 +71,7 @@ public class RequestPreprocessor {
         MultivaluedMap<String, String> queries = u.getQueryParameters();
         handleTypeQuery(m, queries);
         handleMethod(m, queries, new HttpHeadersImpl(m));
+        checkMetadataRequest(m);
         return new UriInfoImpl(m, null).getPath();
     }
     
@@ -145,4 +148,24 @@ public class RequestPreprocessor {
         .put(HttpHeaders.ACCEPT, Collections.singletonList(acceptValue));
     }
     
+    /*
+     * TODO : looks like QueryHandler is well suited for the purpose of serving
+     * wadl/wsdl2 root requests with URIs which can not be used for selecting
+     * ClassResourceInfo which is where RequestFilters invoked after the resource class
+     * has been selected are handy. Consider implementing this method as part of the QueryHandler,
+     * we will need to save the list of ClassResourceInfos on the EndpointInfo though
+     */
+    public void checkMetadataRequest(Message m) {
+        String query = (String)m.get(Message.QUERY_STRING);
+        if (query != null && query.contains(WadlGenerator.WADL_QUERY)) {
+            String requestURI = (String)m.get(Message.REQUEST_URI);
+            String baseAddress = HttpUtils.getBaseAddress(m);
+            if (baseAddress.equals(requestURI)) {
+                Response r = new WadlGenerator().handleRequest(m, null);
+                if (r != null) {
+                    m.getExchange().put(Response.class, r);
+                }
+            }
+        }
+    }
 }
