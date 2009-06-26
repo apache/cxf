@@ -20,6 +20,8 @@ package org.apache.cxf.jca.cxf.test;
 
 
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.cxf.Bus;
@@ -117,6 +119,20 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
 
     public static void setInitializeCount(int count) {
         DummyBus.initializeCount = count;
+    }
+
+
+    public Map<String, Object> getProperties() {
+        return Collections.emptyMap();
+    }
+
+
+    public Object getProperty(String s) {
+        return null;
+    }
+
+
+    public void setProperty(String s, Object o) {
     }
 
 }
