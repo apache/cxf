@@ -20,9 +20,12 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -30,8 +33,26 @@ import org.apache.cxf.message.Message;
 
 public class RequestPreprocessor {
     
+    private static final String ACCEPT_QUERY = "_type";
+    private static final String METHOD_QUERY = "_method";
+    private static final String METHOD_HEADER = "X-HTTP-Method-Override";
+    
+    
+    private static final Map<String, String> SHORTCUTS;
+    static {
+        SHORTCUTS = new HashMap<String, String>();
+        SHORTCUTS.put("json", "application/json");
+        SHORTCUTS.put("text", "text/*");
+        SHORTCUTS.put("xml", "application/xml");
+        // more to come
+    }
+    
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
+    
+    public RequestPreprocessor() {
+        this(null, null);
+    }
     
     public RequestPreprocessor(Map<Object, Object> languageMappings,
                            Map<Object, Object> extensionMappings) {
@@ -44,6 +65,10 @@ public class RequestPreprocessor {
     public String preprocess(Message m, UriInfo u) {
         handleExtensionMappings(m, u);
         handleLanguageMappings(m, u);
+        
+        MultivaluedMap<String, String> queries = u.getQueryParameters();
+        handleTypeQuery(m, queries);
+        handleMethod(m, queries, new HttpHeadersImpl(m));
         return new UriInfoImpl(m, null).getPath();
     }
     
@@ -70,27 +95,54 @@ public class RequestPreprocessor {
         
     }
     
-    private void updateAcceptTypeHeader(Message m, String anotherValue) {
-        m.put(Message.ACCEPT_CONTENT_TYPE, anotherValue);
-    }
-    
     @SuppressWarnings("unchecked")
     private void updateAcceptLanguageHeader(Message m, String anotherValue) {
         List<String> acceptLanguage =
-            ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS)).get("Accept-Language");
+            ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS)).get(HttpHeaders.ACCEPT_LANGUAGE);
         if (acceptLanguage == null) {
             acceptLanguage = new ArrayList<String>(); 
         }
         
         acceptLanguage.add(anotherValue);
         ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS))
-            .put("Accept-Language", acceptLanguage);
+            .put(HttpHeaders.ACCEPT_LANGUAGE, acceptLanguage);
     }
     
     private void updatePath(Message m, String path, String suffix) {
         String newPath = path.substring(0, path.length() - (suffix.length() + 1));
         HttpUtils.updatePath(m, newPath);
-        //m.put(Message.REQUEST_URI, newPath);
+    }
+    
+    private void handleMethod(Message m, 
+                              MultivaluedMap<String, String> queries,
+                              HttpHeaders headers) {
+        String method = queries.getFirst(METHOD_QUERY);
+        if (method == null) {
+            List<String> values = headers.getRequestHeader(METHOD_HEADER);
+            if (values.size() == 1) {
+                method = values.get(0);
+            }
+        }
+        if (method != null) {
+            m.put(Message.HTTP_REQUEST_METHOD, method);
+        }
+    }
+    
+    private void handleTypeQuery(Message m, MultivaluedMap<String, String> queries) {
+        String type = queries.getFirst(ACCEPT_QUERY);
+        if (type != null) {
+            if (SHORTCUTS.containsKey(type)) {
+                type = SHORTCUTS.get(type);
+            }
+            updateAcceptTypeHeader(m, type);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void updateAcceptTypeHeader(Message m, String acceptValue) {
+        m.put(Message.ACCEPT_CONTENT_TYPE, acceptValue);
+        ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS))
+        .put(HttpHeaders.ACCEPT, Collections.singletonList(acceptValue));
     }
     
 }

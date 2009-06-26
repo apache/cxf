@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
@@ -60,6 +61,21 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
     
+    @Test
+    public void testGetBookXSLTHtml() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks5/bookstore/books/xslt";
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xhtml+xml").path(666).matrix("name2", 2).query("name", "Action - ");
+        XMLSource source = wc.get(XMLSource.class);
+        Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
+        Book2 b = source.getNode("xhtml:html/xhtml:body/xhtml:ul/xhtml:Book", namespaces, Book2.class);
+        assertEquals(666, b.getId());
+        assertEquals("CXF in Action - 2", b.getName());
+    }
+
     @Test
     public void testGetBookByUriInfo2() throws Exception {
         String endpointAddress =
@@ -122,10 +138,18 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     private void getBook(String endpointAddress, String resource, String type) throws Exception {
+        getBook(endpointAddress, resource, type, null);
+    }
+    
+    private void getBook(String endpointAddress, String resource, String type, String mHeader) 
+        throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Content-Type", "*/*");
         connect.addRequestProperty("Accept", type);
+        if (mHeader != null) {
+            connect.addRequestProperty("X-HTTP-Method-Override", mHeader);
+        }
         InputStream in = connect.getInputStream();           
 
         InputStream expected = getClass().getResourceAsStream(resource);
@@ -189,6 +213,39 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:9080/the/thebooks4/bookstore/books/aegis"; 
         getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
+    }
+    
+    @Test
+    public void testRetrieveBookAegis1() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks4/bookstore/books/aegis/retrieve?_method=RETRIEVE"; 
+        getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
+    }
+    
+    @Test
+    public void testRetrieveBookAegis2() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/the/thebooks4/bookstore/books/aegis/retrieve"; 
+        getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml", "RETRIEVE"); 
+    }
+    
+    @Test
+    @Ignore
+    public void testRetrieveBookAegis3() throws Exception {
+        GetMethod get = new GetMethod("http://localhost:9080/the/thebooks4/bookstore/books/aegis/retrieve");
+        get.setRequestHeader("Content-Type", "*/*");
+        get.setRequestHeader("Accept", "application/xml");
+        HttpClient httpClient = new HttpClient();
+        try {
+            httpClient.executeMethod(get);           
+            String aegisData = getStringFromInputStream(get.getResponseBodyAsStream());
+            InputStream expected = getClass().getResourceAsStream("resources/expected_add_book_aegis.txt");
+            assertEquals(getStringFromInputStream(expected), aegisData);
+        } finally {
+            get.releaseConnection();
+        }
     }
     
     @Test
@@ -270,21 +327,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
-    public void testGetBookXSLTHtml() throws Exception {
-        
-        String endpointAddress =
-            "http://localhost:9080/the/thebooks5/bookstore/books/xslt";
-        WebClient wc = WebClient.create(endpointAddress);
-        wc.accept("application/xhtml+xml").path(666).matrix("name2", 2).query("name", "Action - ");
-        XMLSource source = wc.get(XMLSource.class);
-        Map<String, String> namespaces = new HashMap<String, String>();
-        namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
-        Book2 b = source.getNode("xhtml:html/xhtml:body/xhtml:ul/xhtml:Book", namespaces, Book2.class);
-        assertEquals(666, b.getId());
-        assertEquals("CXF in Action - 2", b.getName());
-    }
-    
-    @Test
     public void testAddValidBookJson() throws Exception {
         doPost("http://localhost:9080/the/bookstore/books/convert",
                200,
@@ -340,6 +382,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         return bos.getOut().toString();        
     }
 
+        
     @Ignore
     @XmlRootElement(name = "Book", namespace = "http://www.w3.org/1999/xhtml")
     public static class Book2 {

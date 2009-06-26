@@ -127,6 +127,13 @@ public class BookStoreSpring {
         return b;
     }
     
+    @RETRIEVE
+    @Path("books/aegis/retrieve")
+    @Produces({"application/html;q=1.0", "application/xml;q=0.5", "application/json;q=0.5" })
+    public Book getBookAegisRetrieve() {
+        return getBookAegis();
+    }
+    
     @GET
     @Path("books/xslt/{id}")
     @Produces({"text/html", "application/xhtml+xml", "application/xml" })
