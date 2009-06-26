@@ -36,7 +36,7 @@ public abstract class PingServiceBase implements IPingService {
     echo(
         java.lang.String request
     ) {
-        System.out.println("echo(" + request + ")");
+        //System.out.println("echo(" + request + ")");
         return request;
     }
 
