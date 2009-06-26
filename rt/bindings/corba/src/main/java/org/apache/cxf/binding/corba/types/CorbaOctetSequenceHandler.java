@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.binding.corba.types;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.wsdl.W3CConstants;
 import org.omg.CORBA.TypeCode;
@@ -50,9 +49,9 @@ public class CorbaOctetSequenceHandler extends CorbaObjectHandler {
     public String getDataFromValue() {
         String result;
         if (isBase64Octets) {
-            result = new String(Base64.encodeBase64(value));
+            result = new String(DatatypeConverter.printBase64Binary(value));
         } else {
-            result = new String(Hex.encodeHex(value));
+            result = new String(DatatypeConverter.printHexBinary(value));
         }
         return result;
     }
@@ -60,9 +59,9 @@ public class CorbaOctetSequenceHandler extends CorbaObjectHandler {
     public void setValueFromData(String data) {
         try {
             if (isBase64Octets) {
-                value = Base64.decodeBase64(data.getBytes());
+                value = DatatypeConverter.parseBase64Binary(data);
             } else {
-                value = Hex.decodeHex(data.toCharArray());
+                value = DatatypeConverter.parseHexBinary(data);
             }
         } catch (Exception ex) {
             throw new CorbaBindingException("Not able to parse the octet sequence", ex);
