@@ -129,7 +129,7 @@ public class BookStoreSpring {
     
     @RETRIEVE
     @Path("books/aegis/retrieve")
-    @Produces({"application/html;q=1.0", "application/xml;q=0.5", "application/json;q=0.5" })
+    @Produces({"application/html;q=0.5", "application/xml;q=1.0", "application/json;q=0.5" })
     public Book getBookAegisRetrieve() {
         return getBookAegis();
     }
