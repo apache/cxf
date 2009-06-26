@@ -29,11 +29,10 @@ import javax.wsdl.Binding;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
 import com.ibm.wsdl.ImportImpl;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.omg.CORBA.Object;
@@ -157,13 +156,7 @@ public final class CorbaObjectReferenceHelper {
 
     public static String extractTypeIdFromIOR(String url) {        
         String ret = new String();
-        byte data[] = null;
-        try {
-            // skip past IOR:
-            data = Hex.decodeHex(url.substring(4).toCharArray());
-        } catch (DecoderException e) {
-            throw new RuntimeException("Failed to convert ascii hex ior to byte[], ior url=" + url, e);
-        }
+        byte data[] = DatatypeConverter.parseHexBinary(url.substring(4));
         if (data.length > 0) {
             // parse out type_id from IOR CDR encapsulation
             boolean bigIndian = !(data[0] > 0);
