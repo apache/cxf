@@ -86,6 +86,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         RequestPreprocessor rp = ProviderFactory.getInstance(message).getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
+            if (message.getExchange().get(Response.class) != null) {
+                return;
+            }
         }
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
@@ -143,7 +146,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 try {                
                     ori = JAXRSUtils.findTargetMethod(resource, 
                         values.getFirst(URITemplate.FINAL_MATCH_GROUP), httpMethod, values, 
-                        requestContentType, acceptContentTypes);
+                        requestContentType, acceptContentTypes, false);
                     message.getExchange().put(OperationResourceInfo.class, ori);
                 } catch (WebApplicationException ex) {
                     operChecked = true;
