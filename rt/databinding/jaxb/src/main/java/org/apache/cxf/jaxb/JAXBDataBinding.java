@@ -125,7 +125,7 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
 
     }
     
-    private static final class CachedClassOrNull {
+    static final class CachedClassOrNull {
         private WeakReference<Class<?>> cachedClass;
 
         public CachedClassOrNull(Class<?> cachedClass) {

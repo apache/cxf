@@ -251,10 +251,6 @@ public class JCABusFactory {
             propsFile = new File(mcf.getEJBServicePropertiesURLInstance().getPath());
         }
 
-        public void setContinue(boolean c) {
-            this.continuing = c;
-        }
-
         public void run() {
             do {
                 try {
