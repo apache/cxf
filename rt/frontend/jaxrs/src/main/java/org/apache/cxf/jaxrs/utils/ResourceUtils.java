@@ -398,8 +398,9 @@ public final class ResourceUtils {
             DOMUtils.findAllElementsByTagNameNS(e, 
                  "http://cxf.apache.org/jaxrs", "param");
         List<Parameter> params = new ArrayList<Parameter>(paramEls.size());
-        for (Element paramEl : paramEls) {
-            Parameter p = new Parameter(paramEl.getAttribute("type"), paramEl.getAttribute("name"));
+        for (int i = 0; i < paramEls.size(); i++) {
+            Element paramEl = paramEls.get(i);
+            Parameter p = new Parameter(paramEl.getAttribute("type"), i, paramEl.getAttribute("name"));
             p.setEncoded(Boolean.valueOf(paramEl.getAttribute("encoded")));
             p.setDefaultValue(paramEl.getAttribute("default"));
             params.add(p);
