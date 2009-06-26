@@ -19,6 +19,8 @@
 
 package org.apache.cxf;
 
+import java.util.Map;
+
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -40,4 +42,9 @@ public interface Bus extends InterceptorProvider {
     void shutdown(boolean wait);
     
     void run();
+    
+    void setProperty(String s, Object o);
+    Object getProperty(String s);
+    Map<String, Object> getProperties();
+
 }

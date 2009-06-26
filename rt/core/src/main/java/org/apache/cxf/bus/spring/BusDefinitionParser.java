@@ -19,7 +19,9 @@
 
 package org.apache.cxf.bus.spring;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -27,6 +29,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.BusWiringType;
+import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.Interceptor;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
@@ -34,9 +39,18 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
 
     public BusDefinitionParser() {
         super();
-        setBeanClass(CXFBusImpl.class);
+        setBeanClass(BusConfig.class);
     }
-
+    protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
+        String bus = element.getAttribute("bus");
+        if (StringUtils.isEmpty(bus)) {
+            addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
+        } else {
+            bean.addConstructorArgReference(bus);
+        }
+        super.doParse(element, ctx, bean);
+    }
+    
     @Override
     protected void mapElement(ParserContext ctx, 
                               BeanDefinitionBuilder bean, 
@@ -47,14 +61,72 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             || "features".equals(name)) {
             List list = ctx.getDelegate().parseListElement(e, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
-        } 
+        } else if ("properties".equals(name)) {
+            Map map = ctx.getDelegate().parseMapElement(e, bean.getBeanDefinition());
+            bean.addPropertyValue("properties", map);
+        }
     }
     
     protected String getIdOrName(Element elem) {
         String id = super.getIdOrName(elem); 
         if (StringUtils.isEmpty(id)) {
-            id = Bus.DEFAULT_BUS_ID;
+            id = Bus.DEFAULT_BUS_ID + ".config";
         }
         return id;
+    }
+    
+    public static class BusConfig  {
+        CXFBusImpl bus;
+        
+        public BusConfig(Bus b) {
+            bus = (CXFBusImpl)b;
+        }
+        public List<Interceptor> getOutFaultInterceptors() {
+            return bus.getOutFaultInterceptors();
+        }
+
+        public List<Interceptor> getInFaultInterceptors() {
+            return bus.getInFaultInterceptors();
+        }
+
+        public List<Interceptor> getInInterceptors() {
+            return bus.getInInterceptors();
+        }
+
+        public List<Interceptor> getOutInterceptors() {
+            return bus.getOutInterceptors();
+        }
+
+        public void setInInterceptors(List<Interceptor> interceptors) {
+            bus.setInInterceptors(interceptors);
+        }
+
+        public void setInFaultInterceptors(List<Interceptor> interceptors) {
+            bus.setInFaultInterceptors(interceptors);
+        }
+
+        public void setOutInterceptors(List<Interceptor> interceptors) {
+            bus.setOutInterceptors(interceptors);
+        }
+
+        public void setOutFaultInterceptors(List<Interceptor> interceptors) {
+            bus.setOutFaultInterceptors(interceptors);
+        }
+        
+        public Collection<AbstractFeature> getFeatures() {
+            return bus.getFeatures();
+        }
+
+        public void setFeatures(Collection<AbstractFeature> features) {
+            bus.setFeatures(features);
+        }
+        
+        public Map<String, Object> getProperties() {
+            return bus.getProperties();
+        }
+        public void setProperties(Map<String, Object> s) {
+            bus.setProperties(s);
+        }
+
     }
 }

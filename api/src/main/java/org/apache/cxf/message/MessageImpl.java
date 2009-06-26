@@ -24,6 +24,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.service.Service;
@@ -140,6 +141,13 @@ public class MessageImpl extends StringMapImpl implements Message {
             Service ep = ex.get(Service.class); 
             if (ep != null) {
                 val = ep.get(key);
+            }
+        }
+        
+        if (val == null) {
+            Bus bus = ex.get(Bus.class);
+            if (bus != null) {
+                val = bus.getProperty(key);
             }
         }
         
