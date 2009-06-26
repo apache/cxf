@@ -27,7 +27,7 @@ public class PingService implements IPingService {
 
     /** {@inheritDoc}*/
     public String echo(String request) {
-        System.out.println("echo: " + request);
+        //System.out.println("echo: " + request);
         return request;
     }
 
