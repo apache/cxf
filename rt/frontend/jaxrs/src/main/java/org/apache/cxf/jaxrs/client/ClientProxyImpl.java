@@ -392,11 +392,11 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
     }
     
-    protected Object handleResponse(HttpURLConnection connect, Message inMessage, OperationResourceInfo ori) 
+    protected Object handleResponse(HttpURLConnection connect, Message outMessage, OperationResourceInfo ori) 
         throws Throwable {
-        Response r = setResponseBuilder(connect).clone().build();
+        Response r = setResponseBuilder(connect, outMessage.getExchange().getInMessage()).clone().build();
         Method method = ori.getMethodToInvoke();
-        checkResponse(method, r, inMessage);
+        checkResponse(method, r, outMessage);
         if (method.getReturnType() == Void.class) { 
             return null;
         }
@@ -406,7 +406,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             return r;
         }
         
-        return readBody(r, connect, inMessage, method.getReturnType(), 
+        return readBody(r, connect, outMessage, method.getReturnType(), 
                         method.getGenericReturnType(), method.getDeclaredAnnotations());
     }
 

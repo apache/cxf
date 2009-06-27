@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -40,13 +41,18 @@ import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -160,6 +166,19 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    @Test
+    public void testOtherInterceptorDrainingStream() throws Exception {
+
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 
+        bean.setAddress(baseAddress);
+        bean.getInInterceptors().add(new TestStreamDrainInterptor());
+        WebClient client = bean.createWebClient();
+        client.path("/bookstore/123").accept(MediaType.APPLICATION_XML_TYPE);
+        Book b = client.get(Book.class);
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }    
     
     @Test
     public void testGetBookSubresourceClient() throws Exception {
@@ -407,5 +426,31 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             throw new WebApplicationException();
         }
         
+    }
+    
+    @Ignore 
+    public class TestStreamDrainInterptor extends AbstractPhaseInterceptor<Message> {
+        public TestStreamDrainInterptor() {
+            super(Phase.RECEIVE);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            InputStream is = message.getContent(InputStream.class);
+            if (is == null) {
+                return;
+            }
+            byte[] payload;
+            try {
+                // input stream will be closed by readBytesFromStream()
+                payload = IOUtils.readBytesFromStream(is);
+                assertTrue("payload was null", payload != null);
+                assertTrue("payload was EMPTYR", payload.length > 0);
+                message.setContent(InputStream.class, new ByteArrayInputStream(payload));
+            } catch (Exception e) {
+                String error = "Failed to read the stream properly due to " + e.getMessage();
+                assertFalse(error, e != null);
+            } 
+        }
+
     }
 }
