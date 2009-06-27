@@ -486,12 +486,12 @@ public class WebClient extends AbstractClient {
         return handleResponse(connect, m, responseClass);
     }
     
-    protected Response handleResponse(HttpURLConnection conn, Message m, Class<?> responseClass) {
+    protected Response handleResponse(HttpURLConnection conn, Message outMessage, Class<?> responseClass) {
         try {
-            ResponseBuilder rb = setResponseBuilder(conn).clone();
+            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange().getInMessage()).clone();
             Response currentResponse = rb.clone().build();
             
-            Object entity = readBody(currentResponse, conn, m, responseClass, responseClass,
+            Object entity = readBody(currentResponse, conn, outMessage, responseClass, responseClass,
                                      new Annotation[]{});
             rb.entity(entity);
             

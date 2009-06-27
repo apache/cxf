@@ -297,7 +297,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         currentBuilder = new UriBuilderImpl(uri);
     }
     
-    protected ResponseBuilder setResponseBuilder(HttpURLConnection conn) throws Throwable {
+    protected ResponseBuilder setResponseBuilder(HttpURLConnection conn, Message inMessage) throws Throwable {
         
         if (conn == null) {
             throw new WebApplicationException(); 
@@ -321,9 +321,13 @@ public class AbstractClient implements Client, InvocationHandlerAware {
                 }
             }
         }
+        InputStream mStream = null;
+        if (inMessage != null) {
+            mStream = inMessage.getContent(InputStream.class);
+        }
         if (status >= 400) {
             try {
-                InputStream errorStream = conn.getErrorStream();
+                InputStream errorStream = mStream == null ? conn.getErrorStream() : mStream;
                 if (errorStream != null) {
                     responseBuilder.entity(IOUtils.readStringFromStream(errorStream));
                 }
@@ -332,7 +336,8 @@ public class AbstractClient implements Client, InvocationHandlerAware {
             }
         } else {
             try {
-                responseBuilder.entity(conn.getInputStream());
+                InputStream stream = mStream == null ? conn.getInputStream() : mStream;
+                responseBuilder.entity(stream);
             } catch (Exception ex) {
                 // it may that the successful response has no response body
             }
@@ -551,7 +556,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
     protected void setInInterceptors(List<Interceptor> interceptors) {
         inInterceptors = interceptors;
     }
-
+    
     protected void setOutInterceptors(List<Interceptor> interceptors) {
         outInterceptors = interceptors;
     }
