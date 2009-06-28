@@ -85,22 +85,25 @@ public final class JMSFactory {
      * settings in headers override the settings from jmsConfig
      * 
      * @param jmsConfig configuration information
-     * @param headers context headers
+     * @param messageProperties context headers
      * @return
      */
-    public static JmsTemplate createJmsTemplate(JMSConfiguration jmsConfig, JMSMessageHeadersType headers) {
+    public static JmsTemplate createJmsTemplate(JMSConfiguration jmsConfig,
+                                                JMSMessageHeadersType messageProperties) {
         JmsTemplate jmsTemplate = jmsConfig.isUseJms11() ? new JmsTemplate() : new JmsTemplate102();
         jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
         if (jmsConfig.getReceiveTimeout() != null) {
             jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
         }
-        jmsTemplate.setTimeToLive(jmsConfig.getTimeToLive());
-        int priority = (headers != null && headers.isSetJMSPriority())
-            ? headers.getJMSPriority() : jmsConfig.getPriority();
+        long timeToLive = (messageProperties != null && messageProperties.isSetTimeToLive())
+            ? messageProperties.getTimeToLive() : jmsConfig.getTimeToLive();
+        jmsTemplate.setTimeToLive(timeToLive);
+        int priority = (messageProperties != null && messageProperties.isSetJMSPriority())
+            ? messageProperties.getJMSPriority() : jmsConfig.getPriority();
         jmsTemplate.setPriority(priority);
-        int deliveryMode = (headers != null && headers.isSetJMSDeliveryMode()) ? headers
-            .getJMSDeliveryMode() : jmsConfig.getDeliveryMode();
+        int deliveryMode = (messageProperties != null && messageProperties.isSetJMSDeliveryMode())
+            ? messageProperties.getJMSDeliveryMode() : jmsConfig.getDeliveryMode();
         jmsTemplate.setDeliveryMode(deliveryMode);
         jmsTemplate.setExplicitQosEnabled(jmsConfig.isExplicitQosEnabled());
         jmsTemplate.setSessionTransacted(jmsConfig.isSessionTransacted());

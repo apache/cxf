@@ -108,7 +108,7 @@ public abstract class AbstractJMSTester extends Assert {
         os.close();
     }
 
-    protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) {
+    protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) throws IOException {
         if (decoupled) {
             // setup the reference type
         } else {

@@ -162,8 +162,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             public javax.jms.Message createMessage(Session session) throws JMSException {
                 String messageType = jmsConfig.getMessageType();
                 final javax.jms.Message jmsMessage;
-                jmsMessage = JMSUtils.buildJMSMessageFromCXFMessage(outMessage, request, messageType,
-                                                                    session, replyTo,
+                jmsMessage = JMSUtils.buildJMSMessageFromCXFMessage(jmsConfig, outMessage, request,
+                                                                    messageType, session, replyTo,
                                                                     correlationId);
                 LOG.log(Level.FINE, "client sending request: ", jmsMessage);
                 return jmsMessage;

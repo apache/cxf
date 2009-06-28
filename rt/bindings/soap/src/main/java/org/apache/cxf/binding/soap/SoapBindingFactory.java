@@ -54,6 +54,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapHeaderOutFilterInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
@@ -348,6 +349,11 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             if (hasRPC && hasDoc) {
                 throw new RuntimeException("WSI-BP prohibits RPC and Document style "
                                            + "operations in same service.");
+            }
+            
+            //jms
+            if (sbi.getTransportURI().equals("http://www.w3.org/2008/07/soap/bindings/JMS/")) {
+                sb.getInInterceptors().add(new SoapJMSInInterceptor());
             }
         } else {
             throw new RuntimeException("Can not initialize SoapBinding, BindingInfo is not SoapBindingInfo");

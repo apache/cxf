@@ -22,7 +22,7 @@
     <artifactId>cxf-rt-transports-jms</artifactId>
     <packaging>jar</packaging>
     <version>2.3.0-SNAPSHOT</version>
-    <name>Apache CXF Runtime JMS Transport</name>
+    <name>Apache CXF Runtime JMS Transport for SOAP/JMS Specification</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
@@ -109,6 +109,22 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/jms.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/jms-uri.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms-uri.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/jms-spec.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms-spec.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>

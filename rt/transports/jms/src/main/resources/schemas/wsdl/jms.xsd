@@ -78,11 +78,13 @@
     
     <xs:complexType name="JMSMessageHeadersType">
         <xs:annotation>
-            <xs:documentation>JMS header properties.</xs:documentation>
+            <xs:documentation>JMS properties.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:element name="property" type="jms:JMSPropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
+        
+        <!-- JMS Header properties -->
         <xs:attribute name="JMSCorrelationID" type="xs:string"/>
         <xs:attribute name="JMSDeliveryMode" type="xs:int"/>
         <xs:attribute name="JMSExpiration" type="xs:long"/>
@@ -92,7 +94,32 @@
         <xs:attribute name="JMSTimeStamp" type="xs:long"/>
         <xs:attribute name="JMSType" type="xs:string"/>
         <xs:attribute name="TimeToLive" type="xs:long"/>
+        
+        <!-- JMS Message properties for SOAP over JMS specification  -->
+        <xs:attribute name="SOAPJMSTargetService" type="xs:string"/>
+    	<xs:attribute name="SOAPJMSBindingVersion" type="xs:string"/>
+    	<xs:attribute name="SOAPJMSContentType" type="xs:string"/>
+    	<xs:attribute name="SOAPJMSSOAPAction" type="xs:anyURI"/>
+    	<xs:attribute name="SOAPJMSIsFault" type="xs:boolean"/>
+    	<xs:attribute name="SOAPJMSRequestURI" type="xs:string"/>
     </xs:complexType>
+    
+    <!-- 
+    <xs:complexType name="SOAPOverJMSMessageType">
+    	<xs:annotation>
+    		<xs:documentation>SOAP Over JMS Message Properties</xs:documentation>
+    	</xs:annotation>
+    	<xs:sequence>
+    		<xs:element name="property" type="jms:JMSPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    	</xs:sequence>
+    	<xs:attribute name="SOAPJMSTargetService" type="xs:string"/>
+    	<xs:attribute name="SOAPJMSBindingVersion" type="xs:string"/>
+    	<xs:attribute name="SOAPJMSContentType" type="xs:string"/>
+    	<xs:attribute name="SOAPJMSSOAPAction" type="xs:anyURI"/>
+    	<xs:attribute name="SOAPJMSIsFault" type="xs:boolean"/>
+    	<xs:attribute name="SOAPJMSRequestURI" type="xs:string"/>
+    </xs:complexType>
+     -->
     
     <xs:simpleType name="JMSClientReceiveTimeOut">
         <xs:restriction base="xs:long"/>
@@ -279,5 +306,13 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    
+    <xs:complexType name="JMSFaultType">
+    	<xs:sequence>
+      		<xs:element name="FaultCode" type="xs:QName"/>
+      		<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    	</xs:sequence>
+    	<xs:anyAttribute namespace="##any" processContents="lax"/>
+  	</xs:complexType>
     
 </xs:schema>

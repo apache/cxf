@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,12 +17,15 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<extensions xmlns="http://cxf.apache.org/bus/extension">
-
-    <extension class="org.apache.cxf.transport.jms.JMSTransportFactory" deferred="true">
-        <namespace>http://cxf.apache.org/transports/jms</namespace>
-        <namespace>http://cxf.apache.org/transports/jms/configuration</namespace>
-        <namespace>http://www.w3.org/2008/07/soap/bindings/JMS/</namespace>
-    </extension>
-        
-</extensions>
+<jaxb:bindings version="1.0" 
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+  jaxb:extensionBindingPrefixes="xjc">
+    <jaxb:bindings schemaLocation="jms-uri.xsd" node="/xs:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.apache.cxf.transport.jms.uri"/>
+        </jaxb:schemaBindings>
+        <jaxb:globalBindings generateIsSetMethod="true"/>
+    </jaxb:bindings>
+</jaxb:bindings>

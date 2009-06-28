@@ -40,6 +40,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
     static {
         URI_PREFIXES.add("jms://");
+        URI_PREFIXES.add("jms:");
     }
 
     private Bus bus;

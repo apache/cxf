@@ -23,7 +23,11 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.systest.jaxws.Hello;
+import org.apache.cxf.systest.jaxws.HelloImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 public class Server extends AbstractBusTestServerBase {
 
@@ -61,6 +65,33 @@ public class Server extends AbstractBusTestServerBase {
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://cxf.apache.org/transports/jms", mtom);
         Binding binding = ep.getBinding();        
         ((SOAPBinding)binding).setMTOMEnabled(true);  
+        
+        Object spec1 = new GreeterSpecImpl();
+        String address1 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2"
+                         + "?jndiInitialContextFactory"
+                         + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+        Endpoint.publish(address1, spec1);
+        
+        initNoWsdlServer();
+    }
+
+
+    /**
+     * 
+     */
+    private void initNoWsdlServer() {
+        String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
+            + "?jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+        Hello implementor = new HelloImpl();
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        svrFactory.setServiceClass(Hello.class);
+        svrFactory.setAddress(address);
+        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
+        svrFactory.setServiceBean(implementor);
+        svrFactory.create();
     }
 
 
