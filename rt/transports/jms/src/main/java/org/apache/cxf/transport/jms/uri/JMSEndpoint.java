@@ -27,8 +27,8 @@ import java.util.Map;
  * 
  */
 public class JMSEndpoint extends JMSEndpointType {
-    Map jndiParameters = new HashMap();
-    Map parameters = new HashMap();
+    Map<String, String> jndiParameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<String, String>();
 
     /**
      * @param uri
