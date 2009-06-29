@@ -19,7 +19,7 @@
 
 var WebServiceProvider = {
     'wsdlLocation': 'file:../testutils/target/classes/wsdl/hello_world.wsdl',
-    'serviceName': 'SOAPServiceTest1',
+    'serviceName': 'SOAPService_Test1',
     'portName': 'SoapPort_Test1',
     'targetNamespace': 'http://apache.org/hello_world_soap_http',
 };
