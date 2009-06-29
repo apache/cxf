@@ -19,19 +19,17 @@
 
 package org.apache.cxf.js.rhino;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
@@ -137,14 +135,14 @@ public abstract class AbstractDOMProvider {
         } else {
             throw new JSDOMProviderException(ILLEGAL_INVOKE_TYPE);
         }
-        Endpoint ep = Endpoint.create(binding, this);
-        List<Source> metadata = new ArrayList<Source>();
-        metadata.add(new StreamSource(wsdlLoc));
-        ep.setMetadata(metadata);
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Endpoint.WSDL_SERVICE, new QName(tgtNmspc, svcNm));
-        props.put(Endpoint.WSDL_PORT, new QName(tgtNmspc, portNm));
-        ep.setProperties(props);
+        
+        Bus bus = BusFactory.getThreadDefaultBus();
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setWsdlLocation(wsdlLoc);
+        factory.setBindingId(binding); 
+        factory.setServiceName(new QName(tgtNmspc, svcNm));
+        factory.setEndpointName(new QName(tgtNmspc, portNm));
+        Endpoint ep = new EndpointImpl(bus, this, factory);
         ep.publish(addr);
     }
 
