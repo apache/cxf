@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import org.apache.cxf.customer.book.BookNotFoundFault;
-
 public class BookSubresourceImpl implements BookSubresource {
 
     private Long id;

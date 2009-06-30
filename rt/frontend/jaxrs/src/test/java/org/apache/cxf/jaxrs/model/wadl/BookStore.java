@@ -31,13 +31,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
 @Path("/bookstore/{id}")
-@Consumes("application/xml, application/json")
-@Produces("application/xml, application/json")
+@Consumes({"application/xml", "application/json" })
+@Produces({"application/xml", "application/json" })
 public class BookStore {
 
     @GET 
     @Produces("text/plain")
-    public String getName() {
+    public String getName(@PathParam("id") Long id) {
         return "store";
     }
     

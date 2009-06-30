@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,14 +82,14 @@ public class WadlGeneratorTest extends Assert {
         assertNotNull(r);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
-//        File f = new File("test.xml");
-//        f.delete();
-//        f.createNewFile();
-//        System.out.println(f.getAbsolutePath());
-//        FileOutputStream fos = new FileOutputStream(f);
-//        fos.write(r.getEntity().toString().getBytes());
-//        fos.flush();
-//        fos.close();
+        File f = new File("test.xml");
+        f.delete();
+        f.createNewFile();
+        System.out.println(f.getAbsolutePath());
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(r.getEntity().toString().getBytes());
+        fos.flush();
+        fos.close();
     }
     
     @Test
@@ -111,6 +113,31 @@ public class WadlGeneratorTest extends Assert {
 
     private void checkBookStoreInfo(Element resource) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
+        
+        List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
+                  "http://research.sun.com/wadl/2006/10", "resource");
+        assertEquals(3, resourceEls.size());        
+        assertEquals("/", resourceEls.get(0).getAttribute("path"));
+        assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(2).getAttribute("path"));
+        
+        List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
+            "http://research.sun.com/wadl/2006/10", "method");
+        assertEquals(1, methodEls.size());
+        assertEquals("GET", methodEls.get(0).getAttribute("name"));
+                                                           
+        
+        List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
+                                  "http://research.sun.com/wadl/2006/10", "param");
+        assertEquals(3, paramsEls.size());
+        checkParameter(paramsEls.get(0), "id", "template");
+        checkParameter(paramsEls.get(1), "bookid", "template");
+        checkParameter(paramsEls.get(2), "mid", "matrix");
+    }
+    
+    private void checkParameter(Element paramEl, String name, String type) {
+        assertEquals(name, paramEl.getAttribute("name"));
+        assertEquals(type, paramEl.getAttribute("style"));    
     }
     
     private List<Element> getWadlResourcesInfo(String baseURI, int size, String value) throws Exception {
