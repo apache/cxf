@@ -511,7 +511,7 @@ public class BookStore {
         cds.put(cd1.getId(), cd1);
     }
     
-    private static class BookInfo {
+    static class BookInfo {
         private String name;
         private long id;
         
@@ -557,7 +557,7 @@ public class BookStore {
         
     }
     
-    private static class BadBook {
+    static class BadBook {
         public BadBook(String s) {
             throw new RuntimeException("The bad book");
         }

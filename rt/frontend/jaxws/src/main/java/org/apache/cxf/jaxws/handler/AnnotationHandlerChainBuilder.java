@@ -332,7 +332,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         return hcAnn;
     }
     
-    private static class HandlerChainAnnotation {
+    static class HandlerChainAnnotation {
         private final Class<?> declaringClass;
         private final HandlerChain ann;
 

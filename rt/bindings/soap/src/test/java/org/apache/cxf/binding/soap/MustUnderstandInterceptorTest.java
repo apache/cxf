@@ -162,9 +162,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
         private Set<URI> roles = new HashSet<URI>();
         private Set<QName> understood = new HashSet<QName>();
 
-        public DummySoapInterceptor() {
-            super("");
-        }
+
         public DummySoapInterceptor(String phase) {
             super(phase);
         }

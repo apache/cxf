@@ -44,7 +44,7 @@ public class ClassResourceInfoTest extends Assert {
     @Path("/bar")
     @ProduceMime("test/bar")
     @ConsumeMime("test/foo")
-    private static class TestClass {
+    static class TestClass {
         @Context UriInfo u;
         @Context HttpHeaders h;
         @Resource HttpServletRequest req;
@@ -58,21 +58,21 @@ public class ClassResourceInfoTest extends Assert {
         }
     }
     
-    private static class TestClass1 extends TestClass {
+    static class TestClass1 extends TestClass {
         @GET
         public void getIt() { 
             
         }
     }
     
-    private static class TestClass2 extends TestClass1 {
+    static class TestClass2 extends TestClass1 {
         @GET
         public void getIt() { 
             
         }
     }
     
-    private static class TestClass3 {
+    static class TestClass3 {
         @Resource HttpServletRequest req;
         @Resource HttpServletResponse res;
         @Resource ServletContext c;
