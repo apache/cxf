@@ -1344,7 +1344,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
         }
 
-        if (hasOutMessage(method)) {
+        boolean hasOut = hasOutMessage(method);
+        if (hasOut) {
             // Setup the output message
             MessageInfo outMsg = op.createMessage(createOutputMessageName(op, method),
                                                   MessageInfo.Type.OUTPUT);
@@ -1422,7 +1423,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         //when doing java->wsdl->java
         setParameterOrder(method, paramClasses, op);
 
-        initializeFaults(intf, op, method);
+        if (hasOut) {
+            // Faults are only valid if not a one-way operation
+            initializeFaults(intf, op, method);
+        }
     }
     
     private void setParameterOrder(Method method, Class[] paramClasses, OperationInfo op) {
