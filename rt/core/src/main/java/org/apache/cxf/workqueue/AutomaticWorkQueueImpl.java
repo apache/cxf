@@ -137,14 +137,14 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
                             //ignore - if we get here, the "group" is as high as 
                             //the security manager will allow us to go.   Use that one.
                         }
-                        return new ThreadGroup(group, name + "-workqueue"); 
+                        return new ThreadGroup(group, name + "-workqueue");
                     } 
                 }
             );
         } catch (SecurityException e) { 
-            group = new ThreadGroup(name + "-workqueue"); 
+            group = new ThreadGroup(name + "-workqueue");
         }
-        
+        group.setDaemon(true);
         return new AWQThreadFactory(group, name);
     }
     static class AWQThreadFactory implements ThreadFactory {
@@ -164,8 +164,8 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
                                   name + "-workqueue-" + threadNumber.getAndIncrement(),
                                   0);
             t.setContextClassLoader(loader);
-            if (t.isDaemon()) {
-                t.setDaemon(false);
+            if (!t.isDaemon()) {
+                t.setDaemon(true);
             }
             if (t.getPriority() != Thread.NORM_PRIORITY) {
                 t.setPriority(Thread.NORM_PRIORITY);
