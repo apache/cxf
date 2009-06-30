@@ -22,6 +22,7 @@ package org.apache.cxf.configuration.spring;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ import org.springframework.beans.factory.wiring.BeanWiringInfo;
 import org.springframework.beans.factory.wiring.BeanWiringInfoResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class ConfigurerImpl extends BeanConfigurerSupport 
     implements Configurer, ApplicationContextAware, BusExtension {
@@ -221,6 +223,16 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     public final void addApplicationContext(ApplicationContext ac) {
         if (!appContexts.contains(ac)) {
             appContexts.add(ac);
+            
+            Iterator<ApplicationContext> it = appContexts.iterator();
+            while (it.hasNext()) {
+                ApplicationContext c = it.next();
+                if (c instanceof ConfigurableApplicationContext
+                    && !((ConfigurableApplicationContext)c).isActive()) {
+                    it.remove();
+                }
+            }
+            
             initWildcardDefinitionMap();
         }
     }
