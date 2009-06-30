@@ -22,9 +22,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+
 public class Book {
 
     private int id;
+    
+    public Book() {
+    }
+    
     public Book(int id) {
         this.id = id;
     }
@@ -33,6 +38,10 @@ public class Book {
     @Path("/book")
     public int getId() {
         return id;
+    }
+    
+    public void setId(int ident) {
+        id = ident;
     }
     
     @Path("/chapter/{cid}")

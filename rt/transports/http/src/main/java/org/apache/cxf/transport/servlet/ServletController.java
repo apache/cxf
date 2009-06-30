@@ -21,6 +21,7 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -50,7 +51,8 @@ import org.apache.cxf.wsdl.http.AddressType;
 public class ServletController {
     
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
-
+    private static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
+    
     private ServletTransportFactory transport;
     private ServletContext servletContext;
     private ServletConfig servletConfig;
@@ -60,6 +62,7 @@ public class ServletController {
     private boolean disableAddressUpdates;
     private String forcedBaseAddress;
     private String serviceListStyleSheet;
+    private String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
  
     public ServletController(ServletTransportFactory df,
                              ServletConfig config,
@@ -72,9 +75,18 @@ public class ServletController {
         init();
     }
     
+    ServletController() {
+        
+    }
+        
     public void setHideServiceList(boolean generate) {
         isHideServiceList = generate;
     }
+    
+    public void setServiceListRelativePath(String relativePath) {
+        serviceListRelativePath = relativePath;
+    }
+    
     public void setDisableAddressUpdates(boolean noupdates) {
         disableAddressUpdates = noupdates;
     }
@@ -89,7 +101,7 @@ public class ServletController {
         return lastBase;
     }
     
-    private synchronized void updateDests(HttpServletRequest request) {
+    protected synchronized void updateDests(HttpServletRequest request) {
         if (disableAddressUpdates) {
             return;
         }
@@ -119,13 +131,14 @@ public class ServletController {
             String address = request.getPathInfo() == null ? "" : request.getPathInfo();
 
             ei.setAddress(address);
-            ServletDestination d = (ServletDestination)transport.getDestinationForPath(ei.getAddress());
+            
+            ServletDestination d = getDestination(ei.getAddress());
             
             if (d == null) {
-                if (request.getRequestURI().endsWith("/services")
-                    || request.getRequestURI().endsWith("/services/")
+                if (!isHideServiceList && (request.getRequestURI().endsWith(serviceListRelativePath)
+                    || request.getRequestURI().endsWith(serviceListRelativePath + "/")
                     || StringUtils.isEmpty(request.getPathInfo())
-                    || "/".equals(request.getPathInfo())) {
+                    || "/".equals(request.getPathInfo()))) {
                     updateDests(request);
                     
                     if (request.getParameter("stylesheet") != null) {
@@ -193,7 +206,11 @@ public class ServletController {
         } 
     }
     
-    private ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        
+    protected ServletDestination getDestination(String address) {
+        return (ServletDestination)transport.getDestinationForPath(address);
+    }
+    
+    protected ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        
         
         String address = request.getPathInfo() == null ? "" : request.getPathInfo();
         
@@ -228,46 +245,85 @@ public class ServletController {
         response.getWriter().write("<meta http-equiv=content-type content=\"text/html; charset=UTF-8\">");
         response.getWriter().write("<title>CXF - Service list</title>");
         response.getWriter().write("</head><body>");
-        if (!isHideServiceList) {
-            List<ServletDestination> destinations = getServletDestinations();
-                
-            if (destinations.size() > 0) {  
-                response.getWriter().write("<span class=\"heading\">Available services:</span><br/>");
-                response.getWriter().write("<table " + (serviceListStyleSheet == null
-                        ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-                for (ServletDestination sd : destinations) {
-                    if (null != sd.getEndpointInfo().getName() 
-                        && null != sd.getEndpointInfo().getInterface()) {
-                        response.getWriter().write("<tr><td>");
-                        response.getWriter().write("<span class=\"porttypename\">"
-                                + sd.getEndpointInfo().getInterface().getName().getLocalPart()
-                                + "</span>");
-                        response.getWriter().write("<ul>");
-                        for (OperationInfo oi : sd.getEndpointInfo().getInterface().getOperations()) {
-                            response.getWriter().write("<li>" + oi.getName().getLocalPart() + "</li>");
-                        }
-                        response.getWriter().write("</ul>");
-                        response.getWriter().write("</td><td>");
-                        String address = sd.getEndpointInfo().getAddress();
-                        response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
-                                + "<span class=\"value\">" + address + "</span>");
-                        response.getWriter().write("<br/><span class=\"field\">Wsdl:</span> "
-                                + "<a href=\"" + address + "?wsdl\">"
-                                + sd.getEndpointInfo().getService().getName() + "</a>");
-                        response.getWriter().write("<br/><span class=\"field\">Target namespace:</span> "
-                                + "<span class=\"value\">" 
-                                + sd.getEndpointInfo().getService().getTargetNamespace() + "</span>");
-                        response.getWriter().write("</td></tr>");
-                    }    
-                }
-                response.getWriter().write("</table>");
-            } else {
-                response.getWriter().write("<span class=\"heading\">No service was found.</span>");
-            }
-        }    
+        
+        List<ServletDestination> destinations = getServletDestinations();
+            
+        if (destinations.size() > 0) {
+            writeSOAPEndpoints(response, destinations);
+            writeRESTfulEndpoints(response, destinations);
+        } else {
+            response.getWriter().write("<span class=\"heading\">No services have been found.</span>");
+        }
+        
         response.getWriter().write("</body></html>");
     }
 
+    private void writeSOAPEndpoints(HttpServletResponse response, List<ServletDestination> destinations)
+        throws IOException {
+        response.getWriter().write("<span class=\"heading\">Available SOAP services:</span><br/>");
+        response.getWriter().write("<table " + (serviceListStyleSheet == null
+                ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
+        for (ServletDestination sd : destinations) {
+            if (null != sd.getEndpointInfo().getName() 
+                && null != sd.getEndpointInfo().getInterface()) {
+                response.getWriter().write("<tr><td>");
+                response.getWriter().write("<span class=\"porttypename\">"
+                        + sd.getEndpointInfo().getInterface().getName().getLocalPart()
+                        + "</span>");
+                response.getWriter().write("<ul>");
+                for (OperationInfo oi : sd.getEndpointInfo().getInterface().getOperations()) {
+                    response.getWriter().write("<li>" + oi.getName().getLocalPart() + "</li>");
+                }
+                response.getWriter().write("</ul>");
+                response.getWriter().write("</td><td>");
+                String address = sd.getEndpointInfo().getAddress();
+                response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
+                        + "<span class=\"value\">" + address + "</span>");
+                response.getWriter().write("<br/><span class=\"field\">WSDL :</span> "
+                        + "<a href=\"" + address + "?wsdl\">"
+                        + sd.getEndpointInfo().getService().getName() + "</a>");
+                response.getWriter().write("<br/><span class=\"field\">Target namespace:</span> "
+                        + "<span class=\"value\">" 
+                        + sd.getEndpointInfo().getService().getTargetNamespace() + "</span>");
+                response.getWriter().write("</td></tr>");
+            }    
+        }
+        response.getWriter().write("</table><br/><br/>");
+    }
+    
+    
+    private void writeRESTfulEndpoints(HttpServletResponse response, List<ServletDestination> destinations)
+        throws IOException {
+        
+        List<ServletDestination> restfulDests = new ArrayList<ServletDestination>();
+        for (ServletDestination sd : destinations) {
+            // use some more reasonable check - though this one seems to be the only option at the moment
+            if (null == sd.getEndpointInfo().getInterface()) {
+                restfulDests.add(sd);
+            }
+        }
+        if (restfulDests.size() == 0) {
+            return;
+        }
+        
+        response.getWriter().write("<span class=\"heading\">Available RESTful services:</span><br/>");
+        response.getWriter().write("<table " + (serviceListStyleSheet == null
+                ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
+        for (ServletDestination sd : destinations) {
+            if (null == sd.getEndpointInfo().getInterface()) {
+                response.getWriter().write("<tr><td>");
+                String address = sd.getEndpointInfo().getAddress();
+                response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
+                        + "<span class=\"value\">" + address + "</span>");
+                response.getWriter().write("<br/><span class=\"field\">WADL :</span> "
+                        + "<a href=\"" + address + "?_wadl&_type=xml\">"
+                        + address + "?_wadl&type=xml" + "</a>");
+                response.getWriter().write("</td></tr>");
+            }    
+        }
+        response.getWriter().write("</table>");
+    }
+    
     private void renderStyleSheet(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         response.setContentType("text/css; charset=UTF-8");
@@ -303,19 +359,44 @@ public class ServletController {
             HttpServletResponse response) throws IOException {
         response.setContentType("text/plain; charset=UTF-8");
 
-        if (!isHideServiceList) {
-            List<ServletDestination> destinations = getServletDestinations();
-
-            boolean renderWsdlList = "true".equals(request.getParameter("wsdlList"));
+        List<ServletDestination> destinations = getServletDestinations();
+        if (destinations.size() > 0) {
+            writeUnformattedSOAPEndpoints(response, destinations, request.getParameter("wsdlList"));
+            writeUnformattedRESTfulEndpoints(response, destinations);
+        } else {
+            response.getWriter().write("No services have been found.");
+        }
+    }
+    
+    private void writeUnformattedSOAPEndpoints(HttpServletResponse response,
+                                               List<ServletDestination> destinations,
+                                               Object renderParam) 
+        throws IOException {
+        boolean renderWsdlList = "true".equals(renderParam);
+        
+        for (ServletDestination sd : destinations) {
             
-            for (ServletDestination sd : destinations) {
+            if (null != sd.getEndpointInfo().getInterface()) {
+            
                 String address = sd.getEndpointInfo().getAddress();
                 response.getWriter().write(address);
                 
                 if (renderWsdlList) {
                     response.getWriter().write("?wsdl");
                 }
-                
+                response.getWriter().write('\n');
+            }
+        }
+        response.getWriter().write('\n');
+    }
+    
+    private void writeUnformattedRESTfulEndpoints(HttpServletResponse response,
+                                                  List<ServletDestination> destinations) 
+        throws IOException {
+        for (ServletDestination sd : destinations) {
+            if (null == sd.getEndpointInfo().getInterface()) {
+                String address = sd.getEndpointInfo().getAddress();
+                response.getWriter().write(address + "?_wadl&_type=xml");
                 response.getWriter().write('\n');
             }
         }
@@ -395,6 +476,10 @@ public class ServletController {
         String serviceListTransform = servletConfig.getInitParameter("service-list-stylesheet");
         if (serviceListTransform != null) {
             serviceListStyleSheet = serviceListTransform;
+        }
+        String serviceListPath = servletConfig.getInitParameter("service-list-path");
+        if (serviceListPath != null) {
+            serviceListRelativePath = serviceListPath;
         }
     }
 }

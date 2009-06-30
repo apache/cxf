@@ -16,22 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.model.wadl;
+package org.apache.cxf.common.util;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import org.junit.Assert;
+import org.junit.Test;
 
-@Path("/orders")
-public class Orders {
+public class XmlSchemaPrimitiveUtilsTest extends Assert {
 
-    @GET
-    @Produces("text/plain")
-    /**
-     * Foo
-     */
-    public int getNumberOfOrders() {
-        return 100;
+    @Test
+    public void testDefaultRepresentation() {
+        assertEquals("xs:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(Integer.class));
+        assertEquals("xs:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(int.class));
+    }
+    
+    @Test
+    public void testXsdRepresentation() {
+        assertEquals("xsd:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(Integer.class, "xsd"));
+        assertEquals("xsd:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(int.class, "xsd"));
     }
     
 }

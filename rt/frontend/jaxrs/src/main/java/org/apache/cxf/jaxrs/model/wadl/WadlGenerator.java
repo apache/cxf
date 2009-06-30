@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.model.wadl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,26 +38,23 @@ import javax.xml.transform.Result;
 import javax.xml.transform.sax.SAXResult;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.XmlSchemaPrimitiveUtils;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.OperationResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.StreamWriterContentHandler;
-
-// TODO :
-// 1. extract JavaDocs and put them into XML comments
-// 2. if _type = html -> convert the XML buil here using MH's stylesheet
-// 3. generate grammars 
 
 public class WadlGenerator implements RequestHandler {
 
@@ -78,7 +76,8 @@ public class WadlGenerator implements RequestHandler {
         }
         
         StringBuilder sbMain = new StringBuilder();
-        sbMain.append("<application xmlns=\"").append(WADL_NS).append("\">");
+        sbMain.append("<application xmlns=\"").append(WADL_NS)
+              .append("\" xmlns:xs=\"").append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\">");
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
         
@@ -87,8 +86,7 @@ public class WadlGenerator implements RequestHandler {
         
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
         for (ClassResourceInfo cri : cris) {
-            handleResource(sbResources, cri, cri.getURITemplate().getValue(),
-                           cri.getURITemplate().getVariables());
+            handleResource(sbResources, cri, cri.getURITemplate().getValue());
         }
         sbResources.append("</resources>");
         
@@ -105,10 +103,8 @@ public class WadlGenerator implements RequestHandler {
         return Response.ok().type(type).entity(sbMain.toString()).build();
     }
 
-    private void handleResource(StringBuilder sb, ClassResourceInfo cri, String path,
-                                List<String> templateVars) {
+    private void handleResource(StringBuilder sb, ClassResourceInfo cri, String path) {
         sb.append("<resource path=\"").append(path).append("\">");
-        handleTemplateParams(sb, templateVars);
         
         List<OperationResourceInfo> sortedOps = sortOperationsByPath(
             cri.getMethodDispatcher().getOperationResourceInfos());
@@ -119,8 +115,7 @@ public class WadlGenerator implements RequestHandler {
                 Class<?> cls = ori.getMethodToInvoke().getReturnType();
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
                 if (subcri != null) {
-                    handleResource(sb, subcri, ori.getURITemplate().getValue(), 
-                                   ori.getURITemplate().getVariables());
+                    handleResource(sb, subcri, ori.getURITemplate().getValue());
                 } else {
                     handleDynamicSubresource(sb, ori);
                 }
@@ -134,12 +129,12 @@ public class WadlGenerator implements RequestHandler {
     private void handleOperation(StringBuilder sb, OperationResourceInfo ori) {
         
         String path = ori.getURITemplate().getValue();
-        boolean isSlash =  "/".equals(path);
-        if (!isSlash) {
+        boolean useResource = useResource(ori);
+        if (useResource) {
             sb.append("<resource path=\"").append(path).append("\">");
         }
-        handleTemplateParams(sb, ori.getURITemplate().getVariables());
-        handleMatrixParams(sb, ori);
+        handleParams(sb, ori, ParameterType.PATH);
+        handleParams(sb, ori, ParameterType.MATRIX);
         
         sb.append("<method name=\"").append(ori.getHttpMethod()).append("\">");
         if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
@@ -161,9 +156,22 @@ public class WadlGenerator implements RequestHandler {
         
         sb.append("</method>");
         
-        if (!isSlash) {
+        if (useResource) {
             sb.append("</resource>");
         }
+    }
+    
+    private boolean useResource(OperationResourceInfo ori) {
+        String path = ori.getURITemplate().getValue();
+        if ("/".equals(path)) {
+            for (Parameter pm : ori.getParameters()) {
+                if (pm.getType() == ParameterType.PATH || pm.getType() == ParameterType.MATRIX) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
     }
     
     private void handleDynamicSubresource(StringBuilder sb, OperationResourceInfo ori) {
@@ -182,107 +190,112 @@ public class WadlGenerator implements RequestHandler {
     
     
     private void handleParameter(StringBuilder sb, OperationResourceInfo ori, Parameter pm) {
+        Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
         if (pm.getType() == ParameterType.REQUEST_BODY) {
-            handleRepresentation(sb, ori, ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()],
-                                 true);
+            handleRepresentation(sb, ori, cls, true);
             return;
         }
         if (pm.getType() == ParameterType.PATH || pm.getType() == ParameterType.MATRIX) {
             return;
         }
         if (pm.getType() == ParameterType.HEADER || pm.getType() == ParameterType.QUERY) {
-            writeParam(sb, pm.getName(), pm.getType().toString().toLowerCase(), pm.getDefaultValue());
+            writeParam(sb, pm, ori);
         }
         
     }
     
-    private void handleMatrixParams(StringBuilder sb, OperationResourceInfo ori) {
+    private void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type) {
         for (Parameter pm : ori.getParameters()) {
-            if (pm.getType() == ParameterType.MATRIX) {
-                writeParam(sb, pm.getName(), "matrix", pm.getDefaultValue());
+            if (pm.getType() == type) {
+                writeParam(sb, pm, ori);
             }
         }
     }
     
-    private void writeParam(StringBuilder sb, String name, String style, String dValue) {
-        sb.append("<param name=\"").append(name).append("\" ");
+    private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori) {
+        sb.append("<param name=\"").append(pm.getName()).append("\" ");
+        String style = ParameterType.PATH == pm.getType() ? "template" 
+                                                          : pm.getType().toString().toLowerCase();
         sb.append("style=\"").append(style).append("\"");
-        if (dValue != null) {
-            sb.append(" default=\"").append(dValue).append("\"");
+        if (pm.getDefaultValue() != null) {
+            sb.append(" default=\"").append(pm.getDefaultValue()).append("\"");
+        }
+        Class<?> type = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+        String value = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
+        if (value != null) {
+            sb.append(" type=\"").append(value).append("\"");
         }
         sb.append("/>");
     }
     
-    private void handleTemplateParams(StringBuilder sb, List<String> vars) {
-        for (String var : vars) {
-            writeParam(sb, var, "template", null);
-        }
-    }
-    
     private void handleRepresentation(StringBuilder sb, OperationResourceInfo ori, 
                                       Class<?> type, boolean inbound) {
-        if (InjectionUtils.isPrimitive(type)) {
-            sb.append("<!-- Primitive type : " + type.getSimpleName() + " -->");
-        }
-        sb.append("<representation");
-        
         List<MediaType> types = inbound ? ori.getConsumeTypes() : ori.getProduceTypes();
-        boolean wildcardOnly = true; 
+        if (types.size() == 0) {
+            types = Collections.singletonList(MediaType.APPLICATION_ATOM_XML_TYPE);
+        }
         for (MediaType mt : types) {
+            if (InjectionUtils.isPrimitive(type)) {
+                String rep = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
+                String value = rep == null ? type.getSimpleName() : rep;
+                sb.append("<!-- Primitive type : " + value + " -->");
+            }
+            sb.append("<representation");
             if (!mt.isWildcardType()) {
-                wildcardOnly = false;
-                break;
+                sb.append(" mediaType=\"").append(mt.toString()).append("\"");
             }
-        }
-        if (!wildcardOnly) {
-            sb.append(" mediaType=\"");
-            for (int i = 0; i < types.size(); i++) {
-                sb.append(types.get(i).toString());
-                if (i + 1 < types.size()) {
-                    sb.append(',');
+            sb.append(">");
+            if (!InjectionUtils.isPrimitive(type) && mt.getSubtype().contains("xml")) {
+                // try to use JAXB
+                // TODO : reuse JaxbDatabinding code
+                JAXBElementProvider jaxb = new JAXBElementProvider();
+                try {
+                    JAXBContext context = jaxb.getPackageContext(type);
+                    if (context == null) {
+                        context = jaxb.getClassContext(type);
+                    }
+                    if (context != null) {
+                        StringWriter writer = new StringWriter();
+                        XMLStreamWriter streamWriter = StaxUtils.createXMLStreamWriter(writer);
+                        final StreamWriterContentHandler handler = 
+                            new StreamWriterContentHandler(streamWriter);
+                        context.generateSchema(new SchemaOutputResolver() {
+                            @Override
+                            public Result createOutput(String ns, String file) throws IOException {
+                                SAXResult result = new SAXResult(handler);
+                                result.setSystemId(file);
+                                return result;
+                            }
+                        });
+                        streamWriter.flush();
+                        sb.append(writer.toString());
+                    }
+                } catch (Exception ex) {
+                    LOG.fine("No schema can be generated from " + type.getName());
                 }
             }
-            if (types.size() > 0) {
-                sb.append("\"");
-            }
+            sb.append("</representation>");
         }
-        sb.append(">");
-        
-        if (!type.isPrimitive()) {
-            // try to use JAXB
-            // TODO : reuse JaxbDatabinding code
-            JAXBElementProvider jaxb = new JAXBElementProvider();
-            try {
-                JAXBContext context = jaxb.getPackageContext(type);
-                if (context == null) {
-                    context = jaxb.getClassContext(type);
-                }
-                if (context != null) {
-                    StringWriter writer = new StringWriter();
-                    XMLStreamWriter streamWriter = StaxUtils.createXMLStreamWriter(writer);
-                    final StreamWriterContentHandler handler = new StreamWriterContentHandler(streamWriter);
-                    context.generateSchema(new SchemaOutputResolver() {
-                        @Override
-                        public Result createOutput(String ns, String file) throws IOException {
-                            SAXResult result = new SAXResult(handler);
-                            result.setSystemId(file);
-                            return result;
-                        }
-                    });
-                    streamWriter.flush();
-                    sb.append(writer.toString());
-                }
-            } catch (Exception ex) {
-                LOG.fine("No schema can be generated from " + type.getName());
-            }
-        }
-        
-        sb.append("</representation>");
     }
     
     private List<OperationResourceInfo> sortOperationsByPath(Set<OperationResourceInfo> ops) {
         List<OperationResourceInfo> opsWithSamePath = new LinkedList<OperationResourceInfo>(ops);
-        Collections.sort(opsWithSamePath, new OperationResourceInfoComparator());        
+        Collections.sort(opsWithSamePath, new Comparator<OperationResourceInfo>() {
+
+            public int compare(OperationResourceInfo op1, OperationResourceInfo op2) {
+                boolean sub1 = op1.getHttpMethod() == null;
+                boolean sub2 = op2.getHttpMethod() == null;
+                if (sub1 && !sub2) {
+                    return 1;
+                } else if (!sub1 && sub2) {
+                    return -1;
+                }
+                URITemplate ut1 = op1.getURITemplate();
+                URITemplate ut2 = op2.getURITemplate();
+                return ut1.getValue().compareTo(ut2.getValue());
+            }
+            
+        });        
         return opsWithSamePath;
     }
     
