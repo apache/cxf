@@ -28,6 +28,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
+import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
@@ -73,6 +74,8 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
             setBuilder(bus.getExtension(PolicyBuilder.class));
             PolicyEngine pe = (PolicyEngine)bus.getExtension(PolicyEngine.class);
             setRegistry(pe.getRegistry());
+            
+            ((PolicyEngineImpl)pe).getPolicyProviders().add(this);
         }
     }
     

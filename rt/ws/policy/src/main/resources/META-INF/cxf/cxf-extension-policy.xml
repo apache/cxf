@@ -58,7 +58,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <property name="assertionBuilderRegistry" ref="org.apache.cxf.ws.policy.AssertionBuilderRegistry"/>
     </bean>
   
-    <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.spring.InitializingPolicyEngine">
+    <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
        <property name="bus" ref="cxf"/>
     </bean>
     
