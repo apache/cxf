@@ -67,9 +67,14 @@ public class Layout extends AbstractSecurityAssertion {
 
         // <sp:Layout>
         writer.writeStartElement(prefix, localName, namespaceURI);
+        String wspPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
+        if (wspPrefix == null) {
+            wspPrefix = SPConstants.POLICY.getPrefix();
+            writer.setPrefix(wspPrefix, SPConstants.POLICY.getNamespaceURI());
+        }
 
         // <wsp:Policy>
-        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(wspPrefix, SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         // .. <sp:Strict /> | <sp:Lax /> | <sp:LaxTsFirst /> | <sp:LaxTsLast /> ..

@@ -102,11 +102,12 @@ public class Wss11 extends Wss10 {
 
         String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
         if (pPrefix == null) {
+            pPrefix = SPConstants.POLICY.getPrefix();
             writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getNamespaceURI());
         }
 
         // <wsp:Policy>
-        writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
+        writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
         // <sp:MustSupportRefKeyIndentifier />

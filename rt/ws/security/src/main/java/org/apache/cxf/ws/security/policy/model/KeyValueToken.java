@@ -68,7 +68,7 @@ public class KeyValueToken extends Token {
             }
 
             // <wsp:Policy>
-            writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
+            writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
                 .getNamespaceURI());
             
             writer.writeEmptyElement(prefix, "RsaKeyValue", namespaceURI);
