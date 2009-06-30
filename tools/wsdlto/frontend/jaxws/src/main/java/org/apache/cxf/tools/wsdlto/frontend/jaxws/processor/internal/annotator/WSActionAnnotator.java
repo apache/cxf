@@ -85,6 +85,9 @@ public final class WSActionAnnotator implements Annotator {
             for (FaultInfo faultInfo : operation.getFaults()) {
                 if (faultInfo.getExtensionAttributes() != null) {
                     QName faultAction = (QName)faultInfo.getExtensionAttribute(WSAW_ACTION_QNAME);
+                    if (faultAction == null) {
+                        continue;
+                    }
 
                     JavaException exceptionClass = getExceptionClass(method, faultInfo);                    
                     if (!StringUtils.isEmpty(exceptionClass.getPackageName())
