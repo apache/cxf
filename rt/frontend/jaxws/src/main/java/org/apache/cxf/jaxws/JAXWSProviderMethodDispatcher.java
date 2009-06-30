@@ -20,8 +20,8 @@
 package org.apache.cxf.jaxws;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+
+import javax.xml.ws.Provider;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
@@ -35,18 +35,14 @@ public class JAXWSProviderMethodDispatcher implements MethodDispatcher {
     Method invoke;
     
     public JAXWSProviderMethodDispatcher(JaxWsImplementorInfo implInfo) {
-        Type[] genericInterfaces = implInfo.getImplementorClass().getGenericInterfaces();
-        ParameterizedType pt = (ParameterizedType)genericInterfaces[0];
-        Class c = (Class)pt.getActualTypeArguments()[0];
         try {
-            invoke = implInfo.getImplementorClass().getMethod("invoke", c);
+            invoke = Provider.class.getMethod("invoke", new Class[] {Object.class});
         } catch (Exception e) {
             throw new ServiceConstructionException(e);
         }
     }
 
     public BindingOperationInfo getBindingOperation(Method m, Endpoint endpoint) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -55,7 +51,6 @@ public class JAXWSProviderMethodDispatcher implements MethodDispatcher {
     }
 
     public void bind(OperationInfo o, Method... methods) {
-        // TODO Auto-generated method stub
     }
 
     
