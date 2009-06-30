@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.5.7</version>
+            <version>1.5.8-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>axis</groupId>
