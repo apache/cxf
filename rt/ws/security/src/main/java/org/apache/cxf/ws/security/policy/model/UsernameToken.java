@@ -104,11 +104,12 @@ public class UsernameToken extends Token {
         if (isUseUTProfile10() || isUseUTProfile11()) {
             String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
             if (pPrefix == null) {
+                pPrefix = SPConstants.POLICY.getPrefix();
                 writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getNamespaceURI());
             }
 
             // <wsp:Policy>
-            writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
+            writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
                 .getNamespaceURI());
 
             // CHECKME

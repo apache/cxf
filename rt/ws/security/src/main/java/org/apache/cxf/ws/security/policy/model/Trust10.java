@@ -140,7 +140,7 @@ public class Trust10 extends AbstractSecurityAssertion {
         }
 
         // <wsp:Policy>
-        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(wspPrefix, SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         if (isMustSupportClientChallenge()) {
