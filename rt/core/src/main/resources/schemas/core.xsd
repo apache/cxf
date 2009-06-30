@@ -110,6 +110,11 @@
             </xsd:documentation>          
           </xsd:annotation>
         </xsd:element>
+        <xsd:element name="properties" type="beans:mapType" minOccurs="0">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the bus.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:element>
       </xsd:all>
       <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>          
     </xsd:complexType>

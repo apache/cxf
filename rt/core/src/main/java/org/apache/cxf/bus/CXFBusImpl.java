@@ -36,6 +36,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     private BusState state;      
     private Collection<AbstractFeature> features;
     private ExtensionFinder finder;
+    private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
     
     public CXFBusImpl() {
         this(null);
@@ -151,5 +152,22 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     
     public interface ExtensionFinder {
         <T> T findExtension(Class<T> cls);
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> map) {
+        properties.clear();
+        properties.putAll(map);
+    }
+
+    public Object getProperty(String s) {
+        return properties.get(s);
+    }
+
+    public void setProperty(String s, Object o) {
+        properties.put(s, o);
     }
 }
