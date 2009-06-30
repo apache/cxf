@@ -46,6 +46,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -1082,7 +1083,9 @@ public class HTTPConduit
      */
     private Proxy getProxy(HTTPClientPolicy policy) {
         Proxy proxy = null; 
-        if (policy != null && policy.isSetProxyServer()) {
+        if (policy != null 
+            && policy.isSetProxyServer()
+            && !StringUtils.isEmpty(policy.getProxyServer())) {
             proxy = new Proxy(
                     Proxy.Type.valueOf(policy.getProxyServerType().toString()),
                     new InetSocketAddress(policy.getProxyServer(),
