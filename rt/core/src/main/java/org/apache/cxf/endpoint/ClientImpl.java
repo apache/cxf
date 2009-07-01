@@ -640,7 +640,7 @@ public class ClientImpl
             } else if (startingInterceptorID != null) {
                 chain.doInterceptStartingAt(message, startingInterceptorID);
             } else if (message.getContent(Exception.class) != null) {
-                chain.getFaultObserver().onMessage(message);
+                outFaultObserver.onMessage(message);
             } else {
                 chain.doIntercept(message);
             }
