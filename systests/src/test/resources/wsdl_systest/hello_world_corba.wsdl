@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="HelloWorld" 
+    targetNamespace="http://cxf.apache.org/hello_world_corba" 
+    xmlns:tns="http://cxf.apache.org/hello_world_corba"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:corba="http://schemas.apache.org/yoko/bindings/corba" 
+    xmlns:ns1="http://cxf.apache.org/hello_world_corba/corba/typemap/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:x1="http://cxf.apache.org/hello_world_corba/types" 
+    xmlns:x2="http://cxf.apache.org/hello_world_corba" 
+    >
+
+    <wsdl:types>
+        <schema targetNamespace="http://cxf.apache.org/hello_world_corba/types"
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="http://cxf.apache.org/hello_world_corba/types"
+            elementFormDefault="qualified">
+
+            <simpleType name="MyStringType">
+                <restriction base="string">
+                    <maxLength value="30" />
+                </restriction>
+            </simpleType>
+
+            <element name="sayHi">
+                <complexType/>
+            </element>
+            <element name="sayHiResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMe">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="tns:MyStringType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeOneWay">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="pingMe">
+                <complexType>
+                    <sequence>
+                        <element name="faultType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="pingMeResponse">
+                <complexType/>
+            </element>
+            <element name="faultDetail">
+                <complexType>
+                    <sequence>
+                        <element name="minor" type="short"/>
+                        <element name="major" type="short"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </wsdl:types>
+
+    <wsdl:message name="sayHiRequest">
+        <wsdl:part element="x1:sayHi" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="sayHiResponse">
+        <wsdl:part element="x1:sayHiResponse" name="out"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeRequest">
+        <wsdl:part element="x1:greetMe" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeResponse">
+        <wsdl:part element="x1:greetMeResponse" name="out"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeOneWayRequest">
+        <wsdl:part element="x1:greetMeOneWay" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="pingMeRequest">
+        <wsdl:part name="in" element="x1:pingMe"/>
+    </wsdl:message>
+    <wsdl:message name="pingMeResponse">
+        <wsdl:part name="out" element="x1:pingMeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="pingMeFault">
+        <wsdl:part name="faultDetail" element="x1:faultDetail"/>
+    </wsdl:message>
+
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="sayHi">
+            <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
+            <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="greetMe">
+            <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
+            <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="greetMeOneWay">
+            <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="pingMe">
+            <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
+            <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
+            <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
+        </wsdl:operation>
+
+    </wsdl:portType>
+
+  <corba:typeMapping xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/hello_world_corba/corba/typemap/">
+    <corba:anonstring bound="30" type="corba:string" name="MyStringType" />
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:pingMeResponse:1.0" type="x1:pingMeResponse" name="pingMeResponse" />
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:sayHiResponse:1.0" type="x1:sayHiResponse" name="sayHiResponse">
+      <corba:member qualified="true" name="responseType" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:pingMe:1.0" type="x1:pingMe" name="pingMe">
+      <corba:member qualified="true" name="faultType" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:sayHi:1.0" type="x1:sayHi" name="sayHi" />
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:greetMeOneWay:1.0" type="x1:greetMeOneWay" name="greetMeOneWay">
+      <corba:member qualified="true" name="requestType" idltype="corba:string" />
+    </corba:struct>
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:greetMe:1.0" type="x1:greetMe" name="greetMe">
+      <corba:member xmlns:ns1="http://cxf.apache.org/hello_world_corba/corba/typemap/" qualified="true" name="requestType" idltype="ns1:MyStringType" />
+    </corba:struct>
+    <corba:struct xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:greetMeResponse:1.0" type="x1:greetMeResponse" name="greetMeResponse">
+      <corba:member qualified="true" name="responseType" idltype="corba:string" />
+    </corba:struct>
+    <corba:exception xmlns:x1="http://cxf.apache.org/hello_world_corba/types" repositoryID="IDL:faultDetail:1.0" type="x1:faultDetail" name="faultDetail">
+      <corba:member qualified="true" name="minor" idltype="corba:short" />
+      <corba:member qualified="true" name="major" idltype="corba:short" />
+    </corba:exception>
+  </corba:typeMapping>
+
+  <wsdl:binding name="Greeter_CORBABinding" type="x2:Greeter">
+    <corba:binding xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" repositoryID="IDL:Greeter:1.0" />
+    <wsdl:operation name="sayHi">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="sayHi">
+        <corba:return name="responseType" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="sayHiRequest">
+      </wsdl:input>
+      <wsdl:output name="sayHiResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="greetMe">
+        <corba:param xmlns:ns1="http://cxf.apache.org/hello_world_corba/corba/typemap/" mode="in" name="requestType" idltype="ns1:MyStringType" />
+        <corba:return name="responseType" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="greetMeRequest">
+      </wsdl:input>
+      <wsdl:output name="greetMeResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMeOneWay">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="greetMeOneWay">
+        <corba:param mode="in" name="requestType" idltype="corba:string" />
+      </corba:operation>
+      <wsdl:input name="greetMeOneWayRequest">
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="pingMe">
+      <corba:operation xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" name="pingMe">
+        <corba:param mode="in" name="faultType" idltype="corba:string" />
+        <corba:raises xmlns:ns1="http://cxf.apache.org/hello_world_corba/corba/typemap/" exception="ns1:faultDetail" />
+      </corba:operation>
+      <wsdl:input name="pingMeRequest">
+      </wsdl:input>
+      <wsdl:output name="pingMeResponse">
+      </wsdl:output>
+      <wsdl:fault name="pingMeFault">
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GreeterCORBAService">
+    <wsdl:port name="GreeterCORBAPort" binding="tns:Greeter_CORBABinding">
+      <corba:address xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" location="file:./HelloWorld.ref" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
