@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -44,6 +43,8 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -138,7 +139,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         if (ori.isSubResourceLocator()) {
             try {
                 Message msg = exchange.getInMessage();
-                MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+                MultivaluedMap<String, String> values = getTemplateValues(msg);
                 String subResourcePath = (String)msg.get(JAXRSInInterceptor.RELATIVE_PATH);
                 String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD);
                 String contentType = (String)msg.get(Message.CONTENT_TYPE);
@@ -192,6 +193,17 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
+    protected MultivaluedMap getTemplateValues(Message msg) {
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> oldValues = 
+            (MultivaluedMap<String, String>)msg.get(URITemplate.TEMPLATE_PARAMETERS);
+        if (oldValues != null) {
+            values.putAll(oldValues);
+        }
+        return values;
+    }
+    
     private boolean setServiceLoaderAsContextLoader(Message inMessage) {
         Object en = inMessage.getContextualProperty(SERVICE_LOADER_AS_CONTEXT);
         return Boolean.TRUE.equals(en) || "true".equals(en);
@@ -245,10 +257,13 @@ public class JAXRSInvoker extends AbstractInvoker {
             values = Collections.emptyList();
         } else {
             values = new ArrayList<String>(params.size() - 1);
-            // if we have {bar}/{foo}/{bar} then we have a problem
-            for (Map.Entry<String, List<String>> entry : params.entrySet()) {
-                if (!entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
-                    values.addAll(entry.getValue());
+            for (Parameter pm : ori.getParameters()) {
+                if (pm.getType() == ParameterType.PATH) {
+                    List<String> paramValues = params.get(pm.getName());
+                    if (paramValues != null) {
+                        values.addAll(paramValues);
+                    }
+                    
                 }
             }
         }
