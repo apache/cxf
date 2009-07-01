@@ -391,11 +391,9 @@ public class CorbaConduit implements Conduit {
             if (corbaMsg.getStreamableException() != null) {
                 exchange.setInFaultMessage(corbaMsg);
                 inCorbaMsg.setStreamableException(corbaMsg.getStreamableException());
-                inCorbaMsg.setContent(Exception.class, corbaMsg.getContent(Exception.class));
             } else if (corbaMsg.getSystemException() != null) {
                 exchange.setInFaultMessage(corbaMsg);
                 inCorbaMsg.setSystemException(corbaMsg.getSystemException());
-                inCorbaMsg.setContent(Exception.class, corbaMsg.getContent(Exception.class));
             }
             LOG.log(Level.FINE, "incoming observer is " + incomingObserver);
             incomingObserver.onMessage((Message)inCorbaMsg);

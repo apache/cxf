@@ -91,6 +91,9 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
 
         CorbaMessage message = (CorbaMessage)msg;
         if (message.getStreamableException() != null || message.getSystemException() != null) {
+            message.setContent(Exception.class, 
+                               message.getExchange().getOutMessage().getContent(Exception.class));
+
             Endpoint ep = message.getExchange().get(Endpoint.class);
             message.getInterceptorChain().abort();
             if (ep.getInFaultObserver() != null) {
