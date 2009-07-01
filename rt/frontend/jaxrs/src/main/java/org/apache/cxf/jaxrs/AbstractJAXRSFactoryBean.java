@@ -232,6 +232,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
         }
+        factory.setBus(getBus());
         if (schemaLocations != null) {
             factory.setSchemaLocations(schemaLocations);
         }
@@ -252,14 +253,14 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
     
     public void setModelRef(String modelRef) {
-        List<UserResource> resources = ResourceUtils.getUserResources(modelRef);
+        List<UserResource> resources = ResourceUtils.getUserResources(modelRef, getBus());
         if (resources != null) {
             serviceFactory.setUserResources(resources);
         }
     }
     
     public void setModelRefWithServiceClass(String modelRef, Class<?> sClass) {
-        List<UserResource> resources = ResourceUtils.getUserResources(modelRef);
+        List<UserResource> resources = ResourceUtils.getUserResources(modelRef, getBus());
         if (resources != null) {
             serviceFactory.setUserResourcesWithServiceClass(resources, sClass);
         }

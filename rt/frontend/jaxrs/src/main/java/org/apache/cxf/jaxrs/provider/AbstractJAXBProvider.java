@@ -81,7 +81,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
 
     public void setSchemaLocations(List<String> locations) {
-        schema = SchemaHandler.createSchema(locations);    
+        schema = SchemaHandler.createSchema(locations, getBus());    
     }
     
     public void setSchema(Schema s) {

@@ -117,7 +117,7 @@ http://cxf.apache.org/schemas/core.xsd">
   </jaxrs:server> 
   
   <util:map id="outTemplates">
-      <entry key="application/xhtml+xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template.xsl"/>
+      <entry key="application/xhtml+xml" value="classpath:/WEB-INF/templates/template.xsl"/>
       <entry key="application/xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template2.xsl"/>
   </util:map>
   
@@ -134,7 +134,7 @@ http://cxf.apache.org/schemas/core.xsd">
   <bean id="uriResolver" class="org.apache.cxf.systest.jaxrs.URIResolverImpl"/>     
   
   <jaxrs:server id="bookservice6" address="/thebooks6" 
-     modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml"/>
+     modelRef="classpath:/WEB-INF/model/resources.xml"/>
 
   <jaxrs:server id="bookservice7" address="/thebooks7">
     <jaxrs:model>
@@ -161,7 +161,7 @@ http://cxf.apache.org/schemas/core.xsd">
   </bean>
   
   <util:list id="theSchemas">
-    <value>classpath:/org/apache/cxf/systest/jaxrs/resources/bookid.xsd</value>
+    <value>classpath:/WEB-INF/schemas/bookid.xsd</value>
     <value>classpath:/org/apache/cxf/systest/jaxrs/resources/book.xsd</value>
   </util:list>
   
