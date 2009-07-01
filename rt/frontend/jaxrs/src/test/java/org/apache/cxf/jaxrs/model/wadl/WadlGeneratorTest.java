@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,14 +80,14 @@ public class WadlGeneratorTest extends Assert {
         assertNotNull(r);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
-        File f = new File("test.xml");
-        f.delete();
-        f.createNewFile();
-        System.out.println(f.getAbsolutePath());
-        FileOutputStream fos = new FileOutputStream(f);
-        fos.write(r.getEntity().toString().getBytes());
-        fos.flush();
-        fos.close();
+//        File f = new File("test.xml");
+//        f.delete();
+//        f.createNewFile();
+//        System.out.println(f.getAbsolutePath());
+//        FileOutputStream fos = new FileOutputStream(f);
+//        fos.write(r.getEntity().toString().getBytes());
+//        fos.flush();
+//        fos.close();
     }
     
     @Test
