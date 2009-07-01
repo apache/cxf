@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -69,6 +70,17 @@ public class Chapter {
     @GET
     @Produces("application/xml;charset=ISO-8859-1")
     public Chapter get() {
+        return this;
+    }
+    
+    @GET
+    @Path("/ids")
+    @Produces("application/xml;charset=ISO-8859-1")
+    public Chapter getWithBookId(@PathParam("bookId") int bookId,
+                                 @PathParam("chapterid") int chapterId) {
+        if (bookId != 123 || chapterId != 1) {
+            throw new RuntimeException();
+        }
         return this;
     }
 

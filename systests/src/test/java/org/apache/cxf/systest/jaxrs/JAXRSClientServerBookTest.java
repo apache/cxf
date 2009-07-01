@@ -487,6 +487,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetChapterWithParentIds() throws Exception {
+        
+        getAndCompareAsStrings(
+            "http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse2/ids",
+            "resources/expected_get_chapter1.txt",
+            "application/xml", "application/xml;charset=iso-8859-1", 200);
+    }
+    
+    @Test
     public void testGetBook123ReturnString() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/booknames/123",
                                "resources/expected_get_book123_returnstring.txt",
