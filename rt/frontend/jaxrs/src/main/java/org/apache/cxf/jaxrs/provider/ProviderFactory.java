@@ -549,13 +549,28 @@ public final class ProviderFactory {
     }
     
     public void setSchemaLocations(List<String> schemas) {
+        boolean schemasMethodAvailable = false;
         for (ProviderInfo<MessageBodyReader> r : messageReaders) {
             try {
                 Method m = r.getProvider().getClass().getMethod("setSchemas", 
                                                      new Class[]{List.class});
+                schemasMethodAvailable = true;
                 m.invoke(r.getProvider(), new Object[]{schemas});
             } catch (Exception ex) {
                 // ignore
+            }
+        }
+        if (!schemasMethodAvailable) {
+            for (ProviderInfo<MessageBodyReader> r : SHARED_FACTORY.messageReaders) {
+                try {
+                    Method m = r.getProvider().getClass().getMethod("setSchemas", 
+                                                         new Class[]{List.class});
+                    Object provider = r.getProvider().getClass().newInstance();
+                    m.invoke(provider, new Object[]{schemas});
+                    registerUserProvider(provider);
+                } catch (Exception ex) {
+                    // ignore
+                }
             }
         }
     }

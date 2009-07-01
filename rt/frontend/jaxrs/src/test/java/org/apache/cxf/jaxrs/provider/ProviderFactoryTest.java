@@ -54,6 +54,7 @@ import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -78,6 +79,32 @@ public class ProviderFactoryTest extends Assert {
         assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getSharedInstance());
         assertSame(ProviderFactory.getSharedInstance(), ProviderFactory.getSharedInstance());
         assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
+    }
+    
+    @Test
+    public void testSchemaLocations() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.setSchemaLocations(Collections.singletonList("classpath:/test.xsd"));
+        MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(customJaxbReader instanceof JAXBElementProvider);
+        MessageBodyReader jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            (Class<?>)Book.class, null, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(jaxbReader instanceof JAXBElementProvider);
+        assertNotSame(jaxbReader, customJaxbReader);
+        
+        assertNull(((JAXBElementProvider)jaxbReader).getSchema());
+        assertNotNull(((JAXBElementProvider)customJaxbReader).getSchema());
+        
+        MessageBodyReader customJsonReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                 MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertTrue(customJsonReader instanceof JSONProvider);
+        MessageBodyReader jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            (Class<?>)Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertTrue(jsonReader instanceof JSONProvider);
+        assertNotSame(jsonReader, customJsonReader);
+        assertNull(((JSONProvider)jsonReader).getSchema());
+        assertNotNull(((JSONProvider)customJsonReader).getSchema());
     }
     
     @Test

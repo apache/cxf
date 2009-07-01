@@ -28,13 +28,16 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:util="http://www.springframework.org/schema/util"
   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xmlns:cxf="http://cxf.apache.org/core"
   xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/util 
 http://www.springframework.org/schema/util/spring-util-2.0.xsd
 http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
+http://cxf.apache.org/schemas/jaxrs.xsd
+http://cxf.apache.org/core
+http://cxf.apache.org/schemas/core.xsd">
 
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
@@ -51,7 +54,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
        <ref bean="jaxbProvider"/>
        <ref bean="jsonProvider"/>
     </jaxrs:providers>
-    
   </jaxrs:server>
 
   <jaxrs:server id="bookservice2"
@@ -75,7 +77,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
        <ref bean="jaxbProvider"/>
        <ref bean="jsonProvider"/>
     </jaxrs:providers> 
-    
+    <jaxrs:features>
+       <cxf:logging/>
+    </jaxrs:features>    
   </jaxrs:server>
   
   <jaxrs:server id="bookservice4"
