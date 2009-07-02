@@ -83,6 +83,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         this.mtomEnabled = allowMTOM;
     }
     
+
     @Override
     public Object getProperty(Object msgContext, String key) {
         // use the superclass first
@@ -96,6 +97,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         }               
         return result;
     }
+
     public void handleMessage(SoapMessage mc) throws Fault {
         //must turn off mtom when using WS-Sec so binary is inlined so it can
         //be properly signed/encrypted/etc...
