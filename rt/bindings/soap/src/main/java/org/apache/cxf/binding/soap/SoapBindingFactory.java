@@ -511,6 +511,11 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             if (StringUtils.isEmpty(partNameFilter)
                 || part.getName().equals(partNameFilter)) {
             
+                if (StringUtils.isEmpty(part.getName())) {
+                    throw new RuntimeException("Problem with WSDL: part element in message "
+                                               + msg.getQName().getLocalPart() 
+                                               + " does not specify a name.");
+                }
                 QName pqname = new QName(minfo.getName().getNamespaceURI(), part.getName());
                 MessagePartInfo pi = minfo.getMessagePart(pqname);
                 if (pi != null
@@ -597,6 +602,11 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             for (SoapHeader header : headers) {
                 SoapHeaderInfo headerInfo = new SoapHeaderInfo();
                 headerInfo.setUse(header.getUse());
+                if (StringUtils.isEmpty(header.getPart())) {
+                    throw new RuntimeException("Problem with WSDL: soap:header element in operation "
+                                               + boi.getName().getLocalPart() 
+                                               + " does not specify a part.");
+                }
                 MessagePartInfo part = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), 
                                                                     header.getPart()));
                 if (part != null && header.getMessage() != null
@@ -677,6 +687,12 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                     attParts = new LinkedList<MessagePartInfo>();
                 }
 
+                if (StringUtils.isEmpty(partName)) {
+                    throw new RuntimeException("Problem with WSDL: mime content element in operation "
+                                               + bmsg.getBindingOperation().getName().getLocalPart() 
+                                               + " does not specify a part.");
+                }
+
                 MessagePartInfo mpi =
                     msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
                                                  partName));
@@ -699,9 +715,16 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
                 SoapHeaderInfo headerInfo = new SoapHeaderInfo();
                 headerInfo.setUse(header.getUse());
+                
+                if (StringUtils.isEmpty(header.getPart())) {
+                    throw new RuntimeException("Problem with WSDL: soap:header element in operation "
+                                               + bmsg.getBindingOperation().getName().getLocalPart() 
+                                               + " does not specify a part.");
+                }
+                
                 MessagePartInfo mpi =
-                    msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), header
-                                .getPart()));
+                    msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), 
+                                                 header.getPart()));
                 
                 if (mpi != null && header.getMessage() != null
                     && !mpi.getMessageInfo().getName().equals(header.getMessage())) {
