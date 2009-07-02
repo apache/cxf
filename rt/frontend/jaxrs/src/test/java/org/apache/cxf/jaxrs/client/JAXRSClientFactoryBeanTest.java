@@ -19,8 +19,18 @@
 
 package org.apache.cxf.jaxrs.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,6 +76,59 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         BookStoreSubresourcesOnly store2 = store.getItself3("id4");
         assertEquals("http://bar/bookstore/1/2/3/id4/sub3", 
                      WebClient.client(store2).getCurrentURI().toString());
+    }
+    
+    @Test
+    public void testAddLoggingToClient() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookStoreSubresourcesOnly.class);
+        TestFeature testFeature = new TestFeature();
+        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        features.add((AbstractFeature)testFeature);
+        bean.setFeatures(features);
+        
+        BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
+        assertTrue("TestFeature wasn't initialized", testFeature.isInitialized());
+        BookStoreSubresourcesOnly store2 = store.getItself3("id4");
+        assertEquals("http://bar/bookstore/1/2/3/id4/sub3", 
+                     WebClient.client(store2).getCurrentURI().toString());
+    }
+    
+    
+    private class TestFeature extends AbstractFeature {
+        private TestInterceptor testInterceptor;
+
+        @Override
+        protected void initializeProvider(InterceptorProvider provider, Bus bus) {
+            testInterceptor = new TestInterceptor();
+            provider.getOutInterceptors().add(testInterceptor);
+        }
+
+        protected boolean isInitialized() {
+            return testInterceptor.isInitialized();
+        }
+    }
+ 
+    private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
+        private boolean isInitialized;
+
+        public TestInterceptor() {
+            this(Phase.PRE_STREAM);
+        }
+
+        public TestInterceptor(String s) {
+            super(Phase.PRE_STREAM);
+            isInitialized = true;
+        } 
+
+        public void handleMessage(Message message) throws Fault {
+        }
+
+        protected boolean isInitialized() {
+            return isInitialized;
+        }
+
     }
     
 }

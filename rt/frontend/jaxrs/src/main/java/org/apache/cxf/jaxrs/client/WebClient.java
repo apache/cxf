@@ -536,10 +536,7 @@ public class WebClient extends AbstractClient {
     static void copyProperties(Client toClient, Client fromClient) {
         AbstractClient newClient = toAbstractClient(toClient);
         AbstractClient oldClient = toAbstractClient(fromClient);
-        newClient.bus = oldClient.bus;
-        newClient.conduitSelector = oldClient.conduitSelector;
-        newClient.inInterceptors = oldClient.inInterceptors;
-        newClient.outInterceptors = oldClient.outInterceptors;
+        newClient.setConfiguration(oldClient.getConfiguration());
     }
     
     private static AbstractClient toAbstractClient(Client client) {

@@ -145,10 +145,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                 reportInvalidResourceMethod(m, "INVALID_SUBRESOURCE");
             }
             ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, false, inheritHeaders);
-            proxyImpl.setBus(bus);
-            proxyImpl.setConduitSelector(conduitSelector);
-            proxyImpl.setInInterceptors(inInterceptors);
-            proxyImpl.setOutInterceptors(outInterceptors);
+            proxyImpl.setConfiguration(getConfiguration());
             
             Object proxy = JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
             if (inheritHeaders) {

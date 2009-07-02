@@ -29,6 +29,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.UpfrontConduitSelector;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
@@ -167,14 +168,22 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ep.getEndpointInfo().addExtensor(authPolicy);
         }
         
-        
-        client.setConduitSelector(getConduitSelector(ep));
-        client.setBus(getBus());
-        client.setOutInterceptors(getOutInterceptors());
-        client.setInInterceptors(getInInterceptors());
+        applyFeatures(client);
+        client.getConfiguration().setConduitSelector(getConduitSelector(ep));
+        client.getConfiguration().setBus(getBus());
+        client.getConfiguration().getOutInterceptors().addAll(getOutInterceptors());
+        client.getConfiguration().getInInterceptors().addAll(getInInterceptors());
         if (headers != null) {
             client.headers(headers);
         }
         setupFactory(ep);
+    }
+    
+    protected void applyFeatures(AbstractClient client) {
+        if (getFeatures() != null) {
+            for (AbstractFeature feature : getFeatures()) {
+                feature.initialize(client.getConfiguration(), getBus());
+            }
+        }
     }
 } 
