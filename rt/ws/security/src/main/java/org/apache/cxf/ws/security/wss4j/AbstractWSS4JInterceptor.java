@@ -150,6 +150,17 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return MessageUtils.isRequestor(message);
     }  
 
+    protected boolean decodeEnableSignatureConfirmation(RequestData reqData) throws WSSecurityException {
+
+        String value = getString(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
+                reqData.getMsgContext());
+
+        //we need the default to be false to not break older applications and such
+        if (value == null) {
+            return false;
+        }
+        return super.decodeEnableSignatureConfirmation(reqData);
+    }
 
     public Crypto loadSignatureCrypto(RequestData reqData) 
         throws WSSecurityException {
