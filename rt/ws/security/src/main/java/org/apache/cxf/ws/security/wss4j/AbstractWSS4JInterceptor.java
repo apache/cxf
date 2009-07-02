@@ -32,6 +32,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
@@ -144,7 +145,23 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     public void setBefore(Set<String> before) {
         this.before = before;
     }
-    
+
+
+    protected boolean isRequestor(Message message) {
+        return MessageUtils.isRequestor(message);
+    }
+
+    protected boolean decodeEnableSignatureConfirmation(RequestData reqData) throws WSSecurityException {
+        String value = getString(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
+                reqData.getMsgContext());
+
+        //we need the default to be false to not break older applications and such
+        if (value == null) {
+            return false;
+        }
+        return super.decodeEnableSignatureConfirmation(reqData);
+    }
+
     public Crypto loadSignatureCrypto(RequestData reqData) 
         throws WSSecurityException {
         Crypto crypto = null;

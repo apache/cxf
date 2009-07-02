@@ -77,6 +77,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saajMsg);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        msg.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
@@ -97,9 +98,9 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         // Save the signature for future confirmation
         //
         Object sigv = msg.get(WSHandlerConstants.SEND_SIGV);
-        assert sigv != null;
-        assert sigv instanceof List;
-        assert ((List<Object>)sigv).size() != 0;
+        assertNotNull(sigv);
+        assertTrue(sigv instanceof List);
+        assertTrue(((List<Object>)sigv).size() != 0);
         List<Object> sigSaved = (List<Object>)sigv;
         
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
@@ -123,6 +124,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
 
         inHandler.handleMessage(inmsg);
         
@@ -134,8 +136,8 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         assertNotNull(result);
         
         List<Object> sigReceived = (List<Object>)inmsg.get(WSHandlerConstants.RECV_RESULTS);
-        assert sigReceived != null;
-        assert sigReceived.size() != 0;
+        assertNotNull(sigReceived);
+        assertTrue(sigReceived.size() != 0);
         
         testSignatureConfirmationResponse(sigSaved, sigReceived);
     }
