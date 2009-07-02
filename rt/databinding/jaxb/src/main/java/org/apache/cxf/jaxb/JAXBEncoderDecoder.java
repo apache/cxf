@@ -302,6 +302,9 @@ public final class JAXBEncoderDecoder {
                                          Object mObj) throws Fault, JAXBException {
         // Have to handle this ourselves.... which really
         // sucks.... but what can we do?
+        if (mObj == null) {
+            return;
+        }
         Object objArray;
         Class cls = null;
         if (mObj instanceof List) {
