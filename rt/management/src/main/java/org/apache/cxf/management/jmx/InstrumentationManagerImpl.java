@@ -64,7 +64,6 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     private MBServerConnectorFactory mcf;    
     private MBeanServer mbs;
     private Set<ObjectName> busMBeans = new HashSet<ObjectName>();
-    private ModelMBeanAssembler assembler;
     private boolean connectFailed;
     /**
      * For backward compatibility, {@link #createMBServerConnectorFactory} is <code>true</code> by default.
@@ -75,7 +74,6 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     
     public InstrumentationManagerImpl() {
         super();
-        assembler = new ModelMBeanAssembler();
     }
     
     public Bus getBus() {
@@ -169,7 +167,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
             registerMBeanWithServer(obj, name, forceRegistration);           
         } catch (NotCompliantMBeanException e) {        
             //If this is not a "normal" MBean, then try to deploy it using JMX annotations
-            assembler = new ModelMBeanAssembler();
+            ModelMBeanAssembler assembler = new ModelMBeanAssembler();
             ModelMBeanInfo mbi = assembler.getModelMbeanInfo(obj.getClass());
             register(obj, name, mbi, forceRegistration);
         }                
