@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,11 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.cxf.Bus;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -389,6 +393,23 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             getStringFromInputStream(getHttpInputStream("http://localhost:9092/test/services"));
         assertNotNull(listings);
     }
+    
+    @Test
+    public void testAddFeatureToClient() throws Exception {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(baseAddress);
+        bean.setResourceClass(BookStoreJaxrsJaxws.class);
+        TestFeature testFeature = new TestFeature();
+        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        features.add((AbstractFeature)testFeature);
+        bean.setFeatures(features);
+        BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
+        Book b = proxy.getBook(new Long("123"));
+        assertTrue("Interceptor not invoked", testFeature.handleMessageCalled());
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
 
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
@@ -427,7 +448,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         }
         
     }
-    
+
     @Ignore 
     public class TestStreamDrainInterptor extends AbstractPhaseInterceptor<Message> {
         public TestStreamDrainInterptor() {
@@ -444,12 +465,49 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                 // input stream will be closed by readBytesFromStream()
                 payload = IOUtils.readBytesFromStream(is);
                 assertTrue("payload was null", payload != null);
-                assertTrue("payload was EMPTYR", payload.length > 0);
+                assertTrue("payload was EMPTY", payload.length > 0);
                 message.setContent(InputStream.class, new ByteArrayInputStream(payload));
             } catch (Exception e) {
                 String error = "Failed to read the stream properly due to " + e.getMessage();
                 assertFalse(error, e != null);
             } 
+        }
+
+    }
+    
+    @Ignore
+    private class TestFeature extends AbstractFeature {
+        private TestInterceptor testInterceptor;
+
+        @Override
+        protected void initializeProvider(InterceptorProvider provider, Bus bus) {
+            testInterceptor = new TestInterceptor();
+            provider.getOutInterceptors().add(testInterceptor);
+        }
+
+        protected boolean handleMessageCalled() {
+            return testInterceptor.handleMessageCalled();
+        }
+    }
+ 
+    @Ignore
+    private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
+        private boolean handleMessageCalled;
+        public TestInterceptor() {
+            this(Phase.PRE_STREAM);
+        }
+
+        public TestInterceptor(String s) {
+            super(Phase.PRE_STREAM);
+            
+        } 
+
+        public void handleMessage(Message message) throws Fault {
+            handleMessageCalled = true;
+        }
+
+        protected boolean handleMessageCalled() {
+            return handleMessageCalled;
         }
 
     }

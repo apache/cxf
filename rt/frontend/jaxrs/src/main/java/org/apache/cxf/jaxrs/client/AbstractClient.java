@@ -50,7 +50,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
@@ -75,23 +74,17 @@ import org.apache.cxf.transport.MessageObserver;
  *
  */
 public class AbstractClient implements Client, InvocationHandlerAware {
-
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
-    
-    protected List<Interceptor> inInterceptors = new ModCountCopyOnWriteArrayList<Interceptor>();
-    protected List<Interceptor> outInterceptors = new ModCountCopyOnWriteArrayList<Interceptor>();
-    protected ConduitSelector conduitSelector;
-    protected Bus bus;
 
+    protected ClientConfiguration cfg = new ClientConfiguration();
+    
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
     private ResponseBuilder responseBuilder;
     
     private URI baseURI;
     private UriBuilder currentBuilder;
 
-    
-    
     protected AbstractClient(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
         this.currentBuilder = new UriBuilderImpl(currentURI);
@@ -485,31 +478,31 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         }
     }
     
-    protected void setConduitSelector(ConduitSelector cs) {
-        this.conduitSelector = cs;
+    protected ClientConfiguration getConfiguration() {
+        return cfg;
     }
     
-    protected void setBus(Bus bus) {
-        this.bus = bus;
+    protected void setConfiguration(ClientConfiguration config) {
+        cfg = config;
     }
     
     protected void prepareConduitSelector(Message message) {
-        conduitSelector.prepare(message);
-        message.getExchange().put(ConduitSelector.class, conduitSelector);
+        cfg.getConduitSelector().prepare(message);
+        message.getExchange().put(ConduitSelector.class, cfg.getConduitSelector());
     }
     
     protected PhaseInterceptorChain setupOutInterceptorChain(Endpoint endpoint) { 
-        PhaseManager pm = bus.getExtension(PhaseManager.class);
-        List<Interceptor> i1 = bus.getOutInterceptors();
-        List<Interceptor> i2 = outInterceptors;
+        PhaseManager pm = cfg.getBus().getExtension(PhaseManager.class);
+        List<Interceptor> i1 = cfg.getBus().getOutInterceptors();
+        List<Interceptor> i2 = cfg.getOutInterceptors();
         List<Interceptor> i3 = endpoint.getOutInterceptors();
         return new PhaseChainCache().get(pm.getOutPhases(), i1, i2, i3);
     }
     
     protected PhaseInterceptorChain setupInInterceptorChain(Endpoint endpoint) { 
-        PhaseManager pm = bus.getExtension(PhaseManager.class);
-        List<Interceptor> i1 = bus.getInInterceptors();
-        List<Interceptor> i2 = inInterceptors;
+        PhaseManager pm = cfg.getBus().getExtension(PhaseManager.class);
+        List<Interceptor> i1 = cfg.getBus().getInInterceptors();
+        List<Interceptor> i2 = cfg.getInInterceptors();
         List<Interceptor> i3 = endpoint.getInInterceptors();
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
     }
@@ -523,7 +516,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
     protected Message createMessage(String httpMethod, 
                                     MultivaluedMap<String, String> headers,
                                     URI currentURI) {
-        Message m = conduitSelector.getEndpoint().getBinding().createMessage();
+        Message m = cfg.getConduitSelector().getEndpoint().getBinding().createMessage();
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
         
@@ -538,13 +531,13 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         Exchange exchange = new ExchangeImpl();
         exchange.setSynchronous(true);
         exchange.setOutMessage(m);
-        exchange.put(Bus.class, bus);
+        exchange.put(Bus.class, cfg.getBus());
         exchange.put(MessageObserver.class, new ClientMessageObserver());
-        exchange.put(Endpoint.class, conduitSelector.getEndpoint());
+        exchange.put(Endpoint.class, cfg.getConduitSelector().getEndpoint());
         exchange.setOneWay(false);
         m.setExchange(exchange);
         
-        PhaseInterceptorChain chain = setupOutInterceptorChain(conduitSelector.getEndpoint());
+        PhaseInterceptorChain chain = setupOutInterceptorChain(cfg.getConduitSelector().getEndpoint());
         m.setInterceptorChain(chain);
         
         //setup conduit selector
@@ -553,26 +546,18 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         return m;
     }
 
-    protected void setInInterceptors(List<Interceptor> interceptors) {
-        inInterceptors = interceptors;
-    }
-    
-    protected void setOutInterceptors(List<Interceptor> interceptors) {
-        outInterceptors = interceptors;
-    }
-    
     private class ClientMessageObserver implements MessageObserver {
 
         public void onMessage(Message m) {
             
-            Message message = conduitSelector.getEndpoint().getBinding().createMessage(m);
+            Message message = cfg.getConduitSelector().getEndpoint().getBinding().createMessage(m);
             message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
             message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
-            PhaseInterceptorChain chain = setupInInterceptorChain(conduitSelector.getEndpoint());
+            PhaseInterceptorChain chain = setupInInterceptorChain(cfg.getConduitSelector().getEndpoint());
             message.setInterceptorChain(chain);
             message.getExchange().setInMessage(message);
             Bus origBus = BusFactory.getThreadDefaultBus(false);
-            BusFactory.setThreadDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(cfg.getBus());
 
             // execute chain
             try {
@@ -587,4 +572,6 @@ public class AbstractClient implements Client, InvocationHandlerAware {
     public Object getInvocationHandler() {
         return this;
     }
+
+
 }
