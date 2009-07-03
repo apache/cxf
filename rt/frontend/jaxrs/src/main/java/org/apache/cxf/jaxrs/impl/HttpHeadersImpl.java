@@ -123,7 +123,7 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     private List<String> getListValues(String headerName) {
         List<String> values = headers.get(headerName);
-        if (values == null || values.isEmpty()) {
+        if (values == null || values.isEmpty() || values.get(0) == null) {
             return Collections.emptyList();
         }
         if (HttpUtils.isDateRelatedHeader(headerName)) {

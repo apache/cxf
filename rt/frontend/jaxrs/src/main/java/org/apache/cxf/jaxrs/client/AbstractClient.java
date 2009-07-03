@@ -73,7 +73,7 @@ import org.apache.cxf.transport.MessageObserver;
  * Common proxy and http-centric client implementation
  *
  */
-public class AbstractClient implements Client, InvocationHandlerAware {
+public class AbstractClient implements Client {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
 
@@ -369,13 +369,20 @@ public class AbstractClient implements Client, InvocationHandlerAware {
     }
     
     @SuppressWarnings("unchecked")
-    protected Object readBody(Response r, HttpURLConnection conn, Message inMessage, 
-                              Class<?> cls, Type type, Annotation[] anns) {
+    protected Object readBody(Response r, HttpURLConnection conn, Message inMessage, Class<?> cls, 
+                              Type type, Annotation[] anns) {
 
+        InputStream inputStream = (InputStream)r.getEntity();
+        if (inputStream == null) {
+            return cls == Response.class ? cls : null;
+        }
         try {
             int status = conn.getResponseCode();
             if (status < 200 || status == 204 || status > 300) {
-                return null;
+                Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
+                if (length == null || Integer.parseInt(length.toString()) == 0) {
+                    return cls == Response.class ? cls : null;
+                }
             }
         } catch (IOException ex) {
             // won't happen at this stage
@@ -392,8 +399,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         if (mbr != null) {
             try {
                 return mbr.readFrom(cls, type, anns, contentType, 
-                       new MetadataMap<String, Object>(r.getMetadata(), true, true), 
-                       (InputStream)r.getEntity());
+                       new MetadataMap<String, Object>(r.getMetadata(), true, true), inputStream);
             } catch (Exception ex) {
                 throw new WebApplicationException();
             }
@@ -569,9 +575,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         
     }
 
-    public Object getInvocationHandler() {
-        return this;
-    }
+    
 
 
 }

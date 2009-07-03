@@ -476,7 +476,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Ignore
-    private class TestFeature extends AbstractFeature {
+    public class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
 
         @Override
@@ -491,7 +491,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
  
     @Ignore
-    private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
+    public class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         private boolean handleMessageCalled;
         public TestInterceptor() {
             this(Phase.PRE_STREAM);

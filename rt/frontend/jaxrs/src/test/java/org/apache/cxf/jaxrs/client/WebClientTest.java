@@ -133,4 +133,14 @@ public class WebClientTest extends Assert {
         assertEquals(URI.create("http://foo"), wc.getCurrentURI());
     }
     
+    @Test
+    public void testPathWithTemplates() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo"), wc.getCurrentURI());
+        
+        wc.path("{bar}/{foo}", 1, 2);
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/1/2"), wc.getCurrentURI());
+    }
 }
