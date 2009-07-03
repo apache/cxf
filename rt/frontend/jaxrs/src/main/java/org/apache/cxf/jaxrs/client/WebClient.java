@@ -36,6 +36,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -301,6 +302,17 @@ public class WebClient extends AbstractClient {
         getCurrentBuilder().path(path.toString());
         
         return this;
+    }
+    
+    /**
+     * Updates the current URI path with path segment which may contain template variables
+     * @param path new relative path segment
+     * @param values template variable values
+     * @return updated WebClient
+     */
+    public WebClient path(String path, Object... values) {
+        URI u = UriBuilder.fromUri(URI.create("http://tempuri")).path(path).buildFromEncoded(values);
+        return path(u.getRawPath());
     }
     
     /**
