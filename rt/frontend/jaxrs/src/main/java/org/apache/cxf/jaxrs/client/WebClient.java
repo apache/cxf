@@ -43,7 +43,9 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -57,6 +59,8 @@ import org.apache.cxf.transport.http.HTTPConduit;
  *
  */
 public class WebClient extends AbstractClient {
+    
+    private MultivaluedMap<String, String> templates;
     
     protected WebClient(String baseAddress) {
         this(URI.create(baseAddress));
@@ -311,6 +315,16 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient path(String path, Object... values) {
+        URITemplate t = new URITemplate(path);
+        List<String> vars = t.getVariables();
+        if (vars.size() > 0 && vars.size() == values.length) {
+            if (templates == null) {
+                templates = new MetadataMap<String, String>();
+            }
+            for (int i = 0; i < values.length; i++) {
+                templates.add(vars.get(i), values[i].toString());
+            }
+        }
         URI u = UriBuilder.fromUri(URI.create("http://tempuri")).path(path).buildFromEncoded(values);
         return path(u.getRawPath());
     }
@@ -354,6 +368,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient to(String newAddress, boolean forward) {
+        clearTemplates();
         if (forward) {
             if (!newAddress.startsWith(getBaseURI().toString())) {
                 throw new IllegalArgumentException("Base address can not be preserved");
@@ -371,6 +386,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient back(boolean fast) {
+        clearTemplates();
         if (fast) {
             getCurrentBuilder().replacePath(getBaseURI().getPath());
         } else {
@@ -455,6 +471,7 @@ public class WebClient extends AbstractClient {
     
     @Override
     public WebClient reset() {
+        clearTemplates();
         return (WebClient)super.reset();
     }
     
@@ -472,7 +489,11 @@ public class WebClient extends AbstractClient {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
         resetResponse();
-        return doChainedInvocation(httpMethod, headers, body, responseClass);
+        try {
+            return doChainedInvocation(httpMethod, headers, body, responseClass);
+        } finally {
+            clearTemplates();
+        }
         
     }
 
@@ -480,7 +501,7 @@ public class WebClient extends AbstractClient {
         MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
         
         Message m = createMessage(httpMethod, headers, getCurrentURI());
-        
+        m.put(URITemplate.TEMPLATE_PARAMETERS, templates);
         if (body != null) {
             MessageContentsList contents = new MessageContentsList(body);
             m.setContent(List.class, contents);
@@ -515,6 +536,13 @@ public class WebClient extends AbstractClient {
     
     protected HttpURLConnection getConnection(String methodName) {
         return createHttpConnection(getCurrentBuilder().clone().buildFromEncoded(), methodName);
+    }
+    
+    private void clearTemplates() {
+        if (templates != null) {
+            templates.clear();
+            templates = null;
+        }
     }
     
     private class BodyWriter extends AbstractOutDatabindingInterceptor {

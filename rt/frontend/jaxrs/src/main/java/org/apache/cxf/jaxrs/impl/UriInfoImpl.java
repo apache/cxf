@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
@@ -125,6 +126,9 @@ public class UriInfoImpl implements UriInfo {
 
     public MultivaluedMap<String, String> getPathParameters(boolean decode) {
         MetadataMap<String, String> values = new MetadataMap<String, String>();
+        if (templateParams == null) {
+            return values;
+        }
         for (Map.Entry<String, List<String>> entry : templateParams.entrySet()) {
             if (entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
                 continue;
@@ -185,6 +189,9 @@ public class UriInfoImpl implements UriInfo {
 
     private String getAbsolutePathAsString() {
         String address = getBaseUri().toString();
+        if (MessageUtils.isRequestor(message)) {
+            return address;
+        }
         String path = doGetPath(true, false);
         if (path.startsWith("/") && address.endsWith("/")) {
             address = address.substring(0, address.length() - 1);

@@ -50,6 +50,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -159,7 +160,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
             bodyIndex == -1 ? null : params[bodyIndex].getClass(), m.getReturnType());
         
-        return doChainedInvocation(uri, headers, ori, params, bodyIndex, types);
+        return doChainedInvocation(uri, headers, ori, params, bodyIndex, types, pathParams);
         
     }
 
@@ -364,9 +365,20 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     
     private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
                           OperationResourceInfo ori, Object[] params, int bodyIndex, 
-                          MultivaluedMap<ParameterType, Parameter> types) throws Throwable {
+                          MultivaluedMap<ParameterType, Parameter> types,
+                          List<Object> pathParams) throws Throwable {
         Message m = createMessage(ori.getHttpMethod(), headers, uri);
-
+        if (pathParams.size() != 0) { 
+            List<String> vars = ori.getURITemplate().getVariables();
+            MultivaluedMap<String, String> templatesMap =  new MetadataMap<String, String>(vars.size());
+            for (int i = 0; i < vars.size(); i++) {
+                if (i < pathParams.size()) {
+                    templatesMap.add(vars.get(i), pathParams.get(i).toString());
+                }
+            }
+            m.put(URITemplate.TEMPLATE_PARAMETERS, templatesMap);
+        }
+        
         if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
             m.setContent(OperationResourceInfo.class, ori);
             m.put("BODY_INDEX", bodyIndex);
