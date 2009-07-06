@@ -263,7 +263,7 @@ public class JMSOldConfigHolder {
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception e) {
-            IOException e2 = new IOException(e.getMessage(), e);
+            IOException e2 = new IOException(e.getMessage());
             e2.initCause(e);
             throw e2;
         }
