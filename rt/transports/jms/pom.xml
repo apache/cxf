@@ -22,7 +22,7 @@
     <artifactId>cxf-rt-transports-jms</artifactId>
     <packaging>jar</packaging>
     <version>2.3.0-SNAPSHOT</version>
-    <name>Apache CXF Runtime JMS Transport for SOAP/JMS Specification</name>
+    <name>Apache CXF Runtime JMS Transport</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
@@ -91,6 +91,27 @@
         	<version>${spring.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-common-utilities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+           <groupId>commons-lang</groupId>
+           <artifactId>commons-lang</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -122,14 +143,6 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
                                 </xsdOption>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/jms-spec.xsd</xsd>
-                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms-spec.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
-                                    <deleteDirs>
-                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
-                                    </deleteDirs>
-                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>
@@ -137,6 +150,46 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                	<clearOutputDir>false</clearOutputDir> 
+                	<packageName>org.apache.cxf.transport.jms.wsdl</packageName>
+                    <outputDirectory>${basedir}/target/generated/src/main/java</outputDirectory>
+                    <schemaDirectory>${basedir}/src/main/resources/schemas/wsdl/spec</schemaDirectory>
+                    <schemaFiles>jms-spec-wsdl.xsd</schemaFiles>
+                    <arguments>-Xwsdlextension</arguments>
+                    <extension>true</extension>
+                    <quiet>true</quiet>
+                </configuration>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-xjc-ts</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-xjc-wsdlextension</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

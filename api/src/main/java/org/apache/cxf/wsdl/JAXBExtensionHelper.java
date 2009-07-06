@@ -64,11 +64,11 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
 
     JAXBContext context;
-    final Class<? extends TExtensibilityElementImpl> typeClass;
+    final Class<? extends ExtensibilityElement> typeClass;
     final String namespace;
     String jaxbNamespace;
       
-    public JAXBExtensionHelper(Class<? extends TExtensibilityElementImpl> cls,
+    public JAXBExtensionHelper(Class<? extends ExtensibilityElement> cls,
                                String ns) {
         typeClass = cls;
         namespace = ns;
@@ -82,9 +82,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         throws JAXBException, ClassNotFoundException {
         Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
-        Class<? extends TExtensibilityElementImpl> elementTypeClass = 
+        Class<? extends ExtensibilityElement> elementTypeClass = 
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
-                .asSubclass(TExtensibilityElementImpl.class);
+                .asSubclass(ExtensibilityElement.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, null);
     }
     public static void addExtensions(ExtensionRegistry registry,
@@ -107,7 +107,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     }
     public static void addExtensions(ExtensionRegistry registry,
                                      Class<?> parentType,
-                                     Class<? extends TExtensibilityElementImpl> cls,
+                                     Class<? extends ExtensibilityElement> cls,
                                      String namespace) throws JAXBException {
         
         JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);

@@ -32,11 +32,21 @@ import javax.naming.Context;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
+import org.apache.cxf.transport.jms.wsdl.DeliveryModeType;
+import org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType;
+import org.apache.cxf.transport.jms.wsdl.JndiContextParameterType;
+import org.apache.cxf.transport.jms.wsdl.JndiInitialContextFactoryType;
+import org.apache.cxf.transport.jms.wsdl.JndiURLType;
+import org.apache.cxf.transport.jms.wsdl.PriorityType;
+import org.apache.cxf.transport.jms.wsdl.ReplyToNameType;
+import org.apache.cxf.transport.jms.wsdl.TimeToLiveType;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
@@ -248,13 +258,12 @@ public class JMSOldConfigHolder {
                                                                                     boolean isConduit) 
         throws IOException {
         JMSEndpoint endpoint = null;
-        try {
+        try {           
             endpoint = JMSEndpointParser.createEndpoint(endpointInfo.getAddress());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
-        // TODO Need to check if we need to retrieve configuration information that 
-        // was extracted from the WSDL
+        retrieveWSDLInformation(endpoint, endpointInfo);
         //address = endpointInfo.getTraversedExtensor(new AddressType(), AddressType.class); 
         clientConfig = endpointInfo.getTraversedExtensor(new ClientConfig(), ClientConfig.class);
         runtimePolicy = endpointInfo.getTraversedExtensor(new ClientBehaviorPolicyType(),
@@ -368,6 +377,93 @@ public class JMSOldConfigHolder {
         return jmsConfig;
     }
 
+    /**
+     * @param endpoint
+     * @param ei
+     */
+    private void retrieveWSDLInformation(JMSEndpoint endpoint, EndpointInfo ei) {
+        JndiContextParameterType jndiContextParameterType = 
+            getWSDLExtensor(ei, JndiContextParameterType.class);
+        if (jndiContextParameterType != null 
+            && endpoint.getJndiParameters().get(jndiContextParameterType.getName()) == null) {
+            endpoint.putJndiParameter(jndiContextParameterType.getName().trim(),
+                                              jndiContextParameterType.getValue().trim());
+        }
+        
+        if (!endpoint.isSetJndiConnectionFactoryName()) {
+            JndiConnectionFactoryNameType jndiConnectionFactoryNameType = getWSDLExtensor(
+                ei, JndiConnectionFactoryNameType.class);
+            if (jndiConnectionFactoryNameType != null) {
+                endpoint.setJndiConnectionFactoryName(jndiConnectionFactoryNameType.getValue().trim());
+            }
+        }
+        if (!endpoint.isSetJndiInitialContextFactory()) {
+            JndiInitialContextFactoryType jndiInitialContextFactoryType = 
+                getWSDLExtensor(ei, JndiInitialContextFactoryType.class);
+            if (jndiInitialContextFactoryType != null) {
+                endpoint.setJndiInitialContextFactory(jndiInitialContextFactoryType.getValue().trim()); 
+            }
+        }
+        
+        if (!endpoint.isSetJndiURL()) {
+            JndiURLType jndiURLType = getWSDLExtensor(ei, JndiURLType.class);
+            if (jndiURLType != null) {
+                endpoint.setJndiURL(jndiURLType.getValue().trim());
+            }
+        }
+        
+        if (!endpoint.isSetDeliveryMode()) {
+            DeliveryModeType deliveryModeType = getWSDLExtensor(ei, DeliveryModeType.class);
+            if (deliveryModeType != null) {
+                String deliveryMode = deliveryModeType.getValue().trim();
+                endpoint.setDeliveryMode(org.apache.cxf.transport.jms.uri.DeliveryModeType
+                    .valueOf(deliveryMode));
+            }
+        }
+        
+        if (!endpoint.isSetPriority()) {
+            PriorityType priorityType = getWSDLExtensor(ei, PriorityType.class);
+            if (priorityType != null) {
+                endpoint.setPriority(priorityType.getValue());
+            }
+        }
+        
+        if (!endpoint.isSetTimeToLive()) {
+            TimeToLiveType timeToLiveType = getWSDLExtensor(ei, TimeToLiveType.class);
+            if (timeToLiveType != null) {
+                endpoint.setTimeToLive(timeToLiveType.getValue()); 
+            }
+        }
+        
+        if (!endpoint.isSetReplyToName()) {
+            ReplyToNameType replyToNameType = getWSDLExtensor(ei, ReplyToNameType.class);
+            if (replyToNameType != null) {
+                endpoint.setReplyToName(replyToNameType.getValue());
+            }
+        }
+    }
+
+    public <T> T getWSDLExtensor(EndpointInfo ei, Class<T> cls) {
+        ServiceInfo si = ei.getService();
+        BindingInfo bi = ei.getBinding();
+        
+        Object o = ei.getExtensor(cls);
+        if (o == null) {
+            o = si.getExtensor(cls);
+        }
+        if (o == null) {
+            o = bi.getExtensor(cls);
+        }
+        
+        if (o == null) {
+            return null;
+        }
+        if (cls.isInstance(o)) {
+            return cls.cast(o);
+        }
+        return null;
+    }
+    
     private static Properties getInitialContextEnv(JMSEndpoint endpoint) {
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, endpoint.getJndiInitialContextFactory());

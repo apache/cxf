@@ -389,6 +389,7 @@ public final class JMSUtils {
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
         if (messageProperties == null) {
             messageProperties = new JMSMessageHeadersType();
+            outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, messageProperties);
         }
         JMSUtils.prepareJMSProperties(messageProperties, outMessage, jmsConfig);
         JMSUtils.setJMSProperties(jmsMessage, messageProperties);

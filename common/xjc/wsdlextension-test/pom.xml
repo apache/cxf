@@ -19,10 +19,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
-    <artifactId>cxf-xjc-dv-test</artifactId>
+    <artifactId>cxf-xjc-wsdlextension-test</artifactId>
     <packaging>jar</packaging>
     <version>2.3.0-SNAPSHOT</version>
-    <name>Apache CXF XJC Default Value Plugin Tests</name>
+    <name>Apache CXF XJC WSDL Extension Plugin Tests</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
@@ -31,7 +31,6 @@
         <version>2.3.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
 
     <dependencies>
 
@@ -47,12 +46,6 @@
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>jaxme</groupId>
-            <artifactId>jaxme2</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -62,6 +55,10 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-utilities</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+           <groupId>commons-lang</groupId>
+           <artifactId>commons-lang</artifactId>
         </dependency>
     </dependencies>
 
@@ -81,7 +78,7 @@
                 <configuration>
                     <outputDirectory>${basedir}/target/generated/src/test/java</outputDirectory>
                     <schemaDirectory>${basedir}/src/test/resources/schemas/configuration</schemaDirectory>
-                    <arguments>-Xdv</arguments>
+                    <arguments>-Xwsdlextension</arguments>
                     <extension>true</extension>
                     <quiet>true</quiet>
                 </configuration>
@@ -109,8 +106,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/dv-test</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/dv-test</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/wsdlextension-test</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/wsdlextension-test</developerConnection>
     </scm>
 
 </project>

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
+import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
@@ -52,6 +53,7 @@ import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
+import org.apache.cxf.jms_greeter.JMSGreeterService2;
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.systest.jaxws.Hello;
@@ -803,6 +805,78 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
+    }
+    
+    @Test
+    public void testWsdlExtensionSpecJMS() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/jms_greeter",
+                                                     "JMSGreeterService"));
+        QName portName = getPortName(new QName("http://cxf.apache.org/jms_greeter", "GreeterPort"));
+        URL wsdl = getWSDLURL("/wsdl/jms_spec_test.wsdl");
+        assertNotNull(wsdl);
+
+        JMSGreeterService service = new JMSGreeterService(wsdl, serviceName);
+        assertNotNull(service);
+
+        String response = new String("Bonjour");
+        try {
+            JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class);
+            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
+            BindingProvider  bp = null;
+            if (handler instanceof BindingProvider) {
+                bp = (BindingProvider)handler;                
+                Map<String, Object> requestContext = bp.getRequestContext();
+                JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+                requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
+            } 
+            
+            String reply = greeter.sayHi();
+            assertNotNull("no response received from service", reply);
+            assertEquals(response, reply);
+            
+            if (handler instanceof BindingProvider) {
+                bp = (BindingProvider)handler;                
+                Map<String, Object> requestContext = bp.getRequestContext();
+                JMSMessageHeadersType requestHeader = (JMSMessageHeadersType)requestContext
+                    .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+                assertEquals(requestHeader.getSOAPJMSBindingVersion(), "1.0");
+                assertEquals(requestHeader.getSOAPJMSSOAPAction(), "\"test\"");
+                assertEquals(requestHeader.getTimeToLive(), 3000);
+                assertEquals(requestHeader.getJMSDeliveryMode(), DeliveryMode.PERSISTENT);
+                assertEquals(requestHeader.getJMSPriority(), 7);
+                
+                Map<String, Object> responseContext = bp.getResponseContext();
+                JMSMessageHeadersType responseHeader = (JMSMessageHeadersType)responseContext
+                    .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+                assertEquals(responseHeader.getSOAPJMSBindingVersion(), "1.0");
+                assertEquals(responseHeader.getSOAPJMSSOAPAction(), null);
+                assertEquals(responseHeader.getJMSDeliveryMode(), DeliveryMode.PERSISTENT);
+                assertEquals(responseHeader.getJMSPriority(), 7);
+            } 
+            
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        }
+    }
+    
+    @Test
+    public void testWsdlExtensionSpecJMSPortError() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/jms_greeter",
+            "JMSGreeterService2"));
+                
+        URL wsdl = getWSDLURL("/wsdl/jms_spec_test.wsdl");
+        assertNotNull(wsdl);
+
+        JMSGreeterService2 service = new JMSGreeterService2(wsdl, serviceName);
+        assertNotNull(service);
+
+        String response = new String("Bonjour");
+
+        JMSGreeterPortType greeter = service.getGreeterPort2();
+        String reply = greeter.sayHi();
+        assertNotNull("no response received from service", reply);
+        assertEquals(response, reply);     
+       
     }
     
     @Test 

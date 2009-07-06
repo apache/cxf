@@ -73,6 +73,12 @@ public class Server extends AbstractBusTestServerBase {
                          + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
         Endpoint.publish(address1, spec1);
         
+        String address2 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5"
+            + "?jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+        Endpoint.publish(address2, spec1);
+        
         initNoWsdlServer();
     }
 
