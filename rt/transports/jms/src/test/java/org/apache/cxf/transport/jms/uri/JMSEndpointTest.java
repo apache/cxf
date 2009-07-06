@@ -127,7 +127,9 @@ public class JMSEndpointTest extends Assert {
         assertTrue(endpoint instanceof JMSJNDIEndpoint);
         assertEquals(endpoint.getParameters().size(), 2);
         String requestUri = endpoint.getRequestURI();
-        assertEquals(requestUri, "jms:jndi:Foo.Bar?foo=bar&foo2=bar2");
+        assertTrue(requestUri.startsWith("jms:jndi:Foo.Bar?"));
+        assertTrue(requestUri.contains("foo=bar"));
+        assertTrue(requestUri.contains("foo2=bar2"));
     }
     
     private JMSEndpoint resolveEndpoint(String uri) {
