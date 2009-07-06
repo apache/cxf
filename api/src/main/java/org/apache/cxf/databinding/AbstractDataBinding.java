@@ -45,31 +45,31 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 
 /**
- * Supply default implementations, as appropriate, for DataBinding. 
+ * Supply default implementations, as appropriate, for DataBinding.
  */
 public abstract class AbstractDataBinding implements DataBinding {
     private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<String, String>();
     {
         BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
-                     "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
+                                "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
     }
-    
-    
+
     protected int mtomThreshold;
     private Bus bus;
     private Collection<DOMSource> schemas;
     private Map<String, String> namespaceMap;
     private boolean hackAroundEmptyNamespaceIssue;
-    
+
     protected Bus getBus() {
         if (bus == null) {
             return BusFactory.getDefaultBus();
         }
         return bus;
     }
-    
+
     /**
      * This call is used to set the bus. It should only be called once.
+     * 
      * @param bus
      */
     @Resource(name = "cxf")
@@ -87,47 +87,71 @@ public abstract class AbstractDataBinding implements DataBinding {
     }
 
     public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, SchemaCollection col, Document d,
-                                          String systemId) {
+                                       String systemId) {
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
-        
+        boolean copied = false;
+
         if (StringUtils.isEmpty(ns)) {
             if (DOMUtils.getFirstElement(d.getDocumentElement()) == null) {
                 hackAroundEmptyNamespaceIssue = true;
                 return null;
             }
-            //create a copy of the dom so we 
-            //can modify it.
+            // create a copy of the dom so we
+            // can modify it.
             d = copy(d);
+            copied = true;
             ns = serviceInfo.getInterface().getName().getNamespaceURI();
             d.getDocumentElement().setAttribute("targetNamespace", ns);
         }
-        
+
         SchemaInfo schemaInfo = serviceInfo.getSchema(ns);
-        if (schemaInfo != null && (systemId == null && schemaInfo.getSystemId() == null 
-            || systemId != null && systemId.equalsIgnoreCase(schemaInfo.getSystemId()))) {
+        if (schemaInfo != null
+            && (systemId == null && schemaInfo.getSystemId() == null || systemId != null
+                                                                        && systemId
+                                                                            .equalsIgnoreCase(schemaInfo
+                                                                                .getSystemId()))) {
             return schemaInfo.getSchema();
         }
-        
-        
+
         if (hackAroundEmptyNamespaceIssue) {
-            d = doEmptyNamespaceHack(d);            
+            d = doEmptyNamespaceHack(d, copied);
         }
 
         Node n = d.getDocumentElement().getFirstChild();
-        while (n != null) { 
+        boolean patchRequired = false;
+        while (n != null) {
             if (n instanceof Element) {
                 Element e = (Element)n;
                 if (e.getLocalName().equals("import")) {
-                    e.removeAttribute("schemaLocation");
-                    updateSchemaLocation(e);
-                    if (StringUtils.isEmpty(e.getAttribute("namespace"))) {
-                        e.setAttribute("namespace", serviceInfo.getInterface().getName().getNamespaceURI());
-                    }
+                    patchRequired = true;
+                    break;
                 }
             }
             n = n.getNextSibling();
         }
         
+        if (patchRequired) {
+            if (!copied) {
+                d = copy(d);
+            }
+            n = d.getDocumentElement().getFirstChild();
+            while (n != null) {
+                if (n instanceof Element) {
+                    Element e = (Element)n;
+                    if (e.getLocalName().equals("import")) {
+                        e = (Element)n;
+                        e.removeAttribute("schemaLocation");
+                        updateSchemaLocation(e);
+                        if (StringUtils.isEmpty(e.getAttribute("namespace"))) {
+                            e.setAttribute("namespace", serviceInfo.getInterface().getName()
+                                .getNamespaceURI());
+                        }
+                    }
+                }
+                n = n.getNextSibling();
+            }
+        }
+
         SchemaInfo schema = new SchemaInfo(ns);
         schema.setSystemId(systemId);
         XmlSchema xmlSchema;
@@ -139,11 +163,12 @@ public abstract class AbstractDataBinding implements DataBinding {
         serviceInfo.addSchema(schema);
         return xmlSchema;
     }
-    private Document doEmptyNamespaceHack(Document d) {
+
+    private Document doEmptyNamespaceHack(Document d, boolean alreadyWritable) {
         boolean hasStuffToRemove = false;
         Element el = DOMUtils.getFirstElement(d.getDocumentElement());
         while (el != null) {
-            if ("import".equals(el.getLocalName())
+            if ("import".equals(el.getLocalName()) 
                 && StringUtils.isEmpty(el.getAttribute("targetNamespace"))) {
                 hasStuffToRemove = true;
                 break;
@@ -151,9 +176,11 @@ public abstract class AbstractDataBinding implements DataBinding {
             el = DOMUtils.getNextElement(el);
         }
         if (hasStuffToRemove) {
-            //create a copy of the dom so we 
-            //can modify it.
-            d = copy(d);
+            // create a copy of the dom so we
+            // can modify it.
+            if (!alreadyWritable) {
+                d = copy(d);
+            }
             el = DOMUtils.getFirstElement(d.getDocumentElement());
             while (el != null) {
                 if ("import".equals(el.getLocalName())
@@ -165,7 +192,7 @@ public abstract class AbstractDataBinding implements DataBinding {
                 }
             }
         }
-            
+
         return d;
     }
 
@@ -173,9 +200,9 @@ public abstract class AbstractDataBinding implements DataBinding {
         try {
             return StaxUtils.copy(doc);
         } catch (XMLStreamException e) {
-            //ignore
+            // ignore
         } catch (ParserConfigurationException e) {
-            //ignore
+            // ignore
         }
         return doc;
     }
@@ -189,7 +216,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     }
 
     /**
-      * @return Returns the namespaceMap.
+     * @return Returns the namespaceMap.
      */
     public Map<String, String> getNamespaceMap() {
         return namespaceMap;
@@ -211,10 +238,9 @@ public abstract class AbstractDataBinding implements DataBinding {
         this.namespaceMap = namespaceMap;
     }
 
-    /** 
-     * Provide explicit mappings to ReflectionServiceFactory.
-     * {@inheritDoc}
-     * */
+    /**
+     * Provide explicit mappings to ReflectionServiceFactory. {@inheritDoc}
+     */
     public Map<String, String> getDeclaredNamespaceMappings() {
         return this.namespaceMap;
     }
