@@ -64,13 +64,20 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     public SoapTransportFactory() {
         super();
     }
+    
+    public String mapTransportURI(String s) {
+        if ("http://www.w3.org/2008/07/soap/bindings/JMS/".equals(s)) {
+            s = "http://cxf.apache.org/transports/jms";
+        }
+        return s;
+    }
 
     public Destination getDestination(EndpointInfo ei) throws IOException {
         SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
         DestinationFactory destinationFactory;
         try {
             destinationFactory = bus.getExtension(DestinationFactoryManager.class)
-                .getDestinationFactory(binding.getTransportURI());
+                .getDestinationFactory(mapTransportURI(binding.getTransportURI()));
             return destinationFactory.getDestination(ei);
         } catch (BusException e) {
             throw new RuntimeException("Could not find destination factory for transport "
@@ -113,6 +120,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             SoapBindingInfo sbi = (SoapBindingInfo)b;
             transportURI = sbi.getTransportURI();
         }
+        EndpointInfo info = new SoapEndpointInfo(serviceInfo, transportURI);
         if (port != null) {
             List ees = port.getExtensibilityElements();
             for (Iterator itr = ees.iterator(); itr.hasNext();) {
@@ -121,14 +129,14 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 if (SOAPBindingUtil.isSOAPAddress(extensor)) {
                     final SoapAddress sa = SOAPBindingUtil.getSoapAddress(extensor);
     
-                    EndpointInfo info = new SoapEndpointInfo(serviceInfo, transportURI);
                     info.addExtensor(sa);
                     info.setAddress(sa.getLocationURI());
-                    return info;
+                } else {
+                    info.addExtensor(extensor);
                 }
             }
         }
-        return new SoapEndpointInfo(serviceInfo, transportURI);
+        return info;
     }
 
 
@@ -141,7 +149,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         ConduitInitiator conduitInit;
         try {
             conduitInit = bus.getExtension(ConduitInitiatorManager.class)
-                .getConduitInitiator(binding.getTransportURI());
+                .getConduitInitiator(mapTransportURI(binding.getTransportURI()));
 
             return conduitInit.getConduit(ei);
         } catch (BusException e) {

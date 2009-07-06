@@ -150,8 +150,12 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             if (jaxBid.equals(SOAPBinding.SOAP11HTTP_MTOM_BINDING)) {
                 conf.setMtomEnabled(true);
             }
-            
+
+            if (transportId != null) {
+                conf.setTransportURI(transportId);
+            }
             conf.setJaxWsServiceFactoryBean(sf);
+            
         }
         
         BindingInfo bindingInfo = super.createBindingInfo();        

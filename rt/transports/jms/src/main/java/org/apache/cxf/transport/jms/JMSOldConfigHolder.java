@@ -260,8 +260,12 @@ public class JMSOldConfigHolder {
         JMSEndpoint endpoint = null;
         try {           
             endpoint = JMSEndpointParser.createEndpoint(endpointInfo.getAddress());
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception e) {
-            throw new IOException(e.getMessage());
+            IOException e2 = new IOException(e.getMessage(), e);
+            e2.initCause(e);
+            throw e2;
         }
         retrieveWSDLInformation(endpoint, endpointInfo);
         //address = endpointInfo.getTraversedExtensor(new AddressType(), AddressType.class); 

@@ -25,6 +25,7 @@
         <namespace>http://schemas.xmlsoap.org/wsdl/soap/</namespace>
         <namespace>http://schemas.xmlsoap.org/wsdl/soap12/</namespace>
         <namespace>http://www.w3.org/2003/05/soap/bindings/HTTP/</namespace>
+        <namespace>http://www.w3.org/2008/07/soap/bindings/JMS/</namespace>
         <namespace>http://schemas.xmlsoap.org/wsdl/soap/http</namespace>
     </extension>
     

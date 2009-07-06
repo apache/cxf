@@ -20,16 +20,16 @@
   under the License.
 -->
 <wsdl:definitions name="JMSGreeterService"
-    targetNamespace="http://cxf.apache.org/jms_greeter" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    targetNamespace="http://cxf.apache.org/jms_greeter"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
     xmlns:tns="http://cxf.apache.org/jms_greeter"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:x1="http://cxf.apache.org/jms_greeter/types"
     xmlns:soapjms="http://www.w3.org/2008/07/soap/bindings/JMS/">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/jms_greeter/types" 
+        <schema targetNamespace="http://cxf.apache.org/jms_greeter/types"
             xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType/>
@@ -66,6 +66,7 @@
     </wsdl:types>
     
     
+
     <wsdl:message name="sayHiRequest">
         <wsdl:part element="x1:sayHi" name="in"/>
     </wsdl:message>
@@ -82,40 +83,46 @@
         <wsdl:part element="x1:greetMeOneWay" name="in"/>
     </wsdl:message>
     
+
     <wsdl:portType name="JMSGreeterPortType">
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMe">
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
 
     </wsdl:portType>
     
+
     <wsdl:binding name="JMSGreeterPortBinding" type="tns:JMSGreeterPortType">
         <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
         
+
         <soapjms:jndiContextParameter name="name"
-			value="value" />
-		<soapjms:jndiConnectionFactoryName>ConnectionFactory
-		</soapjms:jndiConnectionFactoryName>
-		<soapjms:jndiInitialContextFactory>
+            value="value" />
+        <soapjms:jndiConnectionFactoryName>ConnectionFactory
+        </soapjms:jndiConnectionFactoryName>
+        <soapjms:jndiInitialContextFactory>
 			org.apache.activemq.jndi.ActiveMQInitialContextFactory
-		</soapjms:jndiInitialContextFactory>
-		<soapjms:jndiURL>tcp://localhost:61500
-		</soapjms:jndiURL>
-		<soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
-		<soapjms:priority>5</soapjms:priority>
-		<soapjms:timeToLive>1000</soapjms:timeToLive>
-		<!-- <soapjms:replyToName>replytoname</soapjms:replyToName> -->
+        </soapjms:jndiInitialContextFactory>
+        <soapjms:jndiURL>tcp://localhost:61500
+        </soapjms:jndiURL>
+        <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
+        <soapjms:priority>5</soapjms:priority>
+        <soapjms:timeToLive>1000</soapjms:timeToLive>
+        <!-- <soapjms:replyToName>replytoname</soapjms:replyToName> -->
         
+
         <wsdl:operation name="greetMe">
             <soap:operation soapAction="test" style="document"/>
             <wsdl:input name="greetMeRequest">
@@ -126,6 +133,7 @@
             </wsdl:output>
         </wsdl:operation>
         
+
         <wsdl:operation name="sayHi">
             <soap:operation soapAction="test" style="document"/>
             <wsdl:input name="sayHiRequest">
@@ -136,6 +144,7 @@
             </wsdl:output>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMeOneWay">
             <soap:operation soapaction="test" style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
@@ -144,75 +153,57 @@
         </wsdl:operation>
     </wsdl:binding>
     
+
     <wsdl:service name="JMSGreeterService">
-    	<soapjms:jndiContextParameter name="name2"
-			value="value2" />
-		<soapjms:jndiConnectionFactoryName>ConnectionFactory
-		</soapjms:jndiConnectionFactoryName>
-		<soapjms:jndiInitialContextFactory>
-			org.apache.activemq.jndi.ActiveMQInitialContextFactory
-		</soapjms:jndiInitialContextFactory>
-		<soapjms:jndiURL>tcp://localhost:61500
-		</soapjms:jndiURL>
-		<soapjms:deliveryMode>NON_PERSISTENT
-		</soapjms:deliveryMode>
-		<soapjms:priority>6</soapjms:priority>
-		<soapjms:timeToLive>2000</soapjms:timeToLive>
-		<!--<soapjms:replyToName>replytoname2</soapjms:replyToName>-->
+        <soapjms:jndiContextParameter name="name2" value="value2" />
+        <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
+        <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
+        <soapjms:jndiURL>tcp://localhost:61500
+        </soapjms:jndiURL>
+        <soapjms:deliveryMode>NON_PERSISTENT
+        </soapjms:deliveryMode>
+        <soapjms:priority>6</soapjms:priority>
+        <soapjms:timeToLive>2000</soapjms:timeToLive>
+        <!--<soapjms:replyToName>replytoname2</soapjms:replyToName>-->
         <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort">
             <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
-            <soapjms:jndiContextParameter name="name3"
-				value="value3" />
-			<soapjms:jndiConnectionFactoryName>ConnectionFactory
-			</soapjms:jndiConnectionFactoryName>
-			<soapjms:jndiInitialContextFactory>
-				org.apache.activemq.jndi.ActiveMQInitialContextFactory
-			</soapjms:jndiInitialContextFactory>
-			<soapjms:jndiURL>tcp://localhost:61500
-			</soapjms:jndiURL>
-			<soapjms:deliveryMode>PERSISTENT
-			</soapjms:deliveryMode>
-			<soapjms:priority>7</soapjms:priority>
-			<soapjms:timeToLive>3000</soapjms:timeToLive>
-			<!-- 
-			<soapjms:replyToName>replytoname3</soapjms:replyToName>
-			-->
+            <soapjms:jndiContextParameter name="name3" value="value3" />
+            <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
+            <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
+            <soapjms:jndiURL>tcp://localhost:61500</soapjms:jndiURL>
+            <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
+            <soapjms:priority>7</soapjms:priority>
+            <soapjms:timeToLive>3000</soapjms:timeToLive>
+            <!-- 
+            <soapjms:replyToName>replytoname3</soapjms:replyToName>
+            -->
         </wsdl:port>
     </wsdl:service>
     
+
     <wsdl:service name="JMSGreeterService2">
-    	<soapjms:jndiContextParameter name="name2"
-			value="value2" />
-		<soapjms:jndiConnectionFactoryName>ConnectionFactory
-		</soapjms:jndiConnectionFactoryName>
-		<soapjms:jndiInitialContextFactory>
-			org.apache.activemq.jndi.ActiveMQInitialContextFactory
-		</soapjms:jndiInitialContextFactory>
-		<soapjms:jndiURL>tcp://localhost:61500
-		</soapjms:jndiURL>
-		<soapjms:deliveryMode>NON_PERSISTENT
-		</soapjms:deliveryMode>
-		<soapjms:priority>6</soapjms:priority>
-		<soapjms:timeToLive>2000</soapjms:timeToLive>
-		<!--<soapjms:replyToName>replytoname2</soapjms:replyToName>-->
+        <soapjms:jndiContextParameter name="name2" value="value2" />
+        <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
+        <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
+        <soapjms:jndiURL>tcp://localhost:61500
+        </soapjms:jndiURL>
+        <soapjms:deliveryMode>NON_PERSISTENT
+        </soapjms:deliveryMode>
+        <soapjms:priority>6</soapjms:priority>
+        <soapjms:timeToLive>2000</soapjms:timeToLive>
+        <!--<soapjms:replyToName>replytoname2</soapjms:replyToName>-->
         <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort2">
-            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5"/>
-            <!--soapjms:jndiConnectionFactoryName>ConnectionFactory
-			</soapjms:jndiConnectionFactoryName>            
-            <soapjms:jndiContextParameter name="name3"
-				value="value3" />
-			<soapjms:jndiInitialContextFactory>
-				org.apache.activemq.jndi.ActiveMQInitialContextFactory
-			</soapjms:jndiInitialContextFactory>
-			<soapjms:jndiURL>tcp://localhost:61500
-			</soapjms:jndiURL>
-			<soapjms:deliveryMode>PERSISTENT
-			</soapjms:deliveryMode>
-			<soapjms:priority>7</soapjms:priority>
-			<soapjms:timeToLive>3000</soapjms:timeToLive-->
-			<!-- 
-			<soapjms:replyToName>replytoname3</soapjms:replyToName>
-			-->
+            <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
+            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+            <soapjms:jndiContextParameter name="name3"  value="value3" />
+            <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
+            <soapjms:jndiURL>tcp://localhost:61500</soapjms:jndiURL>
+            <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
+            <soapjms:priority>7</soapjms:priority>
+            <soapjms:timeToLive>3000</soapjms:timeToLive>
+            <!-- 
+            <soapjms:replyToName>replytoname3</soapjms:replyToName>
+            -->
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

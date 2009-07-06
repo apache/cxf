@@ -29,7 +29,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <property name="bus" ref="cxf"/>
         <property name="transportIds">
             <list>
-            	<value>http://www.w3.org/2008/07/soap/bindings/JMS/</value>
                 <value>http://cxf.apache.org/transports/jms</value>
                 <value>http://cxf.apache.org/transports/jms/configuration</value>
             </list>

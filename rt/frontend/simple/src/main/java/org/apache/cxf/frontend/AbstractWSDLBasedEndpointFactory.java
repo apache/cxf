@@ -233,7 +233,8 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
 
     protected EndpointInfo createEndpointInfo() throws BusException {
         if (transportId == null 
-            && getAddress() != null) {
+            && getAddress() != null
+            && getAddress().contains("://")) {
             DestinationFactory df = getDestinationFactory();
             if (df == null) {
                 DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);

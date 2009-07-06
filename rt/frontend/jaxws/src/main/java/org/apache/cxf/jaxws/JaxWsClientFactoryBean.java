@@ -38,7 +38,12 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
     }
     
     protected SoapBindingConfiguration createSoapBindingConfig() {
-        return new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)getServiceFactory());
+        JaxWsSoapBindingConfiguration bc  
+            = new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)getServiceFactory());
+        if (transportId != null) {
+            bc.setTransportURI(transportId);
+        }
+        return bc;
     }
 
     @Override

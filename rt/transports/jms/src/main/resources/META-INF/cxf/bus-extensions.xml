@@ -20,7 +20,6 @@
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
     <extension class="org.apache.cxf.transport.jms.JMSTransportFactory" deferred="true">
-    	<namespace>http://www.w3.org/2008/07/soap/bindings/JMS/</namespace>
         <namespace>http://cxf.apache.org/transports/jms</namespace>
         <namespace>http://cxf.apache.org/transports/jms/configuration</namespace>
     </extension>
