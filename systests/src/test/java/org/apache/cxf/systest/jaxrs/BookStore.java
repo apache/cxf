@@ -244,6 +244,23 @@ public class BookStore {
     }
     
     @GET
+    @Path("/books/wrapper/{bookId}/")
+    @Produces("application/xml")
+    public BookWrapper getWrappedBook(@PathParam("bookId") Long id) throws BookNotFoundFault {
+        BookWrapper bw = new BookWrapper();
+        Book b = new Book("CXF in Action", 99999L);
+        bw.setBook(b);
+        return bw;
+    }
+    
+    @GET
+    @Path("/books/wrapper2/{bookId}/")
+    @Produces("application/xml")
+    public Book getWrappedBook2(@PathParam("bookId") Long id) throws BookNotFoundFault {
+        return new Book("CXF in Action", 99999L);
+    }
+    
+    @GET
     @Path("books/custom/{bookId:\\d\\d\\d}")
     public Book getBookCustom(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);

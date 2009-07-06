@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -41,9 +42,11 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -96,6 +99,34 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Response response = wc.head();
         assertTrue(response.getMetadata().size() != 0);
         assertEquals(0, ((InputStream)response.getEntity()).available());
+    }
+    
+    @Test
+    public void testWebClientUnwrapBookWithXslt() throws Exception {
+        XSLTJaxbProvider provider = new XSLTJaxbProvider();
+        provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook.xsl");
+        WebClient wc = WebClient.create("http://localhost:9080/bookstore/books/wrapper",
+                             Collections.singletonList(provider));
+        wc.path("{id}", 123);
+        Book book = wc.get(Book.class);
+        assertNotNull(book);
+        assertEquals(123L, book.getId());
+        
+    }
+    
+    @Test
+    @Ignore
+    // uncomment once I can figure out how to set for this test only
+    // com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize - JAXB is a pain
+    public void testProxyUnwrapBookWithXslt() throws Exception {
+        XSLTJaxbProvider provider = new XSLTJaxbProvider();
+        provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook2.xsl");
+        BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class,
+                             Collections.singletonList(provider));
+        Book book = bs.getWrappedBook2(123L);
+        assertNotNull(book);
+        assertEquals(123L, book.getId());
+        
     }
     
     @Test

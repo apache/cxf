@@ -380,7 +380,8 @@ public class AbstractClient implements Client {
             int status = conn.getResponseCode();
             if (status < 200 || status == 204 || status > 300) {
                 Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
-                if (length == null || Integer.parseInt(length.toString()) == 0) {
+                if (length == null || Integer.parseInt(length.toString()) == 0
+                    || status >= 400) {
                     return cls == Response.class ? cls : null;
                 }
             }
@@ -557,7 +558,7 @@ public class AbstractClient implements Client {
         public void onMessage(Message m) {
             
             Message message = cfg.getConduitSelector().getEndpoint().getBinding().createMessage(m);
-            message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
+            message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
             message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
             PhaseInterceptorChain chain = setupInInterceptorChain(cfg.getConduitSelector().getEndpoint());
             message.setInterceptorChain(chain);

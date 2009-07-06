@@ -89,6 +89,7 @@ import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class JAXRSUtils {
@@ -693,6 +694,9 @@ public final class JAXRSUtils {
     
     @SuppressWarnings("unchecked")
     private static UriInfo createUriInfo(Message m) {
+        if (MessageUtils.isRequestor(m)) {
+            m = m.getExchange() != null ? m.getExchange().getOutMessage() : m;
+        }
         MultivaluedMap<String, String> templateParams =
             (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         return new UriInfoImpl(m, templateParams);
