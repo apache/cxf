@@ -29,7 +29,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 
-import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
@@ -253,7 +252,7 @@ public class JavascriptUtils {
             // We could do something much more complex in terms of evaluating whether the type
             // permits the contentType attribute. This, however, is enough to clue us in for what Aegis
             // does.
-            if (AbstractXOPType.XML_MIME_BASE64.equals(typeName)) {
+            if (new QName("http://www.w3.org/2005/05/xmlmime", "base64Binary").equals(typeName)) {
                 return true;
             }
             

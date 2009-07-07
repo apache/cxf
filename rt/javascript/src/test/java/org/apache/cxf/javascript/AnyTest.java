@@ -27,6 +27,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AnyImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -65,7 +66,8 @@ public class AnyTest extends JavascriptRhinoTest {
         implementor = (AnyImpl)rawImplementor;
         implementor.reset();
     }
-    
+
+  
     private Void acceptOneChalk(Context context) {
         LOG.info("About to call accept1 with Chalk" + getAddress());
         implementor.prepareToWaitForOneWay();
@@ -136,7 +138,6 @@ public class AnyTest extends JavascriptRhinoTest {
         assertEquals("after chalk", implementor.getAfter());
         return null;
     }
-    
     @Test
     public void callAcceptNRaw() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
@@ -164,6 +165,7 @@ public class AnyTest extends JavascriptRhinoTest {
         return null;
     }
     
+    
     @Test
     public void callReturnAny1() throws Exception {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
@@ -172,6 +174,7 @@ public class AnyTest extends JavascriptRhinoTest {
             }
         });
     }
+    
 
 
 
