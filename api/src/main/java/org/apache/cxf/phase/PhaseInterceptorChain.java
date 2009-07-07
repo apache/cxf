@@ -264,12 +264,12 @@ public class PhaseInterceptorChain implements InterceptorChain {
                                              + t.getClass().getName() 
                                              + ": " + ex.getMessage());
                             }
-                        } else if (LOG.isLoggable(Level.INFO)) {
+                        } else if (LOG.isLoggable(Level.WARNING)) {
                             if (mode == FaultMode.UNCHECKED_APPLICATION_FAULT) {
-                                LogUtils.log(LOG, Level.INFO,
+                                LogUtils.log(LOG, Level.WARNING,
                                              "Application has thrown exception, unwinding now", ex);
                             } else {
-                                LogUtils.log(LOG, Level.INFO,
+                                LogUtils.log(LOG, Level.WARNING,
                                              "Interceptor has thrown exception, unwinding now", ex);
                             }
                         }
