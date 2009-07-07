@@ -23,11 +23,15 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPBinding;
 
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
@@ -48,6 +52,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(ServerNoWsdl.class, true));
     }
     
     @Test
@@ -61,7 +66,51 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
         String resp; 
+        ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
+        ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor());
+        resp = port.sayHi();
+        assertEquals("We should get the right response", resp, "Bonjour");        
         
+        resp = port.greetMe("Willem");
+        assertEquals("We should get the right response", resp, "Hello Willem");
+        
+        try {
+            resp = port.greetMe("Invoking greetMe with invalid length string, expecting exception...");
+            fail("We expect exception here");
+        } catch (WebServiceException ex) {           
+            assertTrue("Get a wrong exception", 
+                       ex.getMessage().
+                       indexOf("string length (67) is greater than maxLength facet (30)") >= 0);
+        }
+        
+        port.greetMeOneWay(System.getProperty("user.name"));
+        
+        try {
+            port.pingMe();
+            fail("We expect exception here");
+        } catch (PingMeFault ex) {            
+            FaultDetailDocument detailDocument = ex.getFaultInfo();
+            FaultDetail detail = detailDocument.getFaultDetail();
+            assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
+            assertEquals("Wrong faultDetail minor:", detail.getMinor(), 1);             
+        }          
+    }
+    
+    @Test
+    public void testCallFromClientNoWsdlServer() throws Exception {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf_no_wsdl.xml");
+        BusFactory.setDefaultBus(bus);
+        URL wsdl = this.getClass().getResource("/wsdl_systest/xmlbeans/hello_world.wsdl");
+        assertNotNull("We should found the WSDL her. " , wsdl);      
+        
+        SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
+        QName soapPort = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SoapPort");
+        ss.addPort(soapPort, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9010/SoapContext/SoapPort");
+        Greeter port = ss.getPort(soapPort, Greeter.class);
+        String resp; 
+        ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
+        ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor());
         resp = port.sayHi();
         assertEquals("We should get the right response", resp, "Bonjour");        
         
