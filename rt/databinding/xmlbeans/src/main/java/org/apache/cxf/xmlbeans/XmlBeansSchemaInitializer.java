@@ -196,8 +196,11 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             
             SchemaTypeSystem sts = st.getTypeSystem();
             schemas.getXmlSchemaCollection().setSchemaResolver(new XMLSchemaResolver(sts));
-
-            XmlSchema schema = getSchema(sts, st.getSourceName());
+            String sourceName = st.getSourceName();
+            if (sourceName.endsWith("wsdl")) {
+                return;
+            }
+            XmlSchema schema = getSchema(sts, sourceName);
 
             if (st.isDocumentType()) {
                 XmlSchemaElement sct = schema.getElementByName(st.getDocumentElementName());
