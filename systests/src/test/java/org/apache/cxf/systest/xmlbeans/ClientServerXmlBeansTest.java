@@ -101,7 +101,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf_no_wsdl.xml");
         BusFactory.setDefaultBus(bus);
-        URL wsdl = this.getClass().getResource("/wsdl_systest/xmlbeans/hello_world.wsdl");
+        URL wsdl = this.getClass().getResource("/wsdl/xmlbeans/hello_world.wsdl");
         assertNotNull("We should found the WSDL her. " , wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
