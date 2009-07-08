@@ -32,10 +32,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
@@ -60,6 +62,8 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.Header;
+import org.apache.cxf.ws.security.policy.model.RequiredElements;
+import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
@@ -519,6 +523,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, doc, "encrypted", false);
         assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg,
                           doc, "encrypted", true);
+        
+        assertHeadersExists(aim, msg, doc);
 
         assertAsymetricBinding(aim, msg, doc, prots, hasDerivedKeys);
         assertSymetricBinding(aim, msg, doc, prots, hasDerivedKeys);
@@ -539,6 +545,51 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         super.doResults(msg, actor, doc, results);
     }
+    private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, SOAPMessage doc) 
+        throws SOAPException {
+        
+        SOAPHeader header = doc.getSOAPHeader();
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.REQUIRED_PARTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                RequiredParts rp = (RequiredParts)ai.getAssertion();
+                ai.setAsserted(true);
+                for (Header h : rp.getHeaders()) {
+                    if (header == null || !header.getChildElements(h.getQName()).hasNext()) {
+                        ai.setNotAsserted("No header element of name " + h.getQName() + " found.");
+                    }
+                }
+            }
+        }
+        ais = aim.get(SP12Constants.REQUIRED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                RequiredElements rp = (RequiredElements)ai.getAssertion();
+                ai.setAsserted(true);
+                Map<String, String> namespaces = rp.getDeclaredNamespaces();
+                XPathFactory factory = XPathFactory.newInstance();
+                for (String expression : rp.getXPathExpressions()) {
+                    XPath xpath = factory.newXPath();
+                    if (namespaces != null) {
+                        xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+                    }
+                    NodeList list;
+                    try {
+                        list = (NodeList)xpath.evaluate(expression, 
+                                                                 header,
+                                                                 XPathConstants.NODESET);
+                        if (list.getLength() == 0) {
+                            ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                        }
+                    } catch (XPathExpressionException e) {
+                        ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
+                    }
+                }
+            }
+        }
+        
+    }
+
     private boolean assertSymetricBinding(AssertionInfoMap aim, 
                                            SoapMessage message,
                                            SOAPMessage doc,
@@ -586,7 +637,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                            Protections prots,
                                            boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-        if (ais == null) {
+        if (ais == null) {                       
             return true;
         }
         for (AssertionInfo ai : ais) {
