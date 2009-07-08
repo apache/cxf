@@ -264,9 +264,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
 
             /*
-             * now check the security actions: do they match, in right order?
+             * now check the security actions: do they match, in any order?
              */
-            if (!ignoreActions && !checkReceiverResults(wsResult, actions)) {
+            if (!ignoreActions && !checkReceiverResultsAnyOrder(wsResult, actions)) {
                 LOG.warning("Security processing failed (actions mismatch)");
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
             }
