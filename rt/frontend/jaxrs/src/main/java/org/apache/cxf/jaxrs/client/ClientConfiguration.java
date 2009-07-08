@@ -18,13 +18,21 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.MessageObserver;
 
 public class ClientConfiguration implements InterceptorProvider {
 
@@ -34,7 +42,10 @@ public class ClientConfiguration implements InterceptorProvider {
     private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
     private ConduitSelector conduitSelector;
     private Bus bus;
-
+    private Map<String, Object> requestContext = new HashMap<String, Object>();
+    private Map<String, Object> responseContext = new HashMap<String, Object>();
+    
+    
     public void setConduitSelector(ConduitSelector cs) {
         this.conduitSelector = cs;
     }
@@ -81,5 +92,22 @@ public class ClientConfiguration implements InterceptorProvider {
 
     public void setOutFaultInterceptors(List<Interceptor> interceptors) {
         outFault = interceptors;
+    }
+    
+    public Conduit getConduit() {
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        exchange.put(MessageObserver.class, new ClientMessageObserver(this));
+        exchange.put(Bus.class, bus);
+        return getConduitSelector().selectConduit(message);
+    }
+    
+    public Map<String, Object> getResponseContext() {
+        return responseContext;
+    }
+    
+    public Map<String, Object> getRequestContext() {
+        return requestContext;
     }
 }

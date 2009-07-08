@@ -31,6 +31,8 @@ import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,6 +45,16 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStore.class);
         assertTrue(bean.create() instanceof BookStore);
+    }
+    
+    @Test
+    public void testGetConduit() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookStore.class);
+        BookStore store = bean.create(BookStore.class);
+        Conduit conduit = WebClient.getConfig(store).getConduit();
+        assertTrue(conduit instanceof HTTPConduit);
     }
     
     @Test

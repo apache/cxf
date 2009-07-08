@@ -176,6 +176,23 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Retieves ClientConfiguration
+     * @param client proxy or http-centric Client
+     * @return underlying ClientConfiguration instance 
+     */
+    public static ClientConfiguration getConfig(Object client) {
+        if (client instanceof Client) {
+            if (client instanceof WebClient) { 
+                return ((AbstractClient)client).getConfiguration();
+            } else if (client instanceof InvocationHandlerAware) {
+                Object handler = ((InvocationHandlerAware)client).getInvocationHandler();
+                return ((AbstractClient)handler).getConfiguration();
+            }
+        }
+        throw new IllegalArgumentException("Not a valid Client");
+    }
+    
+    /**
      * Does HTTP invocation
      * @param httpMethod HTTP method
      * @param body request body, can be null

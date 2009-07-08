@@ -29,6 +29,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -47,7 +48,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -75,7 +75,9 @@ import org.apache.cxf.transport.MessageObserver;
 public class AbstractClient implements Client {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
-
+    private static final String REQUEST_CONTEXT = "RequestContext";
+    private static final String RESPONSE_CONTEXT = "ResponseContext";
+    
     protected ClientConfiguration cfg = new ClientConfiguration();
     
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
@@ -495,19 +497,19 @@ public class AbstractClient implements Client {
         message.getExchange().put(ConduitSelector.class, cfg.getConduitSelector());
     }
     
-    protected PhaseInterceptorChain setupOutInterceptorChain(Endpoint endpoint) { 
+    protected static PhaseInterceptorChain setupOutInterceptorChain(ClientConfiguration cfg) { 
         PhaseManager pm = cfg.getBus().getExtension(PhaseManager.class);
         List<Interceptor> i1 = cfg.getBus().getOutInterceptors();
         List<Interceptor> i2 = cfg.getOutInterceptors();
-        List<Interceptor> i3 = endpoint.getOutInterceptors();
+        List<Interceptor> i3 = cfg.getConduitSelector().getEndpoint().getOutInterceptors();
         return new PhaseChainCache().get(pm.getOutPhases(), i1, i2, i3);
     }
     
-    protected PhaseInterceptorChain setupInInterceptorChain(Endpoint endpoint) { 
+    protected static PhaseInterceptorChain setupInInterceptorChain(ClientConfiguration cfg) { 
         PhaseManager pm = cfg.getBus().getExtension(PhaseManager.class);
         List<Interceptor> i1 = cfg.getBus().getInInterceptors();
         List<Interceptor> i2 = cfg.getInInterceptors();
-        List<Interceptor> i3 = endpoint.getInInterceptors();
+        List<Interceptor> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
     }
     
@@ -536,44 +538,28 @@ public class AbstractClient implements Client {
         exchange.setSynchronous(true);
         exchange.setOutMessage(m);
         exchange.put(Bus.class, cfg.getBus());
-        exchange.put(MessageObserver.class, new ClientMessageObserver());
+        exchange.put(MessageObserver.class, new ClientMessageObserver(cfg));
         exchange.put(Endpoint.class, cfg.getConduitSelector().getEndpoint());
         exchange.setOneWay(false);
         m.setExchange(exchange);
         
-        PhaseInterceptorChain chain = setupOutInterceptorChain(cfg.getConduitSelector().getEndpoint());
+        PhaseInterceptorChain chain = setupOutInterceptorChain(cfg);
         m.setInterceptorChain(chain);
+        
+        // context
+        if (cfg.getRequestContext().size() > 0 || cfg.getResponseContext().size() > 0) {
+            Map<String, Object> context = new HashMap<String, Object>();
+            context.put(REQUEST_CONTEXT, cfg.getRequestContext());
+            context.put(RESPONSE_CONTEXT, cfg.getResponseContext());
+            m.put(Message.INVOCATION_CONTEXT, context);
+            m.putAll(cfg.getRequestContext());
+            exchange.putAll(cfg.getRequestContext());
+        }
         
         //setup conduit selector
         prepareConduitSelector(m);
         
         return m;
     }
-
-    private class ClientMessageObserver implements MessageObserver {
-
-        public void onMessage(Message m) {
-            
-            Message message = cfg.getConduitSelector().getEndpoint().getBinding().createMessage(m);
-            message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
-            message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
-            PhaseInterceptorChain chain = setupInInterceptorChain(cfg.getConduitSelector().getEndpoint());
-            message.setInterceptorChain(chain);
-            message.getExchange().setInMessage(message);
-            Bus origBus = BusFactory.getThreadDefaultBus(false);
-            BusFactory.setThreadDefaultBus(cfg.getBus());
-
-            // execute chain
-            try {
-                chain.doIntercept(message);
-            } finally {
-                BusFactory.setThreadDefaultBus(origBus);
-            }
-        }
-        
-    }
-
-    
-
 
 }
