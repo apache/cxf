@@ -268,7 +268,7 @@ public class WebClient extends AbstractClient {
         
         Response r = doInvoke(httpMethod, body, responseClass);
         
-        if (r.getStatus() >= 400) {
+        if (r.getStatus() >= 400 && responseClass != null) {
             throw new WebApplicationException(r);
         }
         
