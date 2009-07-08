@@ -78,6 +78,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Binding;
+import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KeyValueToken;
@@ -679,7 +680,8 @@ public abstract class AbstractBindingBuilder {
         
         SignedEncryptedParts parts = null;
         SignedEncryptedElements elements = null;
-        
+        ContentEncryptedElements celements = null;
+
         Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.ENCRYPTED_PARTS);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
@@ -691,6 +693,13 @@ public abstract class AbstractBindingBuilder {
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 elements = (SignedEncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        ais = aim.getAssertionInfo(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                celements = (ContentEncryptedElements)ai.getAssertion();
                 ai.setAsserted(true);
             }            
         }
@@ -711,7 +720,9 @@ public abstract class AbstractBindingBuilder {
                                    isBody,
                                    signedParts,
                                    elements == null ? null : elements.getXPathExpressions(),
-                                   elements == null ? null : elements.getDeclaredNamespaces());
+                                   elements == null ? null : elements.getDeclaredNamespaces(),
+                                   celements == null ? null : celements.getXPathExpressions(),
+                                   celements == null ? null : celements.getDeclaredNamespaces());
     }    
     
     public Vector<WSEncryptionPart> getSignedParts() 
@@ -753,13 +764,16 @@ public abstract class AbstractBindingBuilder {
                                    isSignBody,
                                    signedParts,
                                    elements == null ? null : elements.getXPathExpressions(),
-                                   elements == null ? null : elements.getDeclaredNamespaces());
+                                   elements == null ? null : elements.getDeclaredNamespaces(),
+                                   null, null);
     }
     public Vector<WSEncryptionPart> getPartsAndElements(boolean sign, 
                                                     boolean includeBody,
                                                     List<WSEncryptionPart> parts,
                                                     List<String> xpaths, 
-                                                    Map<String, String> namespaces) 
+                                                    Map<String, String> namespaces,
+                                                    List<String> contentXpaths,
+                                                    Map<String, String> cnamespaces) 
         throws SOAPException {
         
         Vector<WSEncryptionPart> result = new Vector<WSEncryptionPart>();
@@ -838,16 +852,19 @@ public abstract class AbstractBindingBuilder {
                     for (int x = 0; x < list.getLength(); x++) {
                         Element el = (Element)list.item(x);
                         if (sign) {
-                            result.add(new WSEncryptionPart(el.getLocalName(),
+                            WSEncryptionPart part = new WSEncryptionPart(el.getLocalName(),
                                                             el.getNamespaceURI(), 
                                                             "Content",
-                                                            WSConstants.PART_TYPE_ELEMENT));
+                                                            WSConstants.PART_TYPE_ELEMENT);
+                            part.setXpath(expression);
+                            result.add(part);
                         } else {
                             WSEncryptionPart encryptedElem = new WSEncryptionPart(el.getLocalName(),
                                                                                   el.getNamespaceURI(),
                                                                                   "Element",
                                                                                   WSConstants
                                                                                       .PART_TYPE_ELEMENT);
+                            encryptedElem.setXpath(expression);
                             String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
                             
                             if (!StringUtils.isEmpty(wsuId)) {
@@ -855,6 +872,36 @@ public abstract class AbstractBindingBuilder {
                             }
                             result.add(encryptedElem);
                         }
+                    }
+                } catch (XPathExpressionException e) {
+                    //REVISIT!!!!
+                }
+            }
+        }
+        if (contentXpaths != null && !contentXpaths.isEmpty()) {
+            XPathFactory factory = XPathFactory.newInstance();
+            for (String expression : contentXpaths) {
+                XPath xpath = factory.newXPath();
+                if (cnamespaces != null) {
+                    xpath.setNamespaceContext(new MapNamespaceContext(cnamespaces));
+                }
+                try {
+                    NodeList list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
+                                                   XPathConstants.NODESET);
+                    for (int x = 0; x < list.getLength(); x++) {
+                        Element el = (Element)list.item(x);
+                        WSEncryptionPart encryptedElem = new WSEncryptionPart(el.getLocalName(),
+                                                                              el.getNamespaceURI(),
+                                                                              "Content",
+                                                                              WSConstants
+                                                                                  .PART_TYPE_ELEMENT);
+                        encryptedElem.setXpath(expression);
+                        String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
+                        
+                        if (!StringUtils.isEmpty(wsuId)) {
+                            encryptedElem.setEncId(wsuId);
+                        }
+                        result.add(encryptedElem);
                     }
                 } catch (XPathExpressionException e) {
                     //REVISIT!!!!
@@ -1535,9 +1582,11 @@ public abstract class AbstractBindingBuilder {
                         Element encHeader = (Element)encDataElem.getParentNode();
                         String encHeaderId = encHeader.getAttributeNS(WSConstants.WSU_NS, "Id");
                         
-                        signedParts.remove(signedPart);
-                        WSEncryptionPart encHeaderToSign = new WSEncryptionPart(encHeaderId);
-                        signedParts.add(encHeaderToSign);
+                        if (!StringUtils.isEmpty(encHeaderId)) {
+                            signedParts.remove(signedPart);
+                            WSEncryptionPart encHeaderToSign = new WSEncryptionPart(encHeaderId);
+                            signedParts.add(encHeaderToSign);
+                        }
                     }
                 }
             }
