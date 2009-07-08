@@ -57,6 +57,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
 
     private static final Logger LOG = LogUtils.getL7dLogger(PhaseInterceptorChain.class); 
 
+    private static final ThreadLocal<Message> CURRENT_MESSAGE = new ThreadLocal<Message>();
     
     private final Map<String, Integer> nameMap;
     private final Phase phases[];
@@ -83,6 +84,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     // to avoid duplicate fault processing on nested calling of
     // doIntercept(), which will throw same fault multi-times
     private boolean faultOccurred;
+    
     
     
     private PhaseInterceptorChain(PhaseInterceptorChain src) {
@@ -137,6 +139,10 @@ public class PhaseInterceptorChain implements InterceptorChain {
             nameMap.put(phase.getName(), idx);
             ++idx;
         }
+    }
+    
+    public static Message getCurrentMessage() {
+        return CURRENT_MESSAGE.get();
     }
     
     // this method should really be on the InterceptorChain interface
@@ -216,71 +222,79 @@ public class PhaseInterceptorChain implements InterceptorChain {
         updateIterator();
         boolean isFineLogging = LOG.isLoggable(Level.FINE);
         pausedMessage = message;
-        while (state == State.EXECUTING && iterator.hasNext()) {
-            try {
-                Interceptor currentInterceptor = iterator.next();
-                if (isFineLogging) {
-                    LOG.fine("Invoking handleMessage on interceptor " + currentInterceptor);
-                }
-                //System.out.println("-----------" + currentInterceptor);
-                currentInterceptor.handleMessage(message);
-            } catch (SuspendedInvocationException ex) {
-                // we need to resume from the same interceptor the exception got originated from
-                if (iterator.hasPrevious()) {
-                    iterator.previous();
-                }
-                pause();
-                throw ex;
-            } catch (RuntimeException ex) {
-                if (!faultOccurred) {
- 
-                    faultOccurred = true;
-                                        
-                    FaultMode mode = message.get(FaultMode.class);
-                    if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
-                        if (LOG.isLoggable(Level.FINE)) { 
-                            LogUtils.log(LOG, Level.FINE,
-                                         "Application has thrown exception, unwinding now", ex);
-                        } else if (LOG.isLoggable(Level.INFO)) {
-                            Throwable t = ex;
-                            if (ex instanceof Fault
-                                && ex.getCause() != null) {
-                                t = ex.getCause();
-                            }                            
-                            
-                            LogUtils.log(LOG, Level.INFO,
-                                         "Application has thrown exception, unwinding now: "
-                                         + t.getClass().getName() 
-                                         + ": " + ex.getMessage());
-                        }
-                    } else if (LOG.isLoggable(Level.INFO)) {
-                        if (mode == FaultMode.UNCHECKED_APPLICATION_FAULT) {
-                            LogUtils.log(LOG, Level.INFO,
-                                         "Application has thrown exception, unwinding now", ex);
-                        } else {
-                            LogUtils.log(LOG, Level.INFO,
-                                         "Interceptor has thrown exception, unwinding now", ex);
-                        }
-                    }
 
-                    message.setContent(Exception.class, ex);
-                    if (message.getExchange() != null) {
-                        message.getExchange().put(Exception.class, ex);
-                    }                    
-                    unwind(message);
-                    
-                    if (faultObserver != null) {
-                        faultObserver.onMessage(message);
+        Message oldMessage = CURRENT_MESSAGE.get();
+        try {
+            CURRENT_MESSAGE.set(message);
+            while (state == State.EXECUTING && iterator.hasNext()) {
+                try {
+                    Interceptor currentInterceptor = iterator.next();
+                    if (isFineLogging) {
+                        LOG.fine("Invoking handleMessage on interceptor " + currentInterceptor);
                     }
-                }
-                state = State.ABORTED;
-            } 
+                    //System.out.println("-----------" + currentInterceptor);
+                    currentInterceptor.handleMessage(message);
+                } catch (SuspendedInvocationException ex) {
+                    // we need to resume from the same interceptor the exception got originated from
+                    if (iterator.hasPrevious()) {
+                        iterator.previous();
+                    }
+                    pause();
+                    throw ex;
+                } catch (RuntimeException ex) {
+                    
+                    if (!faultOccurred) {
+     
+                        faultOccurred = true;
+                                            
+                        FaultMode mode = message.get(FaultMode.class);
+                        if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
+                            if (LOG.isLoggable(Level.FINE)) { 
+                                LogUtils.log(LOG, Level.FINE,
+                                             "Application has thrown exception, unwinding now", ex);
+                            } else if (LOG.isLoggable(Level.INFO)) {
+                                Throwable t = ex;
+                                if (ex instanceof Fault
+                                    && ex.getCause() != null) {
+                                    t = ex.getCause();
+                                }                            
+                                
+                                LogUtils.log(LOG, Level.INFO,
+                                             "Application has thrown exception, unwinding now: "
+                                             + t.getClass().getName() 
+                                             + ": " + ex.getMessage());
+                            }
+                        } else if (LOG.isLoggable(Level.WARNING)) {
+                            if (mode == FaultMode.UNCHECKED_APPLICATION_FAULT) {
+                                LogUtils.log(LOG, Level.WARNING,
+                                             "Application has thrown exception, unwinding now", ex);
+                            } else {
+                                LogUtils.log(LOG, Level.WARNING,
+                                             "Interceptor has thrown exception, unwinding now", ex);
+                            }
+                        }
+    
+                        message.setContent(Exception.class, ex);
+                        if (message.getExchange() != null) {
+                            message.getExchange().put(Exception.class, ex);
+                        }                    
+                        unwind(message);
+                        
+                        if (faultObserver != null) {
+                            faultObserver.onMessage(message);
+                        }
+                    }
+                    state = State.ABORTED;
+                } 
+            }
+            if (state == State.EXECUTING) {
+                state = State.COMPLETE;
+                pausedMessage = null;
+            }
+            return state == State.COMPLETE;
+        } finally {
+            CURRENT_MESSAGE.set(oldMessage);
         }
-        if (state == State.EXECUTING) {
-            state = State.COMPLETE;
-            pausedMessage = null;
-        }
-        return state == State.COMPLETE;
     }
     
     /**
@@ -344,8 +358,12 @@ public class PhaseInterceptorChain implements InterceptorChain {
             }
             try {
                 currentInterceptor.handleFault(message);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e);
+                throw e;
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e); 
+                LOG.log(Level.WARNING, "Exception in handleFault on interceptor " + currentInterceptor, e);
+                throw new RuntimeException(e);
             }
         }
     }
