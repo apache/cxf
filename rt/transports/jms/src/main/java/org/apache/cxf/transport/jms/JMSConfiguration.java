@@ -80,6 +80,7 @@ public class JMSConfiguration implements InitializingBean {
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
+    private boolean enforceSpec = true;
     
     private ConnectionFactory wrappedConnectionFactory;
     
@@ -437,4 +438,11 @@ public class JMSConfiguration implements InitializingBean {
         this.durableSubscriptionClientId = durableSubscriptionClientId;
     }
 
+    public boolean isEnforceSpec() {
+        return enforceSpec;
+    }
+
+    public void setEnforceSpec(boolean enforceSpec) {
+        this.enforceSpec = enforceSpec;
+    }
 }
