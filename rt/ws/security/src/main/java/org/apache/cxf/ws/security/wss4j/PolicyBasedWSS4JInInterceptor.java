@@ -333,6 +333,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                     }
                                 }
                             }
+                            if (!found && "signed".equals(type)) {
+                                for (int x = 0; x < list.getLength(); x++) {
+                                    Element el = (Element)list.item(x);
+                                    for (WSDataRef r : refs) {
+                                        if (r.getName().equals(new QName(el.getNamespaceURI(),
+                                                                     el.getLocalName()))) {
+                                            found = true;
+                                        }
+                                    }
+                                }
+                            }
                             if (!found) {
                                 ai.setNotAsserted("No " + type 
                                                   + " element found matching XPath " + expression);
